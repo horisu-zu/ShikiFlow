@@ -1,0 +1,12 @@
+{
+  "client": {
+    "includes": [
+      "src/main/graphql/**/*.graphql",
+      "src/main/graphql/**/*.yml"
+    ],
+    "service": {
+      "name": "shikimori-api",
+      "url": "https://shikimori.one/api/graphql"
+    }
+  }
+}
