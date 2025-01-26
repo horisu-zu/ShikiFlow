@@ -9,8 +9,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.PullToRefreshState
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,7 +32,7 @@ fun MainPage(
     val pagerState = rememberPagerState { 6 }
     val coroutineScope = rememberCoroutineScope()
     val tabs = listOf(
-        "Watching", "Planned", "Watched",
+        "Watching", "Planned", "Completed",
         "Rewatching", "On Hold", "Dropped"
     )
     var isRefreshing by remember { mutableStateOf(false) }
@@ -61,7 +59,7 @@ fun MainPage(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
-            val status = UserRateMapper.mapStatus(tabs[page])
+            val status = UserRateMapper.mapStringToStatus(tabs[page])
 
             LaunchedEffect(status) {
                 status?.let {

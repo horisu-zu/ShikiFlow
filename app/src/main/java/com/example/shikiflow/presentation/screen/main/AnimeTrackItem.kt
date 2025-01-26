@@ -6,13 +6,10 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -26,6 +23,7 @@ import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
 import com.example.shikiflow.presentation.common.Image
 import com.example.shikiflow.presentation.common.ProgressBar
+import com.example.shikiflow.presentation.common.StatusCard
 
 @Composable
 fun AnimeTrackItem(userRate: AnimeTracksQuery.UserRate) {
@@ -124,20 +122,13 @@ fun AnimeTrackItem(userRate: AnimeTracksQuery.UserRate) {
             }
 
         } else {
-            Card(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(8.dp))
-                    .constrainAs(progressBarRef) {
-                        top.linkTo(dataRef.bottom, margin = 4.dp)
-                        start.linkTo(titleRef.start)
-                    }
-            ) {
-                Text(
-                    text = determineSeason(userRate.animeUserRateWithModel.anime.animeShort.airedOn),
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp)
-                )
-            }
+            StatusCard(
+                text = determineSeason(userRate.animeUserRateWithModel.anime.animeShort.airedOn),
+                modifier = Modifier.constrainAs(progressBarRef) {
+                    top.linkTo(dataRef.bottom, margin = 4.dp)
+                    start.linkTo(titleRef.start)
+                }
+            )
         }
     }
 }

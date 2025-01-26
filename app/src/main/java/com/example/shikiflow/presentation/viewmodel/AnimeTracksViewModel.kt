@@ -7,7 +7,7 @@ import com.example.graphql.type.SortOrderEnum
 import com.example.graphql.type.UserRateOrderFieldEnum
 import com.example.graphql.type.UserRateOrderInputType
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.domain.repository.AnimeRepository
+import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,9 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AnimeTracksViewModel @Inject constructor(
-    private val animeRepository: AnimeRepository
+    private val animeTracksRepository: AnimeTracksRepository
 ): ViewModel() {
-
     private val _userRates = MutableStateFlow<Map<UserRateStatusEnum, List<AnimeTracksQuery.UserRate>>>(
         UserRateStatusEnum.entries.associateWith { emptyList() }
     )
@@ -47,10 +46,6 @@ class AnimeTracksViewModel @Inject constructor(
         status: UserRateStatusEnum,
         isRefresh: Boolean = false
     ) {
-        println("LoadAnimeTracks: status=$status, isRefresh=$isRefresh, " +
-                "isLoading=${_isLoading.value[status]}, " +
-                "hasMorePages=${_hasMorePages.value[status]}")
-
         if (_isLoading.value[status] == true) return
 
         viewModelScope.launch {
@@ -78,7 +73,7 @@ class AnimeTracksViewModel @Inject constructor(
                 }
             }
 
-            val result = animeRepository.getAnimeTracks(
+            val result = animeTracksRepository.getAnimeTracks(
                 page = _currentPages.value[status] ?: 1,
                 status = status,
                 order = UserRateOrderInputType(

@@ -85,6 +85,52 @@ query AnimeDetails(
     }
 }
 
+query animeTracksV2(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $order: OrderEnum = ranked
+    $censored: Boolean
+    $mylist: MylistString
+    $search: String
+) {
+    animes(page: $page, limit: $limit, order: $order, censored: $censored, mylist: $mylist, search: $search) {
+
+        id
+        malId
+        name
+        russian
+        licenseNameRu
+        english
+        japanese
+        synonyms
+        kind
+        rating
+        score
+        status
+        episodes
+        episodesAired
+        duration
+        airedOn { year month day date }
+        releasedOn { year month day date }
+        url
+        season
+
+        poster { ...PosterShort }
+
+        createdAt,
+        updatedAt,
+        nextEpisodeAt,
+        isCensored
+
+        genres { id name russian kind }
+        studios { id name imageUrl }
+
+        userRate {
+            ...AnimeUserRate
+        }
+    }
+}
+
 query animes(
     $page: PositiveInt = 1
     $limit: PositiveInt = 2

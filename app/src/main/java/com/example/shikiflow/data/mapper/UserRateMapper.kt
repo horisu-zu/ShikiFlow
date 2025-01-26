@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.mapper
 
-import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.fragment.AnimeShort
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.AnimeStatusEnum
@@ -8,15 +7,35 @@ import com.example.graphql.type.UserRateStatusEnum
 
 class UserRateMapper {
     companion object {
-        fun mapStatus(tab: String): UserRateStatusEnum? {
+        fun mapStringToStatus(tab: String): UserRateStatusEnum? {
             return mapOf(
                 "Watching" to UserRateStatusEnum.watching,
                 "Planned" to UserRateStatusEnum.planned,
-                "Watched" to UserRateStatusEnum.completed,
+                "Completed" to UserRateStatusEnum.completed,
                 "Rewatching" to UserRateStatusEnum.rewatching,
                 "On Hold" to UserRateStatusEnum.on_hold,
                 "Dropped" to UserRateStatusEnum.dropped
             )[tab]
+        }
+
+        fun mapStatusToString(status: UserRateStatusEnum): String {
+            return when(status) {
+                UserRateStatusEnum.watching -> "Watching"
+                UserRateStatusEnum.planned -> "Planned"
+                UserRateStatusEnum.completed -> "Completed"
+                UserRateStatusEnum.rewatching -> "Rewatching"
+                UserRateStatusEnum.on_hold -> "On Hold"
+                UserRateStatusEnum.dropped -> "Dropped"
+                UserRateStatusEnum.UNKNOWN__ -> "Unknown"
+            }
+        }
+
+        fun isWatched(status: UserRateStatusEnum): Boolean {
+            return setOf(
+                UserRateStatusEnum.watching,
+                UserRateStatusEnum.dropped,
+                UserRateStatusEnum.on_hold
+            ).contains(status)
         }
 
         fun mapAnimeStatus(status: AnimeStatusEnum?): String {

@@ -2,28 +2,33 @@ package com.example.shikiflow.domain.repository
 
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
-import com.example.graphql.AnimeTracksQuery
-import com.example.graphql.type.UserRateOrderInputType
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.graphql.AnimeTracksV2Query
+import com.example.graphql.AnimesQuery
+import com.example.graphql.type.OrderEnum
 import com.example.shikiflow.data.anime.AnimeResponse
+import com.example.shikiflow.data.anime.MyListString
+import com.example.shikiflow.data.anime.toGraphQLValue
 import javax.inject.Inject
 
 class AnimeRepository @Inject constructor(
     private val apolloClient: ApolloClient
 ) {
-    suspend fun getAnimeTracks(
+
+    suspend fun searchAnimeTracks(
+        name: String,
         page: Int = 1,
         limit: Int = 20,
-        userId: String? = null,
-        status: UserRateStatusEnum? = null,
-        order: UserRateOrderInputType? = null
+        userStatus: MyListString? = null,
+        order: OrderEnum? = null
     ): Result<AnimeResponse> {
-        val query = AnimeTracksQuery(
+        val query = AnimeTracksV2Query(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
-            userId = Optional.presentIfNotNull(userId),
-            status = Optional.presentIfNotNull(status),
-            order = Optional.presentIfNotNull(order)
+            search = Optional.presentIfNotNull(name),
+            mylist = userStatus?.let { Optional.present(it.toGraphQLValue()) }
+                ?: Optional.present(MyListString.entries.joinToString(",") { it.toGraphQLValue() }),
+            order = Optional.presentIfNotNull(order),
+            censored = Optional.presentIfNotNull(true)
         )
 
         return try {
@@ -31,8 +36,8 @@ class AnimeRepository @Inject constructor(
             response.data?.let {
                 Result.success(
                     AnimeResponse(
-                        userRates = it.userRates,
-                        hasNextPage = it.userRates.size >= limit
+                        animeList = it.animes,
+                        hasNextPage = it.animes.size >= limit
                     )
                 )
             } ?: Result.failure(Exception("No data"))

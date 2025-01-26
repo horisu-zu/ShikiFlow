@@ -20,7 +20,7 @@ import coil3.request.crossfade
 
 @Composable
 fun Image(
-    model: Any?,
+    model: String?,
     contentDescription: String?,
     modifier: Modifier = Modifier
 ) {
