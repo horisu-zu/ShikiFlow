@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.screen.main.MainScreen
+import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -65,7 +66,7 @@ fun NavigationGraph(navController: NavHostController, modifier: Modifier = Modif
     NavHost(navController, startDestination = BottomNavItem.Home.route, modifier = modifier) {
         composable(BottomNavItem.Home.route) { MainScreen() }
         composable(BottomNavItem.Browse.route) { TestScreen() }
-        composable(BottomNavItem.More.route) { /*ProfileScreen()*/ }
+        composable(BottomNavItem.More.route) { MoreScreenNavigator(mainNavController = navController) }
     }
 }
 

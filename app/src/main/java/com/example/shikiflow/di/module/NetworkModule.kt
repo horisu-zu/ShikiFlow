@@ -3,12 +3,11 @@ package com.example.shikiflow.di.module
 import android.content.Context
 import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.network.okHttpClient
 import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
+import com.example.shikiflow.di.api.UserApi
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
 import com.example.shikiflow.domain.auth.TokenManager
@@ -23,6 +22,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.hilt.android.qualifiers.ApplicationContext
+import retrofit2.create
 import javax.inject.Singleton
 
 @Module
@@ -85,4 +85,9 @@ class NetworkModule {
             }
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideUserApi(@MainRetrofit retrofit: Retrofit): UserApi =
+        retrofit.create()
 }

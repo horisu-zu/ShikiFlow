@@ -23,12 +23,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.presentation.viewmodel.AnimeTracksSearchViewModel
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
@@ -36,9 +37,7 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 @Composable
 fun SearchPage(
     searchViewModel: SearchViewModel = hiltViewModel(),
-    tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel(),
-    selectedTab: Int,
-    onTabSelected: (Int) -> Unit
+    tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel()
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
     val searchResults by tracksViewModel.searchResults.collectAsState()
@@ -46,7 +45,9 @@ fun SearchPage(
     val hasMorePages by tracksViewModel.searchHasMorePages.collectAsState()
     val chips = listOf("All", "Watching", "Planned", "Watched", "Rewatching", "On Hold", "Dropped")
 
-    val selectedStatus = when (chips[selectedTab]) {
+    var selectedTabSearch by remember { mutableStateOf(0) }
+
+    val selectedStatus = when (chips[selectedTabSearch]) {
         "Watching" -> MyListString.WATCHING
         "Planned" -> MyListString.PLANNED
         "Rewatching" -> MyListString.REWATCHING
@@ -62,7 +63,7 @@ fun SearchPage(
         }
     }
 
-    LaunchedEffect(searchQuery.query, selectedTab) {
+    LaunchedEffect(searchQuery.query, selectedTabSearch) {
         if (searchQuery.query.isNotEmpty()) {
             tracksViewModel.searchAnimeTracks(
                 name = searchQuery.query,
@@ -82,12 +83,10 @@ fun SearchPage(
         ) {
             items(chips) { tab ->
                 FilterChip(
-                    selected = chips[selectedTab] == tab,
-                    onClick = {
-                        onTabSelected(chips.indexOf(tab))
-                    },
+                    selected = chips[selectedTabSearch] == tab,
+                    onClick = { selectedTabSearch = chips.indexOf(tab) },
                     label = { Text(tab) },
-                    leadingIcon = if (chips[selectedTab] == tab) {
+                    leadingIcon = if (chips[selectedTabSearch] == tab) {
                         {
                             Icon(
                                 imageVector = Icons.Filled.Done,
@@ -105,7 +104,6 @@ fun SearchPage(
         Box(modifier = Modifier.fillMaxSize()) {
             val isCurrentStatusSearching = isSearching[selectedStatus] == true
 
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(vertical = 12.dp),
@@ -115,7 +113,7 @@ fun SearchPage(
 
                 items(items.size) { index ->
                     val userRate = items[index]
-                    SearchAnimeTrackItem(userRate, userStatus = selectedStatus)
+                    SearchAnimeTrackItem(userRate)
 
                     if (index >= items.size - 5 && shouldLoadMore.value) {
                         LaunchedEffect(selectedStatus) {

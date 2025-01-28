@@ -3,9 +3,7 @@ package com.example.shikiflow.presentation.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.AnimeTracksV2Query
-import com.example.graphql.AnimesQuery
 import com.example.graphql.type.OrderEnum
-import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.domain.repository.AnimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

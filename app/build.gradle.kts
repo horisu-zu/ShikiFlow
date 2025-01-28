@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.apollo)
     kotlin("kapt")
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -97,6 +98,7 @@ dependencies {
     implementation (libs.retrofit)
     implementation (libs.converter.gson)
     implementation(libs.kotlinx.datetime)
+    implementation (libs.androidx.navigation.compose)
 
     //Hilt
     implementation(libs.hilt.android)

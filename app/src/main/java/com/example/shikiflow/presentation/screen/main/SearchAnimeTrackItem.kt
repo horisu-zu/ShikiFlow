@@ -16,11 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeTracksV2Query
-import com.example.graphql.AnimesQuery
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.anime.MyListString
-import com.example.shikiflow.data.anime.toReadableString
-import com.example.shikiflow.data.anime.toUserRateStatusEnum
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.isWatched
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.presentation.common.Image
@@ -29,8 +25,7 @@ import com.example.shikiflow.utils.StatusColor
 
 @Composable
 fun SearchAnimeTrackItem(
-    animeItem: AnimeTracksV2Query.Anime,
-    userStatus: MyListString?
+    animeItem: AnimeTracksV2Query.Anime
 ) {
     ConstraintLayout(
         modifier = Modifier

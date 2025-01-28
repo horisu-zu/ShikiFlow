@@ -1,13 +1,13 @@
 [versions]
-agp = "8.5.2"
-apollo = "4.0.1"
+agp = "8.8.0"
+apollo = "4.1.0"
 browser = "1.8.0"
 coil = "3.0.4"
 coilCompose = "3.0.4"
 constraintlayoutCompose = "1.1.0"
 converterGson = "2.9.0"
 datastorePreferences = "1.1.2"
-kotlin = "1.9.0"
+kotlin = "2.0.21"
 coreKtx = "1.15.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -17,6 +17,7 @@ kotlinxSerializationJsonVersion = "1.6.2"
 lifecycleRuntimeKtx = "2.8.7"
 activityCompose = "1.10.0"
 composeBom = "2025.01.00"
+navigationCompose = "2.8.5"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
 hilt = "2.50"
@@ -27,6 +28,7 @@ kotlin-serialization = "1.9.0"
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
@@ -59,6 +61,7 @@ apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.r
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin-serialization" }
 apollo = { id = "com.apollographql.apollo", version.ref = "apollo" }

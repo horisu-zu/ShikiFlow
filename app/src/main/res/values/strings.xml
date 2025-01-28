@@ -1,3 +1,12 @@
 <resources>
     <string name="app_name">ShikiFlow</string>
+
+    <string name="status_online">Online</string>
+    <string name="status_now">Last seen — just now</string>
+    <string name="status_minute_ago">Last seen — %1$d minute ago</string>
+    <string name="status_minutes_ago">Last seen — %1$d minutes ago</string>
+    <string name="status_hour_ago">Last seen — %1$d hour ago</string>
+    <string name="status_hours_ago">Last seen — %1$d hours ago</string>
+    <string name="status_hours_ago_v2">Last seen — %1$d hours ago</string>
+    <string name="status_days">Last seen on — %1$s</string>
 </resources>

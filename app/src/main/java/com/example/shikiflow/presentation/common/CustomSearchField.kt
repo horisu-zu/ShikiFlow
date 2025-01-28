@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,14 +50,15 @@ fun CustomSearchField(
             .clip(RoundedCornerShape(16.dp))
             .background(
                 if(isActive) MaterialTheme.colorScheme.background
-                else MaterialTheme.colorScheme.surface
-            ),
+                    else MaterialTheme.colorScheme.surface
+            )
     ) {
         Row(
             modifier = Modifier
                 .height(48.dp)
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Box(
                 modifier = Modifier.size(24.dp),

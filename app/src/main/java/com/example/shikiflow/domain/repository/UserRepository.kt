@@ -2,10 +2,15 @@ package com.example.shikiflow.domain.repository
 
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.data.anime.ShortAnimeRate
+import com.example.shikiflow.data.user.TargetType
+import com.example.shikiflow.data.user.UserHistoryResponse
+import com.example.shikiflow.di.api.UserApi
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(
-    private val apolloClient: ApolloClient
+    private val apolloClient: ApolloClient,
+    private val userApi: UserApi
 ) {
 
     suspend fun fetchCurrentUser(): Result<CurrentUserQuery.Data> {
@@ -24,5 +29,37 @@ class UserRepository @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    suspend fun getUserHistory(
+        userId: Long,
+        page: Int? = null,
+        limit: Int? = null,
+        targetId: Long? = null,
+        targetType: TargetType? = null
+    ): Result<List<UserHistoryResponse>> = runCatching {
+        userApi.getUserHistory(
+            userId = userId,
+            page = page,
+            limit = limit,
+            targetId = targetId,
+            targetType = targetType?.name
+        )
+    }
+
+    suspend fun getUserAnimeRates(
+        userId: Long,
+        page: Int? = null,
+        limit: Int? = null,
+        status: String? = null,
+        censored: Boolean? = true
+    ): Result<List<ShortAnimeRate>> = runCatching {
+        userApi.getUserAnimeRates(
+            userId = userId,
+            page = page,
+            limit = limit,
+            status = status,
+            censored = censored
+        )
     }
 }

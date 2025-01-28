@@ -1,9 +1,8 @@
-package com.example.shikiflow.presentation.viewmodel
+package com.example.shikiflow.presentation.viewmodel.user
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.apollographql.apollo.ApolloClient
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

@@ -26,9 +26,12 @@ import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
 
 @Composable
-fun AnimeTrackItem(userRate: AnimeTracksQuery.UserRate) {
+fun AnimeTrackItem(
+    userRate: AnimeTracksQuery.UserRate,
+    modifier: Modifier = Modifier
+) {
     ConstraintLayout(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 12.dp, end = 24.dp)
     ) {
@@ -105,8 +108,8 @@ fun AnimeTrackItem(userRate: AnimeTracksQuery.UserRate) {
             Column(
                 modifier = Modifier.constrainAs(progressBarRef) {
                     top.linkTo(dataRef.bottom, margin = 4.dp)
-                    start.linkTo(titleRef.start)
-                    end.linkTo(titleRef.end)
+                    start.linkTo(dataRef.start)
+                    end.linkTo(dataRef.end)
                 }
             ) {
                 ProgressBar(
@@ -126,7 +129,7 @@ fun AnimeTrackItem(userRate: AnimeTracksQuery.UserRate) {
                 text = determineSeason(userRate.animeUserRateWithModel.anime.animeShort.airedOn),
                 modifier = Modifier.constrainAs(progressBarRef) {
                     top.linkTo(dataRef.bottom, margin = 4.dp)
-                    start.linkTo(titleRef.start)
+                    start.linkTo(dataRef.start)
                 }
             )
         }

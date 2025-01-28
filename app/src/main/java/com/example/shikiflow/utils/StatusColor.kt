@@ -8,6 +8,17 @@ object StatusColor {
     fun getStatusColor(status: Any): Color = when(status) {
         is UserRateStatusEnum -> getColorForUserRateStatus(status)
         is MyListString -> getColorForMyListStatus(status)
+        is String -> getColorForString(status)
+        else -> Color(0xFF8C8C8C)
+    }
+
+    private fun getColorForString(status: String): Color = when (status.lowercase()) {
+        "watching" -> Color(0xFF8F4FA8)
+        "planned" -> Color(0xFFA89F4F)
+        "rewatching" -> Color(0xFF4FA8A8)
+        "completed" -> Color(0xFF4FA85A)
+        "on_hold" -> Color(0xFF4F6FA8)
+        "dropped" -> Color(0xFFA8524F)
         else -> Color(0xFF8C8C8C)
     }
 
