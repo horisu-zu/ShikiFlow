@@ -3,8 +3,10 @@ package com.example.shikiflow.domain.repository
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.data.anime.ShortAnimeRate
+import com.example.shikiflow.data.manga.ShortMangaRate
 import com.example.shikiflow.data.user.TargetType
 import com.example.shikiflow.data.user.UserHistoryResponse
+import com.example.shikiflow.data.user.UserRate
 import com.example.shikiflow.di.api.UserApi
 import javax.inject.Inject
 
@@ -59,6 +61,40 @@ class UserRepository @Inject constructor(
             page = page,
             limit = limit,
             status = status,
+            censored = censored
+        )
+    }
+
+    suspend fun getUserMangaRates(
+        userId: Long,
+        page: Int? = null,
+        limit: Int? = null,
+        status: String? = null,
+        censored: Boolean? = true
+    ): Result<List<ShortMangaRate>> = runCatching {
+        userApi.getUserMangaRates(
+            userId = userId,
+            page = page,
+            limit = limit,
+            status = status,
+            censored = censored
+        )
+    }
+
+    suspend fun getUserRates(
+        userId: Long,
+        page: Int? = null,
+        limit: Int? = null,
+        status: String? = null,
+        targetType: String? = null,
+        censored: Boolean? = true
+    ): Result<List<UserRate>> = runCatching {
+        userApi.getUserRates(
+            userId = userId,
+            page = page,
+            limit = limit,
+            status = status,
+            targetType = targetType,
             censored = censored
         )
     }

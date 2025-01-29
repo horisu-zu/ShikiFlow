@@ -21,12 +21,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.utils.StatusColor.getStatusColor
+import com.example.shikiflow.utils.Converter
+import com.example.shikiflow.utils.StatusColor
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SegmentedProgressBar(
-    groupedData: Map<String?, Int>,
+    groupedData: Map<String, Int>,
     totalCount: Int,
     modifier: Modifier = Modifier
 ) {
@@ -46,7 +47,7 @@ fun SegmentedProgressBar(
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 },
-            horizontalArrangement = Arrangement.Start
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             groupedData.forEach { (status, count) ->
                 val progress = count.toFloat() / totalCount
@@ -55,7 +56,7 @@ fun SegmentedProgressBar(
                         .weight(progress)
                         .fillMaxHeight()
                         .background(
-                            color = getStatusColor(status ?: "")
+                            color = StatusColor.getAnimeStatusBrightColor(status)
                         )
                 )
             }
@@ -64,19 +65,19 @@ fun SegmentedProgressBar(
         FlowRow(
             modifier = Modifier
                 .constrainAs(dataRef) {
-                    top.linkTo(progressBarRef.bottom, margin = 8.dp)
+                    top.linkTo(progressBarRef.bottom, margin = 12.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints
                 },
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             groupedData.forEach { (status, count) ->
                 SegmentedDataItem(
-                    status = status ?: "",
+                    status = Converter.convertStatus(status),
                     count = count,
-                    color = getStatusColor(status ?: "")
+                    color = StatusColor.getAnimeStatusBrightColor(status)
                 )
             }
         }

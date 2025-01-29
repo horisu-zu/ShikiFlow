@@ -2,7 +2,9 @@ package com.example.shikiflow.presentation.screen.main
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
@@ -28,13 +30,15 @@ fun MainTabRow(
             Box(
                 Modifier
                     .tabIndicatorOffset(tabPositions[selectedTab])
+                    .padding(horizontal = 16.dp)
                     .height(2.dp)
                     .background(
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)
                     )
             )
-        }
+        },
+        divider = {}
     ) {
         tabs.forEachIndexed { index, title ->
             Tab(

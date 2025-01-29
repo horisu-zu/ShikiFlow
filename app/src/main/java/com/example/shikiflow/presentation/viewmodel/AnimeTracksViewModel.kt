@@ -46,7 +46,7 @@ class AnimeTracksViewModel @Inject constructor(
         status: UserRateStatusEnum,
         isRefresh: Boolean = false
     ) {
-        if (_isLoading.value[status] == true) return
+        if (_isLoading.value[status] == true || _hasMorePages.value[status] == false) return
 
         viewModelScope.launch {
             _isLoading.update {

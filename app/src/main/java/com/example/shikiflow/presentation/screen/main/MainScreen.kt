@@ -18,13 +18,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
-import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    userViewModel: UserViewModel = hiltViewModel(),
+    currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
     val pagerState = rememberPagerState { 6 }
@@ -36,7 +36,6 @@ fun MainScreen(
             stiffness = Spring.StiffnessVeryLow
         )
     )
-    val currentUser by userViewModel.currentUserData.collectAsState()
     val screenState by searchViewModel.screenState.collectAsState()
 
     Scaffold(

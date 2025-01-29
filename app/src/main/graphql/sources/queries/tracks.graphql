@@ -17,6 +17,25 @@ query AnimeTracks(
     }
 }
 
+query ShortAnimeTracks(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $userId: ID
+    $status: UserRateStatusEnum
+    $order: UserRateOrderInputType
+) {
+    userRates(
+        page: $page,
+        limit: $limit,
+        targetType: Anime,
+        status: $status,
+        userId: $userId,
+        order: $order
+    ) {
+        ...AnimeUserRate
+    }
+}
+
 query MangaTracks(
     $page: PositiveInt = 1
     $limit: PositiveInt = 2
@@ -33,5 +52,24 @@ query MangaTracks(
         order: $order
     ) {
         ...MangaUserRateWithModel
+    }
+}
+
+query ShortMangaTracks(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $userId: ID
+    $status: UserRateStatusEnum
+    $order: UserRateOrderInputType
+) {
+    userRates(
+        page: $page,
+        limit: $limit,
+        targetType: Manga,
+        status: $status,
+        userId: $userId,
+        order: $order
+    ) {
+        ...MangaUserRate
     }
 }

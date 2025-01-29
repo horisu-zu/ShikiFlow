@@ -3,18 +3,29 @@ package com.example.shikiflow.presentation.screen
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
 @Composable
 fun MainNavigator(
-    parentNavController: NavController
+    parentNavController: NavController,
+    userViewModel: UserViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
+    val currentUser by userViewModel.currentUserData.collectAsState()
+
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
-        NavigationGraph(navController = navController, modifier = Modifier.padding(innerPadding))
+        NavigationGraph(
+            currentUser = currentUser,
+            navController = navController,
+            modifier = Modifier.padding(innerPadding)
+        )
     }
 }

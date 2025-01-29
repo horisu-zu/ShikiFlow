@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -28,7 +29,7 @@ fun AnimeTracksPage(
     val userRates by trackViewModel.userRates.collectAsState()
     val isLoading by trackViewModel.isLoading.collectAsState()
     val hasMorePages by trackViewModel.hasMorePages.collectAsState()
-    val shouldLoadMore = remember {
+    val shouldLoadMore = remember(status) {
         derivedStateOf {
             hasMorePages[status] == true && isLoading[status] != true
         }

@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.user
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -18,7 +19,8 @@ data class Target(
     val released_on: String?
 )
 
+@Serializable
 enum class TargetType {
-    Anime,
-    Manga
+    @SerialName("Anime") ANIME,
+    @SerialName("Manga") MANGA
 }

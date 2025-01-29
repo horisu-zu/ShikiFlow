@@ -71,7 +71,7 @@ fun SearchAnimeTrackItem(
         ) {
             StatusCard(
                 text = mapStatusToString(animeItem.userRate?.animeUserRate?.status ?: UserRateStatusEnum.UNKNOWN__),
-                color = animeItem.userRate?.animeUserRate?.status?.let { StatusColor.getStatusColor(it) } ?: Color(0xFF8C8C8C)
+                color = animeItem.userRate?.animeUserRate?.status?.let { StatusColor.getAnimeStatusColor(it) } ?: Color(0xFF8C8C8C)
             )
             if(isWatched(animeItem.userRate?.animeUserRate?.status ?: UserRateStatusEnum.UNKNOWN__)) {
                 StatusCard(

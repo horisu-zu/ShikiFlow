@@ -9,25 +9,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shikiflow.R
-import com.example.shikiflow.data.anime.ShortAnimeRate
+import com.example.shikiflow.data.user.TargetType
+import com.example.shikiflow.data.user.UserRate
+import com.example.shikiflow.data.user.UserRateContentType
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.common.TypeItem
+import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.IconResource
 
 @Composable
 fun TrackSection(
-    animeTrackData: List<ShortAnimeRate?>,
+    userRateData: List<UserRate?>,
     modifier: Modifier = Modifier
 ) {
-    val groupedData = animeTrackData
-        .groupBy { it?.status }
-        .mapValues { it.value.size }
-    val itemsCount = animeTrackData.size
+    val animeTrackData = userRateData.filter { it?.targetType == TargetType.ANIME }
+    val mangaTrackData = userRateData.filter { it?.targetType == TargetType.MANGA }
+
+    val animeItemsCount = animeTrackData.size
+    val groupedAnimeData = animeTrackData.groupAndSortByStatus(UserRateContentType.ANIME) { it?.status }
+
+    val mangaItemsCount = mangaTrackData.size
+    val groupedMangaData = mangaTrackData.groupAndSortByStatus(UserRateContentType.MANGA) { it?.status }
 
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (titleRef, typeRef, progressBarRef, statusRow) = createRefs()
+        val (titleRef, animeDataRef, animeProgressRef, mangaDataRef, mangaProgressRef) = createRefs()
 
         Text(
             text = "Lists",
@@ -42,18 +49,38 @@ fun TrackSection(
         TypeItem(
             icon = IconResource.Drawable(R.drawable.ic_anime),
             type = "Anime",
-            count = itemsCount.toString(),
-            modifier = Modifier.constrainAs(typeRef) {
-                top.linkTo(titleRef.bottom, margin = 4.dp)
+            count = animeItemsCount.toString(),
+            modifier = Modifier.constrainAs(animeDataRef) {
+                top.linkTo(titleRef.bottom, margin = 6.dp)
                 start.linkTo(parent.start)
             }
         )
 
         SegmentedProgressBar(
-            groupedData = groupedData,
-            totalCount = itemsCount,
-            modifier = Modifier.constrainAs(progressBarRef) {
-                top.linkTo(typeRef.bottom, margin = 12.dp)
+            groupedData = groupedAnimeData,
+            totalCount = animeItemsCount,
+            modifier = Modifier.constrainAs(animeProgressRef) {
+                top.linkTo(animeDataRef.bottom, margin = 12.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+            }
+        )
+
+        TypeItem(
+            icon = IconResource.Drawable(R.drawable.ic_manga),
+            type = "Manga & Ranobe",
+            count = mangaItemsCount.toString(),
+            modifier = Modifier.constrainAs(mangaDataRef) {
+                top.linkTo(animeProgressRef.bottom, margin = 12.dp)
+                start.linkTo(parent.start)
+            }
+        )
+
+        SegmentedProgressBar(
+            groupedData = groupedMangaData,
+            totalCount = mangaItemsCount,
+            modifier = Modifier.constrainAs(mangaProgressRef) {
+                top.linkTo(mangaDataRef.bottom, margin = 12.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
             }

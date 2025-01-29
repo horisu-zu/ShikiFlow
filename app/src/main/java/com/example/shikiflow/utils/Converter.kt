@@ -2,6 +2,10 @@ package com.example.shikiflow.utils
 
 import android.content.Context
 import com.example.shikiflow.R
+import com.example.shikiflow.data.user.UserRateContentType
+import com.example.shikiflow.data.user.animeStatusOrder
+import com.example.shikiflow.data.user.animeToMangaStatusMap
+import com.example.shikiflow.data.user.mangaStatusOrder
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -14,7 +18,8 @@ object Converter {
     fun formatInstant(lastSeenInstant: Instant?): String {
         return lastSeenInstant?.let { instant ->
             val date = Date(instant.toEpochMilliseconds())
-            val currentYear = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
+            val currentYear =
+                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
             val instantYear = instant.toLocalDateTime(TimeZone.currentSystemDefault()).year
 
             val pattern = if (instantYear == currentYear) {
@@ -63,5 +68,49 @@ object Converter {
                 context.getString(R.string.status_days, formattedDate)
             }
         }
+    }
+
+    fun convertStatus(status: String): String {
+        return when (status) {
+            "watching" -> "Watching"
+            "completed" -> "Completed"
+            "on_hold" -> "On Hold"
+            "dropped" -> "Dropped"
+            "planned" -> "Planned"
+            "rewatching" -> "Rewatching"
+            "reading" -> "Reading"
+            "rereading" -> "Rereading"
+            else -> "Unknown"
+        }
+    }
+
+    fun <T> List<T>.groupAndSortByStatus(
+        contentType: UserRateContentType,
+        statusExtractor: (T) -> String?
+    ): Map<String, Int> {
+        val order = when (contentType) {
+            UserRateContentType.ANIME -> animeStatusOrder
+            UserRateContentType.MANGA -> mangaStatusOrder
+        }
+
+        return this
+            .groupBy { item ->
+                val status = statusExtractor(item)?.lowercase() ?: ""
+                getStatusKey(contentType, status)
+            }
+            .mapValues { it.value.size }
+            .toList()
+            .sortedBy { (status, _) -> order.indexOf(status) }
+            .toMap()
+    }
+
+    private fun getStatusKey(contentType: UserRateContentType, status: String): String {
+        return when (contentType) {
+            UserRateContentType.ANIME -> animeStatusOrder.firstOrNull { it == status }
+            UserRateContentType.MANGA -> {
+                val mappedStatus = animeToMangaStatusMap[status] ?: status
+                mangaStatusOrder.firstOrNull { it == mappedStatus }
+            }
+        } ?: "unknown"
     }
 }

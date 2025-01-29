@@ -1,10 +1,10 @@
 # ShikiFlow
-Shikimori Mobile App
+[Shikimori](https://shikimori.one/) Mobile App
 
 Work-in-progress
 
 ## About the Project
-ShikiFlow is a work-in-progress mobile app that provides a comprehensive experience for users of the Shikimori anime/manga community platform. 
+ShikiFlow is a mobile app that provides a comprehensive experience for users of the Shikimori anime/manga community platform. 
 
 ## Tech Stack
 Kotlin - Jetpack Compose - MVVM - Hilt - GraphQL (Apollo) - Coil

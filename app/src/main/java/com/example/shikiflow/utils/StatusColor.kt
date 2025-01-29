@@ -5,11 +5,23 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.anime.MyListString
 
 object StatusColor {
-    fun getStatusColor(status: Any): Color = when(status) {
+    fun getAnimeStatusColor(status: Any): Color = when(status) {
         is UserRateStatusEnum -> getColorForUserRateStatus(status)
         is MyListString -> getColorForMyListStatus(status)
         is String -> getColorForString(status)
         else -> Color(0xFF8C8C8C)
+    }
+
+    fun getAnimeStatusBrightColor(status: String): Color = when (status.lowercase()) {
+        "watching" -> Color(0xFFAE62CF)
+        "reading" -> Color(0xFFAE62CF)
+        "planned" -> Color(0xFFD4C862)
+        "rewatching" -> Color(0xFF62CFCF)
+        "rereading" -> Color(0xFF62CFCF)
+        "completed" -> Color(0xFF62CF71)
+        "on_hold" -> Color(0xFF628ACF)
+        "dropped" -> Color(0xFFCF6562)
+        else -> Color(0xFFADADAD)
     }
 
     private fun getColorForString(status: String): Color = when (status.lowercase()) {

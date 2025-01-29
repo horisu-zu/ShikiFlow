@@ -33,23 +33,24 @@ import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.CircleShapeButton
-import com.example.shikiflow.presentation.viewmodel.user.UserRateViewModel
+import com.example.shikiflow.presentation.viewmodel.user.AnimeUserRateViewModel
 import com.example.shikiflow.utils.IconResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    userRateViewModel: UserRateViewModel = hiltViewModel(),
+    userRateViewModel: AnimeUserRateViewModel = hiltViewModel(),
     currentUser: CurrentUserQuery.Data?,
     navController: NavController
 ) {
     val context = LocalContext.current
 
-    val userAnimeTrackData = userRateViewModel.userAnimeTrackData.collectAsState()
+    val isLoading = userRateViewModel.isLoading.collectAsState()
+    val userRateData = userRateViewModel.userRateData.collectAsState()
 
     LaunchedEffect(Unit) {
         currentUser?.currentUser?.id?.toLong()
-            ?.let { userRateViewModel.loadUserAnimeRates(userId = it) }
+            ?.let { userRateViewModel.loadUserRates(userId = it) }
     }
 
     Scaffold(
@@ -80,7 +81,7 @@ fun ProfileScreen(
             )
         }
     ) { paddingValues ->
-        if(userAnimeTrackData.value.isEmpty()) {
+        if(isLoading.value) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -138,7 +139,7 @@ fun ProfileScreen(
                 }
 
                 TrackSection(
-                    animeTrackData = userAnimeTrackData.value,
+                    userRateData = userRateData.value,
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 12.dp)
                         .constrainAs(listsBlock) {
