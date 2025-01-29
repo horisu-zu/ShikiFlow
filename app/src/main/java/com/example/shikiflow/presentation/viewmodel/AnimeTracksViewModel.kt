@@ -40,13 +40,17 @@ class AnimeTracksViewModel @Inject constructor(
         UserRateStatusEnum.entries.associateWith { 1 }
     )
 
+    private val _initializedStatuses = mutableSetOf<UserRateStatusEnum>()
+    val initializedStatuses: Set<UserRateStatusEnum> get() = _initializedStatuses
+
     private val _loadedStatuses = MutableStateFlow<Set<UserRateStatusEnum>>(emptySet())
 
     fun loadAnimeTracks(
         status: UserRateStatusEnum,
         isRefresh: Boolean = false
     ) {
-        if (_isLoading.value[status] == true || _hasMorePages.value[status] == false) return
+        if (_isLoading.value[status] == true ||
+            (!isRefresh && _initializedStatuses.contains(status))) return
 
         viewModelScope.launch {
             _isLoading.update {
@@ -118,6 +122,8 @@ class AnimeTracksViewModel @Inject constructor(
                     }
                 }
             }
+
+            if (!isRefresh) _initializedStatuses.add(status)
 
             _isLoading.update {
                 it.toMutableMap().apply {
