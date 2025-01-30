@@ -23,7 +23,7 @@ fun TypeItem(
     icon: IconResource,
     type: String,
     modifier: Modifier = Modifier,
-    count: String? = null,
+    count: Int? = null,
 ) {
     ConstraintLayout(
         modifier = modifier
@@ -74,7 +74,7 @@ fun TypeItem(
 
         count?.let {
             Text(
-                text = count,
+                text = count.toString(),
                 style = MaterialTheme.typography.bodySmall,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),

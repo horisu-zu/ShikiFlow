@@ -40,9 +40,6 @@ class AnimeTracksViewModel @Inject constructor(
         UserRateStatusEnum.entries.associateWith { 1 }
     )
 
-    private val _initializedStatuses = mutableSetOf<UserRateStatusEnum>()
-    val initializedStatuses: Set<UserRateStatusEnum> get() = _initializedStatuses
-
     private val _loadedStatuses = MutableStateFlow<Set<UserRateStatusEnum>>(emptySet())
 
     fun loadAnimeTracks(
@@ -50,7 +47,7 @@ class AnimeTracksViewModel @Inject constructor(
         isRefresh: Boolean = false
     ) {
         if (_isLoading.value[status] == true ||
-            (!isRefresh && _initializedStatuses.contains(status))) return
+            (_loadedStatuses.value.contains(status) && !isRefresh && _hasMorePages.value[status] != true)) return
 
         viewModelScope.launch {
             _isLoading.update {
@@ -80,6 +77,7 @@ class AnimeTracksViewModel @Inject constructor(
             val result = animeTracksRepository.getAnimeTracks(
                 page = _currentPages.value[status] ?: 1,
                 status = status,
+                limit = 20,
                 order = UserRateOrderInputType(
                     field = UserRateOrderFieldEnum.updated_at,
                     order = SortOrderEnum.desc
@@ -122,8 +120,6 @@ class AnimeTracksViewModel @Inject constructor(
                     }
                 }
             }
-
-            if (!isRefresh) _initializedStatuses.add(status)
 
             _isLoading.update {
                 it.toMutableMap().apply {

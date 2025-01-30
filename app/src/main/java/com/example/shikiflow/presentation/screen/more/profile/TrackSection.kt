@@ -34,7 +34,7 @@ fun TrackSection(
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (titleRef, animeDataRef, animeProgressRef, mangaDataRef, mangaProgressRef) = createRefs()
+        val (titleRef, animeDataRef, mangaDataRef) = createRefs()
 
         Text(
             text = "Lists",
@@ -46,43 +46,25 @@ fun TrackSection(
             }
         )
 
-        TypeItem(
-            icon = IconResource.Drawable(R.drawable.ic_anime),
+        TrackItem(
+            iconResource = IconResource.Drawable(R.drawable.ic_anime),
             type = "Anime",
-            count = animeItemsCount.toString(),
+            groupedData = groupedAnimeData,
+            itemsCount = animeItemsCount,
             modifier = Modifier.constrainAs(animeDataRef) {
-                top.linkTo(titleRef.bottom, margin = 6.dp)
+                top.linkTo(titleRef.bottom, margin = 12.dp)
                 start.linkTo(parent.start)
             }
         )
 
-        SegmentedProgressBar(
-            groupedData = groupedAnimeData,
-            totalCount = animeItemsCount,
-            modifier = Modifier.constrainAs(animeProgressRef) {
+        TrackItem(
+            iconResource = IconResource.Drawable(R.drawable.ic_manga),
+            type = "Manga & Ranobe",
+            groupedData = groupedMangaData,
+            itemsCount = mangaItemsCount,
+            modifier = Modifier.constrainAs(mangaDataRef) {
                 top.linkTo(animeDataRef.bottom, margin = 12.dp)
                 start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        )
-
-        TypeItem(
-            icon = IconResource.Drawable(R.drawable.ic_manga),
-            type = "Manga & Ranobe",
-            count = mangaItemsCount.toString(),
-            modifier = Modifier.constrainAs(mangaDataRef) {
-                top.linkTo(animeProgressRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-            }
-        )
-
-        SegmentedProgressBar(
-            groupedData = groupedMangaData,
-            totalCount = mangaItemsCount,
-            modifier = Modifier.constrainAs(mangaProgressRef) {
-                top.linkTo(mangaDataRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
             }
         )
     }
