@@ -18,14 +18,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.shikiflow.data.mapper.UserRateMapper
-import com.example.shikiflow.presentation.viewmodel.AnimeTracksViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
+    mainNavController: NavController,
     pagerState: PagerState,
     trackViewModel: AnimeTracksViewModel = hiltViewModel()
 ) {
@@ -85,6 +87,7 @@ fun MainPage(
             ) {
                 status?.let {
                     AnimeTracksPage(
+                        mainNavController = mainNavController,
                         trackViewModel = trackViewModel,
                         status = it
                     )

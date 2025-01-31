@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -17,24 +18,22 @@ class UserViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 
-    private val _currentUserData = MutableStateFlow<CurrentUserQuery.Data?>(null)
-    val currentUserData: StateFlow<CurrentUserQuery.Data?> = _currentUserData.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
+    private val _currentUserData = MutableStateFlow<Resource<CurrentUserQuery.Data?>>(Resource.Loading())
+    val currentUserData = _currentUserData.asStateFlow()
 
     init {
         fetchCurrentUser()
     }
 
-    fun fetchCurrentUser() {
+    private fun fetchCurrentUser() {
         viewModelScope.launch {
             val result = userRepository.fetchCurrentUser()
             if (result.isSuccess) {
-                _currentUserData.value = result.getOrNull()
+                _currentUserData.value = Resource.Success(result.getOrNull())
                 Log.d("UserViewModel", "User fetched: ${result.getOrNull()?.currentUser?.nickname}")
             } else if (result.isFailure) {
-                _error.value = result.exceptionOrNull()?.message
+                _currentUserData.value = Resource.Error(result.exceptionOrNull()?.message
+                    ?: "Unknown error")
                 Log.e("UserViewModel", "Error: ${result.exceptionOrNull()?.message}")
             }
         }

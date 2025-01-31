@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.more
+package com.example.shikiflow.presentation.screen.more.history
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

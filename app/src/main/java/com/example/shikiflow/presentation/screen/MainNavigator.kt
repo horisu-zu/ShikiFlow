@@ -23,7 +23,7 @@ fun MainNavigator(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         NavigationGraph(
-            currentUser = currentUser,
+            currentUser = currentUser.data,
             navController = navController,
             modifier = Modifier.padding(innerPadding)
         )

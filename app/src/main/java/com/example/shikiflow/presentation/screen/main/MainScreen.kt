@@ -18,12 +18,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
+    mainNavController: NavController,
     currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -63,6 +65,7 @@ fun MainScreen(
                     SearchPage()
                 } else {
                     MainPage(
+                        mainNavController = mainNavController,
                         pagerState = pagerState
                     )
                 }

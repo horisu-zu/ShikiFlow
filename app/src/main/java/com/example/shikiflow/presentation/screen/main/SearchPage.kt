@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.data.anime.MyListString
-import com.example.shikiflow.presentation.viewmodel.AnimeTracksSearchViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable

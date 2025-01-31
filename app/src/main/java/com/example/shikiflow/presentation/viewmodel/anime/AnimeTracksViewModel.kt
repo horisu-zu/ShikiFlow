@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.viewmodel
+package com.example.shikiflow.presentation.viewmodel.anime
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

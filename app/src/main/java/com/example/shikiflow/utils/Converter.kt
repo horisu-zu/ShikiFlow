@@ -1,6 +1,14 @@
 package com.example.shikiflow.utils
 
 import android.content.Context
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
+import com.example.graphql.type.AnimeRatingEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.data.user.UserRateContentType
 import com.example.shikiflow.data.user.animeStatusOrder
@@ -84,6 +92,19 @@ object Converter {
         }
     }
 
+    fun convertRatingToString(rating: AnimeRatingEnum?): String {
+        return when(rating) {
+            AnimeRatingEnum.none -> "None"
+            AnimeRatingEnum.g -> "G"
+            AnimeRatingEnum.pg -> "PG"
+            AnimeRatingEnum.pg_13 -> "PG-13"
+            AnimeRatingEnum.r -> "R-17"
+            AnimeRatingEnum.r_plus -> "R+"
+            AnimeRatingEnum.rx -> "Rx"
+            else -> "Unknown"
+        }
+    }
+
     fun <T> List<T>.groupAndSortByStatus(
         contentType: UserRateContentType,
         statusExtractor: (T) -> String?
@@ -112,5 +133,54 @@ object Converter {
                 mangaStatusOrder.firstOrNull { it == mappedStatus }
             }
         } ?: "unknown"
+    }
+
+    fun formatText(
+        text: String,
+        linkColor: Color
+    ): AnnotatedString {
+        val builder = AnnotatedString.Builder()
+
+        val regex = Regex("\\[(i|b|u|s|character=\\d+)](.*?)\\[/(?:character|\\1)]")
+        var lastIndex = 0
+
+        regex.findAll(text).forEach { matchResult ->
+            val tag = matchResult.groupValues[1]
+            val content = matchResult.groupValues[2]
+            val start = matchResult.range.first
+
+            if (lastIndex < start) {
+                builder.append(text.substring(lastIndex, start))
+            }
+
+            if (tag.startsWith("character=")) {
+                val characterId = tag.removePrefix("character=")
+                builder.pushStringAnnotation(tag = "CHARACTER_ID", annotation = characterId)
+                builder.withStyle(SpanStyle(color = linkColor)) {
+                    builder.append(content)
+                }
+                builder.pop()
+            } else {
+                val style = when (tag) {
+                    "i" -> SpanStyle(fontStyle = FontStyle.Italic)
+                    "b" -> SpanStyle(fontWeight = FontWeight.Bold)
+                    "u" -> SpanStyle(textDecoration = TextDecoration.Underline)
+                    "s" -> SpanStyle(textDecoration = TextDecoration.LineThrough)
+                    else -> SpanStyle()
+                }
+
+                builder.withStyle(style) {
+                    builder.append(content)
+                }
+            }
+
+            lastIndex = matchResult.range.last + 1
+        }
+
+        if (lastIndex < text.length) {
+            builder.append(text.substring(lastIndex))
+        }
+
+        return builder.toAnnotatedString()
     }
 }

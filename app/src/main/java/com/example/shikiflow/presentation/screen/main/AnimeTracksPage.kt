@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -18,11 +17,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.presentation.viewmodel.AnimeTracksViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 
 @Composable
 fun AnimeTracksPage(
+    mainNavController: NavController,
     trackViewModel: AnimeTracksViewModel,
     status: UserRateStatusEnum?
 ) {
@@ -44,7 +45,12 @@ fun AnimeTracksPage(
 
         items(items.size) { index ->
             val userRate = items[index]
-            AnimeTrackItem(userRate)
+            AnimeTrackItem(
+                userRate,
+                onClick = { id ->
+                    mainNavController.navigate("animeDetailsScreen/$id")
+                }
+            )
 
             if (index >= items.size - 5 && shouldLoadMore.value) {
                 LaunchedEffect(status) {

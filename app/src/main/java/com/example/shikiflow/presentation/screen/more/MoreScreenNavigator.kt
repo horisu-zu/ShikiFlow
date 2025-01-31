@@ -6,7 +6,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
+import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 import com.example.shikiflow.utils.Animations.slideInFromBottom
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
