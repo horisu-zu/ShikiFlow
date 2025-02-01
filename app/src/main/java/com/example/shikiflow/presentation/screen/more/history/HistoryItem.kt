@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.data.user.UserHistoryResponse
-import com.example.shikiflow.presentation.common.Image
+import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.BuildConfig
 import com.example.shikiflow.utils.Converter
 import kotlinx.datetime.toInstant
@@ -30,7 +30,7 @@ fun HistoryItem(
     ) {
         val (posterRef, titleRef, actionRef, dateRef) = createRefs()
 
-        Image(
+        BaseImage(
             model = "${BuildConfig.BASE_URL}${historyItem?.target?.image?.original}",
             contentDescription = "Poster",
             modifier = Modifier

@@ -8,7 +8,6 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,17 +17,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.Converter
 
@@ -45,22 +40,15 @@ fun FormattedText(
     var isExpanded by remember { mutableStateOf(false) }
     val annotatedString = Converter.formatText(text, linkColor)
 
+    var lineCount by remember { mutableStateOf(0) }
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     val lineHeight = style.fontSize * 1.75f
+    val shouldShowButton = lineCount > collapsedMaxLines - 1
 
     Column(
         modifier = modifier
     ) {
-        Box(
-            modifier = Modifier
-                .clip(RectangleShape)
-                .heightIn(max = if (isExpanded) Dp.Unspecified else with(LocalDensity.current) {
-                    lineHeight.toDp() * collapsedMaxLines
-                })
-                .animateContentSize(
-                    animationSpec = tween(durationMillis = 300, easing = FastOutSlowInEasing)
-                )
-        ) {
+        Box {
             Text(
                 text = annotatedString,
                 style = style.copy(
@@ -81,33 +69,43 @@ fun FormattedText(
                     }
                     .drawWithContent {
                         drawContent()
-                        if (!isExpanded) {
+                        if (!isExpanded && shouldShowButton) {
                             drawRect(
                                 brush = Brush.verticalGradient(
                                     colors = listOf(Color.Transparent, brushColor)
                                 )
                             )
                         }
-                    },
+                    }
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = FastOutSlowInEasing
+                        )
+                    ),
                 maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
-                onTextLayout = { layoutResult.value = it }
+                onTextLayout = { layoutResult ->
+                    lineCount = layoutResult.lineCount
+                }
             )
         }
 
-        Text(
-            text = if (isExpanded) "Collapse" else "Expand",
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
-            color = MaterialTheme.colorScheme.onPrimaryContainer,
-            modifier = Modifier
-                .padding(vertical = 4.dp)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null
-                ) {
-                    isExpanded = !isExpanded
-                }
-        )
+        if(shouldShowButton) {
+            Text(
+                text = if (isExpanded) "Collapse" else "Expand",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) {
+                        isExpanded = !isExpanded
+                    }
+            )
+        }
     }
 }

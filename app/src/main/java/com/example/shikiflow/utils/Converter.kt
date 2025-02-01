@@ -23,17 +23,25 @@ import java.util.Date
 import java.util.Locale
 
 object Converter {
-    fun formatInstant(lastSeenInstant: Instant?): String {
+    fun formatInstant(
+        lastSeenInstant: Instant?,
+        includeTime: Boolean = false
+    ): String {
         return lastSeenInstant?.let { instant ->
             val date = Date(instant.toEpochMilliseconds())
-            val currentYear =
-                Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).year
-            val instantYear = instant.toLocalDateTime(TimeZone.currentSystemDefault()).year
+            val currentYear = Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault()).year
+            val instantYear = instant
+                .toLocalDateTime(TimeZone.currentSystemDefault()).year
 
-            val pattern = if (instantYear == currentYear) {
-                "dd MMM, HH:mm"
-            } else {
-                "dd MMM yyyy, HH:mm"
+            val pattern = buildString {
+                append("dd MMM")
+                if (instantYear != currentYear) {
+                    append(" yyyy")
+                }
+                if (includeTime) {
+                    append(", HH:mm")
+                }
             }
 
             SimpleDateFormat(pattern, Locale.getDefault()).format(date)

@@ -24,9 +24,9 @@ import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.determineSeason
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
-import com.example.shikiflow.presentation.common.Image
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
+import com.example.shikiflow.presentation.common.image.BaseImage
 
 @Composable
 fun AnimeTrackItem(
@@ -43,7 +43,7 @@ fun AnimeTrackItem(
     ) {
         val (posterRef, titleRef, dataRef, progressBarRef) = createRefs()
 
-        Image(
+        BaseImage(
             model = userRate.animeUserRateWithModel.anime?.animeShort?.poster?.posterShort?.originalUrl,
             contentDescription = "Poster",
             modifier = Modifier

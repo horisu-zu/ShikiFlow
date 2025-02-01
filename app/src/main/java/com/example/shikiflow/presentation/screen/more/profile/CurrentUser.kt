@@ -15,7 +15,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.graphql.CurrentUserQuery
-import com.example.shikiflow.presentation.common.Image
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import kotlinx.datetime.toInstant
 
@@ -30,14 +31,15 @@ fun CurrentUser(
     ) {
         val (avatar, userInfoBlock) = createRefs()
 
-        Image(
+        BaseImage(
             model = userData?.currentUser?.avatarUrl,
             contentDescription = "Avatar",
+            imageType = ImageType.Square(),
             modifier = Modifier.constrainAs(avatar) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
                 bottom.linkTo(parent.bottom)
-            }.size(96.dp).clip(CircleShape)
+            }.size(96.dp)
         )
 
         Column(

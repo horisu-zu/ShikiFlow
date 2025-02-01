@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details
 
+import android.icu.text.ListFormatter.Width
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,8 +31,9 @@ import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
 import com.example.shikiflow.data.user.AnimeStatus
-import com.example.shikiflow.presentation.common.Image
 import com.example.shikiflow.presentation.common.StarScore
+import com.example.shikiflow.presentation.common.image.GradientImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.IconResource
 
@@ -45,26 +47,30 @@ fun AnimeDetailsTitle(
     ) {
         val (backgroundRef, scoreRef, titleRef, infoRow, statusItem) = createRefs()
 
-        Image(
+        GradientImage(
             model = animeDetails?.poster?.originalUrl,
-            clip = 0.dp,
             gradientFraction = 0.9f,
-            modifier = Modifier.constrainAs(backgroundRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                bottom.linkTo(parent.bottom)
-            }
+            imageType = ImageType.Poster(
+                defaultClip = RoundedCornerShape(0.dp)
+            ),
+            modifier = Modifier
+                .constrainAs(backgroundRef) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    bottom.linkTo(parent.bottom)
+                }
         )
 
-        if(animeDetails?.status != AnimeStatusEnum.anons) {
+        if (animeDetails?.status != AnimeStatusEnum.anons) {
             ScoreItem(
                 score = animeDetails?.score?.toFloat() ?: 0f,
                 modifier = Modifier
                     .constrainAs(scoreRef) {
                         bottom.linkTo(titleRef.top)
                         start.linkTo(parent.start)
-                    }.padding(horizontal = 12.dp)
+                    }
+                    .padding(horizontal = 12.dp)
             )
         }
 
@@ -75,7 +81,8 @@ fun AnimeDetailsTitle(
                 .constrainAs(titleRef) {
                     bottom.linkTo(infoRow.top, margin = 4.dp)
                     start.linkTo(parent.start)
-                }.padding(horizontal = 12.dp)
+                }
+                .padding(horizontal = 12.dp)
         )
 
         Row(
@@ -83,7 +90,8 @@ fun AnimeDetailsTitle(
                 .constrainAs(infoRow) {
                     bottom.linkTo(statusItem.top, margin = 4.dp)
                     start.linkTo(parent.start)
-                }.padding(horizontal = 12.dp),
+                }
+                .padding(horizontal = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             ShortInfoItem(
@@ -106,10 +114,15 @@ fun AnimeDetailsTitle(
 
         UserStatusItem(
             status = animeDetails?.userRate?.status,
-            modifier = Modifier.constrainAs(statusItem) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-            }.padding(horizontal = 12.dp)
+            allEpisodes = animeDetails?.episodesAired,
+            watchedEpisodes = animeDetails?.userRate?.episodes,
+            score = animeDetails?.userRate?.score,
+            modifier = Modifier
+                .constrainAs(statusItem) {
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                }
+                .padding(horizontal = 12.dp)
         )
     }
 }
@@ -155,32 +168,38 @@ private fun ShortInfoItem(
 @Composable
 private fun UserStatusItem(
     status: UserRateStatusEnum?,
+    allEpisodes: Int?,
+    watchedEpisodes: Int?,
+    score: Int?,
     modifier: Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(Brush.horizontalGradient(
+            .background(
+                Brush.horizontalGradient(
                     colors = listOf(
                         MaterialTheme.colorScheme.primary,
                         MaterialTheme.colorScheme.tertiary
                     )
                 )
-            ).padding(horizontal = 16.dp, vertical = 12.dp),
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val icon = AnimeStatus.fromStatus(status ?: UserRateStatusEnum.dropped)?.icon
             ?: IconResource.Vector(Icons.Outlined.Clear)
 
-        when(icon) {
+        when (icon) {
             is IconResource.Drawable -> Icon(
                 painter = painterResource(id = icon.resId),
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.surface
             )
+
             is IconResource.Vector -> Icon(
                 imageVector = icon.imageVector,
                 contentDescription = null,
@@ -189,7 +208,12 @@ private fun UserStatusItem(
             )
         }
         Text(
-            text = UserRateMapper.mapStatusToString(status ?: UserRateStatusEnum.dropped),
+            text = UserRateMapper.mapStatusToString(
+                status = status ?: UserRateStatusEnum.dropped,
+                allEpisodes = allEpisodes,
+                watchedEpisodes = watchedEpisodes,
+                score = score
+            ),
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.surface,
                 fontWeight = FontWeight.SemiBold

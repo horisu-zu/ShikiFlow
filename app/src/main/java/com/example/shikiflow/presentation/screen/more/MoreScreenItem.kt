@@ -18,7 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.presentation.common.Image
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.IconResource
 
 @Composable
@@ -51,12 +52,12 @@ fun ExpandedItem(
     ) {
         val (avatarRef, titleRef, subtitleRef) = createRefs()
 
-        Image(
+        BaseImage(
             model = avatar,
             contentDescription = "Avatar",
+            imageType = ImageType.Square(),
             modifier = Modifier
                 .size(48.dp)
-                .clip(CircleShape)
                 .constrainAs(avatarRef) {
                     top.linkTo(parent.top)
                     bottom.linkTo(parent.bottom)

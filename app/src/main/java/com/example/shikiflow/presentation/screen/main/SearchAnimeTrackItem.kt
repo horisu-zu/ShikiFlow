@@ -19,8 +19,8 @@ import com.example.graphql.AnimeTracksV2Query
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.isWatched
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
-import com.example.shikiflow.presentation.common.Image
 import com.example.shikiflow.presentation.common.StatusCard
+import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.StatusColor
 
 @Composable
@@ -34,7 +34,7 @@ fun SearchAnimeTrackItem(
     ) {
         val (posterRef, titleRef, cardSetRef) = createRefs()
 
-        Image(
+        BaseImage(
             model = animeItem.poster?.posterShort?.originalUrl,
             contentDescription = "Poster",
             modifier = Modifier

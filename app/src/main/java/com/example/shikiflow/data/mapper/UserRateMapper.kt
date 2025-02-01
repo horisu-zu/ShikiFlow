@@ -3,6 +3,8 @@ package com.example.shikiflow.data.mapper
 import com.example.graphql.fragment.AnimeShort
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.AnimeStatusEnum
+import com.example.graphql.type.MangaKindEnum
+import com.example.graphql.type.RelationKindEnum
 import com.example.graphql.type.UserRateStatusEnum
 
 class UserRateMapper {
@@ -26,6 +28,28 @@ class UserRateMapper {
                 UserRateStatusEnum.rewatching -> "Rewatching"
                 UserRateStatusEnum.on_hold -> "On Hold"
                 UserRateStatusEnum.dropped -> "Dropped"
+                UserRateStatusEnum.UNKNOWN__ -> "Unknown"
+            }
+        }
+
+        fun mapStatusToString(
+            status: UserRateStatusEnum,
+            watchedEpisodes: Int? = null,
+            allEpisodes: Int? = null,
+            score: Int? = null
+        ): String {
+            return when (status) {
+                UserRateStatusEnum.watching ->
+                    if (watchedEpisodes != null) "Watching ∙ $watchedEpisodes/$allEpisodes"
+                        else "Watching"
+                UserRateStatusEnum.planned -> "Planned"
+                UserRateStatusEnum.completed ->
+                    if (score != null) "Completed ∙ $score ★" else "Completed"
+                UserRateStatusEnum.rewatching -> "Rewatching"
+                UserRateStatusEnum.on_hold -> if (watchedEpisodes != null) "On Hold ∙ $watchedEpisodes/$allEpisodes"
+                    else "On Hold"
+                UserRateStatusEnum.dropped -> if (score != null && score != 0) "Dropped ∙ $score ★"
+                    else if(watchedEpisodes != null) "Dropped ∙ $watchedEpisodes/$allEpisodes" else "Dropped"
                 UserRateStatusEnum.UNKNOWN__ -> "Unknown"
             }
         }
@@ -58,6 +82,37 @@ class UserRateMapper {
                 AnimeKindEnum.music -> "Music"
                 AnimeKindEnum.special -> "Special"
                 AnimeKindEnum.tv_special -> "TV Special"
+                else -> "Unknown"
+            }
+        }
+
+        fun mapMangaKind(kind: MangaKindEnum?): String {
+            return when(kind) {
+                MangaKindEnum.manga -> "Manga"
+                MangaKindEnum.manhwa -> "Manhwa"
+                MangaKindEnum.manhua -> "Manhua"
+                MangaKindEnum.light_novel -> "Ranobe"
+                MangaKindEnum.novel -> "Novel"
+                MangaKindEnum.one_shot -> "One Shot"
+                MangaKindEnum.doujin -> "Doujin"
+                else -> "Unknown"
+            }
+        }
+
+        fun mapRelationKind(kind: RelationKindEnum?): String {
+            return when(kind) {
+                RelationKindEnum.adaptation -> "Adaptation"
+                RelationKindEnum.alternative_setting -> "Alternative Setting"
+                RelationKindEnum.alternative_version -> "Alternative version"
+                RelationKindEnum.character -> "Character"
+                RelationKindEnum.full_story -> "Full Story"
+                RelationKindEnum.other -> "Other"
+                RelationKindEnum.parent_story -> "Parent Story"
+                RelationKindEnum.prequel -> "Prequel"
+                RelationKindEnum.sequel -> "Sequel"
+                RelationKindEnum.side_story -> "Side Story"
+                RelationKindEnum.spin_off -> "Spin Off"
+                RelationKindEnum.summary -> "Summary"
                 else -> "Unknown"
             }
         }
