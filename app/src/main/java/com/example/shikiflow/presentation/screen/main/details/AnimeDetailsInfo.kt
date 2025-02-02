@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -15,10 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
+import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.presentation.common.CardItem
+import com.example.shikiflow.presentation.common.Graph
+import com.example.shikiflow.presentation.common.GraphGridType
 import com.example.shikiflow.utils.Converter.formatInstant
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -51,23 +54,31 @@ fun AnimeDetailsInfo(
                 label = "Duration",
                 content = {
                     Text(
-                        text = "${animeDetails.duration} min."
+                        text = "${animeDetails.duration} min.",
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 12.dp)
                     )
                 }
             )
         }
-        DetailRow(
-            label = "Aired On",
-            content = {
-                Text(
-                    text = formatInstant(
-                        LocalDate.parse(animeDetails.airedOn?.date.toString())
-                            .atStartOfDayIn(TimeZone.currentSystemDefault()),
-                        includeTime = false
+        animeDetails.airedOn?.date?.let {
+            DetailRow(
+                label = "Aired On",
+                content = {
+                    Text(
+                        text = formatInstant(
+                            LocalDate.parse(it.toString())
+                                .atStartOfDayIn(TimeZone.currentSystemDefault()),
+                            includeTime = false
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 12.dp)
                     )
-                )
-            }
-        )
+                }
+            )
+        }
         if (animeDetails.status == AnimeStatusEnum.ongoing) {
             DetailRow(
                 label = "Next Episode at",
@@ -76,7 +87,10 @@ fun AnimeDetailsInfo(
                         text = formatInstant(
                             Instant.parse(animeDetails.nextEpisodeAt.toString()),
                             includeTime = true
-                        )
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 12.dp)
                     )
                 }
             )
@@ -89,7 +103,10 @@ fun AnimeDetailsInfo(
                             LocalDate.parse(animeDetails.releasedOn.date.toString())
                                 .atStartOfDayIn(TimeZone.currentSystemDefault()),
                             includeTime = false
-                        )
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 12.dp)
                     )
                 }
             )
@@ -99,7 +116,10 @@ fun AnimeDetailsInfo(
             label = "Romaji",
             content = {
                 Text(
-                    text = animeDetails.name
+                    text = animeDetails.name,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier.padding(start = 12.dp)
                 )
             }
         )
@@ -108,7 +128,10 @@ fun AnimeDetailsInfo(
                 label = "Japanese",
                 content = {
                     Text(
-                        text = animeDetails.japanese
+                        text = animeDetails.japanese,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        modifier = Modifier.padding(start = 12.dp)
                     )
                 }
             )
@@ -123,11 +146,49 @@ fun AnimeDetailsInfo(
                     ) {
                         animeDetails.synonyms.forEach { synonym ->
                             Text(
-                                text = synonym
+                                text = synonym,
+                                overflow = TextOverflow.Ellipsis,
+                                maxLines = 1,
+                                modifier = Modifier.padding(start = 12.dp)
                             )
                         }
                     }
                 }
+            )
+        }
+
+        if(animeDetails.status != AnimeStatusEnum.anons) {
+            Column(
+                modifier = modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Score stats ∙ ${animeDetails.score} ★",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Graph(
+                    data = animeDetails.scoresStats?.associate {
+                        it.score.toString() to it.count.toFloat()
+                    } ?: emptyMap(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+        Column(
+            modifier = modifier.fillMaxWidth().padding(top = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(
+                text = "Statuses stats",
+                style = MaterialTheme.typography.titleMedium
+            )
+            Graph(
+                data = animeDetails.statusesStats?.associate {
+                    mapStatusToString(it.status) to it.count.toFloat()
+                } ?: emptyMap(),
+                gridType = GraphGridType.VERTICAL,
+                modifier = Modifier.fillMaxWidth(),
+                height = 180.dp
             )
         }
     }

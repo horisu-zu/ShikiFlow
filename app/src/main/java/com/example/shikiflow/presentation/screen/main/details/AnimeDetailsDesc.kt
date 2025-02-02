@@ -14,6 +14,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +42,8 @@ fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime?,
     modifier: Modifier = Modifier
 ) {
+    var showRelatedBottomSheet by remember { mutableStateOf(false) }
+
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -109,7 +115,8 @@ fun AnimeDetailsDesc(
         ) {
             Text(
                 text = "Related",
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.clickable { showRelatedBottomSheet = true }
             )
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -144,6 +151,12 @@ fun AnimeDetailsDesc(
             )
         }
     }
+
+    RelatedBottomSheet(
+        relatedItems = animeDetails?.related,
+        showBottomSheet = showRelatedBottomSheet,
+        onDismiss = { showRelatedBottomSheet = false }
+    )
 }
 
 @Composable
@@ -186,20 +199,22 @@ fun RelatedItem(
         val (posterRef, titleRef, infoRef) = createRefs()
 
         RoundedImage(
-            model = if(relatedInfo.anime != null) relatedInfo.anime.poster?.mainUrl
-                else relatedInfo.manga?.poster?.mainUrl ?: "Manga Poster",
+            model = if (relatedInfo.anime != null) relatedInfo.anime.poster?.mainUrl
+            else relatedInfo.manga?.poster?.mainUrl ?: "Manga Poster",
             clip = RoundedCornerShape(8.dp),
             contentScale = ContentScale.Crop,
-            modifier = Modifier.size(48.dp).constrainAs(posterRef) {
-                start.linkTo(parent.start)
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-            }
+            modifier = Modifier
+                .size(48.dp)
+                .constrainAs(posterRef) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
         )
 
         Text(
-            text = if(relatedInfo.anime != null) relatedInfo.anime.name
-                else relatedInfo.manga?.name ?: "Manga Title",
+            text = if (relatedInfo.anime != null) relatedInfo.anime.name
+            else relatedInfo.manga?.name ?: "Manga Title",
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.constrainAs(titleRef) {
                 top.linkTo(parent.top)
@@ -211,8 +226,11 @@ fun RelatedItem(
         )
 
         Text(
-            text = if(relatedInfo.anime != null) { mapAnimeKind(relatedInfo.anime.kind) }
-                else { mapMangaKind(relatedInfo.manga?.kind) } + " ∙ ${mapRelationKind(relatedInfo.relationKind)}",
+            text = if (relatedInfo.anime != null) {
+                mapAnimeKind(relatedInfo.anime.kind)
+            } else {
+                mapMangaKind(relatedInfo.manga?.kind)
+            } + " ∙ ${mapRelationKind(relatedInfo.relationKind)}",
             style = MaterialTheme.typography.labelSmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             ),
@@ -232,7 +250,7 @@ fun ScreenshotSection(
     screenshots: List<AnimeDetailsQuery.Screenshot>,
     modifier: Modifier = Modifier
 ) {
-    Column (
+    Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

@@ -114,7 +114,8 @@ fun AnimeDetailsTitle(
 
         UserStatusItem(
             status = animeDetails?.userRate?.status,
-            allEpisodes = animeDetails?.episodesAired,
+            allEpisodes = if(animeDetails?.status == AnimeStatusEnum.released) animeDetails.episodes
+                else animeDetails?.episodesAired,
             watchedEpisodes = animeDetails?.userRate?.episodes,
             score = animeDetails?.userRate?.score,
             modifier = Modifier
