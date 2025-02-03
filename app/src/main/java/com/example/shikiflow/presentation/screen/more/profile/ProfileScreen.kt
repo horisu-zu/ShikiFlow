@@ -77,7 +77,8 @@ fun ProfileScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                modifier = Modifier.padding(top = 24.dp)
             )
         }
     ) { paddingValues ->

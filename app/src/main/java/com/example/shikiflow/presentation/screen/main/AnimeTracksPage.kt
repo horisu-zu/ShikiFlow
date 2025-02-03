@@ -13,12 +13,17 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.user.toUiModel
+import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 
 @Composable
@@ -35,6 +40,8 @@ fun AnimeTracksPage(
             hasMorePages[status] == true && isLoading[status] != true
         }
     }
+    var selectedItem by remember { mutableStateOf<AnimeTracksQuery.UserRate?>(null) }
+    var rateBottomSheet by remember { mutableStateOf(false) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -49,6 +56,10 @@ fun AnimeTracksPage(
                 userRate,
                 onClick = { id ->
                     mainNavController.navigate("animeDetailsScreen/$id")
+                },
+                onLongClick = {
+                    rateBottomSheet = true
+                    selectedItem = userRate
                 }
             )
 
@@ -70,6 +81,15 @@ fun AnimeTracksPage(
                     CircularProgressIndicator()
                 }
             }
+        }
+    }
+
+    if(rateBottomSheet) {
+        selectedItem?.let {
+            UserRateBottomSheet(
+                userRate = it.toUiModel(),
+                onDismiss = { rateBottomSheet = false }
+            )
         }
     }
 }

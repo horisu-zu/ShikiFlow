@@ -1,6 +1,8 @@
 package com.example.shikiflow.presentation.screen.main
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,18 +30,23 @@ import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeTrackItem(
     userRate: AnimeTracksQuery.UserRate,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit
+    onClick: (String) -> Unit,
+    onLongClick: () -> Unit
 ) {
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
             .padding(start = 12.dp, end = 24.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick(userRate.animeUserRateWithModel.anime?.animeShort?.id ?: "") }
+            .combinedClickable(
+                onClick = { onClick(userRate.animeUserRateWithModel.anime?.animeShort?.id ?: "") },
+                onLongClick = { onLongClick() }
+            )
     ) {
         val (posterRef, titleRef, dataRef, progressBarRef) = createRefs()
 

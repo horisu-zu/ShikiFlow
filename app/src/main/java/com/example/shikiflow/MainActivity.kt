@@ -4,11 +4,17 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.Window
+import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.shikiflow.presentation.navigation.AppNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 import com.example.shikiflow.ui.theme.ShikiFlowTheme
@@ -34,6 +40,8 @@ class MainActivity : ComponentActivity() {
                 AppNavigator()
             }
         }
+
+        window.fitSystemWindowsWithAdjustResize()
     }
 
     @Composable
@@ -69,5 +77,27 @@ class MainActivity : ComponentActivity() {
                 authViewModel.handleAuthCode(it)
             }
         }
+    }
+}
+
+fun Window.fitSystemWindowsWithAdjustResize() {
+    setFlags(
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
+    )
+
+    WindowCompat.setDecorFitsSystemWindows(this, true)
+
+    ViewCompat.setOnApplyWindowInsetsListener(decorView) { view, insets ->
+        val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
+
+        WindowInsetsCompat
+            .Builder()
+            .setInsets(
+                WindowInsetsCompat.Type.systemBars(),
+                Insets.of(0, 0, 0, bottom)
+            )
+            .build()
+            .apply { ViewCompat.onApplyWindowInsets(view, this) }
     }
 }

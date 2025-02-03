@@ -1,9 +1,13 @@
 package com.example.shikiflow.presentation.screen.main.details
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -11,6 +15,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -104,30 +112,16 @@ fun AnimeDetailsDesc(
             }
         }
 
-        Column(
+        RelatedSection(
+            relatedItems = animeDetails?.related ?: emptyList(),
+            onArrowClick = { showRelatedBottomSheet = true },
             modifier = Modifier.constrainAs(relatedRef) {
                 top.linkTo(charactersRef.bottom, margin = 12.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 width = Dimension.fillToConstraints
-            },
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Related",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.clickable { showRelatedBottomSheet = true }
-            )
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                animeDetails?.related?.take(3)?.forEach { relatedItem ->
-                    RelatedItem(
-                        relatedInfo = relatedItem
-                    )
-                }
             }
-        }
+        )
 
         ScreenshotSection(
             screenshots = animeDetails?.screenshots ?: emptyList(),
@@ -189,6 +183,64 @@ fun CharacterCard(
 }
 
 @Composable
+private fun RelatedSection(
+    relatedItems: List<AnimeDetailsQuery.Related>,
+    onArrowClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Related",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.clickable { onArrowClick() }
+            )
+            Box(
+                modifier = Modifier
+                    .size(16.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = relatedItems.size.toString(),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.background
+                    )
+                )
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if(relatedItems.size > 3) {
+                IconButton(
+                    onClick = onArrowClick,
+                    modifier = Modifier.size(24.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                        contentDescription = null
+                    )
+                }
+            }
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            relatedItems.take(3).forEach { relatedItem ->
+                RelatedItem(
+                    relatedInfo = relatedItem
+                )
+            }
+        }
+    }
+}
+
+@Composable
 fun RelatedItem(
     relatedInfo: AnimeDetailsQuery.Related,
     modifier: Modifier = Modifier
@@ -246,7 +298,7 @@ fun RelatedItem(
 }
 
 @Composable
-fun ScreenshotSection(
+private fun ScreenshotSection(
     screenshots: List<AnimeDetailsQuery.Screenshot>,
     modifier: Modifier = Modifier
 ) {

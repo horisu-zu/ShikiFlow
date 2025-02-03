@@ -20,6 +20,8 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shikiflow.data.mapper.UserRateMapper
+import com.example.shikiflow.data.user.toUiModel
+import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

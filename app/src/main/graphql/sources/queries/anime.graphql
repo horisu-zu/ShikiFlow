@@ -60,9 +60,13 @@ query AnimeDetails(
         description
 
         userRate {
+            id
             status
             episodes
+            rewatches
             score
+            createdAt
+            updatedAt
         }
     }
 }

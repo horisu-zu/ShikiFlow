@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.screen.main.details
 
 import android.icu.text.ListFormatter.Width
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +41,7 @@ import com.example.shikiflow.utils.IconResource
 @Composable
 fun AnimeDetailsTitle(
     animeDetails: AnimeDetailsQuery.Anime?,
+    onStatusClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
@@ -113,6 +115,7 @@ fun AnimeDetailsTitle(
         }
 
         UserStatusItem(
+            onStatusClick = onStatusClick,
             status = animeDetails?.userRate?.status,
             allEpisodes = if(animeDetails?.status == AnimeStatusEnum.released) animeDetails.episodes
                 else animeDetails?.episodesAired,
@@ -172,6 +175,7 @@ private fun UserStatusItem(
     allEpisodes: Int?,
     watchedEpisodes: Int?,
     score: Int?,
+    onStatusClick: () -> Unit,
     modifier: Modifier
 ) {
     Row(
@@ -186,6 +190,7 @@ private fun UserStatusItem(
                     )
                 )
             )
+            .clickable { onStatusClick() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically

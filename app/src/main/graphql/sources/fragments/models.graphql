@@ -88,6 +88,7 @@ fragment MangaUserRate on UserRate {
     text
     createdAt
     updatedAt
+    rewatches
     manga {
         id
     }
@@ -102,6 +103,7 @@ fragment MangaUserRateWithModel on UserRate {
     text
     createdAt
     updatedAt
+    rewatches
     manga {
         ...MangaShort
     }
