@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -45,9 +46,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.data.user.AnimeStatus
-import com.example.shikiflow.data.user.MediaType
-import com.example.shikiflow.data.user.UserRateData
+import com.example.shikiflow.data.tracks.AnimeStatus
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.data.tracks.UserRateData
+import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.convertStatus
@@ -59,11 +61,12 @@ import kotlinx.datetime.Instant
 fun UserRateBottomSheet(
     userRate: UserRateData,
     onDismiss: () -> Unit,
-    //onSave: (Int, Int, Int, Int) -> Unit,
-    modifier: Modifier = Modifier
+    onSave: (Long, Int, Int, Int, Int, MediaType) -> Unit,
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState()
-    val chips = listOf("Watching", "Planned", "Completed", "Rewatching", "On Hold", "Dropped")
+    val chips = UserRateStatusConstants.chips
     val initialStatusIndex = chips.indexOfFirst { it.equals(convertStatus(userRate.status), ignoreCase = true) }
     val initialScore = userRate.score ?: 0
 
@@ -109,9 +112,20 @@ fun UserRateBottomSheet(
             )
 
             ChangeRow(
-                onSave = { /*TODO*/ },
+                onSave = {
+                    onSave(
+                        userRate.id.toLong(),
+                        selectedStatus,
+                        selectedScore,
+                        progress,
+                        rewatches,
+                        userRate.mediaType
+                    )
+                },
                 createDate = userRate.createDate,
-                updateDate = userRate.updateDate
+                updateDate = userRate.updateDate,
+                isLoading = isLoading,
+                enabled = !isLoading
             )
         }
     }
@@ -251,7 +265,6 @@ private fun ProgressColumn(
             ProgressCard(
                 title = progressTitle,
                 count = userRate.progress,
-                maxValue = it,
                 onIncrement = { onProgressChange(userRate.progress + 1) },
                 onDecrement = { onProgressChange(userRate.progress - 1) },
                 canIncrement = userRate.progress < totalCount,
@@ -261,7 +274,6 @@ private fun ProgressColumn(
         ProgressCard(
             title = rewatchTitle,
             count = userRate.rewatches,
-            maxValue = Int.MAX_VALUE,
             onIncrement = { onRewatchesChange(userRate.rewatches + 1) },
             onDecrement = { onRewatchesChange(userRate.rewatches - 1) },
             canIncrement = true,
@@ -274,7 +286,6 @@ private fun ProgressColumn(
 private fun ProgressCard(
     title: String,
     count: Int,
-    maxValue: Int,
     onIncrement: () -> Unit,
     onDecrement: () -> Unit,
     canIncrement: Boolean,
@@ -365,10 +376,13 @@ private fun RoundBox(
 private fun ChangeRow(
     onSave: () -> Unit,
     createDate: Instant,
-    updateDate: Instant
+    updateDate: Instant,
+    modifier: Modifier = Modifier,
+    isLoading: Boolean = false,
+    enabled: Boolean = true
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer)
@@ -386,17 +400,31 @@ private fun ChangeRow(
                 date = updateDate
             )
         }
-        IconButton (
-            onClick = onSave,
+
+        Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surface)
+                .size(48.dp),
+            contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Outlined.CheckCircle,
-                contentDescription = null,
-                modifier = Modifier.size(36.dp)
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(24.dp),
+                    color = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                IconButton(
+                    onClick = onSave,
+                    enabled = enabled
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.CheckCircle,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+            }
         }
     }
 }

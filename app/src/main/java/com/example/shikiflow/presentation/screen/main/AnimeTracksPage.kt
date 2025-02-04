@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,17 +20,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.user.toUiModel
+import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
+import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
 @Composable
 fun AnimeTracksPage(
     mainNavController: NavController,
-    trackViewModel: AnimeTracksViewModel,
+    trackViewModel: AnimeTracksViewModel = hiltViewModel(),
+    userViewModel: UserViewModel = hiltViewModel(),
     status: UserRateStatusEnum?
 ) {
     val userRates by trackViewModel.userRates.collectAsState()
@@ -70,7 +74,7 @@ fun AnimeTracksPage(
             }
         }
 
-        if (isLoading[status] == true) {
+        if (isLoading[status] == true && (items.isEmpty() || shouldLoadMore.value)) {
             item {
                 Box(
                     modifier = Modifier
@@ -84,11 +88,31 @@ fun AnimeTracksPage(
         }
     }
 
-    if(rateBottomSheet) {
+    if (rateBottomSheet) {
+        val isUpdating by userViewModel.isUpdating.collectAsState()
+
         selectedItem?.let {
             UserRateBottomSheet(
                 userRate = it.toUiModel(),
-                onDismiss = { rateBottomSheet = false }
+                isLoading = isUpdating,
+                onDismiss = { if (!isUpdating) rateBottomSheet = false },
+                onSave = { id, rateStatus, score, episodes, rewatches, mediaType ->
+                    userViewModel.updateUserRate(
+                        id = id,
+                        status = rateStatus,
+                        score = score,
+                        progress = episodes,
+                        rewatches = rewatches,
+                        mediaType = mediaType
+                    ) { success ->
+                        if (success) {
+                            status?.let { currentStatus ->
+                                trackViewModel.refreshAfterStatusUpdate(currentStatus, rateStatus)
+                                rateBottomSheet = false
+                            }
+                        }
+                    }
+                }
             )
         }
     }

@@ -20,8 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shikiflow.data.mapper.UserRateMapper
-import com.example.shikiflow.data.user.toUiModel
-import com.example.shikiflow.presentation.common.UserRateBottomSheet
+import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -34,10 +33,7 @@ fun MainPage(
     trackViewModel: AnimeTracksViewModel = hiltViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val tabs = listOf(
-        "Watching", "Planned", "Completed",
-        "Rewatching", "On Hold", "Dropped"
-    )
+    val tabs = UserRateStatusConstants.chips
     var isRefreshing by remember { mutableStateOf(false) }
 
     Column {
@@ -90,7 +86,6 @@ fun MainPage(
                 status?.let {
                     AnimeTracksPage(
                         mainNavController = mainNavController,
-                        trackViewModel = trackViewModel,
                         status = it
                     )
                 }

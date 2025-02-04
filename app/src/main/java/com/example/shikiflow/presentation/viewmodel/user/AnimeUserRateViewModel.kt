@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.ShortAnimeTracksQuery
 import com.example.shikiflow.data.anime.ShortAnimeRate
-import com.example.shikiflow.data.user.UserRate
+import com.example.shikiflow.data.tracks.UserRate
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

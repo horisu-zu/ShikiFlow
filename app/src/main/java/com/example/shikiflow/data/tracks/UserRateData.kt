@@ -1,4 +1,4 @@
-package com.example.shikiflow.data.user
+package com.example.shikiflow.data.tracks
 
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.AnimeTracksQuery

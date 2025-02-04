@@ -10,10 +10,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.shikiflow.R
-import com.example.shikiflow.data.user.UserRateContentType
-import com.example.shikiflow.data.user.animeStatusOrder
-import com.example.shikiflow.data.user.animeToMangaStatusMap
-import com.example.shikiflow.data.user.mangaStatusOrder
+import com.example.shikiflow.data.tracks.UserRateContentType
+import com.example.shikiflow.data.tracks.animeStatusOrder
+import com.example.shikiflow.data.tracks.animeToMangaStatusMap
+import com.example.shikiflow.data.tracks.mangaStatusOrder
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone

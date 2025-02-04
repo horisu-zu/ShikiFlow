@@ -9,11 +9,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shikiflow.R
-import com.example.shikiflow.data.user.TargetType
-import com.example.shikiflow.data.user.UserRate
-import com.example.shikiflow.data.user.UserRateContentType
-import com.example.shikiflow.presentation.common.SegmentedProgressBar
-import com.example.shikiflow.presentation.common.TypeItem
+import com.example.shikiflow.data.tracks.TargetType
+import com.example.shikiflow.data.tracks.UserRate
+import com.example.shikiflow.data.tracks.UserRateContentType
 import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.IconResource
 

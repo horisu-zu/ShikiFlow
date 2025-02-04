@@ -19,9 +19,11 @@ class AnimeDetailsViewModel @Inject constructor(
     private val _animeDetails = MutableStateFlow<Resource<AnimeDetailsQuery.Anime>>(Resource.Loading())
     val animeDetails = _animeDetails.asStateFlow()
 
-    fun getAnimeDetails(id: String) {
+    fun getAnimeDetails(id: String, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            _animeDetails.value = Resource.Loading()
+            if (!isRefresh) {
+                _animeDetails.value = Resource.Loading()
+            }
 
             try {
                 val result = animeRepository.getAnimeDetails(id)

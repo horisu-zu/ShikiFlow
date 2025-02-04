@@ -4,9 +4,11 @@ import com.apollographql.apollo.ApolloClient
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.data.anime.ShortAnimeRate
 import com.example.shikiflow.data.manga.ShortMangaRate
-import com.example.shikiflow.data.user.TargetType
+import com.example.shikiflow.data.tracks.TargetType
 import com.example.shikiflow.data.user.UserHistoryResponse
-import com.example.shikiflow.data.user.UserRate
+import com.example.shikiflow.data.tracks.UserRate
+import com.example.shikiflow.data.tracks.UserRateRequest
+import com.example.shikiflow.data.tracks.UserRateResponse
 import com.example.shikiflow.di.api.UserApi
 import javax.inject.Inject
 
@@ -96,6 +98,16 @@ class UserRepository @Inject constructor(
             status = status,
             targetType = targetType,
             censored = censored
+        )
+    }
+
+    suspend fun updateUserRate(
+        id: Long,
+        request: UserRateRequest
+    ): Result<UserRateResponse> = kotlin.runCatching {
+        userApi.updateUserRate(
+            id = id,
+            request = request
         )
     }
 }

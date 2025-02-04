@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.anime
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.AnimeTracksQuery
@@ -7,10 +8,15 @@ import com.example.graphql.type.SortOrderEnum
 import com.example.graphql.type.UserRateOrderFieldEnum
 import com.example.graphql.type.UserRateOrderInputType
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.mapper.UserRateMapper
+import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
@@ -21,61 +27,82 @@ import javax.inject.Inject
 class AnimeTracksViewModel @Inject constructor(
     private val animeTracksRepository: AnimeTracksRepository
 ): ViewModel() {
-    private val _userRates = MutableStateFlow<Map<UserRateStatusEnum, List<AnimeTracksQuery.UserRate>>>(
+    data class TrackState(
+        val items: List<AnimeTracksQuery.UserRate> = emptyList(),
+        val isLoading: Boolean = false,
+        val hasMorePages: Boolean = true,
+        val currentPage: Int = 1,
+        val isLoaded: Boolean = false
+    )
+
+    private val _trackStates = MutableStateFlow<Map<UserRateStatusEnum, TrackState>>(
+        UserRateStatusEnum.entries.associateWith { TrackState() }
+    )
+    private val trackStates = _trackStates.asStateFlow()
+
+    val userRates = trackStates.map { states ->
+        states.mapValues { it.value.items }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
         UserRateStatusEnum.entries.associateWith { emptyList() }
     )
-    val userRates = _userRates.asStateFlow()
 
-    private val _isLoading = MutableStateFlow<Map<UserRateStatusEnum, Boolean>>(
+    val isLoading = trackStates.map { states ->
+        states.mapValues { it.value.isLoading }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
         UserRateStatusEnum.entries.associateWith { false }
     )
-    val isLoading = _isLoading.asStateFlow()
 
-    private val _hasMorePages = MutableStateFlow<Map<UserRateStatusEnum, Boolean>>(
+    val hasMorePages = trackStates.map { states ->
+        states.mapValues { it.value.hasMorePages }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
         UserRateStatusEnum.entries.associateWith { true }
     )
-    val hasMorePages = _hasMorePages.asStateFlow()
 
-    private val _currentPages = MutableStateFlow<Map<UserRateStatusEnum, Int>>(
-        UserRateStatusEnum.entries.associateWith { 1 }
-    )
+    fun refreshAfterStatusUpdate(
+        currentStatus: UserRateStatusEnum,
+        newStatus: Int
+    ) {
+        Log.d("Track Refresh", "Received newStatus: $newStatus (${newStatus::class.java})")
+        val mappedNewStatus = UserRateMapper.mapStringToStatus(
+            UserRateStatusConstants.convertToApiStatus(newStatus)
+                .replace("_", " ")
+                .split(" ")
+                .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase() } }
+        ) ?: return
+        Log.d("Track Refresh", "Mapped New Status: $mappedNewStatus")
 
-    private val _loadedStatuses = MutableStateFlow<Set<UserRateStatusEnum>>(emptySet())
+        loadAnimeTracks(currentStatus, isRefresh = true)
+
+        if (currentStatus != mappedNewStatus) {
+            Log.d("Track Refresh", "currentStatus: $currentStatus, newStatus: $mappedNewStatus")
+            loadAnimeTracks(mappedNewStatus, isRefresh = true)
+        }
+    }
 
     fun loadAnimeTracks(
         status: UserRateStatusEnum,
         isRefresh: Boolean = false
     ) {
-        if (_isLoading.value[status] == true ||
-            (_loadedStatuses.value.contains(status) && !isRefresh && _hasMorePages.value[status] != true)) return
+        val currentState = _trackStates.value[status] ?: return
+
+        if (currentState.isLoading ||
+            (currentState.isLoaded && !isRefresh && !currentState.hasMorePages)) return
 
         viewModelScope.launch {
-            _isLoading.update {
-                it.toMutableMap().apply {
-                    this[status] = true
-                }
-            }
-
-            if (isRefresh) {
-                _currentPages.update {
-                    it.toMutableMap().apply {
-                        this[status] = 1
-                    }
-                }
-                _userRates.update {
-                    it.toMutableMap().apply {
-                        this[status] = emptyList()
-                    }
-                }
-                _hasMorePages.update {
-                    it.toMutableMap().apply {
-                        this[status] = true
-                    }
+            _trackStates.update { states ->
+                states.toMutableMap().apply {
+                    this[status] = currentState.copy(isLoading = true)
                 }
             }
 
             val result = animeTracksRepository.getAnimeTracks(
-                page = _currentPages.value[status] ?: 1,
+                page = if (isRefresh) 1 else currentState.currentPage,
                 status = status,
                 limit = 20,
                 order = UserRateOrderInputType(
@@ -85,45 +112,39 @@ class AnimeTracksViewModel @Inject constructor(
             )
 
             result.onSuccess { response ->
-                _userRates.update { currentRates ->
-                    currentRates.toMutableMap().apply {
-                        val combinedRates = (this[status] ?: emptyList()) + response.userRates
+                _trackStates.update { states ->
+                    states.toMutableMap().apply {
+                        val combinedItems = if (isRefresh) {
+                            response.userRates
+                        } else {
+                            currentState.items + response.userRates
+                        }
 
-                        val sortedRates = combinedRates.distinctBy { it.animeUserRateWithModel.id }
+                        val sortedItems = combinedItems
+                            .distinctBy { it.animeUserRateWithModel.id }
                             .sortedByDescending {
-                                (it.animeUserRateWithModel.updatedAt as? String)?.toInstant() ?: Instant.DISTANT_PAST
+                                (it.animeUserRateWithModel.updatedAt as? String)?.toInstant()
+                                    ?: Instant.DISTANT_PAST
                             }
 
-                        this[status] = sortedRates
+                        this[status] = currentState.copy(
+                            items = sortedItems,
+                            currentPage = if (isRefresh) 2 else currentState.currentPage + 1,
+                            hasMorePages = response.hasNextPage,
+                            isLoading = false,
+                            isLoaded = true
+                        )
                     }
                 }
-
-                _currentPages.update {
-                    it.toMutableMap().apply {
-                        if (response.userRates.isNotEmpty()) {
-                            this[status] = (this[status] ?: 1) + 1
-                        }
-                    }
-                }
-
-                _hasMorePages.update {
-                    it.toMutableMap().apply {
-                        this[status] = response.hasNextPage
-                    }
-                }
-
-                _loadedStatuses.update { it + status }
             }.onFailure {
-                _hasMorePages.update {
-                    it.toMutableMap().apply {
-                        this[status] = false
+                _trackStates.update { states ->
+                    states.toMutableMap().apply {
+                        this[status] = currentState.copy(
+                            hasMorePages = false,
+                            isLoading = false,
+                            isLoaded = true
+                        )
                     }
-                }
-            }
-
-            _isLoading.update {
-                it.toMutableMap().apply {
-                    this[status] = false
                 }
             }
         }

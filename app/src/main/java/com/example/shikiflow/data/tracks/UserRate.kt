@@ -1,4 +1,4 @@
-package com.example.shikiflow.data.user
+package com.example.shikiflow.data.tracks
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

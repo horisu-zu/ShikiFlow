@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details
 
-import android.icu.text.ListFormatter.Width
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +30,7 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
-import com.example.shikiflow.data.user.AnimeStatus
+import com.example.shikiflow.data.tracks.AnimeStatus
 import com.example.shikiflow.presentation.common.StarScore
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType

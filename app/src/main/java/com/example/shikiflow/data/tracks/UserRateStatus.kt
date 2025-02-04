@@ -1,4 +1,4 @@
-package com.example.shikiflow.data.user
+package com.example.shikiflow.data.tracks
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear

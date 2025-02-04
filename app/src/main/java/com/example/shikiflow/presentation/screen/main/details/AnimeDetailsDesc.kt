@@ -198,8 +198,7 @@ private fun RelatedSection(
         ) {
             Text(
                 text = "Related",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.clickable { onArrowClick() }
+                style = MaterialTheme.typography.titleMedium
             )
             Box(
                 modifier = Modifier
