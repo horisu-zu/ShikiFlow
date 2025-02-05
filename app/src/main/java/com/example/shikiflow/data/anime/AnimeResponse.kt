@@ -1,8 +1,8 @@
 package com.example.shikiflow.data.anime
 
-import com.example.graphql.AnimeTracksV2Query
+import com.example.graphql.AnimeBrowseQuery
 
 data class AnimeResponse(
-    val animeList: List<AnimeTracksV2Query.Anime>,
+    val animeList: List<AnimeBrowseQuery.Anime>,
     val hasNextPage: Boolean
 )

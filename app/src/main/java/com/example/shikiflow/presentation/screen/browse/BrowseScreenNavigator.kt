@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main
+package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
@@ -12,26 +12,26 @@ import com.example.shikiflow.utils.Animations.slideOutToLeft
 import com.example.shikiflow.utils.Animations.slideOutToRight
 
 @Composable
-fun MainScreenNavigator(
+fun BrowseScreenNavigator(
     currentUser: CurrentUserQuery.Data?,
     rootNavController: NavController
 ) {
-    val mainNavController = rememberNavController()
+    val browseNavController = rememberNavController()
+
     NavHost(
-        startDestination = "mainScreen",
-        navController = mainNavController
+        startDestination = "browseScreen",
+        navController = browseNavController
     ) {
         composable(
-            route = "mainScreen",
+            route = "browseScreen",
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
             popExitTransition = { slideOutToRight() }
         ) {
-            MainScreen(
-                mainNavController = mainNavController,
-                rootNavController = rootNavController,
-                currentUser = currentUser
+            BrowseScreen(
+                browseNavController = browseNavController,
+                rootNavController = rootNavController
             )
         }
     }

@@ -35,21 +35,22 @@ fun AnimeDetailsInfo(
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         DetailRow(
             label = "Studio",
+            verticalAlignment = Alignment.CenterVertically,
             content = {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
                 ) {
                     animeDetails.studios.forEach {
-                        CardItem(it.name)
+                        CardItem(it.name, modifier.padding(6.dp))
                     }
                 }
             }
         )
-        if (animeDetails.duration != null) {
+        if (animeDetails.duration != null && animeDetails.duration != 0) {
             DetailRow(
                 label = "Duration",
                 content = {
@@ -80,20 +81,22 @@ fun AnimeDetailsInfo(
             )
         }
         if (animeDetails.status == AnimeStatusEnum.ongoing) {
-            DetailRow(
-                label = "Next Episode at",
-                content = {
-                    Text(
-                        text = formatInstant(
-                            Instant.parse(animeDetails.nextEpisodeAt.toString()),
-                            includeTime = true
-                        ),
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        modifier = Modifier.padding(start = 12.dp)
-                    )
-                }
-            )
+            animeDetails.nextEpisodeAt?.let { nextEpisode ->
+                DetailRow(
+                    label = "Next Episode at",
+                    content = {
+                        Text(
+                            text = formatInstant(
+                                Instant.parse(nextEpisode.toString()),
+                                includeTime = true
+                            ),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.padding(start = 12.dp)
+                        )
+                    }
+                )
+            }
         } else if (animeDetails.status == AnimeStatusEnum.released && animeDetails.releasedOn?.date != null) {
             DetailRow(
                 label = "Released on",
@@ -199,14 +202,14 @@ fun DetailRow(
     label: String,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
     style: TextStyle = MaterialTheme.typography.labelMedium
 ) {
     Row(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
+        verticalAlignment = verticalAlignment
     ) {
         Text(
             text = label,

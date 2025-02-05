@@ -18,9 +18,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
-import com.example.shikiflow.presentation.screen.main.MainScreen
+import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
+import com.example.shikiflow.presentation.screen.main.details.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
+import com.example.shikiflow.utils.Animations.slideInFromLeft
+import com.example.shikiflow.utils.Animations.slideInFromRight
+import com.example.shikiflow.utils.Animations.slideOutToLeft
+import com.example.shikiflow.utils.Animations.slideOutToRight
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -70,12 +75,33 @@ fun NavigationGraph(
     currentUser: CurrentUserQuery.Data?
 ) {
     NavHost(navController, startDestination = BottomNavItem.Home.route, modifier = modifier) {
-        composable(BottomNavItem.Home.route) { MainScreenNavigator(currentUser) }
-        composable(BottomNavItem.Browse.route) { TestScreen() }
+        composable(BottomNavItem.Home.route) {
+            MainScreenNavigator(
+                currentUser = currentUser,
+                rootNavController = navController
+            )
+        }
+        composable(BottomNavItem.Browse.route) {
+            BrowseScreenNavigator(
+                currentUser = currentUser,
+                rootNavController = navController
+            )
+        }
         composable(BottomNavItem.More.route) {
             MoreScreenNavigator(
                 currentUser = currentUser,
                 mainNavController = navController
+            )
+        }
+        composable(
+            route = "animeDetailsScreen/{id}",
+            enterTransition = { slideInFromRight() },
+            exitTransition = { slideOutToLeft() },
+            popEnterTransition = { slideInFromLeft() },
+            popExitTransition = { slideOutToRight() }
+        ) {
+            AnimeDetailsScreen(
+                id = (it.arguments?.getString("id") ?: 0).toString(),
             )
         }
     }
@@ -89,12 +115,14 @@ sealed class BottomNavItem(
 ) {
     object Home :
         BottomNavItem("Main", R.drawable.ic_selected_book, R.drawable.ic_unselected_book, "home")
+
     object Browse : BottomNavItem(
         "Browse",
         R.drawable.ic_selected_browse,
         R.drawable.ic_unselected_browse,
         "search"
     )
+
     object More :
         BottomNavItem("More", R.drawable.ic_selected_dots, R.drawable.ic_unselected_dots, "profile")
 }

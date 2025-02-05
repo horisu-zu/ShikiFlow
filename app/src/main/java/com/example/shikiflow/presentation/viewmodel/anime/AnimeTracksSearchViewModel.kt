@@ -2,7 +2,7 @@ package com.example.shikiflow.presentation.viewmodel.anime
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.graphql.AnimeTracksV2Query
+import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.type.OrderEnum
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.domain.repository.AnimeRepository
@@ -19,7 +19,7 @@ import javax.inject.Inject
 class AnimeTracksSearchViewModel @Inject constructor(
     private val animeRepository: AnimeRepository
 ): ViewModel() {
-    private val _searchResults = MutableStateFlow<Map<MyListString?, List<AnimeTracksV2Query.Anime>>>(
+    private val _searchResults = MutableStateFlow<Map<MyListString?, List<AnimeBrowseQuery.Anime>>>(
         MyListString.entries.associateWith { emptyList() }
     )
     val searchResults = _searchResults.asStateFlow()
@@ -66,10 +66,11 @@ class AnimeTracksSearchViewModel @Inject constructor(
 
             val currentPage = currentSearchPage.value[status] ?: 1
 
-            val result = animeRepository.searchAnimeTracks(
+            val result = animeRepository.browseAnime(
                 name = name,
                 page = currentPage,
                 userStatus = status,
+                limit = 20,
                 order = OrderEnum.popularity
             )
 

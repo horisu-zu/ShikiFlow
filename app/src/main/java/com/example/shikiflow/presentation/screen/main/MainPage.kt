@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    mainNavController: NavController,
+    rootNavController: NavController,
     pagerState: PagerState,
     trackViewModel: AnimeTracksViewModel = hiltViewModel()
 ) {
@@ -85,7 +85,7 @@ fun MainPage(
             ) {
                 status?.let {
                     AnimeTracksPage(
-                        mainNavController = mainNavController,
+                        rootNavController = rootNavController,
                         status = it
                     )
                 }

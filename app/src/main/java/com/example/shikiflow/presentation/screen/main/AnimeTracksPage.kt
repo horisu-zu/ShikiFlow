@@ -31,7 +31,7 @@ import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
 @Composable
 fun AnimeTracksPage(
-    mainNavController: NavController,
+    rootNavController: NavController,
     trackViewModel: AnimeTracksViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel(),
     status: UserRateStatusEnum?
@@ -59,7 +59,7 @@ fun AnimeTracksPage(
             AnimeTrackItem(
                 userRate,
                 onClick = { id ->
-                    mainNavController.navigate("animeDetailsScreen/$id")
+                    rootNavController.navigate("animeDetailsScreen/$id")
                 },
                 onLongClick = {
                     rateBottomSheet = true

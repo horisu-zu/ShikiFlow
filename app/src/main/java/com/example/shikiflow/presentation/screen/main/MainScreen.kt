@@ -3,8 +3,7 @@ package com.example.shikiflow.presentation.screen.main
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.rememberPagerState
@@ -27,6 +26,7 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 @Composable
 fun MainScreen(
     mainNavController: NavController,
+    rootNavController: NavController,
     currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel()
 ) {
@@ -56,18 +56,17 @@ fun MainScreen(
             )
         }
     ) { innerPadding ->
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
-            verticalArrangement = Arrangement.Top
+                .padding(innerPadding)
         ) {
             Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                 if (isSearchActive) {
                     SearchPage()
                 } else {
                     MainPage(
-                        mainNavController = mainNavController,
+                        rootNavController = rootNavController,
                         pagerState = pagerState
                     )
                 }

@@ -104,7 +104,7 @@ fun AnimeDetailsTitle(
                 infoItem = if (animeDetails?.status != AnimeStatusEnum.ongoing) {
                     "${animeDetails?.episodes} ep."
                 } else {
-                    "${animeDetails.episodesAired} of ${animeDetails.episodes} ep."
+                    "${animeDetails.episodesAired} of ${animeDetails.episodes.takeIf { it != 0 } ?: "?"} ep."
                 }
             )
             ShortInfoItem(

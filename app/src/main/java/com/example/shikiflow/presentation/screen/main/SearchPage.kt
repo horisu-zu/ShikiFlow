@@ -52,7 +52,7 @@ fun SearchPage(
         "Watching" -> MyListString.WATCHING
         "Planned" -> MyListString.PLANNED
         "Rewatching" -> MyListString.REWATCHING
-        "Watched" -> MyListString.COMPLETED
+        "Completed" -> MyListString.COMPLETED
         "On Hold" -> MyListString.ON_HOLD
         "Dropped" -> MyListString.DROPPED
         else -> null
