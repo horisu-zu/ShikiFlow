@@ -125,13 +125,25 @@ fun AnimeTrackItem(
                 }
             ) {
                 ProgressBar(
-                    progress = userRate.animeUserRateWithModel.anime?.animeShort?.episodes?.let {
-                        (userRate.animeUserRateWithModel.episodes.toFloat() / it)
+                    progress = userRate.animeUserRateWithModel.anime?.animeShort?.let { animeShort ->
+                        val totalEpisodes = when {
+                            animeShort.episodes > 0 -> animeShort.episodes
+                            animeShort.episodesAired > 0 -> animeShort.episodesAired
+                            else -> null
+                        }
+                        totalEpisodes?.let { userRate.animeUserRateWithModel.episodes.toFloat() / it } ?: 0f
                     } ?: 0f
                 )
                 Text(
                     text = "${userRate.animeUserRateWithModel.episodes} of " +
-                            "${userRate.animeUserRateWithModel.anime?.animeShort?.episodes} ep.",
+                            "${userRate.animeUserRateWithModel.anime?.animeShort?.let { animeShort ->
+                                val totalEpisodes = when {
+                                    animeShort.episodes > 0 -> animeShort.episodes
+                                    animeShort.episodesAired > 0 -> animeShort.episodesAired
+                                    else -> 0
+                                }
+                                totalEpisodes
+                            } ?: 0} ep.",
                     fontSize = 12.sp
                 )
             }

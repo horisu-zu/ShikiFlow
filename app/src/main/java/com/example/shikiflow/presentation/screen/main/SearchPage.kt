@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
@@ -37,6 +38,7 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable
 fun SearchPage(
+    rootNavController: NavController,
     searchViewModel: SearchViewModel = hiltViewModel(),
     tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel()
 ) {
@@ -114,7 +116,12 @@ fun SearchPage(
 
                 items(items.size) { index ->
                     val userRate = items[index]
-                    SearchAnimeTrackItem(userRate)
+                    SearchAnimeTrackItem(
+                        animeItem = userRate,
+                        onItemClick = { id ->
+                            rootNavController.navigate("animeDetailsScreen/$id")
+                        }
+                    )
 
                     if (index >= items.size - 5 && shouldLoadMore.value) {
                         LaunchedEffect(selectedStatus) {

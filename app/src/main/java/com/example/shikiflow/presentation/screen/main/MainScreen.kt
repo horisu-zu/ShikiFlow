@@ -63,7 +63,9 @@ fun MainScreen(
         ) {
             Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                 if (isSearchActive) {
-                    SearchPage()
+                    SearchPage(
+                        rootNavController = rootNavController
+                    )
                 } else {
                     MainPage(
                         rootNavController = rootNavController,

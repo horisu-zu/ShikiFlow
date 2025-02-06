@@ -23,6 +23,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.data.tracks.TargetType
+import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
@@ -35,6 +39,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AnimeDetailsScreen(
     id: String,
+    currentUser: CurrentUserQuery.Data?,
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -117,29 +122,47 @@ fun AnimeDetailsScreen(
 
     if (rateBottomSheet) {
         val isUpdating by userViewModel.isUpdating.collectAsState()
+        val animeDetailsData = animeDetails.value.data
 
-        animeDetails.value.data?.userRate?.toUiModel(animeDetails.value.data)?.let { rate ->
-            UserRateBottomSheet(
-                userRate = rate,
-                isLoading = isUpdating,
-                onDismiss = { rateBottomSheet = false },
-                onSave = { rateId, status, score, episodes, rewatches, mediaType ->
-                    userViewModel.updateUserRate(
-                        id = rateId,
-                        status = status,
-                        score = score,
-                        progress = episodes,
-                        rewatches = rewatches,
-                        mediaType = mediaType,
-                        onComplete = { success ->
-                            if (success) {
-                                animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
-                                rateBottomSheet = false
-                            }
+        UserRateBottomSheet(
+            userRate = animeDetailsData?.userRate?.toUiModel(animeDetailsData) ?: UserRateData.createEmpty(
+                mediaId = animeDetailsData?.id ?: "",
+                mediaTitle = animeDetailsData?.name ?: "",
+                mediaPosterUrl = animeDetailsData?.poster?.originalUrl ?: "",
+                mediaType = MediaType.ANIME
+            ),
+            isLoading = isUpdating,
+            onDismiss = { rateBottomSheet = false },
+            onSave = { rateId, status, score, episodes, rewatches, mediaType ->
+                userViewModel.updateUserRate(
+                    id = rateId,
+                    status = status,
+                    score = score,
+                    progress = episodes,
+                    rewatches = rewatches,
+                    mediaType = mediaType,
+                    onComplete = { success ->
+                        if (success) {
+                            animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
+                            rateBottomSheet = false
                         }
-                    )
-                }
-            )
-        }
+                    }
+                )
+            },
+            onCreateRate = { mediaId, status ->
+                userViewModel.createUserRate(
+                    userId = currentUser?.currentUser?.id ?: "",
+                    targetId = mediaId,
+                    status = status,
+                    targetType = TargetType.ANIME,
+                    onComplete = { success ->
+                        if (success) {
+                            animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
+                            rateBottomSheet = false
+                        }
+                    }
+                )
+            }
+        )
     }
 }

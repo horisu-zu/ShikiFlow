@@ -1,5 +1,5 @@
 # ShikiFlow
-[Shikimori](https://shikimori.one/) Mobile App
+(NON-OFFICIAL) [Shikimori](https://shikimori.one/) Mobile App
 
 Work-in-progress
 

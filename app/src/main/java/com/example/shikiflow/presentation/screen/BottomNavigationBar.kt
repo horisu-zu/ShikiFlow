@@ -102,6 +102,7 @@ fun NavigationGraph(
         ) {
             AnimeDetailsScreen(
                 id = (it.arguments?.getString("id") ?: 0).toString(),
+                currentUser = currentUser
             )
         }
     }

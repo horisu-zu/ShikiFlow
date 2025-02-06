@@ -4,13 +4,14 @@ import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.MangaTracksQuery
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant
 
 enum class MediaType { ANIME, MANGA }
 
 data class UserRateData(
-    val id: String,
+    val id: String? = null,
     val mediaType: MediaType,
     val status: String,
     val progress: Int,
@@ -23,7 +24,30 @@ data class UserRateData(
     val updateDate: Instant,
     val totalEpisodes: Int?,
     val totalChapters: Int?
-)
+) {
+    companion object {
+        fun createEmpty(
+            mediaId: String,
+            mediaTitle: String,
+            mediaPosterUrl: String?,
+            mediaType: MediaType
+        ) = UserRateData(
+            id = null,
+            mediaType = mediaType,
+            status = "",
+            progress = 0,
+            rewatches = 0,
+            score = 0,
+            mediaId = mediaId,
+            title = mediaTitle,
+            posterUrl = mediaPosterUrl,
+            createDate = Clock.System.now(),
+            updateDate = Clock.System.now(),
+            totalEpisodes = null,
+            totalChapters = null
+        )
+    }
+}
 
 fun AnimeTracksQuery.UserRate.toUiModel() = UserRateData(
     id = animeUserRateWithModel.id,
@@ -67,8 +91,8 @@ fun AnimeDetailsQuery.UserRate.toUiModel(media: AnimeDetailsQuery.Anime?) = User
     mediaId = media?.id.toString(),
     title = media?.name.toString(),
     posterUrl = media?.poster?.originalUrl,
-    createDate = media?.createdAt.toString().toInstant(),
-    updateDate = media?.updatedAt.toString().toInstant(),
+    createDate = createdAt.toString().toInstant(),
+    updateDate = updatedAt.toString().toInstant(),
     totalEpisodes = media?.episodes,
     totalChapters = null
 )

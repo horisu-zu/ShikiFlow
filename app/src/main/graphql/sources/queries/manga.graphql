@@ -75,6 +75,56 @@ query MangaDetails(
     }
 }
 
+query MangaBrowse(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $order: OrderEnum = ranked
+    $kind: MangaKindString
+    $status: MangaStatusString
+    $score: Int
+    $genre: String
+    $search: String
+    $publisher: String
+    $franchise: String
+    $censored: Boolean
+    $mylist: MylistString
+) {
+    mangas(
+        page: $page, limit: $limit, order: $order, search: $search, kind: $kind, status: $status, score: $score,
+        genre: $genre, publisher: $publisher, franchise: $franchise,censored: $censored, mylist: $mylist
+    ) {
+        id
+        malId
+        name
+        russian
+        licenseNameRu
+        english
+        japanese
+        synonyms
+        kind
+        score
+        status
+        volumes
+        chapters
+        airedOn { year month day date }
+        releasedOn { year month day date }
+        url
+
+        poster { ...PosterShort }
+
+        createdAt,
+        updatedAt,
+        isCensored
+
+        genres { id name russian kind }
+        publishers { id name }
+
+        userRate {
+            ...MangaUserRate
+        }
+    }
+}
+
 query mangas(
     $page: PositiveInt = 1
     $limit: PositiveInt = 2

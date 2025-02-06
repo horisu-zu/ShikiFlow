@@ -36,6 +36,7 @@ import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun AnimeDetailsTitle(
@@ -194,27 +195,16 @@ private fun UserStatusItem(
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val icon = AnimeStatus.fromStatus(status ?: UserRateStatusEnum.dropped)?.icon
+        val icon = AnimeStatus.fromStatus(status ?: UserRateStatusEnum.UNKNOWN__)?.icon
             ?: IconResource.Vector(Icons.Outlined.Clear)
 
-        when (icon) {
-            is IconResource.Drawable -> Icon(
-                painter = painterResource(id = icon.resId),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.surface
-            )
-
-            is IconResource.Vector -> Icon(
-                imageVector = icon.imageVector,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.surface
-            )
-        }
+        icon.toIcon(
+            modifier = Modifier.size(24.dp),
+            tint = MaterialTheme.colorScheme.surface
+        )
         Text(
             text = UserRateMapper.mapStatusToString(
-                status = status ?: UserRateStatusEnum.dropped,
+                status = status ?: UserRateStatusEnum.UNKNOWN__,
                 allEpisodes = allEpisodes,
                 watchedEpisodes = watchedEpisodes,
                 score = score

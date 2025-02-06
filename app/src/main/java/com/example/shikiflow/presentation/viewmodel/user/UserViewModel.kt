@@ -7,6 +7,8 @@ import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.UserRateRequest
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
+import com.example.shikiflow.data.tracks.CreateUserRateRequest
+import com.example.shikiflow.data.tracks.TargetType
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -76,6 +78,36 @@ class UserViewModel @Inject constructor(
             onComplete?.invoke(result)
         } catch (e: Exception) {
             Log.e("UserViewModel", "Error updating user rate", e)
+            onComplete?.invoke(false)
+        } finally {
+            _isUpdating.value = false
+        }
+    }
+
+    fun createUserRate(
+        userId: String,
+        targetId: String,
+        status: Int,
+        targetType: TargetType,
+        onComplete: ((Boolean) -> Unit)? = null
+    ) = viewModelScope.launch {
+        _isUpdating.value = true
+
+        try {
+            val request = CreateUserRateRequest(
+                userId = userId.toLong(),
+                targetId = targetId.toLong(),
+                status = UserRateStatusConstants.convertToApiStatus(status),
+                targetType = targetType
+            )
+
+            val result = withContext(Dispatchers.IO) {
+                userRepository.createUserRate(request)
+            }.isSuccess
+
+            onComplete?.invoke(result)
+        } catch (e: Exception) {
+            Log.e("UserViewModel", "Error creating user rate: ${e.message}")
             onComplete?.invoke(false)
         } finally {
             _isUpdating.value = false

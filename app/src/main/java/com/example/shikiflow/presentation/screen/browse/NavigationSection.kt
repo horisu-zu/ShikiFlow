@@ -9,13 +9,16 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.shikiflow.R
+import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.presentation.common.NavigationCard
 import com.example.shikiflow.utils.IconResource
 
 @Composable
 fun NavigationSection(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    browseNavController: NavController
 ) {
     Column (
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -27,7 +30,9 @@ fun NavigationSection(
             NavigationCard(
                 icon = IconResource.Drawable(R.drawable.ic_anime) ,
                 title = "Anime's Top",
-                onClick = { /**/ },
+                onClick = {
+                    browseNavController.navigate("sideScreen/${BrowseType.AnimeBrowseType.TOP}")
+                },
                 modifier = Modifier.weight(1f),
             )
             NavigationCard(
@@ -40,7 +45,9 @@ fun NavigationSection(
         NavigationCard(
             icon = IconResource.Vector(Icons.Default.DateRange),
             title = "Ongoings Calendar",
-            onClick = { /**/ }
+            onClick = {
+                browseNavController.navigate("sideScreen/${BrowseType.AnimeBrowseType.ONGOING_CALENDAR}")
+            }
         )
     }
 }

@@ -13,14 +13,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.data.anime.AnimeBrowseState
+import androidx.navigation.NavController
+import com.example.shikiflow.data.anime.BrowseState
 
 @Composable
 fun BrowseMainPage(
-    ongoingBrowseState: AnimeBrowseState,
+    ongoingBrowseState: BrowseState.AnimeBrowseState,
     onNavigate: (String) -> Unit,
     onLoadMore: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    browseNavController: NavController
 ) {
     if(ongoingBrowseState.isLoading) {
         Box(
@@ -43,7 +45,9 @@ fun BrowseMainPage(
             item(
                 span = { GridItemSpan(3) }
             ) {
-                NavigationSection()
+                NavigationSection(
+                    browseNavController = browseNavController
+                )
             }
 
             items(ongoingList.size) { index ->

@@ -2,6 +2,7 @@ package com.example.shikiflow.di.api
 
 import com.example.shikiflow.data.anime.ShortAnimeRate
 import com.example.shikiflow.data.manga.ShortMangaRate
+import com.example.shikiflow.data.tracks.CreateUserRateRequest
 import com.example.shikiflow.data.user.UserHistoryResponse
 import com.example.shikiflow.data.tracks.UserRate
 import com.example.shikiflow.data.tracks.UserRateRequest
@@ -9,6 +10,7 @@ import com.example.shikiflow.data.tracks.UserRateResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -54,5 +56,10 @@ interface UserApi {
     suspend fun updateUserRate(
         @Path("id") id: Long,
         @Body request: UserRateRequest
+    ): UserRateResponse
+
+    @POST("api/v2/user_rates")
+    suspend fun createUserRate(
+        @Body createRequest: CreateUserRateRequest
     ): UserRateResponse
 }

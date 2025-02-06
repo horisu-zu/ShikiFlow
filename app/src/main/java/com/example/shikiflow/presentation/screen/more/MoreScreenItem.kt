@@ -21,6 +21,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun SectionTitle(
@@ -105,33 +106,16 @@ fun GeneralItem(
     ) {
         val (iconRef, titleRef) = createRefs()
 
-        when (icon) {
-            is IconResource.Drawable -> Icon(
-                painter = painterResource(id = icon.resId),
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .constrainAs(iconRef) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start)
-                    },
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-
-            is IconResource.Vector -> Icon(
-                imageVector = icon.imageVector,
-                contentDescription = null,
-                modifier = Modifier
-                    .size(24.dp)
-                    .constrainAs(iconRef) {
-                        top.linkTo(parent.top)
-                        bottom.linkTo(parent.bottom)
-                        start.linkTo(parent.start)
-                    },
-                tint = MaterialTheme.colorScheme.onSurface
-            )
-        }
+        icon.toIcon(
+            modifier = Modifier
+                .size(24.dp)
+                .constrainAs(iconRef) {
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                },
+            tint = MaterialTheme.colorScheme.onSurface
+        )
 
         Text(
             text = title,

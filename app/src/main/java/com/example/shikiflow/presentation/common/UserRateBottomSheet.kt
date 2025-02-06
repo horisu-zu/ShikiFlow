@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -53,7 +52,7 @@ import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.convertStatus
-import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,15 +62,15 @@ fun UserRateBottomSheet(
     onDismiss: () -> Unit,
     onSave: (Long, Int, Int, Int, Int, MediaType) -> Unit,
     modifier: Modifier = Modifier,
+    onCreateRate: (String, Int) -> Unit = { _, _ -> },
     isLoading: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState()
     val chips = UserRateStatusConstants.chips
     val initialStatusIndex = chips.indexOfFirst { it.equals(convertStatus(userRate.status), ignoreCase = true) }
-    val initialScore = userRate.score ?: 0
 
-    var selectedStatus by remember { mutableIntStateOf(initialStatusIndex.coerceAtLeast(0)) }
-    var selectedScore by remember { mutableIntStateOf(initialScore) }
+    var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
+    var selectedScore by remember { mutableIntStateOf(userRate.score) }
     var progress by remember { mutableIntStateOf(userRate.progress) }
     var rewatches by remember { mutableIntStateOf(userRate.rewatches) }
 
@@ -97,36 +96,45 @@ fun UserRateBottomSheet(
                 onStatusSelected = { selectedStatus = it }
             )
 
-            ScoreSelector(
-                score = selectedScore,
-                onScoreChange = { selectedScore = it }
-            )
+            if(userRate.id != null) {
+                ScoreSelector(
+                    score = selectedScore,
+                    onScoreChange = { selectedScore = it }
+                )
 
-            ProgressColumn(
-                userRate = userRate.copy(
-                    progress = progress,
-                    rewatches = rewatches
-                ),
-                onProgressChange = { newProgress -> progress = newProgress },
-                onRewatchesChange = { newRewatches -> rewatches = newRewatches }
-            )
+                ProgressColumn(
+                    userRate = userRate.copy(
+                        progress = progress,
+                        rewatches = rewatches
+                    ),
+                    onProgressChange = { newProgress -> progress = newProgress },
+                    onRewatchesChange = { newRewatches -> rewatches = newRewatches }
+                )
 
-            ChangeRow(
-                onSave = {
-                    onSave(
-                        userRate.id.toLong(),
-                        selectedStatus,
-                        selectedScore,
-                        progress,
-                        rewatches,
-                        userRate.mediaType
-                    )
-                },
-                createDate = userRate.createDate,
-                updateDate = userRate.updateDate,
-                isLoading = isLoading,
-                enabled = !isLoading
-            )
+                ChangeRow(
+                    onSave = {
+                        onSave(
+                            userRate.id.toLong(),
+                            selectedStatus,
+                            selectedScore,
+                            progress,
+                            rewatches,
+                            userRate.mediaType
+                        )
+                    },
+                    createDate = userRate.createDate,
+                    updateDate = userRate.updateDate,
+                    isLoading = isLoading,
+                    enabled = !isLoading
+                )
+            } else {
+                Button(
+                    modifier = Modifier.clip(RoundedCornerShape(12.dp)),
+                    label = "Add to List",
+                    onClick = { onCreateRate(userRate.mediaId, selectedStatus) },
+                    enabled = selectedStatus != -1
+                )
+            }
         }
     }
 }
@@ -192,26 +200,17 @@ private fun StatusChips(
     ) {
         items(chips) { tab ->
             FilterChip(
-                selected = chips[selectedStatus] == tab,
-                onClick = { onStatusSelected(chips.indexOf(tab)) },
+                selected = selectedStatus != -1 && chips.getOrNull(selectedStatus) == tab,
+                onClick = {
+                    val newIndex = chips.indexOf(tab)
+                    onStatusSelected(if (selectedStatus == newIndex) -1 else newIndex)
+                },
                 label = { Text(tab) },
                 leadingIcon = {
-                    statusMap[tab.lowercase()]?.icon?.let { iconResource ->
-                        when (iconResource) {
-                            is IconResource.Vector -> Icon(
-                                imageVector = iconResource.imageVector,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.size(FilterChipDefaults.IconSize)
-                            )
-                            is IconResource.Drawable -> Icon(
-                                painter = painterResource(iconResource.resId),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.size(FilterChipDefaults.IconSize)
-                            )
-                        }
-                    }
+                    statusMap[tab.lowercase()]?.icon?.toIcon(
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(FilterChipDefaults.IconSize)
+                    )
                 }
             )
         }

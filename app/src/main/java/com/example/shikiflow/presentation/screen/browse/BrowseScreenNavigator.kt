@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
 import com.example.shikiflow.utils.Animations.slideOutToLeft
@@ -32,6 +33,24 @@ fun BrowseScreenNavigator(
             BrowseScreen(
                 browseNavController = browseNavController,
                 rootNavController = rootNavController
+            )
+        }
+        composable(
+            route = "sideScreen/{browseType}",
+            enterTransition = { slideInFromRight() },
+            exitTransition = { slideOutToLeft() },
+            popEnterTransition = { slideInFromLeft() },
+            popExitTransition = { slideOutToRight() }
+        ) { backStackEntry ->
+            val browseTypeArg = backStackEntry.arguments?.getString("browseType") ?: return@composable
+            val browseType = BrowseType.AnimeBrowseType.entries
+                .find { it.name == browseTypeArg }
+                ?: BrowseType.AnimeBrowseType.SEARCH
+
+            BrowseSideScreen(
+                browseType = browseType,
+                rootNavController = rootNavController,
+                browseNavController = browseNavController
             )
         }
     }

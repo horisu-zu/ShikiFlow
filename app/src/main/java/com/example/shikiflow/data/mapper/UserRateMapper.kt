@@ -50,7 +50,7 @@ class UserRateMapper {
                     else "On Hold"
                 UserRateStatusEnum.dropped -> if (score != null && score != 0) "Dropped ∙ $score ★"
                     else if(watchedEpisodes != null) "Dropped ∙ $watchedEpisodes/$allEpisodes" else "Dropped"
-                UserRateStatusEnum.UNKNOWN__ -> "Unknown"
+                UserRateStatusEnum.UNKNOWN__ -> "Add to List"
             }
         }
 

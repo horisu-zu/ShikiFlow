@@ -21,8 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.example.graphql.type.AnimeStatusEnum
-import com.example.shikiflow.data.anime.AnimeBrowseType
+import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeBrowseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,7 +31,7 @@ fun BrowseScreen(
     browseNavController: NavController,
     rootNavController : NavController
 ) {
-    val ongoingBrowseState by browseViewModel.getAnimeState(AnimeBrowseType.ONGOING).collectAsState()
+    val ongoingBrowseState by browseViewModel.getAnimeState(BrowseType.AnimeBrowseType.ONGOING).collectAsState()
     val isInitialized = remember {
         derivedStateOf {
             ongoingBrowseState.hasMorePages && ongoingBrowseState.items.isEmpty()
@@ -41,7 +40,7 @@ fun BrowseScreen(
 
     LaunchedEffect(Unit) {
         if (isInitialized.value) {
-            browseViewModel.browseAnime(status = AnimeStatusEnum.ongoing)
+            browseViewModel.browseAnime(BrowseType.AnimeBrowseType.ONGOING)
         }
     }
 
@@ -77,9 +76,10 @@ fun BrowseScreen(
                 rootNavController.navigate("animeDetailsScreen/$id")
             },
             onLoadMore = {
-                browseViewModel.browseAnime(status = AnimeStatusEnum.ongoing, isLoadingMore = true)
+                browseViewModel.browseAnime(BrowseType.AnimeBrowseType.ONGOING, isLoadingMore = true)
             },
-            modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp)
+            modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
+            browseNavController = browseNavController
         )
     }
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun CardItem(
@@ -58,18 +59,10 @@ fun NavigationCard(
         horizontalArrangement = Arrangement.spacedBy(6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        when(icon) {
-            is IconResource.Drawable -> Icon(
-                painter = painterResource(icon.resId),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
-            is IconResource.Vector -> Icon(
-                imageVector = icon.imageVector,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
-        }
+        icon.toIcon(
+            modifier = Modifier.size(24.dp),
+            tint = MaterialTheme.colorScheme.onSurface
+        )
         Text(
             text = title,
             style = MaterialTheme.typography.labelLarge

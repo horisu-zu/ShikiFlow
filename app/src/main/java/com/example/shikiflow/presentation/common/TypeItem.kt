@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun TypeItem(
@@ -41,25 +42,12 @@ fun TypeItem(
                 },
             contentAlignment = Alignment.Center
         ) {
-            when (icon) {
-                is IconResource.Drawable -> Icon(
-                    painter = painterResource(id = icon.resId),
-                    contentDescription = "Type Icon",
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .size(36.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-
-                is IconResource.Vector -> Icon(
-                    imageVector = icon.imageVector,
-                    contentDescription = "Type Icon",
-                    modifier = Modifier
-                        .padding(6.dp)
-                        .size(36.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+            icon.toIcon(
+                modifier = Modifier
+                    .padding(6.dp)
+                    .size(36.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
 
         Text(

@@ -4,6 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.data.anime.ShortAnimeRate
 import com.example.shikiflow.data.manga.ShortMangaRate
+import com.example.shikiflow.data.tracks.CreateUserRateRequest
 import com.example.shikiflow.data.tracks.TargetType
 import com.example.shikiflow.data.user.UserHistoryResponse
 import com.example.shikiflow.data.tracks.UserRate
@@ -109,5 +110,9 @@ class UserRepository @Inject constructor(
             id = id,
             request = request
         )
+    }
+
+    suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse> = kotlin.runCatching {
+        userApi.createUserRate(createRequest)
     }
 }

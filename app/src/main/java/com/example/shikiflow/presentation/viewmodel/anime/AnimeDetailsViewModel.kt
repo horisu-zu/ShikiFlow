@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.anime
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.AnimeDetailsQuery
@@ -28,7 +29,10 @@ class AnimeDetailsViewModel @Inject constructor(
             try {
                 val result = animeRepository.getAnimeDetails(id)
                 _animeDetails.value = when {
-                    result.isSuccess -> Resource.Success(result.getOrNull())
+                    result.isSuccess -> {
+                        Log.d("AnimeDetailsViewModel", "User Rate: ${result.getOrNull()?.userRate}")
+                        Resource.Success(result.getOrNull())
+                    }
                     result.isFailure -> Resource.Error(
                         result.exceptionOrNull()?.message ?: "Unknown error"
                     )
