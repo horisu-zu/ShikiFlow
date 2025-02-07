@@ -2,9 +2,10 @@ package com.example.shikiflow.presentation.screen.main.details
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,8 @@ fun RelatedBottomSheet(
             modifier = Modifier.heightIn(min = 480.dp)
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 Text(
                     text = "Related",

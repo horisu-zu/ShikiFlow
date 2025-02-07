@@ -1,16 +1,8 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -22,21 +14,25 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shikiflow.data.anime.BrowseType
+import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeBrowseViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseScreen(
     browseViewModel: AnimeBrowseViewModel = hiltViewModel(),
+    searchViewModel: SearchViewModel = hiltViewModel(),
     browseNavController: NavController,
-    rootNavController : NavController
+    rootNavController: NavController
 ) {
-    val ongoingBrowseState by browseViewModel.getAnimeState(BrowseType.AnimeBrowseType.ONGOING).collectAsState()
+    val ongoingBrowseState by browseViewModel.getAnimeState(BrowseType.AnimeBrowseType.ONGOING)
+        .collectAsState()
     val isInitialized = remember {
         derivedStateOf {
             ongoingBrowseState.hasMorePages && ongoingBrowseState.items.isEmpty()
         }
     }
+    val searchQuery by searchViewModel.screenState.collectAsState()
+    val screenState by searchViewModel.screenState.collectAsState()
 
     LaunchedEffect(Unit) {
         if (isInitialized.value) {
@@ -46,40 +42,42 @@ fun BrowseScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Browse",
-                        style = MaterialTheme.typography.headlineSmall
-                    )
+            BrowseAppBar(
+                title = "Browse",
+                searchQuery = searchQuery.query,
+                onSearchQueryChange = searchViewModel::onQueryChange,
+                isSearchActive = screenState.isSearchActive,
+                onSearchActiveChange = { isActive ->
+                    searchViewModel.onSearchActiveChange(isActive)
+                    searchViewModel.clearSearchState()
                 },
-                actions = {
-                    IconButton(
-                        onClick = { /**/ }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
                 modifier = Modifier.padding(top = 24.dp)
             )
         }
     ) { paddingValues ->
-        BrowseMainPage(
-            ongoingBrowseState = ongoingBrowseState,
-            onNavigate = { id ->
-                rootNavController.navigate("animeDetailsScreen/$id")
-            },
-            onLoadMore = {
-                browseViewModel.browseAnime(BrowseType.AnimeBrowseType.ONGOING, isLoadingMore = true)
-            },
-            modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
-            browseNavController = browseNavController
-        )
+        Crossfade(screenState.isSearchActive) { isSearchActive ->
+            if (isSearchActive) {
+                BrowseSearchPage(
+                    query = searchQuery.query,
+                    modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
+                    rootNavController = rootNavController
+                )
+            } else {
+                BrowseMainPage(
+                    ongoingBrowseState = ongoingBrowseState,
+                    onNavigate = { id ->
+                        rootNavController.navigate("animeDetailsScreen/$id")
+                    },
+                    onLoadMore = {
+                        browseViewModel.browseAnime(
+                            type = BrowseType.AnimeBrowseType.ONGOING,
+                            isLoadingMore = true
+                        )
+                    },
+                    modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
+                    browseNavController = browseNavController
+                )
+            }
+        }
     }
 }

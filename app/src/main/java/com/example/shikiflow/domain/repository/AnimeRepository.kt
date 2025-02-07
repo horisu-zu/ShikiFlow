@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.repository
 
+import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.example.graphql.AnimeBrowseQuery
@@ -42,7 +43,7 @@ class AnimeRepository @Inject constructor(
         userStatus: MyListString? = null,
         searchInUserList: Boolean = true,
         order: OrderEnum? = null,
-        kind: AnimeKindEnum? = null,
+        kind: String? = null,
         status: String? = null,
         season: SeasonString? = null,
         score: Int? = null,
@@ -74,6 +75,7 @@ class AnimeRepository @Inject constructor(
             studio = Optional.presentIfNotNull(studio),
             franchise = Optional.presentIfNotNull(franchise)
         )
+        Log.d("AnimeRepository", "Query: ${order?.rawValue}")
 
         return try {
             val response = apolloClient.query(query).execute()

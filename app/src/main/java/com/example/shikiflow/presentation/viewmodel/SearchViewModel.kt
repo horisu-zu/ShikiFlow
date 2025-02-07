@@ -22,4 +22,8 @@ class SearchViewModel @Inject constructor(): ViewModel() {
     fun onSearchActiveChange(isActive: Boolean) {
         _screenState.update { it.copy(isSearchActive = isActive) }
     }
+
+    fun clearSearchState() {
+        _screenState.update { it.copy(query = "") }
+    }
 }

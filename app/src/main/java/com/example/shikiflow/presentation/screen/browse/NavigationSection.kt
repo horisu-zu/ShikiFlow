@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.shikiflow.R
 import com.example.shikiflow.data.anime.BrowseType
+import com.example.shikiflow.data.anime.navigateToSideScreen
 import com.example.shikiflow.presentation.common.NavigationCard
 import com.example.shikiflow.utils.IconResource
 
@@ -31,14 +32,14 @@ fun NavigationSection(
                 icon = IconResource.Drawable(R.drawable.ic_anime) ,
                 title = "Anime's Top",
                 onClick = {
-                    browseNavController.navigate("sideScreen/${BrowseType.AnimeBrowseType.TOP}")
+                    browseNavController.navigateToSideScreen(BrowseType.AnimeBrowseType.ANIME_TOP)
                 },
                 modifier = Modifier.weight(1f),
             )
             NavigationCard(
                 icon = IconResource.Drawable(R.drawable.ic_manga) ,
                 title = "Manga's Top",
-                onClick = { /**/ },
+                onClick = { browseNavController.navigateToSideScreen(BrowseType.MangaBrowseType.MANGA_TOP) },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -46,7 +47,7 @@ fun NavigationSection(
             icon = IconResource.Vector(Icons.Default.DateRange),
             title = "Ongoings Calendar",
             onClick = {
-                browseNavController.navigate("sideScreen/${BrowseType.AnimeBrowseType.ONGOING_CALENDAR}")
+                browseNavController.navigateToSideScreen(BrowseType.AnimeBrowseType.ONGOING)
             }
         )
     }

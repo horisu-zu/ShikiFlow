@@ -6,6 +6,23 @@ import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.RelationKindEnum
 import com.example.graphql.type.UserRateStatusEnum
+import kotlin.reflect.KClass
+
+object EnumUtils {
+    fun formatEnumName(enumValue: Enum<*>): String =
+        enumValue.name.lowercase().replace("_", " ").replaceFirstChar { it.uppercase() }
+
+    private fun <T : Enum<T>> getEnumList(enumClass: KClass<T>): List<T> =
+        enumClass.java.enumConstants
+            ?.filter { !it.name.startsWith("UNKNOWN") }
+            ?: emptyList()
+
+    fun <T : Enum<T>> getFormattedEnumList(enumClass: KClass<T>): List<String> =
+        getEnumList(enumClass).map { formatEnumName(it) }
+
+    fun <T : Enum<T>> findEnumByFormattedName(enumClass: KClass<T>, formattedName: String): T? =
+        getEnumList(enumClass).find { formatEnumName(it) == formattedName }
+}
 
 class UserRateMapper {
     companion object {

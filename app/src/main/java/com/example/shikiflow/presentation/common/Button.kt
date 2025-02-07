@@ -36,7 +36,7 @@ fun Button(
             .fillMaxWidth(),
         colors = ButtonDefaults.buttonColors(
             containerColor = if (enabled) MaterialTheme.colorScheme.primary else Color.Transparent,
-            contentColor = if (enabled) MaterialTheme.colorScheme.onPrimary
+            contentColor = if (enabled) MaterialTheme.colorScheme.onSurface
                 else MaterialTheme.colorScheme.onSurfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),

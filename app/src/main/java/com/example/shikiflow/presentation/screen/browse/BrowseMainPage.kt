@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.shikiflow.data.anime.BrowseState
+import com.example.shikiflow.data.anime.toBrowseAnime
 
 @Composable
 fun BrowseMainPage(
@@ -52,7 +53,7 @@ fun BrowseMainPage(
 
             items(ongoingList.size) { index ->
                 BrowseItem(
-                    anime = ongoingList[index],
+                    browseItem = ongoingList[index].toBrowseAnime(),
                     onItemClick = onNavigate
                 )
 

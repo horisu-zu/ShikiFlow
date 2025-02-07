@@ -14,15 +14,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.graphql.AnimeBrowseQuery
-import com.example.shikiflow.data.mapper.UserRateMapper
+import com.example.shikiflow.data.anime.Browse
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 
 @SuppressLint("UnrememberedMutableInteractionSource")
 @Composable
 fun BrowseItem(
-    anime: AnimeBrowseQuery.Anime,
+    browseItem: Browse,
     onItemClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -32,13 +31,13 @@ fun BrowseItem(
             .clickable(
                 interactionSource = MutableInteractionSource(),
                 indication = null,
-                onClick = { onItemClick(anime.id) }
+                onClick = { onItemClick(browseItem.id) }
             )
     ) {
         val (posterRef, titleRef, infoRef) = createRefs()
 
         BaseImage(
-            model = anime.poster?.posterShort?.mainUrl,
+            model = browseItem.posterUrl,
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(),
             modifier = Modifier.constrainAs(posterRef) {
@@ -49,7 +48,7 @@ fun BrowseItem(
         )
 
         Text(
-            text = anime.name,
+            text = browseItem.title,
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,
@@ -62,7 +61,7 @@ fun BrowseItem(
         )
 
         Text(
-            text = "${UserRateMapper.mapAnimeKind(anime.kind)} • ${anime.score}★",
+            text = "${browseItem.kind} • ${browseItem.score}★",
             style = MaterialTheme.typography.labelSmall.copy(
                 fontSize = 10.sp
             ),

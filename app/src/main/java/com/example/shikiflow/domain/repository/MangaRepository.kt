@@ -5,11 +5,7 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.example.graphql.MangaBrowseQuery
 import com.example.graphql.ShortMangaTracksQuery
-import com.example.graphql.type.AnimeKindEnum
-import com.example.graphql.type.DurationString
 import com.example.graphql.type.OrderEnum
-import com.example.graphql.type.RatingString
-import com.example.graphql.type.SeasonString
 import com.example.graphql.type.UserRateOrderInputType
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.anime.MyListString
@@ -29,7 +25,7 @@ class MangaRepository @Inject constructor(
         userStatus: MyListString? = null,
         searchInUserList: Boolean = true,
         order: OrderEnum? = null,
-        kind: AnimeKindEnum? = null,
+        kind: String? = null,
         status: String? = null,
         score: Int? = null,
         genre: String? = null,

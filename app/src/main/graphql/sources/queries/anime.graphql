@@ -88,7 +88,7 @@ query AnimeBrowse(
     $mylist: MylistString
     $search: String
 ) {
-    animes(page: $page, limit: $limit, order: $order,kind: $kind, status: $status,
+    animes(page: $page, limit: $limit, order: $order, kind: $kind, status: $status,
         season: $season, score: $score, duration: $duration, rating: $rating, genre: $genre,
         studio: $studio, franchise: $franchise, censored: $censored, mylist: $mylist, search: $search) {
 
