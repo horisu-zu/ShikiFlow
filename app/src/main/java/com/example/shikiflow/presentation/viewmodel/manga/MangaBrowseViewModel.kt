@@ -40,13 +40,15 @@ class MangaBrowseViewModel @Inject constructor(
         if (currentState.isLoading || !currentState.hasMorePages) return
 
         if (!isLoadingMore) {
-            stateFlow.update { it.copy(isLoading = true) }
+            stateFlow.update { it.copy(isLoading = true, currentPage = 1, items = emptyList()) }
         }
 
         viewModelScope.launch {
+            val page = if (isLoadingMore) currentState.currentPage + 1 else 1
+
             val result = mangaRepository.browseManga(
                 name = name,
-                page = currentState.currentPage,
+                page = page,
                 limit = 45,
                 searchInUserList = false,
                 status = options.status?.name,
@@ -64,7 +66,7 @@ class MangaBrowseViewModel @Inject constructor(
                             response.mangaList
                         },
                         hasMorePages = response.hasNextPage,
-                        currentPage = currentState.currentPage + 1,
+                        currentPage = page,
                         isLoading = false,
                         error = null
                     )

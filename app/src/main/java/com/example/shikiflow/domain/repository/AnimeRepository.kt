@@ -40,7 +40,7 @@ class AnimeRepository @Inject constructor(
         name: String? = null,
         page: Int = 1,
         limit: Int = 45,
-        userStatus: MyListString? = null,
+        userStatus: List<MyListString?> = emptyList(),
         searchInUserList: Boolean = true,
         order: OrderEnum? = null,
         kind: String? = null,
@@ -60,7 +60,7 @@ class AnimeRepository @Inject constructor(
             search = Optional.presentIfNotNull(name),
             mylist = when {
                 !searchInUserList -> Optional.Absent
-                userStatus != null -> Optional.present(userStatus.toGraphQLValue())
+                userStatus.isNotEmpty() -> Optional.present(userStatus.joinToString(",") { it?.toGraphQLValue() ?: "" })
                 else -> Optional.present(MyListString.entries.joinToString(",") { it.toGraphQLValue() })
             },
             order = Optional.presentIfNotNull(order),
@@ -75,7 +75,7 @@ class AnimeRepository @Inject constructor(
             studio = Optional.presentIfNotNull(studio),
             franchise = Optional.presentIfNotNull(franchise)
         )
-        Log.d("AnimeRepository", "Query: ${order?.rawValue}")
+        Log.d("AnimeRepository", "Query: $query")
 
         return try {
             val response = apolloClient.query(query).execute()

@@ -69,7 +69,7 @@ class AnimeTracksSearchViewModel @Inject constructor(
             val result = animeRepository.browseAnime(
                 name = name,
                 page = currentPage,
-                userStatus = status,
+                userStatus = listOf(status),
                 limit = 20,
                 order = OrderEnum.popularity
             )

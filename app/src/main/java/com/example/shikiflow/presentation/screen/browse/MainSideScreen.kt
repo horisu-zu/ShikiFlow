@@ -49,10 +49,6 @@ fun MainSideScreen(
                             rootNavController.navigate("animeDetailsScreen/$id")
                         }
                     )
-
-                    if (index >= items.size - 3 && state.hasMorePages) {
-                        onLoadMore(MediaType.ANIME)
-                    }
                 }
                 is MangaBrowseQuery.Manga -> {
                     BrowseItem(
@@ -61,10 +57,6 @@ fun MainSideScreen(
                             //rootNavController.navigate("manga?DetailsScreen/$id")
                         }
                     )
-
-                    if (index >= items.size - 3 && state.hasMorePages) {
-                        onLoadMore(MediaType.MANGA)
-                    }
                 }
             }
         }
@@ -79,6 +71,7 @@ fun MainSideScreen(
                         .padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
+                    onLoadMore(state.mediaType)
                     CircularProgressIndicator()
                 }
             }

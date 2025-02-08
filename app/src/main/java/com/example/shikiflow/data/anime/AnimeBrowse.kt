@@ -6,8 +6,10 @@ import com.example.graphql.MangaBrowseQuery
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.data.mapper.UserRateMapper
+import com.example.shikiflow.data.tracks.MediaType
 
 sealed interface BrowseState {
+    val mediaType: MediaType
     val isLoading: Boolean
     val hasMorePages: Boolean
     val currentPage: Int
@@ -15,6 +17,7 @@ sealed interface BrowseState {
 
     data class AnimeBrowseState(
         val items: List<AnimeBrowseQuery.Anime> = emptyList(),
+        override val mediaType: MediaType = MediaType.ANIME,
         override val isLoading: Boolean = false,
         override val hasMorePages: Boolean = true,
         override val currentPage: Int = 1,
@@ -23,6 +26,7 @@ sealed interface BrowseState {
 
     data class MangaBrowseState(
         val items: List<MangaBrowseQuery.Manga> = emptyList(),
+        override val mediaType: MediaType = MediaType.MANGA,
         override val isLoading: Boolean = false,
         override val hasMorePages: Boolean = true,
         override val currentPage: Int = 1,

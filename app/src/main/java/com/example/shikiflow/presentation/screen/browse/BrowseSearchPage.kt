@@ -3,10 +3,11 @@ package com.example.shikiflow.presentation.screen.browse
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -63,26 +64,26 @@ fun BrowseSearchPage(
     }
 
     LaunchedEffect(query, searchOptions) {
-        if(query.isNotEmpty()) {
-            delay(500)
-            Log.d("Search Page", "Query: $query")
-            when(searchOptions.mediaType) {
-                MediaType.ANIME -> animeBrowseViewModel.browseAnime(
-                    type = BrowseType.AnimeBrowseType.SEARCH,
-                    options = searchOptions,
-                    name = query
-                )
-                MediaType.MANGA -> mangaBrowseViewModel.browseManga(
-                    type = BrowseType.MangaBrowseType.SEARCH,
-                    options = searchOptions,
-                    name = query
-                )
-            }
-        } else { /**/ }
+        if (query.isEmpty()) return@LaunchedEffect
+        delay(500)
+        Log.d("Search Page", "Query: $query")
+        when (searchOptions.mediaType) {
+            MediaType.ANIME -> animeBrowseViewModel.browseAnime(
+                type = BrowseType.AnimeBrowseType.SEARCH,
+                options = searchOptions,
+                name = query
+            )
+
+            MediaType.MANGA -> mangaBrowseViewModel.browseManga(
+                type = BrowseType.MangaBrowseType.SEARCH,
+                options = searchOptions,
+                name = query
+            )
+        }
     }
 
     Box {
-        if(state.isLoading) {
+        if (state.isLoading) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -99,7 +100,7 @@ fun BrowseSearchPage(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(items.size) { index ->
-                    when(val item = items[index]) {
+                    when (val item = items[index]) {
                         is AnimeBrowseQuery.Anime -> {
                             BrowseItem(
                                 browseItem = item.toBrowseAnime(),
@@ -107,16 +108,8 @@ fun BrowseSearchPage(
                                     rootNavController.navigate("animeDetailsScreen/$id")
                                 }
                             )
-
-                            if (index >= items.size - 3 && state.hasMorePages) {
-                                animeBrowseViewModel.browseAnime(
-                                    type = BrowseType.AnimeBrowseType.SEARCH,
-                                    options = searchOptions,
-                                    name = query,
-                                    isLoadingMore = true
-                                )
-                            }
                         }
+
                         is MangaBrowseQuery.Manga -> {
                             BrowseItem(
                                 browseItem = item.toBrowseManga(),
@@ -124,9 +117,29 @@ fun BrowseSearchPage(
                                     //rootNavController.navigate("manga?DetailsScreen/$id")
                                 }
                             )
+                        }
+                    }
+                }
+                if (state.hasMorePages && query.isNotEmpty()) {
+                    item(
+                        span = { GridItemSpan(3) }
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                            when (searchOptions.mediaType) {
+                                MediaType.ANIME -> animeBrowseViewModel.browseAnime(
+                                    type = BrowseType.AnimeBrowseType.SEARCH,
+                                    options = searchOptions,
+                                    name = query,
+                                    isLoadingMore = true
+                                )
 
-                            if (index >= items.size - 3 && state.hasMorePages) {
-                                mangaBrowseViewModel.browseManga(
+                                MediaType.MANGA -> mangaBrowseViewModel.browseManga(
                                     type = BrowseType.MangaBrowseType.SEARCH,
                                     options = searchOptions,
                                     name = query,
@@ -150,7 +163,7 @@ fun BrowseSearchPage(
         }
     }
 
-    if(showBottomSheet) {
+    if (showBottomSheet) {
         SearchBottomSheet(
             searchOptions = searchOptions,
             onOptionsChanged = { newOptions ->

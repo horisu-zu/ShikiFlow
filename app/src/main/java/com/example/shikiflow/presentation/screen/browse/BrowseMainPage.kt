@@ -56,10 +56,6 @@ fun BrowseMainPage(
                     browseItem = ongoingList[index].toBrowseAnime(),
                     onItemClick = onNavigate
                 )
-
-                if (index >= ongoingList.size - 3 && ongoingBrowseState.hasMorePages) {
-                    onLoadMore()
-                }
             }
 
             if (ongoingBrowseState.hasMorePages) {
@@ -74,6 +70,7 @@ fun BrowseMainPage(
                     ) {
                         CircularProgressIndicator()
                     }
+                    onLoadMore()
                 }
             }
         }

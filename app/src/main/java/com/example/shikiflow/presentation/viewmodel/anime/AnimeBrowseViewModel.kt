@@ -40,13 +40,15 @@ class AnimeBrowseViewModel @Inject constructor(
         if (currentState.isLoading) return
 
         if (!isLoadingMore) {
-            stateFlow.update { it.copy(isLoading = true, currentPage = 1) }
+            stateFlow.update { it.copy(isLoading = true, currentPage = 1, items = emptyList()) }
         }
 
         viewModelScope.launch {
+            val page = if (isLoadingMore) currentState.currentPage + 1 else 1
+
             val result = animeRepository.browseAnime(
                 name = name,
-                page = currentState.currentPage,
+                page = page,
                 limit = 45,
                 searchInUserList = false,
                 status = options.status?.name,
@@ -54,7 +56,7 @@ class AnimeBrowseViewModel @Inject constructor(
                 kind = options.kind?.name,
                 season = options.season,
                 genre = options.genre,
-                //userStatus = options.userListStatus
+                userStatus = options.userListStatus
             )
 
             result.onSuccess { response ->
@@ -66,7 +68,7 @@ class AnimeBrowseViewModel @Inject constructor(
                             response.animeList
                         },
                         hasMorePages = response.hasNextPage,
-                        currentPage = if (isLoadingMore) currentState.currentPage + 1 else 1,
+                        currentPage = page,
                         isLoading = false,
                         error = null
                     )

@@ -1,7 +1,7 @@
 # ShikiFlow
 (NON-OFFICIAL) [Shikimori](https://shikimori.one/) Mobile App
 
-Work-in-progress
+Development status: On Hold
 
 ## About the Project
 ShikiFlow is a mobile app that provides a comprehensive experience for users of the Shikimori anime/manga community platform. 
