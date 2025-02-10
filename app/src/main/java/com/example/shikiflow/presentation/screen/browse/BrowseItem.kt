@@ -39,7 +39,9 @@ fun BrowseItem(
         BaseImage(
             model = browseItem.posterUrl,
             contentScale = ContentScale.Crop,
-            imageType = ImageType.Poster(),
+            imageType = ImageType.Poster(
+                defaultWidth = 120.dp
+            ),
             modifier = Modifier.constrainAs(posterRef) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)

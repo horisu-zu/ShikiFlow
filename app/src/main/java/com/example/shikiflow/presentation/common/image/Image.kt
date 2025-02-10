@@ -6,12 +6,16 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -48,6 +52,7 @@ fun BaseImage(
         contentDescription = contentDescription,
         contentScale = contentScale,
         modifier = modifier
+            .width(imageType.defaultWidth)
             .aspectRatio(imageType.defaultAspectRatio)
             .clip(imageType.defaultClip),
         loading = {
@@ -101,6 +106,40 @@ fun GradientImage(
         )
     }
 }
+
+/*@Composable
+fun CoverImage(
+    model: String?,
+    modifier: Modifier = Modifier,
+    size: Dp = 240.dp,
+    alpha: Float = 0.2f,
+    clip: RoundedCornerShape = RoundedCornerShape(12.dp),
+    contentScale: ContentScale = ContentScale.Crop,
+    contentDescription: String? = null
+) {
+    Box(modifier = modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            GradientImage(
+                model = model,
+                contentScale = ContentScale.Fit,
+                gradientFraction = 0.8f,
+                contentDescription = null,
+                modifier = Modifier
+                    .alpha(alpha)
+            )
+
+            BaseImage(
+                model = model,
+                contentScale = contentScale,
+                contentDescription = contentDescription,
+                modifier = Modifier
+                    .width(size)
+                    .clip(clip)
+                    .align(Alignment.Center)
+            )
+        }
+    }
+}*/
 
 @Composable
 fun RoundedImage(

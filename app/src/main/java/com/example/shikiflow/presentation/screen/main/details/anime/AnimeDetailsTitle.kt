@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main.details
+package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -69,8 +69,7 @@ fun AnimeDetailsTitle(
                     .constrainAs(scoreRef) {
                         bottom.linkTo(titleRef.top)
                         start.linkTo(parent.start)
-                    }
-                    .padding(horizontal = 12.dp)
+                    }.padding(horizontal = 12.dp)
             )
         }
 
@@ -81,8 +80,7 @@ fun AnimeDetailsTitle(
                 .constrainAs(titleRef) {
                     bottom.linkTo(infoRow.top, margin = 4.dp)
                     start.linkTo(parent.start)
-                }
-                .padding(horizontal = 12.dp)
+                }.padding(horizontal = 12.dp)
         )
 
         Row(
@@ -90,8 +88,7 @@ fun AnimeDetailsTitle(
                 .constrainAs(infoRow) {
                     bottom.linkTo(statusItem.top, margin = 4.dp)
                     start.linkTo(parent.start)
-                }
-                .padding(horizontal = 12.dp),
+                }.padding(horizontal = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             ShortInfoItem(
@@ -123,14 +120,13 @@ fun AnimeDetailsTitle(
                 .constrainAs(statusItem) {
                     bottom.linkTo(parent.bottom)
                     start.linkTo(parent.start)
-                }
-                .padding(horizontal = 12.dp)
+                }.padding(horizontal = 12.dp)
         )
     }
 }
 
 @Composable
-private fun ScoreItem(
+fun ScoreItem(
     score: Float,
     modifier: Modifier
 ) {
@@ -148,7 +144,7 @@ private fun ScoreItem(
 }
 
 @Composable
-private fun ShortInfoItem(
+fun ShortInfoItem(
     infoType: String,
     infoItem: String
 ) {

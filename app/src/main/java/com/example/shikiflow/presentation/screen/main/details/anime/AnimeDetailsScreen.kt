@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main.details
+package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -82,36 +82,32 @@ fun AnimeDetailsScreen(
                         }
                     }
                 ) {
-                    Column(
+                    ConstraintLayout(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(paddingValues)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        ConstraintLayout(
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            val (titleRef, descriptionRef) = createRefs()
+                        val (titleRef, descriptionRef) = createRefs()
 
-                            AnimeDetailsTitle(
-                                animeDetails = animeDetails.value.data,
-                                onStatusClick = { rateBottomSheet = true },
-                                modifier = Modifier.constrainAs(titleRef) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                    bottom.linkTo(descriptionRef.top)
-                                }
-                            )
+                        AnimeDetailsTitle(
+                            animeDetails = animeDetails.value.data,
+                            onStatusClick = { rateBottomSheet = true },
+                            modifier = Modifier.constrainAs(titleRef) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                                bottom.linkTo(descriptionRef.top)
+                            }
+                        )
 
-                            AnimeDetailsDesc(
-                                animeDetails = animeDetails.value.data,
-                                modifier = Modifier
-                                    .constrainAs(descriptionRef) {
-                                        top.linkTo(titleRef.bottom, margin = 12.dp)
-                                    }.padding(horizontal = 12.dp)
-                            )
-                        }
+                        AnimeDetailsDesc(
+                            animeDetails = animeDetails.value.data,
+                            modifier = Modifier
+                                .constrainAs(descriptionRef) {
+                                    top.linkTo(titleRef.bottom, margin = 12.dp)
+                                }.padding(horizontal = 12.dp)
+                        )
                     }
                 }
             }

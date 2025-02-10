@@ -20,7 +20,8 @@ import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
-import com.example.shikiflow.presentation.screen.main.details.AnimeDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
@@ -101,6 +102,18 @@ fun NavigationGraph(
             popExitTransition = { slideOutToRight() }
         ) {
             AnimeDetailsScreen(
+                id = (it.arguments?.getString("id") ?: 0).toString(),
+                currentUser = currentUser
+            )
+        }
+        composable(
+            route = "mangaDetailsScreen/{id}",
+            enterTransition = { slideInFromRight() },
+            exitTransition = { slideOutToLeft() },
+            popEnterTransition = { slideInFromLeft() },
+            popExitTransition = { slideOutToRight() }
+        ) {
+            MangaDetailsScreen(
                 id = (it.arguments?.getString("id") ?: 0).toString(),
                 currentUser = currentUser
             )

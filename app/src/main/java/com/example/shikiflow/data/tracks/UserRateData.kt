@@ -97,18 +97,20 @@ fun AnimeDetailsQuery.UserRate.toUiModel(media: AnimeDetailsQuery.Anime?) = User
     totalChapters = null
 )
 
-fun MangaDetailsQuery.UserRate.toUiModel(media: MangaDetailsQuery.Manga) = UserRateData(
-    id = mangaUserRate.id,
-    mediaType = MediaType.MANGA,
-    status = mangaUserRate.status.rawValue,
-    progress = mangaUserRate.chapters,
-    rewatches = mangaUserRate.rewatches,
-    score = mangaUserRate.score,
-    mediaId = media.id,
-    title = media.name,
-    posterUrl = media.poster?.posterShort?.previewUrl,
-    createDate = mangaUserRate.createdAt.toString().toInstant(),
-    updateDate = mangaUserRate.updatedAt.toString().toInstant(),
-    totalEpisodes = null,
-    totalChapters = media.chapters
-)
+fun MangaDetailsQuery.UserRate.toUiModel(media: MangaDetailsQuery.Manga) = media.userRate?.let {
+    UserRateData(
+        id = media.userRate.id,
+        mediaType = MediaType.MANGA,
+        status = media.userRate.status.rawValue,
+        progress = media.userRate.chapters,
+        rewatches = media.userRate.rewatches,
+        score = media.userRate.score,
+        mediaId = media.id,
+        title = media.name,
+        posterUrl = media.poster?.posterShort?.previewUrl,
+        createDate = media.userRate.createdAt.toString().toInstant(),
+        updateDate = media.userRate.updatedAt.toString().toInstant(),
+        totalEpisodes = null,
+        totalChapters = media.chapters
+    )
+}

@@ -110,7 +110,6 @@ fun BrowseSideScreen(
         } else {
             MainSideScreen(
                 state = state,
-                browseType = browseType,
                 modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
                 rootNavController = rootNavController,
                 onLoadMore = { type ->

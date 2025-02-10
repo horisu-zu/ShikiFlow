@@ -24,7 +24,6 @@ import com.example.shikiflow.data.tracks.MediaType
 @Composable
 fun MainSideScreen(
     state: BrowseState,
-    browseType: BrowseType,
     rootNavController: NavController,
     onLoadMore: (MediaType) -> Unit,
     modifier: Modifier = Modifier
@@ -54,7 +53,7 @@ fun MainSideScreen(
                     BrowseItem(
                         browseItem = item.toBrowseManga(),
                         onItemClick = { id ->
-                            //rootNavController.navigate("manga?DetailsScreen/$id")
+                            rootNavController.navigate("mangaDetailsScreen/$id")
                         }
                     )
                 }

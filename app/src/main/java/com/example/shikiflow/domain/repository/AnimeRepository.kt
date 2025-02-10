@@ -5,7 +5,6 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.AnimeDetailsQuery
-import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.DurationString
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.RatingString

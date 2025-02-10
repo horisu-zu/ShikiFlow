@@ -5,8 +5,6 @@ query MangaDetails(
         id
         malId
         name
-        russian
-        licenseNameRu
         english
         japanese
         synonyms
@@ -21,56 +19,43 @@ query MangaDetails(
 
         poster { ...PosterShort }
 
-        licensors
-        createdAt,
-        updatedAt,
-        isCensored
-
         genres { id name russian kind }
         publishers { id name }
 
-        externalLinks {
-            id
-            kind
-            url
-            createdAt
-            updatedAt
-        }
-
-        personRoles {
-            id
-            rolesRu
-            rolesEn
-            person { ...PersonShort }
-        }
         characterRoles {
             id
-            rolesRu
-            rolesEn
             character { ...CharacterShort }
         }
 
         related {
             id
             anime {
-                ...AnimeShort
+                name
+                poster { mainUrl }
+                kind
             }
             manga {
-                ...MangaShort
+                name
+                poster { mainUrl }
+                kind
             }
             relationKind
-            relationText
         }
 
         scoresStats { score count }
         statusesStats { status count }
 
         description
-        descriptionHtml
-        descriptionSource
 
         userRate {
-            ...MangaUserRate
+            id
+            status
+            chapters
+            volumes
+            score
+            rewatches
+            createdAt
+            updatedAt
         }
     }
 }

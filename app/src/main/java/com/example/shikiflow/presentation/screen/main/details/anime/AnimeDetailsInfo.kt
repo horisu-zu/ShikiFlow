@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main.details
+package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

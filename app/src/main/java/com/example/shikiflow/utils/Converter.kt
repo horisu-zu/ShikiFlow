@@ -149,36 +149,38 @@ object Converter {
     ): AnnotatedString {
         val builder = AnnotatedString.Builder()
 
-        val regex = Regex("\\[(i|b|u|s|character=\\d+)](.*?)\\[/(?:character|\\1)]")
+        val regex = Regex("\\[(\\w+)(?:=(\\w+))?\\](.*?)\\[/\\1\\]")
         var lastIndex = 0
 
         regex.findAll(text).forEach { matchResult ->
-            val tag = matchResult.groupValues[1]
-            val content = matchResult.groupValues[2]
+            val tagName = matchResult.groupValues[1]
+            val param = matchResult.groupValues[2]
+            val content = matchResult.groupValues[3]
             val start = matchResult.range.first
 
             if (lastIndex < start) {
                 builder.append(text.substring(lastIndex, start))
             }
 
-            if (tag.startsWith("character=")) {
-                val characterId = tag.removePrefix("character=")
-                builder.pushStringAnnotation(tag = "CHARACTER_ID", annotation = characterId)
+            if (param.isNotEmpty()) {
+                val annotationTag = when (tagName) {
+                    "character" -> "CHARACTER_ID"
+                    else -> "LINK"
+                }
+                val annotationValue = if (tagName == "character") param else "$tagName:$param"
+
+                builder.pushStringAnnotation(tag = annotationTag, annotation = annotationValue)
                 builder.withStyle(SpanStyle(color = linkColor)) {
                     builder.append(content)
                 }
                 builder.pop()
             } else {
-                val style = when (tag) {
-                    "i" -> SpanStyle(fontStyle = FontStyle.Italic)
-                    "b" -> SpanStyle(fontWeight = FontWeight.Bold)
-                    "u" -> SpanStyle(textDecoration = TextDecoration.Underline)
-                    "s" -> SpanStyle(textDecoration = TextDecoration.LineThrough)
-                    else -> SpanStyle()
-                }
-
-                builder.withStyle(style) {
-                    builder.append(content)
+                when (tagName.lowercase()) {
+                    "i" -> builder.withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { builder.append(content) }
+                    "b" -> builder.withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { builder.append(content) }
+                    "u" -> builder.withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) { builder.append(content) }
+                    "s" -> builder.withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { builder.append(content) }
+                    else -> builder.append(content)
                 }
             }
 

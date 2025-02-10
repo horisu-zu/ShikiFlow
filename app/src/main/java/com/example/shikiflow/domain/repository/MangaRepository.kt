@@ -4,6 +4,7 @@ import android.util.Log
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.example.graphql.MangaBrowseQuery
+import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.ShortMangaTracksQuery
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.UserRateOrderInputType
@@ -17,6 +18,23 @@ import javax.inject.Inject
 class MangaRepository @Inject constructor(
     private val apolloClient: ApolloClient
 ) {
+
+    suspend fun getMangaDetails(
+        id: String
+    ): Result<MangaDetailsQuery.Manga?> {
+        val query = MangaDetailsQuery(
+            ids = Optional.presentIfNotNull(id)
+        )
+
+        return try {
+            val response = apolloClient.query(query).execute()
+            response.data?.let {
+                Result.success(it.mangas.first())
+            } ?: Result.failure(Exception("No data"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     suspend fun browseManga(
         name: String? = null,

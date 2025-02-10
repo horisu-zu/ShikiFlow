@@ -15,12 +15,13 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.graphql.AnimeDetailsQuery
+import com.example.shikiflow.data.common.RelatedInfo
+import com.example.shikiflow.presentation.screen.main.details.anime.RelatedItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelatedBottomSheet(
-    relatedItems: List<AnimeDetailsQuery.Related>?,
+    relatedItems: List<RelatedInfo>,
     showBottomSheet: Boolean,
     onDismiss: () -> Unit
 ) {
@@ -42,7 +43,7 @@ fun RelatedBottomSheet(
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
                 HorizontalDivider()
-                relatedItems?.forEach { relatedItem ->
+                relatedItems.forEach { relatedItem ->
                     RelatedItem(
                         relatedInfo = relatedItem,
                         modifier = Modifier.padding(horizontal = 12.dp)

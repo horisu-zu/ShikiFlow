@@ -4,6 +4,7 @@ import com.example.graphql.fragment.AnimeShort
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.MangaKindEnum
+import com.example.graphql.type.MangaStatusEnum
 import com.example.graphql.type.RelationKindEnum
 import com.example.graphql.type.UserRateStatusEnum
 import kotlin.reflect.KClass
@@ -84,6 +85,17 @@ class UserRateMapper {
                 AnimeStatusEnum.anons -> "Announced"
                 AnimeStatusEnum.ongoing -> "Ongoing"
                 AnimeStatusEnum.released -> "Released"
+                else -> "Unknown"
+            }
+        }
+
+        fun mapMangaStatus(status: MangaStatusEnum?): String {
+            return when(status) {
+                MangaStatusEnum.anons -> "Announced"
+                MangaStatusEnum.ongoing -> "Ongoing"
+                MangaStatusEnum.released -> "Released"
+                MangaStatusEnum.paused -> "Paused"
+                MangaStatusEnum.discontinued -> "Discontinued"
                 else -> "Unknown"
             }
         }

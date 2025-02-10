@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main.details
+package com.example.shikiflow.presentation.screen.main.details.anime
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -37,14 +37,14 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeDetailsQuery
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapMangaKind
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapRelationKind
+import com.example.shikiflow.data.common.RelatedInfo
+import com.example.shikiflow.data.mapper.RelatedMapper
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.FormattedText
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 
 @Composable
 fun AnimeDetailsDesc(
@@ -109,7 +109,9 @@ fun AnimeDetailsDesc(
             ) {
                 items(animeDetails?.characterRoles ?: emptyList()) { characterItem ->
                     CharacterCard(
-                        character = characterItem.character,
+                        characterPoster = characterItem.character.characterShort.poster
+                            ?.posterShort?.previewUrl,
+                        characterName = characterItem.character.characterShort.name,
                         onClick = { /*TODO*/ }
                     )
                 }
@@ -117,7 +119,7 @@ fun AnimeDetailsDesc(
         }
 
         RelatedSection(
-            relatedItems = animeDetails?.related ?: emptyList(),
+            relatedItems = animeDetails?.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
             onArrowClick = { showRelatedBottomSheet = true },
             modifier = Modifier.constrainAs(relatedRef) {
                 top.linkTo(charactersRef.bottom, margin = 12.dp)
@@ -151,7 +153,7 @@ fun AnimeDetailsDesc(
     }
 
     RelatedBottomSheet(
-        relatedItems = animeDetails?.related,
+        relatedItems = animeDetails?.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
         showBottomSheet = showRelatedBottomSheet,
         onDismiss = { showRelatedBottomSheet = false }
     )
@@ -159,7 +161,8 @@ fun AnimeDetailsDesc(
 
 @Composable
 fun CharacterCard(
-    character: AnimeDetailsQuery.Character,
+    characterPoster: String?,
+    characterName: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -172,13 +175,13 @@ fun CharacterCard(
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         RoundedImage(
-            model = character.characterShort.poster?.posterShort?.previewUrl,
+            model = characterPoster, //character.characterShort.poster?.posterShort?.previewUrl,
             size = 96.dp,
             clip = CircleShape,
             contentScale = ContentScale.Crop
         )
         Text(
-            text = character.characterShort.name,
+            text = characterName, //character.characterShort.name,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp)
@@ -187,8 +190,8 @@ fun CharacterCard(
 }
 
 @Composable
-private fun RelatedSection(
-    relatedItems: List<AnimeDetailsQuery.Related>,
+fun RelatedSection(
+    relatedItems: List<RelatedInfo>,
     onArrowClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -245,7 +248,7 @@ private fun RelatedSection(
 
 @Composable
 fun RelatedItem(
-    relatedInfo: AnimeDetailsQuery.Related,
+    relatedInfo: RelatedInfo,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
@@ -254,8 +257,8 @@ fun RelatedItem(
         val (posterRef, titleRef, infoRef) = createRefs()
 
         RoundedImage(
-            model = if (relatedInfo.anime != null) relatedInfo.anime.poster?.mainUrl
-            else relatedInfo.manga?.poster?.mainUrl ?: "Manga Poster",
+            model = relatedInfo.manga?.poster?.mainUrl
+                ?: relatedInfo.anime?.poster?.mainUrl,
             clip = RoundedCornerShape(8.dp),
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -268,8 +271,8 @@ fun RelatedItem(
         )
 
         Text(
-            text = if (relatedInfo.anime != null) relatedInfo.anime.name
-            else relatedInfo.manga?.name ?: "Manga Title",
+            text = relatedInfo.manga?.name
+                ?: (relatedInfo.anime?.name ?: "Title"),
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.constrainAs(titleRef) {
                 top.linkTo(parent.top)
@@ -281,11 +284,7 @@ fun RelatedItem(
         )
 
         Text(
-            text = if (relatedInfo.anime != null) {
-                mapAnimeKind(relatedInfo.anime.kind)
-            } else {
-                mapMangaKind(relatedInfo.manga?.kind)
-            } + " ∙ ${mapRelationKind(relatedInfo.relationKind)}",
+            text = "${relatedInfo.anime?.kind ?: relatedInfo.manga?.kind} ${relatedInfo.relationKind}",
             style = MaterialTheme.typography.labelSmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             ),
