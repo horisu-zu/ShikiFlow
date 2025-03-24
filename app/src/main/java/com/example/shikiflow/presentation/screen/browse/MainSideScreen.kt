@@ -16,7 +16,6 @@ import androidx.navigation.NavController
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.MangaBrowseQuery
 import com.example.shikiflow.data.anime.BrowseState
-import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.data.anime.toBrowseAnime
 import com.example.shikiflow.data.anime.toBrowseManga
 import com.example.shikiflow.data.tracks.MediaType

@@ -53,7 +53,7 @@ fun BrowseItem(
             text = browseItem.title,
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 2,
+            maxLines = 1,
             modifier = Modifier.constrainAs(titleRef) {
                 top.linkTo(posterRef.bottom, margin = 4.dp)
                 start.linkTo(parent.start)

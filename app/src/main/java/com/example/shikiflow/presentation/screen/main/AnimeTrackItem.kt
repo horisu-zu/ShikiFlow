@@ -40,7 +40,7 @@ fun AnimeTrackItem(
     ConstraintLayout(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 12.dp, end = 24.dp)
+            .padding(start = 12.dp, end = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
                 onClick = { onClick(userRate.animeUserRateWithModel.anime?.animeShort?.id ?: "") },

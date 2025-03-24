@@ -39,6 +39,8 @@ fun BaseImage(
     SubcomposeAsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
             .data(model)
+            .memoryCacheKey(model)
+            .diskCacheKey(model)
             .listener(
                 onSuccess = { _ , result ->
                     Log.d("Image", "Image successfully loaded: $result")

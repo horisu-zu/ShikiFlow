@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,23 +46,16 @@ fun BrowseSideScreen(
         is BrowseType.MangaBrowseType -> mangaBrowseViewModel.getMangaState(browseType).collectAsState()
     }.value
 
-    val items = when (state) {
-        is BrowseState.AnimeBrowseState -> state.items
-        is BrowseState.MangaBrowseState -> state.items
-    }
-    val isInitialized = remember {
-        derivedStateOf {
-            state.hasMorePages && items.isNotEmpty()
-        }
-    }
+    val isInitialized = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         if(!isInitialized.value) {
             Log.d("SideScreen", "BrowseType: $browseType")
-            when(browseType) {
+            when (browseType) {
                 is BrowseType.AnimeBrowseType -> animeBrowseViewModel.browseAnime(type = browseType)
                 is BrowseType.MangaBrowseType -> mangaBrowseViewModel.browseManga(type = browseType)
             }
+            isInitialized.value = true
         }
     }
 
@@ -113,18 +107,20 @@ fun BrowseSideScreen(
                 modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
                 rootNavController = rootNavController,
                 onLoadMore = { type ->
-                    when(type) {
-                        MediaType.ANIME -> {
-                            animeBrowseViewModel.browseAnime(
-                                type = browseType,
-                                isLoadingMore = true
-                            )
-                        }
-                        MediaType.MANGA -> {
-                            mangaBrowseViewModel.browseManga(
-                                type = browseType,
-                                isLoadingMore = true
-                            )
+                    if(isInitialized.value) {
+                        when(type) {
+                            MediaType.ANIME -> {
+                                animeBrowseViewModel.browseAnime(
+                                    type = browseType,
+                                    isLoadingMore = true
+                                )
+                            }
+                            MediaType.MANGA -> {
+                                mangaBrowseViewModel.browseManga(
+                                    type = browseType,
+                                    isLoadingMore = true
+                                )
+                            }
                         }
                     }
                 }

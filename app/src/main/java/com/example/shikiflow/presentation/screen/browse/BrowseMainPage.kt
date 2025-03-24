@@ -58,7 +58,7 @@ fun BrowseMainPage(
                 )
             }
 
-            if (ongoingBrowseState.hasMorePages) {
+            if (ongoingBrowseState.hasMorePages && ongoingBrowseState.items.isNotEmpty()) {
                 item(
                     span = { GridItemSpan(3) }
                 ) {

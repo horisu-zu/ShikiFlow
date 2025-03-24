@@ -29,19 +29,13 @@ class AnimeUserRateViewModel @Inject constructor(
     private val _userAnimeTrack = MutableStateFlow<List<ShortAnimeRate?>>(emptyList())
     val userAnimeTrack = _userAnimeTrack.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
     private val _hasMorePages = MutableStateFlow(true)
 
     fun loadUserRates(
         userId: Long,
         isRefresh: Boolean = false
     ) {
-        if (_isLoading.value) return
-
         viewModelScope.launch {
-            _isLoading.value = true
 
             if (isRefresh) {
                 _userRateData.value = emptyList()
@@ -68,8 +62,6 @@ class AnimeUserRateViewModel @Inject constructor(
                 _userRateData.value = tempList
             } catch (e: Exception) {
                 _hasMorePages.value = false
-            } finally {
-                _isLoading.value = false
             }
         }
     }
