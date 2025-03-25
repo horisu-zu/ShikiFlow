@@ -7,6 +7,7 @@ import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.MangaStatusEnum
 import com.example.graphql.type.RelationKindEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.tracks.MediaType
 import kotlin.reflect.KClass
 
 object EnumUtils {
@@ -54,20 +55,27 @@ class UserRateMapper {
             status: UserRateStatusEnum,
             watchedEpisodes: Int? = null,
             allEpisodes: Int? = null,
-            score: Int? = null
+            score: Int? = null,
+            mediaType: MediaType = MediaType.ANIME
         ): String {
+            val watchingVerb = if (mediaType == MediaType.ANIME) "Watching" else "Reading"
+            val rewatchVerb = if (mediaType == MediaType.ANIME) "Rewatching" else "Rereading"
+
             return when (status) {
                 UserRateStatusEnum.watching ->
-                    if (watchedEpisodes != null) "Watching ∙ $watchedEpisodes/$allEpisodes"
-                        else "Watching"
+                    if (watchedEpisodes != null) "$watchingVerb ∙ $watchedEpisodes/$allEpisodes"
+                    else watchingVerb
                 UserRateStatusEnum.planned -> "Planned"
                 UserRateStatusEnum.completed ->
                     if (score != null) "Completed ∙ $score ★" else "Completed"
-                UserRateStatusEnum.rewatching -> "Rewatching"
-                UserRateStatusEnum.on_hold -> if (watchedEpisodes != null) "On Hold ∙ $watchedEpisodes/$allEpisodes"
+                UserRateStatusEnum.rewatching -> rewatchVerb
+                UserRateStatusEnum.on_hold ->
+                    if (watchedEpisodes != null) "On Hold ∙ $watchedEpisodes/$allEpisodes"
                     else "On Hold"
-                UserRateStatusEnum.dropped -> if (score != null && score != 0) "Dropped ∙ $score ★"
-                    else if(watchedEpisodes != null) "Dropped ∙ $watchedEpisodes/$allEpisodes" else "Dropped"
+                UserRateStatusEnum.dropped ->
+                    if (score != null && score != 0) "Dropped ∙ $score ★"
+                    else if(watchedEpisodes != null) "Dropped ∙ $watchedEpisodes/$allEpisodes"
+                    else "Dropped"
                 UserRateStatusEnum.UNKNOWN__ -> "Add to List"
             }
         }

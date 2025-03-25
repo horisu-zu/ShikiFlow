@@ -6,13 +6,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,10 +23,18 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.data.tracks.TargetType
+import com.example.shikiflow.data.tracks.UserRateData
+import com.example.shikiflow.data.tracks.toUiModel
+import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Resource
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MangaDetailsScreen(
     id: String,
@@ -32,16 +43,16 @@ fun MangaDetailsScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val mangaDetails = mangaDetailsViewModel.mangaDetails.collectAsState()
+    var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(id) {
         mangaDetailsViewModel.getMangaDetails(id)
     }
 
     Scaffold(
-        topBar = {
-
-        }
+        topBar = { /*TODO*/ }
     ) { paddingValues ->
         when (mangaDetails.value) {
             is Resource.Loading -> {
@@ -53,35 +64,97 @@ fun MangaDetailsScreen(
                 }
             }
             is Resource.Success -> {
-                ConstraintLayout(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    val (headerRef, descriptionRef) = createRefs()
-
-                    MangaDetailsHeader(
-                        mangaDetails = mangaDetails.value.data,
-                        modifier = Modifier.constrainAs(headerRef) {
-                            top.linkTo(parent.top)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                            bottom.linkTo(descriptionRef.top)
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        coroutineScope.launch {
+                            try {
+                                isRefreshing = true
+                                delay(300)
+                                mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
+                            } finally {
+                                isRefreshing = false
+                            }
                         }
-                    )
+                    }
+                ) {
+                    ConstraintLayout(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        val (headerRef, descriptionRef) = createRefs()
 
-                    MangaDetailsDesc(
-                        mangaDetails = mangaDetails.value.data,
-                        modifier = Modifier.constrainAs(descriptionRef) {
-                            top.linkTo(headerRef.bottom, margin = 12.dp)
-                            start.linkTo(parent.start)
-                            end.linkTo(parent.end)
-                        }.padding(horizontal = 12.dp)
-                    )
+                        MangaDetailsHeader(
+                            mangaDetails = mangaDetails.value.data,
+                            onStatusClick = { rateBottomSheet = true },
+                            modifier = Modifier.constrainAs(headerRef) {
+                                top.linkTo(parent.top)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                                bottom.linkTo(descriptionRef.top)
+                            }
+                        )
+
+                        MangaDetailsDesc(
+                            mangaDetails = mangaDetails.value.data,
+                            modifier = Modifier.constrainAs(descriptionRef) {
+                                top.linkTo(headerRef.bottom)
+                                start.linkTo(parent.start)
+                                end.linkTo(parent.end)
+                            }.padding(12.dp)
+                        )
+                    }
                 }
             }
             is Resource.Error -> { /*TODO*/ }
         }
+    }
+
+    if(rateBottomSheet) {
+        val isUpdating by userViewModel.isUpdating.collectAsState()
+        val mangaDetailsData = mangaDetails.value.data
+
+        UserRateBottomSheet(
+            userRate = mangaDetailsData?.userRate?.toUiModel(mangaDetailsData) ?: UserRateData.createEmpty(
+                mediaId = mangaDetailsData?.id ?: "",
+                mediaTitle = mangaDetailsData?.name ?: "",
+                mediaPosterUrl = mangaDetailsData?.poster?.posterShort?.originalUrl ?: "",
+                mediaType = MediaType.MANGA
+            ),
+            isLoading = isUpdating,
+            onDismiss = { rateBottomSheet = false },
+            onSave = { rateId, status, score, episodes, rewatches, mediaType ->
+                userViewModel.updateUserRate(
+                    id = rateId,
+                    status = status,
+                    score = score,
+                    progress = episodes,
+                    rewatches = rewatches,
+                    mediaType = mediaType,
+                    onComplete = { success ->
+                        if (success) {
+                            mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
+                            rateBottomSheet = false
+                        }
+                    }
+                )
+            },
+            onCreateRate = { mediaId, status ->
+                userViewModel.createUserRate(
+                    userId = currentUser?.currentUser?.id ?: "",
+                    targetId = mediaId,
+                    status = status,
+                    targetType = TargetType.MANGA,
+                    onComplete = { success ->
+                        if (success) {
+                            mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
+                            rateBottomSheet = false
+                        }
+                    }
+                )
+            }
+        )
     }
 }

@@ -9,9 +9,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shikiflow.R
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.TargetType
 import com.example.shikiflow.data.tracks.UserRate
-import com.example.shikiflow.data.tracks.UserRateContentType
 import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.IconResource
 
@@ -24,10 +24,10 @@ fun TrackSection(
     val mangaTrackData = userRateData.filter { it?.targetType == TargetType.MANGA }
 
     val animeItemsCount = animeTrackData.size
-    val groupedAnimeData = animeTrackData.groupAndSortByStatus(UserRateContentType.ANIME) { it?.status }
+    val groupedAnimeData = animeTrackData.groupAndSortByStatus(MediaType.ANIME)
 
     val mangaItemsCount = mangaTrackData.size
-    val groupedMangaData = mangaTrackData.groupAndSortByStatus(UserRateContentType.MANGA) { it?.status }
+    val groupedMangaData = mangaTrackData.groupAndSortByStatus(MediaType.MANGA)
 
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()

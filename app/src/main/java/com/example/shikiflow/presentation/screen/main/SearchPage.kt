@@ -33,6 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
@@ -46,7 +47,7 @@ fun SearchPage(
     val searchResults by tracksViewModel.searchResults.collectAsState()
     val isSearching by tracksViewModel.isSearching.collectAsState()
     val hasMorePages by tracksViewModel.searchHasMorePages.collectAsState()
-    val chips = listOf("All") + UserRateStatusConstants.chips
+    val chips = listOf("All") + UserRateStatusConstants.getStatusChips(MediaType.ANIME)
 
     var selectedTabSearch by remember { mutableStateOf(0) }
 

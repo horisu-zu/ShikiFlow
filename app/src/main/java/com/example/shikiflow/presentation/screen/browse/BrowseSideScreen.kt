@@ -19,8 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -46,16 +49,16 @@ fun BrowseSideScreen(
         is BrowseType.MangaBrowseType -> mangaBrowseViewModel.getMangaState(browseType).collectAsState()
     }.value
 
-    val isInitialized = remember { mutableStateOf(false) }
+    var isInitialized by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        if(!isInitialized.value) {
+        if(!isInitialized) {
             Log.d("SideScreen", "BrowseType: $browseType")
             when (browseType) {
                 is BrowseType.AnimeBrowseType -> animeBrowseViewModel.browseAnime(type = browseType)
                 is BrowseType.MangaBrowseType -> mangaBrowseViewModel.browseManga(type = browseType)
             }
-            isInitialized.value = true
+            isInitialized = true
         }
     }
 
@@ -107,7 +110,7 @@ fun BrowseSideScreen(
                 modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
                 rootNavController = rootNavController,
                 onLoadMore = { type ->
-                    if(isInitialized.value) {
+                    if(isInitialized) {
                         when(type) {
                             MediaType.ANIME -> {
                                 animeBrowseViewModel.browseAnime(

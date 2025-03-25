@@ -9,34 +9,6 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.utils.IconResource
 
-enum class UserRateContentType {
-    ANIME,
-    MANGA
-}
-
-val animeStatusOrder = listOf(
-    "planned",
-    "watching",
-    "completed",
-    "rewatching",
-    "on_hold",
-    "dropped"
-)
-
-val animeToMangaStatusMap = mapOf(
-    "watching" to "reading",
-    "rewatching" to "rereading"
-)
-
-val mangaStatusOrder = listOf(
-    "planned",
-    "reading",
-    "completed",
-    "rereading",
-    "on_hold",
-    "dropped"
-)
-
 enum class AnimeStatus(val icon: IconResource) {
     PLANNED(IconResource.Vector(Icons.Outlined.DateRange)),
     WATCHING(IconResource.Vector(Icons.Outlined.PlayArrow)),

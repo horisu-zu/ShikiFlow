@@ -66,7 +66,7 @@ fun UserRateBottomSheet(
     isLoading: Boolean = false
 ) {
     val sheetState = rememberModalBottomSheetState()
-    val chips = UserRateStatusConstants.chips
+    val chips = UserRateStatusConstants.getStatusChips(userRate.mediaType)
     val initialStatusIndex = chips.indexOfFirst { it.equals(convertStatus(userRate.status), ignoreCase = true) }
 
     var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }

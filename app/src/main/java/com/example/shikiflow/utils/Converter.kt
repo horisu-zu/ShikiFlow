@@ -10,10 +10,10 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.shikiflow.R
-import com.example.shikiflow.data.tracks.UserRateContentType
-import com.example.shikiflow.data.tracks.animeStatusOrder
-import com.example.shikiflow.data.tracks.animeToMangaStatusMap
-import com.example.shikiflow.data.tracks.mangaStatusOrder
+import com.example.shikiflow.data.mapper.UserRateStatusConstants
+import com.example.shikiflow.data.mapper.UserRateStatusConstants.getStatusOrder
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.data.tracks.UserRate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
@@ -113,34 +113,20 @@ object Converter {
         }
     }
 
-    fun <T> List<T>.groupAndSortByStatus(
-        contentType: UserRateContentType,
-        statusExtractor: (T) -> String?
+    fun List<UserRate?>.groupAndSortByStatus(
+        contentType: MediaType
     ): Map<String, Int> {
-        val order = when (contentType) {
-            UserRateContentType.ANIME -> animeStatusOrder
-            UserRateContentType.MANGA -> mangaStatusOrder
-        }
+        val order = getStatusOrder(contentType)
 
         return this
-            .groupBy { item ->
-                val status = statusExtractor(item)?.lowercase() ?: ""
-                getStatusKey(contentType, status)
-            }
+            .groupBy { getStatusKey(contentType, it?.status ?: "unknown") }
             .mapValues { it.value.size }
-            .toList()
-            .sortedBy { (status, _) -> order.indexOf(status) }
-            .toMap()
+            .toSortedMap(compareBy { order.indexOf(it) })
     }
 
-    private fun getStatusKey(contentType: UserRateContentType, status: String): String {
-        return when (contentType) {
-            UserRateContentType.ANIME -> animeStatusOrder.firstOrNull { it == status }
-            UserRateContentType.MANGA -> {
-                val mappedStatus = animeToMangaStatusMap[status] ?: status
-                mangaStatusOrder.firstOrNull { it == mappedStatus }
-            }
-        } ?: "unknown"
+    private fun getStatusKey(mediaType: MediaType, status: String): String {
+        return getStatusOrder(mediaType).firstOrNull { it == status }
+            ?: UserRateStatusConstants.convertStatus(status)
     }
 
     fun formatText(
@@ -149,7 +135,7 @@ object Converter {
     ): AnnotatedString {
         val builder = AnnotatedString.Builder()
 
-        val regex = Regex("\\[(\\w+)(?:=(\\w+))?\\](.*?)\\[/\\1\\]")
+        val regex = Regex("\\[(\\w+)(?:=(\\w+))?](.*?)\\[/\\1]")
         var lastIndex = 0
 
         regex.findAll(text).forEach { matchResult ->

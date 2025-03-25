@@ -122,6 +122,7 @@ fun AnimeTrackItem(
                     top.linkTo(dataRef.bottom, margin = 4.dp)
                     start.linkTo(dataRef.start)
                     end.linkTo(dataRef.end)
+                    width = Dimension.fillToConstraints
                 }
             ) {
                 ProgressBar(

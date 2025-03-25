@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ fun MainPage(
     trackViewModel: AnimeTracksViewModel = hiltViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val tabs = UserRateStatusConstants.chips
+    val tabs = UserRateStatusConstants.getStatusChips(MediaType.ANIME)
     var isRefreshing by remember { mutableStateOf(false) }
 
     Column {
