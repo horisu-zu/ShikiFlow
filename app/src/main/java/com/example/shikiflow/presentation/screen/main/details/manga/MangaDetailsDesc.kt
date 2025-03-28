@@ -20,9 +20,11 @@ import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.MangaDetailsQuery
 import com.example.shikiflow.data.mapper.RelatedMapper
 import com.example.shikiflow.presentation.common.FormattedText
+import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedSection
+import com.example.shikiflow.utils.Converter.convertStatus
 
 @Composable
 fun MangaDetailsDesc(
@@ -34,7 +36,7 @@ fun MangaDetailsDesc(
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (descRef, charactersRef, relatedRef) = createRefs()
+        val (descRef, charactersRef, listRef ,relatedRef) = createRefs()
 
         FormattedText(
             text = mangaDetails?.description ?: "No Description",
@@ -79,12 +81,25 @@ fun MangaDetailsDesc(
             }
         }
 
+        SegmentedProgressBar(
+            groupedData = mangaDetails?.statusesStats?.associate {
+                convertStatus(it.status.toString()) to it.count
+            } ?: emptyMap(),
+            totalCount = mangaDetails?.statusesStats?.size ?: 0,
+            modifier = Modifier.constrainAs(listRef) {
+                top.linkTo(charactersRef.bottom, margin = 12.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                width = Dimension.fillToConstraints
+            }
+        )
+
         if(mangaDetails?.related != null && mangaDetails.related.isNotEmpty()) {
             RelatedSection(
                 relatedItems = mangaDetails.related.map { RelatedMapper.fromMangaRelated(it) },
                 onArrowClick = { showRelatedBottomSheet = true },
                 modifier = Modifier.constrainAs(relatedRef) {
-                    top.linkTo(charactersRef.bottom, margin = 12.dp)
+                    top.linkTo(listRef.bottom, margin = 12.dp)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                     width = Dimension.fillToConstraints

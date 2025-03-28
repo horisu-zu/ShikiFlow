@@ -32,8 +32,7 @@ fun SegmentedProgressBar(
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
-        modifier = modifier
-            .fillMaxWidth()
+        modifier = modifier.fillMaxWidth()
     ) {
         val (progressBarRef, dataRef) = createRefs()
 
@@ -56,7 +55,7 @@ fun SegmentedProgressBar(
                         .weight(progress)
                         .fillMaxHeight()
                         .background(
-                            color = StatusColor.getAnimeStatusBrightColor(status)
+                            color = StatusColor.getStatusBrightColor(status)
                         )
                 )
             }
@@ -75,9 +74,9 @@ fun SegmentedProgressBar(
         ) {
             groupedData.forEach { (status, count) ->
                 SegmentedDataItem(
-                    status = Converter.convertStatus(status),
+                    status = status,
                     count = count,
-                    color = StatusColor.getAnimeStatusBrightColor(status)
+                    color = StatusColor.getStatusBrightColor(status)
                 )
             }
         }

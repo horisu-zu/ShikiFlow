@@ -45,10 +45,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.data.tracks.AnimeStatus
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
+import com.example.shikiflow.data.tracks.RateStatus
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.convertStatus
@@ -190,7 +190,7 @@ private fun StatusChips(
     onStatusSelected: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val statusMap = AnimeStatus.entries.associateBy {
+    val statusMap = RateStatus.entries.associateBy {
         it.name.lowercase().replace("_", " ")
     }
 

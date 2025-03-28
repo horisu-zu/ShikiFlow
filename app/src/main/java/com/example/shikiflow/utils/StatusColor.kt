@@ -12,7 +12,7 @@ object StatusColor {
         else -> Color(0xFF8C8C8C)
     }
 
-    fun getAnimeStatusBrightColor(status: String): Color = when (status.lowercase()) {
+    fun getStatusBrightColor(status: String): Color = when (status.lowercase().replace(" ", "_")) {
         "watching" -> Color(0xFFAE62CF)
         "reading" -> Color(0xFFAE62CF)
         "planned" -> Color(0xFFD4C862)

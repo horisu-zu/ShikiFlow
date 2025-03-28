@@ -122,6 +122,7 @@ object Converter {
             .groupBy { getStatusKey(contentType, it?.status ?: "unknown") }
             .mapValues { it.value.size }
             .toSortedMap(compareBy { order.indexOf(it) })
+            .mapKeys { convertStatus(it.key) }
     }
 
     private fun getStatusKey(mediaType: MediaType, status: String): String {

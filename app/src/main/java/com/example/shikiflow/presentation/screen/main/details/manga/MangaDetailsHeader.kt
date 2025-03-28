@@ -31,8 +31,8 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapMangaKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapMangaStatus
-import com.example.shikiflow.data.tracks.AnimeStatus
 import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.data.tracks.RateStatus
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.GradientImage
@@ -208,7 +208,7 @@ fun MangaUserRateItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         val color = StatusColor.getAnimeStatusColor(userRate ?: UserRateStatusEnum.UNKNOWN__)
-        val icon = AnimeStatus.fromStatus(userRate ?: UserRateStatusEnum.UNKNOWN__)?.icon
+        val icon = RateStatus.fromStatus(userRate ?: UserRateStatusEnum.UNKNOWN__)?.icon
             ?: IconResource.Vector(Icons.Outlined.Clear)
 
         icon.toIcon(

@@ -28,7 +28,7 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
-import com.example.shikiflow.data.tracks.AnimeStatus
+import com.example.shikiflow.data.tracks.RateStatus
 import com.example.shikiflow.presentation.common.StarScore
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -189,7 +189,7 @@ private fun UserStatusItem(
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val icon = AnimeStatus.fromStatus(status ?: UserRateStatusEnum.UNKNOWN__)?.icon
+        val icon = RateStatus.fromStatus(status ?: UserRateStatusEnum.UNKNOWN__)?.icon
             ?: IconResource.Vector(Icons.Outlined.Clear)
 
         icon.toIcon(
