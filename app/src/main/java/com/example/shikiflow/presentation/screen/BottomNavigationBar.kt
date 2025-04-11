@@ -102,8 +102,9 @@ fun NavigationGraph(
             popExitTransition = { slideOutToRight() }
         ) {
             AnimeDetailsScreen(
-                id = (it.arguments?.getString("id") ?: 0).toString(),
-                currentUser = currentUser
+                id = (it.arguments?.getString("id") ?: "No ID").toString(),
+                currentUser = currentUser,
+                rootNavController = navController
             )
         }
         composable(
@@ -115,6 +116,7 @@ fun NavigationGraph(
         ) {
             MangaDetailsScreen(
                 id = (it.arguments?.getString("id") ?: 0).toString(),
+                rootNavController = navController,
                 currentUser = currentUser
             )
         }

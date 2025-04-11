@@ -16,12 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.TargetType
@@ -39,16 +41,21 @@ import kotlinx.coroutines.launch
 fun MangaDetailsScreen(
     id: String,
     currentUser: CurrentUserQuery.Data?,
+    rootNavController: NavController,
     mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val mangaDetails = mangaDetailsViewModel.mangaDetails.collectAsState()
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
+    val isInitialized = rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(id) {
-        mangaDetailsViewModel.getMangaDetails(id)
+        if(!isInitialized.value) {
+            mangaDetailsViewModel.getMangaDetails(id)
+            isInitialized.value = true
+        }
     }
 
     Scaffold(
@@ -99,6 +106,11 @@ fun MangaDetailsScreen(
 
                         MangaDetailsDesc(
                             mangaDetails = mangaDetails.value.data,
+                            onItemClick = { id, mediaType ->
+                                if(mediaType == MediaType.ANIME) {
+                                    rootNavController.navigate("animeDetailsScreen/$id")
+                                } else rootNavController.navigate("mangaDetailsScreen/$id")
+                            },
                             modifier = Modifier.constrainAs(descriptionRef) {
                                 top.linkTo(headerRef.bottom)
                                 start.linkTo(parent.start)

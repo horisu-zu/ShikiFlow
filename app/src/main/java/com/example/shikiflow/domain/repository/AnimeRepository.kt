@@ -59,8 +59,8 @@ class AnimeRepository @Inject constructor(
             search = Optional.presentIfNotNull(name),
             mylist = when {
                 !searchInUserList -> Optional.Absent
-                userStatus.isNotEmpty() -> Optional.present(userStatus.joinToString(",") { it?.toGraphQLValue() ?: "" })
-                else -> Optional.present(MyListString.entries.joinToString(",") { it.toGraphQLValue() })
+                userStatus.any { it == null } -> Optional.present(MyListString.entries.joinToString(",") { it.toGraphQLValue() })
+                else -> Optional.present(userStatus.joinToString(",") { it?.toGraphQLValue() ?: "" })
             },
             order = Optional.presentIfNotNull(order),
             censored = Optional.presentIfNotNull(censored ?: true),

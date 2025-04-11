@@ -33,9 +33,7 @@ class AnimeDetailsViewModel @Inject constructor(
                         Log.d("AnimeDetailsViewModel", "User Rate: ${result.getOrNull()?.userRate}")
                         Resource.Success(result.getOrNull())
                     }
-                    result.isFailure -> Resource.Error(
-                        result.exceptionOrNull()?.message ?: "Unknown error"
-                    )
+                    result.isFailure -> Resource.Error(result.exceptionOrNull()?.message ?: "Unknown error")
                     else -> Resource.Error("Unknown error")
                 }
             } catch (e: Exception) {

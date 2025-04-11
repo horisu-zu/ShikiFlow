@@ -39,6 +39,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeDetailsQuery
 import com.example.shikiflow.data.common.RelatedInfo
 import com.example.shikiflow.data.mapper.RelatedMapper
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.FormattedText
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -49,6 +50,7 @@ import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 @Composable
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime?,
+    onItemClick: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -121,6 +123,7 @@ fun AnimeDetailsDesc(
         RelatedSection(
             relatedItems = animeDetails?.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
             onArrowClick = { showRelatedBottomSheet = true },
+            onItemClick = onItemClick,
             modifier = Modifier.constrainAs(relatedRef) {
                 top.linkTo(charactersRef.bottom, margin = 12.dp)
                 start.linkTo(parent.start)
@@ -155,6 +158,7 @@ fun AnimeDetailsDesc(
     RelatedBottomSheet(
         relatedItems = animeDetails?.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
         showBottomSheet = showRelatedBottomSheet,
+        onItemClick = onItemClick,
         onDismiss = { showRelatedBottomSheet = false }
     )
 }
@@ -192,6 +196,7 @@ fun CharacterCard(
 @Composable
 fun RelatedSection(
     relatedItems: List<RelatedInfo>,
+    onItemClick: (String, MediaType) -> Unit,
     onArrowClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -239,7 +244,8 @@ fun RelatedSection(
         ) {
             relatedItems.take(3).forEach { relatedItem ->
                 RelatedItem(
-                    relatedInfo = relatedItem
+                    relatedInfo = relatedItem,
+                    onItemClick = onItemClick
                 )
             }
         }
@@ -249,6 +255,7 @@ fun RelatedSection(
 @Composable
 fun RelatedItem(
     relatedInfo: RelatedInfo,
+    onItemClick: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
@@ -263,6 +270,10 @@ fun RelatedItem(
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
+                .clickable { onItemClick(
+                    relatedInfo.manga?.id ?: relatedInfo.anime?.id!!,
+                    if(relatedInfo.anime != null) MediaType.ANIME else MediaType.MANGA
+                ) }
                 .constrainAs(posterRef) {
                     start.linkTo(parent.start)
                     top.linkTo(parent.top)

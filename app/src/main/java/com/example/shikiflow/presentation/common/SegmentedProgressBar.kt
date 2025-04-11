@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.StatusColor
 
 @OptIn(ExperimentalLayoutApi::class)

@@ -30,11 +30,13 @@ query MangaDetails(
         related {
             id
             anime {
+                id
                 name
                 poster { mainUrl }
                 kind
             }
             manga {
+                id
                 name
                 poster { mainUrl }
                 kind

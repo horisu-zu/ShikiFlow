@@ -19,16 +19,18 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.MangaDetailsQuery
 import com.example.shikiflow.data.mapper.RelatedMapper
+import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.common.FormattedText
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedSection
-import com.example.shikiflow.utils.Converter.convertStatus
 
 @Composable
 fun MangaDetailsDesc(
     mangaDetails: MangaDetailsQuery.Manga?,
+    onItemClick: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -83,7 +85,7 @@ fun MangaDetailsDesc(
 
         SegmentedProgressBar(
             groupedData = mangaDetails?.statusesStats?.associate {
-                convertStatus(it.status.toString()) to it.count
+                mapStatusToString(it.status, MediaType.MANGA) to it.count
             } ?: emptyMap(),
             totalCount = mangaDetails?.statusesStats?.size ?: 0,
             modifier = Modifier.constrainAs(listRef) {
@@ -97,6 +99,7 @@ fun MangaDetailsDesc(
         if(mangaDetails?.related != null && mangaDetails.related.isNotEmpty()) {
             RelatedSection(
                 relatedItems = mangaDetails.related.map { RelatedMapper.fromMangaRelated(it) },
+                onItemClick = onItemClick,
                 onArrowClick = { showRelatedBottomSheet = true },
                 modifier = Modifier.constrainAs(relatedRef) {
                     top.linkTo(listRef.bottom, margin = 12.dp)
@@ -111,6 +114,7 @@ fun MangaDetailsDesc(
     RelatedBottomSheet(
         relatedItems = mangaDetails?.related?.map { RelatedMapper.fromMangaRelated(it) } ?: emptyList(),
         showBottomSheet = showRelatedBottomSheet,
+        onItemClick = onItemClick,
         onDismiss = { showRelatedBottomSheet = false }
     )
 }

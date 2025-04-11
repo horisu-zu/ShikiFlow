@@ -114,7 +114,7 @@ fun BrowseSearchPage(
                             BrowseItem(
                                 browseItem = item.toBrowseManga(),
                                 onItemClick = { id ->
-                                    //rootNavController.navigate("manga?DetailsScreen/$id")
+                                    rootNavController.navigate("mangaDetailsScreen/$id")
                                 }
                             )
                         }

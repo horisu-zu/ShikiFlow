@@ -16,12 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.data.common.RelatedInfo
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelatedBottomSheet(
     relatedItems: List<RelatedInfo>,
+    onItemClick: (String, MediaType) -> Unit,
     showBottomSheet: Boolean,
     onDismiss: () -> Unit
 ) {
@@ -46,6 +48,7 @@ fun RelatedBottomSheet(
                 relatedItems.forEach { relatedItem ->
                     RelatedItem(
                         relatedInfo = relatedItem,
+                        onItemClick = onItemClick,
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
                 }

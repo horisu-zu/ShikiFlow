@@ -39,12 +39,12 @@ class UserRateMapper {
             )[tab]
         }
 
-        fun mapStatusToString(status: UserRateStatusEnum): String {
+        fun mapStatusToString(status: UserRateStatusEnum, mediaType: MediaType = MediaType.ANIME): String {
             return when(status) {
-                UserRateStatusEnum.watching -> "Watching"
+                UserRateStatusEnum.watching -> if(mediaType == MediaType.ANIME) "Watching" else "Reading"
                 UserRateStatusEnum.planned -> "Planned"
                 UserRateStatusEnum.completed -> "Completed"
-                UserRateStatusEnum.rewatching -> "Rewatching"
+                UserRateStatusEnum.rewatching -> if(mediaType == MediaType.ANIME) "Rewatching" else "Rereading"
                 UserRateStatusEnum.on_hold -> "On Hold"
                 UserRateStatusEnum.dropped -> "Dropped"
                 UserRateStatusEnum.UNKNOWN__ -> "Unknown"
