@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+/*
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
@@ -35,4 +36,4 @@ fun MainScreenNavigator(
             )
         }
     }
-}
+}*/

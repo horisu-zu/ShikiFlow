@@ -26,7 +26,6 @@ import com.example.shikiflow.utils.IconResource
 fun MoreScreen(
     currentUser: CurrentUserQuery.Data?,
     navController: NavController,
-    mainNavController: NavController,
     searchViewModel: SearchViewModel = hiltViewModel(),
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()

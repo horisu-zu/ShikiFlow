@@ -33,6 +33,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         appSettingsManager = AppSettingsManager(applicationContext)
 
+        //enableEdgeToEdge()
+
         setContent {
             val darkTheme = observeTheme(appSettingsManager)
 
@@ -89,13 +91,11 @@ fun Window.fitSystemWindowsWithAdjustResize() {
     WindowCompat.setDecorFitsSystemWindows(this, true)
 
     ViewCompat.setOnApplyWindowInsetsListener(decorView) { view, insets ->
-        val bottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
-
         WindowInsetsCompat
             .Builder()
             .setInsets(
                 WindowInsetsCompat.Type.systemBars(),
-                Insets.of(0, 0, 0, bottom)
+                Insets.of(0, 0, 0, 0)
             )
             .build()
             .apply { ViewCompat.onApplyWindowInsets(view, this) }

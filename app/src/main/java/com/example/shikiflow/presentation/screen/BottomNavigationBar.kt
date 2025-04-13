@@ -19,7 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
-import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
+import com.example.shikiflow.presentation.screen.main.MainScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
@@ -77,7 +77,7 @@ fun NavigationGraph(
 ) {
     NavHost(navController, startDestination = BottomNavItem.Home.route, modifier = modifier) {
         composable(BottomNavItem.Home.route) {
-            MainScreenNavigator(
+            MainScreen(
                 currentUser = currentUser,
                 rootNavController = navController
             )
@@ -89,10 +89,7 @@ fun NavigationGraph(
             )
         }
         composable(BottomNavItem.More.route) {
-            MoreScreenNavigator(
-                currentUser = currentUser,
-                mainNavController = navController
-            )
+            MoreScreenNavigator(currentUser = currentUser)
         }
         composable(
             route = "animeDetailsScreen/{id}",

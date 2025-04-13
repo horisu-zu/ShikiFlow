@@ -20,8 +20,7 @@ import com.example.shikiflow.utils.Animations.slideOutToTop
 
 @Composable
 fun MoreScreenNavigator(
-    currentUser: CurrentUserQuery.Data?,
-    mainNavController: NavController
+    currentUser: CurrentUserQuery.Data?
 ) {
     val moreNavController = rememberNavController()
 
@@ -38,7 +37,6 @@ fun MoreScreenNavigator(
         ) {
             MoreScreen(
                 navController = moreNavController,
-                mainNavController = mainNavController,
                 currentUser = currentUser
             )
         }

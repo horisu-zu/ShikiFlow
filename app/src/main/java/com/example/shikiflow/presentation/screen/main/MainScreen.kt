@@ -25,7 +25,6 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    mainNavController: NavController,
     rootNavController: NavController,
     currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel()

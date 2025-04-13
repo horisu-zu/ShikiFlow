@@ -1,8 +1,5 @@
-@file:JvmName("AuthScreenKt")
-
 package com.example.shikiflow.presentation.auth
 
-import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -16,6 +13,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.example.shikiflow.data.auth.AuthState
 import kotlinx.coroutines.launch
+import androidx.core.net.toUri
 
 @Composable
 fun AuthScreen(
@@ -35,7 +33,7 @@ fun AuthScreen(
                 Log.d("AuthScreen", "Launching Custom Tab with URL: $authUrl")
                 CustomTabsIntent.Builder()
                     .build()
-                    .launchUrl(context, Uri.parse(authUrl))
+                    .launchUrl(context, authUrl.toUri())
             }
         }
     )

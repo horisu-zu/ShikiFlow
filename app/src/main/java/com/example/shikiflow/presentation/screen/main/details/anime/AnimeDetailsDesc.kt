@@ -264,15 +264,14 @@ fun RelatedItem(
         val (posterRef, titleRef, infoRef) = createRefs()
 
         RoundedImage(
-            model = relatedInfo.manga?.poster?.mainUrl
-                ?: relatedInfo.anime?.poster?.mainUrl,
+            model = relatedInfo.media?.poster?.mainUrl,
             clip = RoundedCornerShape(8.dp),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
                 .clickable { onItemClick(
-                    relatedInfo.manga?.id ?: relatedInfo.anime?.id!!,
-                    if(relatedInfo.anime != null) MediaType.ANIME else MediaType.MANGA
+                    relatedInfo.media?.id ?: "",
+                    relatedInfo.media?.mediaType ?: MediaType.ANIME
                 ) }
                 .constrainAs(posterRef) {
                     start.linkTo(parent.start)
@@ -282,8 +281,7 @@ fun RelatedItem(
         )
 
         Text(
-            text = relatedInfo.manga?.name
-                ?: (relatedInfo.anime?.name ?: "Title"),
+            text = relatedInfo.media?.name ?: "Unknown",
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.constrainAs(titleRef) {
                 top.linkTo(parent.top)
@@ -295,7 +293,7 @@ fun RelatedItem(
         )
 
         Text(
-            text = "${relatedInfo.anime?.kind ?: relatedInfo.manga?.kind} ${relatedInfo.relationKind}",
+            text = "${relatedInfo.media?.kind} ${relatedInfo.relationKind}",
             style = MaterialTheme.typography.labelSmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
             ),

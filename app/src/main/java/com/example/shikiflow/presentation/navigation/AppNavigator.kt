@@ -46,7 +46,7 @@ fun AppNavigator(
             AuthScreen(navController = navController)
         }
         composable(route = "main") {
-            MainNavigator(parentNavController = navController)
+            MainNavigator()
         }
     }
 }
