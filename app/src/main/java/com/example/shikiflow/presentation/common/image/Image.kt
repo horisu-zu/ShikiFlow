@@ -43,7 +43,7 @@ fun BaseImage(
             .diskCacheKey(model)
             .listener(
                 onSuccess = { _ , result ->
-                    Log.d("Image", "Image successfully loaded: $result")
+                    //Log.d("Image", "Image successfully loaded: $result")
                 },
                 onError = { _ , error ->
                     Log.d("Image", "Error loading image: $error")

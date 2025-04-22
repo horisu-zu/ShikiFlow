@@ -22,6 +22,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.type.AnimeStatusEnum
+import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.determineSeason
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
@@ -32,7 +33,7 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeTrackItem(
-    userRate: AnimeTracksQuery.UserRate,
+    userRate: AnimeTrack,
     modifier: Modifier = Modifier,
     onClick: (String) -> Unit,
     onLongClick: () -> Unit
@@ -43,14 +44,14 @@ fun AnimeTrackItem(
             .padding(start = 12.dp, end = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
-                onClick = { onClick(userRate.animeUserRateWithModel.anime?.animeShort?.id ?: "") },
+                onClick = { onClick(userRate.anime.id) },
                 onLongClick = { onLongClick() }
             )
     ) {
         val (posterRef, titleRef, dataRef, progressBarRef) = createRefs()
 
         BaseImage(
-            model = userRate.animeUserRateWithModel.anime?.animeShort?.poster?.posterShort?.originalUrl,
+            model = userRate.anime.poster?.originalUrl,
             contentDescription = "Poster",
             modifier = Modifier
                 .width(96.dp)
@@ -61,7 +62,7 @@ fun AnimeTrackItem(
         )
 
         Text(
-            text = userRate.animeUserRateWithModel.anime?.animeShort?.name ?: "Huh!",
+            text = userRate.anime.name,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.SemiBold,
             //fontSize = 10.sp,
@@ -85,7 +86,7 @@ fun AnimeTrackItem(
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = mapAnimeStatus(userRate.animeUserRateWithModel.anime?.animeShort?.status),
+                text = mapAnimeStatus(userRate.anime.status),
                 fontSize = 12.sp
             )
             Text(
@@ -93,7 +94,7 @@ fun AnimeTrackItem(
                 fontSize = 12.sp
             )
             Text(
-                text = mapAnimeKind(userRate.animeUserRateWithModel.anime?.animeShort?.kind),
+                text = mapAnimeKind(userRate.anime.kind),
                 fontSize = 12.sp
             )
             Text(
@@ -101,22 +102,22 @@ fun AnimeTrackItem(
                 fontSize = 12.sp
             )
             Text(
-                text = "${userRate.animeUserRateWithModel.anime?.animeShort?.episodes?.takeIf { it > 0 } ?: "?"} ep.",
+                text = "${userRate.anime.episodes.takeIf { it > 0 } ?: "?"} ep.",
                 fontSize = 12.sp
             )
-            if (userRate.animeUserRateWithModel.anime?.animeShort?.status != AnimeStatusEnum.anons) {
+            if (userRate.anime.status != AnimeStatusEnum.anons) {
                 Text(
                     text = "•",
                     fontSize = 12.sp
                 )
                 Text(
-                    text = "${userRate.animeUserRateWithModel.anime?.animeShort?.score} ★",
+                    text = "${userRate.anime.score} ★",
                     fontSize = 12.sp
                 )
             }
         }
 
-        if (userRate.animeUserRateWithModel.anime?.animeShort?.status != AnimeStatusEnum.anons) {
+        if (userRate.anime.status != AnimeStatusEnum.anons) {
             Column(
                 modifier = Modifier.constrainAs(progressBarRef) {
                     top.linkTo(dataRef.bottom, margin = 4.dp)
@@ -126,32 +127,32 @@ fun AnimeTrackItem(
                 }
             ) {
                 ProgressBar(
-                    progress = userRate.animeUserRateWithModel.anime?.animeShort?.let { animeShort ->
+                    progress = userRate.anime.let { animeShort ->
                         val totalEpisodes = when {
                             animeShort.episodes > 0 -> animeShort.episodes
                             animeShort.episodesAired > 0 -> animeShort.episodesAired
                             else -> null
                         }
-                        totalEpisodes?.let { userRate.animeUserRateWithModel.episodes.toFloat() / it } ?: 0f
-                    } ?: 0f
+                        totalEpisodes?.let { userRate.track.episodes.toFloat() / it } ?: 0f
+                    }
                 )
                 Text(
-                    text = "${userRate.animeUserRateWithModel.episodes} of " +
-                            "${userRate.animeUserRateWithModel.anime?.animeShort?.let { animeShort ->
+                    text = "${userRate.track.episodes} of " +
+                            "${userRate.anime.let { animeShort ->
                                 val totalEpisodes = when {
                                     animeShort.episodes > 0 -> animeShort.episodes
                                     animeShort.episodesAired > 0 -> animeShort.episodesAired
                                     else -> 0
                                 }
                                 totalEpisodes
-                            } ?: 0} ep.",
+                            }} ep.",
                     fontSize = 12.sp
                 )
             }
 
         } else {
             StatusCard(
-                text = determineSeason(userRate.animeUserRateWithModel.anime.animeShort.airedOn),
+                text = determineSeason(userRate.anime.airedOn),
                 modifier = Modifier.constrainAs(progressBarRef) {
                     top.linkTo(dataRef.bottom, margin = 4.dp)
                     start.linkTo(dataRef.start)

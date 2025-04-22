@@ -35,7 +35,7 @@ class AnimeTracksRepository @Inject constructor(
                 Result.success(
                     AnimeTracksResponse(
                         userRates = it.userRates,
-                        hasNextPage = it.userRates.size >= limit
+                        hasNextPage = it.userRates.isNotEmpty()
                     )
                 )
             } ?: Result.failure(Exception("No data"))

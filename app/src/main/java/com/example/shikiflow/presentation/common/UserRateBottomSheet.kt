@@ -32,6 +32,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -73,6 +74,10 @@ fun UserRateBottomSheet(
     var selectedScore by remember { mutableIntStateOf(userRate.score) }
     var progress by remember { mutableIntStateOf(userRate.progress) }
     var rewatches by remember { mutableIntStateOf(userRate.rewatches) }
+
+    LaunchedEffect(Unit) {
+
+    }
 
     ModalBottomSheet(
         modifier = modifier,

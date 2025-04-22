@@ -51,6 +51,13 @@ fun MangaDetailsScreen(
     val isInitialized = rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        userViewModel.updateEvent.collect {
+            mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
+            rateBottomSheet = false
+        }
+    }
+
     LaunchedEffect(id) {
         if(!isInitialized.value) {
             mangaDetailsViewModel.getMangaDetails(id)
@@ -144,13 +151,7 @@ fun MangaDetailsScreen(
                     score = score,
                     progress = episodes,
                     rewatches = rewatches,
-                    mediaType = mediaType,
-                    onComplete = { success ->
-                        if (success) {
-                            mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
-                            rateBottomSheet = false
-                        }
-                    }
+                    mediaType = mediaType
                 )
             },
             onCreateRate = { mediaId, status ->
@@ -158,13 +159,7 @@ fun MangaDetailsScreen(
                     userId = currentUser?.currentUser?.id ?: "",
                     targetId = mediaId,
                     status = status,
-                    targetType = TargetType.MANGA,
-                    onComplete = { success ->
-                        if (success) {
-                            mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
-                            rateBottomSheet = false
-                        }
-                    }
+                    targetType = TargetType.MANGA
                 )
             }
         )

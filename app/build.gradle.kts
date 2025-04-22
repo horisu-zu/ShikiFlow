@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.apollo)
-    kotlin("kapt")
+    id("com.google.devtools.ksp")
     alias(libs.plugins.compose.compiler)
 }
 
@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.shikiflow"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -51,9 +51,6 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
-    }
-    kapt {
-        correctErrorTypes = true
     }
     hilt {
         enableAggregatingTask = false
@@ -102,7 +99,7 @@ dependencies {
 
     //Hilt
     implementation(libs.hilt.android)
-    kapt(libs.hilt.compiler)
+    ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
     //ConstraintLayout
@@ -117,4 +114,12 @@ dependencies {
     //Coil
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+
+    //Paging3
+    implementation(libs.androidx.paging.compose)
+
+    //Room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.paging)
+    ksp(libs.androidx.room.compiler)
 }

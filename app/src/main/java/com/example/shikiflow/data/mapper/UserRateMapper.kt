@@ -7,6 +7,7 @@ import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.MangaStatusEnum
 import com.example.graphql.type.RelationKindEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.local.entity.animetrack.ReleaseDateEntity
 import com.example.shikiflow.data.tracks.MediaType
 import kotlin.reflect.KClass
 
@@ -154,7 +155,7 @@ class UserRateMapper {
             }
         }
 
-        fun determineSeason(airedOn: AnimeShort.AiredOn?): String {
+        fun determineSeason(airedOn: ReleaseDateEntity?): String {
             val year = airedOn?.year
             val month = airedOn?.month
 

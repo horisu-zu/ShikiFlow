@@ -1,26 +1,27 @@
 [versions]
-agp = "8.8.0"
-apollo = "4.1.0"
+agp = "8.9.1"
+apollo = "4.1.1"
 browser = "1.8.0"
-coil = "3.0.4"
 coilCompose = "3.0.4"
-constraintlayoutCompose = "1.1.0"
+constraintlayoutCompose = "1.1.1"
 converterGson = "2.9.0"
-datastorePreferences = "1.1.2"
-kotlin = "2.0.21"
-coreKtx = "1.15.0"
+datastorePreferences = "1.1.4"
+kotlin = "2.1.20"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxDatetime = "0.4.0"
-kotlinxSerializationJsonVersion = "1.6.2"
+kotlinxSerializationJsonVersion = "1.6.3"
 lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.10.0"
-composeBom = "2025.01.00"
-navigationCompose = "2.8.5"
+activityCompose = "1.10.1"
+composeBom = "2025.04.00"
+navigationCompose = "2.8.9"
+pagingCompose = "3.3.6"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
-hilt = "2.50"
+hilt = "2.56.2"
+room = "2.7.0"
 hilt-navigation-compose = "1.2.0"
 retrofit-kotlinx-serialization = "1.0.0"
 kotlin-serialization = "1.9.0"
@@ -29,7 +30,10 @@ kotlin-serialization = "1.9.0"
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
-coil = { module = "io.coil-kt:coil", version.ref = "coil" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pagingCompose" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }

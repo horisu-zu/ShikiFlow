@@ -52,6 +52,13 @@ fun AnimeDetailsScreen(
     val isInitialized = rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
+    LaunchedEffect(Unit) {
+        userViewModel.updateEvent.collect { response ->
+            animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
+            rateBottomSheet = false
+        }
+    }
+
     LaunchedEffect(id) {
         if(!isInitialized.value) {
             Log.d("Details Screen", "Loading Anime ID: $id")
@@ -147,13 +154,7 @@ fun AnimeDetailsScreen(
                     score = score,
                     progress = episodes,
                     rewatches = rewatches,
-                    mediaType = mediaType,
-                    onComplete = { success ->
-                        if (success) {
-                            animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
-                            rateBottomSheet = false
-                        }
-                    }
+                    mediaType = mediaType
                 )
             },
             onCreateRate = { mediaId, status ->
@@ -161,13 +162,7 @@ fun AnimeDetailsScreen(
                     userId = currentUser?.currentUser?.id ?: "",
                     targetId = mediaId,
                     status = status,
-                    targetType = TargetType.ANIME,
-                    onComplete = { success ->
-                        if (success) {
-                            animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
-                            rateBottomSheet = false
-                        }
-                    }
+                    targetType = TargetType.ANIME
                 )
             }
         )

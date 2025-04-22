@@ -9,11 +9,14 @@ import com.example.shikiflow.data.tracks.UserRateRequest
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.tracks.CreateUserRateRequest
 import com.example.shikiflow.data.tracks.TargetType
+import com.example.shikiflow.data.tracks.UserRateResponse
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -30,6 +33,9 @@ class UserViewModel @Inject constructor(
 
     private val _isUpdating = MutableStateFlow(false)
     val isUpdating = _isUpdating.asStateFlow()
+
+    private val _updateEvent = MutableSharedFlow<UserRateResponse>(0)
+    val updateEvent = _updateEvent.asSharedFlow()
 
     init {
         fetchCurrentUser()
@@ -57,8 +63,7 @@ class UserViewModel @Inject constructor(
         score: Int,
         progress: Int,
         rewatches: Int,
-        mediaType: MediaType,
-        onComplete: ((Boolean) -> Unit)? = null
+        mediaType: MediaType
     ) = viewModelScope.launch {
         _isUpdating.value = true
 
@@ -73,12 +78,15 @@ class UserViewModel @Inject constructor(
 
             val result = withContext(Dispatchers.IO) {
                 userRepository.updateUserRate(id, request)
-            }.isSuccess
+            }
 
-            onComplete?.invoke(result)
+            if (result.isSuccess) {
+                _updateEvent.emit(result.getOrThrow())
+            } else {
+                Log.e("UserViewModel", "Error updating user rate")
+            }
         } catch (e: Exception) {
             Log.e("UserViewModel", "Error updating user rate", e)
-            onComplete?.invoke(false)
         } finally {
             _isUpdating.value = false
         }
@@ -88,8 +96,7 @@ class UserViewModel @Inject constructor(
         userId: String,
         targetId: String,
         status: Int,
-        targetType: TargetType,
-        onComplete: ((Boolean) -> Unit)? = null
+        targetType: TargetType
     ) = viewModelScope.launch {
         _isUpdating.value = true
 
@@ -103,12 +110,15 @@ class UserViewModel @Inject constructor(
 
             val result = withContext(Dispatchers.IO) {
                 userRepository.createUserRate(request)
-            }.isSuccess
+            }
 
-            onComplete?.invoke(result)
+            if (result.isSuccess) {
+                _updateEvent.emit(result.getOrNull()!!)
+            } else {
+                Log.e("UserViewModel", "Error creating user rate")
+            }
         } catch (e: Exception) {
             Log.e("UserViewModel", "Error creating user rate: ${e.message}")
-            onComplete?.invoke(false)
         } finally {
             _isUpdating.value = false
         }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,6 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.tracks.MediaType
@@ -60,11 +60,7 @@ fun MainPage(
         ) { page ->
             val status = UserRateMapper.mapStringToStatus(tabs[page])
 
-            LaunchedEffect(status) {
-                status?.let {
-                    trackViewModel.loadAnimeTracks(it)
-                }
-            }
+            val trackItems = status?.let { trackViewModel.getAnimeTracks(it) }?.collectAsLazyPagingItems()
 
             PullToRefreshBox(
                 isRefreshing = isRefreshing,
@@ -74,8 +70,8 @@ fun MainPage(
                             try {
                                 Log.d("PullToRefresh", "Refreshing...")
                                 isRefreshing = true
+                                trackItems?.refresh()
                                 delay(300)
-                                trackViewModel.loadAnimeTracks(it, isRefresh = true)
                             } finally {
                                 Log.d("PullToRefresh", "Refresh completed")
                                 isRefreshing = false
@@ -84,10 +80,11 @@ fun MainPage(
                     }
                 }
             ) {
-                status?.let {
+                trackItems?.let { items ->
                     AnimeTracksPage(
                         rootNavController = rootNavController,
-                        status = it
+                        trackItems = items,
+                        tracksViewModel = trackViewModel
                     )
                 }
             }
