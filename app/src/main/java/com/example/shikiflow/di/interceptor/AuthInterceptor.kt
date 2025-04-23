@@ -1,8 +1,8 @@
 package com.example.shikiflow.di.interceptor
 
 import android.util.Log
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.auth.TokenManager
-import com.example.shikiflow.utils.BuildConfig
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor

@@ -8,7 +8,6 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -16,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.toRoute
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
@@ -35,12 +35,16 @@ fun BottomNavigationBar(navController: NavHostController) {
         BottomNavItem.Browse,
         BottomNavItem.More
     )
+
+    val navBackStackEntry = navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry.value?.destination?.route
+
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface
     ) {
-        val currentRoute = currentRoute(navController)
         items.forEach { item ->
-            val isSelected = currentRoute == item.route
+            val isSelected = currentRoute?.contains(item.route.toString()) == true
+
             NavigationBarItem(
                 icon = {
                     Icon(
@@ -54,7 +58,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = { Text(item.title) },
                 selected = isSelected,
                 onClick = {
-                    if (currentRoute != item.route) {
+                    if (!isSelected) {
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId) {
                                 saveState = true
@@ -75,44 +79,43 @@ fun NavigationGraph(
     modifier: Modifier = Modifier,
     currentUser: CurrentUserQuery.Data?
 ) {
-    NavHost(navController, startDestination = BottomNavItem.Home.route, modifier = modifier) {
-        composable(BottomNavItem.Home.route) {
+    NavHost(navController, startDestination = MainNavRoute.Home, modifier = modifier) {
+        composable<MainNavRoute.Home> {
             MainScreen(
                 currentUser = currentUser,
                 rootNavController = navController
             )
         }
-        composable(BottomNavItem.Browse.route) {
+        composable<MainNavRoute.Browse> {
             BrowseScreenNavigator(
-                currentUser = currentUser,
                 rootNavController = navController
             )
         }
-        composable(BottomNavItem.More.route) {
+        composable<MainNavRoute.More> {
             MoreScreenNavigator(currentUser = currentUser)
         }
-        composable(
-            route = "animeDetailsScreen/{id}",
+        composable<MainNavRoute.AnimeDetails>(
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
             popExitTransition = { slideOutToRight() }
-        ) {
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<MainNavRoute.AnimeDetails>()
             AnimeDetailsScreen(
-                id = (it.arguments?.getString("id") ?: "No ID").toString(),
+                id = args.id,
                 currentUser = currentUser,
                 rootNavController = navController
             )
         }
-        composable(
-            route = "mangaDetailsScreen/{id}",
+        composable<MainNavRoute.MangaDetails>(
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
             popExitTransition = { slideOutToRight() }
-        ) {
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<MainNavRoute.MangaDetails>()
             MangaDetailsScreen(
-                id = (it.arguments?.getString("id") ?: 0).toString(),
+                id = args.id,
                 rootNavController = navController,
                 currentUser = currentUser
             )
@@ -124,24 +127,26 @@ sealed class BottomNavItem(
     var title: String,
     @DrawableRes var selectedIconRes: Int,
     @DrawableRes var unselectedIconRes: Int,
-    var route: String
+    var route: MainNavRoute
 ) {
-    object Home :
-        BottomNavItem("Main", R.drawable.ic_selected_book, R.drawable.ic_unselected_book, "home")
+    object Home : BottomNavItem(
+        "Main",
+        R.drawable.ic_selected_book,
+        R.drawable.ic_unselected_book,
+        MainNavRoute.Home
+    )
 
     object Browse : BottomNavItem(
         "Browse",
         R.drawable.ic_selected_browse,
         R.drawable.ic_unselected_browse,
-        "search"
+        MainNavRoute.Browse
     )
 
-    object More :
-        BottomNavItem("More", R.drawable.ic_selected_dots, R.drawable.ic_unselected_dots, "profile")
-}
-
-@Composable
-fun currentRoute(navController: NavHostController): String? {
-    val navBackStackEntry by navController.currentBackStackEntryAsState()
-    return navBackStackEntry?.destination?.route
+    object More : BottomNavItem(
+        "More",
+        R.drawable.ic_selected_dots,
+        R.drawable.ic_unselected_dots,
+        MainNavRoute.More
+    )
 }

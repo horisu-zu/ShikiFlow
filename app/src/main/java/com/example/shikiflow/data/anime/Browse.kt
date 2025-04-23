@@ -8,7 +8,9 @@ import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.tracks.MediaType
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
+@Serializable
 sealed interface BrowseType {
     enum class AnimeBrowseType: BrowseType { ONGOING, SEARCH, ANIME_TOP }
     enum class MangaBrowseType: BrowseType { SEARCH, MANGA_TOP }

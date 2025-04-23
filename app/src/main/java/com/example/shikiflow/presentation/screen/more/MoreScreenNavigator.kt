@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.screen.more
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -26,10 +25,9 @@ fun MoreScreenNavigator(
 
     NavHost(
         navController = moreNavController,
-        startDestination = "moreMainScreen"
+        startDestination = MoreNavRoute.MoreScreen
     ) {
-        composable(
-            route = "moreMainScreen",
+        composable<MoreNavRoute.MoreScreen>(
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
@@ -40,8 +38,7 @@ fun MoreScreenNavigator(
                 currentUser = currentUser
             )
         }
-        composable(
-            route = "profileScreen",
+        composable<MoreNavRoute.ProfileScreen>(
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
@@ -52,8 +49,7 @@ fun MoreScreenNavigator(
                 currentUser = currentUser
             )
         }
-        composable(
-            route = "historyScreen",
+        composable<MoreNavRoute.HistoryScreen>(
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
@@ -64,8 +60,7 @@ fun MoreScreenNavigator(
                 navController = moreNavController
             )
         }
-        composable(
-            route = "settingsScreen",
+        composable<MoreNavRoute.SettingsScreen>(
             enterTransition = { slideInFromBottom() },
             exitTransition = { slideOutToTop() },
             popEnterTransition = { slideInFromTop() },

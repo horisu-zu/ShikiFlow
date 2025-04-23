@@ -29,6 +29,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.data.mapper.BrowseOptions
 import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @Composable
@@ -67,9 +68,9 @@ fun BrowseSearchPage(
                             browseItem = browseItem,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
-                                    rootNavController.navigate("animeDetailsScreen/$id")
+                                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
                                 } else {
-                                    rootNavController.navigate("mangaDetailsScreen/$id")
+                                    rootNavController.navigate(MainNavRoute.MangaDetails(id))
                                 }
                             }
                         )

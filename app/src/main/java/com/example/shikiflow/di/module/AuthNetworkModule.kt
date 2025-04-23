@@ -1,9 +1,9 @@
 package com.example.shikiflow.di.module
 
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.di.annotations.AuthOkHttpClient
 import com.example.shikiflow.di.annotations.AuthRetrofit
 import com.example.shikiflow.di.api.ShikimoriAuthApi
-import com.example.shikiflow.utils.BuildConfig
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides

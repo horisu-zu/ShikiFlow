@@ -56,7 +56,7 @@ fun MoreScreen(
                         title = currentUser?.currentUser?.nickname ?: "NoNickname!",
                         subtitle = "My Profile",
                         onClick = {
-                            navController.navigate("profileScreen")
+                            navController.navigate(MoreNavRoute.ProfileScreen)
                         }
                     ),
                     SectionItem.General(
@@ -68,7 +68,7 @@ fun MoreScreen(
                         icon = IconResource.Drawable(R.drawable.ic_history),
                         title = "History",
                         onClick = {
-                            navController.navigate("historyScreen")
+                            navController.navigate(MoreNavRoute.HistoryScreen)
                         }
                     )
                 ),
@@ -84,7 +84,7 @@ fun MoreScreen(
                         icon = IconResource.Vector(Icons.Default.Settings),
                         title = "Settings",
                         onClick = {
-                            navController.navigate("settingsScreen")
+                            navController.navigate(MoreNavRoute.SettingsScreen)
                         }
                     ),
                     SectionItem.General(
@@ -104,7 +104,7 @@ fun MoreScreen(
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.AutoMirrored.Filled.ExitToApp),
                         title = "Logout",
-                        onClick = {  }
+                        onClick = { /**/ }
                     )
                 ),
                 modifier = Modifier.constrainAs(logoutItem) {

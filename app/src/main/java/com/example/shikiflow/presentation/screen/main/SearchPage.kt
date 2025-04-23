@@ -34,6 +34,7 @@ import androidx.navigation.NavController
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
@@ -120,7 +121,7 @@ fun SearchPage(
                     SearchAnimeTrackItem(
                         animeItem = userRate,
                         onItemClick = { id ->
-                            rootNavController.navigate("animeDetailsScreen/$id")
+                            rootNavController.navigate(MainNavRoute.AnimeDetails(id))
                         }
                     )
 

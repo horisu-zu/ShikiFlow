@@ -12,9 +12,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.user.UserHistoryResponse
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.utils.BuildConfig
 import com.example.shikiflow.utils.Converter
 import kotlinx.datetime.toInstant
 

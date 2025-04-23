@@ -2,32 +2,33 @@ package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.graphql.CurrentUserQuery
-import com.example.shikiflow.data.anime.BrowseScreens
+import androidx.navigation.toRoute
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
 import com.example.shikiflow.utils.Animations.slideOutToLeft
 import com.example.shikiflow.utils.Animations.slideOutToRight
+import com.example.shikiflow.utils.CustomNavType
+import kotlinx.serialization.json.Json
+import kotlin.reflect.typeOf
 
 @Composable
 fun BrowseScreenNavigator(
-    currentUser: CurrentUserQuery.Data?,
     rootNavController: NavController
 ) {
     val browseNavController = rememberNavController()
+    val json = Json {
+        useArrayPolymorphism = true
+    }
 
     NavHost(
-        startDestination = "browseScreen",
+        startDestination = BrowseNavRoute.BrowseScreen,
         navController = browseNavController
     ) {
-        composable(
-            route = "browseScreen",
+        composable<BrowseNavRoute.BrowseScreen>(
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
@@ -38,26 +39,18 @@ fun BrowseScreenNavigator(
                 rootNavController = rootNavController
             )
         }
-        composable(
-            route = BrowseScreens.SideScreen.route,
-            arguments = listOf(
-                navArgument(BrowseScreens.SideScreen.ARG_BROWSE_TYPE) {
-                    type = NavType.StringType
-                }
+        composable<BrowseNavRoute.SideScreen>(
+            typeMap = mapOf(
+                typeOf<BrowseType>() to CustomNavType.navTypeOf<BrowseType>(json = json)
             ),
             enterTransition = { slideInFromRight() },
             exitTransition = { slideOutToLeft() },
             popEnterTransition = { slideInFromLeft() },
             popExitTransition = { slideOutToRight() }
         ) { backStackEntry ->
-            val browseTypeString = backStackEntry.arguments?.getString(BrowseScreens.SideScreen.ARG_BROWSE_TYPE)
-                ?: return@composable
-
-            val browseType = BrowseScreens.SideScreen.parseBrowseType(browseTypeString)
-                ?: return@composable
-
+            val args = backStackEntry.toRoute<BrowseNavRoute.SideScreen>()
             BrowseSideScreen(
-                browseType = browseType,
+                browseType = args.browseType,
                 rootNavController = rootNavController,
                 browseNavController = browseNavController
             )

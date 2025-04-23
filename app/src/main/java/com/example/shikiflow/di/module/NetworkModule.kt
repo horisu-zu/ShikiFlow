@@ -5,13 +5,13 @@ import coil3.ImageLoader
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.network.okHttpClient
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
 import com.example.shikiflow.di.api.UserApi
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
 import com.example.shikiflow.domain.auth.TokenManager
-import com.example.shikiflow.utils.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

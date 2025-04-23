@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable
@@ -46,7 +47,7 @@ fun BrowseScreen(
             } else {
                 BrowseMainPage(
                     onNavigate = { id, mediaType ->
-                        rootNavController.navigate("animeDetailsScreen/$id")
+                        rootNavController.navigate(MainNavRoute.AnimeDetails(id))
                     },
                     modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
                     browseNavController = browseNavController

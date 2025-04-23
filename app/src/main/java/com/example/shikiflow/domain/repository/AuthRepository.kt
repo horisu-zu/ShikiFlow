@@ -1,14 +1,13 @@
 package com.example.shikiflow.domain.repository
 
 import android.util.Log
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.auth.TokenResponse
 import com.example.shikiflow.di.api.ShikimoriAuthApi
 import com.example.shikiflow.domain.auth.TokenManager
-import com.example.shikiflow.utils.BuildConfig
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import okio.ByteString.Companion.encode
 
 class AuthRepository(
     private val authApi: ShikimoriAuthApi,

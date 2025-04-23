@@ -20,6 +20,7 @@ import androidx.paging.compose.itemKey
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack.Companion.toUserRateData
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toEntity
+import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
@@ -55,7 +56,7 @@ fun AnimeTracksPage(
             AnimeTrackItem(
                 userRate = item,
                 onClick = { id ->
-                    rootNavController.navigate("animeDetailsScreen/$id")
+                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
                 },
                 onLongClick = {
                     rateBottomSheet.value = true

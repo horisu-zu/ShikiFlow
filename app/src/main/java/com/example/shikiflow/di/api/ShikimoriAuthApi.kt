@@ -1,7 +1,7 @@
 package com.example.shikiflow.di.api
 
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.auth.TokenResponse
-import com.example.shikiflow.utils.BuildConfig
 import retrofit2.Response
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

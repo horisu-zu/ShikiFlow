@@ -21,6 +21,7 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.data.anime.Browse
+import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.utils.Converter.formatDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -72,7 +73,7 @@ fun OngoingSideScreen(
                         BrowseItem(
                             browseItem = anime,
                             onItemClick = { id, mediaType ->
-                                rootNavController.navigate("animeDetailsScreen/$id")
+                                rootNavController.navigate(MainNavRoute.AnimeDetails(id))
                             },
                             modifier = Modifier.width(120.dp)
                         )

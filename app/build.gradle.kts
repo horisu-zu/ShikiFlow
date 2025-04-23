@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.apollo)
     id("com.google.devtools.ksp")
     alias(libs.plugins.compose.compiler)
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -43,6 +44,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -68,6 +70,10 @@ android {
             generateKotlinModels.set(true)
         }
     }
+}
+
+secrets {
+    propertiesFileName = "secret.properties"
 }
 
 dependencies {

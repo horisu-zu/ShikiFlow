@@ -33,6 +33,7 @@ import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.CircleShapeButton
+import com.example.shikiflow.presentation.screen.more.MoreNavRoute
 import com.example.shikiflow.presentation.viewmodel.user.AnimeUserRateViewModel
 import com.example.shikiflow.utils.IconResource
 
@@ -126,7 +127,7 @@ fun ProfileScreen(
                         label = "Clubs",
                         icon = IconResource.Drawable(R.drawable.ic_group),
                         onClick = {
-                            navController.navigate("clubsScreen")
+                            navController.navigate(MoreNavRoute.ClubsScreen)
                         },
                         modifier = Modifier.weight(1f)
                     )
@@ -134,7 +135,7 @@ fun ProfileScreen(
                         label = "History",
                         icon = IconResource.Drawable(R.drawable.ic_history),
                         onClick = {
-                            navController.navigate("historyScreen")
+                            navController.navigate(MoreNavRoute.HistoryScreen)
                         },
                         modifier = Modifier.weight(1f)
                     )
