@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.data.anime.Browse
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 
@@ -22,7 +23,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 @Composable
 fun BrowseItem(
     browseItem: Browse,
-    onItemClick: (String) -> Unit,
+    onItemClick: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
@@ -31,7 +32,7 @@ fun BrowseItem(
             .clickable(
                 interactionSource = MutableInteractionSource(),
                 indication = null,
-                onClick = { onItemClick(browseItem.id) }
+                onClick = { onItemClick(browseItem.id, browseItem.mediaType) }
             )
     ) {
         val (posterRef, titleRef, infoRef) = createRefs()

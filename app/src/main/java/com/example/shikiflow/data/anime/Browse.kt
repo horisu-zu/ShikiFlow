@@ -7,32 +7,7 @@ import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.tracks.MediaType
-
-sealed interface BrowseState {
-    val mediaType: MediaType
-    val isLoading: Boolean
-    val hasMorePages: Boolean
-    val currentPage: Int
-    val error: String?
-
-    data class AnimeBrowseState(
-        val items: List<AnimeBrowseQuery.Anime> = emptyList(),
-        override val mediaType: MediaType = MediaType.ANIME,
-        override val isLoading: Boolean = false,
-        override val hasMorePages: Boolean = true,
-        override val currentPage: Int = 1,
-        override val error: String? = null
-    ) : BrowseState
-
-    data class MangaBrowseState(
-        val items: List<MangaBrowseQuery.Manga> = emptyList(),
-        override val mediaType: MediaType = MediaType.MANGA,
-        override val isLoading: Boolean = false,
-        override val hasMorePages: Boolean = true,
-        override val currentPage: Int = 1,
-        override val error: String? = null
-    ) : BrowseState
-}
+import kotlinx.datetime.Instant
 
 sealed interface BrowseType {
     enum class AnimeBrowseType: BrowseType { ONGOING, SEARCH, ANIME_TOP }
@@ -45,14 +20,18 @@ sealed interface Browse {
     val posterUrl: String?
     val score: Double
     val kind: String
+    val nextEpisodeAt: Instant?
+    val mediaType: MediaType
 
     data class Anime(
         override val id: String,
         override val title: String,
         override val posterUrl: String?,
         override val score: Double,
-        val animeKind: AnimeKindEnum
-    ) : Browse {
+        override val nextEpisodeAt: Instant? = null,
+        override val mediaType: MediaType = MediaType.ANIME,
+        val animeKind: AnimeKindEnum,
+    ): Browse {
         override val kind: String get() = UserRateMapper.mapAnimeKind(animeKind)
     }
 
@@ -61,8 +40,10 @@ sealed interface Browse {
         override val title: String,
         override val posterUrl: String?,
         override val score: Double,
+        override val nextEpisodeAt: Instant? = null,
+        override val mediaType: MediaType = MediaType.MANGA,
         val mangaKind: MangaKindEnum
-    ) : Browse {
+    ): Browse {
         override val kind: String get() = UserRateMapper.mapMangaKind(mangaKind)
     }
 }
@@ -73,7 +54,8 @@ fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
         title = this.name,
         posterUrl = this.poster?.posterShort?.mainUrl,
         score = this.score ?: 0.0,
-        animeKind = this.kind ?: AnimeKindEnum.UNKNOWN__
+        animeKind = this.kind ?: AnimeKindEnum.UNKNOWN__,
+        nextEpisodeAt = this.nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) }
     )
 }
 

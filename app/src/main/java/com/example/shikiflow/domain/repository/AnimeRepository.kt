@@ -52,7 +52,7 @@ class AnimeRepository @Inject constructor(
         studio: String? = null,
         franchise: String? = null,
         censored: Boolean? = null,
-    ): Result<AnimeResponse> {
+    ): Result<List<AnimeBrowseQuery.Anime>> {
         val query = AnimeBrowseQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
@@ -78,13 +78,8 @@ class AnimeRepository @Inject constructor(
 
         return try {
             val response = apolloClient.query(query).execute()
-            response.data?.let {
-                Result.success(
-                    AnimeResponse(
-                        animeList = it.animes,
-                        hasNextPage = it.animes.size >= limit
-                    )
-                )
+            response.data?.let { data ->
+                Result.success(data.animes)
             } ?: Result.failure(Exception("No data"))
         } catch (e: Exception) {
             Result.failure(e)

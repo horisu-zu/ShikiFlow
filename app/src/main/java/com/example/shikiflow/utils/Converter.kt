@@ -16,9 +16,13 @@ import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.UserRate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
 import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 
@@ -46,6 +50,31 @@ object Converter {
 
             SimpleDateFormat(pattern, Locale.getDefault()).format(date)
         } ?: "Not available"
+    }
+
+    fun formatDate(
+        date: LocalDate,
+        includeTime: Boolean = false,
+        locale: Locale = Locale.getDefault()
+    ): String {
+        return date.let { date ->
+            val currentYear = Clock.System.now()
+                .toLocalDateTime(TimeZone.currentSystemDefault()).year
+            val instantYear = date.year
+
+            val pattern = buildString {
+                append ("dd MMM")
+                if (instantYear != currentYear) {
+                    append(" yyyy")
+                }
+                if (includeTime) {
+                    append(", HH:mm")
+                }
+            }
+
+            val formatter = DateTimeFormatter.ofPattern(pattern, locale)
+            return date.toJavaLocalDate().format(formatter)
+        }
     }
 
     fun convertInstantToString(context: Context, lastSeenInstant: Instant?): String {

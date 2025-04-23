@@ -77,7 +77,7 @@ class AnimeTracksSearchViewModel @Inject constructor(
             result.onSuccess { response ->
                 _searchResults.update { currentResults ->
                     currentResults.toMutableMap().apply {
-                        val newResults = response.animeList
+                        val newResults = response
                         val existingResults = currentResults[status] ?: emptyList()
 
                         this[status] = if (isRefresh) {
@@ -93,7 +93,7 @@ class AnimeTracksSearchViewModel @Inject constructor(
                 }
 
                 _searchHasMorePages.update {
-                    it.toMutableMap().apply { this[status] = response.hasNextPage }
+                    it.toMutableMap().apply { this[status] = response.size >= 20}
                 }
 
                 currentSearchPage.update {

@@ -13,24 +13,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.mapper.BrowseOptions
 import com.example.shikiflow.data.mapper.EnumUtils
 import com.example.shikiflow.data.search.ContentType
-import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.common.ChipSection
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchBottomSheet(
+    currentType: BrowseType,
     searchOptions: BrowseOptions,
+    onTypeChanged: (BrowseType) -> Unit,
     onOptionsChanged: (BrowseOptions) -> Unit,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val contentType = remember(searchOptions.mediaType) {
-        ContentType.fromMediaType(searchOptions.mediaType)
+    val isAnime = currentType is BrowseType.AnimeBrowseType
+    val contentType = remember(currentType) {
+        ContentType.fromBrowseType(currentType)
     }
 
     ModalBottomSheet(
@@ -44,18 +47,19 @@ fun SearchBottomSheet(
         ) {
             ChipSection(
                 label = "Media",
-                items = EnumUtils.getFormattedEnumList(MediaType::class),
-                selectedItems = listOf(EnumUtils.formatEnumName(searchOptions.mediaType)),
+                items = listOf("Anime", "Manga"),
+                selectedItems = listOf(if (isAnime) "Anime" else "Manga"),
                 onItemSelected = { formattedName ->
-                    EnumUtils.findEnumByFormattedName(MediaType::class, formattedName)?.let { mediaType ->
-                        onOptionsChanged(searchOptions.copy(
-                            mediaType = mediaType
-                        ))
+                    val newType = if (formattedName == "Anime") {
+                        BrowseType.AnimeBrowseType.SEARCH
+                    } else {
+                        BrowseType.MangaBrowseType.SEARCH
                     }
+                    onTypeChanged(newType)
                 },
                 required = true
             )
-            contentType?.let { type ->
+            contentType.let { type ->
                 ChipSection(
                     label = "Kind",
                     items = EnumUtils.getFormattedEnumList(type.kindEnum),
@@ -71,7 +75,7 @@ fun SearchBottomSheet(
                     }
                 )
             }
-            contentType?.let { type ->
+            contentType.let { type ->
                 ChipSection(
                     label = "Status",
                     items = EnumUtils.getFormattedEnumList(type.statusEnum),

@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -13,64 +14,43 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.graphql.AnimeBrowseQuery
-import com.example.graphql.MangaBrowseQuery
-import com.example.shikiflow.data.anime.BrowseState
-import com.example.shikiflow.data.anime.toBrowseAnime
-import com.example.shikiflow.data.anime.toBrowseManga
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import com.example.shikiflow.data.anime.Browse
 import com.example.shikiflow.data.tracks.MediaType
 
 @Composable
 fun MainSideScreen(
-    state: BrowseState,
+    browseData: LazyPagingItems<Browse>,
     rootNavController: NavController,
-    onLoadMore: (MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val items = when (state) {
-        is BrowseState.AnimeBrowseState -> state.items
-        is BrowseState.MangaBrowseState -> state.items
-    }
-
     LazyVerticalGrid(
         columns = GridCells.Fixed(3),
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        items(items.size) { index ->
-            when(val item = items[index]) {
-                is AnimeBrowseQuery.Anime -> {
-                    BrowseItem(
-                        browseItem = item.toBrowseAnime(),
-                        onItemClick = { id ->
-                            rootNavController.navigate("animeDetailsScreen/$id")
-                        }
-                    )
+        items(browseData.itemCount) { index ->
+            val browseItem = browseData[index]!!
+            BrowseItem(
+                browseItem = browseItem,
+                onItemClick = { id, mediaType ->
+                    if(mediaType == MediaType.ANIME) {
+                        rootNavController.navigate("animeDetailsScreen/$id")
+                    } else {
+                        rootNavController.navigate("mangaDetailsScreen/$id")
+                    }
                 }
-                is MangaBrowseQuery.Manga -> {
-                    BrowseItem(
-                        browseItem = item.toBrowseManga(),
-                        onItemClick = { id ->
-                            rootNavController.navigate("mangaDetailsScreen/$id")
-                        }
-                    )
-                }
-            }
+            )
         }
-
-        if (state.hasMorePages) {
-            item(
-                span = { GridItemSpan(3) }
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    onLoadMore(state.mediaType)
-                    CircularProgressIndicator()
+        browseData.apply {
+            if(loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading) {
+                item(span = { GridItemSpan(3) }) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
                 }
             }
         }

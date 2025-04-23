@@ -4,6 +4,7 @@ import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.MangaStatusEnum
+import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.data.tracks.MediaType
 import kotlin.reflect.KClass
 
@@ -22,10 +23,9 @@ sealed class ContentType {
     }
 
     companion object {
-        fun fromMediaType(mediaType: MediaType?) = when (mediaType) {
-            MediaType.ANIME -> Anime
-            MediaType.MANGA -> Manga
-            else -> null
+        fun fromBrowseType(browseType: BrowseType) = when (browseType) {
+            is BrowseType.AnimeBrowseType -> Anime
+            is BrowseType.MangaBrowseType -> Manga
         }
     }
 }
