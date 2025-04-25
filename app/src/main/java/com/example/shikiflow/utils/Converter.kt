@@ -17,7 +17,6 @@ import com.example.shikiflow.data.tracks.UserRate
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
@@ -164,49 +163,77 @@ object Converter {
         linkColor: Color
     ): AnnotatedString {
         val builder = AnnotatedString.Builder()
+        formatRecursive(text, linkColor, builder)
+        return builder.toAnnotatedString()
+    }
 
-        val regex = Regex("\\[(\\w+)(?:=(\\w+))?](.*?)\\[/\\1]")
+    private fun formatRecursive(
+        text: String,
+        linkColor: Color,
+        builder: AnnotatedString.Builder
+    ) {
+        val regex = Regex("(\\[(\\w+)(?:=(\\w+))?](.*?)\\[/\\2])|(\\[br])|(\\r\\n)")
+
         var lastIndex = 0
 
         regex.findAll(text).forEach { matchResult ->
-            val tagName = matchResult.groupValues[1]
-            val param = matchResult.groupValues[2]
-            val content = matchResult.groupValues[3]
+            val fullMatch = matchResult.value
             val start = matchResult.range.first
+            val end = matchResult.range.last + 1
 
             if (lastIndex < start) {
                 builder.append(text.substring(lastIndex, start))
             }
 
-            if (param.isNotEmpty()) {
-                val annotationTag = when (tagName) {
-                    "character" -> "CHARACTER_ID"
-                    else -> "LINK"
-                }
-                val annotationValue = if (tagName == "character") param else "$tagName:$param"
+            when {
+                matchResult.groups[1]?.value != null -> {
+                    val tagName = matchResult.groups[2]?.value ?: ""
+                    val param = matchResult.groups[3]?.value ?: ""
+                    val content = matchResult.groups[4]?.value ?: ""
 
-                builder.pushStringAnnotation(tag = annotationTag, annotation = annotationValue)
-                builder.withStyle(SpanStyle(color = linkColor)) {
-                    builder.append(content)
+                    if (param.isNotEmpty()) {
+                        val annotationTag = when (tagName) {
+                            "character" -> "CHARACTER_ID"
+                            "spoiler" -> "SPOILER"
+                            else -> "LINK"
+                        }
+                        val annotationValue = when (tagName) {
+                            "character" -> param
+                            "spoiler" -> param
+                            else -> "$tagName:$param"
+                        }
+
+                        builder.pushStringAnnotation(tag = annotationTag, annotation = annotationValue)
+                        builder.withStyle(SpanStyle(color = linkColor)) {
+                            formatRecursive(content, linkColor, builder)
+                        }
+                        builder.pop()
+
+                    } else {
+                        when (tagName.lowercase()) {
+                            "i" -> builder.withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { formatRecursive(content, linkColor, builder) }
+                            "b" -> builder.withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { formatRecursive(content, linkColor, builder) }
+                            "u" -> builder.withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) { formatRecursive(content, linkColor, builder) }
+                            "s" -> builder.withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { formatRecursive(content, linkColor, builder) }
+                            else -> {
+                                formatRecursive(content, linkColor, builder)
+                            }
+                        }
+                    }
                 }
-                builder.pop()
-            } else {
-                when (tagName.lowercase()) {
-                    "i" -> builder.withStyle(SpanStyle(fontStyle = FontStyle.Italic)) { builder.append(content) }
-                    "b" -> builder.withStyle(SpanStyle(fontWeight = FontWeight.Bold)) { builder.append(content) }
-                    "u" -> builder.withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) { builder.append(content) }
-                    "s" -> builder.withStyle(SpanStyle(textDecoration = TextDecoration.LineThrough)) { builder.append(content) }
-                    else -> builder.append(content)
+                matchResult.groups[5]?.value != null || matchResult.groups[6]?.value != null -> {
+                    builder.append("\n")
+                }
+                else -> {
+                    builder.append(fullMatch)
                 }
             }
 
-            lastIndex = matchResult.range.last + 1
+            lastIndex = end
         }
 
         if (lastIndex < text.length) {
             builder.append(text.substring(lastIndex))
         }
-
-        return builder.toAnnotatedString()
     }
 }

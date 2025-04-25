@@ -17,4 +17,7 @@ sealed interface MainNavRoute {
 
     @Serializable
     data class MangaDetails(val id: String) : MainNavRoute
+
+    @Serializable
+    data class CharacterDetails(val characterId: String) : MainNavRoute
 }

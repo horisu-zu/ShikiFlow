@@ -31,6 +31,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.RelatedSecti
 fun MangaDetailsDesc(
     mangaDetails: MangaDetailsQuery.Manga?,
     onItemClick: (String, MediaType) -> Unit,
+    onCharacterClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -77,7 +78,7 @@ fun MangaDetailsDesc(
                         characterPoster = characterItem.character.characterShort.poster
                             ?.posterShort?.previewUrl,
                         characterName = characterItem.character.characterShort.name,
-                        onClick = { /*TODO*/ }
+                        onClick = { onCharacterClick(characterItem.character.characterShort.id) }
                     )
                 }
             }

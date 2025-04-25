@@ -152,7 +152,7 @@ fun RoundedImage(
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null
 ) {
-    AsyncImage(
+    BaseImage(
         model = model,
         modifier = modifier
             .size(size)

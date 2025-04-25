@@ -25,7 +25,7 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.utils.Converter
+import com.example.shikiflow.utils.Converter.formatText
 
 @Composable
 fun FormattedText(
@@ -38,12 +38,12 @@ fun FormattedText(
     onClick: (id: String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    val annotatedString = Converter.formatText(text, linkColor)
+    val annotatedString = formatText(text, linkColor)
 
     var lineCount by remember { mutableStateOf(0) }
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     val lineHeight = style.fontSize * 1.75f
-    val shouldShowButton = lineCount > collapsedMaxLines - 1
+    val shouldShowButton = lineCount >= collapsedMaxLines
 
     Column(
         modifier = modifier

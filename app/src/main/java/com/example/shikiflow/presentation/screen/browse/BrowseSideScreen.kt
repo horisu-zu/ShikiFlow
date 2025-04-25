@@ -1,5 +1,7 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,6 +15,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -52,21 +55,24 @@ fun BrowseSideScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
-                ),
-                modifier = Modifier.padding(top = 24.dp)
+                )
             )
         }
-    ) { paddingValues ->
+    ) { innerPadding ->
         if (browseType == BrowseType.AnimeBrowseType.ONGOING) {
             OngoingSideScreen(
                 ongoingData = sideScreenData,
-                modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
+                modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
                 rootNavController = rootNavController
             )
         } else {
             MainSideScreen(
                 browseData = sideScreenData,
-                modifier = Modifier.padding(paddingValues).padding(horizontal = 12.dp),
+                modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
                 rootNavController = rootNavController
             )
         }

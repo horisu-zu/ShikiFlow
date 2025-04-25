@@ -2,6 +2,8 @@ package com.example.shikiflow.presentation.screen.main.details.anime
 
 import android.util.Log
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -21,6 +23,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -31,6 +34,7 @@ import com.example.shikiflow.data.tracks.TargetType
 import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
+import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Resource
@@ -98,8 +102,10 @@ fun AnimeDetailsScreen(
                     ConstraintLayout(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(paddingValues)
-                            .verticalScroll(rememberScrollState())
+                            .padding(
+                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                            ).verticalScroll(rememberScrollState())
                     ) {
                         val (titleRef, descriptionRef) = createRefs()
 
@@ -118,8 +124,11 @@ fun AnimeDetailsScreen(
                             animeDetails = animeDetails.value.data,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
-                                    rootNavController.navigate("animeDetailsScreen/$id")
-                                } else rootNavController.navigate("mangaDetailsScreen/$id")
+                                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
+                                } else rootNavController.navigate(MainNavRoute.MangaDetails(id))
+                            },
+                            onCharacterClick = { characterId ->
+                                rootNavController.navigate(MainNavRoute.CharacterDetails(characterId))
                             },
                             modifier = Modifier
                                 .constrainAs(descriptionRef) {

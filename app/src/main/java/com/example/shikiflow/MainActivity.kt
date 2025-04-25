@@ -8,6 +8,7 @@ import android.view.Window
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,7 +34,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         appSettingsManager = AppSettingsManager(applicationContext)
 
-        //enableEdgeToEdge()
+        enableEdgeToEdge()
 
         setContent {
             val darkTheme = observeTheme(appSettingsManager)
@@ -43,7 +44,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        window.fitSystemWindowsWithAdjustResize()
+        //window.fitSystemWindowsWithAdjustResize()
     }
 
     @Composable

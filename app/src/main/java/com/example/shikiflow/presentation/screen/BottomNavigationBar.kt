@@ -1,6 +1,11 @@
 package com.example.shikiflow.presentation.screen
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -21,6 +26,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.utils.Animations.slideInFromLeft
@@ -118,6 +124,18 @@ fun NavigationGraph(
                 id = args.id,
                 rootNavController = navController,
                 currentUser = currentUser
+            )
+        }
+        composable<MainNavRoute.CharacterDetails>(
+            enterTransition = { slideInFromRight() },
+            exitTransition = { slideOutToLeft() },
+            popEnterTransition = { slideInFromLeft() },
+            popExitTransition = { slideOutToRight() }
+        ) { backStackEntry ->
+            val args = backStackEntry.toRoute<MainNavRoute.CharacterDetails>()
+            CharacterDetailsScreen(
+                characterId = args.characterId,
+                rootNavController = navController
             )
         }
     }

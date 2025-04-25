@@ -9,7 +9,6 @@ import com.example.graphql.type.DurationString
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.RatingString
 import com.example.graphql.type.SeasonString
-import com.example.shikiflow.data.anime.AnimeResponse
 import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.anime.toGraphQLValue
 import javax.inject.Inject

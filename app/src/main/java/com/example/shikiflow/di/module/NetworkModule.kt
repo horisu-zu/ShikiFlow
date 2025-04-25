@@ -8,6 +8,7 @@ import com.apollographql.apollo.network.okHttpClient
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
+import com.example.shikiflow.di.api.CharacterApi
 import com.example.shikiflow.di.api.UserApi
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
@@ -89,5 +90,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideUserApi(@MainRetrofit retrofit: Retrofit): UserApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideCharacterApi(@MainRetrofit retrofit: Retrofit): CharacterApi =
         retrofit.create()
 }

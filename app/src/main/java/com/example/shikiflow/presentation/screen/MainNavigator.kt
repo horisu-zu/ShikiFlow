@@ -23,7 +23,9 @@ fun MainNavigator(
         NavigationGraph(
             currentUser = currentUser.data,
             navController = navController,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier.padding(
+                bottom = innerPadding.calculateBottomPadding()
+            ) //It's an anti pattern, but Column with BottomNavBar has some weird anims during navigation
         )
     }
 }

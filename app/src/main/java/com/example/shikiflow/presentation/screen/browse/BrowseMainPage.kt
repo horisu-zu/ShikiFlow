@@ -29,34 +29,46 @@ fun BrowseMainPage(
     val ongoingBrowseState = browseViewModel.paginatedBrowse(BrowseType.AnimeBrowseType.ONGOING)
         .collectAsLazyPagingItems()
 
-    LazyVerticalGrid(
-        columns = GridCells.Fixed(3),
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-    ) {
-        item(
-            span = { GridItemSpan(3) }
+    if(ongoingBrowseState.loadState.refresh is LoadState.Loading) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) { CircularProgressIndicator() }
+    } else if(ongoingBrowseState.loadState.refresh is LoadState.Error) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) { /*Retry Button?*/ }
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(3),
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            NavigationSection(
-                browseNavController = browseNavController
-            )
-        }
-        items(ongoingBrowseState.itemCount) { index ->
-            ongoingBrowseState[index]?.let { browseItem ->
-                BrowseItem(
-                    browseItem = browseItem,
-                    onItemClick = onNavigate
+            item(
+                span = { GridItemSpan(3) }
+            ) {
+                NavigationSection(
+                    browseNavController = browseNavController
                 )
             }
-        }
-        ongoingBrowseState.apply {
-            if(loadState.refresh is LoadState.Loading || loadState.append is LoadState.Loading) {
-                item(span = { GridItemSpan(3) }) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+            items(ongoingBrowseState.itemCount) { index ->
+                ongoingBrowseState[index]?.let { browseItem ->
+                    BrowseItem(
+                        browseItem = browseItem,
+                        onItemClick = onNavigate
+                    )
+                }
+            }
+            ongoingBrowseState.apply {
+                if(loadState.append is LoadState.Loading) {
+                    item(span = { GridItemSpan(3) }) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
+                    }
                 }
             }
         }

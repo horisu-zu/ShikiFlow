@@ -105,14 +105,14 @@ class UserRepository @Inject constructor(
     suspend fun updateUserRate(
         id: Long,
         request: UserRateRequest
-    ): Result<UserRateResponse> = kotlin.runCatching {
+    ): Result<UserRateResponse> = runCatching {
         userApi.updateUserRate(
             id = id,
             request = request
         )
     }
 
-    suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse> = kotlin.runCatching {
+    suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse> = runCatching {
         userApi.createUserRate(createRequest)
     }
 }
