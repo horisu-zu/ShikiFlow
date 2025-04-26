@@ -60,6 +60,7 @@ query AnimeDetails(
         statusesStats { status count }
 
         description
+        descriptionHtml
 
         userRate {
             id

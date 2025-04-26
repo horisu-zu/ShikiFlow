@@ -48,6 +48,7 @@ query MangaDetails(
         statusesStats { status count }
 
         description
+        descriptionHtml
 
         userRate {
             id

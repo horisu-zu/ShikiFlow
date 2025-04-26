@@ -1,18 +1,23 @@
 package com.example.shikiflow.presentation.common
 
+import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -21,15 +26,18 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.utils.Converter.formatText
+import com.example.shikiflow.utils.Converter.DescriptionElement
+import com.example.shikiflow.utils.Converter.parseDescriptionHtml
 
 @Composable
 fun FormattedText(
-    text: String,
+    descriptionHtml: String,
     linkColor: Color,
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = 8,
@@ -38,56 +46,50 @@ fun FormattedText(
     onClick: (id: String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    val annotatedString = formatText(text, linkColor)
-
-    var lineCount by remember { mutableStateOf(0) }
-    val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    var lineCount by remember { mutableIntStateOf(0) }
     val lineHeight = style.fontSize * 1.75f
     val shouldShowButton = lineCount >= collapsedMaxLines
 
-    Column(
-        modifier = modifier
-    ) {
-        Box {
-            Text(
-                text = annotatedString,
-                style = style.copy(
-                    lineHeight = lineHeight
-                ),
-                modifier = Modifier
-                    .pointerInput(Unit) {
-                        detectTapGestures { offset ->
-                            layoutResult.value?.let { result ->
-                                val position = result.getOffsetForPosition(offset)
-                                annotatedString.getStringAnnotations("CHARACTER_ID", position, position)
-                                    .firstOrNull()
-                                    ?.let { annotation ->
-                                        onClick(annotation.item)
-                                    }
-                            }
+    val elements = remember(descriptionHtml) {
+        parseDescriptionHtml(descriptionHtml, linkColor)
+    }
+
+    Column(modifier = modifier.fillMaxWidth()) {
+        elements.forEachIndexed { index, element ->
+            when (element) {
+                is DescriptionElement.Text -> {
+                    AnnotatedText(
+                        text = element.annotatedString,
+                        collapsedMaxLines = collapsedMaxLines,
+                        style = style.copy(),
+                        lineHeight = lineHeight,
+                        brushColor = brushColor,
+                        isExpanded = isExpanded,
+                        onLineCountChange = { lineCount = it },
+                        onLinkClick = { link ->
+                            Log.d("FormattedText", "Clicked on link: $link")
+                            onClick(link)
                         }
-                    }
-                    .drawWithContent {
-                        drawContent()
-                        if (!isExpanded && shouldShowButton) {
-                            drawRect(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, brushColor)
-                                )
-                            )
-                        }
-                    }
-                    .animateContentSize(
-                        animationSpec = tween(
-                            durationMillis = 300,
-                            easing = FastOutSlowInEasing
-                        )
-                    ),
-                maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
-                onTextLayout = { layoutResult ->
-                    lineCount = layoutResult.lineCount
+                    )
                 }
-            )
+                is DescriptionElement.Spoiler -> {
+                    val isSpoilerVisible = isExpanded
+
+                    if (isSpoilerVisible) {
+                        SpoilerElement(
+                            label = "Spoiler",
+                            content = element.content,
+                            style = style.copy(),
+                            lineHeight = lineHeight,
+                            brushColor = brushColor,
+                            onLinkClick = { link ->
+                                Log.d("FormattedText", "Clicked on link: $link")
+                                onClick(link)
+                            }
+                        )
+                    }
+                }
+            }
         }
 
         if(shouldShowButton) {
@@ -105,6 +107,102 @@ fun FormattedText(
                     ) {
                         isExpanded = !isExpanded
                     }
+            )
+        }
+    }
+}
+
+@Composable
+private fun AnnotatedText(
+    text: AnnotatedString,
+    collapsedMaxLines: Int,
+    style: TextStyle,
+    lineHeight: TextUnit,
+    brushColor: Color,
+    isExpanded: Boolean,
+    onLineCountChange: (Int) -> Unit,
+    onLinkClick: (String) -> Unit
+) {
+    val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    var lineCount by remember { mutableIntStateOf(0) }
+
+    Text(
+        text = text,
+        style = style.copy(lineHeight = lineHeight),
+        modifier = Modifier
+            .pointerInput(Unit) {
+                detectTapGestures { offset ->
+                    layoutResult.value?.let { result ->
+                        val position = result.getOffsetForPosition(offset)
+                        Log.d("ClickDebug", "Calculated Position: $position")
+                        text.getStringAnnotations("CHARACTER_ID", position, position)
+                            .firstOrNull()?.let { annotation ->
+                                onLinkClick(annotation.item)
+                            }
+                    }
+                }
+            }
+            .drawWithContent {
+                drawContent()
+                if (!isExpanded && lineCount >= collapsedMaxLines) {
+                    drawRect(
+                        brush = Brush.verticalGradient(
+                            colors = listOf(Color.Transparent, brushColor)
+                        )
+                    )
+                }
+            }
+            .animateContentSize(
+                animationSpec = tween(
+                    durationMillis = 300,
+                    easing = FastOutSlowInEasing
+                )
+            ),
+        maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
+        onTextLayout = { result ->
+            layoutResult.value = result
+            lineCount = result.lineCount
+            onLineCountChange(lineCount)
+        }
+    )
+}
+
+@Composable
+private fun SpoilerElement(
+    label: String,
+    lineHeight: TextUnit,
+    brushColor: Color,
+    content: AnnotatedString,
+    style: TextStyle,
+    onLinkClick: (String) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Column(Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
+        Text(
+            text = label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant,
+                    shape = RoundedCornerShape(4.dp)
+                )
+                .clickable { expanded = !expanded }
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+        AnimatedVisibility(visible = expanded) {
+            AnnotatedText(
+                text = content,
+                collapsedMaxLines = Int.MAX_VALUE,
+                style = style.copy(),
+                lineHeight = lineHeight,
+                brushColor = brushColor,
+                isExpanded = expanded,
+                onLineCountChange = { /**/ },
+                onLinkClick = { link ->
+                    Log.d("FormattedText", "Clicked on link: $link")
+                    onLinkClick(link)
+                }
             )
         }
     }

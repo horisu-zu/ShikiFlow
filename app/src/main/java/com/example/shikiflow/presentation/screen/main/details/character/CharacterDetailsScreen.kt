@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -20,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -64,8 +67,10 @@ fun CharacterDetailsScreen(
                 val characterDetails = characterDetailsState.value.data
 
                 Column(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding).padding(horizontal = 12.dp)
-                        .verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxSize().padding(
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    ).padding(horizontal = 12.dp).verticalScroll(rememberScrollState()),
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                 ) {
                     CharacterTitleSection(
@@ -73,12 +78,13 @@ fun CharacterDetailsScreen(
                         name = characterDetails?.name,
                         japaneseName = characterDetails?.japanese
                     )
-                    characterDetails?.description?.let { description ->
+                    characterDetails?.descriptionHtml?.let { description ->
                         FormattedText(
-                            text = description,
+                            descriptionHtml = description,
                             style = MaterialTheme.typography.bodySmall,
                             linkColor = MaterialTheme.colorScheme.primary,
                             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
+                            collapsedMaxLines = 3,
                             onClick = { id ->
                                 Log.d("Details Screen", "Clicked id: $id")
                             }

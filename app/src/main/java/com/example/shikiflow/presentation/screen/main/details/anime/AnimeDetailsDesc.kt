@@ -62,7 +62,7 @@ fun AnimeDetailsDesc(
         val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef) = createRefs()
 
         FormattedText(
-            text = animeDetails?.description ?: "No Description",
+            descriptionHtml = animeDetails?.descriptionHtml ?: "No Description",
             modifier = Modifier.constrainAs(descRef) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)

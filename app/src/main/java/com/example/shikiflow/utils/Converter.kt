@@ -1,6 +1,7 @@
 package com.example.shikiflow.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -14,12 +15,18 @@ import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.mapper.UserRateStatusConstants.getStatusOrder
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.UserRate
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Element
+import com.fleeksoft.ksoup.nodes.Node
+import com.fleeksoft.ksoup.nodes.TextNode
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
+import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -158,7 +165,7 @@ object Converter {
             ?: UserRateStatusConstants.convertStatus(status)
     }
 
-    fun formatText(
+    /*fun formatText(
         text: String,
         linkColor: Color
     ): AnnotatedString {
@@ -235,5 +242,123 @@ object Converter {
         if (lastIndex < text.length) {
             builder.append(text.substring(lastIndex))
         }
+    }*/
+
+    sealed class DescriptionElement {
+        data class Text(val annotatedString: AnnotatedString) : DescriptionElement()
+        data class Spoiler(val label: String, val content: AnnotatedString) : DescriptionElement()
+    }
+
+    fun parseDescriptionHtml(html: String, linkColor: Color): List<DescriptionElement> {
+        val doc = Ksoup.parse(html)
+        val elements = mutableListOf<DescriptionElement>()
+
+        val contentElement = doc.selectFirst("div.b-text_with_paragraphs") ?: doc.body()
+
+        val textAnnotated = parseInnerHtml(contentElement.html(), linkColor)
+        if (textAnnotated.isNotEmpty()) {
+            elements.add(DescriptionElement.Text(textAnnotated))
+        }
+
+        contentElement.select("div.b-spoiler_block").forEach { spoilerNode ->
+            spoilerNode.remove()
+
+            val labelElement = spoilerNode.selectFirst("span")
+            val contentElement = spoilerNode.selectFirst("> div")
+
+            val spoilerLabel = labelElement?.text() ?: "Spoiler"
+            val spoilerContentHtml = contentElement?.html() ?: ""
+            val spoilerContentAnnotated = parseInnerHtml(spoilerContentHtml, linkColor)
+
+            elements.add(DescriptionElement.Spoiler(spoilerLabel, spoilerContentAnnotated))
+        }
+
+        return elements
+    }
+
+    fun parseInnerHtml(html: String, linkColor: Color): AnnotatedString {
+        if (html.isBlank()) return AnnotatedString("")
+
+        val doc = Ksoup.parseBodyFragment(html)
+        val builder = AnnotatedString.Builder()
+
+        processInlineContent(doc.body(), builder, linkColor)
+
+        Log.d("ParserAnnotations", "Final Annotations: ${builder.toAnnotatedString().getStringAnnotations(0, builder.length)}")
+        return builder.toAnnotatedString()
+    }
+
+    private fun processInlineContent(
+        element: Element,
+        builder: AnnotatedString.Builder,
+        linkColor: Color
+    ) {
+        element.childNodes().forEach { node ->
+            when (node) {
+                is TextNode -> {
+                    builder.append(node.text())
+                }
+                is Element -> {
+                    if (node.tagName() == "div" && node.hasClass("b-spoiler_block")) {
+                        return@forEach
+                    }
+
+                    val spanStyle = getSpanStyleForElement(node, linkColor)
+                    val annotationTag = getAnnotationTagForElement(node)
+                    val annotationValue = getAnnotationValueForElement(node)
+
+                    val hasAnnotation = annotationTag != null && annotationValue != null
+
+                    if (hasAnnotation) {
+                        Log.d("Annotation", "Push - Tag: $annotationTag, Value: $annotationValue")
+                        builder.pushStringAnnotation(tag = annotationTag, annotation = annotationValue)
+                    }
+
+                    builder.pushStyle(spanStyle)
+                    processInlineContent(node, builder, linkColor)
+                    builder.pop()
+
+                    if (hasAnnotation) {
+                        Log.d("Annotation", "Pop - Tag: $annotationTag, Value: $annotationValue")
+                        builder.pop()
+                    }
+                }
+            }
+        }
+    }
+
+    fun getSpanStyleForElement(element: Element, linkColor: Color): SpanStyle {
+        return when (element.tagName()) {
+            "b", "strong" -> SpanStyle(fontWeight = FontWeight.Bold)
+            "i", "em" -> SpanStyle(fontStyle = FontStyle.Italic)
+            "u" -> SpanStyle(textDecoration = TextDecoration.Underline)
+            "s", "strike", "del" -> SpanStyle(textDecoration = TextDecoration.LineThrough)
+            "a" -> SpanStyle(color = linkColor)
+            else -> SpanStyle()
+        }
+    }
+
+    fun getAnnotationTagForElement(element: Element): String? {
+        return if (element.tagName() == "a") {
+            if (element.hasClass("b-link") && element.hasAttr("data-attrs")) {
+                "CHARACTER_ID"
+            } else { "URL_LINK" }
+        } else { null }
+    }
+
+    fun getAnnotationValueForElement(element: Element): String? {
+        return if (element.tagName() == "a") {
+            if (element.hasClass("b-link") && element.hasAttr("data-attrs")) {
+                try {
+                    val dataAttrsJson = element.attr("data-attrs")
+                    val jsonObject = JSONObject(dataAttrsJson)
+                    Log.d("DataAttrs", "Parsed data-attrs JSON: $jsonObject")
+                    jsonObject.optString("id", null)
+                } catch (e: Exception) {
+                    Log.e("ParseError", "Failed to parse data-attrs JSON: ${e.message}")
+                    null
+                }
+            } else { element.attr("href") }
+        } else { null }
     }
 }
