@@ -52,7 +52,10 @@ fun MangaDetailsDesc(
             style = MaterialTheme.typography.bodySmall,
             linkColor = MaterialTheme.colorScheme.primary,
             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
-            onClick = { id ->
+            onCharacterClick = { characterId ->
+                onCharacterClick(characterId)
+            },
+            onLinkClick = { id ->
                 Log.d("Details Screen", "Clicked id: $id")
             }
         )
