@@ -7,21 +7,27 @@ import androidx.navigation.compose.rememberNavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
-import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
-import com.example.shikiflow.utils.Animations.slideInFromBottom
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
-import com.example.shikiflow.utils.Animations.slideInFromTop
-import com.example.shikiflow.utils.Animations.slideOutToBottom
 import com.example.shikiflow.utils.Animations.slideOutToLeft
 import com.example.shikiflow.utils.Animations.slideOutToRight
-import com.example.shikiflow.utils.Animations.slideOutToTop
 
 @Composable
 fun MoreScreenNavigator(
     currentUser: CurrentUserQuery.Data?
 ) {
     val moreNavController = rememberNavController()
+    val moreNavOptions = object : MoreNavOptions {
+        override fun navigateToProfile() {
+            moreNavController.navigate(MoreNavRoute.ProfileScreen)
+        }
+        override fun navigateToHistory() {
+            moreNavController.navigate(MoreNavRoute.HistoryScreen)
+        }
+        override fun navigateBack() {
+            moreNavController.popBackStack()
+        }
+    }
 
     NavHost(
         navController = moreNavController,
@@ -34,7 +40,7 @@ fun MoreScreenNavigator(
             popExitTransition = { slideOutToRight() }
         ) {
             MoreScreen(
-                navController = moreNavController,
+                moreNavOptions = moreNavOptions,
                 currentUser = currentUser
             )
         }
@@ -45,7 +51,7 @@ fun MoreScreenNavigator(
             popExitTransition = { slideOutToRight() }
         ) {
             ProfileScreen(
-                navController = moreNavController,
+                moreNavOptions = moreNavOptions,
                 currentUser = currentUser
             )
         }
@@ -57,17 +63,7 @@ fun MoreScreenNavigator(
         ) {
             HistoryScreen(
                 userData = currentUser,
-                navController = moreNavController
-            )
-        }
-        composable<MoreNavRoute.SettingsScreen>(
-            enterTransition = { slideInFromBottom() },
-            exitTransition = { slideOutToTop() },
-            popEnterTransition = { slideInFromTop() },
-            popExitTransition = { slideOutToBottom() }
-        ) {
-            SettingsScreen(
-                navController = moreNavController
+                moreNavOptions = moreNavOptions,
             )
         }
     }

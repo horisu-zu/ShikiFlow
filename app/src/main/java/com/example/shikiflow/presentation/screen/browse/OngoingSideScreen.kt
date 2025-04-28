@@ -22,6 +22,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.data.anime.Browse
 import com.example.shikiflow.presentation.screen.MainNavRoute
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.utils.Converter.formatDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -29,7 +30,7 @@ import kotlinx.datetime.toLocalDateTime
 @Composable
 fun OngoingSideScreen(
     ongoingData: LazyPagingItems<Browse>,
-    rootNavController: NavController,
+    onNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val groupedOngoings = remember(ongoingData.loadState) {
@@ -72,9 +73,7 @@ fun OngoingSideScreen(
                     items(animeValues) { anime ->
                         BrowseItem(
                             browseItem = anime,
-                            onItemClick = { id, mediaType ->
-                                rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                            },
+                            onItemClick = { id, mediaType -> onNavigate(id) },
                             modifier = Modifier.width(120.dp)
                         )
                     }

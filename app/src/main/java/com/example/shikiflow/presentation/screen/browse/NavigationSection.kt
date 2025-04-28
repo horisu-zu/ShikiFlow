@@ -9,7 +9,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.shikiflow.R
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.presentation.common.NavigationCard
@@ -18,7 +17,7 @@ import com.example.shikiflow.utils.IconResource
 @Composable
 fun NavigationSection(
     modifier: Modifier = Modifier,
-    browseNavController: NavController
+    onNavigateSideScreen: (BrowseType) -> Unit
 ) {
     Column (
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -30,15 +29,13 @@ fun NavigationSection(
             NavigationCard(
                 icon = IconResource.Drawable(R.drawable.ic_anime) ,
                 title = "Anime's Top",
-                onClick = {
-                    browseNavController.navigate(BrowseNavRoute.SideScreen(BrowseType.AnimeBrowseType.ANIME_TOP))
-                },
+                onClick = { onNavigateSideScreen(BrowseType.AnimeBrowseType.ANIME_TOP) },
                 modifier = Modifier.weight(1f),
             )
             NavigationCard(
                 icon = IconResource.Drawable(R.drawable.ic_manga) ,
                 title = "Manga's Top",
-                onClick = { browseNavController.navigate(BrowseNavRoute.SideScreen(BrowseType.MangaBrowseType.MANGA_TOP)) },
+                onClick = { onNavigateSideScreen(BrowseType.MangaBrowseType.MANGA_TOP) },
                 modifier = Modifier.weight(1f),
             )
         }
@@ -46,7 +43,7 @@ fun NavigationSection(
             icon = IconResource.Vector(Icons.Default.DateRange),
             title = "Ongoings Calendar",
             onClick = {
-                browseNavController.navigate(BrowseNavRoute.SideScreen(BrowseType.AnimeBrowseType.ONGOING))
+                onNavigateSideScreen(BrowseType.AnimeBrowseType.ONGOING)
             }
         )
     }

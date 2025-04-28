@@ -27,10 +27,10 @@ import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
 @Composable
 fun AnimeTracksPage(
-    rootNavController: NavController,
     trackItems: LazyPagingItems<AnimeTrack>,
     tracksViewModel: AnimeTracksViewModel,
-    userViewModel: UserViewModel = hiltViewModel()
+    userViewModel: UserViewModel = hiltViewModel(),
+    onAnimeClick: (String) -> Unit
 ) {
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
     var rateBottomSheet = remember { mutableStateOf(false) }
@@ -55,9 +55,7 @@ fun AnimeTracksPage(
 
             AnimeTrackItem(
                 userRate = item,
-                onClick = { id ->
-                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                },
+                onClick = { id -> onAnimeClick(id) },
                 onLongClick = {
                     rateBottomSheet.value = true
                     selectedItem = item

@@ -36,12 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.anime.toBrowseAnime
 import com.example.shikiflow.data.anime.toBrowseManga
 import com.example.shikiflow.presentation.common.FormattedText
-import com.example.shikiflow.presentation.screen.MainNavRoute
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
 import com.example.shikiflow.utils.Resource
@@ -50,7 +49,7 @@ import com.example.shikiflow.utils.Resource
 @Composable
 fun CharacterDetailsScreen(
     characterId: String,
-    rootNavController: NavController,
+    navOptions: MediaNavOptions,
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
@@ -82,7 +81,7 @@ fun CharacterDetailsScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { rootNavController.popBackStack() }
+                        onClick = { navOptions.navigateBack() }
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -131,7 +130,7 @@ fun CharacterDetailsScreen(
                             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
                             collapsedMaxLines = 3,
                             onCharacterClick = { characterId ->
-                                rootNavController.navigate(MainNavRoute.CharacterDetails(characterId))
+                                navOptions.navigateToCharacterDetails(characterId)
                             },
                             onLinkClick = { id ->
                                 Log.d("Details Screen", "Clicked id: $id")
@@ -157,7 +156,7 @@ fun CharacterDetailsScreen(
                             sectionTitle = "Anime",
                             items = browseItems,
                             onItemClick = { id, mediaType ->
-                                rootNavController.navigate(MainNavRoute.AnimeDetails(id))
+                                navOptions.navigateToAnimeDetails(id)
                             }
                         )
                     }
@@ -169,7 +168,7 @@ fun CharacterDetailsScreen(
                             sectionTitle = "Manga",
                             items = browseItems,
                             onItemClick = { id, mediaType ->
-                                rootNavController.navigate(MainNavRoute.MangaDetails(id))
+                                navOptions.navigateToMangaDetails(id)
                             }
                         )
                     }

@@ -30,13 +30,14 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     userData: CurrentUserQuery.Data?,
-    navController: NavController,
+    moreNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
     val currentUserId = userData?.currentUser?.id?.toLong() ?: 0L
@@ -52,7 +53,7 @@ fun HistoryScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { moreNavOptions.navigateBack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back to Main"

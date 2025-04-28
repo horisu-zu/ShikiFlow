@@ -40,9 +40,9 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable
 fun SearchPage(
-    rootNavController: NavController,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel()
+    tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel(),
+    onAnimeClick: (String) -> Unit
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
     val searchResults by tracksViewModel.searchResults.collectAsState()
@@ -120,9 +120,7 @@ fun SearchPage(
                     val userRate = items[index]
                     SearchAnimeTrackItem(
                         animeItem = userRate,
-                        onItemClick = { id ->
-                            rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                        }
+                        onItemClick = { id -> onAnimeClick(id) }
                     )
 
                     if (index >= items.size - 5 && shouldLoadMore.value) {

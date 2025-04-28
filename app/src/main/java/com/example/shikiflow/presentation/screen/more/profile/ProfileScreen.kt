@@ -32,11 +32,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.CircleShapeButton
-import com.example.shikiflow.presentation.screen.more.MoreNavRoute
+import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.AnimeUserRateViewModel
 import com.example.shikiflow.utils.IconResource
 
@@ -45,7 +44,7 @@ import com.example.shikiflow.utils.IconResource
 fun ProfileScreen(
     userRateViewModel: AnimeUserRateViewModel = hiltViewModel(),
     currentUser: CurrentUserQuery.Data?,
-    navController: NavController
+    moreNavOptions: MoreNavOptions
 ) {
     val context = LocalContext.current
 
@@ -68,7 +67,7 @@ fun ProfileScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { moreNavOptions.navigateBack() }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back to Main"
@@ -132,17 +131,13 @@ fun ProfileScreen(
                     CircleShapeButton(
                         label = "Clubs",
                         icon = IconResource.Drawable(R.drawable.ic_group),
-                        onClick = {
-                            navController.navigate(MoreNavRoute.ClubsScreen)
-                        },
+                        onClick = { /**/ },
                         modifier = Modifier.weight(1f)
                     )
                     CircleShapeButton(
                         label = "History",
                         icon = IconResource.Drawable(R.drawable.ic_history),
-                        onClick = {
-                            navController.navigate(MoreNavRoute.HistoryScreen)
-                        },
+                        onClick = { moreNavOptions.navigateToHistory() },
                         modifier = Modifier.weight(1f)
                     )
                 }

@@ -1,12 +1,12 @@
 package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.example.shikiflow.data.anime.BrowseType
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
 import com.example.shikiflow.utils.Animations.slideOutToLeft
@@ -17,7 +17,7 @@ import kotlin.reflect.typeOf
 
 @Composable
 fun BrowseScreenNavigator(
-    rootNavController: NavController
+    navOptions: MediaNavOptions
 ) {
     val browseNavController = rememberNavController()
     val json = Json {
@@ -34,9 +34,16 @@ fun BrowseScreenNavigator(
             popEnterTransition = { slideInFromLeft() },
             popExitTransition = { slideOutToRight() }
         ) {
+            val browseNavOptions = object: BrowseNavOptions {
+                override fun navigateToSideScreen(browseType: BrowseType) {
+                    browseNavController.navigate(BrowseNavRoute.SideScreen(browseType))
+                }
+                override fun navigateBack() { browseNavController.popBackStack() }
+            }
+
             BrowseScreen(
-                browseNavController = browseNavController,
-                rootNavController = rootNavController
+                browseNavOptions = browseNavOptions,
+                navOptions = navOptions
             )
         }
         composable<BrowseNavRoute.SideScreen>(
@@ -51,8 +58,8 @@ fun BrowseScreenNavigator(
             val args = backStackEntry.toRoute<BrowseNavRoute.SideScreen>()
             BrowseSideScreen(
                 browseType = args.browseType,
-                rootNavController = rootNavController,
-                browseNavController = browseNavController
+                navOptions = navOptions,
+                onBackNavigate = { browseNavController.popBackStack() }
             )
         }
     }

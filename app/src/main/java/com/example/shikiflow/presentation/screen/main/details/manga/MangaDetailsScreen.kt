@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.TargetType
@@ -34,6 +33,7 @@ import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MainNavRoute
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Resource
@@ -45,7 +45,7 @@ import kotlinx.coroutines.launch
 fun MangaDetailsScreen(
     id: String,
     currentUser: CurrentUserQuery.Data?,
-    rootNavController: NavController,
+    navOptions: MediaNavOptions,
     mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -121,11 +121,11 @@ fun MangaDetailsScreen(
                             mangaDetails = mangaDetails.value.data,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
-                                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                                } else rootNavController.navigate(MainNavRoute.MangaDetails(id))
+                                    navOptions.navigateToAnimeDetails(id)
+                                } else navOptions.navigateToMangaDetails(id)
                             },
                             onCharacterClick = { characterId ->
-                                rootNavController.navigate(MainNavRoute.CharacterDetails(characterId))
+                                navOptions.navigateToCharacterDetails(characterId)
                             },
                             modifier = Modifier.constrainAs(descriptionRef) {
                                 top.linkTo(headerRef.bottom)

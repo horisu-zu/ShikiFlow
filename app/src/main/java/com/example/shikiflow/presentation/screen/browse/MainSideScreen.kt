@@ -26,7 +26,7 @@ import com.example.shikiflow.presentation.screen.MainNavRoute
 @Composable
 fun MainSideScreen(
     browseData: LazyPagingItems<Browse>,
-    rootNavController: NavController,
+    onMediaNavigate: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if(browseData.loadState.refresh is LoadState.Loading) {
@@ -67,13 +67,7 @@ fun MainSideScreen(
                 val browseItem = browseData[index]!!
                 BrowseItem(
                     browseItem = browseItem,
-                    onItemClick = { id, mediaType ->
-                        if(mediaType == MediaType.ANIME) {
-                            rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                        } else {
-                            rootNavController.navigate(MainNavRoute.MangaDetails(id))
-                        }
-                    }
+                    onItemClick = { id, mediaType -> onMediaNavigate }
                 )
             }
             browseData.apply {

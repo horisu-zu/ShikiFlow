@@ -23,21 +23,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.data.mapper.BrowseOptions
 import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @Composable
 fun BrowseSearchPage(
     query: String,
+    onMediaNavigate: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier,
-    browseViewModel: BrowseViewModel = hiltViewModel(),
-    rootNavController: NavController
+    browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var currentType by rememberSaveable { mutableStateOf<BrowseType>(BrowseType.AnimeBrowseType.SEARCH) }
@@ -66,13 +64,7 @@ fun BrowseSearchPage(
                     browseSearchData[index]?.let { browseItem ->
                         BrowseItem(
                             browseItem = browseItem,
-                            onItemClick = { id, mediaType ->
-                                if(mediaType == MediaType.ANIME) {
-                                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                                } else {
-                                    rootNavController.navigate(MainNavRoute.MangaDetails(id))
-                                }
-                            }
+                            onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
                         )
                     }
                 }

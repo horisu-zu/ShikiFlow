@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.data.common.SectionItem
@@ -28,7 +27,7 @@ import com.example.shikiflow.utils.IconResource
 @Composable
 fun MoreScreen(
     currentUser: CurrentUserQuery.Data?,
-    navController: NavController,
+    moreNavOptions: MoreNavOptions,
     searchViewModel: SearchViewModel = hiltViewModel(),
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
@@ -62,21 +61,17 @@ fun MoreScreen(
                         avatar = currentUser?.currentUser?.avatarUrl ?: "NoUrl?",
                         title = currentUser?.currentUser?.nickname ?: "NoNickname!",
                         subtitle = "My Profile",
-                        onClick = {
-                            navController.navigate(MoreNavRoute.ProfileScreen)
-                        }
+                        onClick = { moreNavOptions.navigateToProfile() }
                     ),
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.ic_group),
                         title = "Clubs",
-                        onClick = {  }
+                        onClick = { /**/ }
                     ),
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.ic_history),
                         title = "History",
-                        onClick = {
-                            navController.navigate(MoreNavRoute.HistoryScreen)
-                        }
+                        onClick = { moreNavOptions.navigateToHistory() }
                     )
                 ),
                 modifier = Modifier.constrainAs(userBlock) {
@@ -90,14 +85,12 @@ fun MoreScreen(
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Settings),
                         title = "Settings",
-                        onClick = {
-                            navController.navigate(MoreNavRoute.SettingsScreen)
-                        }
+                        onClick = { /**/ }
                     ),
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Info),
                         title = "About App",
-                        onClick = {  }
+                        onClick = { /**/ }
                     )
                 ),
                 modifier = Modifier.constrainAs(settingsBlock) {

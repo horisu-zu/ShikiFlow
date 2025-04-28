@@ -12,15 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.example.shikiflow.presentation.screen.MainNavRoute
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable
 fun BrowseScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
-    browseNavController: NavController,
-    rootNavController: NavController
+    browseNavOptions: BrowseNavOptions,
+    navOptions: MediaNavOptions
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
     val screenState by searchViewModel.screenState.collectAsState()
@@ -46,17 +46,23 @@ fun BrowseScreen(
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
-                    rootNavController = rootNavController
+                    onMediaNavigate = { id, mediaType ->
+                        if(mediaType == MediaType.ANIME) {
+                           navOptions.navigateToAnimeDetails(id)
+                        } else { navOptions.navigateToMangaDetails(id) }
+                    }
                 )
             } else {
                 BrowseMainPage(
                     onNavigate = { id, mediaType ->
-                        rootNavController.navigate(MainNavRoute.AnimeDetails(id))
+                        navOptions.navigateToAnimeDetails(id)
+                    },
+                    onSideScreenNavigate = { sideScreen ->
+                        browseNavOptions.navigateToSideScreen(sideScreen)
                     },
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
-                    browseNavController = browseNavController
                 )
             }
         }

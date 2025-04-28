@@ -35,6 +35,7 @@ import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MainNavRoute
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Resource
@@ -46,7 +47,7 @@ import kotlinx.coroutines.launch
 fun AnimeDetailsScreen(
     id: String,
     currentUser: CurrentUserQuery.Data?,
-    rootNavController: NavController,
+    navOptions: MediaNavOptions,
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -124,11 +125,11 @@ fun AnimeDetailsScreen(
                             animeDetails = animeDetails.value.data,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
-                                    rootNavController.navigate(MainNavRoute.AnimeDetails(id))
-                                } else rootNavController.navigate(MainNavRoute.MangaDetails(id))
+                                    navOptions.navigateToAnimeDetails(id)
+                                } else navOptions.navigateToMangaDetails(id)
                             },
                             onCharacterClick = { characterId ->
-                                rootNavController.navigate(MainNavRoute.CharacterDetails(characterId))
+                                navOptions.navigateToCharacterDetails(characterId)
                             },
                             modifier = Modifier
                                 .constrainAs(descriptionRef) {

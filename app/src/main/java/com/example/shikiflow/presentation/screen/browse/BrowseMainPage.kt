@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.anime.BrowseType
@@ -22,7 +21,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 @Composable
 fun BrowseMainPage(
     onNavigate: (String, MediaType) -> Unit,
-    browseNavController: NavController,
+    onSideScreenNavigate: (BrowseType) -> Unit,
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
@@ -50,7 +49,7 @@ fun BrowseMainPage(
                 span = { GridItemSpan(3) }
             ) {
                 NavigationSection(
-                    browseNavController = browseNavController
+                    onNavigateSideScreen = { sideScreen -> onSideScreenNavigate(sideScreen) }
                 )
             }
             items(ongoingBrowseState.itemCount) { index ->

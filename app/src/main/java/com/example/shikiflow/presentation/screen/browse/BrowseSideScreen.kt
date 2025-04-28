@@ -21,14 +21,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.anime.BrowseType
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseSideScreen(
     browseType: BrowseType,
-    rootNavController: NavController,
-    browseNavController: NavController,
+    navOptions: MediaNavOptions,
+    onBackNavigate: () -> Unit,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
     val sideScreenData = browseViewModel.paginatedBrowse(browseType).collectAsLazyPagingItems()
@@ -45,7 +47,7 @@ fun BrowseSideScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { browseNavController.popBackStack() }
+                        onClick = { onBackNavigate() }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -62,18 +64,22 @@ fun BrowseSideScreen(
         if (browseType == BrowseType.AnimeBrowseType.ONGOING) {
             OngoingSideScreen(
                 ongoingData = sideScreenData,
+                onNavigate = { id -> navOptions.navigateToAnimeDetails(id) },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                     end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
-                rootNavController = rootNavController
             )
         } else {
             MainSideScreen(
                 browseData = sideScreenData,
+                onMediaNavigate = { id, mediaType ->
+                    if(mediaType == MediaType.ANIME) {
+                        navOptions.navigateToAnimeDetails(id)
+                    } else { navOptions.navigateToMangaDetails(id) }
+                },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                     end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
-                rootNavController = rootNavController
             )
         }
     }

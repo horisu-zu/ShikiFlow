@@ -29,9 +29,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    rootNavController: NavController,
     pagerState: PagerState,
-    trackViewModel: AnimeTracksViewModel = hiltViewModel()
+    trackViewModel: AnimeTracksViewModel = hiltViewModel(),
+    onAnimeClick: (String) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val tabs = UserRateStatusConstants.getStatusChips(MediaType.ANIME)
@@ -82,9 +82,9 @@ fun MainPage(
             ) {
                 trackItems?.let { items ->
                     AnimeTracksPage(
-                        rootNavController = rootNavController,
                         trackItems = items,
-                        tracksViewModel = trackViewModel
+                        tracksViewModel = trackViewModel,
+                        onAnimeClick = onAnimeClick
                     )
                 }
             }

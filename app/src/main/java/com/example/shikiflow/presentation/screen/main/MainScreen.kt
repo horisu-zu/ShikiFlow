@@ -28,9 +28,9 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    rootNavController: NavController,
     currentUser: CurrentUserQuery.Data?,
-    searchViewModel: SearchViewModel = hiltViewModel()
+    searchViewModel: SearchViewModel = hiltViewModel(),
+    onAnimeClick: (String) -> Unit
 ) {
     val pagerState = rememberPagerState { 6 }
     val topAppBarState = rememberTopAppBarState()
@@ -70,11 +70,11 @@ fun MainScreen(
             Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                 if (isSearchActive) {
                     SearchPage(
-                        rootNavController = rootNavController
+                        onAnimeClick = onAnimeClick
                     )
                 } else {
                     MainPage(
-                        rootNavController = rootNavController,
+                        onAnimeClick = onAnimeClick,
                         pagerState = pagerState
                     )
                 }

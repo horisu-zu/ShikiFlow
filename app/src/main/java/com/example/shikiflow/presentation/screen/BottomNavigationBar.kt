@@ -1,11 +1,6 @@
 package com.example.shikiflow.presentation.screen
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -27,6 +22,7 @@ import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.utils.Animations.slideInFromLeft
@@ -85,16 +81,36 @@ fun NavigationGraph(
     modifier: Modifier = Modifier,
     currentUser: CurrentUserQuery.Data?
 ) {
+    val options = object : MediaNavOptions {
+        override fun navigateToCharacterDetails(characterId: String) {
+            navController.navigate(MainNavRoute.CharacterDetails(characterId))
+        }
+
+        override fun navigateToAnimeDetails(animeId: String) {
+            navController.navigate(MainNavRoute.AnimeDetails(animeId))
+        }
+
+        override fun navigateToMangaDetails(mangaId: String) {
+            navController.navigate(MainNavRoute.MangaDetails(mangaId))
+        }
+
+        override fun navigateBack() {
+            navController.popBackStack()
+        }
+    }
+
     NavHost(navController, startDestination = MainNavRoute.Home, modifier = modifier) {
         composable<MainNavRoute.Home> {
             MainScreen(
                 currentUser = currentUser,
-                rootNavController = navController
+                onAnimeClick = { animeId ->
+                    navController.navigate(MainNavRoute.AnimeDetails(animeId))
+                }
             )
         }
         composable<MainNavRoute.Browse> {
             BrowseScreenNavigator(
-                rootNavController = navController
+                navOptions = options
             )
         }
         composable<MainNavRoute.More> {
@@ -110,7 +126,7 @@ fun NavigationGraph(
             AnimeDetailsScreen(
                 id = args.id,
                 currentUser = currentUser,
-                rootNavController = navController
+                navOptions = options
             )
         }
         composable<MainNavRoute.MangaDetails>(
@@ -122,7 +138,7 @@ fun NavigationGraph(
             val args = backStackEntry.toRoute<MainNavRoute.MangaDetails>()
             MangaDetailsScreen(
                 id = args.id,
-                rootNavController = navController,
+                navOptions = options,
                 currentUser = currentUser
             )
         }
@@ -135,7 +151,7 @@ fun NavigationGraph(
             val args = backStackEntry.toRoute<MainNavRoute.CharacterDetails>()
             CharacterDetailsScreen(
                 characterId = args.characterId,
-                rootNavController = navController
+                navOptions = options
             )
         }
     }
