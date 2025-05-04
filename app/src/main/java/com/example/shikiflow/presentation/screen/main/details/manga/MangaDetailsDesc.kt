@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,12 +25,13 @@ import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedSection
+import com.example.shikiflow.utils.Converter.EntityType
 
 @Composable
 fun MangaDetailsDesc(
     mangaDetails: MangaDetailsQuery.Manga?,
     onItemClick: (String, MediaType) -> Unit,
-    onCharacterClick: (String) -> Unit,
+    onEntityClick: (EntityType, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -52,11 +52,8 @@ fun MangaDetailsDesc(
             style = MaterialTheme.typography.bodySmall,
             linkColor = MaterialTheme.colorScheme.primary,
             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
-            onCharacterClick = { characterId ->
-                onCharacterClick(characterId)
-            },
-            onLinkClick = { id ->
-                Log.d("Details Screen", "Clicked id: $id")
+            onEntityClick = { entityType, id ->
+                onEntityClick(entityType, id)
             }
         )
 
@@ -81,7 +78,7 @@ fun MangaDetailsDesc(
                         characterPoster = characterItem.character.characterShort.poster
                             ?.posterShort?.previewUrl,
                         characterName = characterItem.character.characterShort.name,
-                        onClick = { onCharacterClick(characterItem.character.characterShort.id) }
+                        onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
                     )
                 }
             }

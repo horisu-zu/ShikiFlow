@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
 import android.util.Log
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -23,21 +24,23 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.TargetType
 import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
-import com.example.shikiflow.presentation.screen.MainNavRoute
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
+import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,6 +59,8 @@ fun AnimeDetailsScreen(
     var isRefreshing by remember { mutableStateOf(false) }
     val isInitialized = rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
+    val customTabIntent = CustomTabsIntent.Builder().build()
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         userViewModel.updateEvent.collect { response ->
@@ -128,8 +133,23 @@ fun AnimeDetailsScreen(
                                     navOptions.navigateToAnimeDetails(id)
                                 } else navOptions.navigateToMangaDetails(id)
                             },
-                            onCharacterClick = { characterId ->
-                                navOptions.navigateToCharacterDetails(characterId)
+                            onEntityClick = { entityType, id ->
+                                when(entityType) {
+                                    EntityType.CHARACTER -> {
+                                        navOptions.navigateToCharacterDetails(id)
+                                    }
+                                    EntityType.PERSON -> {
+                                        customTabIntent.launchUrl(context,
+                                            "${BuildConfig.BASE_URL}/person/$id".toUri()
+                                        )
+                                    }
+                                    EntityType.ANIME -> {
+                                        navOptions.navigateToAnimeDetails(id)
+                                    }
+                                    EntityType.MANGA -> {
+                                        navOptions.navigateToMangaDetails(id)
+                                    }
+                                }
                             },
                             modifier = Modifier
                                 .constrainAs(descriptionRef) {

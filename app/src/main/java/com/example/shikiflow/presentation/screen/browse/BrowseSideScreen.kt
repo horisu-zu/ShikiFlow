@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import android.util.Log
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
@@ -74,6 +75,7 @@ fun BrowseSideScreen(
                 browseData = sideScreenData,
                 onMediaNavigate = { id, mediaType ->
                     if(mediaType == MediaType.ANIME) {
+                        Log.d("BrowseSideScreen", "Trying to Navigate to Anime with ID: $id")
                         navOptions.navigateToAnimeDetails(id)
                     } else { navOptions.navigateToMangaDetails(id) }
                 },

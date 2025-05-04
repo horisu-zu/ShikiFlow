@@ -22,7 +22,6 @@ import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
-import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.utils.Animations.slideInFromLeft

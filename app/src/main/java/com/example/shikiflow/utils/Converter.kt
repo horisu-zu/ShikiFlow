@@ -8,7 +8,6 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
@@ -16,9 +15,7 @@ import com.example.shikiflow.data.mapper.UserRateStatusConstants.getStatusOrder
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.UserRate
 import com.fleeksoft.ksoup.Ksoup
-import com.fleeksoft.ksoup.nodes.Document
 import com.fleeksoft.ksoup.nodes.Element
-import com.fleeksoft.ksoup.nodes.Node
 import com.fleeksoft.ksoup.nodes.TextNode
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
@@ -249,6 +246,18 @@ object Converter {
         data class Spoiler(val label: String, val content: AnnotatedString) : DescriptionElement()
     }
 
+    enum class EntityType {
+        CHARACTER,
+        PERSON,
+        ANIME,
+        MANGA
+    }
+
+    data class EntityData(
+        val id: String,
+        val type: EntityType
+    )
+
     fun parseDescriptionHtml(html: String, linkColor: Color): List<DescriptionElement> {
         val doc = Ksoup.parse(html)
         val elements = mutableListOf<DescriptionElement>()
@@ -304,8 +313,16 @@ object Converter {
                     }
 
                     val spanStyle = getSpanStyleForElement(node, linkColor)
-                    val annotationTag = getAnnotationTagForElement(node)
-                    val annotationValue = getAnnotationValueForElement(node)
+
+                    val entityData = getEntityDataForElement(node)
+
+                    val annotationTag = when {
+                        entityData != null -> entityData.type.name
+                        node.tagName() == "a" -> "URL_LINK"
+                        else -> null
+                    }
+
+                    val annotationValue = entityData?.id ?: if (node.tagName() == "a") node.attr("href") else null
 
                     val hasAnnotation = annotationTag != null && annotationValue != null
 
@@ -338,27 +355,25 @@ object Converter {
         }
     }
 
-    fun getAnnotationTagForElement(element: Element): String? {
-        return if (element.tagName() == "a") {
-            if (element.hasClass("b-link") && element.hasAttr("data-attrs")) {
-                "CHARACTER_ID"
-            } else { "URL_LINK" }
-        } else { null }
-    }
+    fun getEntityDataForElement(element: Element): EntityData? {
+        if (element.tagName() != "a" || !element.hasClass("b-link") || !element.hasAttr("data-attrs")) {
+            return null
+        }
 
-    fun getAnnotationValueForElement(element: Element): String? {
-        return if (element.tagName() == "a") {
-            if (element.hasClass("b-link") && element.hasAttr("data-attrs")) {
-                try {
-                    val dataAttrsJson = element.attr("data-attrs")
-                    val jsonObject = JSONObject(dataAttrsJson)
-                    Log.d("DataAttrs", "Parsed data-attrs JSON: $jsonObject")
-                    jsonObject.optString("id", null)
-                } catch (e: Exception) {
-                    Log.e("ParseError", "Failed to parse data-attrs JSON: ${e.message}")
-                    null
-                }
-            } else { element.attr("href") }
-        } else { null }
+        try {
+            val dataAttrsJson = element.attr("data-attrs")
+            val jsonObject = JSONObject(dataAttrsJson)
+            Log.d("DataAttrs", "Parsed data-attrs JSON: $jsonObject")
+
+            val id = jsonObject.optString("id", "unknown")
+            val typeStr = jsonObject.optString("type", "unknown")
+
+            val entityType = EntityType.valueOf(typeStr.uppercase())
+
+            return EntityData(id, entityType)
+        } catch (e: Exception) {
+            Log.e("ParseError", "Failed to parse data-attrs JSON: ${e.message}")
+            return null
+        }
     }
 }

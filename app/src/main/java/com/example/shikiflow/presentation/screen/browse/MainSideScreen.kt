@@ -16,12 +16,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.data.anime.Browse
 import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.presentation.screen.MainNavRoute
 
 @Composable
 fun MainSideScreen(
@@ -67,7 +65,7 @@ fun MainSideScreen(
                 val browseItem = browseData[index]!!
                 BrowseItem(
                     browseItem = browseItem,
-                    onItemClick = { id, mediaType -> onMediaNavigate }
+                    onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
                 )
             }
             browseData.apply {

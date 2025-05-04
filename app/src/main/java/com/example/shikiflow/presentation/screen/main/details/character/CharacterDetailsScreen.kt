@@ -1,6 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.character
 
-import android.util.Log
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,8 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.anime.toBrowseAnime
@@ -43,6 +45,7 @@ import com.example.shikiflow.presentation.common.FormattedText
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
+import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +57,8 @@ fun CharacterDetailsScreen(
 ) {
     val isInitialized = rememberSaveable { mutableStateOf(false) }
     val characterDetailsState = characterDetailsViewModel.characterDetails.collectAsState()
+    val customTabIntent = CustomTabsIntent.Builder().build()
+    val context = LocalContext.current
 
     val scrollState = rememberScrollState()
     val isAtTop by remember {
@@ -129,11 +134,23 @@ fun CharacterDetailsScreen(
                             linkColor = MaterialTheme.colorScheme.primary,
                             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
                             collapsedMaxLines = 3,
-                            onCharacterClick = { characterId ->
-                                navOptions.navigateToCharacterDetails(characterId)
-                            },
-                            onLinkClick = { id ->
-                                Log.d("Details Screen", "Clicked id: $id")
+                            onEntityClick = { entityType, id ->
+                                when(entityType) {
+                                    EntityType.CHARACTER -> {
+                                        navOptions.navigateToCharacterDetails(id)
+                                    }
+                                    EntityType.PERSON -> {
+                                        customTabIntent.launchUrl(context,
+                                            "${BuildConfig.BASE_URL}/person/$id".toUri()
+                                        )
+                                    }
+                                    EntityType.ANIME -> {
+                                        navOptions.navigateToAnimeDetails(id)
+                                    }
+                                    EntityType.MANGA -> {
+                                        navOptions.navigateToMangaDetails(id)
+                                    }
+                                }
                             }
                         )
                     }

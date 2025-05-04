@@ -6,7 +6,6 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -18,12 +17,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,6 +33,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -39,7 +41,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.Converter.DescriptionElement
+import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Converter.parseDescriptionHtml
+import kotlinx.coroutines.launch
 
 @Composable
 fun FormattedText(
@@ -49,8 +53,7 @@ fun FormattedText(
     collapsedMaxLines: Int = 8,
     style: TextStyle = TextStyle.Default,
     brushColor: Color,
-    onCharacterClick: (String) -> Unit,
-    onLinkClick: (String) -> Unit
+    onEntityClick: (EntityType, String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
     var lineCount by remember { mutableIntStateOf(0) }
@@ -76,13 +79,9 @@ fun FormattedText(
                         brushColor = brushColor,
                         isExpanded = isExpanded,
                         onLineCountChange = { lineCount = it },
-                        onCharacterClick = {
-                            Log.d("FormattedText", "Clicked on character: $it")
-                            onCharacterClick(it)
-                        },
-                        onLinkClick = { link ->
-                            Log.d("FormattedText", "Clicked on link: $link")
-                            onLinkClick(link)
+                        onEntityClick = { entityType, id ->
+                            Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
+                            onEntityClick(entityType, id)
                         }
                     )
                 }
@@ -96,13 +95,9 @@ fun FormattedText(
                             style = style.copy(),
                             lineHeight = lineHeight,
                             brushColor = brushColor,
-                            onCharacterClick = {
-                                Log.d("FormattedText", "Clicked on character: $it")
-                                onCharacterClick(it)
-                            },
-                            onLinkClick = { link ->
-                                Log.d("FormattedText", "Clicked on link: $link")
-                                onLinkClick(link)
+                            onEntityClick = { entityType, id ->
+                                Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
+                                onEntityClick(entityType, id)
                             }
                         )
                     }
@@ -139,9 +134,11 @@ private fun AnnotatedText(
     brushColor: Color,
     isExpanded: Boolean,
     onLineCountChange: (Int) -> Unit,
-    onCharacterClick: (String) -> Unit,
-    onLinkClick: (String) -> Unit
+    onEntityClick: (EntityType, String) -> Unit,
 ) {
+    val uriHandler = LocalUriHandler.current
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     var lineCount by remember { mutableIntStateOf(0) }
 
@@ -153,15 +150,26 @@ private fun AnnotatedText(
                 detectTapGestures { offset ->
                     layoutResult.value?.let { result ->
                         val position = result.getOffsetForPosition(offset)
-                        Log.d("ClickDebug", "Calculated Position: $position")
-                        text.getStringAnnotations("CHARACTER_ID", position, position)
-                            .firstOrNull()?.let { annotation ->
-                                onCharacterClick(annotation.item)
-                            }
+                        for(entityType in EntityType.entries) {
+                            text.getStringAnnotations(entityType.name, position, position)
+                                .firstOrNull()?.let { annotation ->
+                                    Log.d("Formatted Text", "Clicked on entity: ${annotation.item}")
+                                    onEntityClick(entityType, annotation.item)
+                                    return@detectTapGestures
+                                }
+                        }
 
                         text.getStringAnnotations("URL_LINK", position, position)
                             .firstOrNull()?.let { annotation ->
-                                onLinkClick(annotation.item)
+                                try {
+                                    Log.d("Formatted Text", "Clicked on URL: ${annotation.item}")
+                                    uriHandler.openUri(annotation.item)
+                                } catch (e: Exception) {
+                                    Log.e("Formatted Text", "Error opening URL: ${annotation.item}", e)
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Can't open link")
+                                    }
+                                }
                             }
                     }
                 }
@@ -198,8 +206,7 @@ private fun SpoilerElement(
     brushColor: Color,
     content: AnnotatedString,
     style: TextStyle,
-    onCharacterClick: (String) -> Unit,
-    onLinkClick: (String) -> Unit
+    onEntityClick: (EntityType, String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -236,13 +243,9 @@ private fun SpoilerElement(
                 brushColor = brushColor,
                 isExpanded = expanded,
                 onLineCountChange = { /**/ },
-                onCharacterClick = { characterId ->
-                    Log.d("FormattedText", "Clicked on character: $characterId")
-                    onCharacterClick(characterId)
-                },
-                onLinkClick = { link ->
-                    Log.d("FormattedText", "Clicked on link: $link")
-                    onLinkClick(link)
+                onEntityClick = { entityType, id ->
+                    Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
+                    onEntityClick(entityType, id)
                 }
             )
         }
