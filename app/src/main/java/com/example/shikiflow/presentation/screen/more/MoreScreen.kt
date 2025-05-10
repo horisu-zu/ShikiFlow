@@ -85,7 +85,7 @@ fun MoreScreen(
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Settings),
                         title = "Settings",
-                        onClick = { /**/ }
+                        onClick = { moreNavOptions.navigateToSettings() }
                     ),
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Info),

@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
+import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
 import com.example.shikiflow.utils.Animations.slideOutToLeft
@@ -23,6 +24,9 @@ fun MoreScreenNavigator(
         }
         override fun navigateToHistory() {
             moreNavController.navigate(MoreNavRoute.HistoryScreen)
+        }
+        override fun navigateToSettings() {
+            moreNavController.navigate(MoreNavRoute.SettingsScreen)
         }
         override fun navigateBack() {
             moreNavController.popBackStack()
@@ -64,6 +68,16 @@ fun MoreScreenNavigator(
             HistoryScreen(
                 userData = currentUser,
                 moreNavOptions = moreNavOptions,
+            )
+        }
+        composable<MoreNavRoute.SettingsScreen>(
+            enterTransition = { slideInFromRight() },
+            exitTransition = { slideOutToLeft() },
+            popEnterTransition = { slideInFromLeft() },
+            popExitTransition = { slideOutToRight() }
+        ) {
+            SettingsScreen(
+                userData = currentUser
             )
         }
     }

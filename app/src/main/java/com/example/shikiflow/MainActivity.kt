@@ -83,7 +83,7 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-fun Window.fitSystemWindowsWithAdjustResize() {
+/*fun Window.fitSystemWindowsWithAdjustResize() {
     setFlags(
         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
         WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
@@ -101,4 +101,4 @@ fun Window.fitSystemWindowsWithAdjustResize() {
             .build()
             .apply { ViewCompat.onApplyWindowInsets(view, this) }
     }
-}
+}*/
