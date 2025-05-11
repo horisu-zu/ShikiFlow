@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Scaffold
@@ -53,7 +52,7 @@ fun MoreScreen(
                     end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                 )
         ) {
-            val (userBlock, settingsBlock, logoutItem) = createRefs()
+            val (userBlock, settingsBlock) = createRefs()
 
             Section(
                 items = listOf(
@@ -95,20 +94,6 @@ fun MoreScreen(
                 ),
                 modifier = Modifier.constrainAs(settingsBlock) {
                     top.linkTo(userBlock.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                }
-            )
-            Section(
-                items = listOf(
-                    SectionItem.General(
-                        icon = IconResource.Vector(Icons.AutoMirrored.Filled.ExitToApp),
-                        title = "Logout",
-                        onClick = { /**/ }
-                    )
-                ),
-                modifier = Modifier.constrainAs(logoutItem) {
-                    top.linkTo(settingsBlock.bottom)
                     start.linkTo(parent.start)
                     end.linkTo(parent.end)
                 }

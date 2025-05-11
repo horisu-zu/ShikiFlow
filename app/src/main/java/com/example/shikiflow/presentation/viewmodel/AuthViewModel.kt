@@ -7,9 +7,7 @@ import com.example.shikiflow.data.auth.AuthState
 import com.example.shikiflow.domain.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -17,12 +15,6 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ): ViewModel() {
-
-    private val isAuthenticated = authRepository.isAuthenticated.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = false
-    )
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState = _authState.asStateFlow()
@@ -49,12 +41,6 @@ class AuthViewModel @Inject constructor(
             authRepository.handleAuthCode(code)
                 .onSuccess { _authState.value = AuthState.Success }
                 .onFailure { _authState.value = AuthState.Error(it.message ?: "Authentication failed") }
-        }
-    }
-
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logout()
         }
     }
 }

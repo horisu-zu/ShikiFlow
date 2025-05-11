@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,19 +26,33 @@ fun CardItem(
     item: String,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Box(
+        modifier = modifier.clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = item,
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+        )
+    }
+    /*Card(
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer
         ),
-        onClick = { /*TODO*/ }
+        onClick = { *//*TODO*//* },
+        modifier = modifier
     ) {
         Text(
             text = item,
             style = MaterialTheme.typography.labelMedium,
-            modifier = modifier
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
         )
-    }
+    }*/
 }
 
 @Composable

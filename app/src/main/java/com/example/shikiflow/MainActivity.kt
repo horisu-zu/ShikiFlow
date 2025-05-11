@@ -37,9 +37,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            val darkTheme = observeTheme(appSettingsManager)
+            val (darkTheme, oledTheme) = observeTheme(appSettingsManager)
 
-            ShikiFlowTheme(darkTheme = darkTheme) {
+            ShikiFlowTheme(
+                darkTheme = darkTheme,
+                oledTheme = oledTheme
+            ) {
                 AppNavigator()
             }
         }
@@ -48,8 +51,10 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun observeTheme(appSettingsManager: AppSettingsManager): Boolean {
+    private fun observeTheme(appSettingsManager: AppSettingsManager): Pair<Boolean, Boolean> {
         val theme = appSettingsManager.themeFlow.collectAsState(initial = ThemeMode.SYSTEM)
+        val isOledEnabled = appSettingsManager.oledFlow.collectAsState(initial = false)
+
         val systemTheme =
             when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
                 Configuration.UI_MODE_NIGHT_YES -> true
@@ -57,12 +62,14 @@ class MainActivity : ComponentActivity() {
                 else -> false
             }
 
-        Log.d("MainActivity", "Theme: ${theme.value}")
-        return when (theme.value) {
+        Log.d("MainActivity", "Theme: ${theme.value}, OLED: ${isOledEnabled.value}")
+        val isDarkTheme = when (theme.value) {
             ThemeMode.SYSTEM -> systemTheme
             ThemeMode.LIGHT -> false
             ThemeMode.DARK -> true
         }
+
+        return Pair(isDarkTheme, isOledEnabled.value && isDarkTheme)
     }
 
     override fun onNewIntent(intent: Intent) {

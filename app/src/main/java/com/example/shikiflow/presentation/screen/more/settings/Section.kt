@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -240,10 +241,10 @@ private fun SwitchItem(
     onClick: () -> Unit,
     showDivider: Boolean = true
 ) {
+    Log.d("SwitchItem", "isChecked: $isChecked")
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         val (titleRef, valueRef, switchRef, divider) = createRefs()
@@ -253,7 +254,8 @@ private fun SwitchItem(
             modifier = Modifier.constrainAs(titleRef) {
                 top.linkTo(parent.top)
                 bottom.linkTo(valueRef.top)
-                end.linkTo(switchRef.start, margin = 16.dp)
+                start.linkTo(parent.start)
+                end.linkTo(switchRef.start, margin = 4.dp)
                 width = Dimension.fillToConstraints
             },
             maxLines = 1,
@@ -265,8 +267,8 @@ private fun SwitchItem(
             modifier = Modifier.constrainAs(valueRef) {
                 top.linkTo(titleRef.bottom)
                 bottom.linkTo(parent.bottom)
-                end.linkTo(switchRef.start, margin = 16.dp)
-                end.linkTo(parent.end)
+                start.linkTo(parent.start)
+                end.linkTo(switchRef.start, margin = 4.dp)
                 width = Dimension.fillToConstraints
             },
             style = MaterialTheme.typography.labelSmall.copy(
@@ -278,7 +280,7 @@ private fun SwitchItem(
 
         Switch(
             checked = isChecked,
-            onCheckedChange = { onClick },
+            onCheckedChange = { onClick() },
             modifier = Modifier.constrainAs(switchRef) {
                 top.linkTo(parent.top)
                 bottom.linkTo(parent.bottom)

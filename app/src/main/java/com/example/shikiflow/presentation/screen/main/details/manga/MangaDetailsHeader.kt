@@ -174,10 +174,7 @@ fun MangaDetailsHeader(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(mangaDetails?.genres ?: emptyList()) { genreItem ->
-                CardItem(
-                    genreItem.name,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-                )
+                CardItem(genreItem.name)
             }
         }
     }

@@ -23,6 +23,7 @@ fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val themeMode = settingsViewModel.appTheme.collectAsState().value
+    val isOLEDModeEnabled = settingsViewModel.isOLEDModeEnabled.collectAsState().value
 
     Scaffold { innerPadding ->
         Column(
@@ -39,7 +40,7 @@ fun SettingsScreen(
                         title = userData?.currentUser?.nickname ?: "Unknown",
                         displayValue = "Sign Out",
                         imageUrl = userData?.currentUser?.avatarUrl ?: "Unknown",
-                        onClick = { /**/ }
+                        onClick = { settingsViewModel.logout() }
                     )
                 )
             )
@@ -51,6 +52,14 @@ fun SettingsScreen(
                         themeMode = themeMode,
                         onClick = { newTheme ->
                             settingsViewModel.setTheme(newTheme)
+                        }
+                    ),
+                    SectionItem.Switch(
+                        title = "OLED theme",
+                        displayValue = "Fully black theme",
+                        isChecked = isOLEDModeEnabled,
+                        onClick = {
+                            settingsViewModel.setOled(!isOLEDModeEnabled)
                         }
                     )
                 )

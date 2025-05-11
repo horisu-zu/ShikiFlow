@@ -20,28 +20,28 @@ fun AppNavigator(
 ) {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = "splash") {
-        composable("splash") {
-            val authState by viewModel.authState.collectAsState()
+    val authState by viewModel.authState.collectAsState()
 
-            LaunchedEffect(authState) {
-                when(authState) {
-                    AuthState.Success -> {
-                        Log.d("AppNavigator", "Navigating to main")
-                        navController.navigate("main") {
-                            popUpTo("splash") { inclusive = true }
-                        }
-                    }
-                    AuthState.Initial -> {
-                        Log.d("AppNavigator", "Navigating to auth")
-                        navController.navigate("auth") {
-                            popUpTo("splash") { inclusive = true }
-                        }
-                    }
-                    else -> {}
+    LaunchedEffect(authState) {
+        when(authState) {
+            AuthState.Success -> {
+                Log.d("AppNavigator", "Navigating to main")
+                navController.navigate("main") {
+                    popUpTo("splash") { inclusive = true }
                 }
             }
+            AuthState.Initial -> {
+                Log.d("AppNavigator", "Navigating to auth")
+                navController.navigate("auth") {
+                    popUpTo("splash") { inclusive = true }
+                }
+            }
+            else -> {}
         }
+    }
+
+    NavHost(navController = navController, startDestination = "splash") {
+        composable("splash") { /**/ }
         composable(route = "auth") {
             AuthScreen(navController = navController)
         }

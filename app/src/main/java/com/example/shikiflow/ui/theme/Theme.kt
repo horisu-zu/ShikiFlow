@@ -86,9 +86,48 @@ private val darkScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDark,
 )
 
+private val oledScheme = darkColorScheme(
+    primary = primaryOLED,
+    onPrimary = onPrimaryOLED,
+    primaryContainer = primaryContainerOLED,
+    onPrimaryContainer = onPrimaryContainerOLED,
+    secondary = secondaryOLED,
+    onSecondary = onSecondaryOLED,
+    secondaryContainer = secondaryContainerOLED,
+    onSecondaryContainer = onSecondaryContainerOLED,
+    tertiary = tertiaryOLED,
+    onTertiary = onTertiaryOLED,
+    tertiaryContainer = tertiaryContainerOLED,
+    onTertiaryContainer = onTertiaryContainerOLED,
+    error = errorOLED,
+    onError = onErrorOLED,
+    errorContainer = errorContainerOLED,
+    onErrorContainer = onErrorContainerOLED,
+    background = backgroundOLED,
+    onBackground = onBackgroundOLED,
+    surface = surfaceOLED,
+    onSurface = onSurfaceOLED,
+    surfaceVariant = surfaceVariantOLED,
+    onSurfaceVariant = onSurfaceVariantOLED,
+    outline = outlineOLED,
+    outlineVariant = outlineVariantOLED,
+    scrim = scrimOLED,
+    inverseSurface = inverseSurfaceOLED,
+    inverseOnSurface = inverseOnSurfaceOLED,
+    inversePrimary = inversePrimaryOLED,
+    surfaceDim = surfaceDimOLED,
+    surfaceBright = surfaceBrightOLED,
+    surfaceContainerLowest = surfaceContainerLowestOLED,
+    surfaceContainerLow = surfaceContainerLowOLED,
+    surfaceContainer = surfaceContainerOLED,
+    surfaceContainerHigh = surfaceContainerHighOLED,
+    surfaceContainerHighest = surfaceContainerHighestOLED
+)
+
 @Composable
 fun ShikiFlowTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    oledTheme: Boolean = false,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
@@ -99,6 +138,7 @@ fun ShikiFlowTheme(
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
 
+        darkTheme && oledTheme -> oledScheme
         darkTheme -> darkScheme
         else -> lightScheme
     }

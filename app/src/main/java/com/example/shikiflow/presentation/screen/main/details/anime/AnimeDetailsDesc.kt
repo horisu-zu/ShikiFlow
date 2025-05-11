@@ -87,10 +87,7 @@ fun AnimeDetailsDesc(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             items(animeDetails?.genres ?: emptyList()) { genreItem ->
-                CardItem(
-                    genreItem.name,
-                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
-                )
+                CardItem(genreItem.name)
             }
         }
 

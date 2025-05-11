@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -39,14 +40,13 @@ fun AnimeDetailsInfo(
     ) {
         DetailRow(
             label = "Studio",
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Top,
             content = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                 ) {
-                    animeDetails.studios.forEach {
-                        CardItem(it.name, modifier.padding(6.dp))
-                    }
+                    animeDetails.studios.forEach { CardItem(it.name) }
                 }
             }
         )

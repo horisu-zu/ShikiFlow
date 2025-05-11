@@ -20,12 +20,18 @@ class AppSettingsManager @Inject constructor(
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("app_settings")
         private val THEME_KEY = stringPreferencesKey("theme")
+        private val OLED_KEY = stringPreferencesKey("oled")
         private val LOCALE_KEY = stringPreferencesKey("locale")
     }
 
     val themeFlow: Flow<ThemeMode> = context.dataStore.data
         .map { preferences ->
             ThemeMode.fromString(preferences[THEME_KEY])
+        }
+
+    val oledFlow: Flow<Boolean> = context.dataStore.data
+        .map { preferences ->
+            preferences[OLED_KEY]?.toBoolean() ?: false
         }
 
     val localeFlow: Flow<String> = context.dataStore.data
@@ -36,6 +42,12 @@ class AppSettingsManager @Inject constructor(
     suspend fun saveTheme(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = themeMode.name
+        }
+    }
+
+    suspend fun saveOLEDMode(isEnabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[OLED_KEY] = isEnabled.toString()
         }
     }
 
