@@ -137,14 +137,14 @@ private fun TextItem(
         Text(
             text = subtitle,
             modifier = Modifier.constrainAs(subtitleRef) {
-                top.linkTo(titleRef.bottom)
+                top.linkTo(titleRef.bottom, margin = 4.dp)
                 bottom.linkTo(parent.bottom, margin = 4.dp)
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 width = Dimension.fillToConstraints
             },
             style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
