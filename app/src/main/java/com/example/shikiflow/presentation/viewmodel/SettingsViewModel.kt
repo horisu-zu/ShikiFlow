@@ -55,8 +55,8 @@ class SettingsViewModel @Inject constructor(
 
     fun clearCache() {
         viewModelScope.launch {
-            val success = cacheManager.clearCache()
-            if (success) {
+            val isSuccess = cacheManager.clearCache()
+            if (isSuccess) {
                 loadCacheSize()
             }
         }

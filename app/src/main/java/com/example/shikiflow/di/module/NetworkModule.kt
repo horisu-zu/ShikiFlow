@@ -6,9 +6,12 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.network.okHttpClient
 import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.di.annotations.GithubOkHttpClient
+import com.example.shikiflow.di.annotations.GithubRetrofit
 import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
 import com.example.shikiflow.di.api.CharacterApi
+import com.example.shikiflow.di.api.GithubApi
 import com.example.shikiflow.di.api.UserApi
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
@@ -45,6 +48,22 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @GithubOkHttpClient
+    fun provideGithubOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor { chain ->
+                val original = chain.request()
+                val request = original.newBuilder()
+                    .header("Accept", "application/vnd.github.v3+json")
+                    .header("Authorization", "Bearer ${BuildConfig.GITHUB_TOKEN}")
+                    .build()
+                chain.proceed(request)
+            }
+            .build()
+    }
+
+    @Provides
+    @Singleton
     @MainRetrofit
     fun provideMainRetrofit(
         @MainOkHttpClient okHttpClient: OkHttpClient,
@@ -52,6 +71,20 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @GithubRetrofit
+    fun provideGithubRetrofit(
+        @GithubOkHttpClient okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.GITHUB_API_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
@@ -95,5 +128,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideCharacterApi(@MainRetrofit retrofit: Retrofit): CharacterApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideGithubApi(@GithubRetrofit retrofit: Retrofit): GithubApi =
         retrofit.create()
 }

@@ -89,7 +89,7 @@ fun MoreScreen(
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Info),
                         title = "About App",
-                        onClick = { /**/ }
+                        onClick = { moreNavOptions.navigateToAbout() }
                     )
                 ),
                 modifier = Modifier.constrainAs(settingsBlock) {

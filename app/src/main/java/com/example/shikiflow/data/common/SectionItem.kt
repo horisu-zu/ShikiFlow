@@ -13,6 +13,7 @@ sealed class SectionItem {
     data class General(
         val icon: IconResource,
         val title: String,
+        val subtitle: String? = null,
         val onClick: () -> Unit
     ): SectionItem()
 }

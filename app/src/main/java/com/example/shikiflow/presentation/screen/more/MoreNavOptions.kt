@@ -6,4 +6,5 @@ interface MoreNavOptions: MainNavOptions {
     fun navigateToProfile()
     fun navigateToHistory()
     fun navigateToSettings()
+    fun navigateToAbout()
 }

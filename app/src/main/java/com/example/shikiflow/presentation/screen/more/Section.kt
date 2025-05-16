@@ -62,6 +62,7 @@ fun Section(
                     is SectionItem.General -> GeneralItem(
                         icon = item.icon,
                         title = item.title,
+                        subtitle = item.subtitle,
                         onClick = item.onClick
                     )
                 }

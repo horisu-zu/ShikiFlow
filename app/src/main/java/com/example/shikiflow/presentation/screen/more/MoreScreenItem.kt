@@ -1,12 +1,16 @@
 package com.example.shikiflow.presentation.screen.more
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -92,38 +96,36 @@ fun ExpandedItem(
 fun GeneralItem(
     icon: IconResource,
     title: String,
+    subtitle: String? = null,
     onClick: () -> Unit
 ) {
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxWidth()
+    Row(
+        modifier = Modifier.fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val (iconRef, titleRef) = createRefs()
-
         icon.toIcon(
-            modifier = Modifier
-                .size(24.dp)
-                .constrainAs(iconRef) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                },
+            modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.onSurface
         )
-
-        Text(
-            text = title,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(iconRef.end, margin = 16.dp)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+        ) {
+            Text(
+                text = title,
+                fontWeight = FontWeight.Medium,
+                fontSize = 14.sp
+            )
+            subtitle?.let { subtitle ->
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                    )
+                )
             }
-        )
+        }
     }
 }

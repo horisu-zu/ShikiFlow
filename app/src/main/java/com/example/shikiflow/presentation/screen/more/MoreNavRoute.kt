@@ -15,6 +15,6 @@ sealed interface MoreNavRoute {
     @Serializable
     object SettingsScreen : MoreNavRoute
 
-    /*@Serializable
-    object ClubsScreen : MoreNavRoute*/
+    @Serializable
+    object AboutAppScreen : MoreNavRoute
 }
