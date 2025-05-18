@@ -22,11 +22,11 @@ class VersionListener @Inject constructor(
             if(result.isSuccess) {
                 return result.getOrNull()
             } else {
-                Log.e("VersionListener", "Failed to check for updates: ${result.exceptionOrNull()}")
+                Log.e("VersionListener", "Failed to get release by version: ${result.exceptionOrNull()}")
                 null
             }
         } catch (e: Exception) {
-            Log.e("VersionListener", "Failed to check for updates", e)
+            Log.e("VersionListener", "Failed to get release by version", e)
             null
         }
     }
@@ -34,6 +34,7 @@ class VersionListener @Inject constructor(
     fun isUpdateAvailable(currentVersion: String, remoteVersion: String): Boolean {
         val current = currentVersion.split(".").map { it.toIntOrNull() ?: 0 }
         val remote = remoteVersion.split(".").map { it.toIntOrNull() ?: 0 }
+        Log.d("VersionListener", "Current Version: $currentVersion, Remote Version: $remoteVersion")
 
         for (i in 0 until minOf(current.size, remote.size)) {
             if (remote[i] > current[i]) return true

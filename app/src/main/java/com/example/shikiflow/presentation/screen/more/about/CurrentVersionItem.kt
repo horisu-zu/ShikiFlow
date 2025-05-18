@@ -15,6 +15,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.data.common.GithubRelease
+import com.example.shikiflow.utils.Converter.formatInstant
 
 @Composable
 fun CurrentVersionItem(
@@ -27,21 +28,27 @@ fun CurrentVersionItem(
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Icon(
-            painter = painterResource(id = R.drawable.ic_launcher_background),
+            painter = painterResource(id = R.drawable.ic_shikilogo),
             contentDescription = null,
             modifier = Modifier.size(64.dp)
         )
         Text(
-            text = currentRelease.tagName,
-            style = MaterialTheme.typography.labelMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+            text = "ShikiFlow",
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
             )
         )
-        /*Text(
-            text = "from: ${currentRelease.publishedAt}",
+        Text(
+            text = currentRelease.tagName,
             style = MaterialTheme.typography.labelMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
             )
-        )*/
+        )
+        Text(
+            text = "from: ${formatInstant(currentRelease.publishedAt, true)}",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+            )
+        )
     }
 }

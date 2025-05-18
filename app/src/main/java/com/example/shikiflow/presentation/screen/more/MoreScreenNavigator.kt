@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.more
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,6 +10,7 @@ import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
+import com.example.shikiflow.presentation.viewmodel.AboutViewModel
 import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
 import com.example.shikiflow.utils.Animations.slideOutToLeft
@@ -19,6 +21,8 @@ fun MoreScreenNavigator(
     currentUser: CurrentUserQuery.Data?
 ) {
     val moreNavController = rememberNavController()
+    val aboutViewModel = hiltViewModel<AboutViewModel>()
+
     val moreNavOptions = object : MoreNavOptions {
         override fun navigateToProfile() {
             moreNavController.navigate(MoreNavRoute.ProfileScreen)
@@ -90,7 +94,7 @@ fun MoreScreenNavigator(
             popEnterTransition = { slideInFromLeft() },
             popExitTransition = { slideOutToRight() }
         ) {
-            AboutAppScreen()
+            AboutAppScreen(aboutViewModel)
         }
     }
 }

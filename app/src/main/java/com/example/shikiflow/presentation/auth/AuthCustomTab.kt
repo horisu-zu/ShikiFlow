@@ -8,7 +8,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -20,8 +19,6 @@ fun AuthCustomTab(
     authViewModel: AuthViewModel = hiltViewModel(),
     onHandleAuth: () -> Unit
 ) {
-    val context = LocalContext.current
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->

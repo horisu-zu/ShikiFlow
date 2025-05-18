@@ -24,7 +24,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
 import org.json.JSONObject
-import java.io.File
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.Date
@@ -116,6 +115,15 @@ object Converter {
 
                 context.getString(R.string.status_days, formattedDate)
             }
+        }
+    }
+
+    fun formatFileSize(size: Double): String {
+        return when {
+            size < 1024 -> "%.0f B".format(size)
+            size < 1024 * 1024 -> "%.2f KB".format(size / 1024)
+            size < 1024 * 1024 * 1024 -> "%.2f MB".format(size / (1024 * 1024))
+            else -> "%.2f GB".format(size / (1024 * 1024 * 1024))
         }
     }
 
