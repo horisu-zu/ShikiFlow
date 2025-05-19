@@ -18,12 +18,13 @@ android {
         minSdk = 26
         targetSdk = 35
         versionCode = 2
-        versionName = "0.1.1"
+        versionName = "0.1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "GITHUB_API_TOKEN", "\"${System.getenv("GITHUB_API_TOKEN") ?: ""}\"")
     }
 
     buildTypes {
