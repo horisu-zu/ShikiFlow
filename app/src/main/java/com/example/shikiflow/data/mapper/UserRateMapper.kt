@@ -32,9 +32,11 @@ class UserRateMapper {
         fun mapStringToStatus(tab: String): UserRateStatusEnum? {
             return mapOf(
                 "Watching" to UserRateStatusEnum.watching,
+                "Reading" to UserRateStatusEnum.watching,
                 "Planned" to UserRateStatusEnum.planned,
                 "Completed" to UserRateStatusEnum.completed,
                 "Rewatching" to UserRateStatusEnum.rewatching,
+                "Rereading" to UserRateStatusEnum.rewatching,
                 "On Hold" to UserRateStatusEnum.on_hold,
                 "Dropped" to UserRateStatusEnum.dropped
             )[tab]

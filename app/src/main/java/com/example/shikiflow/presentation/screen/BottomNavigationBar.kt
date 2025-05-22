@@ -28,6 +28,7 @@ import com.example.shikiflow.utils.Animations.slideInFromLeft
 import com.example.shikiflow.utils.Animations.slideInFromRight
 import com.example.shikiflow.utils.Animations.slideOutToLeft
 import com.example.shikiflow.utils.Animations.slideOutToRight
+import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
@@ -76,6 +77,7 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun NavigationGraph(
+    appSettingsManager: AppSettingsManager,
     navController: NavHostController,
     modifier: Modifier = Modifier,
     currentUser: CurrentUserQuery.Data?
@@ -101,9 +103,13 @@ fun NavigationGraph(
     NavHost(navController, startDestination = MainNavRoute.Home, modifier = modifier) {
         composable<MainNavRoute.Home> {
             MainScreen(
+                appSettingsManager = appSettingsManager,
                 currentUser = currentUser,
                 onAnimeClick = { animeId ->
                     navController.navigate(MainNavRoute.AnimeDetails(animeId))
+                },
+                onMangaClick = { mangaId ->
+                    navController.navigate(MainNavRoute.MangaDetails(mangaId))
                 }
             )
         }

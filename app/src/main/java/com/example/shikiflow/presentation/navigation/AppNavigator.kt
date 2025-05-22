@@ -13,9 +13,11 @@ import com.example.shikiflow.data.auth.AuthState
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
+import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun AppNavigator(
+    appSettingsManager: AppSettingsManager,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
@@ -46,7 +48,7 @@ fun AppNavigator(
             AuthScreen(navController = navController)
         }
         composable(route = "main") {
-            MainNavigator()
+            MainNavigator(appSettingsManager = appSettingsManager)
         }
     }
 }

@@ -9,9 +9,11 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
+import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun MainNavigator(
+    appSettingsManager: AppSettingsManager,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
@@ -21,6 +23,7 @@ fun MainNavigator(
         bottomBar = { BottomNavigationBar(navController) }
     ) { innerPadding ->
         NavigationGraph(
+            appSettingsManager = appSettingsManager,
             currentUser = currentUser.data,
             navController = navController,
             modifier = Modifier.padding(

@@ -93,13 +93,13 @@ class AnimeTracksMediator(
                 return MediatorResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
             }
         } catch (e: IOException) {
-            Log.e("ChatRestrictionMediator", "Error loading data: ${e.message}")
+            Log.e("AnimeTracksMediator", "Error loading data: ${e.message}")
             MediatorResult.Error(e)
         } catch (e: HttpException) {
-            Log.e("ChatRestrictionMediator", "Error loading data: ${e.message}")
+            Log.e("AnimeTracksMediator", "Error loading data: ${e.message}")
             MediatorResult.Error(e)
         } catch (e: Exception) {
-            Log.e("ChatRestrictionMediator", "Error loading data: ${e.message}")
+            Log.e("AnimeTracksMediator", "Error loading data: ${e.message}")
             MediatorResult.Error(e)
         }
     }

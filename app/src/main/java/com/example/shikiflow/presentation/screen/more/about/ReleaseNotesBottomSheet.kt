@@ -43,8 +43,7 @@ fun ReleaseNotesBottomSheet(
     if (showBottomSheet) {
         ModalBottomSheet(
             sheetState = sheetState,
-            onDismissRequest = onDismiss,
-            modifier = modifier.heightIn(min = 480.dp)
+            onDismissRequest = onDismiss
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),

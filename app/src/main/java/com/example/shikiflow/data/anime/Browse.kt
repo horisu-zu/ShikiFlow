@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.anime
 
-import androidx.navigation.NavController
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.MangaBrowseQuery
 import com.example.graphql.type.AnimeKindEnum
@@ -71,7 +70,7 @@ fun MangaBrowseQuery.Manga.toBrowseManga(): Browse.Manga {
     )
 }
 
-sealed class BrowseScreens(val route: String) {
+/*sealed class BrowseScreens(val route: String) {
     data object SideScreen : BrowseScreens("sideScreen/{browseType}") {
         const val ARG_BROWSE_TYPE = "browseType"
 
@@ -95,4 +94,4 @@ sealed class BrowseScreens(val route: String) {
 
 fun NavController.navigateToSideScreen(browseType: BrowseType) {
     navigate(BrowseScreens.SideScreen.createRoute(browseType))
-}
+}*/

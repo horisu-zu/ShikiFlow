@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -22,6 +23,7 @@ class AppSettingsManager @Inject constructor(
         private val THEME_KEY = stringPreferencesKey("theme")
         private val OLED_KEY = stringPreferencesKey("oled")
         private val LOCALE_KEY = stringPreferencesKey("locale")
+        private val TRACK_MODE = stringPreferencesKey("track_theme")
     }
 
     val themeFlow: Flow<ThemeMode> = context.dataStore.data
@@ -39,6 +41,11 @@ class AppSettingsManager @Inject constructor(
             preferences[LOCALE_KEY] ?: Locale.getDefault().language
         }
 
+    val trackModeFlow: Flow<MainTrackMode> = context.dataStore.data
+        .map { preferences ->
+            preferences[TRACK_MODE]?.let { MainTrackMode.valueOf(it) } ?: MainTrackMode.ANIME
+        }
+
     suspend fun saveTheme(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->
             preferences[THEME_KEY] = themeMode.name
@@ -54,6 +61,12 @@ class AppSettingsManager @Inject constructor(
     suspend fun saveLocale(locale: String) {
         context.dataStore.edit { preferences ->
             preferences[LOCALE_KEY] = locale
+        }
+    }
+
+    suspend fun saveTrackMode(trackMode: MainTrackMode) {
+        context.dataStore.edit { preferences ->
+            preferences[TRACK_MODE] = trackMode.name
         }
     }
 }

@@ -43,7 +43,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 oledTheme = oledTheme
             ) {
-                AppNavigator()
+                AppNavigator(appSettingsManager)
             }
         }
 

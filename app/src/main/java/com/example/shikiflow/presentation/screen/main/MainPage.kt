@@ -6,7 +6,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -17,7 +17,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.mapper.UserRateMapper
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
@@ -29,10 +28,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    pagerState: PagerState,
     trackViewModel: AnimeTracksViewModel = hiltViewModel(),
     onAnimeClick: (String) -> Unit
 ) {
+    val pagerState = rememberPagerState { 6 }
     val coroutineScope = rememberCoroutineScope()
     val tabs = UserRateStatusConstants.getStatusChips(MediaType.ANIME)
     var isRefreshing by remember { mutableStateOf(false) }
@@ -51,9 +50,8 @@ fun MainPage(
                         )
                     )
                 }
-            },
+            }
         )
-
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
