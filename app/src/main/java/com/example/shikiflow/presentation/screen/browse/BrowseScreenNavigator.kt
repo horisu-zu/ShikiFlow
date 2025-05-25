@@ -1,30 +1,51 @@
 package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.presentation.screen.MediaNavOptions
-import com.example.shikiflow.utils.Animations.slideInFromLeft
-import com.example.shikiflow.utils.Animations.slideInFromRight
-import com.example.shikiflow.utils.Animations.slideOutToLeft
-import com.example.shikiflow.utils.Animations.slideOutToRight
-import com.example.shikiflow.utils.CustomNavType
 import kotlinx.serialization.json.Json
-import kotlin.reflect.typeOf
 
 @Composable
 fun BrowseScreenNavigator(
     navOptions: MediaNavOptions
 ) {
-    val browseNavController = rememberNavController()
+    val browseBackstack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
+    //val browseNavController = rememberNavController()
     val json = Json {
         useArrayPolymorphism = true
     }
+    val browseNavOptions = object: BrowseNavOptions {
+        override fun navigateToSideScreen(browseType: BrowseType) {
+            browseBackstack.add(BrowseNavRoute.SideScreen(browseType))
+        }
+        override fun navigateBack() { browseBackstack.removeLastOrNull() }
+    }
 
-    NavHost(
+    NavDisplay(
+        backStack = browseBackstack,
+        onBack = { browseBackstack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            entry<BrowseNavRoute.BrowseScreen> {
+                BrowseScreen(
+                    browseNavOptions = browseNavOptions,
+                    navOptions = navOptions
+                )
+            }
+            entry<BrowseNavRoute.SideScreen> { route ->
+                BrowseSideScreen(
+                    browseType = route.browseType,
+                    navOptions = navOptions,
+                    onBackNavigate = { browseBackstack.removeLastOrNull() }
+                )
+            }
+        }
+    )
+
+    /*NavHost(
         startDestination = BrowseNavRoute.BrowseScreen,
         navController = browseNavController
     ) {
@@ -62,5 +83,5 @@ fun BrowseScreenNavigator(
                 onBackNavigate = { browseNavController.popBackStack() }
             )
         }
-    }
+    }*/
 }

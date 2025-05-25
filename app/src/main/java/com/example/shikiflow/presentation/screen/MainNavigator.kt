@@ -7,7 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.rememberNavBackStack
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.AppSettingsManager
 
@@ -16,16 +16,22 @@ fun MainNavigator(
     appSettingsManager: AppSettingsManager,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val navController = rememberNavController()
+    val mainBackstack = rememberNavBackStack(MainNavRoute.Home)
+    //val mainBackStack = remember { mutableStateListOf<MainNavRoute>(MainNavRoute.Home) }
     val currentUser by userViewModel.currentUserData.collectAsState()
 
     Scaffold(
-        bottomBar = { BottomNavigationBar(navController) }
+        bottomBar = { BottomNavigationBar(
+            currentRoute = mainBackstack.lastOrNull() ?: MainNavRoute.Home,
+            onNavigate = { route ->
+                mainBackstack.add(route)
+            }
+        ) }
     ) { innerPadding ->
         NavigationGraph(
             appSettingsManager = appSettingsManager,
             currentUser = currentUser.data,
-            navController = navController,
+            mainBackstack = mainBackstack,
             modifier = Modifier.padding(
                 bottom = innerPadding.calculateBottomPadding()
             ) //It's an anti pattern, but Column with BottomNavBar has some weird anims during navigation

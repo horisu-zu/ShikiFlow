@@ -1,47 +1,81 @@
 package com.example.shikiflow.presentation.screen.more
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation3.runtime.NavEntry
+import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.ui.NavDisplay
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 import com.example.shikiflow.presentation.viewmodel.AboutViewModel
-import com.example.shikiflow.utils.Animations.slideInFromLeft
-import com.example.shikiflow.utils.Animations.slideInFromRight
-import com.example.shikiflow.utils.Animations.slideOutToLeft
-import com.example.shikiflow.utils.Animations.slideOutToRight
 
 @Composable
 fun MoreScreenNavigator(
     currentUser: CurrentUserQuery.Data?
 ) {
-    val moreNavController = rememberNavController()
+    val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
+    //val moreNavController = rememberNavController()
     val aboutViewModel = hiltViewModel<AboutViewModel>()
 
     val moreNavOptions = object : MoreNavOptions {
         override fun navigateToProfile() {
-            moreNavController.navigate(MoreNavRoute.ProfileScreen)
+            moreBackstack.add(MoreNavRoute.ProfileScreen)
         }
         override fun navigateToHistory() {
-            moreNavController.navigate(MoreNavRoute.HistoryScreen)
+            moreBackstack.add(MoreNavRoute.HistoryScreen)
         }
         override fun navigateToSettings() {
-            moreNavController.navigate(MoreNavRoute.SettingsScreen)
+            moreBackstack.add(MoreNavRoute.SettingsScreen)
         }
         override fun navigateToAbout() {
-            moreNavController.navigate(MoreNavRoute.AboutAppScreen)
+            moreBackstack.add(MoreNavRoute.AboutAppScreen)
         }
         override fun navigateBack() {
-            moreNavController.popBackStack()
+            moreBackstack.removeLastOrNull()
         }
     }
 
-    NavHost(
+    NavDisplay(
+        backStack = moreBackstack,
+        onBack = { moreBackstack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            entry<MoreNavRoute.MoreScreen> {
+                MoreScreen(
+                    moreNavOptions = moreNavOptions,
+                    currentUser = currentUser
+                )
+            }
+            entry<MoreNavRoute.ProfileScreen> {
+                ProfileScreen(
+                    moreNavOptions = moreNavOptions,
+                    currentUser = currentUser
+                )
+            }
+            entry<MoreNavRoute.HistoryScreen> {
+                HistoryScreen(
+                    userData = currentUser,
+                    moreNavOptions = moreNavOptions,
+                )
+            }
+            entry<MoreNavRoute.SettingsScreen> {
+                SettingsScreen(
+                    userData = currentUser
+                )
+            }
+            entry<MoreNavRoute.AboutAppScreen> {
+                AboutAppScreen(aboutViewModel)
+            }
+        }
+    )
+
+    /*NavHost(
         navController = moreNavController,
         startDestination = MoreNavRoute.MoreScreen
     ) {
@@ -96,5 +130,5 @@ fun MoreScreenNavigator(
         ) {
             AboutAppScreen(aboutViewModel)
         }
-    }
+    }*/
 }

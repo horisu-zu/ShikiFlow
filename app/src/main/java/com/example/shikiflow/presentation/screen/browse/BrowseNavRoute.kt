@@ -1,9 +1,10 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.data.anime.BrowseType
 import kotlinx.serialization.Serializable
 
-sealed interface BrowseNavRoute {
+sealed interface BrowseNavRoute: NavKey {
     @Serializable
     object BrowseScreen: BrowseNavRoute
 

@@ -1,8 +1,9 @@
 package com.example.shikiflow.presentation.screen.more
 
+import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
-sealed interface MoreNavRoute {
+sealed interface MoreNavRoute : NavKey {
     @Serializable
     object MoreScreen : MoreNavRoute
 

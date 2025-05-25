@@ -1,6 +1,10 @@
 package com.example.shikiflow.presentation.screen
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -11,11 +15,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entry
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
@@ -24,28 +28,29 @@ import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetails
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
-import com.example.shikiflow.utils.Animations.slideInFromLeft
-import com.example.shikiflow.utils.Animations.slideInFromRight
-import com.example.shikiflow.utils.Animations.slideOutToLeft
-import com.example.shikiflow.utils.Animations.slideOutToRight
 import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
-fun BottomNavigationBar(navController: NavHostController) {
+fun BottomNavigationBar(
+    currentRoute: NavKey,
+    onNavigate: (MainNavRoute) -> Unit
+) {
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Browse,
         BottomNavItem.More
     )
 
-    val navBackStackEntry = navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry.value?.destination?.route
-
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface
     ) {
         items.forEach { item ->
-            val isSelected = currentRoute?.contains(item.route.toString()) == true
+            val isSelected = when (currentRoute) {
+                MainNavRoute.Home -> item.route == MainNavRoute.Home
+                MainNavRoute.Browse -> item.route == MainNavRoute.Browse
+                MainNavRoute.More -> item.route == MainNavRoute.More
+                else -> false
+            }
 
             NavigationBarItem(
                 icon = {
@@ -61,13 +66,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 selected = isSelected,
                 onClick = {
                     if (!isSelected) {
-                        navController.navigate(item.route) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
+                        onNavigate(item.route)
                     }
                 }
             )
@@ -78,29 +77,97 @@ fun BottomNavigationBar(navController: NavHostController) {
 @Composable
 fun NavigationGraph(
     appSettingsManager: AppSettingsManager,
-    navController: NavHostController,
+    mainBackstack: NavBackStack,
     modifier: Modifier = Modifier,
     currentUser: CurrentUserQuery.Data?
 ) {
+    //val mainBackstack = remember { mutableStateListOf<MainNavRoute>(MainNavRoute.Home) }
     val options = object : MediaNavOptions {
         override fun navigateToCharacterDetails(characterId: String) {
-            navController.navigate(MainNavRoute.CharacterDetails(characterId))
+            mainBackstack.add(MainNavRoute.CharacterDetails(characterId))
         }
 
         override fun navigateToAnimeDetails(animeId: String) {
-            navController.navigate(MainNavRoute.AnimeDetails(animeId))
+            mainBackstack.add(MainNavRoute.AnimeDetails(animeId))
         }
 
         override fun navigateToMangaDetails(mangaId: String) {
-            navController.navigate(MainNavRoute.MangaDetails(mangaId))
+            mainBackstack.add(MainNavRoute.MangaDetails(mangaId))
         }
 
         override fun navigateBack() {
-            navController.popBackStack()
+            mainBackstack.removeLastOrNull()
         }
     }
 
-    NavHost(navController, startDestination = MainNavRoute.Home, modifier = modifier) {
+    NavDisplay(
+        backStack = mainBackstack,
+        onBack = { mainBackstack.removeLastOrNull() },
+        modifier = modifier,
+        entryProvider = entryProvider {
+            entry<MainNavRoute.Home> {
+                MainScreen(
+                    appSettingsManager = appSettingsManager,
+                    currentUser = currentUser,
+                    onAnimeClick = { animeId ->
+                        mainBackstack.add(MainNavRoute.AnimeDetails(animeId))
+                    },
+                    onMangaClick = { mangaId ->
+                        mainBackstack.add(MainNavRoute.MangaDetails(mangaId))
+                    }
+                )
+            }
+            entry<MainNavRoute.Browse> {
+                BrowseScreenNavigator(navOptions = options)
+            }
+            entry<MainNavRoute.More> {
+                MoreScreenNavigator(currentUser = currentUser)
+            }
+            entry<MainNavRoute.AnimeDetails>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) { route ->
+                AnimeDetailsScreen(
+                    id = route.id,
+                    currentUser = currentUser,
+                    navOptions = options
+                )
+            }
+            entry<MainNavRoute.MangaDetails>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) { route ->
+                MangaDetailsScreen(
+                    id = route.id,
+                    navOptions = options,
+                    currentUser = currentUser
+                )
+            }
+            entry<MainNavRoute.CharacterDetails>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) { route ->
+                CharacterDetailsScreen(
+                    characterId = route.characterId,
+                    navOptions = options
+                )
+            }
+        }
+    )
+
+    /*NavHost(navController, startDestination = MainNavRoute.Home, modifier = modifier) {
         composable<MainNavRoute.Home> {
             MainScreen(
                 appSettingsManager = appSettingsManager,
@@ -159,7 +226,7 @@ fun NavigationGraph(
                 navOptions = options
             )
         }
-    }
+    }*/
 }
 
 sealed class BottomNavItem(
