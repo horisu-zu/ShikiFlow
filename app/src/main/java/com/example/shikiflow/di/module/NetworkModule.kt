@@ -10,8 +10,10 @@ import com.example.shikiflow.di.annotations.GithubOkHttpClient
 import com.example.shikiflow.di.annotations.GithubRetrofit
 import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
+import com.example.shikiflow.di.api.AnimeApi
 import com.example.shikiflow.di.api.CharacterApi
 import com.example.shikiflow.di.api.GithubApi
+import com.example.shikiflow.di.api.MangaApi
 import com.example.shikiflow.di.api.UserApi
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
@@ -133,5 +135,15 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideGithubApi(@GithubRetrofit retrofit: Retrofit): GithubApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideAnimeApi(@MainRetrofit retrofit: Retrofit): AnimeApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideMangaApi(@MainRetrofit retrofit: Retrofit): MangaApi =
         retrofit.create()
 }

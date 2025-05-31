@@ -13,17 +13,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.Graph
 import com.example.shikiflow.presentation.common.GraphGridType
+import com.example.shikiflow.presentation.screen.more.GeneralItem
 import com.example.shikiflow.utils.Converter.formatInstant
+import com.example.shikiflow.utils.IconResource
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -32,6 +36,7 @@ import kotlinx.datetime.atStartOfDayIn
 @Composable
 fun AnimeDetailsInfo(
     animeDetails: AnimeDetailsQuery.Anime,
+    onSimilarClick: (String, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -157,6 +162,19 @@ fun AnimeDetailsInfo(
                         }
                     }
                 }
+            )
+        }
+
+        HorizontalDivider()
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start
+        ) {
+            GeneralItem(
+                icon = IconResource.Drawable(resId = R.drawable.ic_intersection),
+                title = "Similar",
+                onClick = { onSimilarClick(animeDetails.id, animeDetails.name) }
             )
         }
 

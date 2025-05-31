@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.navOptions
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entry
@@ -22,8 +23,10 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
+import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreen
+import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
@@ -95,6 +98,10 @@ fun NavigationGraph(
             mainBackstack.add(MainNavRoute.MangaDetails(mangaId))
         }
 
+        override fun navigateToSimilarPage(id: String, title: String, mediaType: MediaType) {
+            mainBackstack.add(MainNavRoute.SimilarPage(id, title, mediaType))
+        }
+
         override fun navigateBack() {
             mainBackstack.removeLastOrNull()
         }
@@ -161,6 +168,21 @@ fun NavigationGraph(
             ) { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
+                    navOptions = options
+                )
+            }
+            entry<MainNavRoute.SimilarPage>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                }
+            ) { route ->
+                SimilarMediaScreen(
+                    mediaTitle = route.title,
+                    mediaId = route.id,
+                    mediaType = route.mediaType,
                     navOptions = options
                 )
             }

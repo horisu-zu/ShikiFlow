@@ -10,13 +10,15 @@ import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.UserRateOrderInputType
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.anime.MyListString
+import com.example.shikiflow.data.anime.ShikiManga
 import com.example.shikiflow.data.anime.ShortMangaTracksResponse
 import com.example.shikiflow.data.anime.toGraphQLValue
-import com.example.shikiflow.data.manga.MangaResponse
+import com.example.shikiflow.di.api.MangaApi
 import javax.inject.Inject
 
 class MangaRepository @Inject constructor(
-    private val apolloClient: ApolloClient
+    private val apolloClient: ApolloClient,
+    private val mangaApi: MangaApi
 ) {
 
     suspend fun getMangaDetails(
@@ -109,6 +111,15 @@ class MangaRepository @Inject constructor(
             } ?: Result.failure(Exception("No data"))
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun getSimilarManga(id: String): List<ShikiManga> {
+        return try {
+            mangaApi.getSimilarMangas(id)
+        } catch (e: Exception) {
+            Log.e("MangaRepository", "Exception fetching similar manga", e)
+            emptyList()
         }
     }
 }

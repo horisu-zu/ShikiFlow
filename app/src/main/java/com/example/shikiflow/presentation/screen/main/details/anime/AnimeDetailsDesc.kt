@@ -50,6 +50,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 @Composable
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime?,
+    onSimilarClick: (String, String) -> Unit,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     modifier: Modifier = Modifier
@@ -59,7 +60,7 @@ fun AnimeDetailsDesc(
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef) = createRefs()
+        val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef, similarRef) = createRefs()
 
         FormattedText(
             descriptionHtml = animeDetails?.descriptionHtml ?: "No Description",
@@ -143,6 +144,7 @@ fun AnimeDetailsDesc(
         animeDetails?.let {
             AnimeDetailsInfo(
                 animeDetails = it,
+                onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
                 modifier = Modifier.constrainAs(additionalRef) {
                     top.linkTo(screenshotsRef.bottom, margin = 12.dp)
                     start.linkTo(parent.start)

@@ -10,11 +10,14 @@ import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.RatingString
 import com.example.graphql.type.SeasonString
 import com.example.shikiflow.data.anime.MyListString
+import com.example.shikiflow.data.anime.SimilarAnime
 import com.example.shikiflow.data.anime.toGraphQLValue
+import com.example.shikiflow.di.api.AnimeApi
 import javax.inject.Inject
 
 class AnimeRepository @Inject constructor(
-    private val apolloClient: ApolloClient
+    private val apolloClient: ApolloClient,
+    private val animeApi: AnimeApi
 ) {
 
     suspend fun getAnimeDetails(
@@ -82,6 +85,15 @@ class AnimeRepository @Inject constructor(
             } ?: Result.failure(Exception("No data"))
         } catch (e: Exception) {
             Result.failure(e)
+        }
+    }
+
+    suspend fun getSimilarAnime(id: String): List<SimilarAnime> {
+        return try {
+            animeApi.getSimilarAnime(id)
+        } catch (e: Exception) {
+            Log.e("AnimeRepository", "Exception fetching similar anime", e)
+            emptyList()
         }
     }
 }

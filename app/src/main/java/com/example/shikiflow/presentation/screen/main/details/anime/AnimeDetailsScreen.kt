@@ -151,6 +151,9 @@ fun AnimeDetailsScreen(
                                     }
                                 }
                             },
+                            onSimilarClick = { animeId, title ->
+                                navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)
+                            },
                             modifier = Modifier
                                 .constrainAs(descriptionRef) {
                                     top.linkTo(titleRef.bottom, margin = 12.dp)
