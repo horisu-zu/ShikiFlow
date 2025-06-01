@@ -19,8 +19,7 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 @Composable
 fun BrowseScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
-    browseNavOptions: BrowseNavOptions,
-    navOptions: MediaNavOptions
+    browseNavOptions: BrowseNavOptions
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
     val screenState by searchViewModel.screenState.collectAsState()
@@ -48,14 +47,14 @@ fun BrowseScreen(
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
                     onMediaNavigate = { id, mediaType ->
                         if(mediaType == MediaType.ANIME) {
-                           navOptions.navigateToAnimeDetails(id)
-                        } else { navOptions.navigateToMangaDetails(id) }
+                            browseNavOptions.navigateToAnimeDetails(id)
+                        } else { browseNavOptions.navigateToMangaDetails(id) }
                     }
                 )
             } else {
                 BrowseMainPage(
                     onNavigate = { id, mediaType ->
-                        navOptions.navigateToAnimeDetails(id)
+                        browseNavOptions.navigateToAnimeDetails(id)
                     },
                     onSideScreenNavigate = { sideScreen ->
                         browseNavOptions.navigateToSideScreen(sideScreen)

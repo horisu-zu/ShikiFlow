@@ -2,7 +2,8 @@ package com.example.shikiflow.presentation.screen.browse
 
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.presentation.screen.MainNavOptions
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 
-interface BrowseNavOptions: MainNavOptions {
+interface BrowseNavOptions: MainNavOptions, MediaNavOptions {
     fun navigateToSideScreen(browseType: BrowseType)
 }

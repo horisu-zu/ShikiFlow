@@ -21,6 +21,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.mangatrack.MainMangaPage
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 import com.example.shikiflow.utils.AppSettingsManager
@@ -32,8 +33,7 @@ fun MainScreen(
     appSettingsManager: AppSettingsManager,
     currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    onAnimeClick: (String) -> Unit,
-    onMangaClick: (String) -> Unit
+    navOptions: MediaNavOptions
 ) {
     val scope = rememberCoroutineScope()
     val topAppBarState = rememberTopAppBarState()
@@ -79,15 +79,21 @@ fun MainScreen(
                 MainTrackMode.ANIME -> {
                     Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                         if (isSearchActive) {
-                            SearchPage(onAnimeClick = onAnimeClick)
+                            SearchPage(onAnimeClick = { animeId ->
+                                navOptions.navigateToAnimeDetails(animeId)
+                            })
                         } else {
-                            MainPage(onAnimeClick = onAnimeClick)
+                            MainPage(onAnimeClick = { animeId ->
+                                navOptions.navigateToAnimeDetails(animeId)
+                            })
                         }
                     }
                 }
                 MainTrackMode.MANGA -> {
                     MainMangaPage(
-                        onMangaClick = onMangaClick
+                        onMangaClick = { mangaId ->
+                            navOptions.navigateToMangaDetails(mangaId)
+                        }
                     )
                 }
             }
