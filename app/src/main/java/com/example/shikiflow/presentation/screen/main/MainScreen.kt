@@ -21,7 +21,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
-import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.main.mangatrack.MainMangaPage
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 import com.example.shikiflow.utils.AppSettingsManager
@@ -33,7 +34,7 @@ fun MainScreen(
     appSettingsManager: AppSettingsManager,
     currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    navOptions: MediaNavOptions
+    navOptions: MainScreenNavOptions
 ) {
     val scope = rememberCoroutineScope()
     val topAppBarState = rememberTopAppBarState()
@@ -80,11 +81,11 @@ fun MainScreen(
                     Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                         if (isSearchActive) {
                             SearchPage(onAnimeClick = { animeId ->
-                                navOptions.navigateToAnimeDetails(animeId)
+                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
                             })
                         } else {
                             MainPage(onAnimeClick = { animeId ->
-                                navOptions.navigateToAnimeDetails(animeId)
+                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
                             })
                         }
                     }
@@ -92,7 +93,7 @@ fun MainScreen(
                 MainTrackMode.MANGA -> {
                     MainMangaPage(
                         onMangaClick = { mangaId ->
-                            navOptions.navigateToMangaDetails(mangaId)
+                            navOptions.navigateToDetails(mangaId, MediaType.MANGA)
                         }
                     )
                 }

@@ -13,7 +13,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable
@@ -46,15 +45,13 @@ fun BrowseScreen(
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
                     onMediaNavigate = { id, mediaType ->
-                        if(mediaType == MediaType.ANIME) {
-                            browseNavOptions.navigateToAnimeDetails(id)
-                        } else { browseNavOptions.navigateToMangaDetails(id) }
+                        browseNavOptions.navigateToDetails(id, mediaType)
                     }
                 )
             } else {
                 BrowseMainPage(
                     onNavigate = { id, mediaType ->
-                        browseNavOptions.navigateToAnimeDetails(id)
+                        browseNavOptions.navigateToDetails(id, MediaType.ANIME)
                     },
                     onSideScreenNavigate = { sideScreen ->
                         browseNavOptions.navigateToSideScreen(sideScreen)

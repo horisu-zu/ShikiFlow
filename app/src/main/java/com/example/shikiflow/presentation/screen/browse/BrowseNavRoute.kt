@@ -13,14 +13,5 @@ sealed interface BrowseNavRoute: NavKey {
     data class SideScreen(val browseType: BrowseType): BrowseNavRoute
 
     @Serializable
-    data class AnimeDetails(val id: String) : BrowseNavRoute
-
-    @Serializable
-    data class MangaDetails(val id: String) : BrowseNavRoute
-
-    @Serializable
-    data class CharacterDetails(val characterId: String) : BrowseNavRoute
-
-    @Serializable
-    data class SimilarPage(val id: String, val title: String, val mediaType: MediaType) : BrowseNavRoute
+    data class Details(val mediaId: String, val mediaType: MediaType) : BrowseNavRoute
 }

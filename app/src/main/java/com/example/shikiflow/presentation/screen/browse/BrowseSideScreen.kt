@@ -19,18 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.data.anime.BrowseType
 import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseSideScreen(
     browseType: BrowseType,
-    navOptions: MediaNavOptions,
+    navOptions: BrowseNavOptions,
     onBackNavigate: () -> Unit,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
@@ -65,7 +63,7 @@ fun BrowseSideScreen(
         if (browseType == BrowseType.AnimeBrowseType.ONGOING) {
             OngoingSideScreen(
                 ongoingData = sideScreenData,
-                onNavigate = { id -> navOptions.navigateToAnimeDetails(id) },
+                onNavigate = { id -> navOptions.navigateToDetails(id, MediaType.ANIME) },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                     end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
@@ -74,10 +72,7 @@ fun BrowseSideScreen(
             MainSideScreen(
                 browseData = sideScreenData,
                 onMediaNavigate = { id, mediaType ->
-                    if(mediaType == MediaType.ANIME) {
-                        Log.d("BrowseSideScreen", "Trying to Navigate to Anime with ID: $id")
-                        navOptions.navigateToAnimeDetails(id)
-                    } else { navOptions.navigateToMangaDetails(id) }
+                    navOptions.navigateToDetails(id, mediaType)
                 },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
