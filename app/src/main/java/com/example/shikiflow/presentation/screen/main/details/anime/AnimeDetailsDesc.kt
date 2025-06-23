@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -40,7 +39,7 @@ import com.example.shikiflow.data.common.RelatedInfo
 import com.example.shikiflow.data.mapper.RelatedMapper
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.common.CardItem
-import com.example.shikiflow.presentation.common.FormattedText
+import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -60,9 +59,9 @@ fun AnimeDetailsDesc(
     ConstraintLayout(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef, similarRef) = createRefs()
+        val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef) = createRefs()
 
-        FormattedText(
+        ExpandableText(
             descriptionHtml = animeDetails?.descriptionHtml ?: "No Description",
             modifier = Modifier.constrainAs(descRef) {
                 top.linkTo(parent.top)
@@ -145,6 +144,7 @@ fun AnimeDetailsDesc(
             AnimeDetailsInfo(
                 animeDetails = it,
                 onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
+                onEntityClick = onEntityClick,
                 modifier = Modifier.constrainAs(additionalRef) {
                     top.linkTo(screenshotsRef.bottom, margin = 12.dp)
                     start.linkTo(parent.start)

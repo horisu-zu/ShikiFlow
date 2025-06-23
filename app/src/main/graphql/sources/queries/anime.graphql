@@ -6,7 +6,6 @@ query AnimeDetails(
         malId
         name
         russian
-        licenseNameRu
         english
         japanese
         synonyms
@@ -59,7 +58,6 @@ query AnimeDetails(
         scoresStats { score count }
         statusesStats { status count }
 
-        description
         descriptionHtml
 
         userRate {
@@ -70,6 +68,11 @@ query AnimeDetails(
             score
             createdAt
             updatedAt
+        }
+
+        topic {
+            id
+            commentsCount
         }
     }
 }

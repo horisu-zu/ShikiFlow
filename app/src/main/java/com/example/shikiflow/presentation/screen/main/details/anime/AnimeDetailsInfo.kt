@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,7 +24,9 @@ import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToStr
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.Graph
 import com.example.shikiflow.presentation.common.GraphGridType
+import com.example.shikiflow.presentation.screen.main.details.common.CommentSection
 import com.example.shikiflow.presentation.screen.more.GeneralItem
+import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
 import kotlinx.datetime.Instant
@@ -37,10 +38,11 @@ import kotlinx.datetime.atStartOfDayIn
 fun AnimeDetailsInfo(
     animeDetails: AnimeDetailsQuery.Anime,
     onSimilarClick: (String, String) -> Unit,
+    onEntityClick: (Converter.EntityType, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         DetailRow(
@@ -211,6 +213,11 @@ fun AnimeDetailsInfo(
                 modifier = Modifier.fillMaxWidth(),
                 height = 180.dp
             )
+        }
+
+        animeDetails.topic?.id?.let { topicId ->
+            HorizontalDivider()
+            CommentSection(topicId = topicId, onEntityClick = onEntityClick)
         }
     }
 }

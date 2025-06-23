@@ -294,7 +294,7 @@ object Converter {
         return elements
     }
 
-    fun parseInnerHtml(html: String, linkColor: Color): AnnotatedString {
+    private fun parseInnerHtml(html: String, linkColor: Color): AnnotatedString {
         if (html.isBlank()) return AnnotatedString("")
 
         val doc = Ksoup.parseBodyFragment(html)

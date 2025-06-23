@@ -112,7 +112,7 @@ fun DetailsNavigator(
                     mediaId = route.id,
                     mediaType = route.mediaType,
                     navOptions = options,
-                    similarMediaViewModel = hiltViewModel(key = "${source}_${route.id}")
+                    similarMediaViewModel = hiltViewModel(key = "similar_${route.id}")
                 )
             }
         }

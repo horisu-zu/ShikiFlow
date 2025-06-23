@@ -17,12 +17,14 @@ class AnimeDetailsViewModel @Inject constructor(
     private val animeRepository: AnimeRepository
 ) : ViewModel() {
 
+    private var currentId: String? = null
+
     private val _animeDetails = MutableStateFlow<Resource<AnimeDetailsQuery.Anime>>(Resource.Loading())
     val animeDetails = _animeDetails.asStateFlow()
 
     fun getAnimeDetails(id: String, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if (!isRefresh) {
+            if (!isRefresh && currentId != id) {
                 _animeDetails.value = Resource.Loading()
             }
 
@@ -31,6 +33,7 @@ class AnimeDetailsViewModel @Inject constructor(
                 _animeDetails.value = when {
                     result.isSuccess -> {
                         Log.d("AnimeDetailsViewModel", "User Rate: ${result.getOrNull()?.userRate}")
+                        currentId = id
                         Resource.Success(result.getOrNull())
                     }
                     result.isFailure -> Resource.Error(result.exceptionOrNull()?.message ?: "Unknown error")

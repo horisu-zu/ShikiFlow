@@ -41,7 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.anime.toBrowseAnime
 import com.example.shikiflow.data.anime.toBrowseManga
-import com.example.shikiflow.presentation.common.FormattedText
+import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
@@ -128,11 +128,9 @@ fun CharacterDetailsScreen(
                         japaneseName = characterDetails?.japanese
                     )
                     characterDetails?.descriptionHtml?.let { description ->
-                        FormattedText(
+                        ExpandableText(
                             descriptionHtml = description,
                             style = MaterialTheme.typography.bodySmall,
-                            linkColor = MaterialTheme.colorScheme.primary,
-                            brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
                             collapsedMaxLines = 3,
                             onEntityClick = { entityType, id ->
                                 when(entityType) {

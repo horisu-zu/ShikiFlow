@@ -60,6 +60,12 @@ query MangaDetails(
             createdAt
             updatedAt
         }
+
+        topic {
+            id
+            commentsCount
+            title
+        }
     }
 }
 

@@ -17,12 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.data.anime.Browse
-import com.example.shikiflow.presentation.screen.MainNavRoute
-import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.utils.Converter.formatDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime

@@ -12,6 +12,7 @@ import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
 import com.example.shikiflow.di.api.AnimeApi
 import com.example.shikiflow.di.api.CharacterApi
+import com.example.shikiflow.di.api.CommentApi
 import com.example.shikiflow.di.api.GithubApi
 import com.example.shikiflow.di.api.MangaApi
 import com.example.shikiflow.di.api.UserApi
@@ -145,5 +146,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideMangaApi(@MainRetrofit retrofit: Retrofit): MangaApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideCommentApi(@MainRetrofit retrofit: Retrofit): CommentApi =
         retrofit.create()
 }

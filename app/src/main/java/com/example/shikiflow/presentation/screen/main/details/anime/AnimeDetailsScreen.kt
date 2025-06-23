@@ -20,7 +20,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,7 +56,6 @@ fun AnimeDetailsScreen(
     val animeDetails = animeDetailsViewModel.animeDetails.collectAsState()
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
-    val isInitialized = rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
@@ -70,11 +68,7 @@ fun AnimeDetailsScreen(
     }
 
     LaunchedEffect(id) {
-        if(!isInitialized.value) {
-            Log.d("Details Screen", "Loading Anime ID: $id")
-            animeDetailsViewModel.getAnimeDetails(id)
-            isInitialized.value = true
-        }
+        animeDetailsViewModel.getAnimeDetails(id)
     }
 
     Scaffold(
@@ -86,6 +80,7 @@ fun AnimeDetailsScreen(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
+                    Log.d("Details Screen", "Loading Anime ID: $id")
                     CircularProgressIndicator()
                 }
             }

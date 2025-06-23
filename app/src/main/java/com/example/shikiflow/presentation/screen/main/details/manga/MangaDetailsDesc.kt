@@ -20,7 +20,7 @@ import com.example.graphql.MangaDetailsQuery
 import com.example.shikiflow.data.mapper.RelatedMapper
 import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.presentation.common.FormattedText
+import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
@@ -41,7 +41,7 @@ fun MangaDetailsDesc(
     ) {
         val (descRef, charactersRef, listRef ,relatedRef) = createRefs()
 
-        FormattedText(
+        ExpandableText(
             descriptionHtml = mangaDetails?.descriptionHtml ?: "No Description",
             modifier = Modifier.constrainAs(descRef) {
                 top.linkTo(parent.top)
