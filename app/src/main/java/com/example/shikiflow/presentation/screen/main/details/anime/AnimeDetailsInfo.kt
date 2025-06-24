@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -38,6 +40,7 @@ import kotlinx.datetime.atStartOfDayIn
 fun AnimeDetailsInfo(
     animeDetails: AnimeDetailsQuery.Anime,
     onSimilarClick: (String, String) -> Unit,
+    onLinksClick: (String) -> Unit,
     onEntityClick: (Converter.EntityType, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -169,8 +172,8 @@ fun AnimeDetailsInfo(
 
         HorizontalDivider()
         Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
         ) {
             GeneralItem(
@@ -178,7 +181,13 @@ fun AnimeDetailsInfo(
                 title = "Similar",
                 onClick = { onSimilarClick(animeDetails.id, animeDetails.name) }
             )
+            GeneralItem(
+                icon = IconResource.Drawable(resId = R.drawable.ic_link),
+                title = "Links",
+                onClick = { onLinksClick(animeDetails.id) }
+            )
         }
+        HorizontalDivider()
 
         if(animeDetails.status != AnimeStatusEnum.anons) {
             Column(

@@ -16,4 +16,7 @@ sealed interface DetailsNavRoute : NavKey {
 
     @Serializable
     data class SimilarPage(val id: String, val title: String, val mediaType: MediaType) : DetailsNavRoute
+
+    @Serializable
+    data class ExternalLinks(val mediaId: String, val mediaType: MediaType) : DetailsNavRoute
 }

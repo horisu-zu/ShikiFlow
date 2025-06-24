@@ -50,6 +50,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime?,
     onSimilarClick: (String, String) -> Unit,
+    onLinksClick: (String) -> Unit,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     modifier: Modifier = Modifier
@@ -144,6 +145,7 @@ fun AnimeDetailsDesc(
             AnimeDetailsInfo(
                 animeDetails = it,
                 onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
+                onLinksClick = onLinksClick,
                 onEntityClick = onEntityClick,
                 modifier = Modifier.constrainAs(additionalRef) {
                     top.linkTo(screenshotsRef.bottom, margin = 12.dp)

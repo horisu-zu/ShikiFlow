@@ -1,6 +1,14 @@
 package com.example.shikiflow.presentation.screen
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -94,6 +102,27 @@ fun MainNavigator(
                 entry<MainNavRoute.More> {
                     MoreScreenNavigator(currentUser = currentUser.data)
                 }
+            },
+            transitionSpec = {
+                slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(300)
+                ) + fadeIn(
+                    initialAlpha = 0.1f,
+                    animationSpec = tween(500)
+                ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+            },
+            popTransitionSpec = {
+                EnterTransition.None togetherWith slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(300)
+                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(500))
+            },
+            predictivePopTransitionSpec = {
+                EnterTransition.None togetherWith slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = tween(300)
+                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(500))
             }
         )
     }

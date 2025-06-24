@@ -16,6 +16,7 @@ import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 
 @Composable
@@ -46,6 +47,10 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.SimilarPage(id, title, mediaType))
         }
 
+        override fun navigateToLinksPage(id: String, mediaType: MediaType) {
+            detailsBackstack.add(DetailsNavRoute.ExternalLinks(mediaId, mediaType))
+        }
+
         override fun navigateBack() {
             detailsBackstack.removeLastOrNull()
         }
@@ -55,14 +60,7 @@ fun DetailsNavigator(
         backStack = detailsBackstack,
         onBack = { detailsBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<DetailsNavRoute.AnimeDetails>(
-                metadata = NavDisplay.transitionSpec {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                }
-            ) { route ->
+            entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
                     id = route.id,
                     currentUser = currentUserData,
@@ -70,14 +68,7 @@ fun DetailsNavigator(
                     animeDetailsViewModel = hiltViewModel(key = "${source}_${route.id}")
                 )
             }
-            entry<DetailsNavRoute.MangaDetails>(
-                metadata = NavDisplay.transitionSpec {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                }
-            ) { route ->
+            entry<DetailsNavRoute.MangaDetails> { route ->
                 MangaDetailsScreen(
                     id = route.id,
                     navOptions = options,
@@ -85,28 +76,14 @@ fun DetailsNavigator(
                     mangaDetailsViewModel = hiltViewModel(key = "${source}_${route.id}")
                 )
             }
-            entry<DetailsNavRoute.CharacterDetails>(
-                metadata = NavDisplay.transitionSpec {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                }
-            ) { route ->
+            entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
                     navOptions = options,
                     characterDetailsViewModel = hiltViewModel(key = "${source}_${route.characterId}")
                 )
             }
-            entry<DetailsNavRoute.SimilarPage>(
-                metadata = NavDisplay.transitionSpec {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                }
-            ) { route ->
+            entry<DetailsNavRoute.SimilarPage> { route ->
                 SimilarMediaScreen(
                     mediaTitle = route.title,
                     mediaId = route.id,
@@ -115,6 +92,20 @@ fun DetailsNavigator(
                     similarMediaViewModel = hiltViewModel(key = "similar_${route.id}")
                 )
             }
+            entry<DetailsNavRoute.ExternalLinks> { route ->
+                ExternalLinksScreen(
+                    mediaId = route.mediaId,
+                    mediaType = route.mediaType,
+                    navOptions = options,
+                    externalLinksViewModel = hiltViewModel(key = "links_${route.mediaId}")
+                )
+            }
+        },
+        transitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(300)
+            ) togetherWith ExitTransition.KeepUntilTransitionsFinished
         }
     )
 }

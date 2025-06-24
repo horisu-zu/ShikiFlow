@@ -13,6 +13,7 @@ import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.anime.ShikiManga
 import com.example.shikiflow.data.anime.ShortMangaTracksResponse
 import com.example.shikiflow.data.anime.toGraphQLValue
+import com.example.shikiflow.data.common.ExternalLink
 import com.example.shikiflow.di.api.MangaApi
 import javax.inject.Inject
 
@@ -122,4 +123,6 @@ class MangaRepository @Inject constructor(
             emptyList()
         }
     }
+
+    suspend fun getExternalLinks(id: String): List<ExternalLink> = mangaApi.getExternalLinks(id)
 }
