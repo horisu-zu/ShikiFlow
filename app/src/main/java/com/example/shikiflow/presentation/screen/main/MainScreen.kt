@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
@@ -21,6 +22,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.main.mangatrack.MainMangaPage
@@ -33,7 +35,7 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     appSettingsManager: AppSettingsManager,
     currentUser: CurrentUserQuery.Data?,
-    searchViewModel: SearchViewModel = hiltViewModel(),
+    searchViewModel: SearchViewModel = hiltViewModel(key = "main_search"),
     navOptions: MainScreenNavOptions
 ) {
     val scope = rememberCoroutineScope()
@@ -78,15 +80,19 @@ fun MainScreen(
         ) {
             when(currentTrackMode) {
                 MainTrackMode.ANIME -> {
+                    val pagerState = rememberPagerState { UserRateStatusConstants.getStatusChips(MediaType.ANIME).size }
                     Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                         if (isSearchActive) {
                             SearchPage(onAnimeClick = { animeId ->
                                 navOptions.navigateToDetails(animeId, MediaType.ANIME)
                             })
                         } else {
-                            MainPage(onAnimeClick = { animeId ->
-                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
-                            })
+                            MainPage(
+                                pagerState = pagerState,
+                                onAnimeClick = { animeId ->
+                                    navOptions.navigateToDetails(animeId, MediaType.ANIME)
+                                }
+                            )
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package com.example.shikiflow.di.api
+package com.example.shikiflow.data.api
 
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.auth.TokenResponse

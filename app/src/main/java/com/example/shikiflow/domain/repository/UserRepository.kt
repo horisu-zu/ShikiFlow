@@ -10,7 +10,7 @@ import com.example.shikiflow.data.user.UserHistoryResponse
 import com.example.shikiflow.data.tracks.UserRate
 import com.example.shikiflow.data.tracks.UserRateRequest
 import com.example.shikiflow.data.tracks.UserRateResponse
-import com.example.shikiflow.di.api.UserApi
+import com.example.shikiflow.data.api.UserApi
 import javax.inject.Inject
 
 class UserRepository @Inject constructor(

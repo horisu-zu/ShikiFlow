@@ -3,7 +3,7 @@ package com.example.shikiflow.domain.repository
 import android.util.Log
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.auth.TokenResponse
-import com.example.shikiflow.di.api.ShikimoriAuthApi
+import com.example.shikiflow.data.api.ShikimoriAuthApi
 import com.example.shikiflow.domain.auth.TokenManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged

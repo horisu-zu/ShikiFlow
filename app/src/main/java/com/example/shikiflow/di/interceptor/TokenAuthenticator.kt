@@ -1,7 +1,7 @@
 package com.example.shikiflow.di.interceptor
 
 import android.util.Log
-import com.example.shikiflow.di.api.ShikimoriAuthApi
+import com.example.shikiflow.data.api.ShikimoriAuthApi
 import com.example.shikiflow.domain.auth.TokenManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull

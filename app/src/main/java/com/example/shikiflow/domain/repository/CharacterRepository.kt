@@ -2,7 +2,7 @@ package com.example.shikiflow.domain.repository
 
 import android.util.Log
 import com.example.shikiflow.data.character.ShikiCharacter
-import com.example.shikiflow.di.api.CharacterApi
+import com.example.shikiflow.data.api.CharacterApi
 import javax.inject.Inject
 
 class CharacterRepository @Inject constructor(

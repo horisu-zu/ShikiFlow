@@ -13,7 +13,7 @@ import com.example.shikiflow.data.anime.MyListString
 import com.example.shikiflow.data.anime.SimilarAnime
 import com.example.shikiflow.data.anime.toGraphQLValue
 import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.di.api.AnimeApi
+import com.example.shikiflow.data.api.AnimeApi
 import javax.inject.Inject
 
 class AnimeRepository @Inject constructor(

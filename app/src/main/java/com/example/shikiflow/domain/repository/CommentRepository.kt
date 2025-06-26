@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.repository
 
 import com.example.shikiflow.data.common.comment.CommentItem
-import com.example.shikiflow.di.api.CommentApi
+import com.example.shikiflow.data.api.CommentApi
 import javax.inject.Inject
 
 class CommentRepository @Inject constructor(

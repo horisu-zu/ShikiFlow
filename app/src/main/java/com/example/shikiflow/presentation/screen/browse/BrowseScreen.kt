@@ -17,7 +17,7 @@ import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable
 fun BrowseScreen(
-    searchViewModel: SearchViewModel = hiltViewModel(),
+    searchViewModel: SearchViewModel = hiltViewModel(key = "browse_search"),
     browseNavOptions: BrowseNavOptions
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()

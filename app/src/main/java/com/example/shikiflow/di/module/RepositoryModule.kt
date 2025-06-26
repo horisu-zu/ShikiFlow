@@ -1,6 +1,6 @@
 package com.example.shikiflow.di.module
 
-import com.example.shikiflow.di.api.ShikimoriAuthApi
+import com.example.shikiflow.data.api.ShikimoriAuthApi
 import com.example.shikiflow.domain.auth.TokenManager
 import com.example.shikiflow.domain.repository.AuthRepository
 import dagger.Module

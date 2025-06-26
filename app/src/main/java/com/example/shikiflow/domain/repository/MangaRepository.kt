@@ -14,7 +14,7 @@ import com.example.shikiflow.data.anime.ShikiManga
 import com.example.shikiflow.data.anime.ShortMangaTracksResponse
 import com.example.shikiflow.data.anime.toGraphQLValue
 import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.di.api.MangaApi
+import com.example.shikiflow.data.api.MangaApi
 import javax.inject.Inject
 
 class MangaRepository @Inject constructor(
