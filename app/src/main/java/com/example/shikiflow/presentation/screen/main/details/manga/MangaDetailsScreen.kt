@@ -19,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +55,6 @@ fun MangaDetailsScreen(
     val mangaDetails = mangaDetailsViewModel.mangaDetails.collectAsState()
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
-    val isInitialized = rememberSaveable { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
     val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
@@ -69,10 +67,7 @@ fun MangaDetailsScreen(
     }
 
     LaunchedEffect(id) {
-        if(!isInitialized.value) {
-            mangaDetailsViewModel.getMangaDetails(id)
-            isInitialized.value = true
-        }
+        mangaDetailsViewModel.getMangaDetails(id)
     }
 
     Scaffold(
@@ -83,9 +78,7 @@ fun MangaDetailsScreen(
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+                ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
                 PullToRefreshBox(
@@ -115,6 +108,9 @@ fun MangaDetailsScreen(
                         MangaDetailsHeader(
                             mangaDetails = mangaDetails.value.data,
                             onStatusClick = { rateBottomSheet = true },
+                            onMangaDexClick = { mangaTitle ->
+                                //MangaDex Page or BottomSheet with Chapters List
+                            },
                             modifier = Modifier.constrainAs(headerRef) {
                                 top.linkTo(parent.top)
                                 start.linkTo(parent.start)

@@ -9,6 +9,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import com.example.graphql.type.AnimeRatingEnum
+import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.mapper.UserRateStatusConstants.getStatusOrder
@@ -139,6 +140,11 @@ object Converter {
             "rereading" -> "Rereading"
             else -> "Unknown"
         }
+    }
+
+    fun MangaKindEnum.isManga(): Boolean {
+        return this in setOf(MangaKindEnum.manga, MangaKindEnum.manhwa,
+            MangaKindEnum.manhua, MangaKindEnum.one_shot, MangaKindEnum.doujin)
     }
 
     fun convertRatingToString(rating: AnimeRatingEnum?): String {

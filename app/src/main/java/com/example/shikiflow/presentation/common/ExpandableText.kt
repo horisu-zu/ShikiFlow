@@ -11,6 +11,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,7 +22,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -33,11 +33,14 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.Converter.DescriptionElement
@@ -56,9 +59,7 @@ fun ExpandableText(
     brushColor: Color = MaterialTheme.colorScheme.background.copy(0.8f)
 ) {
     var isExpanded by remember { mutableStateOf(false) }
-    var lineCount by remember { mutableIntStateOf(0) }
     val lineHeight = style.fontSize * 1.75f
-    val shouldShowButton = lineCount >= collapsedMaxLines
 
     val elements = remember(descriptionHtml) {
         parseDescriptionHtml(descriptionHtml, linkColor)
@@ -78,7 +79,7 @@ fun ExpandableText(
                         lineHeight = lineHeight,
                         brushColor = brushColor,
                         isExpanded = isExpanded,
-                        onLineCountChange = { lineCount = it },
+                        onExpandToggle = { isExpanded = !isExpanded },
                         onEntityClick = { entityType, id ->
                             Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
                             onEntityClick(entityType, id)
@@ -104,24 +105,6 @@ fun ExpandableText(
                 }
             }
         }
-
-        if(shouldShowButton) {
-            Text(
-                text = if (isExpanded) "Collapse" else "Expand",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null
-                    ) {
-                        isExpanded = !isExpanded
-                    }
-            )
-        }
     }
 }
 
@@ -133,70 +116,111 @@ private fun AnnotatedText(
     lineHeight: TextUnit,
     brushColor: Color,
     isExpanded: Boolean,
-    onLineCountChange: (Int) -> Unit,
+    onExpandToggle: () -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-    var lineCount by remember { mutableIntStateOf(0) }
+    val textMeasurer = rememberTextMeasurer()
+    val density = LocalDensity.current
 
-    Text(
-        text = text,
-        style = style.copy(lineHeight = lineHeight),
-        modifier = Modifier
-            .pointerInput(Unit) {
-                detectTapGestures { offset ->
-                    layoutResult.value?.let { result ->
-                        val position = result.getOffsetForPosition(offset)
-                        for(entityType in EntityType.entries) {
-                            text.getStringAnnotations(entityType.name, position, position)
-                                .firstOrNull()?.let { annotation ->
-                                    Log.d("Formatted Text", "Clicked on entity: ${annotation.item}")
-                                    onEntityClick(entityType, annotation.item)
-                                    return@detectTapGestures
-                                }
-                        }
+    BoxWithConstraints {
+        val maxWidthPx = with(density) { maxWidth.roundToPx() }
 
-                        text.getStringAnnotations("URL_LINK", position, position)
-                            .firstOrNull()?.let { annotation ->
-                                try {
-                                    Log.d("Formatted Text", "Clicked on URL: ${annotation.item}")
-                                    uriHandler.openUri(annotation.item)
-                                } catch (e: Exception) {
-                                    Log.e("Formatted Text", "Error opening URL: ${annotation.item}", e)
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("Can't open link")
-                                    }
-                                }
-                            }
-                    }
-                }
-            }
-            .drawWithContent {
-                drawContent()
-                if (!isExpanded && lineCount >= collapsedMaxLines) {
-                    drawRect(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, brushColor)
-                        )
-                    )
-                }
-            }
-            .animateContentSize(
-                animationSpec = tween(
-                    durationMillis = 300,
-                    easing = FastOutSlowInEasing
-                )
-            ),
-        maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
-        onTextLayout = { result ->
-            layoutResult.value = result
-            lineCount = result.lineCount
-            onLineCountChange(lineCount)
+        val fullLineCount = remember(text, style, lineHeight) {
+            val measuredText = textMeasurer.measure(
+                text = text,
+                style = style.copy(lineHeight = lineHeight),
+                constraints = Constraints(maxWidth = maxWidthPx)
+            )
+            measuredText.lineCount
         }
-    )
+
+        val shouldShowButton = fullLineCount > collapsedMaxLines
+
+        Column {
+            Text(
+                text = text,
+                style = style.copy(lineHeight = lineHeight),
+                modifier = Modifier
+                    .pointerInput(Unit) {
+                        detectTapGestures { offset ->
+                            layoutResult.value?.let { result ->
+                                val position = result.getOffsetForPosition(offset)
+                                for (entityType in EntityType.entries) {
+                                    text.getStringAnnotations(entityType.name, position, position)
+                                        .firstOrNull()?.let { annotation ->
+                                            Log.d(
+                                                "Formatted Text",
+                                                "Clicked on entity: ${annotation.item}"
+                                            )
+                                            onEntityClick(entityType, annotation.item)
+                                            return@detectTapGestures
+                                        }
+                                }
+
+                                text.getStringAnnotations("URL_LINK", position, position)
+                                    .firstOrNull()?.let { annotation ->
+                                        try {
+                                            Log.d(
+                                                "Formatted Text",
+                                                "Clicked on URL: ${annotation.item}"
+                                            )
+                                            uriHandler.openUri(annotation.item)
+                                        } catch (e: Exception) {
+                                            Log.e(
+                                                "Formatted Text",
+                                                "Error opening URL: ${annotation.item}",
+                                                e
+                                            )
+                                            scope.launch {
+                                                snackbarHostState.showSnackbar("Can't open link")
+                                            }
+                                        }
+                                    }
+                            }
+                        }
+                    }
+                    .drawWithContent {
+                        drawContent()
+                        if (!isExpanded && shouldShowButton) {
+                            drawRect(
+                                brush = Brush.verticalGradient(
+                                    colors = listOf(Color.Transparent, brushColor)
+                                )
+                            )
+                        }
+                    }
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = FastOutSlowInEasing
+                        )
+                    ),
+                maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
+                onTextLayout = { result ->
+                    layoutResult.value = result
+                }
+            )
+            if (shouldShowButton) {
+                Text(
+                    text = if (isExpanded) "Collapse" else "Expand",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { onExpandToggle() }
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -229,9 +253,7 @@ private fun SpoilerElement(
             modifier = Modifier.clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = null,
-                onClick = {
-                    expanded = !expanded
-                }
+                onClick = { expanded = !expanded }
             )
         )
         if (expanded) {
@@ -242,7 +264,7 @@ private fun SpoilerElement(
                 lineHeight = lineHeight,
                 brushColor = brushColor,
                 isExpanded = expanded,
-                onLineCountChange = { /**/ },
+                onExpandToggle = { /**/ },
                 onEntityClick = { entityType, id ->
                     Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
                     onEntityClick(entityType, id)

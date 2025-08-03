@@ -93,7 +93,7 @@ fun AnimeDetailsQuery.UserRate.toUiModel(media: AnimeDetailsQuery.Anime?) = User
     posterUrl = media?.poster?.originalUrl,
     createDate = createdAt.toString().toInstant(),
     updateDate = updatedAt.toString().toInstant(),
-    totalEpisodes = media?.episodes,
+    totalEpisodes = media?.episodesAired,
     totalChapters = null
 )
 

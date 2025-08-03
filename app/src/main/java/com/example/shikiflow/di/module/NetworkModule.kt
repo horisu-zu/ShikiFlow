@@ -15,7 +15,9 @@ import com.example.shikiflow.data.api.CharacterApi
 import com.example.shikiflow.data.api.CommentApi
 import com.example.shikiflow.data.api.GithubApi
 import com.example.shikiflow.data.api.MangaApi
+import com.example.shikiflow.data.api.MangaDexApi
 import com.example.shikiflow.data.api.UserApi
+import com.example.shikiflow.di.annotations.MangaDexRetrofit
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
 import com.example.shikiflow.domain.auth.TokenManager
@@ -74,6 +76,20 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @MangaDexRetrofit
+    fun provideMangaDexRetrofit(
+        @MainOkHttpClient okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.MANGADEX_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
@@ -151,5 +167,10 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideCommentApi(@MainRetrofit retrofit: Retrofit): CommentApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideMangaDexApi(@MangaDexRetrofit retrofit: Retrofit): MangaDexApi =
         retrofit.create()
 }

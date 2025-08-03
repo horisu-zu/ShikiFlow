@@ -1,11 +1,9 @@
 package com.example.shikiflow.utils
 
 import android.content.Context
-import android.content.Intent
 import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-
 
 object WebIntent {
     fun openUrlCustomTab(context: Context, url: String) {
@@ -19,9 +17,9 @@ object WebIntent {
         }
     }
 
-    fun openUrlIntent(context: Context, url: String) {
+    /*fun openUrlIntent(context: Context, url: String) {
         val intent = Intent(Intent.ACTION_VIEW, url.toUri())
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(intent)
-    }
+    }*/
 }
