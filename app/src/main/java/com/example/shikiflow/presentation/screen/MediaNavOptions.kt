@@ -8,4 +8,5 @@ interface MediaNavOptions: MainNavOptions {
     fun navigateToMangaDetails(mangaId: String)
     fun navigateToSimilarPage(id: String, title: String, mediaType: MediaType)
     fun navigateToLinksPage(id: String, mediaType: MediaType)
+    fun navigateToMangaRead(mangaDexId: String, title: String, completedChapters: Int)
 }

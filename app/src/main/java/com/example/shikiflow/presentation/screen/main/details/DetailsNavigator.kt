@@ -18,6 +18,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetails
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.manga.read.MangaReadNavigator
 
 @Composable
 fun DetailsNavigator(
@@ -49,6 +50,10 @@ fun DetailsNavigator(
 
         override fun navigateToLinksPage(id: String, mediaType: MediaType) {
             detailsBackstack.add(DetailsNavRoute.ExternalLinks(mediaId, mediaType))
+        }
+
+        override fun navigateToMangaRead(mangaDexId: String, title: String, completedChapters: Int) {
+            detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexId, title, completedChapters))
         }
 
         override fun navigateBack() {
@@ -98,6 +103,14 @@ fun DetailsNavigator(
                     mediaType = route.mediaType,
                     navOptions = options,
                     externalLinksViewModel = hiltViewModel(key = "links_${route.mediaId}")
+                )
+            }
+            entry<DetailsNavRoute.MangaRead> { route ->
+                MangaReadNavigator(
+                    mangaDexId = route.mangaDexId,
+                    title = route.title,
+                    completedChapters = route.completedChapters,
+                    mangaReadViewModel = hiltViewModel(key = "read_${route.mangaDexId}")
                 )
             }
         },

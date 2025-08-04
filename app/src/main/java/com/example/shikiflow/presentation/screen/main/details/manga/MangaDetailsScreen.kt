@@ -53,6 +53,8 @@ fun MangaDetailsScreen(
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val mangaDetails = mangaDetailsViewModel.mangaDetails.collectAsState()
+    val mangaDexId = mangaDetailsViewModel.mangaDexId.collectAsState().value
+
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -108,8 +110,15 @@ fun MangaDetailsScreen(
                         MangaDetailsHeader(
                             mangaDetails = mangaDetails.value.data,
                             onStatusClick = { rateBottomSheet = true },
-                            onMangaDexClick = { mangaTitle ->
-                                //MangaDex Page or BottomSheet with Chapters List
+                            onMangaDexClick = { title ->
+                                if(mangaDexId is Resource.Success) {
+                                    navOptions.navigateToMangaRead(
+                                        mangaDexId = mangaDexId.data ?: "",
+                                        title = title,
+                                        completedChapters = mangaDetails.value.data
+                                            ?.userRate?.chapters ?: 0
+                                    )
+                                }
                             },
                             modifier = Modifier.constrainAs(headerRef) {
                                 top.linkTo(parent.top)
