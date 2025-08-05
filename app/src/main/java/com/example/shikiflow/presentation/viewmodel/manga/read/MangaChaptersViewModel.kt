@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.viewmodel.manga
+package com.example.shikiflow.presentation.viewmodel.manga.read
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
@@ -12,11 +12,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MangaReadViewModel @Inject constructor(
+class MangaChaptersViewModel @Inject constructor(
     private val aggregateMangaUseCase: AggregateMangaUseCase
 ): ViewModel() {
 
-    private val _mangaChapters = MutableStateFlow<Resource<Map<String, List<String>>>>(Resource.Loading())
+    private val _mangaChapters =
+        MutableStateFlow<Resource<Map<String, List<String>>>>(Resource.Loading())
     val mangaChapters = _mangaChapters.asStateFlow()
 
     fun getMangaChapters(mangaDexId: String) {

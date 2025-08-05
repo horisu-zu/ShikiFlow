@@ -1,6 +1,5 @@
 package com.example.shikiflow.domain.usecase
 
-import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.utils.Resource
@@ -19,10 +18,11 @@ class AggregateMangaUseCase @Inject constructor(
                 .flatMap { it.chapters.values }
                 .groupBy { it.chapter }
                 .mapValues { (_ , chapters) ->
-                    chapters.map { it.id }
+                    chapters.flatMap { chapter ->
+                        listOf(chapter.id) + chapter.others
+                    }
                 }
 
-            Log.d("AggregateMangaUseCase", "Count of Chapters: ${chaptersMap.size}")
             emit(Resource.Success(chaptersMap))
         } catch (e: HttpException) {
             emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))

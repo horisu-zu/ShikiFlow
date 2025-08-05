@@ -6,14 +6,15 @@ import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.presentation.viewmodel.manga.MangaReadViewModel
+import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
 
 @Composable
 fun MangaReadNavigator(
     mangaDexId: String,
     title: String,
     completedChapters: Int,
-    mangaReadViewModel: MangaReadViewModel = hiltViewModel()
+    onNavigateBack: () -> Unit,
+    mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
 ) {
     val mangaReadBackstack = rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
         mangaDexId = mangaDexId,
@@ -22,6 +23,12 @@ fun MangaReadNavigator(
     ))
 
     val navOptions = object : MangaReadNavOptions {
+        override fun navigateToChapterTranslations(chapterTranslationIds: List<String>, chapterNumber: String) {
+            mangaReadBackstack.add(MangaReadNavRoute.ChapterTranslationsScreen(
+                chapterTranslationIds, title, chapterNumber
+            ))
+        }
+
         override fun navigateBack() {
             mangaReadBackstack.removeLastOrNull()
         }
@@ -37,10 +44,18 @@ fun MangaReadNavigator(
                     title = route.title,
                     completedChapters = route.completedChapters,
                     navOptions = navOptions,
-                    mangaReadViewModel = mangaReadViewModel
+                    onNavigateBack = onNavigateBack,
+                    mangaChaptersViewModel = mangaChaptersViewModel
                 )
             }
-            // Other Screens
+            entry<MangaReadNavRoute.ChapterTranslationsScreen> { route ->
+                ChapterTranslationsScreen(
+                    chapterTranslationIds = route.chapterTranslationIds,
+                    title = route.title,
+                    chapterNumber = route.chapterNumber,
+                    navOptions = navOptions
+                )
+            }
         }
     )
 }

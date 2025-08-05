@@ -110,7 +110,8 @@ fun DetailsNavigator(
                     mangaDexId = route.mangaDexId,
                     title = route.title,
                     completedChapters = route.completedChapters,
-                    mangaReadViewModel = hiltViewModel(key = "read_${route.mangaDexId}")
+                    onNavigateBack = { options.navigateBack() },
+                    mangaChaptersViewModel = hiltViewModel(key = "read_${route.mangaDexId}")
                 )
             }
         },

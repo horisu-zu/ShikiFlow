@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,15 +10,11 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -43,30 +38,33 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
+import com.example.shikiflow.data.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
+import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MangaChaptersScreen(
-    mangaDexId: String,
+fun ChapterTranslationsScreen(
+    chapterTranslationIds: List<String>,
     title: String,
-    completedChapters: Int,
+    chapterNumber: String,
     navOptions: MangaReadNavOptions,
-    onNavigateBack: () -> Unit,
-    mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
+    chapterTranslationsViewModel: MangaChapterTranslationViewModel = hiltViewModel()
 ) {
-    val mangaChapters = mangaChaptersViewModel.mangaChapters.collectAsState()
+
+    val chapterTranslations = chapterTranslationsViewModel.chapterTranslations.collectAsState()
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
+            lazyListState.firstVisibleItemIndex == 0 &&
+                    lazyListState.firstVisibleItemScrollOffset == 0
         }
     }
 
-    LaunchedEffect(mangaDexId) {
-        mangaChaptersViewModel.getMangaChapters(mangaDexId)
+    LaunchedEffect(chapterTranslationIds) {
+        chapterTranslationsViewModel.getChapterTranslations(chapterTranslationIds)
     }
 
     Scaffold(
@@ -74,17 +72,15 @@ fun MangaChaptersScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = title,
+                        text = "Chapter $chapterNumber — $title",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
-                //Temporarily removed due to navigation issue that lead to crash
                 navigationIcon = {
                     IconButton(
-                        onClick = { onNavigateBack() },
-                        enabled = false
+                        onClick = { navOptions.navigateBack() }
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -99,7 +95,7 @@ fun MangaChaptersScreen(
             )
         }, modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        when(mangaChapters.value) {
+        when(val translations = chapterTranslations.value) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -107,10 +103,6 @@ fun MangaChaptersScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
-                val chapters = mangaChapters.value.data
-                val sortedChapters = chapters?.keys
-                    ?.sortedBy { it.toFloat() } ?: emptyList()
-
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier.fillMaxSize().padding(
@@ -118,61 +110,54 @@ fun MangaChaptersScreen(
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                     ),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(sortedChapters){ chapterNumber ->
-                        ChapterItem(
-                            chapterNumber = chapterNumber,
-                            onChapterClick = {
-                                val chapterIds = chapters?.get(chapterNumber) ?: emptyList()
-                                Log.d("ChapterClick", "Chapter: $chapterNumber, IDs count: ${chapterIds.size}, IDs: $chapterIds")
+                    val translations = translations.data?.sortedBy {
+                        it.attributes.publishAt
+                    } ?: emptyList()
 
-                                navOptions.navigateToChapterTranslations(
-                                    chapterTranslationIds = chapterIds,
-                                    chapterNumber = chapterNumber
-                                )
+                    items(translations.size) { index ->
+                        ChapterTranslationItem(
+                            mangaDexChapter = translations[index],
+                            onTranslationClick = { translationId ->
+                                Log.d("ChapterTranslationsScreen", "Translation clicked: $translationId")
+                                //navOptions.navigateToChapter(translationId)
                             },
-                            isCompleted = (chapterNumber.toFloatOrNull() ?: 0f) <= completedChapters,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            modifier = Modifier.padding(horizontal = 12.dp)
                         )
                     }
                 }
             }
-            is Resource.Error -> { /*TODO*/ }
+            is Resource.Error -> { /**/ }
         }
     }
 }
 
 @Composable
-private fun ChapterItem(
-    chapterNumber: String,
-    onChapterClick: (String) -> Unit,
-    isCompleted: Boolean,
+private fun ChapterTranslationItem(
+    mangaDexChapter: MangaDexChapterMetadata,
+    onTranslationClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-            .clickable { onChapterClick(chapterNumber) }
-            .padding(horizontal = 6.dp, vertical = 12.dp),
+            .clickable { onTranslationClick(mangaDexChapter.id) }
+            .padding(horizontal = 6.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if(isCompleted) {
-            Icon(
-                imageVector = Icons.Default.Check,
-                tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "Completed Chapter",
-                modifier = Modifier.size(24.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.75f))
-                    .padding(4.dp)
-            )
-        }
         Text(
-            text = "Chapter $chapterNumber",
+            text = FlagConverter.getFlag(mangaDexChapter.attributes.translatedLanguage),
+            style = MaterialTheme.typography.titleLarge
+        )
+        Text(
+            text = if(!mangaDexChapter.attributes.title.isNullOrEmpty()) mangaDexChapter.attributes.title
+                else "Ch. ${mangaDexChapter.attributes.chapter}",
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold
-            )
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

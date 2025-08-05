@@ -10,4 +10,8 @@ class MangaDexRepository @Inject constructor(
     suspend fun getMangaList(title: String) = mangaDexApi.getMangaList(title)
 
     suspend fun aggregateManga(mangaId: String) = mangaDexApi.aggregateManga(mangaId)
+
+    suspend fun getChapterMetadata(chapterId: String) = mangaDexApi.getChapterMetadata(chapterId)
+
+    suspend fun getChapter(chapterId: String) = mangaDexApi.getChapter(chapterId)
 }
