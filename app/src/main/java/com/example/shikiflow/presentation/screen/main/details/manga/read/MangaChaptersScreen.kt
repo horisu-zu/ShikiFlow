@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -117,7 +118,7 @@ fun MangaChaptersScreen(
                         top = paddingValues.calculateTopPadding(),
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                    ),
+                    ), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     items(sortedChapters){ chapterNumber ->
@@ -132,8 +133,7 @@ fun MangaChaptersScreen(
                                     chapterNumber = chapterNumber
                                 )
                             },
-                            isCompleted = (chapterNumber.toFloatOrNull() ?: 0f) <= completedChapters,
-                            modifier = Modifier.padding(horizontal = 8.dp)
+                            isCompleted = (chapterNumber.toFloatOrNull() ?: 0f) <= completedChapters
                         )
                     }
                 }

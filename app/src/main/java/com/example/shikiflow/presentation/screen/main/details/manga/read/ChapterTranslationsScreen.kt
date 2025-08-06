@@ -1,9 +1,9 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -109,7 +109,7 @@ fun ChapterTranslationsScreen(
                         top = paddingValues.calculateTopPadding(),
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                    ),
+                    ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     val translations = translations.data?.sortedBy {
@@ -120,10 +120,8 @@ fun ChapterTranslationsScreen(
                         ChapterTranslationItem(
                             mangaDexChapter = translations[index],
                             onTranslationClick = { translationId ->
-                                Log.d("ChapterTranslationsScreen", "Translation clicked: $translationId")
-                                //navOptions.navigateToChapter(translationId)
-                            },
-                            modifier = Modifier.padding(horizontal = 12.dp)
+                                navOptions.navigateToChapter(translationId)
+                            }
                         )
                     }
                 }

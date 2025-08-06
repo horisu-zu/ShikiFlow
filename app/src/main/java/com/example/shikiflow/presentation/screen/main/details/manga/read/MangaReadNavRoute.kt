@@ -19,6 +19,8 @@ sealed interface MangaReadNavRoute : NavKey {
         val chapterNumber: String
     ) : MangaReadNavRoute
 
-    // Chapter Translation Choice Screen
-    // Chapter Reader Screen
+    @Serializable
+    data class ChapterScreen(
+        val mangaDexChapterId: String
+    ) : MangaReadNavRoute
 }
