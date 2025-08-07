@@ -61,13 +61,14 @@ fun MangaTracksPage(
                 modifier = Modifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 items(trackItems.itemCount) { index ->
-                    val mangaItem = trackItems[index]?.toBrowse()!!
-                    BrowseItem(
-                        browseItem = mangaItem,
-                        onItemClick = { id, mediaType ->
-                            onMangaClick(id)
-                        }
-                    )
+                    trackItems[index]?.toBrowse()?.let { mangaItem ->
+                        BrowseItem(
+                            browseItem = mangaItem,
+                            onItemClick = { id, mediaType ->
+                                onMangaClick(id)
+                            }
+                        )
+                    }
                 }
                 trackItems.apply {
                     if(loadState.append is LoadState.Loading) {

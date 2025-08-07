@@ -26,7 +26,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.presentation.common.image.RoundedImage
-import com.example.shikiflow.utils.ThemeMode
+import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
 @Composable
@@ -50,7 +50,7 @@ fun SettingsSection(
                 start.linkTo(parent.start)
                 end.linkTo(parent.end)
                 width = Dimension.fillToConstraints
-            }.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+            }.padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 4.dp),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.secondary,
@@ -93,10 +93,19 @@ fun SettingsSection(
                             showDivider = index != items.lastIndex
                         )
                     }
-                    is SectionItem.Theme -> {
+                    /*is SectionItem.Theme -> {
                         ThemeItem(
                             title = item.title,
                             currentTheme = item.themeMode,
+                            onClick = item.onClick
+                        )
+                    }*/
+                    is SectionItem.Mode -> {
+                        ModeItem(
+                            title = item.title,
+                            entries = item.entries,
+                            iconResources = item.iconResources,
+                            mode = item.mode,
                             onClick = item.onClick
                         )
                     }
@@ -274,7 +283,7 @@ private fun SwitchItem(
             style = MaterialTheme.typography.labelSmall.copy(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
             ),
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
 
@@ -302,6 +311,80 @@ private fun SwitchItem(
     }
 }
 
+@Composable
+private fun <T> ModeItem(
+    title: String,
+    entries: List<T>,
+    iconResources: List<IconResource> = emptyList(),
+    mode: T,
+    onClick: (T) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Text(
+            text = title,
+            modifier = Modifier.fillMaxWidth(),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            entries.forEach { entry ->
+                ModeRowItem(
+                    entry = entry.toString(),
+                    isCurrentMode = mode == entry,
+                    onClick = { onClick(entry) },
+                    modifier = Modifier.weight(1f),
+                    iconResource = iconResources[entries.indexOf(entry)]
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ModeRowItem(
+    entry: String,
+    isCurrentMode: Boolean,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    iconResource: IconResource? = null,
+) {
+    Column(
+        modifier = modifier.clip(RoundedCornerShape(12.dp))
+            .clickable { onClick(entry) }
+            .background(if(isCurrentMode) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.background)
+            .border(
+                width = if(isCurrentMode) 1.dp else 0.dp,
+                color = if(isCurrentMode) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.outline,
+                shape = RoundedCornerShape(12.dp)
+            ).padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        iconResource?.let {
+            iconResource.toIcon(
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.onSurface
+            )
+        }
+        Text(
+            text = entry,
+            style = MaterialTheme.typography.bodyMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
+
+/*
 @Composable
 private fun ThemeItem(
     title: String,
@@ -383,4 +466,4 @@ private fun ThemeRowItem(
             overflow = TextOverflow.Ellipsis
         )
     }
-}
+}*/

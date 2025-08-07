@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -45,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -52,6 +54,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -120,7 +123,7 @@ private fun ChapterScrollComponent(
         }
     }
 
-    LaunchedEffect(lazyListState.isScrollInProgress, isUserInteracting.value) {
+    LaunchedEffect(lazyListState.firstVisibleItemIndex, isUserInteracting.value) {
         if (!isUserInteracting.value) {
             isNavigationVisible.value = true
             delay(2000)
@@ -154,7 +157,7 @@ private fun ChapterScrollComponent(
             exit = fadeOut()
         ) {
             ChapterNavigationComponent(
-                modifier = Modifier.imePadding(),
+                modifier = Modifier.navigationBarsPadding().imePadding(),
                 currentPage = currentPage,
                 pageCount = chapterPageUrls.size,
                 onNavigateClick = { pageNumber ->
@@ -178,9 +181,12 @@ private fun ChapterNavigationComponent(
     onInteractionStart: () -> Unit = {},
     onInteractionEnd: () -> Unit = {}
 ) {
-    var pageInput by remember { mutableStateOf(currentPage.toString()) }
+    var pageInput by remember { mutableStateOf("") }
+    var isEditing by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
     val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
+
+    val displayValue = if (isEditing) pageInput else currentPage.toString()
 
     LaunchedEffect(imeBottom) {
         if (imeBottom == 0) {
@@ -190,7 +196,7 @@ private fun ChapterNavigationComponent(
 
     Row(
         modifier = modifier.wrapContentWidth().clip(RoundedCornerShape(16.dp))
-            .background(Color.Black.copy(alpha = 0.45f)),
+            .background(Color.Black.copy(alpha = 0.75f)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -205,18 +211,45 @@ private fun ChapterNavigationComponent(
             )
         }
         BasicTextField(
-            value = pageInput,
+            value = displayValue,
             onValueChange = { newValue ->
+                if (!isEditing) {
+                    isEditing = true
+                    pageInput = currentPage.toString()
+                }
                 pageInput = newValue.filter { it.isDigit() }
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = Color.White
+                color = Color.White,
+                textAlign = TextAlign.Center
             ),
-            modifier = Modifier.width(32.dp).onFocusChanged {
-                if(it.isFocused) {
+            singleLine = true,
+            modifier = Modifier.width(32.dp).onFocusChanged { focusState ->
+                if (focusState.isFocused) {
                     onInteractionStart()
-                } else onInteractionEnd()
-            },
+                    if (!isEditing) {
+                        isEditing = true
+                        pageInput = currentPage.toString()
+                    }
+                } else {
+                    onInteractionEnd()
+                    if (isEditing) {
+                        pageInput.toIntOrNull()?.let { targetPage ->
+                            if (targetPage in 1..pageCount) {
+                                onNavigateClick(targetPage)
+                            }
+                        }
+                        isEditing = false
+                    }
+                }
+            }, decorationBox = { innerTextField ->
+                Box(
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp))
+                        .background(Color.White.copy(0.25f))
+                        .padding(horizontal = 4.dp),
+                    contentAlignment = Alignment.Center
+                ) { innerTextField() }
+            }
         )
         Text(
             text = "/ $pageCount",
