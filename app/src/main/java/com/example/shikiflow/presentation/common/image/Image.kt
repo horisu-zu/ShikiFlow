@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
@@ -18,10 +20,12 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
+import coil3.request.allowHardware
 import coil3.request.crossfade
 
 @Composable
@@ -155,5 +159,48 @@ fun RoundedImage(
             .clip(clip),
         contentScale = contentScale,
         contentDescription = contentDescription
+    )
+}
+
+@Composable
+fun ChapterItem(
+    pageUrl: String,
+    pageNumber: Int,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Crop,
+) {
+    SubcomposeAsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(pageUrl)
+            .allowHardware(false) // Disabled due to issues with large images
+            .memoryCacheKey(pageUrl)
+            //.diskCacheKey(pageUrl)
+            .listener(
+                onSuccess = { _, result ->
+                    Log.d("Image", "Image successfully loaded: $result")
+                },
+                onError = { _, error ->
+                    Log.d("Image", "Error loading image: $error")
+                }
+            )
+            .crossfade(true)
+            .build(),
+        contentDescription = pageUrl,
+        contentScale = contentScale,
+        modifier = modifier.fillMaxWidth(),
+        loading = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                contentAlignment = Alignment.Center
+            ) { Text(
+                text = pageNumber.toString(),
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+                )
+            ) }
+        }
     )
 }

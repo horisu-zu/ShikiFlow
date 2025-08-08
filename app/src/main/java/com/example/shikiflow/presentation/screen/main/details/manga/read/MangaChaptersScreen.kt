@@ -81,11 +81,9 @@ fun MangaChaptersScreen(
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
-                //Temporarily removed due to navigation issue that lead to crash
                 navigationIcon = {
                     IconButton(
-                        onClick = { onNavigateBack() },
-                        enabled = false
+                        onClick = { onNavigateBack() }
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,

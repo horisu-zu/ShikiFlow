@@ -2,6 +2,7 @@ package com.example.shikiflow.di.module
 
 import android.content.Context
 import coil3.ImageLoader
+import coil3.memory.MemoryCache
 import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.network.okHttpClient
@@ -127,6 +128,11 @@ class NetworkModule {
         @MainOkHttpClient okHttpClient: OkHttpClient
     ): ImageLoader {
         return ImageLoader.Builder(context)
+            .memoryCache {
+                MemoryCache.Builder()
+                    .maxSizePercent(context, 0.25)
+                    .build()
+            }
             .components {
                 add(
                     OkHttpNetworkFetcherFactory(
