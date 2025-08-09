@@ -109,7 +109,7 @@ fun ChapterNavigationComponent(
             }, decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp))
-                        .background(Color.White.copy(0.25f))
+                        .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f))
                         .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.Center
                 ) { innerTextField() }

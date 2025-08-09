@@ -342,7 +342,7 @@ private fun <T> ModeItem(
                     isCurrentMode = mode == entry,
                     onClick = { onClick(entry) },
                     modifier = Modifier.weight(1f),
-                    iconResource = iconResources[entries.indexOf(entry)]
+                    iconResource = iconResources.getOrNull(entries.indexOf(entry))
                 )
             }
         }

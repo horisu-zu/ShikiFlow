@@ -109,7 +109,7 @@ fun SettingsScreen(
                         title = "Chapter UI Mode",
                         mode = chapterUIMode.displayValue,
                         entries = ChapterUIMode.entries.map { it.displayValue },
-                        iconResources = ChapterUIMode.entries.map { it.icon },
+                        //iconResources = ChapterUIMode.entries.map { it.icon },
                         onClick = { newMode ->
                             settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(newMode.uppercase()))
                         }

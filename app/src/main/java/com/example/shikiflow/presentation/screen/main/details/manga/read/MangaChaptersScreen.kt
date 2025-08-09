@@ -119,6 +119,8 @@ fun MangaChaptersScreen(
                     ), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
+                    val startsFromZero = sortedChapters.firstOrNull()?.toFloat() == 0f
+
                     items(sortedChapters){ chapterNumber ->
                         ChapterItem(
                             chapterNumber = chapterNumber,
@@ -131,7 +133,9 @@ fun MangaChaptersScreen(
                                     chapterNumber = chapterNumber
                                 )
                             },
-                            isCompleted = (chapterNumber.toFloatOrNull() ?: 0f) <= completedChapters
+                            isCompleted = if(startsFromZero) {
+                                (chapterNumber.toFloat()) < completedChapters
+                            } else (chapterNumber.toFloat()) <= completedChapters
                         )
                     }
                 }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
@@ -57,6 +58,8 @@ fun ChapterPageModeComponent(
 
     val context = LocalContext.current
     val imageLoader = remember { context.imageLoader }
+
+    val showBottomSheet = remember { mutableStateOf(false) }
 
     LaunchedEffect(currentPage) {
         withContext(Dispatchers.IO) {
@@ -133,11 +136,16 @@ fun ChapterPageModeComponent(
             modifier = Modifier.fillMaxWidth().navigationBarsPadding().imePadding(),
             currentPage = currentPage,
             pageCount = chapterPageUrls.size,
-            onSettingsClick = { /**/ },
+            onSettingsClick = { showBottomSheet.value = true },
             onNavigate = { pageNumber ->
                 currentPage = pageNumber.coerceIn(1, pageCount)
             }
         )
+        if (showBottomSheet.value) {
+            ChapterSettingsBottomSheet(
+                onDismiss = { showBottomSheet.value = false }
+            )
+        }
     }
 }
 
@@ -153,12 +161,13 @@ private fun ChapterPageModeBottomComponent(
         modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp)
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.background.copy(alpha = 0.65f)),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.size(48.dp)) // IconButton default size iirc
 
         ChapterNavigationComponent(
-            modifier = Modifier.navigationBarsPadding().imePadding(),
+            modifier = Modifier.padding(vertical = 4.dp).navigationBarsPadding().imePadding(),
             currentPage = currentPage,
             pageCount = pageCount,
             onNavigateClick = { pageNumber -> onNavigate(pageNumber) }
