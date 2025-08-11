@@ -1,22 +1,12 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,9 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
@@ -59,8 +47,6 @@ fun ChapterPageModeComponent(
     val context = LocalContext.current
     val imageLoader = remember { context.imageLoader }
 
-    val showBottomSheet = remember { mutableStateOf(false) }
-
     LaunchedEffect(currentPage) {
         withContext(Dispatchers.IO) {
             if (currentPage < chapterPageUrls.size) {
@@ -77,7 +63,7 @@ fun ChapterPageModeComponent(
     }
 
     Column(
-        modifier = modifier,
+        modifier = modifier.padding(vertical = 12.dp).imePadding(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         ChapterItem(
@@ -132,55 +118,13 @@ fun ChapterPageModeComponent(
                     }
             }*/
         )
-        ChapterPageModeBottomComponent(
-            modifier = Modifier.fillMaxWidth().navigationBarsPadding().imePadding(),
+        ChapterNavigationComponent(
+            modifier = Modifier.fillMaxWidth(),
             currentPage = currentPage,
-            pageCount = chapterPageUrls.size,
-            onSettingsClick = { showBottomSheet.value = true },
-            onNavigate = { pageNumber ->
+            pageCount = pageCount,
+            onNavigateClick = { pageNumber ->
                 currentPage = pageNumber.coerceIn(1, pageCount)
             }
         )
-        if (showBottomSheet.value) {
-            ChapterSettingsBottomSheet(
-                onDismiss = { showBottomSheet.value = false }
-            )
-        }
-    }
-}
-
-@Composable
-private fun ChapterPageModeBottomComponent(
-    currentPage: Int,
-    pageCount: Int,
-    onNavigate: (Int) -> Unit,
-    onSettingsClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 12.dp)
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.background.copy(alpha = 0.65f)),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.size(48.dp)) // IconButton default size iirc
-
-        ChapterNavigationComponent(
-            modifier = Modifier.padding(vertical = 4.dp).navigationBarsPadding().imePadding(),
-            currentPage = currentPage,
-            pageCount = pageCount,
-            onNavigateClick = { pageNumber -> onNavigate(pageNumber) }
-        )
-
-        IconButton(
-            onClick = { onSettingsClick() }
-        ) {
-            Icon(
-                imageVector = Icons.Default.Settings,
-                contentDescription = "Chapter UI Settings",
-                modifier = Modifier.size(24.dp)
-            )
-        }
     }
 }

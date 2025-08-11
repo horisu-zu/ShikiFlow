@@ -62,7 +62,7 @@ fun ChapterNavigationComponent(
         modifier = modifier.wrapContentWidth().clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.onPrimary),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp)
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
     ) {
         IconButton(
             onClick = { onNavigateClick(currentPage - 1) },
@@ -109,7 +109,7 @@ fun ChapterNavigationComponent(
             }, decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                         .padding(horizontal = 4.dp),
                     contentAlignment = Alignment.Center
                 ) { innerTextField() }

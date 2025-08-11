@@ -29,8 +29,8 @@ fun MangaReadNavigator(
             ))
         }
 
-        override fun navigateToChapter(mangaDexChapterId: String) {
-            mangaReadBackstack.add(MangaReadNavRoute.ChapterScreen(mangaDexChapterId))
+        override fun navigateToChapter(mangaDexChapterId: String, title: String?, chapterNumber: String) {
+            mangaReadBackstack.add(MangaReadNavRoute.ChapterScreen(mangaDexChapterId, title, chapterNumber))
         }
 
         override fun navigateBack() {
@@ -62,7 +62,10 @@ fun MangaReadNavigator(
             }
             entry<MangaReadNavRoute.ChapterScreen> { route ->
                 ChapterScreen(
-                    mangaDexChapterId = route.mangaDexChapterId
+                    mangaDexChapterId = route.mangaDexChapterId,
+                    chapterNumber = route.chapterNumber,
+                    title = route.title,
+                    navOptions = navOptions
                 )
             }
         }

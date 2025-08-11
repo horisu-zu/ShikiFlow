@@ -75,7 +75,7 @@ fun ChapterTranslationsScreen(
                         text = "Chapter $chapterNumber — $title",
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 navigationIcon = {
@@ -120,8 +120,12 @@ fun ChapterTranslationsScreen(
                     items(translations.size) { index ->
                         ChapterTranslationItem(
                             mangaDexChapter = translations[index],
-                            onTranslationClick = { translationId ->
-                                navOptions.navigateToChapter(translationId)
+                            onTranslationClick = { translationId, chapterTitle ->
+                                navOptions.navigateToChapter(
+                                    mangaDexChapterId = translationId,
+                                    title = chapterTitle,
+                                    chapterNumber = chapterNumber
+                                )
                             }
                         )
                     }
@@ -135,12 +139,12 @@ fun ChapterTranslationsScreen(
 @Composable
 private fun ChapterTranslationItem(
     mangaDexChapter: MangaDexChapterMetadata,
-    onTranslationClick: (String) -> Unit,
+    onTranslationClick: (String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-            .clickable { onTranslationClick(mangaDexChapter.id) }
+            .clickable { onTranslationClick(mangaDexChapter.id, mangaDexChapter.attributes.title) }
             .padding(horizontal = 6.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
