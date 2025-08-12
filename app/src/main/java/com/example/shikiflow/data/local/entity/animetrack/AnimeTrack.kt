@@ -2,6 +2,7 @@ package com.example.shikiflow.data.local.entity.animetrack
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.data.tracks.MediaType
 import com.example.shikiflow.data.tracks.UserRateData
 import kotlinx.datetime.toInstant
@@ -27,7 +28,8 @@ data class AnimeTrack(
             posterUrl = anime.poster?.previewUrl,
             createDate = track.createdAt.toString().toInstant(),
             updateDate = track.updatedAt.toString().toInstant(),
-            totalEpisodes = anime.episodesAired,
+            totalEpisodes = if(anime.status == AnimeStatusEnum.ongoing) anime.episodesAired
+                else anime.episodes,
             totalChapters = null
         )
     }

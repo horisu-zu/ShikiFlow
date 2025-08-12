@@ -63,7 +63,7 @@ fun ChapterPageModeComponent(
     }
 
     Column(
-        modifier = modifier.padding(vertical = 12.dp).imePadding(),
+        modifier = modifier.padding(vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         ChapterItem(
@@ -119,7 +119,7 @@ fun ChapterPageModeComponent(
             }*/
         )
         ChapterNavigationComponent(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().imePadding(),
             currentPage = currentPage,
             pageCount = pageCount,
             onNavigateClick = { pageNumber ->

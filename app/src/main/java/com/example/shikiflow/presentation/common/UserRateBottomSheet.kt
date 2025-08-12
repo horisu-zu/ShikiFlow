@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.common
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -255,6 +256,8 @@ private fun ProgressColumn(
     val totalCount = if (isAnime) userRate.totalEpisodes else userRate.totalChapters
     val progressTitle = if (isAnime) "Episodes" else "Chapters"
     val rewatchTitle = if (isAnime) "Rewatches" else "Rereads"
+
+    Log.d("UserRateBottomSheet", "totalCount = $totalCount")
 
     Column(
         modifier = modifier.fillMaxWidth(),

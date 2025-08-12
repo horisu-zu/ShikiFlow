@@ -4,6 +4,7 @@ import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.MangaTracksQuery
+import com.example.graphql.type.AnimeStatusEnum
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant
@@ -93,7 +94,7 @@ fun AnimeDetailsQuery.UserRate.toUiModel(media: AnimeDetailsQuery.Anime?) = User
     posterUrl = media?.poster?.originalUrl,
     createDate = createdAt.toString().toInstant(),
     updateDate = updatedAt.toString().toInstant(),
-    totalEpisodes = media?.episodesAired,
+    totalEpisodes = if(media?.status == AnimeStatusEnum.ongoing) media.episodesAired else media?.episodes,
     totalChapters = null
 )
 
