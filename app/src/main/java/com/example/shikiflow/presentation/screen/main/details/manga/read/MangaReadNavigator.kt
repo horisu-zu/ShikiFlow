@@ -34,7 +34,9 @@ fun MangaReadNavigator(
         }
 
         override fun navigateBack() {
-            mangaReadBackstack.removeLastOrNull()
+            if(mangaReadBackstack.size > 1) {
+                mangaReadBackstack.removeLastOrNull()
+            }
         }
     }
 

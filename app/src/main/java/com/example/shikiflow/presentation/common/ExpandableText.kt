@@ -6,6 +6,7 @@ import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -33,6 +35,8 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
@@ -43,6 +47,10 @@ import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import coil3.compose.SubcomposeAsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
+import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter.DescriptionElement
 import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Converter.parseDescriptionHtml
@@ -87,21 +95,31 @@ fun ExpandableText(
                     )
                 }
                 is DescriptionElement.Spoiler -> {
-                    val isSpoilerVisible = isExpanded
-
-                    if (isSpoilerVisible) {
-                        SpoilerElement(
-                            label = "Spoiler",
-                            content = element.content,
-                            style = style.copy(),
-                            lineHeight = lineHeight,
-                            brushColor = brushColor,
-                            onEntityClick = { entityType, id ->
-                                Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
-                                onEntityClick(entityType, id)
-                            }
-                        )
-                    }
+                    SpoilerElement(
+                        label = element.label,
+                        content = element.content,
+                        style = style.copy(),
+                        lineHeight = lineHeight,
+                        brushColor = brushColor,
+                        onEntityClick = { entityType, id ->
+                            Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
+                            onEntityClick(entityType, id)
+                        }
+                    )
+                }
+                is DescriptionElement.Video -> { /**/ }
+                is DescriptionElement.Image -> {
+                    ImageItem(
+                        label = element.label,
+                        imageUrl = element.imageUrl,
+                        onEntityClick = onEntityClick
+                    )
+                }
+                is DescriptionElement.Quote -> {
+                    QuoteItem(
+                        quoteElement = element,
+                        style = style
+                    )
                 }
             }
         }
@@ -113,11 +131,12 @@ private fun AnnotatedText(
     text: AnnotatedString,
     collapsedMaxLines: Int,
     style: TextStyle,
-    lineHeight: TextUnit,
-    brushColor: Color,
     isExpanded: Boolean,
     onExpandToggle: () -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
+    modifier: Modifier = Modifier,
+    brushColor: Color = MaterialTheme.colorScheme.primary,
+    lineHeight: TextUnit = TextUnit.Unspecified
 ) {
     val uriHandler = LocalUriHandler.current
     val snackbarHostState = remember { SnackbarHostState() }
@@ -140,7 +159,7 @@ private fun AnnotatedText(
 
         val shouldShowButton = fullLineCount > collapsedMaxLines
 
-        Column {
+        Column(modifier = modifier) {
             Text(
                 text = text,
                 style = style.copy(lineHeight = lineHeight),
@@ -228,7 +247,7 @@ private fun SpoilerElement(
     label: String,
     lineHeight: TextUnit,
     brushColor: Color,
-    content: AnnotatedString,
+    content: List<DescriptionElement>,
     style: TextStyle,
     onEntityClick: (EntityType, String) -> Unit
 ) {
@@ -237,18 +256,20 @@ private fun SpoilerElement(
     Column(
         Modifier
             .wrapContentWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(12.dp))
-            .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, MaterialTheme.colorScheme.outline, RoundedCornerShape(8.dp))
+            .padding(horizontal = 8.dp, vertical = 6.dp)
             .animateContentSize(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
                     stiffness = Spring.StiffnessLow
                 )
-            )
+            ),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
             text = label,
+            style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -257,18 +278,115 @@ private fun SpoilerElement(
             )
         )
         if (expanded) {
-            AnnotatedText(
-                text = content,
-                collapsedMaxLines = Int.MAX_VALUE,
-                style = style.copy(),
-                lineHeight = lineHeight,
-                brushColor = brushColor,
-                isExpanded = expanded,
-                onExpandToggle = { /**/ },
-                onEntityClick = { entityType, id ->
-                    Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
-                    onEntityClick(entityType, id)
+            Column {
+                content.forEach { element ->
+                    when (element) {
+                        is DescriptionElement.Text -> {
+                            AnnotatedText(
+                                text = element.annotatedString,
+                                collapsedMaxLines = Int.MAX_VALUE,
+                                style = style.copy(),
+                                lineHeight = lineHeight,
+                                brushColor = brushColor,
+                                isExpanded = true,
+                                onExpandToggle = { /**/ },
+                                onEntityClick = { entityType, id ->
+                                    Log.d("FormattedText", "Clicked on Entity in spoiler with type $entityType: $id")
+                                    onEntityClick(entityType, id)
+                                }
+                            )
+                        }
+                        is DescriptionElement.Spoiler -> {
+                            SpoilerElement(
+                                label = element.label,
+                                content = element.content,
+                                style = style,
+                                lineHeight = lineHeight,
+                                brushColor = brushColor,
+                                onEntityClick = onEntityClick
+                            )
+                        }
+                        is DescriptionElement.Image -> {
+                            ImageItem(
+                                label = element.label,
+                                imageUrl = element.imageUrl,
+                                onEntityClick = onEntityClick
+                            )
+                        }
+                        is DescriptionElement.Video -> { /**/ }
+                        is DescriptionElement.Quote -> { /**/ }
+                    }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ImageItem(
+    label: AnnotatedString,
+    imageUrl: String,
+    onEntityClick: (EntityType, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+    ) {
+        SubcomposeAsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(imageUrl)
+                .memoryCacheKey(imageUrl)
+                .crossfade(true)
+                .build(),
+            modifier = Modifier.weight(1f),
+            contentScale = ContentScale.Crop,
+            contentDescription = imageUrl
+        )
+        AnnotatedText(
+            text = label,
+            collapsedMaxLines = Int.MAX_VALUE,
+            style = MaterialTheme.typography.labelSmall,
+            onEntityClick = onEntityClick,
+            isExpanded = false,
+            onExpandToggle = { /**/ }
+        )
+    }
+}
+
+@Composable
+private fun QuoteItem(
+    quoteElement: DescriptionElement.Quote,
+    style: TextStyle
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(4.dp))
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+        horizontalAlignment = Alignment.Start
+    ) {
+        quoteElement.senderNickname?.let { nickname ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RoundedImage(
+                    model = quoteElement.senderAvatarUrl,
+                    size = 24.dp,
+                    clip = RoundedCornerShape(8.dp)
+                )
+                Text(
+                    text = nickname,
+                    style = style
+                )
+            }
+            Text(
+                text = quoteElement.content,
+                style = style
             )
         }
     }

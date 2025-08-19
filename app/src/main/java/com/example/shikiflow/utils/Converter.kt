@@ -61,7 +61,7 @@ object Converter {
         includeTime: Boolean = false,
         locale: Locale = Locale.getDefault()
     ): String {
-        return date.let { date ->
+        date.let { date ->
             val currentYear = Clock.System.now()
                 .toLocalDateTime(TimeZone.currentSystemDefault()).year
             val instantYear = date.year
@@ -258,7 +258,14 @@ object Converter {
 
     sealed class DescriptionElement {
         data class Text(val annotatedString: AnnotatedString) : DescriptionElement()
-        data class Spoiler(val label: String, val content: AnnotatedString) : DescriptionElement()
+        data class Spoiler(val label: String, val content: List<DescriptionElement>) : DescriptionElement()
+        data class Image(val label: AnnotatedString, val imageUrl: String) : DescriptionElement()
+        data class Video(val videoUrl: String, val thumbnailUrl: String) : DescriptionElement()
+        data class Quote(
+            val senderAvatarUrl: String?,
+            val senderNickname: String?,
+            val content: String
+        ) : DescriptionElement()
     }
 
     enum class EntityType {
@@ -274,29 +281,102 @@ object Converter {
     )
 
     fun parseDescriptionHtml(html: String, linkColor: Color): List<DescriptionElement> {
-        val doc = Ksoup.parse(html)
-        val elements = mutableListOf<DescriptionElement>()
+        if (html.isBlank()) {
+            return emptyList()
+        }
 
+        val doc = Ksoup.parse(html)
         val contentElement = doc.selectFirst("div.b-text_with_paragraphs") ?: doc.body()
 
-        val textAnnotated = parseInnerHtml(contentElement.html(), linkColor)
-        if (textAnnotated.isNotEmpty()) {
-            elements.add(DescriptionElement.Text(textAnnotated))
+        return parseElementContent(contentElement, linkColor)
+    }
+
+    private fun parseElementContent(containerElement: Element, linkColor: Color): List<DescriptionElement> {
+        val elements = mutableListOf<DescriptionElement>()
+        val textHtmlBuffer = StringBuilder()
+
+        fun processTextBuffer() {
+            if (textHtmlBuffer.isNotBlank()) {
+                val annotatedString = parseInnerHtml(textHtmlBuffer.toString(), linkColor)
+                if (annotatedString.isNotBlank()) {
+                    elements.add(DescriptionElement.Text(annotatedString))
+                }
+                textHtmlBuffer.clear()
+            }
         }
 
-        contentElement.select("div.b-spoiler_block").forEach { spoilerNode ->
-            spoilerNode.remove()
+        containerElement.childNodes().forEach { node ->
+            if (node !is Element) {
+                textHtmlBuffer.append(node.outerHtml())
+                return@forEach
+            }
 
-            val labelElement = spoilerNode.selectFirst("span")
-            val contentElement = spoilerNode.selectFirst("> div")
+            val isSpoiler = node.tagName() == "div" && (node.hasClass("b-spoiler")
+                    || node.hasClass("b-spoiler_block"))
+            val isVideo = node.tagName() == "div" && node.hasClass("b-video")
+            val isImage = node.tagName() == "a" && node.hasClass("b-image")
+            val isQuote = node.tagName() == "div" && node.hasClass("b-quote")
 
-            val spoilerLabel = labelElement?.text() ?: "Spoiler"
-            val spoilerContentHtml = contentElement?.html() ?: ""
-            val spoilerContentAnnotated = parseInnerHtml(spoilerContentHtml, linkColor)
+            when {
+                isSpoiler -> {
+                    processTextBuffer()
 
-            elements.add(DescriptionElement.Spoiler(spoilerLabel, spoilerContentAnnotated))
+                    val label = node.selectFirst("span")?.text()
+                        ?: node.selectFirst("label")?.text() ?: ""
+                    val contentDiv = node.selectFirst("> div")
+
+                    val spoilerContent = if (contentDiv != null) {
+                        parseElementContent(contentDiv, linkColor)
+                    } else {
+                        emptyList()
+                    }
+
+                    elements.add(DescriptionElement.Spoiler(label, spoilerContent))
+                }
+                isVideo -> {
+                    processTextBuffer()
+
+                    val linkElement = node.selectFirst("a.video-link")
+                    val imgElement = node.selectFirst("img")
+
+                    val videoUrl = linkElement?.attr("href") ?: ""
+                    val thumbnailUrl = imgElement?.attr("src") ?: ""
+
+                    elements.add(DescriptionElement.Video(videoUrl, thumbnailUrl))
+                }
+                isImage -> {
+                    processTextBuffer()
+
+                    val imageUrl = node.attr("href")
+                    val labelText = node.text()
+
+                    val label = AnnotatedString.Builder().apply {
+                        append(labelText)
+                        if (labelText.isNotBlank()) {
+                            addStringAnnotation("URL_LINK", imageUrl, 0, labelText.length)
+                            addStyle(SpanStyle(color = linkColor), 0, labelText.length)
+                        }
+                    }.toAnnotatedString()
+
+                    elements.add(DescriptionElement.Image(label, imageUrl))
+                }
+                isQuote -> {
+                    processTextBuffer()
+
+                    val senderAvatarUrl = node.selectFirst("img")
+                        ?.attr("srcset") ?: node.selectFirst("img")?.attr("src")
+                    val senderNickname = node.selectFirst("span")?.text()
+                    val content = node.selectFirst(".quote-content")?.text() ?: ""
+
+                    elements.add(DescriptionElement.Quote(senderAvatarUrl, senderNickname, content))
+                }
+                else -> {
+                    textHtmlBuffer.append(node.outerHtml())
+                }
+            }
         }
 
+        processTextBuffer()
         return elements
     }
 
@@ -323,9 +403,12 @@ object Converter {
                     builder.append(node.text())
                 }
                 is Element -> {
-                    if (node.tagName() == "div" && node.hasClass("b-spoiler_block")) {
-                        return@forEach
-                    }
+                    if ((node.tagName() == "div" && (node.hasClass("b-spoiler")
+                                || node.hasClass("b-spoiler_block")
+                                || node.hasClass("b-video") || node.hasClass("b-quote"))
+                                || node.tagName() == "a" && node.hasClass("b-image")
+                            )
+                        ) { return@forEach }
 
                     val spanStyle = getSpanStyleForElement(node, linkColor)
 
@@ -364,7 +447,7 @@ object Converter {
             "b", "strong" -> SpanStyle(fontWeight = FontWeight.Bold)
             "i", "em" -> SpanStyle(fontStyle = FontStyle.Italic)
             "u" -> SpanStyle(textDecoration = TextDecoration.Underline)
-            "s", "strike", "del" -> SpanStyle(textDecoration = TextDecoration.LineThrough)
+            "strike", "del" -> SpanStyle(textDecoration = TextDecoration.LineThrough)
             "a" -> SpanStyle(color = linkColor)
             else -> SpanStyle()
         }

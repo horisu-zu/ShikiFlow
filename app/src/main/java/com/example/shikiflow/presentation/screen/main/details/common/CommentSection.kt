@@ -132,7 +132,8 @@ private fun CommentItem(
             ExpandableText(
                 descriptionHtml = comment.htmlBody,
                 style = MaterialTheme.typography.bodySmall,
-                onEntityClick = { type, id -> onEntityClick(type, id) }
+                onEntityClick = { type, id -> onEntityClick(type, id) },
+                collapsedMaxLines = Int.MAX_VALUE
             )
         }
     }

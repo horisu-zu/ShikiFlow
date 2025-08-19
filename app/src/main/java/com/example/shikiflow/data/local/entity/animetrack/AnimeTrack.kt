@@ -28,8 +28,8 @@ data class AnimeTrack(
             posterUrl = anime.poster?.previewUrl,
             createDate = track.createdAt.toString().toInstant(),
             updateDate = track.updatedAt.toString().toInstant(),
-            totalEpisodes = if(anime.status == AnimeStatusEnum.ongoing) anime.episodesAired
-                else anime.episodes,
+            totalEpisodes = if(anime.status == AnimeStatusEnum.released) anime.episodes
+                else anime.episodesAired,
             totalChapters = null
         )
     }
