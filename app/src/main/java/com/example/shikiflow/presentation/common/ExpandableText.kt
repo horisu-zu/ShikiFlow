@@ -73,11 +73,36 @@ fun ExpandableText(
         parseDescriptionHtml(descriptionHtml, linkColor)
     }
 
+    DescriptionElementsList(
+        modifier = modifier,
+        elements = elements,
+        collapsedMaxLines = collapsedMaxLines,
+        isExpanded = isExpanded,
+        onExpandToggle = { isExpanded = !isExpanded },
+        style = style,
+        lineHeight = lineHeight,
+        brushColor = brushColor,
+        onEntityClick = onEntityClick
+    )
+}
+
+@Composable
+private fun DescriptionElementsList(
+    elements: List<DescriptionElement>,
+    style: TextStyle,
+    lineHeight: TextUnit,
+    brushColor: Color,
+    onEntityClick: (EntityType, String) -> Unit,
+    modifier: Modifier = Modifier,
+    collapsedMaxLines: Int = Int.MAX_VALUE,
+    isExpanded: Boolean = true,
+    onExpandToggle: () -> Unit = { }
+) {
     Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        elements.forEachIndexed { index, element ->
+        elements.forEach { element ->
             when (element) {
                 is DescriptionElement.Text -> {
                     AnnotatedText(
@@ -87,7 +112,7 @@ fun ExpandableText(
                         lineHeight = lineHeight,
                         brushColor = brushColor,
                         isExpanded = isExpanded,
-                        onExpandToggle = { isExpanded = !isExpanded },
+                        onExpandToggle = onExpandToggle,
                         onEntityClick = { entityType, id ->
                             Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
                             onEntityClick(entityType, id)
@@ -98,16 +123,12 @@ fun ExpandableText(
                     SpoilerElement(
                         label = element.label,
                         content = element.content,
-                        style = style.copy(),
+                        style = style,
                         lineHeight = lineHeight,
                         brushColor = brushColor,
-                        onEntityClick = { entityType, id ->
-                            Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
-                            onEntityClick(entityType, id)
-                        }
+                        onEntityClick = onEntityClick
                     )
                 }
-                is DescriptionElement.Video -> { /**/ }
                 is DescriptionElement.Image -> {
                     ImageItem(
                         label = element.label,
@@ -115,6 +136,7 @@ fun ExpandableText(
                         onEntityClick = onEntityClick
                     )
                 }
+                is DescriptionElement.Video -> { /**/ }
                 is DescriptionElement.Quote -> {
                     QuoteItem(
                         quoteElement = element,
@@ -129,12 +151,12 @@ fun ExpandableText(
 @Composable
 private fun AnnotatedText(
     text: AnnotatedString,
-    collapsedMaxLines: Int,
     style: TextStyle,
-    isExpanded: Boolean,
-    onExpandToggle: () -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     modifier: Modifier = Modifier,
+    collapsedMaxLines: Int = Int.MAX_VALUE,
+    isExpanded: Boolean = false,
+    onExpandToggle: () -> Unit = { /**/ },
     brushColor: Color = MaterialTheme.colorScheme.primary,
     lineHeight: TextUnit = TextUnit.Unspecified
 ) {
@@ -176,7 +198,6 @@ private fun AnnotatedText(
                                                 "Clicked on entity: ${annotation.item}"
                                             )
                                             onEntityClick(entityType, annotation.item)
-                                            return@detectTapGestures
                                         }
                                 }
 
@@ -278,46 +299,13 @@ private fun SpoilerElement(
             )
         )
         if (expanded) {
-            Column {
-                content.forEach { element ->
-                    when (element) {
-                        is DescriptionElement.Text -> {
-                            AnnotatedText(
-                                text = element.annotatedString,
-                                collapsedMaxLines = Int.MAX_VALUE,
-                                style = style.copy(),
-                                lineHeight = lineHeight,
-                                brushColor = brushColor,
-                                isExpanded = true,
-                                onExpandToggle = { /**/ },
-                                onEntityClick = { entityType, id ->
-                                    Log.d("FormattedText", "Clicked on Entity in spoiler with type $entityType: $id")
-                                    onEntityClick(entityType, id)
-                                }
-                            )
-                        }
-                        is DescriptionElement.Spoiler -> {
-                            SpoilerElement(
-                                label = element.label,
-                                content = element.content,
-                                style = style,
-                                lineHeight = lineHeight,
-                                brushColor = brushColor,
-                                onEntityClick = onEntityClick
-                            )
-                        }
-                        is DescriptionElement.Image -> {
-                            ImageItem(
-                                label = element.label,
-                                imageUrl = element.imageUrl,
-                                onEntityClick = onEntityClick
-                            )
-                        }
-                        is DescriptionElement.Video -> { /**/ }
-                        is DescriptionElement.Quote -> { /**/ }
-                    }
-                }
-            }
+            DescriptionElementsList(
+                elements = content,
+                style = style,
+                lineHeight = lineHeight,
+                brushColor = brushColor,
+                onEntityClick = onEntityClick
+            )
         }
     }
 }
@@ -361,9 +349,10 @@ private fun QuoteItem(
     style: TextStyle
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f))
+            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75f))
             .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start

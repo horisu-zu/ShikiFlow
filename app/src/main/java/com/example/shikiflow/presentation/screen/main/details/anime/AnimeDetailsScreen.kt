@@ -144,6 +144,7 @@ fun AnimeDetailsScreen(
                                     EntityType.MANGA -> {
                                         navOptions.navigateToMangaDetails(id)
                                     }
+                                    EntityType.COMMENT -> { /**/ }
                                 }
                             },
                             onSimilarClick = { animeId, title ->

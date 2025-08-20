@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.R
@@ -272,7 +274,8 @@ object Converter {
         CHARACTER,
         PERSON,
         ANIME,
-        MANGA
+        MANGA,
+        COMMENT
     }
 
     data class EntityData(
@@ -316,20 +319,19 @@ object Converter {
             val isVideo = node.tagName() == "div" && node.hasClass("b-video")
             val isImage = node.tagName() == "a" && node.hasClass("b-image")
             val isQuote = node.tagName() == "div" && node.hasClass("b-quote")
+            val isReply = node.tagName() == "div" && node.hasClass("b-replies")
 
             when {
                 isSpoiler -> {
                     processTextBuffer()
 
-                    val label = node.selectFirst("span")?.text()
-                        ?: node.selectFirst("label")?.text() ?: ""
+                    val label = node.selectFirst("label")?.text()
+                        ?: node.selectFirst("span")?.text() ?: ""
                     val contentDiv = node.selectFirst("> div")
 
                     val spoilerContent = if (contentDiv != null) {
                         parseElementContent(contentDiv, linkColor)
-                    } else {
-                        emptyList()
-                    }
+                    } else { emptyList() }
 
                     elements.add(DescriptionElement.Spoiler(label, spoilerContent))
                 }
@@ -370,6 +372,31 @@ object Converter {
 
                     elements.add(DescriptionElement.Quote(senderAvatarUrl, senderNickname, content))
                 }
+                isReply -> {
+                    processTextBuffer()
+
+                    val mentions = node.select("a.b-mention")
+                    val annotatedReplies = buildAnnotatedString {
+                        if (mentions.size > 1) { append("Replies: ") } else {
+                            append("Reply: ")
+                        }
+
+                        mentions.forEachIndexed { i, mention ->
+                            val username = mention.selectFirst("span")?.text() ?: ""
+                            val commentId = mention.attr("href").substringAfter("/comments/")
+
+                            pushStringAnnotation(EntityType.COMMENT.name, commentId)
+                            withStyle(SpanStyle(color = linkColor)) {
+                                append("@$username")
+                            }
+                            pop()
+
+                            if (i < mentions.lastIndex) append(", ")
+                        }
+                    }
+
+                    elements.add(DescriptionElement.Text(annotatedReplies))
+                }
                 else -> {
                     textHtmlBuffer.append(node.outerHtml())
                 }
@@ -405,6 +432,7 @@ object Converter {
                 is Element -> {
                     if ((node.tagName() == "div" && (node.hasClass("b-spoiler")
                                 || node.hasClass("b-spoiler_block")
+                                || node.hasClass("b-replies")
                                 || node.hasClass("b-video") || node.hasClass("b-quote"))
                                 || node.tagName() == "a" && node.hasClass("b-image")
                             )
@@ -416,6 +444,7 @@ object Converter {
 
                     val annotationTag = when {
                         entityData != null -> entityData.type.name
+                        node.hasClass("b-mention") -> EntityType.COMMENT.name
                         node.tagName() == "a" -> "URL_LINK"
                         else -> null
                     }

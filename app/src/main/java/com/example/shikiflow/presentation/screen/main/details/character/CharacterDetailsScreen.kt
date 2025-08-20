@@ -148,6 +148,7 @@ fun CharacterDetailsScreen(
                                     EntityType.MANGA -> {
                                         navOptions.navigateToMangaDetails(id)
                                     }
+                                    EntityType.COMMENT -> { /**/ }
                                 }
                             }
                         )

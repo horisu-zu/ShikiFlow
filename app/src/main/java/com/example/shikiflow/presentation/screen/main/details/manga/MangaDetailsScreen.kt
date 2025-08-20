@@ -151,6 +151,7 @@ fun MangaDetailsScreen(
                                     EntityType.MANGA -> {
                                         navOptions.navigateToMangaDetails(id)
                                     }
+                                    EntityType.COMMENT -> { /**/ }
                                 }
                             },
                             modifier = Modifier.constrainAs(descriptionRef) {
