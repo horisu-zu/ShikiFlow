@@ -54,6 +54,7 @@ fun AnimeDetailsDesc(
     onLinksClick: (String) -> Unit,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
+    onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -148,6 +149,7 @@ fun AnimeDetailsDesc(
                 onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
                 onLinksClick = onLinksClick,
                 onEntityClick = onEntityClick,
+                onTopicNavigate = onTopicNavigate,
                 modifier = Modifier.constrainAs(additionalRef) {
                     top.linkTo(screenshotsRef.bottom, margin = 12.dp)
                     start.linkTo(parent.start)

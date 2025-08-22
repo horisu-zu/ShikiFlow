@@ -37,6 +37,7 @@ import com.example.shikiflow.utils.Resource
 fun CommentSection(
     topicId: String,
     onEntityClick: (Converter.EntityType, String) -> Unit,
+    onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier,
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
@@ -76,7 +77,7 @@ fun CommentSection(
                         style = MaterialTheme.typography.titleMedium
                     )
                     IconButton(
-                        onClick = { /*Navigate to Topic Comments Page*/ }
+                        onClick = { onTopicNavigate(topicId) }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -97,7 +98,7 @@ fun CommentSection(
 }
 
 @Composable
-private fun CommentItem(
+fun CommentItem(
     comment: CommentItem,
     onEntityClick: (type: Converter.EntityType, id: String) -> Unit,
     modifier: Modifier = Modifier

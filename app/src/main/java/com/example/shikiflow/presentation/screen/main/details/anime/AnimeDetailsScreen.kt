@@ -37,6 +37,7 @@ import com.example.shikiflow.data.tracks.UserRateData
 import com.example.shikiflow.data.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Converter.EntityType
@@ -144,8 +145,13 @@ fun AnimeDetailsScreen(
                                     EntityType.MANGA -> {
                                         navOptions.navigateToMangaDetails(id)
                                     }
-                                    EntityType.COMMENT -> { /**/ }
+                                    EntityType.COMMENT -> {
+                                        navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
+                                    }
                                 }
+                            },
+                            onTopicNavigate = { topicId ->
+                                navOptions.navigateToComments(CommentsScreenMode.TOPIC, id)
                             },
                             onSimilarClick = { animeId, title ->
                                 navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)

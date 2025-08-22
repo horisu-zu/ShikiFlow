@@ -45,11 +45,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.ChapterItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterNavigationViewModel
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel
@@ -132,32 +135,52 @@ fun ChapterScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
-                when(chapterUiMode.value) {
-                    ChapterUIMode.PAGE -> {
-                        ChapterPageModeComponent(
-                            chapterPageUrls = pageUrls.data ?: emptyList(),
-                            modifier = Modifier.fillMaxSize().padding(
-                                top = paddingValues.calculateTopPadding(),
-                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                            )
+                if(pageUrls.data.isNullOrEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize().padding(
+                            top = paddingValues.calculateTopPadding(),
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                        ), contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = stringResource(R.string.chp_mangadex_empty),
+                            buttonLabel = stringResource(R.string.chp_navigate_back),
+                            onButtonClick = { navOptions.navigateBack() }
                         )
                     }
-                    ChapterUIMode.SCROLL -> {
-                        ChapterScrollModeComponent(
-                            chapterPageUrls = pageUrls.data ?: emptyList(),
-                            modifier = Modifier.fillMaxSize().padding(
-                                top = paddingValues.calculateTopPadding(),
-                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                } else {
+                    when(chapterUiMode.value) {
+                        ChapterUIMode.PAGE -> {
+                            ChapterPageModeComponent(
+                                chapterPageUrls = pageUrls.data,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(
+                                        top = paddingValues.calculateTopPadding(),
+                                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                                    )
                             )
+                        }
+                        ChapterUIMode.SCROLL -> {
+                            ChapterScrollModeComponent(
+                                chapterPageUrls = pageUrls.data,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(
+                                        top = paddingValues.calculateTopPadding(),
+                                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                                    )
+                            )
+                        }
+                    }
+                    if(showBottomSheet.value) {
+                        ChapterSettingsBottomSheet(
+                            onDismiss = { showBottomSheet.value = false }
                         )
                     }
-                }
-                if(showBottomSheet.value) {
-                    ChapterSettingsBottomSheet(
-                        onDismiss = { showBottomSheet.value = false }
-                    )
                 }
             }
             is Resource.Error -> { /**/ }
@@ -199,13 +222,15 @@ private fun ChapterScrollModeComponent(
     ) {
         LazyColumn(
             state = lazyListState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .graphicsLayer(
                     scaleX = scale,
                     scaleY = scale,
                     translationX = offsetX,
                     translationY = offsetY
-                ).zoomable(rememberZoomState()), //Well, it's easier this way I guess
+                )
+                .zoomable(rememberZoomState()), //Well, it's easier this way I guess
             verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
@@ -224,7 +249,9 @@ private fun ChapterScrollModeComponent(
             exit = fadeOut()
         ) {
             ChapterNavigationComponent(
-                modifier = Modifier.navigationBarsPadding().imePadding(),
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding(),
                 currentPage = currentPage,
                 pageCount = chapterPageUrls.size,
                 onNavigateClick = { pageNumber ->

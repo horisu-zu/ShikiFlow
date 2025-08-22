@@ -16,6 +16,8 @@ import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MangaReadNavigator
@@ -54,6 +56,10 @@ fun DetailsNavigator(
 
         override fun navigateToMangaRead(mangaDexId: String, title: String, completedChapters: Int) {
             detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexId, title, completedChapters))
+        }
+
+        override fun navigateToComments(screenMode: CommentsScreenMode, id: String) {
+            detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id))
         }
 
         override fun navigateBack() {
@@ -112,6 +118,14 @@ fun DetailsNavigator(
                     completedChapters = route.completedChapters,
                     onNavigateBack = { options.navigateBack() },
                     mangaChaptersViewModel = hiltViewModel(key = "read_${route.mangaDexId}")
+                )
+            }
+            entry<DetailsNavRoute.Comments> { route ->
+                CommentsScreen(
+                    screenMode = route.screenMode,
+                    id = route.id,
+                    navOptions = options,
+                    commentViewModel = hiltViewModel(key = "comments_${route.screenMode}_${route.id}")
                 )
             }
         },

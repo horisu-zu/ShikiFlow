@@ -13,6 +13,7 @@ import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.R
+import com.example.shikiflow.data.common.comment.CommentType
 import com.example.shikiflow.data.mapper.UserRateStatusConstants
 import com.example.shikiflow.data.mapper.UserRateStatusConstants.getStatusOrder
 import com.example.shikiflow.data.tracks.MediaType
@@ -283,7 +284,7 @@ object Converter {
         val type: EntityType
     )
 
-    fun parseDescriptionHtml(html: String, linkColor: Color): List<DescriptionElement> {
+    fun parseDescriptionHtml(html: String, linkColor: Color = Color.Blue): List<DescriptionElement> {
         if (html.isBlank()) {
             return emptyList()
         }
@@ -449,7 +450,14 @@ object Converter {
                         else -> null
                     }
 
-                    val annotationValue = entityData?.id ?: if (node.tagName() == "a") node.attr("href") else null
+                    val annotationValue = when {
+                        entityData != null -> entityData.id
+                        node.hasClass("b-mention") -> {
+                            node.attr("href").substringAfter("/comments/")
+                        }
+                        node.tagName() == "a" -> node.attr("href")
+                        else -> null
+                    }
 
                     val hasAnnotation = annotationTag != null && annotationValue != null
 
@@ -471,7 +479,7 @@ object Converter {
         }
     }
 
-    fun getSpanStyleForElement(element: Element, linkColor: Color): SpanStyle {
+    private fun getSpanStyleForElement(element: Element, linkColor: Color): SpanStyle {
         return when (element.tagName()) {
             "b", "strong" -> SpanStyle(fontWeight = FontWeight.Bold)
             "i", "em" -> SpanStyle(fontStyle = FontStyle.Italic)
@@ -482,7 +490,7 @@ object Converter {
         }
     }
 
-    fun getEntityDataForElement(element: Element): EntityData? {
+    private fun getEntityDataForElement(element: Element): EntityData? {
         if (element.tagName() != "a" || !element.hasClass("b-link") || !element.hasAttr("data-attrs")) {
             return null
         }
@@ -502,5 +510,40 @@ object Converter {
             Log.e("ParseError", "Failed to parse data-attrs JSON: ${e.message}")
             return null
         }
+    }
+
+    fun getCommentStringAnnotations(
+        annotatedList: List<DescriptionElement>
+    ): Map<CommentType, List<String>> {
+        val result = mutableMapOf<CommentType, MutableList<String>>()
+
+        annotatedList.forEach { element ->
+            if(element is DescriptionElement.Text) {
+                val annotatedString = element.annotatedString
+
+                val commentAnnotations = annotatedString.getStringAnnotations(
+                    tag = EntityType.COMMENT.name,
+                    start = 0,
+                    end = annotatedString.length
+                )
+                Log.d("CommentAnnotations", "Found annotations: $commentAnnotations")
+
+                val text = annotatedString.text
+                when {
+                    text.startsWith("Reply:") || text.startsWith("Replies:") -> {
+                        commentAnnotations.forEach { annotation ->
+                            result.getOrPut(CommentType.REPLIES) { mutableListOf() }.add(annotation.item)
+                        }
+                    }
+                    else -> {
+                        commentAnnotations.forEach { annotation ->
+                            result.getOrPut(CommentType.REPLIED_TO) { mutableListOf() }.add(annotation.item)
+                        }
+                    }
+                }
+            }
+        }
+
+        return result
     }
 }

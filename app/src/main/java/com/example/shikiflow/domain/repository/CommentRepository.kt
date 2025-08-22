@@ -17,4 +17,7 @@ class CommentRepository @Inject constructor(
         page = page,
         limit = limit
     )
+
+    suspend fun getCommentById(commentId: String): CommentItem
+        = commentApi.getCommentById(commentId)
 }

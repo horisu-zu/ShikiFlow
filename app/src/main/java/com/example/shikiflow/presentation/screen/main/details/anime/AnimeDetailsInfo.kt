@@ -42,6 +42,7 @@ fun AnimeDetailsInfo(
     onSimilarClick: (String, String) -> Unit,
     onLinksClick: (String) -> Unit,
     onEntityClick: (Converter.EntityType, String) -> Unit,
+    onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -226,7 +227,11 @@ fun AnimeDetailsInfo(
 
         animeDetails.topic?.id?.let { topicId ->
             HorizontalDivider()
-            CommentSection(topicId = topicId, onEntityClick = onEntityClick)
+            CommentSection(
+                topicId = topicId,
+                onEntityClick = onEntityClick,
+                onTopicNavigate = onTopicNavigate
+            )
         }
     }
 }

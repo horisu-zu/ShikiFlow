@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.screen.main.details
 
 import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import kotlinx.serialization.Serializable
 
 sealed interface DetailsNavRoute : NavKey {
@@ -22,4 +23,7 @@ sealed interface DetailsNavRoute : NavKey {
 
     @Serializable
     data class MangaRead(val mangaDexId: String, val title: String, val completedChapters: Int) : DetailsNavRoute
+
+    @Serializable
+    data class Comments(val screenMode: CommentsScreenMode, val id: String) : DetailsNavRoute
 }

@@ -9,4 +9,6 @@
     <string name="status_hours_ago">Last seen — %1$d hours ago</string>
     <string name="status_hours_ago_v2">Last seen — %1$d hours ago</string>
     <string name="status_days">Last seen on — %1$s</string>
+    <string name="chp_navigate_back">Navigate Back</string>
+    <string name="chp_mangadex_empty">Response is Empty.\nIn most cases, this means that the MangaDex removed all unofficial content and left only official one with links to licensed sources.</string>
 </resources>

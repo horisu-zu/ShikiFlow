@@ -75,9 +75,8 @@ fun HistoryScreen(
             contentPadding = PaddingValues(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(historyData.itemCount) {
-                val historyItem = historyData[it]
-                HistoryItem(historyItem)
+            items(historyData.itemCount) { index ->
+                HistoryItem(historyData[index])
             }
             historyData.apply {
                 when {
