@@ -24,8 +24,8 @@ class MangaDetailsViewModel @Inject constructor(
     private val _mangaDetails = MutableStateFlow<Resource<MangaDetailsQuery.Manga>>(Resource.Loading())
     val mangaDetails = _mangaDetails.asStateFlow()
 
-    private val _mangaDexId = MutableStateFlow<Resource<String>>(Resource.Loading())
-    val mangaDexId = _mangaDexId.asStateFlow()
+    private val _mangaDexIds = MutableStateFlow<Resource<List<String>>>(Resource.Loading())
+    val mangaDexIds = _mangaDexIds.asStateFlow()
 
     fun getMangaDetails(id: String, isRefresh: Boolean = false) {
         viewModelScope.launch {
@@ -60,8 +60,8 @@ class MangaDetailsViewModel @Inject constructor(
     private fun getMangaDexId(title: String, malId: String) {
         viewModelScope.launch {
             Log.d("MangaDetailsViewModel", "Fetching MangaDex ID for title: $title, MAL ID: $malId")
-            _mangaDexId.value = getMangaDexUseCase(title, malId)
-            Log.d("MangaDetailsViewModel", "MangaDex ID: ${_mangaDexId.value.data}")
+            _mangaDexIds.value = getMangaDexUseCase(title, malId)
+            Log.d("MangaDetailsViewModel", "MangaDex ID: ${_mangaDexIds.value.data}")
         }
     }
 }

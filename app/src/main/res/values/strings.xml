@@ -11,4 +11,8 @@
     <string name="status_days">Last seen on — %1$s</string>
     <string name="chp_navigate_back">Navigate Back</string>
     <string name="chp_mangadex_empty">Response is Empty.\nIn most cases, this means that the MangaDex removed all unofficial content and left only official one with links to licensed sources.</string>
+    <string name="mtp_loading_error">Error loading tracked manga</string>
+    <string name="common_retry">Retry</string>
+    <string name="b_oss_error">Error Loading Ongoings</string>
+    <string name="b_mss_error">Error Loading Browse Data</string>
 </resources>

@@ -80,8 +80,7 @@ fun ChapterTranslationsScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { navOptions.navigateBack() },
-                        enabled = false
+                        onClick = { navOptions.navigateBack() }
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,

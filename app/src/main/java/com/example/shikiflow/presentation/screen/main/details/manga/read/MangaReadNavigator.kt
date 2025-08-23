@@ -10,19 +10,38 @@ import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersView
 
 @Composable
 fun MangaReadNavigator(
-    mangaDexId: String,
+    mangaDexIds: List<String>,
     title: String,
     completedChapters: Int,
     onNavigateBack: () -> Unit,
     mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
 ) {
-    val mangaReadBackstack = rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
-        mangaDexId = mangaDexId,
-        title = title,
-        completedChapters = completedChapters
-    ))
+    val mangaReadBackstack = when(mangaDexIds.size) {
+        1 -> rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
+            mangaDexId = mangaDexIds[0],
+            title = title,
+            completedChapters = completedChapters,
+            source = ChaptersScreenSource.AUTOMATED
+        ))
+        else -> {
+            rememberNavBackStack(MangaReadNavRoute.MangaSelectionScreen(
+                mangaDexIds = mangaDexIds,
+                title = title,
+                completedChapters = completedChapters
+            ))
+        }
+    }
 
     val navOptions = object : MangaReadNavOptions {
+        override fun navigateToChapters(
+            mangaDexId: String,
+            title: String,
+            completedChapters: Int,
+            source: ChaptersScreenSource
+        ) {
+            mangaReadBackstack.add(MangaReadNavRoute.ChaptersScreen(mangaDexId, title, completedChapters, source))
+        }
+
         override fun navigateToChapterTranslations(chapterTranslationIds: List<String>, chapterNumber: String) {
             mangaReadBackstack.add(MangaReadNavRoute.ChapterTranslationsScreen(
                 chapterTranslationIds, title, chapterNumber
@@ -44,6 +63,15 @@ fun MangaReadNavigator(
         backStack = mangaReadBackstack,
         onBack = { mangaReadBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
+            entry<MangaReadNavRoute.MangaSelectionScreen> { route ->
+                MangaSelectionScreen(
+                    mangaDexIds = route.mangaDexIds,
+                    title = route.title,
+                    completedChapters = route.completedChapters,
+                    navOptions = navOptions,
+                    onNavigateBack = onNavigateBack
+                )
+            }
             entry<MangaReadNavRoute.ChaptersScreen> { route ->
                 MangaChaptersScreen(
                     mangaDexId = route.mangaDexId,
@@ -51,7 +79,8 @@ fun MangaReadNavigator(
                     completedChapters = route.completedChapters,
                     navOptions = navOptions,
                     onNavigateBack = onNavigateBack,
-                    mangaChaptersViewModel = mangaChaptersViewModel
+                    mangaChaptersViewModel = mangaChaptersViewModel,
+                    navigationSource = route.source
                 )
             }
             entry<MangaReadNavRoute.ChapterTranslationsScreen> { route ->
@@ -72,4 +101,9 @@ fun MangaReadNavigator(
             }
         }
     )
+}
+
+enum class ChaptersScreenSource {
+    AUTOMATED,
+    MANUAL
 }

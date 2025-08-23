@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.browse
 
-import android.util.Log
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding

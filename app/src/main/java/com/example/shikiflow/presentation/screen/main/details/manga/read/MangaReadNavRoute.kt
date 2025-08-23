@@ -6,10 +6,18 @@ import kotlinx.serialization.Serializable
 sealed interface MangaReadNavRoute : NavKey {
 
     @Serializable
+    data class MangaSelectionScreen(
+        val mangaDexIds: List<String>,
+        val title: String,
+        val completedChapters: Int
+    ) : MangaReadNavRoute
+
+    @Serializable
     data class ChaptersScreen(
         val mangaDexId: String,
         val title: String,
-        val completedChapters: Int
+        val completedChapters: Int,
+        val source: ChaptersScreenSource
     ) : MangaReadNavRoute
 
     @Serializable

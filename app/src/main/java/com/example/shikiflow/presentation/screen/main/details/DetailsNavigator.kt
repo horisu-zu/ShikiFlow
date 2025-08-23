@@ -54,8 +54,8 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.ExternalLinks(mediaId, mediaType))
         }
 
-        override fun navigateToMangaRead(mangaDexId: String, title: String, completedChapters: Int) {
-            detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexId, title, completedChapters))
+        override fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int) {
+            detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexIds, title, completedChapters))
         }
 
         override fun navigateToComments(screenMode: CommentsScreenMode, id: String) {
@@ -63,7 +63,7 @@ fun DetailsNavigator(
         }
 
         override fun navigateBack() {
-            detailsBackstack.removeLastOrNull()
+            if(detailsBackstack.size > 1) detailsBackstack.removeLastOrNull()
         }
     }
 
@@ -113,11 +113,11 @@ fun DetailsNavigator(
             }
             entry<DetailsNavRoute.MangaRead> { route ->
                 MangaReadNavigator(
-                    mangaDexId = route.mangaDexId,
+                    mangaDexIds = route.mangaDexIds,
                     title = route.title,
                     completedChapters = route.completedChapters,
                     onNavigateBack = { options.navigateBack() },
-                    mangaChaptersViewModel = hiltViewModel(key = "read_${route.mangaDexId}")
+                    mangaChaptersViewModel = hiltViewModel(key = "read_${route.mangaDexIds}")
                 )
             }
             entry<DetailsNavRoute.Comments> { route ->

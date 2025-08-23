@@ -19,7 +19,7 @@ data class Attributes(
     //val originalLanguage: String,
     //val publicationDemographic: String,
     //val state: String,
-    //val status: String,
+    val status: String,
     //val tags: List<Tag>,
     val title: Title,
     //val updatedAt: String,

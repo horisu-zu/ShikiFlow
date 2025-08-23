@@ -12,6 +12,14 @@ object StatusColor {
         else -> Color(0xFF8C8C8C)
     }
 
+    fun getMangaDexStatusColor(status: String): Color = when(status) {
+        "hiatus" -> Color(0xFFDA7500)
+        "ongoing" -> Color(0xFF04D000)
+        "completed" -> Color(0xFF00C9F5)
+        "cancelled" -> Color(0xFFFF4040)
+        else -> Color(0xFF8C8C8C)
+    }
+
     fun getStatusBrightColor(status: String): Color = when (status.lowercase().replace(" ", "_")) {
         "watching" -> Color(0xFFAE62CF)
         "reading" -> Color(0xFFAE62CF)

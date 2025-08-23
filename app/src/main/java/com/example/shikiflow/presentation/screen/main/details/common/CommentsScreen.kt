@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +33,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.common.comment.CommentItem
 import com.example.shikiflow.data.common.comment.CommentType
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.CommentViewModel
 import com.example.shikiflow.utils.Converter.EntityType
@@ -139,9 +139,7 @@ private fun TopicCommentsSection(
                         Box(
                             modifier = Modifier.fillParentMaxSize(),
                             contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
+                        ) { CircularProgressIndicator() }
                     }
                 }
                 loadState.append is LoadState.Loading -> {
@@ -149,9 +147,7 @@ private fun TopicCommentsSection(
                         Box(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                             contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
+                        ) { CircularProgressIndicator() }
                     }
                 }
             }
@@ -223,7 +219,20 @@ private fun CommentThreadSection(
                     }
                 }
             }
-            is Resource.Error -> { /**/ }
+            is Resource.Error -> {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = "Error: ${comments.message}",
+                            buttonLabel = "Retry",
+                            onButtonClick = { commentViewModel.getCommentWithReplies(commentId) }
+                        )
+                    }
+                }
+            }
         }
     }
 }

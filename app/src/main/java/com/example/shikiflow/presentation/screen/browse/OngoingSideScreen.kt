@@ -16,10 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import com.example.shikiflow.R
 import com.example.shikiflow.data.anime.Browse
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.utils.Converter.formatDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
@@ -42,7 +45,9 @@ fun OngoingSideScreen(
     }
 
     LazyColumn(
-        modifier = modifier.fillMaxSize().padding(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         if(ongoingData.loadState.refresh is LoadState.Loading) {
@@ -54,11 +59,24 @@ fun OngoingSideScreen(
                     CircularProgressIndicator()
                 }
             }
+        } else if (ongoingData.loadState.refresh is LoadState.Error) {
+            item {
+                Box(
+                    modifier = Modifier.fillParentMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.b_oss_error),
+                        buttonLabel = stringResource(id = R.string.common_retry),
+                        onButtonClick = { ongoingData.refresh() }
+                    )
+                }
+            }
         }
         groupedOngoings.forEach { (date, animeValues) ->
             item {
                 Text(
-                    text = date.toString(),
+                    text = date,
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
@@ -82,7 +100,9 @@ fun OngoingSideScreen(
                 text = "*Items are grouped by date and sorted by score.\nCurrently screen supports " +
                         "functionality for the first 45 rated ongoings (and among them only those " +
                         "with a release date of the next episode can be shown).",
-                modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 4.dp),
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
                 )

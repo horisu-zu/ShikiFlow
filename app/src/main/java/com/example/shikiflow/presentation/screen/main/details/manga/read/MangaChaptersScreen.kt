@@ -55,6 +55,7 @@ fun MangaChaptersScreen(
     completedChapters: Int,
     navOptions: MangaReadNavOptions,
     onNavigateBack: () -> Unit,
+    navigationSource: ChaptersScreenSource,
     mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
 ) {
     val mangaChapters = mangaChaptersViewModel.mangaChapters.collectAsState()
@@ -83,7 +84,10 @@ fun MangaChaptersScreen(
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = { onNavigateBack() }
+                        onClick = { when(navigationSource) {
+                            ChaptersScreenSource.AUTOMATED -> onNavigateBack()
+                            ChaptersScreenSource.MANUAL -> navOptions.navigateBack()
+                        } }
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,

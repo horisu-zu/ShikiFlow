@@ -2,24 +2,22 @@ package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import com.example.shikiflow.R
 import com.example.shikiflow.data.anime.Browse
 import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.presentation.common.ErrorItem
 
 @Composable
 fun MainSideScreen(
@@ -37,22 +35,11 @@ fun MainSideScreen(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = "Error Loading Browse Data"
-                )
-                Button(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        browseData.refresh()
-                    }
-                ) {
-                    Text(text = "Retry")
-                }
-            }
+            ErrorItem(
+                message = stringResource(R.string.b_mss_error),
+                buttonLabel = stringResource(id = R.string.common_retry),
+                onButtonClick = { browseData.refresh() }
+            )
         }
     } else {
         LazyVerticalGrid(
