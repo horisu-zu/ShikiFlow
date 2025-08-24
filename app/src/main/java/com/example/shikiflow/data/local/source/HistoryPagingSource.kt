@@ -39,7 +39,7 @@ class HistoryPagingSource @Inject constructor(
             Log.d("HistoryPagingSource", "Received $responseSize items for page $page, requested ${params.loadSize}")
 
             LoadResult.Page(
-                data = response.getOrNull() ?: emptyList(),
+                data = response.getOrThrow(),
                 prevKey = prevKey,
                 nextKey = nextKey
             )

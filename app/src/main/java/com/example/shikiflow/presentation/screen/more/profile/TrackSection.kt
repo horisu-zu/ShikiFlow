@@ -17,11 +17,11 @@ import com.example.shikiflow.utils.IconResource
 
 @Composable
 fun TrackSection(
-    userRateData: List<UserRate?>,
+    userRateData: List<UserRate>,
     modifier: Modifier = Modifier
 ) {
-    val animeTrackData = userRateData.filter { it?.targetType == TargetType.ANIME }
-    val mangaTrackData = userRateData.filter { it?.targetType == TargetType.MANGA }
+    val animeTrackData = userRateData.filter { it.targetType == TargetType.ANIME }
+    val mangaTrackData = userRateData.filter { it.targetType == TargetType.MANGA }
 
     val animeItemsCount = animeTrackData.size
     val groupedAnimeData = animeTrackData.groupAndSortByStatus(MediaType.ANIME)

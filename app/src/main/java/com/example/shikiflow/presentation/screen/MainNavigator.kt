@@ -39,6 +39,7 @@ import com.example.shikiflow.utils.AppSettingsManager
 @Composable
 fun MainNavigator(
     appSettingsManager: AppSettingsManager,
+    onFinishActivity: () -> Unit,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
     val items = listOf(
@@ -83,7 +84,7 @@ fun MainNavigator(
     ) { innerPadding ->
         NavDisplay(
             backStack = mainNavBackStack,
-            onBack = { mainNavBackStack.removeLastOrNull() },
+            onBack = { onFinishActivity() },
             modifier = Modifier.padding(
                 bottom = innerPadding.calculateBottomPadding()
             ),

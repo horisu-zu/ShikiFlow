@@ -91,16 +91,14 @@ class UserRepository @Inject constructor(
         status: String? = null,
         targetType: String? = null,
         censored: Boolean? = true
-    ): Result<List<UserRate>> = runCatching {
-        userApi.getUserRates(
-            userId = userId,
-            page = page,
-            limit = limit,
-            status = status,
-            targetType = targetType,
-            censored = censored
-        )
-    }
+    ): List<UserRate> = userApi.getUserRates(
+        userId = userId,
+        page = page,
+        limit = limit,
+        status = status,
+        targetType = targetType,
+        censored = censored
+    )
 
     suspend fun updateUserRate(
         id: Long,

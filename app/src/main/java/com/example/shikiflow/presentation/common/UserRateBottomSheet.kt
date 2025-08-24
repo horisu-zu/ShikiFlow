@@ -130,7 +130,7 @@ fun UserRateBottomSheet(
                 )
             } else {
                 Button(
-                    modifier = Modifier.clip(RoundedCornerShape(12.dp)),
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
                     label = "Add to List",
                     onClick = { onCreateRate(userRate.mediaId, selectedStatus) },
                     enabled = selectedStatus != -1

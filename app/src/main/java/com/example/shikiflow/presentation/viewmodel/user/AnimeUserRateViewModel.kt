@@ -3,11 +3,9 @@ package com.example.shikiflow.presentation.viewmodel.user
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.graphql.ShortAnimeTracksQuery
-import com.example.shikiflow.data.anime.ShortAnimeRate
 import com.example.shikiflow.data.tracks.UserRate
-import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,18 +14,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AnimeUserRateViewModel @Inject constructor(
-    private val userRepository: UserRepository,
-    private val animeTracksRepository: AnimeTracksRepository
+    private val userRepository: UserRepository
 ) : ViewModel() {
-    private val _userAnimeTrackData =
-        MutableStateFlow<List<ShortAnimeTracksQuery.UserRate?>>(emptyList())
-    val userAnimeTrackData = _userAnimeTrackData.asStateFlow()
-
-    private val _userRateData = MutableStateFlow<List<UserRate>>(emptyList())
+    private val _userRateData = MutableStateFlow<Resource<List<UserRate>>>(Resource.Loading())
     val userRateData = _userRateData.asStateFlow()
-
-    private val _userAnimeTrack = MutableStateFlow<List<ShortAnimeRate?>>(emptyList())
-    val userAnimeTrack = _userAnimeTrack.asStateFlow()
 
     private val _hasMorePages = MutableStateFlow(true)
 
@@ -38,29 +28,19 @@ class AnimeUserRateViewModel @Inject constructor(
         viewModelScope.launch {
 
             if (isRefresh) {
-                _userRateData.value = emptyList()
+                _userRateData.value = Resource.Loading()
                 _hasMorePages.value = true
             }
 
             val tempList = mutableListOf<UserRate>()
 
             try {
-                val result = userRepository.getUserRates(
-                    userId = userId
-                )
-
-                result.onSuccess { response ->
-                    tempList.addAll(response)
-                }
-
-                result.onFailure { error ->
-                    Log.d("UserRateViewModel", "Error: $error")
-                    _hasMorePages.value = false
-                }
+                val result = userRepository.getUserRates(userId)
 
                 Log.d("UserRateViewModel", "UserRateData: $tempList")
-                _userRateData.value = tempList
+                _userRateData.value = Resource.Success(result)
             } catch (e: Exception) {
+                _userRateData.value = Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
                 _hasMorePages.value = false
             }
         }

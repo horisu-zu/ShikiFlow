@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.history
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,9 +21,16 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -30,8 +38,12 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +54,9 @@ fun HistoryScreen(
 ) {
     val currentUserId = userData?.currentUser?.id?.toLong() ?: 0L
     val historyData = userHistoryViewModel.loadPaginatedHistory(currentUserId).collectAsLazyPagingItems()
+
+    val coroutineScope = rememberCoroutineScope()
+    var isRefreshing by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -66,37 +81,73 @@ fun HistoryScreen(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(
-                top = innerPadding.calculateTopPadding(),
-                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-            ),
-            contentPadding = PaddingValues(vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(historyData.itemCount) { index ->
-                HistoryItem(historyData[index])
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                coroutineScope.launch {
+                    try {
+                        Log.d("PullToRefresh", "Refreshing...")
+                        isRefreshing = true
+                        historyData.refresh()
+                        delay(300)
+                    } finally {
+                        Log.d("PullToRefresh", "Refresh completed")
+                        isRefreshing = false
+                    }
+                }
             }
-            historyData.apply {
-                when {
-                    loadState.refresh is LoadState.Loading -> {
-                        item {
-                            Box(
-                                modifier = Modifier.fillParentMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
-                            }
+        ) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().padding(
+                    top = innerPadding.calculateTopPadding(),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                ),
+                contentPadding = PaddingValues(vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                if(historyData.loadState.refresh is LoadState.Error) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { historyData.refresh() }
+                            )
                         }
                     }
-                    loadState.append is LoadState.Loading -> {
-                        item {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+                } else if(historyData.loadState.append is LoadState.Error) {
+                    item {
+                        ErrorItem(
+                            message = stringResource(R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { historyData.refresh() }
+                        )
+                    }
+                } else {
+                    items(historyData.itemCount) { index ->
+                        HistoryItem(historyData[index])
+                    }
+                    historyData.apply {
+                        when {
+                            loadState.refresh is LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier.fillParentMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
+                            }
+                            loadState.append is LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
                             }
                         }
                     }

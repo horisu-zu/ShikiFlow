@@ -78,13 +78,11 @@ fun MainPage(
                     }
                 }
             ) {
-                trackItems?.let { items ->
-                    AnimeTracksPage(
-                        trackItems = items,
-                        tracksViewModel = trackViewModel,
-                        onAnimeClick = onAnimeClick
-                    )
-                }
+                AnimeTracksPage(
+                    trackItems = trackItems,
+                    tracksViewModel = trackViewModel,
+                    onAnimeClick = onAnimeClick
+                )
             }
         }
     }
