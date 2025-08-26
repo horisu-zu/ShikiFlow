@@ -9,9 +9,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.shikiflow.data.auth.AuthState
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
+import com.example.shikiflow.presentation.viewmodel.AuthState
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 import com.example.shikiflow.utils.AppSettingsManager
 
@@ -22,7 +22,6 @@ fun AppNavigator(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
-
     val authState by viewModel.authState.collectAsState()
 
     LaunchedEffect(authState) {

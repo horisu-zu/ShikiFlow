@@ -18,9 +18,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.shikiflow.data.mapper.UserRateMapper
-import com.example.shikiflow.data.mapper.UserRateStatusConstants
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.mapper.UserRateMapper
+import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -57,7 +57,6 @@ fun MainPage(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             val status = UserRateMapper.mapStringToStatus(tabs[page])
-
             val trackItems = status?.let { trackViewModel.getAnimeTracks(it) }?.collectAsLazyPagingItems()
 
             PullToRefreshBox(
@@ -69,7 +68,7 @@ fun MainPage(
                                 Log.d("PullToRefresh", "Refreshing...")
                                 isRefreshing = true
                                 trackItems?.refresh()
-                                delay(300)
+                                delay(100)
                             } finally {
                                 Log.d("PullToRefresh", "Refresh completed")
                                 isRefreshing = false

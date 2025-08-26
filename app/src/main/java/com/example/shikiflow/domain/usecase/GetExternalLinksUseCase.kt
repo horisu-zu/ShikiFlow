@@ -1,8 +1,8 @@
 package com.example.shikiflow.domain.usecase
 
 import coil3.network.HttpException
-import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.utils.Resource

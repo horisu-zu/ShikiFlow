@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.repository
 
-import com.example.shikiflow.data.common.GithubRelease
-import com.example.shikiflow.data.api.GithubApi
+import com.example.shikiflow.domain.model.common.GithubRelease
+import com.example.shikiflow.data.remote.GithubApi
 import javax.inject.Inject
 
 class GithubRepository @Inject constructor(

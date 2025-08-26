@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.user
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.tracks.UserRate
+import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

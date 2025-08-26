@@ -7,8 +7,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.data.common.comment.CommentItem
-import com.example.shikiflow.data.common.comment.CommentType
+import com.example.shikiflow.domain.model.comment.CommentItem
+import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.data.local.source.CommentPagingSource
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.usecase.GetCommentTopicUseCase

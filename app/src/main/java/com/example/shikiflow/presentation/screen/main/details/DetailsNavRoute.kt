@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details
 
 import androidx.navigation3.runtime.NavKey
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import kotlinx.serialization.Serializable
 

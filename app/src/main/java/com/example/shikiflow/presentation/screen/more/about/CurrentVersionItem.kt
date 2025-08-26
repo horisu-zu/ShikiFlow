@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.data.common.GithubRelease
+import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.utils.Converter.formatInstant
 
 @Composable

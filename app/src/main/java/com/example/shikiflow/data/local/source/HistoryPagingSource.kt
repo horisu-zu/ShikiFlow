@@ -3,7 +3,7 @@ package com.example.shikiflow.data.local.source
 import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.shikiflow.data.user.UserHistoryResponse
+import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.repository.UserRepository
 import retrofit2.HttpException
 import java.io.IOException

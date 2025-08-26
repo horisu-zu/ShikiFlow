@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.shikiflow.presentation.screen.main.MainTrackMode
@@ -22,6 +23,10 @@ class AppSettingsManager @Inject constructor(
 ) {
     companion object {
         private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("app_settings")
+        private val AVATAR_URL = stringPreferencesKey("avatar_url")
+        private val USERNAME = stringPreferencesKey("username")
+        private val USER_ID = intPreferencesKey("user_id")
+
         private val THEME_KEY = stringPreferencesKey("theme")
         private val OLED_KEY = stringPreferencesKey("oled")
         private val LOCALE_KEY = stringPreferencesKey("locale")
@@ -29,6 +34,15 @@ class AppSettingsManager @Inject constructor(
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
     }
+
+    val avatarUrlFlow: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[AVATAR_URL] }
+
+    val usernameFlow: Flow<String?> = context.dataStore.data
+        .map { preferences -> preferences[USERNAME] }
+
+    val userIdFlow: Flow<Int?> = context.dataStore.data
+        .map { preferences -> preferences[USER_ID] }
 
     val themeFlow: Flow<ThemeMode> = context.dataStore.data
         .map { preferences ->
@@ -60,6 +74,22 @@ class AppSettingsManager @Inject constructor(
             ChapterUIMode.entries.find { it.name == preferences[CHAPTER_UI_MODE] }
                 ?: ChapterUIMode.SCROLL
         }
+
+    suspend fun saveUserInfo(userId: Int, username: String, avatarUrl: String) {
+        context.dataStore.edit { preferences ->
+            preferences[USER_ID] = userId
+            preferences[USERNAME] = username
+            preferences[AVATAR_URL] = avatarUrl
+        }
+    }
+
+    suspend fun clearUserInfo() {
+        context.dataStore.edit { preferences ->
+            preferences.remove(USER_ID)
+            preferences.remove(USERNAME)
+            preferences.remove(AVATAR_URL)
+        }
+    }
 
     suspend fun saveTheme(themeMode: ThemeMode) {
         context.dataStore.edit { preferences ->

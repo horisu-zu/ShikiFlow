@@ -11,6 +11,7 @@ import com.example.shikiflow.utils.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -51,7 +52,7 @@ class SettingsViewModel @Inject constructor(
             ) { appTheme, isOledEnabled ->
                 _appTheme.value = appTheme
                 _isOledThemeEnabled.value = isOledEnabled
-            }.collect { /**/ }
+            }.collect()
         }
     }
 
@@ -63,7 +64,7 @@ class SettingsViewModel @Inject constructor(
             ) { isDataSaverEnabled, chapterUIMode ->
                 _isDataSaver.value = isDataSaverEnabled
                 _chapterUIMode.value = chapterUIMode
-            }.collect{ /**/ }
+            }.collect()
         }
     }
 

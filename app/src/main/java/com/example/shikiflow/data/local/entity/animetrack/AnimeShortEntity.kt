@@ -7,8 +7,10 @@ import com.example.graphql.fragment.AnimeShort
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.graphql.type.AnimeStatusEnum
-import com.example.shikiflow.data.local.entity.animetrack.PosterEntity.Companion.toEntity
-import com.example.shikiflow.data.local.entity.animetrack.ReleaseDateEntity.Companion.toEntity
+import com.example.shikiflow.data.local.entity.PosterEntity
+import com.example.shikiflow.data.local.entity.PosterEntity.Companion.toEntity
+import com.example.shikiflow.data.local.entity.ReleaseDateEntity
+import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toEntity
 import kotlinx.datetime.Instant
 
 @Entity(tableName = "anime_short")

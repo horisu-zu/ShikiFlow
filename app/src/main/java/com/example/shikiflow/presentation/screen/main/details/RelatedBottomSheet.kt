@@ -15,8 +15,8 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.data.common.RelatedInfo
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.common.RelatedInfo
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedItem
 
 @OptIn(ExperimentalMaterial3Api::class)

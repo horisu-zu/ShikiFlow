@@ -1,8 +1,8 @@
 package com.example.shikiflow.presentation.screen.browse
 
 import androidx.navigation3.runtime.NavKey
-import com.example.shikiflow.data.anime.BrowseType
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
 
 sealed interface BrowseNavRoute: NavKey {

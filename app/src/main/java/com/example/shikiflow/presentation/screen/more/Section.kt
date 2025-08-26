@@ -12,7 +12,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.data.common.SectionItem
+import com.example.shikiflow.domain.model.common.SectionItem
 
 @Composable
 fun Section(

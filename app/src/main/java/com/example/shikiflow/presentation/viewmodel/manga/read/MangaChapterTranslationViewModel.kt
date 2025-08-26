@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.manga.read
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
 import com.example.shikiflow.domain.usecase.GetChapterDataUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

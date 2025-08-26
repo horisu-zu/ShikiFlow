@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.graphql.fragment.AnimeUserRateWithModel
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.tracks.UserRateResponse
+import com.example.shikiflow.domain.model.tracks.UserRateResponse
 import kotlinx.datetime.Instant
 
 @Entity(tableName = "anime_track")

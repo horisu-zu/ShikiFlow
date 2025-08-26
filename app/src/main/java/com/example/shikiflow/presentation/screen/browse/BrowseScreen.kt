@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @Composable

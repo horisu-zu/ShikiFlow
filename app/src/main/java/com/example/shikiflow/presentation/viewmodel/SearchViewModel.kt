@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.example.shikiflow.data.search.SearchState
+import com.example.shikiflow.domain.model.search.SearchState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

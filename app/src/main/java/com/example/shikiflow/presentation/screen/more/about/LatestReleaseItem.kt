@@ -26,7 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.data.common.GithubRelease
+import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.utils.WebIntent
 
 @Composable

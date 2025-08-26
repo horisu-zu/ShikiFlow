@@ -9,12 +9,12 @@ import com.example.graphql.ShortMangaTracksQuery
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.UserRateOrderInputType
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.anime.MyListString
-import com.example.shikiflow.data.anime.ShikiManga
-import com.example.shikiflow.data.anime.ShortMangaTracksResponse
-import com.example.shikiflow.data.anime.toGraphQLValue
-import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.data.api.MangaApi
+import com.example.shikiflow.domain.model.anime.MyListString
+import com.example.shikiflow.domain.model.anime.ShikiManga
+import com.example.shikiflow.domain.model.anime.ShortMangaTracksResponse
+import com.example.shikiflow.domain.model.anime.toGraphQLValue
+import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.data.remote.MangaApi
 import javax.inject.Inject
 
 class MangaRepository @Inject constructor(

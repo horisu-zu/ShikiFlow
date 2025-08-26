@@ -6,8 +6,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.graphql.CurrentUserQuery
-import com.example.shikiflow.data.anime.BrowseType
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 
 @Composable

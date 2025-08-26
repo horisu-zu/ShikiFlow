@@ -39,8 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.data.anime.toBrowseAnime
-import com.example.shikiflow.data.anime.toBrowseManga
+import com.example.shikiflow.domain.model.anime.toBrowseAnime
+import com.example.shikiflow.domain.model.anime.toBrowseManga
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard

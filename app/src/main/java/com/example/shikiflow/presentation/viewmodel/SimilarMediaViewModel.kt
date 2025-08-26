@@ -2,10 +2,10 @@ package com.example.shikiflow.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.anime.Browse
-import com.example.shikiflow.data.anime.toBrowseAnime
-import com.example.shikiflow.data.anime.toBrowseManga
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.anime.toBrowseAnime
+import com.example.shikiflow.domain.model.anime.toBrowseManga
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.utils.Resource

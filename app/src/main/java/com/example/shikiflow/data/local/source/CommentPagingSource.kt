@@ -2,7 +2,7 @@ package com.example.shikiflow.data.local.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.shikiflow.data.common.comment.CommentItem
+import com.example.shikiflow.domain.model.comment.CommentItem
 import com.example.shikiflow.domain.repository.CommentRepository
 import retrofit2.HttpException
 import java.io.IOException

@@ -22,9 +22,9 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack.Companion.toUserRateData
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toEntity
+import com.example.shikiflow.domain.model.track.anime.AnimeTrack
+import com.example.shikiflow.domain.model.track.anime.AnimeTrack.Companion.toUserRateData
+import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack.Companion.toEntity
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel

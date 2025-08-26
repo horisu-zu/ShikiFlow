@@ -6,10 +6,10 @@ import androidx.room.PrimaryKey
 import com.example.graphql.fragment.MangaShort
 import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.MangaStatusEnum
-import com.example.shikiflow.data.local.entity.animetrack.PosterEntity
-import com.example.shikiflow.data.local.entity.animetrack.PosterEntity.Companion.toEntity
-import com.example.shikiflow.data.local.entity.animetrack.ReleaseDateEntity
-import com.example.shikiflow.data.local.entity.animetrack.ReleaseDateEntity.Companion.toEntity
+import com.example.shikiflow.data.local.entity.PosterEntity
+import com.example.shikiflow.data.local.entity.PosterEntity.Companion.toEntity
+import com.example.shikiflow.data.local.entity.ReleaseDateEntity
+import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toEntity
 
 @Entity(tableName = "manga_short")
 data class MangaShortEntity(

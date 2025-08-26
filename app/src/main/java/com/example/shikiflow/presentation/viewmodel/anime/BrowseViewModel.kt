@@ -6,11 +6,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.data.anime.Browse
-import com.example.shikiflow.data.anime.BrowseType
+import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.data.local.source.BrowsePagingSource
-import com.example.shikiflow.data.mapper.BrowseOptions
-import com.example.shikiflow.data.mapper.BrowseParams
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
+import com.example.shikiflow.domain.model.mapper.BrowseParams
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel

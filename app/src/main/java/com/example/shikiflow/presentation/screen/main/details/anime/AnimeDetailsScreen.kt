@@ -31,10 +31,10 @@ import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.data.tracks.TargetType
-import com.example.shikiflow.data.tracks.UserRateData
-import com.example.shikiflow.data.tracks.toUiModel
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.TargetType
+import com.example.shikiflow.domain.model.tracks.UserRateData
+import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode

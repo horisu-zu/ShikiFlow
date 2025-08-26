@@ -6,7 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.data.common.GithubRelease
+import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.utils.VersionListener
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

@@ -13,11 +13,11 @@ import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.R
-import com.example.shikiflow.data.common.comment.CommentType
-import com.example.shikiflow.data.mapper.UserRateStatusConstants
-import com.example.shikiflow.data.mapper.UserRateStatusConstants.getStatusOrder
-import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.data.tracks.UserRate
+import com.example.shikiflow.domain.model.comment.CommentType
+import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
+import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants.getStatusOrder
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserRate
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
@@ -131,16 +131,14 @@ object Converter {
         }
     }
 
-    fun convertStatus(status: String): String {
+    fun convertStatus(status: String, mediaType: MediaType): String {
         return when (status) {
-            "watching" -> "Watching"
+            "watching" -> if(mediaType == MediaType.ANIME) "Watching" else "Reading"
             "completed" -> "Completed"
             "on_hold" -> "On Hold"
             "dropped" -> "Dropped"
             "planned" -> "Planned"
-            "rewatching" -> "Rewatching"
-            "reading" -> "Reading"
-            "rereading" -> "Rereading"
+            "rewatching" -> if(mediaType == MediaType.ANIME) "Rewatching" else "Rereading"
             else -> "Unknown"
         }
     }
@@ -172,7 +170,7 @@ object Converter {
             .groupBy { getStatusKey(contentType, it?.status ?: "unknown") }
             .mapValues { it.value.size }
             .toSortedMap(compareBy { order.indexOf(it) })
-            .mapKeys { convertStatus(it.key) }
+            .mapKeys { convertStatus(it.key, contentType) }
     }
 
     private fun getStatusKey(mediaType: MediaType, status: String): String {

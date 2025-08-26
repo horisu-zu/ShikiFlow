@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.data.anime.Browse
+import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.utils.Converter.formatDate
 import kotlinx.datetime.TimeZone

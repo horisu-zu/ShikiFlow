@@ -17,9 +17,9 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.MangaDetailsQuery
-import com.example.shikiflow.data.mapper.RelatedMapper
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.mapper.RelatedMapper
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet

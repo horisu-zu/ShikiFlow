@@ -20,8 +20,8 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.isWatched
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.isWatched
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.StatusColor

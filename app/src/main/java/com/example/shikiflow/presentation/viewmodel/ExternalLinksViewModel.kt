@@ -3,8 +3,8 @@ package com.example.shikiflow.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.usecase.GetExternalLinksUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

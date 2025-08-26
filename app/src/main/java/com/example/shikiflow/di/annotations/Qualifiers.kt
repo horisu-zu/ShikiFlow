@@ -29,5 +29,3 @@ annotation class MangaDexRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class GithubRetrofit
-
-annotation class GraphQLScalar(val type: String)

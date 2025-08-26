@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.data.anime.BrowseType
+import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.presentation.common.NavigationCard
 import com.example.shikiflow.utils.IconResource
 

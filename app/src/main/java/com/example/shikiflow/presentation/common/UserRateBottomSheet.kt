@@ -46,10 +46,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.data.tracks.UserRateData
-import com.example.shikiflow.data.mapper.UserRateStatusConstants
-import com.example.shikiflow.data.tracks.RateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserRateData
+import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
+import com.example.shikiflow.domain.model.tracks.RateStatus
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.convertStatus
@@ -68,7 +68,9 @@ fun UserRateBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState()
     val chips = UserRateStatusConstants.getStatusChips(userRate.mediaType)
-    val initialStatusIndex = chips.indexOfFirst { it.equals(convertStatus(userRate.status), ignoreCase = true) }
+    val initialStatusIndex = chips.indexOfFirst {
+        it.equals(convertStatus(userRate.status, userRate.mediaType), ignoreCase = true)
+    }
 
     var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
     var selectedScore by remember { mutableIntStateOf(userRate.score) }

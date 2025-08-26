@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
-import com.example.shikiflow.data.common.SectionItem
+import com.example.shikiflow.domain.model.common.SectionItem
 import com.example.shikiflow.presentation.screen.more.Section
 import com.example.shikiflow.presentation.viewmodel.AboutViewModel
 import com.example.shikiflow.utils.IconResource

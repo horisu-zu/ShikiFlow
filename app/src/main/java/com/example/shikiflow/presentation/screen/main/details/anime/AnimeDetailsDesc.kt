@@ -36,9 +36,9 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeDetailsQuery
-import com.example.shikiflow.data.common.RelatedInfo
-import com.example.shikiflow.data.mapper.RelatedMapper
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.common.RelatedInfo
+import com.example.shikiflow.domain.model.mapper.RelatedMapper
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage

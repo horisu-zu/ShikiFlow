@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.character
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.character.ShikiCharacter
+import com.example.shikiflow.domain.model.character.ShikiCharacter
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

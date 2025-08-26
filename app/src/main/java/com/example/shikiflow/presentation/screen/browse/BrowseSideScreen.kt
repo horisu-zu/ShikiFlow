@@ -19,8 +19,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.shikiflow.data.anime.BrowseType
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

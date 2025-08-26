@@ -13,7 +13,7 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.dao.AnimeTracksDao
 import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Companion.toEntity
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack
+import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toEntity
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import retrofit2.HttpException
@@ -25,7 +25,7 @@ class AnimeTracksMediator(
     private val appRoomDatabase: AppRoomDatabase,
     private val animeTracksDao: AnimeTracksDao,
     private val userRateStatus: UserRateStatusEnum
-): RemoteMediator<Int, AnimeTrack>() {
+): RemoteMediator<Int, AnimeTrackDto>() {
 
     companion object {
         private val loadedPagesMap = mutableMapOf<UserRateStatusEnum, Int>()
@@ -33,7 +33,7 @@ class AnimeTracksMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, AnimeTrack>
+        state: PagingState<Int, AnimeTrackDto>
     ): MediatorResult {
         return try {
             // I'm using custom page map cuz of the way the API works. It's indexed starting with 1
@@ -62,6 +62,7 @@ class AnimeTracksMediator(
             val response = animeTracksRepository.getAnimeTracks(
                 page = page,
                 limit = state.config.pageSize,
+                userId = null,
                 status = userRateStatus,
                 order = UserRateOrderInputType(
                     field = UserRateOrderFieldEnum.updated_at,

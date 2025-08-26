@@ -14,8 +14,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.shikiflow.data.anime.Browse
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 

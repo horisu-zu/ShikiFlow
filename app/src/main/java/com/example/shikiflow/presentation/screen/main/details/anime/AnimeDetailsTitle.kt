@@ -25,10 +25,10 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.mapper.UserRateMapper
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
-import com.example.shikiflow.data.tracks.RateStatus
+import com.example.shikiflow.domain.model.mapper.UserRateMapper
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeKind
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeStatus
+import com.example.shikiflow.domain.model.tracks.RateStatus
 import com.example.shikiflow.presentation.common.StarScore
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType

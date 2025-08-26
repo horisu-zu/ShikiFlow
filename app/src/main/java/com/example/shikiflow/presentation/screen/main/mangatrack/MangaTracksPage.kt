@@ -16,8 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.data.local.entity.mangatrack.MangaTrack
-import com.example.shikiflow.data.local.entity.mangatrack.MangaTrack.Companion.toBrowse
+import com.example.shikiflow.domain.model.track.manga.MangaTrack
+import com.example.shikiflow.domain.model.track.manga.MangaTrack.Companion.toBrowse
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.browse.BrowseItem
 

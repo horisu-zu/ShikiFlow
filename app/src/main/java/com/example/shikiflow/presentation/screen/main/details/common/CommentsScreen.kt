@@ -31,8 +31,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.data.common.comment.CommentItem
-import com.example.shikiflow.data.common.comment.CommentType
+import com.example.shikiflow.domain.model.comment.CommentItem
+import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.CommentViewModel

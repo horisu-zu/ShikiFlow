@@ -1,6 +1,6 @@
 package com.example.shikiflow.domain.repository
 
-import com.example.shikiflow.data.api.MangaDexApi
+import com.example.shikiflow.data.remote.MangaDexApi
 import javax.inject.Inject
 
 class MangaDexRepository @Inject constructor(

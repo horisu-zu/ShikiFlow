@@ -2,11 +2,11 @@ package com.example.shikiflow.data.local.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.shikiflow.data.anime.Browse
-import com.example.shikiflow.data.anime.BrowseType
-import com.example.shikiflow.data.anime.toBrowseAnime
-import com.example.shikiflow.data.anime.toBrowseManga
-import com.example.shikiflow.data.mapper.BrowseOptions
+import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.anime.toBrowseAnime
+import com.example.shikiflow.domain.model.anime.toBrowseManga
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import retrofit2.HttpException

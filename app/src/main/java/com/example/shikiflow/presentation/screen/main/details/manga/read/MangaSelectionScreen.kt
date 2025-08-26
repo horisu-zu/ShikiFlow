@@ -43,7 +43,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
-import com.example.shikiflow.data.mangadex.manga.MangaData
+import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaSelectionViewModel

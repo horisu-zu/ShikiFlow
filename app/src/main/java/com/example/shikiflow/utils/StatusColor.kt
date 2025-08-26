@@ -2,7 +2,7 @@ package com.example.shikiflow.utils
 
 import androidx.compose.ui.graphics.Color
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.anime.MyListString
+import com.example.shikiflow.domain.model.anime.MyListString
 
 object StatusColor {
     fun getAnimeStatusColor(status: Any): Color = when(status) {

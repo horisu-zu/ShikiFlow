@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.Graph
 import com.example.shikiflow.presentation.common.GraphGridType

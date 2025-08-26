@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.type.OrderEnum
-import com.example.shikiflow.data.anime.MyListString
+import com.example.shikiflow.domain.model.anime.MyListString
 import com.example.shikiflow.domain.repository.AnimeRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow

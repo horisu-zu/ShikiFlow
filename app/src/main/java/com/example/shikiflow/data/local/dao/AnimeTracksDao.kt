@@ -7,7 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack
+import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity
 
 @Dao
@@ -32,5 +32,5 @@ interface AnimeTracksDao {
     fun clearAnimeItems(status: String)
 
     @Query("SELECT * FROM anime_track WHERE status = :status ORDER BY updatedAt DESC")
-    fun getTracksByStatus(status: String): PagingSource<Int, AnimeTrack>
+    fun getTracksByStatus(status: String): PagingSource<Int, AnimeTrackDto>
 }

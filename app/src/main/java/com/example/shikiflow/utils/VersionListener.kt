@@ -2,7 +2,7 @@ package com.example.shikiflow.utils
 
 import android.util.Log
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.data.common.GithubRelease
+import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.domain.repository.GithubRepository
 import javax.inject.Inject
 import javax.inject.Singleton

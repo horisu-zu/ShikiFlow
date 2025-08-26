@@ -13,7 +13,7 @@ import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.dao.MangaTracksDao
 import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity.Companion.toEntity
-import com.example.shikiflow.data.local.entity.mangatrack.MangaTrack
+import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackDto
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity.Companion.toEntity
 import com.example.shikiflow.domain.repository.MangaTracksRepository
 import retrofit2.HttpException
@@ -25,7 +25,7 @@ class MangaTracksMediator(
     private val appRoomDatabase: AppRoomDatabase,
     private val mangaTracksDao: MangaTracksDao,
     private val userRateStatus: UserRateStatusEnum
-): RemoteMediator<Int, MangaTrack>() {
+): RemoteMediator<Int, MangaTrackDto>() {
 
     companion object {
         private val loadedPagesMap = mutableMapOf<UserRateStatusEnum, Int>()
@@ -33,7 +33,7 @@ class MangaTracksMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, MangaTrack>
+        state: PagingState<Int, MangaTrackDto>
     ): MediatorResult {
         return try {
             val page = when(loadType) {

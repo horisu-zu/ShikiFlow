@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.shikiflow.data.anime.BrowseType
-import com.example.shikiflow.data.mapper.BrowseOptions
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @Composable

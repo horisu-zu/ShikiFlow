@@ -18,7 +18,7 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
-import com.example.shikiflow.data.common.SectionItem
+import com.example.shikiflow.domain.model.common.SectionItem
 import com.example.shikiflow.presentation.common.CustomSearchField
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 import com.example.shikiflow.utils.IconResource

@@ -83,6 +83,11 @@ fun HistoryScreen(
     ) { innerPadding ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
+            modifier = Modifier.padding(
+                top = innerPadding.calculateTopPadding(),
+                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+            ),
             onRefresh = {
                 coroutineScope.launch {
                     try {
@@ -98,11 +103,7 @@ fun HistoryScreen(
             }
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize().padding(
-                    top = innerPadding.calculateTopPadding(),
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                ),
+                modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -121,11 +122,16 @@ fun HistoryScreen(
                     }
                 } else if(historyData.loadState.append is LoadState.Error) {
                     item {
-                        ErrorItem(
-                            message = stringResource(R.string.common_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { historyData.refresh() }
-                        )
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { historyData.refresh() }
+                            )
+                        }
                     }
                 } else {
                     items(historyData.itemCount) { index ->

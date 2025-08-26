@@ -22,8 +22,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
-import com.example.shikiflow.data.mapper.UserRateStatusConstants
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.main.mangatrack.MainMangaPage
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel

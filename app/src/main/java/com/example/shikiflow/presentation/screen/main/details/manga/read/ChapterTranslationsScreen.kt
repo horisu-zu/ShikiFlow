@@ -38,7 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.shikiflow.data.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.Resource

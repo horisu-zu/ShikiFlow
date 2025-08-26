@@ -13,11 +13,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.UserRateStatusEnum
-import com.example.shikiflow.data.anime.BrowseType
-import com.example.shikiflow.data.anime.MyListString
-import com.example.shikiflow.data.mapper.BrowseOptions
-import com.example.shikiflow.data.mapper.EnumUtils
-import com.example.shikiflow.data.search.ContentType
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.anime.MyListString
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
+import com.example.shikiflow.domain.model.mapper.EnumUtils
+import com.example.shikiflow.domain.model.search.ContentType
 import com.example.shikiflow.presentation.common.ChipSection
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -2,7 +2,7 @@ package com.example.shikiflow.domain.usecase
 
 import android.util.Log
 import coil3.network.HttpException
-import com.example.shikiflow.data.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.async

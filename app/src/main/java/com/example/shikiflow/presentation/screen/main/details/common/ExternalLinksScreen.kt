@@ -31,8 +31,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.data.tracks.MediaType
+import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.ExternalLinksViewModel
 import com.example.shikiflow.utils.Resource

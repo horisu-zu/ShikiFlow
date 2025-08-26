@@ -21,7 +21,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.data.common.ErrorFaces
+import com.example.shikiflow.domain.model.common.ErrorFaces
 
 @Composable
 fun ErrorItem(

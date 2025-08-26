@@ -20,12 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.type.AnimeStatusEnum
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrack
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.determineSeason
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeKind
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapAnimeStatus
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.determineSeason
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeKind
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeStatus
+import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage

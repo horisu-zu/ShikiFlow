@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.usecase
 
 import coil3.network.HttpException
-import com.example.shikiflow.data.common.comment.CommentItem
+import com.example.shikiflow.domain.model.comment.CommentItem
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.flow.Flow

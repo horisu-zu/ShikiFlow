@@ -7,7 +7,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.shikiflow.data.local.source.HistoryPagingSource
-import com.example.shikiflow.data.user.UserHistoryResponse
+import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

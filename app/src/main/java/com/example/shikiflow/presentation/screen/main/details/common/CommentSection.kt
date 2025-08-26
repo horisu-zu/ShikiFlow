@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.shikiflow.data.common.comment.CommentItem
+import com.example.shikiflow.domain.model.comment.CommentItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.viewmodel.CommentViewModel

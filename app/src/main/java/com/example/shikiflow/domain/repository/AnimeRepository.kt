@@ -9,11 +9,11 @@ import com.example.graphql.type.DurationString
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.RatingString
 import com.example.graphql.type.SeasonString
-import com.example.shikiflow.data.anime.MyListString
-import com.example.shikiflow.data.anime.SimilarAnime
-import com.example.shikiflow.data.anime.toGraphQLValue
-import com.example.shikiflow.data.common.ExternalLink
-import com.example.shikiflow.data.api.AnimeApi
+import com.example.shikiflow.domain.model.anime.MyListString
+import com.example.shikiflow.domain.model.anime.SimilarAnime
+import com.example.shikiflow.domain.model.anime.toGraphQLValue
+import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.data.remote.AnimeApi
 import javax.inject.Inject
 
 class AnimeRepository @Inject constructor(

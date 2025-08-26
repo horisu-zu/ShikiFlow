@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -33,11 +32,11 @@ import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.type.MangaStatusEnum
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.R
-import com.example.shikiflow.data.mapper.UserRateMapper
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapMangaKind
-import com.example.shikiflow.data.mapper.UserRateMapper.Companion.mapMangaStatus
-import com.example.shikiflow.data.tracks.MediaType
-import com.example.shikiflow.data.tracks.RateStatus
+import com.example.shikiflow.domain.model.mapper.UserRateMapper
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapMangaKind
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapMangaStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.RateStatus
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.GradientImage

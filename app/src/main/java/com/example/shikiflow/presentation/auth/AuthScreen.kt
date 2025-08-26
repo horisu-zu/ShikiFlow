@@ -11,9 +11,9 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.shikiflow.data.auth.AuthState
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.shikiflow.presentation.viewmodel.AuthState
 
 @Composable
 fun AuthScreen(
