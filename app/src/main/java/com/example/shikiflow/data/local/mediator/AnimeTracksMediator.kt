@@ -62,7 +62,6 @@ class AnimeTracksMediator(
             val response = animeTracksRepository.getAnimeTracks(
                 page = page,
                 limit = state.config.pageSize,
-                userId = null,
                 status = userRateStatus,
                 order = UserRateOrderInputType(
                     field = UserRateOrderFieldEnum.updated_at,
@@ -72,10 +71,10 @@ class AnimeTracksMediator(
 
             if (response.isSuccess) {
                 val data = response.getOrThrow()
-                val tracks = data.userRates.map { userRate ->
+                val tracks = data.map { userRate ->
                     userRate.animeUserRateWithModel.toEntity()
                 }
-                val animeItems = data.userRates
+                val animeItems = data
                     .mapNotNull { it.animeUserRateWithModel.anime?.animeShort }
                     .map { it.toEntity() }
 
@@ -88,7 +87,7 @@ class AnimeTracksMediator(
                     appRoomDatabase.animeTracksDao().insertAnimeItems(animeItems)
                 }
 
-                val endOfPaginationReached = data.userRates.isEmpty() || data.userRates.size < state.config.pageSize
+                val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize
                 return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
             } else {
                 return MediatorResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))

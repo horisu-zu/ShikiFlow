@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -56,6 +57,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.ChapterItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterNavigationViewModel
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel
+import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -145,6 +147,7 @@ fun ChapterScreen(
                     ) {
                         ErrorItem(
                             message = stringResource(R.string.chp_mangadex_empty),
+                            icon = IconResource.Vector(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
                             buttonLabel = stringResource(R.string.chp_navigate_back),
                             onButtonClick = { navOptions.navigateBack() }
                         )

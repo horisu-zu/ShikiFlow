@@ -173,7 +173,7 @@ private fun MangaItem(
             verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
         ) {
             Text(
-                text = mangaItem.data.attributes.title.en,
+                text = mangaItem.data.attributes.title.en ?: mangaItem.data.attributes.title.jaRo ?: "",
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),

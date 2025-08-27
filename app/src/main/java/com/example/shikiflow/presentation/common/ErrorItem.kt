@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,11 +21,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.common.ErrorFaces
+import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun ErrorItem(
     message: String,
     modifier: Modifier = Modifier,
+    icon: IconResource = IconResource.Vector(Icons.Default.Refresh),
     buttonLabel: String? = null,
     onButtonClick: () -> Unit = { /**/ }
 ) {
@@ -56,10 +58,9 @@ fun ErrorItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Refresh,
-                        contentDescription = label,
-                        modifier = Modifier.size(24.dp)
+                    icon.toIcon(
+                        modifier = Modifier.size(24.dp),
+                        tint = MaterialTheme.colorScheme.onPrimary
                     )
                     Text(
                         text = label,

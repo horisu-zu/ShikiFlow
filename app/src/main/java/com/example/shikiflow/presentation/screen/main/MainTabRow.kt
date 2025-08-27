@@ -37,8 +37,7 @@ fun MainTabRow(
                         shape = RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp)
                     )
             )
-        },
-        divider = {}
+        }, divider = {}
     ) {
         tabs.forEachIndexed { index, title ->
             Tab(

@@ -1,6 +1,5 @@
 package com.example.shikiflow.domain.repository
 
-import com.apollographql.apollo.ApolloClient
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.anime.ShortAnimeRate
 import com.example.shikiflow.data.manga.ShortMangaRate
@@ -10,47 +9,16 @@ import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
-import com.example.shikiflow.data.remote.UserApi
-import javax.inject.Inject
 
-class UserRepository @Inject constructor(
-    private val apolloClient: ApolloClient,
-    private val userApi: UserApi
-) {
-
-    suspend fun fetchCurrentUser(): Result<CurrentUserQuery.Data> {
-        return try {
-            val response = apolloClient.query(CurrentUserQuery()).execute()
-
-            if (response.hasErrors()) {
-                val errorMessage = response.errors?.joinToString { it.message }
-                    ?: "Unknown error occurred"
-                Result.failure(Exception(errorMessage))
-            } else {
-                response.data?.let { data ->
-                    Result.success(data)
-                } ?: Result.failure(Exception("No data received"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
+interface UserRepository {
+    suspend fun fetchCurrentUser(): Result<CurrentUserQuery.Data>
     suspend fun getUserHistory(
         userId: Long,
         page: Int? = null,
         limit: Int? = null,
         targetId: Long? = null,
         targetType: TargetType? = null
-    ): Result<List<UserHistoryResponse>> = runCatching {
-        userApi.getUserHistory(
-            userId = userId,
-            page = page,
-            limit = limit,
-            targetId = targetId,
-            targetType = targetType?.name
-        )
-    }
+    ): Result<List<UserHistoryResponse>>
 
     suspend fun getUserAnimeRates(
         userId: Long,
@@ -58,15 +26,7 @@ class UserRepository @Inject constructor(
         limit: Int? = null,
         status: String? = null,
         censored: Boolean? = true
-    ): Result<List<ShortAnimeRate>> = runCatching {
-        userApi.getUserAnimeRates(
-            userId = userId,
-            page = page,
-            limit = limit,
-            status = status,
-            censored = censored
-        )
-    }
+    ): Result<List<ShortAnimeRate>>
 
     suspend fun getUserMangaRates(
         userId: Long,
@@ -74,15 +34,7 @@ class UserRepository @Inject constructor(
         limit: Int? = null,
         status: String? = null,
         censored: Boolean? = true
-    ): Result<List<ShortMangaRate>> = runCatching {
-        userApi.getUserMangaRates(
-            userId = userId,
-            page = page,
-            limit = limit,
-            status = status,
-            censored = censored
-        )
-    }
+    ): Result<List<ShortMangaRate>>
 
     suspend fun getUserRates(
         userId: Long,
@@ -91,26 +43,12 @@ class UserRepository @Inject constructor(
         status: String? = null,
         targetType: String? = null,
         censored: Boolean? = true
-    ): List<UserRate> = userApi.getUserRates(
-        userId = userId,
-        page = page,
-        limit = limit,
-        status = status,
-        targetType = targetType,
-        censored = censored
-    )
+    ): List<UserRate>
 
     suspend fun updateUserRate(
         id: Long,
         request: UserRateRequest
-    ): Result<UserRateResponse> = runCatching {
-        userApi.updateUserRate(
-            id = id,
-            request = request
-        )
-    }
+    ): Result<UserRateResponse>
 
-    suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse> = runCatching {
-        userApi.createUserRate(createRequest)
-    }
+    suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse>
 }

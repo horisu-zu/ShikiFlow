@@ -163,7 +163,7 @@ fun MangaDetailsHeader(
             score = mangaDetails?.userRate?.score ?: 0,
             isManga = mangaDetails?.kind?.isManga() ?: false,
             onStatusClick = { onStatusClick() },
-            onMangaDexClick = { onMangaDexClick(mangaDetails?.english ?: "") },
+            onMangaDexClick = { onMangaDexClick(mangaDetails?.name ?: "") },
             modifier = Modifier.constrainAs(statusItem) {
                 bottom.linkTo(genresRow.top, margin = 4.dp)
                 start.linkTo(parent.start)

@@ -40,7 +40,7 @@ class MangaDetailsViewModel @Inject constructor(
                         currentId = id
 
                         getMangaDexId(
-                            title = result.getOrNull()?.japanese ?: "",
+                            title = result.getOrNull()?.name ?: "",
                             malId = result.getOrNull()?.malId ?: ""
                         )
 
@@ -61,7 +61,17 @@ class MangaDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d("MangaDetailsViewModel", "Fetching MangaDex ID for title: $title, MAL ID: $malId")
             _mangaDexIds.value = getMangaDexUseCase(title, malId)
-            Log.d("MangaDetailsViewModel", "MangaDex ID: ${_mangaDexIds.value.data}")
+            when(val result = _mangaDexIds.value) {
+                is Resource.Success -> {
+                    Log.d("MangaDetailsViewModel", "Successfully fetched MangaDex IDs: ${result.data}")
+                }
+                is Resource.Error -> {
+                    Log.e("MangaDetailsViewModel", "Error fetching MangaDex IDs: ${result.message}")
+                }
+                is Resource.Loading -> {
+                    Log.d("MangaDetailsViewModel", "Loading MangaDex IDs...")
+                }
+            }
         }
     }
 }

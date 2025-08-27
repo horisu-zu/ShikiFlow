@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.mangatrack
 
+import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
@@ -31,7 +32,7 @@ fun MainMangaPage(
     mangaTracksViewModel: MangaTracksViewModel = hiltViewModel(),
     onMangaClick: (String) -> Unit
 ) {
-    val pagerState = rememberPagerState { 6 }
+    val pagerState = rememberPagerState { UserRateStatusConstants.getStatusChips(MediaType.MANGA).size }
     val coroutineScope = rememberCoroutineScope()
     val tabs = UserRateStatusConstants.getStatusChips(MediaType.MANGA)
     var isRefreshing by remember { mutableStateOf(false) }
@@ -63,9 +64,15 @@ fun MainMangaPage(
                 isRefreshing = isRefreshing,
                 onRefresh = {
                     coroutineScope.launch {
-                        isRefreshing = true
-                        delay(300)
-                        isRefreshing = false
+                        try {
+                            Log.d("PullToRefresh", "Refreshing...")
+                            isRefreshing = true
+                            trackData?.refresh()
+                            delay(100)
+                        } finally {
+                            Log.d("PullToRefresh", "Refresh completed")
+                            isRefreshing = false
+                        }
                     }
                 }
             ) {

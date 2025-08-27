@@ -80,6 +80,16 @@ fun AnimeTracksPage(
                         }
                     )
                 }
+                trackItems.apply {
+                    if(loadState.append is LoadState.Loading) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        }
+                    }
+                }
             }
 
             if (rateBottomSheet.value) {

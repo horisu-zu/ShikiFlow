@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack.Companion.toBrowse
@@ -43,11 +44,13 @@ fun MangaTracksPage(
                 columns = GridCells.Fixed(3),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
                     .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
-                items(trackItems.itemCount) { index ->
+                items(
+                    count = trackItems.itemCount,
+                    key = trackItems.itemKey { it.track.id }
+                ) { index ->
                     trackItems[index]?.toBrowse()?.let { mangaItem ->
                         BrowseItem(
                             browseItem = mangaItem,

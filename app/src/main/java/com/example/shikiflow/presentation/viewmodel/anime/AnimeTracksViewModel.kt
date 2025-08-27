@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import androidx.room.withTransaction
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack
@@ -23,9 +22,7 @@ class AnimeTracksViewModel @Inject constructor(
 
     private val _pagingDataMap = mutableMapOf<UserRateStatusEnum, Flow<PagingData<AnimeTrack>>>()
 
-    fun getAnimeTracks(
-        status: UserRateStatusEnum
-    ): Flow<PagingData<AnimeTrack>> {
+    fun getAnimeTracks(status: UserRateStatusEnum): Flow<PagingData<AnimeTrack>> {
         return _pagingDataMap.getOrPut(status) {
             animeTracksRepository.getAnimeTracks(status).cachedIn(viewModelScope)
         }

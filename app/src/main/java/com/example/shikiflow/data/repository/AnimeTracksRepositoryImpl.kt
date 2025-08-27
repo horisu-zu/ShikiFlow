@@ -16,7 +16,6 @@ import com.example.shikiflow.data.local.dao.AnimeTracksDao
 import com.example.shikiflow.data.local.mediator.AnimeTracksMediator
 import com.example.shikiflow.data.mapper.AnimeTrackMapper.toDomain
 import com.example.shikiflow.data.mapper.AnimeTrackMapper.toDto
-import com.example.shikiflow.domain.model.anime.AnimeTracksResponse
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
@@ -54,7 +53,7 @@ class AnimeTracksRepositoryImpl @Inject constructor(
         userId: String?,
         status: UserRateStatusEnum?,
         order: UserRateOrderInputType?
-    ): Result<AnimeTracksResponse> {
+    ): Result<List<AnimeTracksQuery.UserRate>> {
         val query = AnimeTracksQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
@@ -66,12 +65,7 @@ class AnimeTracksRepositoryImpl @Inject constructor(
         return try {
             val response = apolloClient.query(query).execute()
             response.data?.let {
-                Result.success(
-                    AnimeTracksResponse(
-                        userRates = it.userRates,
-                        hasNextPage = it.userRates.isNotEmpty()
-                    )
-                )
+                Result.success(it.userRates)
             } ?: Result.failure(Exception("No data"))
         } catch (e: Exception) {
             Result.failure(e)

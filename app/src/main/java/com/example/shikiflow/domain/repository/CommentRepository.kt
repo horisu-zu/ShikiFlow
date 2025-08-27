@@ -1,23 +1,13 @@
 package com.example.shikiflow.domain.repository
 
 import com.example.shikiflow.domain.model.comment.CommentItem
-import com.example.shikiflow.data.remote.CommentApi
-import javax.inject.Inject
 
-class CommentRepository @Inject constructor(
-    private val commentApi: CommentApi
-) {
-
+interface CommentRepository {
     suspend fun getComments(
         topicId: String,
         page: Int = 1,
         limit: Int = 30,
-    ): List<CommentItem> = commentApi.getComments(
-        commentableId = topicId.toInt(),
-        page = page,
-        limit = limit
-    )
+    ): List<CommentItem>
 
     suspend fun getCommentById(commentId: String): CommentItem
-        = commentApi.getCommentById(commentId)
 }

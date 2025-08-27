@@ -1,8 +1,5 @@
 package com.example.shikiflow.domain.repository
 
-import android.util.Log
-import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.Optional
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.DurationString
@@ -11,33 +8,10 @@ import com.example.graphql.type.RatingString
 import com.example.graphql.type.SeasonString
 import com.example.shikiflow.domain.model.anime.MyListString
 import com.example.shikiflow.domain.model.anime.SimilarAnime
-import com.example.shikiflow.domain.model.anime.toGraphQLValue
 import com.example.shikiflow.domain.model.common.ExternalLink
-import com.example.shikiflow.data.remote.AnimeApi
-import javax.inject.Inject
 
-class AnimeRepository @Inject constructor(
-    private val apolloClient: ApolloClient,
-    private val animeApi: AnimeApi
-) {
-
-    suspend fun getAnimeDetails(
-        id: String
-    ): Result<AnimeDetailsQuery.Anime> {
-        val query = AnimeDetailsQuery(
-            ids = Optional.presentIfNotNull(id)
-        )
-
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let {
-                Result.success(it.animes.first())
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
+interface AnimeRepository {
+    suspend fun getAnimeDetails(id: String): Result<AnimeDetailsQuery.Anime>
     suspend fun browseAnime(
         name: String? = null,
         page: Int = 1,
@@ -55,48 +29,8 @@ class AnimeRepository @Inject constructor(
         studio: String? = null,
         franchise: String? = null,
         censored: Boolean? = null,
-    ): Result<List<AnimeBrowseQuery.Anime>> {
-        val query = AnimeBrowseQuery(
-            page = Optional.presentIfNotNull(page),
-            limit = Optional.presentIfNotNull(limit),
-            search = Optional.presentIfNotNull(name),
-            mylist = when {
-                !searchInUserList -> Optional.Absent
-                userStatus.any { it == null } -> Optional.present(MyListString.entries.joinToString(",") { it.toGraphQLValue() })
-                else -> Optional.present(userStatus.joinToString(",") { it?.toGraphQLValue() ?: "" })
-            },
-            order = Optional.presentIfNotNull(order),
-            censored = Optional.presentIfNotNull(censored ?: true),
-            kind = Optional.presentIfNotNull(kind),
-            status = Optional.presentIfNotNull(status),
-            season = Optional.presentIfNotNull(season),
-            score = Optional.presentIfNotNull(score),
-            duration = Optional.presentIfNotNull(duration),
-            rating = Optional.presentIfNotNull(rating),
-            genre = Optional.presentIfNotNull(genre),
-            studio = Optional.presentIfNotNull(studio),
-            franchise = Optional.presentIfNotNull(franchise)
-        )
-        Log.d("AnimeRepository", "Query: $query")
+    ): Result<List<AnimeBrowseQuery.Anime>>
 
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let { data ->
-                Result.success(data.animes)
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun getSimilarAnime(id: String): List<SimilarAnime> {
-        return try {
-            animeApi.getSimilarAnime(id)
-        } catch (e: Exception) {
-            Log.e("AnimeRepository", "Exception fetching similar anime", e)
-            emptyList()
-        }
-    }
-
-    suspend fun getExternalLinks(id: String): List<ExternalLink> = animeApi.getExternalLinks(id)
+    suspend fun getSimilarAnime(id: String): List<SimilarAnime>
+    suspend fun getExternalLinks(id: String): List<ExternalLink>
 }
