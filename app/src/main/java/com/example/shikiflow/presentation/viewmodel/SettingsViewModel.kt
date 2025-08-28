@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.repository.AuthRepository
+import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
 import com.example.shikiflow.utils.AppSettingsManager
+import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.CacheManager
 import com.example.shikiflow.utils.ThemeMode
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,6 +34,12 @@ class SettingsViewModel @Inject constructor(
     private val _isDataSaver = MutableStateFlow<Boolean>(false)
     val isDataSaver = _isDataSaver.asStateFlow()
 
+    private val _trackMode = MutableStateFlow<MainTrackMode>(MainTrackMode.ANIME)
+    val trackMode = _trackMode.asStateFlow()
+
+    private val _appUiMode = MutableStateFlow<AppUiMode>(AppUiMode.LIST)
+    val appUiMode = _appUiMode.asStateFlow()
+
     private val _chapterUIMode = MutableStateFlow<ChapterUIMode>(ChapterUIMode.SCROLL)
     val chapterUIMode = _chapterUIMode.asStateFlow()
 
@@ -48,10 +56,14 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 appSettingsManager.themeFlow.distinctUntilChanged(),
-                appSettingsManager.oledFlow.distinctUntilChanged()
-            ) { appTheme, isOledEnabled ->
+                appSettingsManager.oledFlow.distinctUntilChanged(),
+                appSettingsManager.appUiModeFlow.distinctUntilChanged(),
+                appSettingsManager.trackModeFlow.distinctUntilChanged()
+            ) { appTheme, isOledEnabled, appUiMode, trackMode ->
                 _appTheme.value = appTheme
                 _isOledThemeEnabled.value = isOledEnabled
+                _appUiMode.value = appUiMode
+                _trackMode.value = trackMode
             }.collect()
         }
     }
@@ -80,6 +92,20 @@ class SettingsViewModel @Inject constructor(
             if (isSuccess) {
                 loadCacheSize()
             }
+        }
+    }
+
+    fun setTrackMode(trackMode: MainTrackMode) {
+        viewModelScope.launch {
+            Log.d("SettingsViewModel", "setTrackMode: $trackMode")
+            appSettingsManager.saveTrackMode(trackMode)
+        }
+    }
+
+    fun setAppUiMode(appUiMode: AppUiMode) {
+        viewModelScope.launch {
+            Log.d("SettingsViewModel", "setAppUiMode: $appUiMode")
+            appSettingsManager.saveAppUiMode(appUiMode)
         }
     }
 

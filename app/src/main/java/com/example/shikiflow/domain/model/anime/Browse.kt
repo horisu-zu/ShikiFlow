@@ -4,6 +4,7 @@ import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.MangaBrowseQuery
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.MangaKindEnum
+import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.datetime.Instant
@@ -32,6 +33,11 @@ sealed interface Browse {
         override val nextEpisodeAt: Instant? = null,
         override val mediaType: MediaType = MediaType.ANIME,
         val animeKind: AnimeKindEnum,
+        val userRateStatus: UserRateStatusEnum? = null,
+        val episodesAired: Int,
+        val episodes: Int,
+        val studios: List<String> = emptyList(),
+        val genres: List<String> = emptyList()
     ): Browse {
         override val kind: String get() = UserRateMapper.mapAnimeKind(animeKind)
     }
@@ -56,7 +62,12 @@ fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
         posterUrl = this.poster?.posterShort?.mainUrl,
         score = this.score ?: 0.0,
         animeKind = this.kind ?: AnimeKindEnum.UNKNOWN__,
-        nextEpisodeAt = this.nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) }
+        nextEpisodeAt = this.nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
+        userRateStatus = this.userRate?.animeUserRate?.status,
+        episodesAired = this.episodesAired,
+        episodes = this.episodes,
+        studios = this.studios.map { it.name },
+        genres = this.genres?.map { it.name } ?: emptyList()
     )
 }
 

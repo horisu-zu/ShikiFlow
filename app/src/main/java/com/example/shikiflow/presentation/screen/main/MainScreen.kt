@@ -14,31 +14,32 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.main.mangatrack.MainMangaPage
+import com.example.shikiflow.presentation.viewmodel.MainViewModel
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
-import com.example.shikiflow.utils.AppSettingsManager
-import kotlinx.coroutines.launch
+import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    appSettingsManager: AppSettingsManager,
     currentUser: CurrentUserQuery.Data?,
     searchViewModel: SearchViewModel = hiltViewModel(key = "main_search"),
+    mainViewModel: MainViewModel = hiltViewModel(),
     navOptions: MainScreenNavOptions
 ) {
-    val scope = rememberCoroutineScope()
     val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         state = topAppBarState,
@@ -47,8 +48,9 @@ fun MainScreen(
             stiffness = Spring.StiffnessVeryLow
         )
     )
-    val currentTrackMode by appSettingsManager.trackModeFlow.collectAsState(initial = MainTrackMode.ANIME)
-    val screenState by searchViewModel.screenState.collectAsState()
+
+    val currentTrackMode by mainViewModel.currentTrackMode.collectAsStateWithLifecycle()
+    val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -59,11 +61,7 @@ fun MainScreen(
                 user = currentUser,
                 query = screenState.query,
                 isSearchActive = screenState.isSearchActive,
-                onModeChange = { trackMode ->
-                    scope.launch {
-                        appSettingsManager.saveTrackMode(trackMode)
-                    }
-                },
+                onModeChange = { trackMode -> mainViewModel.setCurrentTrackMode(trackMode) },
                 onQueryChange = searchViewModel::onQueryChange,
                 onSearchToggle = searchViewModel::onSearchActiveChange
             )
@@ -103,6 +101,7 @@ fun MainScreen(
                         }
                     )
                 }
+                else -> { /**/ }
             }
         }
     }

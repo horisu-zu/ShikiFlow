@@ -38,7 +38,6 @@ import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun MainNavigator(
-    appSettingsManager: AppSettingsManager,
     onFinishActivity: () -> Unit,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -91,7 +90,6 @@ fun MainNavigator(
             entryProvider = entryProvider {
                 entry<MainNavRoute.Home> {
                     MainScreenNavigator(
-                        appSettingsManager = appSettingsManager,
                         currentUserData = currentUser.data
                     )
                 }

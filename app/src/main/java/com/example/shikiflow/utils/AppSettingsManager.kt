@@ -27,6 +27,8 @@ class AppSettingsManager @Inject constructor(
         private val USERNAME = stringPreferencesKey("username")
         private val USER_ID = intPreferencesKey("user_id")
 
+        private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
+        private val BROWSE_UI_MODE = stringPreferencesKey("browse_ui_mode")
         private val THEME_KEY = stringPreferencesKey("theme")
         private val OLED_KEY = stringPreferencesKey("oled")
         private val LOCALE_KEY = stringPreferencesKey("locale")
@@ -43,6 +45,16 @@ class AppSettingsManager @Inject constructor(
 
     val userIdFlow: Flow<Int?> = context.dataStore.data
         .map { preferences -> preferences[USER_ID] }
+
+    val appUiModeFlow: Flow<AppUiMode> = context.dataStore.data
+        .map { preferences ->
+            AppUiMode.fromString(preferences[APP_UI_MODE])
+        }
+
+    val browseUiModeFlow: Flow<BrowseUiMode> = context.dataStore.data
+        .map { preferences ->
+            BrowseUiMode.fromString(preferences[BROWSE_UI_MODE])
+        }
 
     val themeFlow: Flow<ThemeMode> = context.dataStore.data
         .map { preferences ->
@@ -88,6 +100,18 @@ class AppSettingsManager @Inject constructor(
             preferences.remove(USER_ID)
             preferences.remove(USERNAME)
             preferences.remove(AVATAR_URL)
+        }
+    }
+
+    suspend fun saveAppUiMode(appUiMode: AppUiMode) {
+        context.dataStore.edit { preferences ->
+            preferences[APP_UI_MODE] = appUiMode.name
+        }
+    }
+
+    suspend fun saveBrowseUiMode(browseUiMode: BrowseUiMode) {
+        context.dataStore.edit { preferences ->
+            preferences[BROWSE_UI_MODE] = browseUiMode.name
         }
     }
 

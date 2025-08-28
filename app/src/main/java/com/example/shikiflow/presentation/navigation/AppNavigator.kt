@@ -17,7 +17,6 @@ import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun AppNavigator(
-    appSettingsManager: AppSettingsManager,
     onFinishActivity: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
@@ -48,10 +47,7 @@ fun AppNavigator(
             AuthScreen(navController = navController)
         }
         composable(route = "main") {
-            MainNavigator(
-                appSettingsManager = appSettingsManager,
-                onFinishActivity = onFinishActivity
-            )
+            MainNavigator(onFinishActivity = onFinishActivity)
         }
     }
 }

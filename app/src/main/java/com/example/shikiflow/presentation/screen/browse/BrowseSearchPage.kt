@@ -62,7 +62,7 @@ fun BrowseSearchPage(
             ) {
                 items(browseSearchData.itemCount) { index ->
                     browseSearchData[index]?.let { browseItem ->
-                        BrowseItem(
+                        BrowseGridItem(
                             browseItem = browseItem,
                             onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
                         )

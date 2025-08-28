@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MediaNavOptions
-import com.example.shikiflow.presentation.screen.browse.BrowseItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.viewmodel.SimilarMediaViewModel
 import com.example.shikiflow.utils.Resource
 
@@ -127,7 +127,7 @@ fun SimilarMediaScreen(
                 items(similarMediaState.value.data?.size ?: 0) { index ->
                     val browseItem = similarMediaState.value.data?.get(index)
                         ?: return@items
-                    BrowseItem(
+                    BrowseGridItem(
                         browseItem = browseItem,
                         onItemClick = { id, mediaType ->
                             when(mediaType) {

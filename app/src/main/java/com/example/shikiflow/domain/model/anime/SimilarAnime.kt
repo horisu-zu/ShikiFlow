@@ -28,5 +28,7 @@ fun SimilarAnime.toBrowseAnime(): Browse.Anime {
         posterUrl = "${BuildConfig.BASE_URL}${this.image.original}",
         score = this.score?.toDouble() ?: 0.0,
         animeKind = AnimeKindEnum.valueOf(this.kind ?: "UNKNOWN__"),
+        episodesAired = this.episodesAired ?: 0,
+        episodes = this.episodes,
     )
 }

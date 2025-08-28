@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,7 +38,11 @@ fun SettingsSection(
         modifier = modifier.fillMaxWidth()
             .padding(horizontal = 24.dp)
             .clip(RoundedCornerShape(12.dp))
-            .border(1.dp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(12.dp))
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(12.dp)
+            )
     ) {
         val (titleRef, itemsRef) = createRefs()
 
@@ -250,7 +253,6 @@ private fun SwitchItem(
     onClick: () -> Unit,
     showDivider: Boolean = true
 ) {
-    Log.d("SwitchItem", "isChecked: $isChecked")
     ConstraintLayout(
         modifier = Modifier
             .fillMaxWidth()

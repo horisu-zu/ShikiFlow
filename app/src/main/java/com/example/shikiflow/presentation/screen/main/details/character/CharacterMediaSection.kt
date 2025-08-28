@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.screen.browse.BrowseItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 
 @Composable
 fun CharacterMediaSection(
@@ -31,7 +31,7 @@ fun CharacterMediaSection(
             items(items.size) { index ->
                 val mediaItem = items[index]
 
-                BrowseItem(
+                BrowseGridItem(
                     browseItem = mediaItem,
                     onItemClick = onItemClick,
                     modifier = Modifier

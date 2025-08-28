@@ -57,8 +57,9 @@ fun BrowseScreen(
                         browseNavOptions.navigateToSideScreen(sideScreen)
                     },
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 12.dp,
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 12.dp
+                    ),
                 )
             }
         }

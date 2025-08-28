@@ -66,5 +66,9 @@ fun MainDropdown(
 
 enum class MainTrackMode(val displayValue: String) {
     ANIME("Anime"),
-    MANGA("Manga & Ranobe")
+    MANGA("Manga & Ranobe");
+
+    companion object {
+        fun fromString(value: String?) = entries.find { it.displayValue == value } ?: ANIME
+    }
 }

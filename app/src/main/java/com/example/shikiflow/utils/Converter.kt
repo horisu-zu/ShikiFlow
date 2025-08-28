@@ -35,10 +35,11 @@ import java.util.Locale
 
 object Converter {
     fun formatInstant(
-        lastSeenInstant: Instant?,
-        includeTime: Boolean = false
+        instant: Instant?,
+        includeTime: Boolean = false,
+        includeDayOfWeek: Boolean = false
     ): String {
-        return lastSeenInstant?.let { instant ->
+        return instant?.let { instant ->
             val date = Date(instant.toEpochMilliseconds())
             val currentYear = Clock.System.now()
                 .toLocalDateTime(TimeZone.currentSystemDefault()).year
@@ -46,6 +47,9 @@ object Converter {
                 .toLocalDateTime(TimeZone.currentSystemDefault()).year
 
             val pattern = buildString {
+                if(includeDayOfWeek) {
+                    append("EEE, ")
+                }
                 append("dd MMM")
                 if (instantYear != currentYear) {
                     append(" yyyy")

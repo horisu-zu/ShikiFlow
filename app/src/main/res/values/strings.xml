@@ -21,4 +21,29 @@
 
     <string name="common_error">Error Loading Data</string>
     <string name="common_retry">Retry</string>
+
+    <string name="settings_app_ui_mode">Display Mode</string>
+    <string name="settings_clear_cache">Clear Image Cache</string>
+    <string name="settings_chapter_ui_mode">Chapter UI Mode</string>
+    <string name="settings_data_saver_mode">Data Saver Mode</string>
+    <string name="settings_data_saver_desc">Reduce data usage by viewing lower quality versions of chapters</string>
+    <string name="settings_app_theme">Application Theme</string>
+    <string name="settings_oled_theme">OLED theme</string>
+    <string name="settings_oled_desc">Enable OLED mode for darker backgrounds</string>
+    <string name="settings_cache_confirmation">Are you sure you want to clear the image cache?</string>
+    <string name="settings_app_mode_select">Select UI Mode for the Tracks</string>
+    <string name="settings_cache_size">Cache Size: %1$s</string>
+    <string name="settings_account_section_title">Account</string>
+    <string name="settings_theme_section_title">Theme</string>
+    <string name="seetings_interface_section_title">Interface</string>
+    <string name="settings_data_section_title">Data</string>
+    <string name="settings_manga_section_title">Manga</string>
+    <string name="settings_track_mode">Track Mode by default</string>
+    <string name="settings_track_mode_select">Select Track Mode when opening the app</string>
+    <string name="settings_sign_out">Sign Out</string>
+
+    <string name="next_episode_at">"Next episode at: "</string>
+
+    <string name="browse_ongoings">Ongoings</string>
+    <string name="browse_mode_select">Display Mode and Sorting</string>
 </resources>

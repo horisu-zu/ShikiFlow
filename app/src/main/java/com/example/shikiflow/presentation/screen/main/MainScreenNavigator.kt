@@ -10,11 +10,9 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.MainScreenNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
-import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun MainScreenNavigator(
-    appSettingsManager: AppSettingsManager,
     currentUserData: CurrentUserQuery.Data?
 ) {
     val mainScreenBackstack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
@@ -34,7 +32,6 @@ fun MainScreenNavigator(
         entryProvider = entryProvider {
             entry<MainScreenNavRoute.MainTracks> {
                 MainScreen(
-                    appSettingsManager = appSettingsManager,
                     currentUser = currentUserData,
                     navOptions = options
                 )

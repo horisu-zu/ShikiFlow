@@ -50,7 +50,7 @@ fun MainSideScreen(
         ) {
             items(browseData.itemCount) { index ->
                 val browseItem = browseData[index]!!
-                BrowseItem(
+                BrowseGridItem(
                     browseItem = browseItem,
                     onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
                 )

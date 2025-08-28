@@ -151,7 +151,7 @@ fun AnimeDetailsScreen(
                                 }
                             },
                             onTopicNavigate = { topicId ->
-                                navOptions.navigateToComments(CommentsScreenMode.TOPIC, id)
+                                navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
                             },
                             onSimilarClick = { animeId, title ->
                                 navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)

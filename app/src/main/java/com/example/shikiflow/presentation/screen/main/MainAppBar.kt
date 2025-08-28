@@ -35,7 +35,7 @@ import com.example.shikiflow.presentation.common.CustomSearchField
 @Composable
 fun MainAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    currentTrackMode: MainTrackMode,
+    currentTrackMode: MainTrackMode?,
     user: CurrentUserQuery.Data?,
     query: String,
     isSearchActive: Boolean,
@@ -61,18 +61,21 @@ fun MainAppBar(
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     modifier = Modifier.weight(1f)
                 ) { trackMode ->
-                    if(trackMode == MainTrackMode.ANIME) {
-                        CustomSearchField(
-                            query = query,
-                            onQueryChange = onQueryChange,
-                            isActive = isSearchActive,
-                            onActiveChange = onSearchToggle
-                        )
-                    } else {
-                        Text(
-                            text = "Manga",
-                            style = MaterialTheme.typography.titleMedium
-                        )
+                    when(trackMode) {
+                        MainTrackMode.ANIME -> {
+                            CustomSearchField(
+                                query = query,
+                                onQueryChange = onQueryChange,
+                                isActive = isSearchActive,
+                                onActiveChange = onSearchToggle
+                            )
+                        }
+                        MainTrackMode.MANGA -> {
+                            Text(
+                                text = "Manga",
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        } null -> { /**/ }
                     }
                 }
 
@@ -96,7 +99,7 @@ fun MainAppBar(
         actions = {
             MainDropdown(
                 expanded = dropdownExpanded,
-                currentTrackMode = currentTrackMode,
+                currentTrackMode = currentTrackMode ?: MainTrackMode.ANIME,
                 onModeChange = { trackMode ->
                     onModeChange(trackMode)
                 },

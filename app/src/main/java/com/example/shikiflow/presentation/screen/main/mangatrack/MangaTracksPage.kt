@@ -20,7 +20,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack.Companion.toBrowse
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.screen.browse.BrowseItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 
 @Composable
 fun MangaTracksPage(
@@ -52,7 +52,7 @@ fun MangaTracksPage(
                     key = trackItems.itemKey { it.track.id }
                 ) { index ->
                     trackItems[index]?.toBrowse()?.let { mangaItem ->
-                        BrowseItem(
+                        BrowseGridItem(
                             browseItem = mangaItem,
                             onItemClick = { id, mediaType ->
                                 onMangaClick(id)

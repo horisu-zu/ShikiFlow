@@ -21,7 +21,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 
 @SuppressLint("UnrememberedMutableInteractionSource")
 @Composable
-fun BrowseItem(
+fun BrowseGridItem(
     browseItem: Browse,
     onItemClick: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier

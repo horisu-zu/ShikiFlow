@@ -86,7 +86,7 @@ fun OngoingSideScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(animeValues) { anime ->
-                        BrowseItem(
+                        BrowseGridItem(
                             browseItem = anime,
                             onItemClick = { id, mediaType -> onNavigate(id) },
                             modifier = Modifier.width(120.dp)

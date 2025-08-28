@@ -43,10 +43,7 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 oledTheme = oledTheme
             ) {
-                AppNavigator(
-                    appSettingsManager = appSettingsManager,
-                    onFinishActivity = { this.finish() }
-                )
+                AppNavigator(onFinishActivity = { this.finish() })
             }
         }
 

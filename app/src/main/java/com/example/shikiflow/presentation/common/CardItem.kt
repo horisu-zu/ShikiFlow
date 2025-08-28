@@ -9,14 +9,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
@@ -24,7 +23,8 @@ import com.example.shikiflow.utils.toIcon
 @Composable
 fun CardItem(
     item: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.labelMedium,
 ) {
     Box(
         modifier = modifier.clip(RoundedCornerShape(8.dp))
@@ -33,7 +33,7 @@ fun CardItem(
     ) {
         Text(
             text = item,
-            style = MaterialTheme.typography.labelMedium.copy(
+            style = style.copy(
                 color = MaterialTheme.colorScheme.onSurface
             ),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
