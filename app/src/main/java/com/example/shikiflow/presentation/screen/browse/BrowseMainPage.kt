@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -31,9 +32,11 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
@@ -47,53 +50,43 @@ fun BrowseMainPage(
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
-    val ongoingBrowseState = browseViewModel.paginatedBrowse(BrowseType.AnimeBrowseType.ONGOING)
-        .collectAsLazyPagingItems()
     val browseUiMode = browseViewModel.browseUiMode.collectAsStateWithLifecycle()
     val appUiMode = browseViewModel.appUiMode.collectAsStateWithLifecycle()
+    val browseOngoingOrder = browseViewModel.browseOngoingMode.collectAsStateWithLifecycle()
+
+    val ongoingBrowseState = browseViewModel.paginatedBrowse(
+        type = BrowseType.AnimeBrowseType.ONGOING,
+        options = BrowseOptions(
+            status = AnimeStatusEnum.ongoing,
+            order = browseOngoingOrder.value.orderEnum
+        )
+    ).collectAsLazyPagingItems()
 
     val showBottomSheet = remember { mutableStateOf(false) }
 
-    when (ongoingBrowseState.loadState.refresh) {
-        is LoadState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        }
-        is LoadState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = stringResource(R.string.common_error),
-                    buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { ongoingBrowseState.refresh() }
-                )
+    BrowseComponent(
+        browseUiMode = browseUiMode.value,
+        appUiMode = appUiMode.value,
+        browseState = ongoingBrowseState,
+        onSideScreenNavigate = onSideScreenNavigate,
+        onNavigate = onNavigate,
+        onSettingClick = { showBottomSheet.value = true },
+        modifier = modifier
+    )
+    if(showBottomSheet.value) {
+        BrowseMainBottomSheet(
+            currentBrowseMode = browseUiMode.value,
+            currentOngoingMode = browseOngoingOrder.value,
+            onDismiss = { showBottomSheet.value = false },
+            onModeSelect = { newMode ->
+                browseViewModel.setBrowseUiMode(newMode)
+                showBottomSheet.value = false
+            },
+            onOrderSelect = { newOrder ->
+                browseViewModel.setBrowseOngoingOrder(newOrder)
+                showBottomSheet.value = false
             }
-        }
-        else -> {
-            BrowseComponent(
-                browseUiMode = browseUiMode.value,
-                appUiMode = appUiMode.value,
-                browseState = ongoingBrowseState,
-                onSideScreenNavigate = onSideScreenNavigate,
-                onNavigate = onNavigate,
-                onSettingClick = { showBottomSheet.value = true },
-                modifier = modifier
-            )
-            if(showBottomSheet.value) {
-                BrowseMainBottomSheet(
-                    currentBrowseMode = browseUiMode.value,
-                    onDismiss = { showBottomSheet.value = false },
-                    onModeSelect = { newMode ->
-                        browseViewModel.setBrowseUiMode(newMode)
-                        showBottomSheet.value = false
-                    }
-                )
-            }
-        }
+        )
     }
 }
 
@@ -172,15 +165,45 @@ private fun BrowseListComponent(
 
         item { OngoingTitleComponent(onSettingClick = onSettingClick) }
 
-        items(
-            count = browseState.itemCount,
-            key = browseState.itemKey { it.id }
-        ) { index ->
-            browseState[index]?.let { browseItem ->
-                BrowseListItem(
-                    browseItem = browseItem as Browse.Anime,
-                    onItemClick = onNavigate
-                )
+        if(browseState.loadState.refresh is LoadState.Loading) {
+            item {
+                Box(
+                    modifier = Modifier.fillParentMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
+            }
+        } else if(browseState.loadState.refresh is LoadState.Error) {
+            item {
+                Box(
+                    modifier = Modifier.fillParentMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { browseState.refresh() }
+                    )
+                }
+            }
+        } else {
+            items(
+                count = browseState.itemCount,
+                key = browseState.itemKey { it.id }
+            ) { index ->
+                browseState[index]?.let { browseItem ->
+                    BrowseListItem(
+                        browseItem = browseItem as Browse.Anime,
+                        onItemClick = onNavigate
+                    )
+                }
+            }
+            if(browseState.loadState.append is LoadState.Loading) {
+                item {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
+                }
             }
         }
     }
@@ -210,24 +233,46 @@ private fun BrowseGridComponent(
             OngoingTitleComponent(onSettingClick = onSettingClick)
         }
 
-        items(
-            count = browseState.itemCount,
-            key = browseState.itemKey { it.id }
-        ) { index ->
-            browseState[index]?.let { browseItem ->
-                BrowseGridItem(
-                    browseItem = browseItem,
-                    onItemClick = onNavigate
-                )
+        if(browseState.loadState.refresh is LoadState.Loading) {
+            item(span = { GridItemSpan(3) }) {
+                Box(
+                    modifier = Modifier.fillMaxSize().heightIn(240.dp),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        }
-        browseState.apply {
-            if(loadState.append is LoadState.Loading) {
-                item(span = { GridItemSpan(3) }) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+        } else if(browseState.loadState.refresh is LoadState.Error) {
+            item(span = { GridItemSpan(3) }) {
+                Box(
+                    modifier = Modifier.fillMaxSize().heightIn(240.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { browseState.refresh() }
+                    )
+                }
+            }
+        } else {
+            items(
+                count = browseState.itemCount,
+                key = browseState.itemKey { it.id }
+            ) { index ->
+                browseState[index]?.let { browseItem ->
+                    BrowseGridItem(
+                        browseItem = browseItem,
+                        onItemClick = onNavigate
+                    )
+                }
+            }
+            browseState.apply {
+                if(loadState.append is LoadState.Loading) {
+                    item(span = { GridItemSpan(3) }) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
+                    }
                 }
             }
         }

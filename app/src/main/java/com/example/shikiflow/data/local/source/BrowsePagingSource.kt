@@ -52,7 +52,7 @@ class BrowsePagingSource @Inject constructor(
                             anime.toBrowseAnime()
                         } ?: emptyList()
 
-                        val prevKey = if (page > 0) page - 1 else null
+                        val prevKey = if (page > 1) page - 1 else null
                         val nextKey = if (data.isNotEmpty()) page + 1 else null
 
                         LoadResult.Page(
@@ -81,7 +81,7 @@ class BrowsePagingSource @Inject constructor(
                             manga.toBrowseManga()
                         } ?: emptyList()
 
-                        val prevKey = if (page > 0) page - 1 else null
+                        val prevKey = if (page > 1) page - 1 else null
                         val nextKey = if (data.isNotEmpty()) page + 1 else null
 
                         LoadResult.Page(

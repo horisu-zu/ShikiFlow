@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +42,7 @@ fun BrowseGridItem(
             model = browseItem.posterUrl,
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
-                defaultWidth = 120.dp
+                defaultWidth = Int.MAX_VALUE.dp,
             ),
             modifier = Modifier.constrainAs(posterRef) {
                 top.linkTo(parent.top)

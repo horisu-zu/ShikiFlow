@@ -12,6 +12,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.graphql.type.MangaKindEnum
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
@@ -320,7 +321,7 @@ object Converter {
             val isSpoiler = node.tagName() == "div" && (node.hasClass("b-spoiler")
                     || node.hasClass("b-spoiler_block"))
             val isVideo = node.tagName() == "div" && node.hasClass("b-video")
-            val isImage = node.tagName() == "a" && node.hasClass("b-image")
+            val isImage = (node.tagName() == "a" || node.tagName() == "span") && node.hasClass("b-image")
             val isQuote = node.tagName() == "div" && node.hasClass("b-quote")
             val isReply = node.tagName() == "div" && node.hasClass("b-replies")
 
@@ -329,8 +330,12 @@ object Converter {
                     processTextBuffer()
 
                     val label = node.selectFirst("label")?.text()
-                        ?: node.selectFirst("span")?.text() ?: ""
-                    val contentDiv = node.selectFirst("> div")
+                        ?: node.selectFirst("span")?.text()
+                        ?: ""
+
+                    val contentDiv = node.selectFirst(".content .inner")
+                        ?: node.selectFirst(".content")
+                        ?: node.selectFirst("> div")
 
                     val spoilerContent = if (contentDiv != null) {
                         parseElementContent(contentDiv, linkColor)
@@ -341,10 +346,12 @@ object Converter {
                 isVideo -> {
                     processTextBuffer()
 
-                    val linkElement = node.selectFirst("a.video-link")
+                    val linkElement = node.selectFirst("a.marker")
+                        ?: node.selectFirst("a.video-link")
                     val imgElement = node.selectFirst("img")
 
-                    val videoUrl = linkElement?.attr("href") ?: ""
+                    val videoUrl = linkElement?.attr("href")
+                        ?: linkElement?.attr("data-video") ?: ""
                     val thumbnailUrl = imgElement?.attr("src") ?: ""
 
                     elements.add(DescriptionElement.Video(videoUrl, thumbnailUrl))
@@ -352,7 +359,12 @@ object Converter {
                 isImage -> {
                     processTextBuffer()
 
-                    val imageUrl = node.attr("href")
+                    val imageUrl = when (node.tagName()) {
+                        "a" -> node.attr("href")
+                        "span" -> {
+                            node.selectFirst("img")?.attr("src") ?: ""
+                        } else -> ""
+                    }
                     val labelText = node.text()
 
                     val label = AnnotatedString.Builder().apply {
@@ -419,6 +431,7 @@ object Converter {
         processInlineContent(doc.body(), builder, linkColor)
 
         Log.d("ParserAnnotations", "Final Annotations: ${builder.toAnnotatedString().getStringAnnotations(0, builder.length)}")
+        Log.d("ParseAnnotations", "Content: ${builder.toAnnotatedString()}")
         return builder.toAnnotatedString()
     }
 
@@ -457,7 +470,8 @@ object Converter {
                         node.hasClass("b-mention") -> {
                             node.attr("href").substringAfter("/comments/")
                         }
-                        node.tagName() == "a" -> node.attr("href")
+                        node.tagName() == "a" -> node.attr("href").takeIf { it.startsWith("http") }
+                            ?: "${BuildConfig.BASE_URL}/${node.attr("href")}"
                         else -> null
                     }
 
@@ -469,7 +483,15 @@ object Converter {
                     }
 
                     builder.pushStyle(spanStyle)
-                    processInlineContent(node, builder, linkColor)
+
+                    if (node.tagName() == "a" && node.hasClass("b-link") && node.hasAttr("data-attrs")) {
+                        val json = JSONObject(node.attr("data-attrs"))
+                        val display = json.optString("russian").ifBlank { json.optString("name") }
+                        builder.append(display)
+                    } else {
+                        processInlineContent(node, builder, linkColor)
+                    }
+
                     builder.pop()
 
                     if (hasAnnotation) {

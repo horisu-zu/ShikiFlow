@@ -10,9 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.graphql.type.OrderEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.anime.MyListString
 import com.example.shikiflow.domain.model.mapper.BrowseOptions
@@ -30,6 +33,8 @@ fun SearchBottomSheet(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val isAnime = currentType is BrowseType.AnimeBrowseType
     val contentType = remember(currentType) {
@@ -46,11 +51,15 @@ fun SearchBottomSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
             ChipSection(
-                label = "Media",
-                items = listOf("Anime", "Manga"),
-                selectedItems = listOf(if (isAnime) "Anime" else "Manga"),
+                label = stringResource(R.string.browse_search_label_media),
+                items = listOf(
+                    stringResource(R.string.browse_search_media_anime),
+                    stringResource(R.string.browse_search_media_manga)
+                ),
+                selectedItems = listOf(if (isAnime) stringResource(R.string.browse_search_media_anime)
+                    else stringResource(R.string.browse_search_media_manga)),
                 onItemSelected = { formattedName ->
-                    val newType = if (formattedName == "Anime") {
+                    val newType = if (formattedName == context.getString(R.string.browse_search_media_anime)) {
                         BrowseType.AnimeBrowseType.SEARCH
                     } else {
                         BrowseType.MangaBrowseType.SEARCH
@@ -61,7 +70,7 @@ fun SearchBottomSheet(
             )
             contentType.let { type ->
                 ChipSection(
-                    label = "Kind",
+                    label = stringResource(R.string.browse_search_label_kind),
                     items = EnumUtils.getFormattedEnumList(type.kindEnum),
                     selectedItems = searchOptions.kind?.let {
                         listOf(EnumUtils.formatEnumName(it))
@@ -77,7 +86,7 @@ fun SearchBottomSheet(
             }
             contentType.let { type ->
                 ChipSection(
-                    label = "Status",
+                    label = stringResource(R.string.browse_search_label_status),
                     items = EnumUtils.getFormattedEnumList(type.statusEnum),
                     selectedItems = searchOptions.status?.let {
                         listOf(EnumUtils.formatEnumName(it))
@@ -92,7 +101,7 @@ fun SearchBottomSheet(
                 )
             }
             ChipSection(
-                label = "In my list",
+                label = stringResource(R.string.browse_search_label_in_my_list),
                 items = EnumUtils.getFormattedEnumList(UserRateStatusEnum::class),
                 selectedItems = searchOptions.userListStatus.map {
                     EnumUtils.formatEnumName(it)
@@ -109,7 +118,7 @@ fun SearchBottomSheet(
                 }
             )
             ChipSection(
-                label = "Sort by",
+                label = stringResource(R.string.browse_search_label_sort_by),
                 items = EnumUtils.getFormattedEnumList(OrderEnum::class),
                 selectedItems = searchOptions.order?.let {
                     listOf(EnumUtils.formatEnumName(it))

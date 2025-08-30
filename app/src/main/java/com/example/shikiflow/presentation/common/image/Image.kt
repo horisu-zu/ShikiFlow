@@ -34,7 +34,8 @@ fun BaseImage(
     modifier: Modifier = Modifier,
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null,
-    imageType: ImageType = ImageType.Poster()
+    imageType: ImageType = ImageType.Poster(),
+    error: @Composable () -> Unit = {}
 ) {
     SubcomposeAsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
@@ -63,7 +64,8 @@ fun BaseImage(
                     .fillMaxSize()
                     .shimmerEffect()
             )
-        }
+        },
+        error = { error() }
     )
 }
 

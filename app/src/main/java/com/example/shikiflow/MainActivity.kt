@@ -4,40 +4,31 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
-import android.view.Window
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.shikiflow.presentation.navigation.AppNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
+import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.ui.theme.ShikiFlowTheme
-import com.example.shikiflow.utils.AppSettingsManager
 import com.example.shikiflow.utils.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    @Inject
-    lateinit var appSettingsManager: AppSettingsManager
+    private val settingsViewModel: SettingsViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        appSettingsManager = AppSettingsManager(applicationContext)
 
         enableEdgeToEdge()
 
         setContent {
-            val (darkTheme, oledTheme) = observeTheme(appSettingsManager)
+            val (darkTheme, oledTheme) = observeTheme()
 
             ShikiFlowTheme(
                 darkTheme = darkTheme,
@@ -51,9 +42,9 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    private fun observeTheme(appSettingsManager: AppSettingsManager): Pair<Boolean, Boolean> {
-        val theme = appSettingsManager.themeFlow.collectAsState(initial = ThemeMode.SYSTEM)
-        val isOledEnabled = appSettingsManager.oledFlow.collectAsState(initial = false)
+    private fun observeTheme(): Pair<Boolean, Boolean> {
+        val theme = settingsViewModel.appTheme.collectAsState()
+        val isOledEnabled = settingsViewModel.isOLEDModeEnabled.collectAsState()
 
         val systemTheme =
             when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {

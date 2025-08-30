@@ -46,4 +46,15 @@
 
     <string name="browse_ongoings">Ongoings</string>
     <string name="browse_mode_select">Display Mode and Sorting</string>
+    <string name="ongoing_browse_mode_ranked">Ranked</string>
+    <string name="ongoing_browse_mode_popularity">Popularity</string>
+    <string name="ongoing_browse_mode_aired_on">Aired On</string>
+    <string name="ongoing_browse_mode_ranked_shiki">Ranked Shiki</string>
+    <string name="browse_search_label_media">Media</string>
+    <string name="browse_search_media_anime">Anime</string>
+    <string name="browse_search_media_manga">Manga</string>
+    <string name="browse_search_label_kind">Kind</string>
+    <string name="browse_search_label_status">Status</string>
+    <string name="browse_search_label_in_my_list">In my list</string>
+    <string name="browse_search_label_sort_by">Sort by</string>
 </resources>

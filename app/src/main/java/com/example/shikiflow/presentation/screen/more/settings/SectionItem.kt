@@ -39,6 +39,7 @@ sealed interface SectionItem {
         override val title: String,
         val entries: List<String>,
         val iconResources: List<IconResource> = emptyList(),
+        val weights: List<Float> = emptyList(),
         val onClick: (String) -> Unit,
         val mode: String
     ): SectionItem {

@@ -150,6 +150,8 @@ fun CharacterDetailsScreen(
                                     }
                                     EntityType.COMMENT -> { /**/ }
                                 }
+                            }, onLinkClick = { url ->
+                                customTabIntent.launchUrl(context, url.toUri())
                             }
                         )
                     }

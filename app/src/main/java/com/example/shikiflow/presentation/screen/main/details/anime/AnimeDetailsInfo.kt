@@ -39,8 +39,9 @@ import kotlinx.datetime.atStartOfDayIn
 @Composable
 fun AnimeDetailsInfo(
     animeDetails: AnimeDetailsQuery.Anime,
+    onLinkClick: (String) -> Unit,
     onSimilarClick: (String, String) -> Unit,
-    onLinksClick: (String) -> Unit,
+    onExternalLinksClick: (String) -> Unit,
     onEntityClick: (Converter.EntityType, String) -> Unit,
     onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -185,7 +186,7 @@ fun AnimeDetailsInfo(
             GeneralItem(
                 icon = IconResource.Drawable(resId = R.drawable.ic_link),
                 title = "Links",
-                onClick = { onLinksClick(animeDetails.id) }
+                onClick = { onExternalLinksClick(animeDetails.id) }
             )
         }
         HorizontalDivider()
@@ -230,7 +231,8 @@ fun AnimeDetailsInfo(
             CommentSection(
                 topicId = topicId,
                 onEntityClick = onEntityClick,
-                onTopicNavigate = onTopicNavigate
+                onTopicNavigate = onTopicNavigate,
+                onLinkClick = onLinkClick
             )
         }
     }

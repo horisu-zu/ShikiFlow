@@ -51,7 +51,8 @@ import com.example.shikiflow.utils.Converter.EntityType
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime?,
     onSimilarClick: (String, String) -> Unit,
-    onLinksClick: (String) -> Unit,
+    onLinkClick: (String) -> Unit,
+    onExternalLinksClick: (String) -> Unit,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     onTopicNavigate: (String) -> Unit,
@@ -77,7 +78,7 @@ fun AnimeDetailsDesc(
             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
             onEntityClick = { entityType, id ->
                 onEntityClick(entityType, id)
-            }
+            }, onLinkClick = onLinkClick
         )
 
         LazyRow(
@@ -146,8 +147,9 @@ fun AnimeDetailsDesc(
         animeDetails?.let {
             AnimeDetailsInfo(
                 animeDetails = it,
+                onLinkClick = onLinkClick,
                 onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
-                onLinksClick = onLinksClick,
+                onExternalLinksClick = onExternalLinksClick,
                 onEntityClick = onEntityClick,
                 onTopicNavigate = onTopicNavigate,
                 modifier = Modifier.constrainAs(additionalRef) {

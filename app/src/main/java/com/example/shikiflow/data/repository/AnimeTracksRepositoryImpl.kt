@@ -32,7 +32,7 @@ class AnimeTracksRepositoryImpl @Inject constructor(
 
     override fun getAnimeTracks(status: UserRateStatusEnum): Flow<PagingData<AnimeTrack>> {
         return Pager(
-            config = PagingConfig(pageSize = 20),
+            config = PagingConfig(pageSize = 21),
             remoteMediator = AnimeTracksMediator(
                 animeTracksRepository = this,
                 appRoomDatabase = appRoomDatabase,

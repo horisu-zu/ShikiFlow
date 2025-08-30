@@ -108,6 +108,7 @@ fun SettingsSection(
                             title = item.title,
                             entries = item.entries,
                             iconResources = item.iconResources,
+                            weights = item.weights,
                             mode = item.mode,
                             onClick = item.onClick
                         )
@@ -318,6 +319,7 @@ private fun <T> ModeItem(
     title: String,
     entries: List<T>,
     iconResources: List<IconResource> = emptyList(),
+    weights: List<Float> = emptyList(),
     mode: T,
     onClick: (T) -> Unit
 ) {
@@ -338,12 +340,13 @@ private fun <T> ModeItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            entries.forEach { entry ->
+            entries.forEachIndexed { index, entry ->
+                val entryWeight = weights.getOrNull(index) ?: 1f
                 ModeRowItem(
                     entry = entry.toString(),
                     isCurrentMode = mode == entry,
                     onClick = { onClick(entry) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(entryWeight),
                     iconResource = iconResources.getOrNull(entries.indexOf(entry))
                 )
             }

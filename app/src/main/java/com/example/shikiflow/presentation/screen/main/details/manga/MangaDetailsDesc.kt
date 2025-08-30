@@ -32,6 +32,7 @@ fun MangaDetailsDesc(
     mangaDetails: MangaDetailsQuery.Manga?,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -54,7 +55,7 @@ fun MangaDetailsDesc(
             brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
             onEntityClick = { entityType, id ->
                 onEntityClick(entityType, id)
-            }
+            }, onLinkClick = onLinkClick
         )
 
         Column(

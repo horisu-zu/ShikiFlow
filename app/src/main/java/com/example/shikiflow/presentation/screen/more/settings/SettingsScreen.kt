@@ -92,6 +92,7 @@ fun SettingsScreen(
                         mode = themeMode.displayValue,
                         entries = ThemeMode.entries.map { it.displayValue },
                         iconResources = ThemeMode.entries.map { it.icon },
+                        weights = listOf(3f, 2f, 2f),
                         onClick = { newTheme ->
                             settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
                         }

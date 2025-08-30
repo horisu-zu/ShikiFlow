@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.graphql.type.OrderEnum
 import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,6 +30,7 @@ class AppSettingsManager @Inject constructor(
 
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
         private val BROWSE_UI_MODE = stringPreferencesKey("browse_ui_mode")
+        private val BROWSE_ONGOING_ORDER = stringPreferencesKey("browse_ongoing_order")
         private val THEME_KEY = stringPreferencesKey("theme")
         private val OLED_KEY = stringPreferencesKey("oled")
         private val LOCALE_KEY = stringPreferencesKey("locale")
@@ -54,6 +56,11 @@ class AppSettingsManager @Inject constructor(
     val browseUiModeFlow: Flow<BrowseUiMode> = context.dataStore.data
         .map { preferences ->
             BrowseUiMode.fromString(preferences[BROWSE_UI_MODE])
+        }
+
+    val browseOngoingOrderFlow: Flow<BrowseOngoingOrder> = context.dataStore.data
+        .map { preferences ->
+            BrowseOngoingOrder.fromString(preferences[BROWSE_ONGOING_ORDER])
         }
 
     val themeFlow: Flow<ThemeMode> = context.dataStore.data
@@ -112,6 +119,12 @@ class AppSettingsManager @Inject constructor(
     suspend fun saveBrowseUiMode(browseUiMode: BrowseUiMode) {
         context.dataStore.edit { preferences ->
             preferences[BROWSE_UI_MODE] = browseUiMode.name
+        }
+    }
+
+    suspend fun saveBrowseOngoingOrder(browseOngoingOrder: BrowseOngoingOrder) {
+        context.dataStore.edit { preferences ->
+            preferences[BROWSE_ONGOING_ORDER] = browseOngoingOrder.name
         }
     }
 

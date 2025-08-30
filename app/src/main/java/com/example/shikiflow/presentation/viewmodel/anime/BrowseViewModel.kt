@@ -7,14 +7,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.data.local.source.BrowsePagingSource
+import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.mapper.BrowseOptions
-import com.example.shikiflow.domain.model.mapper.BrowseParams
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.utils.AppSettingsManager
 import com.example.shikiflow.utils.AppUiMode
+import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -41,14 +41,19 @@ class BrowseViewModel @Inject constructor(
     private val _appUiMode = MutableStateFlow(AppUiMode.LIST)
     val appUiMode = _appUiMode.asStateFlow()
 
+    private val _browseOngoingMode = MutableStateFlow(BrowseOngoingOrder.RANKED)
+    val browseOngoingMode = _browseOngoingMode.asStateFlow()
+
     init {
         viewModelScope.launch {
             combine(
                 appSettingsManager.appUiModeFlow.distinctUntilChanged(),
-                appSettingsManager.browseUiModeFlow.distinctUntilChanged()
-            ) { appUiMode, browseUiMode ->
+                appSettingsManager.browseUiModeFlow.distinctUntilChanged(),
+                appSettingsManager.browseOngoingOrderFlow.distinctUntilChanged()
+            ) { appUiMode, browseUiMode, browseOngoingMode ->
                 _appUiMode.value = appUiMode
                 _browseUiMode.value = browseUiMode
+                _browseOngoingMode.value = browseOngoingMode
             }.collect()
         }
     }
@@ -61,7 +66,7 @@ class BrowseViewModel @Inject constructor(
 
     fun paginatedBrowse(
         type: BrowseType = BrowseType.AnimeBrowseType.ONGOING,
-        options: BrowseOptions = BrowseParams.animeParams[type] ?: BrowseOptions(),
+        options: BrowseOptions = BrowseOptions(),
         name: String? = null,
     ): Flow<PagingData<Browse>> {
         val key = BrowseKey(type, options, name)
@@ -88,6 +93,12 @@ class BrowseViewModel @Inject constructor(
     fun setBrowseUiMode(mode: BrowseUiMode) {
         viewModelScope.launch {
             appSettingsManager.saveBrowseUiMode(mode)
+        }
+    }
+
+    fun setBrowseOngoingOrder(order: BrowseOngoingOrder) {
+        viewModelScope.launch {
+            appSettingsManager.saveBrowseOngoingOrder(order)
         }
     }
 }

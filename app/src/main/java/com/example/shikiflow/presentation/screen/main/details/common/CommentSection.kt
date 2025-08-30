@@ -37,6 +37,7 @@ import com.example.shikiflow.utils.Resource
 fun CommentSection(
     topicId: String,
     onEntityClick: (Converter.EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier,
     commentViewModel: CommentViewModel = hiltViewModel()
@@ -89,6 +90,7 @@ fun CommentSection(
                     CommentItem(
                         comment = comment,
                         onEntityClick = onEntityClick,
+                        onLinkClick = onLinkClick,
                         modifier = Modifier
                     )
                 }
@@ -101,6 +103,7 @@ fun CommentSection(
 fun CommentItem(
     comment: CommentItem,
     onEntityClick: (type: Converter.EntityType, id: String) -> Unit,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -133,6 +136,7 @@ fun CommentItem(
                 descriptionHtml = comment.htmlBody,
                 style = MaterialTheme.typography.bodySmall,
                 onEntityClick = { type, id -> onEntityClick(type, id) },
+                onLinkClick = onLinkClick,
                 collapsedMaxLines = Int.MAX_VALUE
             )
         }

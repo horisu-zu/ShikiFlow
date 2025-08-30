@@ -150,13 +150,16 @@ fun AnimeDetailsScreen(
                                     }
                                 }
                             },
+                            onLinkClick = { url ->
+                                customTabIntent.launchUrl(context, url.toUri())
+                            },
                             onTopicNavigate = { topicId ->
                                 navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
                             },
                             onSimilarClick = { animeId, title ->
                                 navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)
                             },
-                            onLinksClick = { animeId ->
+                            onExternalLinksClick = { animeId ->
                                 navOptions.navigateToLinksPage(id, MediaType.ANIME)
                             },
                             modifier = Modifier.constrainAs(descriptionRef) {

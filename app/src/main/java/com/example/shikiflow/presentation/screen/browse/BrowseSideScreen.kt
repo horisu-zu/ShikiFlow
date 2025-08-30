@@ -19,7 +19,9 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
@@ -31,7 +33,12 @@ fun BrowseSideScreen(
     onBackNavigate: () -> Unit,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
-    val sideScreenData = browseViewModel.paginatedBrowse(browseType).collectAsLazyPagingItems()
+    val sideScreenData = browseViewModel.paginatedBrowse(
+        type = browseType,
+        options = BrowseOptions(
+            status = if(browseType == BrowseType.AnimeBrowseType.ONGOING) AnimeStatusEnum.ongoing else null
+        )
+    ).collectAsLazyPagingItems()
 
     Scaffold(
         topBar = {

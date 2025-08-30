@@ -154,6 +154,9 @@ fun MangaDetailsScreen(
                                     EntityType.COMMENT -> { /**/ }
                                 }
                             },
+                            onLinkClick = { url ->
+                                customTabIntent.launchUrl(context, url.toUri())
+                            },
                             modifier = Modifier.constrainAs(descriptionRef) {
                                 top.linkTo(headerRef.bottom)
                                 start.linkTo(parent.start)

@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.local.source
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.domain.model.comment.CommentItem
@@ -29,7 +30,7 @@ class CommentPagingSource @Inject constructor(
                 limit = params.loadSize
             )
 
-            val prevKey = if (page > 0) page - 1 else null
+            val prevKey = if (page > 1) page - 1 else null
             val nextKey = if (response.isNotEmpty()) page + 1 else null
 
             LoadResult.Page(

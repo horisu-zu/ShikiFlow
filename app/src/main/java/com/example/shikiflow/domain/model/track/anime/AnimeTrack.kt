@@ -24,7 +24,7 @@ data class AnimeTrack(
             createDate = track.createdAt.toString().toInstant(),
             updateDate = track.updatedAt.toString().toInstant(),
             totalEpisodes = if (anime.status == AnimeStatusEnum.released) anime.episodes
-            else anime.episodesAired,
+                else anime.episodesAired,
             totalChapters = null
         )
     }

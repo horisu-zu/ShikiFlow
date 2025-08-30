@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.common
 
 import android.content.Context
+import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -128,6 +129,7 @@ private fun TopicCommentsSection(
                             }
                         }
                     },
+                    onLinkClick = { url -> customTabIntent.launchUrl(context, url.toUri()) },
                     modifier = Modifier
                 )
             }
@@ -213,6 +215,8 @@ private fun CommentThreadSection(
                                             }
                                         }
                                     }
+                                }, onLinkClick = { url ->
+                                    customTabIntent.launchUrl(context, url.toUri())
                                 }
                             )
                         }
@@ -242,6 +246,7 @@ private fun CommentsMapSection(
     title: CommentType,
     comments: List<CommentItem>,
     onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -271,6 +276,7 @@ private fun CommentsMapSection(
             CommentItem(
                 comment = comment,
                 onEntityClick = onEntityClick,
+                onLinkClick = onLinkClick,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
             )
         }

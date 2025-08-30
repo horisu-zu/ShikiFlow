@@ -12,13 +12,18 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -38,7 +43,6 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
@@ -50,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter.DescriptionElement
 import com.example.shikiflow.utils.Converter.EntityType
@@ -61,6 +67,7 @@ fun ExpandableText(
     descriptionHtml: String,
     modifier: Modifier = Modifier,
     onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     linkColor: Color = MaterialTheme.colorScheme.primary,
     collapsedMaxLines: Int = 8,
     style: TextStyle = TextStyle.Default,
@@ -82,7 +89,8 @@ fun ExpandableText(
         style = style,
         lineHeight = lineHeight,
         brushColor = brushColor,
-        onEntityClick = onEntityClick
+        onEntityClick = onEntityClick,
+        onLinkClick = onLinkClick
     )
 }
 
@@ -93,6 +101,7 @@ private fun DescriptionElementsList(
     lineHeight: TextUnit,
     brushColor: Color,
     onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = Int.MAX_VALUE,
     isExpanded: Boolean = true,
@@ -116,7 +125,8 @@ private fun DescriptionElementsList(
                         onEntityClick = { entityType, id ->
                             Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
                             onEntityClick(entityType, id)
-                        }
+                        },
+                        onLinkClick = onLinkClick
                     )
                 }
                 is DescriptionElement.Spoiler -> {
@@ -126,17 +136,24 @@ private fun DescriptionElementsList(
                         style = style,
                         lineHeight = lineHeight,
                         brushColor = brushColor,
-                        onEntityClick = onEntityClick
+                        onEntityClick = onEntityClick,
+                        onLinkClick = onLinkClick
                     )
                 }
                 is DescriptionElement.Image -> {
                     ImageItem(
                         label = element.label,
                         imageUrl = element.imageUrl,
-                        onEntityClick = onEntityClick
+                        onEntityClick = onEntityClick,
+                        onLinkClick = onLinkClick
                     )
                 }
-                is DescriptionElement.Video -> { /**/ }
+                is DescriptionElement.Video -> {
+                    VideoItem(
+                        thumbnailUrl = element.thumbnailUrl,
+                        onVideoClick = { onLinkClick(element.videoUrl) }
+                    )
+                }
                 is DescriptionElement.Quote -> {
                     QuoteItem(
                         quoteElement = element,
@@ -153,6 +170,7 @@ private fun AnnotatedText(
     text: AnnotatedString,
     style: TextStyle,
     onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = Int.MAX_VALUE,
     isExpanded: Boolean = false,
@@ -160,7 +178,6 @@ private fun AnnotatedText(
     brushColor: Color = MaterialTheme.colorScheme.primary,
     lineHeight: TextUnit = TextUnit.Unspecified
 ) {
-    val uriHandler = LocalUriHandler.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -208,7 +225,7 @@ private fun AnnotatedText(
                                                 "Formatted Text",
                                                 "Clicked on URL: ${annotation.item}"
                                             )
-                                            uriHandler.openUri(annotation.item)
+                                            onLinkClick(annotation.item)
                                         } catch (e: Exception) {
                                             Log.e(
                                                 "Formatted Text",
@@ -270,7 +287,8 @@ private fun SpoilerElement(
     brushColor: Color,
     content: List<DescriptionElement>,
     style: TextStyle,
-    onEntityClick: (EntityType, String) -> Unit
+    onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -304,7 +322,8 @@ private fun SpoilerElement(
                 style = style,
                 lineHeight = lineHeight,
                 brushColor = brushColor,
-                onEntityClick = onEntityClick
+                onEntityClick = onEntityClick,
+                onLinkClick = onLinkClick
             )
         }
     }
@@ -315,6 +334,7 @@ private fun ImageItem(
     label: AnnotatedString,
     imageUrl: String,
     onEntityClick: (EntityType, String) -> Unit,
+    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -337,6 +357,7 @@ private fun ImageItem(
             collapsedMaxLines = Int.MAX_VALUE,
             style = MaterialTheme.typography.labelSmall,
             onEntityClick = onEntityClick,
+            onLinkClick = onLinkClick,
             isExpanded = false,
             onExpandToggle = { /**/ }
         )
@@ -373,10 +394,39 @@ private fun QuoteItem(
                     style = style
                 )
             }
-            Text(
-                text = quoteElement.content,
-                style = style
-            )
         }
+        Text(
+            text = quoteElement.content,
+            style = style
+        )
+    }
+}
+
+@Composable
+private fun VideoItem(
+    thumbnailUrl: String,
+    onVideoClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        BaseImage(
+            model = thumbnailUrl,
+            imageType = ImageType.Screenshot(defaultWidth = Int.MAX_VALUE.dp),
+            modifier = Modifier.clickable { onVideoClick() },
+            error = {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                        .aspectRatio(16f / 9f)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surface),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
+                }
+            }
+        )
     }
 }
