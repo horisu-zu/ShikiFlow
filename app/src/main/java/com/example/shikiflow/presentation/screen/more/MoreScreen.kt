@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -58,18 +59,19 @@ fun MoreScreen(
                 items = listOf(
                     SectionItem.Expanded(
                         avatar = currentUser?.currentUser?.avatarUrl ?: "NoUrl?",
-                        title = currentUser?.currentUser?.nickname ?: "NoNickname!",
-                        subtitle = "My Profile",
+                        title = currentUser?.currentUser?.nickname
+                            ?: stringResource(R.string.profile_screen_missing_nickname),
+                        subtitle = stringResource(R.string.more_screen_profile),
                         onClick = { moreNavOptions.navigateToProfile() }
                     ),
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.ic_group),
-                        title = "Clubs",
+                        title = stringResource(R.string.more_screen_clubs),
                         onClick = { /**/ }
                     ),
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.ic_history),
-                        title = "History",
+                        title = stringResource(R.string.more_screen_history),
                         onClick = { moreNavOptions.navigateToHistory() }
                     )
                 ),
@@ -83,12 +85,12 @@ fun MoreScreen(
                 items = listOf(
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Settings),
-                        title = "Settings",
+                        title = stringResource(R.string.more_screen_settings),
                         onClick = { moreNavOptions.navigateToSettings() }
                     ),
                     SectionItem.General(
                         icon = IconResource.Vector(Icons.Default.Info),
-                        title = "About App",
+                        title = stringResource(R.string.more_screen_about_app),
                         onClick = { moreNavOptions.navigateToAbout() }
                     )
                 ),

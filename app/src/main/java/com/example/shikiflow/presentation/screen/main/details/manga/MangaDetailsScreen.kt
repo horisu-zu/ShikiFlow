@@ -109,17 +109,17 @@ fun MangaDetailsScreen(
 
                         MangaDetailsHeader(
                             mangaDetails = mangaDetails.value.data,
+                            mangaDexResource = mangaDexIds,
                             onStatusClick = { rateBottomSheet = true },
-                            onMangaDexClick = { title ->
-                                if(mangaDexIds is Resource.Success) {
-                                    navOptions.navigateToMangaRead(
-                                        mangaDexIds = mangaDexIds.data ?: emptyList(),
-                                        title = title,
-                                        completedChapters = mangaDetails.value.data
-                                            ?.userRate?.chapters ?: 0
-                                    )
-                                }
+                            onMangaDexNavigateClick = { title ->
+                                navOptions.navigateToMangaRead(
+                                    mangaDexIds = mangaDexIds.data ?: emptyList(),
+                                    title = title,
+                                    completedChapters = mangaDetails.value.data
+                                        ?.userRate?.chapters ?: 0
+                                )
                             },
+                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) },
                             modifier = Modifier.constrainAs(headerRef) {
                                 top.linkTo(parent.top)
                                 start.linkTo(parent.start)

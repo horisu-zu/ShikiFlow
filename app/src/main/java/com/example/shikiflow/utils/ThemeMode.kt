@@ -9,8 +9,12 @@ enum class ThemeMode {
         fun fromString(value: String?) = entries.find { it.name == value } ?: SYSTEM
     }
 
-    val displayValue: String
-        get() = name.lowercase().replaceFirstChar { it.uppercase() }
+    val displayValue: Int
+        get() = when(this) {
+            SYSTEM -> R.string.theme_mode_system
+            LIGHT -> R.string.theme_mode_light
+            DARK -> R.string.theme_mode_dark
+        }
 
     val icon: IconResource
         get() = when(this) {

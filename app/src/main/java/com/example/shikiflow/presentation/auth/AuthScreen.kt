@@ -22,18 +22,16 @@ fun AuthScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    val customTabsIntent = CustomTabsIntent.Builder().build()
+
     val authState by authViewModel.authState.collectAsState()
 
     AuthMain(
-        navController = navController,
-        authViewModel = authViewModel,
         onStartAuth = {
             scope.launch {
                 val authUrl = authViewModel.getAuthorizationUrl()
                 Log.d("AuthScreen", "Launching Custom Tab with URL: $authUrl")
-                CustomTabsIntent.Builder()
-                    .build()
-                    .launchUrl(context, authUrl.toUri())
+                customTabsIntent.launchUrl(context, authUrl.toUri())
             }
         }
     )

@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.graphql.type.OrderEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
@@ -71,7 +70,7 @@ fun BrowseMainBottomSheet(
                         ),
                         label = {
                             Text(
-                                text = browseEntry.displayValue,
+                                text = stringResource(browseEntry.displayValue),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         },

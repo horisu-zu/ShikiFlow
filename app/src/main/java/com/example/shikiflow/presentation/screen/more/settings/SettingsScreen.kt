@@ -56,7 +56,7 @@ fun SettingsScreen(
         CustomDialog(
             onDismissRequest = { openCacheDialog.value = false },
             text = stringResource(R.string.settings_cache_confirmation),
-            confirmButtonText = "Clear",
+            confirmButtonText = stringResource(R.string.settings_cache_button_label),
             onConfirm = { settingsViewModel.clearCache() }
         )
     }
@@ -77,9 +77,9 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_account_section_title),
                 items = listOf(
                     SectionItem.Image(
-                        title = userData?.currentUser?.nickname ?: "Unknown",
+                        title = userData?.currentUser?.nickname ?: stringResource(R.string.common_unknown),
                         displayValue = stringResource(R.string.settings_sign_out),
-                        imageUrl = userData?.currentUser?.avatarUrl ?: "Unknown",
+                        imageUrl = userData?.currentUser?.avatarUrl ?: stringResource(R.string.common_unknown),
                         onClick = { settingsViewModel.logout() }
                     )
                 )
@@ -89,8 +89,8 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Mode(
                         title = stringResource(R.string.settings_app_theme),
-                        mode = themeMode.displayValue,
-                        entries = ThemeMode.entries.map { it.displayValue },
+                        mode = stringResource(themeMode.displayValue),
+                        entries = ThemeMode.entries.map { stringResource(it.displayValue) },
                         iconResources = ThemeMode.entries.map { it.icon },
                         weights = listOf(3f, 2f, 2f),
                         onClick = { newTheme ->
@@ -112,14 +112,14 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Default(
                         title = stringResource(R.string.settings_track_mode),
-                        displayValue = trackMode.displayValue,
+                        displayValue = stringResource(trackMode.displayValue),
                         onClick = {
                             bottomSheetConfig.value = BottomSheetConfig(
                                 title = context.getString(R.string.settings_track_mode_select),
-                                options = MainTrackMode.entries.map { it.displayValue },
-                                currentValue = trackMode.displayValue,
-                                onOptionClick = { selectedMode ->
-                                    settingsViewModel.setTrackMode(MainTrackMode.fromString(selectedMode))
+                                options = MainTrackMode.entries.map { context.getString(it.displayValue) },
+                                currentValue = context.getString(trackMode.displayValue),
+                                onOptionClick = { selectedIndex ->
+                                    settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
                                     bottomSheetConfig.value = null
                                 }
                             )
@@ -127,14 +127,14 @@ fun SettingsScreen(
                     ),
                     SectionItem.Default(
                         title = stringResource(R.string.settings_app_ui_mode),
-                        displayValue = appUiMode.displayValue,
+                        displayValue = context.getString(appUiMode.displayValue),
                         onClick = {
                             bottomSheetConfig.value = BottomSheetConfig(
                                 title = context.getString(R.string.settings_app_mode_select),
-                                options = AppUiMode.entries.map { it.displayValue },
-                                currentValue = appUiMode.displayValue,
-                                onOptionClick = { selectedMode ->
-                                    settingsViewModel.setAppUiMode(AppUiMode.valueOf(selectedMode.uppercase()))
+                                options = AppUiMode.entries.map { context.getString(it.displayValue) },
+                                currentValue = context.getString(appUiMode.displayValue),
+                                onOptionClick = { selectedIndex ->
+                                    settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
                                     bottomSheetConfig.value = null
                                 }
                             )
@@ -148,7 +148,7 @@ fun SettingsScreen(
                     SectionItem.Default(
                         title = stringResource(R.string.settings_clear_cache),
                         displayValue = stringResource(R.string.settings_cache_size, cacheSize),
-                        onClick = { if(cacheSize != "0 B") openCacheDialog.value = true }
+                        onClick = { if(cacheSize != context.getString(R.string.cache_size_zero_bytes)) openCacheDialog.value = true }
                     )
                 )
             )
@@ -157,8 +157,8 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Mode(
                         title = stringResource(R.string.settings_chapter_ui_mode),
-                        mode = chapterUIMode.displayValue,
-                        entries = ChapterUIMode.entries.map { it.displayValue },
+                        mode = stringResource(chapterUIMode.displayValue),
+                        entries = ChapterUIMode.entries.map { stringResource(it.displayValue) },
                         iconResources = ChapterUIMode.entries.map { it.icon },
                         onClick = { newMode ->
                             settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(newMode.uppercase()))

@@ -12,8 +12,11 @@ enum class AppUiMode {
         fun fromString(value: String?) = entries.find { it.name == value } ?: LIST
     }
 
-    val displayValue: String
-        get() = name.lowercase().replaceFirstChar { it.uppercase() }
+    val displayValue: Int
+        get() = when(this) {
+            LIST -> R.string.app_ui_mode_list
+            GRID -> R.string.app_ui_mode_grid
+        }
 }
 
 enum class BrowseUiMode {
@@ -23,8 +26,12 @@ enum class BrowseUiMode {
         fun fromString(value: String?) = entries.find { it.name == value } ?: AUTO
     }
 
-    val displayValue: String
-        get() = name.lowercase().replaceFirstChar { it.uppercase() }
+    val displayValue: Int
+        get() = when(this) {
+            AUTO -> R.string.browse_ui_mode_auto
+            LIST -> R.string.browse_ui_mode_list
+            GRID -> R.string.browse_ui_mode_grid
+        }
 
     val icon: IconResource
         get() = when(this) {

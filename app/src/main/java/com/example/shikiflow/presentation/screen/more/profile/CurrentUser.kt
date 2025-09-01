@@ -10,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
@@ -35,11 +37,13 @@ fun CurrentUser(
             model = userData?.currentUser?.avatarUrl,
             contentDescription = "Avatar",
             imageType = ImageType.Square(),
-            modifier = Modifier.constrainAs(avatar) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                bottom.linkTo(parent.bottom)
-            }.size(96.dp)
+            modifier = Modifier
+                .constrainAs(avatar) {
+                    top.linkTo(parent.top)
+                    start.linkTo(parent.start)
+                    bottom.linkTo(parent.bottom)
+                }
+                .size(96.dp)
         )
 
         Column(
@@ -50,7 +54,7 @@ fun CurrentUser(
             }
         ) {
             Text(
-                text = userData?.currentUser?.nickname ?: "NoNickname!",
+                text = userData?.currentUser?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )

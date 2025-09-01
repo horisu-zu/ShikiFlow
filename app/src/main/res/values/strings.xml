@@ -1,6 +1,16 @@
 <resources>
     <string name="app_name">ShikiFlow</string>
 
+    <string name="auth_sign_in">Sign In</string>
+    <string name="auth_features_shiki_integration_label">Shikimori Integration</string>
+    <string name="auth_features_shiki_integration_desc">"Connect your Shikimori account to search, track, and manage your anime and manga with ease."</string>
+    <string name="auth_features_personalize_label">Personalized Favorites</string>
+    <string name="auth_features_personalize_desc">Save and organize your favorite anime and manga to revisit them anytime.</string>
+    <string name="auth_features_mangadex_integration_label">MangaDex Integration</string>
+    <string name="auth_features_mangadex_integration_desc">
+        Access a vast manga library with multilingual support and tracking across your reading list.
+    </string>
+
     <string name="status_online">Online</string>
     <string name="status_now">Last seen — just now</string>
     <string name="status_minute_ago">Last seen — %1$d minute ago</string>
@@ -21,19 +31,27 @@
 
     <string name="common_error">Error Loading Data</string>
     <string name="common_retry">Retry</string>
+    <string name="common_unknown">Unknown</string>
 
     <string name="settings_app_ui_mode">Display Mode</string>
     <string name="settings_clear_cache">Clear Image Cache</string>
     <string name="settings_chapter_ui_mode">Chapter UI Mode</string>
+
     <string name="settings_data_saver_mode">Data Saver Mode</string>
-    <string name="settings_data_saver_desc">Reduce data usage by viewing lower quality versions of chapters</string>
+    <string name="settings_data_saver_desc">Reduce data usage by loading lower quality versions of chapters</string>
+    <string name="settings_data_saver_mode_enabled">Enabled</string>
+    <string name="settings_data_saver_mode_disabled">Disabled</string>
+
     <string name="settings_app_theme">Application Theme</string>
     <string name="settings_oled_theme">OLED theme</string>
     <string name="settings_oled_desc">Enable OLED mode for darker backgrounds</string>
+
     <string name="settings_cache_confirmation">Are you sure you want to clear the image cache?</string>
-    <string name="settings_app_mode_select">Select UI Mode for the Tracks</string>
     <string name="settings_cache_size">Cache Size: %1$s</string>
+    <string name="settings_cache_button_label">Clear</string>
+
     <string name="settings_account_section_title">Account</string>
+    <string name="settings_app_mode_select">Select UI Mode for the Tracks</string>
     <string name="settings_theme_section_title">Theme</string>
     <string name="seetings_interface_section_title">Interface</string>
     <string name="settings_data_section_title">Data</string>
@@ -57,4 +75,52 @@
     <string name="browse_search_label_status">Status</string>
     <string name="browse_search_label_in_my_list">In my list</string>
     <string name="browse_search_label_sort_by">Sort by</string>
+
+    <string name="chapter_ui_mode_page">Page</string>
+    <string name="chapter_ui_mode_scroll">Scroll</string>
+
+    <string name="app_ui_mode_list">List</string>
+    <string name="app_ui_mode_grid">Grid</string>
+
+    <string name="theme_mode_system">System</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+
+    <string name="main_track_mode_anime">Anime</string>
+    <string name="main_track_mode_manga"><![CDATA[Manga & Ranobe]]></string>
+
+    <string name="cache_size_bytes">%1$d B</string>
+    <string name="cache_size_kbytes">%.2f KB</string>
+    <string name="cache_size_mbytes">%.2f MB</string>
+    <string name="cache_size_gbytes">%.2f GB</string>
+    <string name="cache_size_zero_bytes">0 B</string>
+    <string name="browse_ui_mode_auto">Auto</string>
+    <string name="browse_ui_mode_list">List</string>
+    <string name="browse_ui_mode_grid">Grid</string>
+
+    <string name="about_app_github_label">Github</string>
+    <string name="about_app_github_desc">Link to Repository</string>
+    <string name="about_app_shikimori_label">Shikimori</string>
+    <string name="about_app_shikimori_desc">Encyclopedia of Anime and Manga</string>
+    <string name="about_app_mangadex_label">MangaDex</string>
+    <string name="about_app_mangadex_desc">Online Platform for reading Manga</string>
+    <string name="version_from">from: %1$s</string>
+    <string name="update_available">Update Available</string>
+    <string name="update_version">"Version: "</string>
+    <string name="update_release_notes">Release Notes</string>
+    <string name="update_download">Download</string>
+    <string name="release_notes_whats_new">What\'s New</string>
+    <string name="release_notes_current_version">Current Version: %1$s</string>
+    <string name="release_notes_latest_version">Latest Version: %1$s</string>
+    <string name="release_notes_release_date">Release Date: %1$s</string>
+    <string name="release_notes_update_size">Size: %1$s</string>
+
+    <string name="profile_screen_missing_nickname">NoNickname!</string>
+    <string name="profile_screen_track_lists_label">Lists</string>
+    <string name="more_screen_profile">My Profile</string>
+    <string name="more_screen_clubs">Clubs</string>
+    <string name="more_screen_history">History</string>
+    <string name="more_screen_settings">Settings</string>
+    <string name="more_screen_about_app">About App</string>
+
 </resources>

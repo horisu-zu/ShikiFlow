@@ -34,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.graphql.CurrentUserQuery
@@ -63,7 +62,7 @@ fun HistoryScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "History",
+                        text = stringResource(R.string.more_screen_history),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
@@ -150,7 +149,9 @@ fun HistoryScreen(
                             loadState.append is LoadState.Loading -> {
                                 item {
                                     Box(
-                                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
                                         contentAlignment = Alignment.Center
                                     ) { CircularProgressIndicator() }
                                 }

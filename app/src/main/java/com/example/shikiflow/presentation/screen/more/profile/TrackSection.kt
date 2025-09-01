@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -35,7 +36,7 @@ fun TrackSection(
         val (titleRef, animeDataRef, mangaDataRef) = createRefs()
 
         Text(
-            text = "Lists",
+            text = stringResource(R.string.profile_screen_track_lists_label),
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.constrainAs(titleRef) {
@@ -46,7 +47,7 @@ fun TrackSection(
 
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_anime),
-            type = "Anime",
+            type = stringResource(R.string.main_track_mode_anime),
             groupedData = groupedAnimeData,
             itemsCount = animeItemsCount,
             modifier = Modifier.constrainAs(animeDataRef) {
@@ -57,7 +58,7 @@ fun TrackSection(
 
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_manga),
-            type = "Manga & Ranobe",
+            type = stringResource(R.string.main_track_mode_manga),
             groupedData = groupedMangaData,
             itemsCount = mangaItemsCount,
             modifier = Modifier.constrainAs(mangaDataRef) {

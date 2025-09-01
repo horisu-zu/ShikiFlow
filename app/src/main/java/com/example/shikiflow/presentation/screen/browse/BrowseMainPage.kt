@@ -154,7 +154,7 @@ private fun BrowseListComponent(
 ) {
     LazyColumn(
         modifier = modifier,
-        contentPadding = PaddingValues(bottom = 12.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         item {
@@ -205,6 +205,15 @@ private fun BrowseListComponent(
                     ) { CircularProgressIndicator() }
                 }
             }
+            if(browseState.loadState.append is LoadState.Error) {
+                item {
+                    ErrorItem(
+                        message = stringResource(R.string.b_mss_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { browseState.retry() }
+                    )
+                }
+            }
         }
     }
 }
@@ -222,6 +231,7 @@ private fun BrowseGridComponent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 8.dp)
     ) {
         item(span = { GridItemSpan(3) }) {
             NavigationSection(
@@ -272,6 +282,15 @@ private fun BrowseGridComponent(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) { CircularProgressIndicator() }
+                    }
+                }
+                if(browseState.loadState.append is LoadState.Error) {
+                    item(span = { GridItemSpan(3) }) {
+                        ErrorItem(
+                            message = stringResource(R.string.b_mss_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { browseState.retry() }
+                        )
                     }
                 }
             }

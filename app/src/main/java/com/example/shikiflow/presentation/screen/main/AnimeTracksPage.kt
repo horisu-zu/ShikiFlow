@@ -163,6 +163,15 @@ private fun AnimeTracksListComponent(
                     ) { CircularProgressIndicator() }
                 }
             }
+            if(loadState.append is LoadState.Error) {
+                item {
+                    ErrorItem(
+                        message = stringResource(R.string.atp_loading_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { trackItems.retry() }
+                    )
+                }
+            }
         }
     }
 }
@@ -233,6 +242,15 @@ private fun AnimeTracksGridComponent(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
+                }
+            }
+            if(loadState.append is LoadState.Error) {
+                item(span = { GridItemSpan(3) }) {
+                    ErrorItem(
+                        message = stringResource(R.string.atp_loading_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { trackItems.retry() }
+                    )
                 }
             }
         }

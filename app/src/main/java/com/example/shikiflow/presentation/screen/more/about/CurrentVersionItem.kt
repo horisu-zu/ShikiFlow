@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.GithubRelease
@@ -23,7 +24,9 @@ fun CurrentVersionItem(
     modifier: Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -33,7 +36,7 @@ fun CurrentVersionItem(
             modifier = Modifier.size(64.dp)
         )
         Text(
-            text = "ShikiFlow",
+            text = stringResource(R.string.app_name),
             style = MaterialTheme.typography.titleMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
             )
@@ -45,7 +48,10 @@ fun CurrentVersionItem(
             )
         )
         Text(
-            text = "from: ${formatInstant(currentRelease.publishedAt, true)}",
+            text = stringResource(
+                R.string.version_from,
+                formatInstant(currentRelease.publishedAt, true)
+            ),
             style = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
             )

@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.GithubRelease
@@ -34,8 +35,7 @@ fun ReleaseNotesBottomSheet(
     release: GithubRelease,
     onDismiss: () -> Unit,
     onDownloadReleaseClick: () -> Unit,
-    showBottomSheet: Boolean,
-    modifier: Modifier = Modifier
+    showBottomSheet: Boolean
 ) {
     val sheetState = rememberModalBottomSheetState()
 
@@ -45,7 +45,9 @@ fun ReleaseNotesBottomSheet(
             onDismissRequest = onDismiss
         ) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
             ) {
                 ReleaseNotesHeader(
@@ -56,13 +58,15 @@ fun ReleaseNotesBottomSheet(
                 )
                 if(!release.body.isNullOrBlank()) {
                     Column(
-                        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.surface)
                             .padding(horizontal = 12.dp, vertical = 8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                     ) {
                         Text(
-                            text = "What's New",
+                            text = stringResource(R.string.release_notes_whats_new),
                             style = MaterialTheme.typography.titleMedium
                         )
                         Text(
@@ -80,7 +84,9 @@ fun ReleaseNotesBottomSheet(
                     ),
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
@@ -90,7 +96,7 @@ fun ReleaseNotesBottomSheet(
                             modifier = Modifier.size(24.dp)
                         )
                         Text(
-                            text = "Download",
+                            text = stringResource(R.string.update_download),
                             style = MaterialTheme.typography.labelMedium
                         )
                     }
@@ -113,19 +119,25 @@ private fun ReleaseNotesHeader(
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Text(
-            text = "Current Version: $currentVersion",
+            text = stringResource(R.string.release_notes_current_version, currentVersion),
             style = MaterialTheme.typography.labelMedium
         )
         Text(
-            text = "Latest Version: $latestVersion",
+            text = stringResource(R.string.release_notes_latest_version, latestVersion),
             style = MaterialTheme.typography.labelMedium
         )
         Text(
-            text = "Release Date: ${Converter.formatInstant(releaseDate)}",
+            text = stringResource(
+                R.string.release_notes_release_date,
+                Converter.formatInstant(releaseDate)
+            ),
             style = MaterialTheme.typography.labelMedium
         )
         Text(
-            text = "Size: ${Converter.formatFileSize(latestSize.toDouble())}",
+            text = stringResource(
+                R.string.release_notes_update_size,
+                Converter.formatFileSize(latestSize.toDouble())
+            ),
             style = MaterialTheme.typography.labelMedium
         )
     }

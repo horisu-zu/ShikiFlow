@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -10,7 +11,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
@@ -22,6 +22,11 @@ fun BrowseScreen(
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
     val screenState by searchViewModel.screenState.collectAsState()
+
+    BackHandler(enabled = screenState.isSearchActive) {
+        searchViewModel.onSearchActiveChange(false)
+        searchViewModel.clearSearchState()
+    }
 
     Scaffold(
         topBar = {
@@ -43,7 +48,7 @@ fun BrowseScreen(
                     query = searchQuery.query,
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)),
                     onMediaNavigate = { id, mediaType ->
                         browseNavOptions.navigateToDetails(id, mediaType)
                     }
@@ -57,8 +62,8 @@ fun BrowseScreen(
                         browseNavOptions.navigateToSideScreen(sideScreen)
                     },
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 12.dp,
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 12.dp
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                     ),
                 )
             }

@@ -7,8 +7,11 @@ enum class ChapterUIMode {
     PAGE,
     SCROLL;
 
-    val displayValue: String
-        get() = name.lowercase().replaceFirstChar { it.uppercase() }
+    val displayValue: Int
+        get() = when(this) {
+            PAGE -> R.string.chapter_ui_mode_page
+            SCROLL -> R.string.chapter_ui_mode_scroll
+        }
 
     val icon: IconResource
         get() = when(this) {

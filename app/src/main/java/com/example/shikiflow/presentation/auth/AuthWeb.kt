@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.auth
 
+/*
 import android.util.Log
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
@@ -71,3 +72,4 @@ fun AuthWeb(
         )
     }
 }
+*/

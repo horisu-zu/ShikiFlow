@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -37,7 +38,9 @@ fun LatestReleaseItem(
     modifier: Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 12.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -55,13 +58,13 @@ fun LatestReleaseItem(
                 modifier = Modifier.size(32.dp)
             )
             Text(
-                text = "Update Available",
+                text = stringResource(R.string.update_available),
                 style = MaterialTheme.typography.titleLarge
             )
         }
         Text(
             buildAnnotatedString {
-                append("Version: ")
+                append(stringResource(R.string.update_version))
                 withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
                     append(latestRelease.tagName)
                 }
@@ -75,7 +78,7 @@ fun LatestReleaseItem(
                 onClick = { showBottomSheet() }
             ) {
                 Text(
-                    text = "Release Notes",
+                    text = stringResource(R.string.update_release_notes),
                     style = MaterialTheme.typography.labelMedium,
                 )
             }
@@ -90,7 +93,7 @@ fun LatestReleaseItem(
                 ),
             ) {
                 Text(
-                    text = "Download",
+                    text = stringResource(R.string.update_download),
                     style = MaterialTheme.typography.labelMedium
                 )
             }

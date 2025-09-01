@@ -20,9 +20,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.shikiflow.R
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
@@ -45,22 +47,28 @@ fun ChapterSettingsBottomSheet(
         modifier = modifier
     ) {
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 18.dp, vertical = 12.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 18.dp, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Top)
         ) {
             ChapterSettingsRow(
-                title = "UI Mode",
-                currentValue = chapterUIMode.displayValue,
-                values = ChapterUIMode.entries.map { it.displayValue },
+                title = stringResource(R.string.settings_app_ui_mode),
+                currentValue = stringResource(chapterUIMode.displayValue),
+                values = ChapterUIMode.entries.map { stringResource(it.displayValue)  },
                 iconResources = ChapterUIMode.entries.map { it.icon },
                 onSettingClick = { selectedMode ->
                     settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(selectedMode.uppercase()))
                 }
             )
             ChapterSettingsRow(
-                title = "Data Saver Mode",
-                currentValue = if(isDataSaverEnabled) "Enabled" else "Disabled",
-                values = listOf("Enabled", "Disabled"),
+                title = stringResource(R.string.settings_data_saver_mode),
+                currentValue = if(isDataSaverEnabled) stringResource(R.string.settings_data_saver_mode_enabled)
+                    else stringResource(R.string.settings_data_saver_mode_disabled),
+                values = listOf(
+                    stringResource(R.string.settings_data_saver_mode_enabled),
+                    stringResource(R.string.settings_data_saver_mode_disabled)
+                ),
                 onSettingClick = { selectedValue ->
                     settingsViewModel.setDataSaver(!isDataSaverEnabled)
                 }
@@ -88,7 +96,8 @@ private fun ChapterSettingsRow(
             style = MaterialTheme.typography.titleMedium
         )
         Row(
-            modifier = modifier.fillMaxWidth()
+            modifier = modifier
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.background)
         ) {
@@ -98,7 +107,9 @@ private fun ChapterSettingsRow(
                     icon = iconResources?.get(values.indexOf(settingValue)),
                     isChecked = settingValue == currentValue,
                     onClick = { onSettingClick(settingValue) },
-                    modifier = Modifier.weight(1f).padding(4.dp)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(4.dp)
                 )
             }
         }
@@ -114,11 +125,14 @@ private fun ChapterSettingsItem(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier.clip(RoundedCornerShape(8.dp))
-            .clickable { if(!isChecked) onClick() }
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { if (!isChecked) onClick() }
             .heightIn(min = 48.dp)
-            .background(if(isChecked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.background)
+            .background(
+                if (isChecked) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.background
+            )
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)

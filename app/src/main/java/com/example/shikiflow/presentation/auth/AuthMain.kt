@@ -8,30 +8,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.FeatureItem
 import com.example.shikiflow.presentation.common.FeaturesGroup
-import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 import com.example.shikiflow.utils.IconResource
 
 @Composable
-fun AuthMain(
-    authViewModel: AuthViewModel = hiltViewModel(),
-    navController: NavController,
-    onStartAuth: () -> Unit
-) {
+fun AuthMain(onStartAuth: () -> Unit) {
+    val context = LocalContext.current
+
     ConstraintLayout(
         modifier = Modifier
             .fillMaxSize()
@@ -56,23 +52,22 @@ fun AuthMain(
                 {
                     FeatureItem(
                         icon = IconResource.Drawable(resId = R.drawable.shiki_logo),
-                        title = "Shikimori Integration",
-                        subtitle = "Seamlessly connect your Shikimori account to search, track, " +
-                                "and manage your anime and manga with ease."
+                        title = context.getString(R.string.auth_features_shiki_integration_label),
+                        subtitle = context.getString(R.string.auth_features_shiki_integration_desc)
                     )
                 },
                 {
                     FeatureItem(
                         icon = IconResource.Vector(imageVector = Icons.Default.Favorite),
-                        title = "Personalized Favorites",
-                        subtitle = "Save and organize your favorite anime and manga to revisit them anytime."
+                        title = context.getString(R.string.auth_features_personalize_label),
+                        subtitle = context.getString(R.string.auth_features_personalize_desc)
                     )
                 },
                 {
                     FeatureItem(
-                        icon = IconResource.Vector(imageVector = Icons.Default.Notifications),
-                        title = "Notifications & Updates",
-                        subtitle = "Get real-time updates on new episodes, chapters, and community interactions."
+                        icon = IconResource.Drawable(resId = R.drawable.ic_manga),
+                        title = context.getString(R.string.auth_features_mangadex_integration_label),
+                        subtitle = context.getString(R.string.auth_features_mangadex_integration_desc)
                     )
                 }
             ),
@@ -97,9 +92,11 @@ fun AuthMain(
                 .background(color = MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Button(
-                label = "Sign In",
+                label = stringResource(R.string.auth_sign_in),
                 onClick = onStartAuth,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 36.dp, vertical = 18.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 36.dp, vertical = 18.dp)
             )
         }
     }

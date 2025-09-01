@@ -7,6 +7,7 @@ import com.example.shikiflow.utils.AppSettingsManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,9 +21,7 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            appSettingsManager.trackModeFlow.collect { mode ->
-                _currentTrackMode.value = mode
-            }
+            _currentTrackMode.value = appSettingsManager.trackModeFlow.first()
         }
     }
 

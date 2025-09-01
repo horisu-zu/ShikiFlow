@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main.mangatrack
+package com.example.shikiflow.presentation.screen.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,6 +67,15 @@ fun MangaTracksPage(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
                             ) { CircularProgressIndicator() }
+                        }
+                    }
+                    if(loadState.append is LoadState.Error) {
+                        item(span = { GridItemSpan(3) }) {
+                            ErrorItem(
+                                message = stringResource(R.string.mtp_loading_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { trackItems.retry() }
+                            )
                         }
                     }
                 }

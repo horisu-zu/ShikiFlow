@@ -131,13 +131,13 @@ fun ProfileScreen(
                             }
                     ) {
                         CircleShapeButton(
-                            label = "Clubs",
+                            label = stringResource(R.string.more_screen_clubs),
                             icon = IconResource.Drawable(R.drawable.ic_group),
                             onClick = { /**/ },
                             modifier = Modifier.weight(1f)
                         )
                         CircleShapeButton(
-                            label = "History",
+                            label = stringResource(R.string.more_screen_history),
                             icon = IconResource.Drawable(R.drawable.ic_history),
                             onClick = { moreNavOptions.navigateToHistory() },
                             modifier = Modifier.weight(1f)

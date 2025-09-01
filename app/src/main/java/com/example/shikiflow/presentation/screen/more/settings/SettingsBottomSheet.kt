@@ -25,7 +25,7 @@ data class BottomSheetConfig(
     val title: String,
     val options: List<String>,
     val currentValue: String,
-    val onOptionClick: (String) -> Unit
+    val onOptionClick: (Int) -> Unit
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +34,7 @@ fun SettingsBottomSheet(
     title: String,
     options: List<String>,
     currentValue: String,
-    onOptionClick: (String) -> Unit,
+    onOptionClick: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -53,12 +53,12 @@ fun SettingsBottomSheet(
                 text = title,
                 style = MaterialTheme.typography.titleLarge
             )
-            options.forEach { value ->
+            options.forEachIndexed { index, value ->
                 Row(
                     modifier = Modifier.fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp))
                         .clickable {
-                            if(value != currentValue) onOptionClick(value)
+                            if(value != currentValue) onOptionClick(index)
                         },
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically

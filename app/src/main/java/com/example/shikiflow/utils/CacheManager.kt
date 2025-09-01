@@ -1,6 +1,7 @@
 package com.example.shikiflow.utils
 
 import android.content.Context
+import com.example.shikiflow.R
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -58,10 +59,10 @@ class CacheManagerImpl @Inject constructor(
 
     private fun formatSize(size: Long): String {
         return when {
-            size < 1024 -> "$size B"
-            size < 1024 * 1024 -> "%.2f KB".format(size.toDouble() / 1024)
-            size < 1024 * 1024 * 1024 -> "%.2f MB".format(size.toDouble() / (1024 * 1024))
-            else -> "%.2f GB".format(size.toDouble() / (1024 * 1024 * 1024))
+            size < 1024 -> context.getString(R.string.cache_size_bytes, size)
+            size < 1024 * 1024 -> context.getString(R.string.cache_size_kbytes).format(size.toDouble() / 1024)
+            size < 1024 * 1024 * 1024 -> context.getString(R.string.cache_size_mbytes).format(size.toDouble() / (1024 * 1024))
+            else -> context.getString(R.string.cache_size_gbytes).format(size.toDouble() / (1024 * 1024 * 1024))
         }
     }
 }

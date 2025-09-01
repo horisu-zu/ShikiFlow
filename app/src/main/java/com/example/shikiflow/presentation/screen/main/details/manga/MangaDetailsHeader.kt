@@ -13,7 +13,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,6 +48,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoIte
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.Converter.isManga
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.StatusColor
 import com.example.shikiflow.utils.toIcon
 import kotlinx.datetime.LocalDate
@@ -55,8 +58,10 @@ import kotlinx.datetime.atStartOfDayIn
 @Composable
 fun MangaDetailsHeader(
     mangaDetails: MangaDetailsQuery.Manga?,
+    mangaDexResource: Resource<List<String>>,
     onStatusClick: () -> Unit,
-    onMangaDexClick: (String) -> Unit,
+    onMangaDexNavigateClick: (String) -> Unit,
+    onMangaDexRefreshClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
@@ -162,8 +167,10 @@ fun MangaDetailsHeader(
             readChapters = mangaDetails?.userRate?.chapters ?: 0,
             score = mangaDetails?.userRate?.score ?: 0,
             isManga = mangaDetails?.kind?.isManga() ?: false,
+            mangaDexResource = mangaDexResource,
             onStatusClick = { onStatusClick() },
-            onMangaDexClick = { onMangaDexClick(mangaDetails?.name ?: "") },
+            onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails?.name ?: "") },
+            onMangaDexRefreshClick = onMangaDexRefreshClick,
             modifier = Modifier.constrainAs(statusItem) {
                 bottom.linkTo(genresRow.top, margin = 4.dp)
                 start.linkTo(parent.start)
@@ -195,8 +202,10 @@ fun MangaUserRateItem(
     readChapters: Int,
     score: Int,
     isManga: Boolean,
+    mangaDexResource: Resource<List<String>>,
     onStatusClick: () -> Unit,
-    onMangaDexClick: () -> Unit,
+    onMangaDexNavigateClick: () -> Unit,
+    onMangaDexRefreshClick: () -> Unit,
     modifier: Modifier
 ) {
     Row(
@@ -244,16 +253,36 @@ fun MangaUserRateItem(
         if(isManga) {
             Box(
                 modifier = Modifier.clip(RoundedCornerShape(12.dp))
-                    .clickable { onMangaDexClick() }
+                    .clickable {
+                        if(mangaDexResource is Resource.Success) onMangaDexNavigateClick()
+                        else if(mangaDexResource is Resource.Error) onMangaDexRefreshClick()
+                    }
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_mangadex_v2),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp)
-                )
+                when(mangaDexResource) {
+                    is Resource.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 3.dp
+                        )
+                    }
+                    is Resource.Success -> {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_mangadex_v2),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    is Resource.Error -> {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
     }

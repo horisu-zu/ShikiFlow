@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.BuildConfig
@@ -34,11 +35,13 @@ fun AboutAppScreen(
 
     Scaffold { innerPadding ->
         Column(
-            modifier = Modifier.fillMaxWidth().padding(
-                top = innerPadding.calculateTopPadding() + 12.dp,
-                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-            ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = innerPadding.calculateTopPadding() + 12.dp,
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
             currentVersion?.let { version ->
                 CurrentVersionItem(
@@ -58,15 +61,21 @@ fun AboutAppScreen(
                 items = listOf(
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.ic_github),
-                        title = "Github",
-                        subtitle = "Link to Repository",
+                        title = stringResource(R.string.about_app_github_label),
+                        subtitle = stringResource(R.string.about_app_github_desc),
                         onClick = { WebIntent.openUrlCustomTab(context, BuildConfig.REPO_URL) }
                     ),
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.shiki_logo),
-                        title = "Shikimori",
-                        subtitle = "Encyclopedia of Anime and Manga",
+                        title = stringResource(R.string.about_app_shikimori_label),
+                        subtitle = stringResource(R.string.about_app_shikimori_desc),
                         onClick = { WebIntent.openUrlCustomTab(context, BuildConfig.BASE_URL) }
+                    ),
+                    SectionItem.General(
+                        icon = IconResource.Drawable(R.drawable.ic_mangadex_v2),
+                        title = stringResource(R.string.about_app_mangadex_label),
+                        subtitle = stringResource(R.string.about_app_mangadex_desc),
+                        onClick = { WebIntent.openUrlCustomTab(context, BuildConfig.MANGADEX_BASE_URL) }
                     )
                 )
             )
@@ -75,17 +84,15 @@ fun AboutAppScreen(
 
     latestRelease?.let {
         ReleaseNotesBottomSheet(
-            currentVersion = currentVersion?.tagName ?: "Unknown",
+            currentVersion = currentVersion?.tagName ?: stringResource(R.string.common_unknown),
             release = latestRelease,
             onDismiss = { showBottomSheet.value = false },
             onDownloadReleaseClick = {
                 WebIntent.openUrlCustomTab(
                     context = context,
-                    url = latestRelease.assets.firstOrNull()?.downloadUrl ?: "Url"
+                    url = latestRelease.assets.first().downloadUrl
                 )
-            },
-            showBottomSheet = showBottomSheet.value,
-            modifier = Modifier
+            }, showBottomSheet = showBottomSheet.value
         )
     }
 }

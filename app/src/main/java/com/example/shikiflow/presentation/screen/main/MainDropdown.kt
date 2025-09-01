@@ -15,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
@@ -38,7 +39,8 @@ fun MainDropdown(
         ) {
             modeOptions.forEach { mode ->
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .selectable(
                             selected = mode == currentTrackMode,
                             onClick = {
@@ -46,7 +48,8 @@ fun MainDropdown(
                                 onDismiss()
                             },
                             role = Role.RadioButton
-                        ).padding(horizontal = 16.dp, vertical = 12.dp),
+                        )
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -55,20 +58,11 @@ fun MainDropdown(
                         onClick = null
                     )
                     Text(
-                        text = mode.displayValue,
+                        text = stringResource(mode.displayValue),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
         }
-    }
-}
-
-enum class MainTrackMode(val displayValue: String) {
-    ANIME("Anime"),
-    MANGA("Manga & Ranobe");
-
-    companion object {
-        fun fromString(value: String?) = entries.find { it.displayValue == value } ?: ANIME
     }
 }
