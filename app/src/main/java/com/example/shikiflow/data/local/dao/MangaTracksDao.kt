@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackDto
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity
@@ -30,6 +31,7 @@ interface MangaTracksDao {
     @Query("DELETE FROM manga_short WHERE status = :status")
     fun clearMangaItems(status: String)
 
+    @Transaction
     @Query("SELECT * FROM manga_track WHERE status = :status ORDER BY updatedAt DESC")
     fun getTracksByStatus(status: String): PagingSource<Int, MangaTrackDto>
 }

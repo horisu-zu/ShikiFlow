@@ -15,11 +15,15 @@ import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.data.remote.GithubApi
+import com.example.shikiflow.data.remote.KodikApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.MangaDexApi
 import com.example.shikiflow.data.remote.UserApi
+import com.example.shikiflow.di.annotations.KodikOkHttpClient
+import com.example.shikiflow.di.annotations.KodikRetrofit
 import com.example.shikiflow.di.annotations.MangaDexRetrofit
 import com.example.shikiflow.di.interceptor.AuthInterceptor
+import com.example.shikiflow.di.interceptor.KodikInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
 import com.example.shikiflow.domain.auth.TokenManager
 import dagger.Module
@@ -70,6 +74,15 @@ class NetworkModule {
 
     @Provides
     @Singleton
+    @KodikOkHttpClient
+    fun provideKodikOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .addInterceptor(KodikInterceptor())
+            .build()
+    }
+
+    @Provides
+    @Singleton
     @MainRetrofit
     fun provideMainRetrofit(
         @MainOkHttpClient okHttpClient: OkHttpClient,
@@ -105,6 +118,20 @@ class NetworkModule {
     ): Retrofit {
         return Retrofit.Builder()
             .baseUrl(BuildConfig.GITHUB_API_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @KodikRetrofit
+    fun provideKodikRetrofit(
+        @KodikOkHttpClient okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.KODIK_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
@@ -179,4 +206,8 @@ class NetworkModule {
     @Singleton
     fun provideMangaDexApi(@MangaDexRetrofit retrofit: Retrofit): MangaDexApi =
         retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideKodikApi(@KodikRetrofit retrofit: Retrofit): KodikApi = retrofit.create()
 }

@@ -15,6 +15,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavigator
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
@@ -60,6 +61,10 @@ fun DetailsNavigator(
 
         override fun navigateToComments(screenMode: CommentsScreenMode, id: String) {
             detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id))
+        }
+
+        override fun navigateToAnimeWatch(title: String, shikimoriId: String, completedEpisodes: Int) {
+            detailsBackstack.add(DetailsNavRoute.AnimeWatch(title, shikimoriId, completedEpisodes))
         }
 
         override fun navigateBack() {
@@ -126,6 +131,14 @@ fun DetailsNavigator(
                     id = route.id,
                     navOptions = options,
                     commentViewModel = hiltViewModel(key = "comments_${route.screenMode}_${route.id}")
+                )
+            }
+            entry<DetailsNavRoute.AnimeWatch> { route ->
+                AnimeWatchNavigator(
+                    title = route.title,
+                    shikimoriId = route.shikimoriId,
+                    completedEpisodes = route.completedEpisodes,
+                    onNavigateBack = { options.navigateBack() }
                 )
             }
         },

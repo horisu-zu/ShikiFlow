@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details.anime
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,12 +37,14 @@ import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun AnimeDetailsTitle(
-    animeDetails: AnimeDetailsQuery.Anime?,
+    animeDetails: AnimeDetailsQuery.Anime,
     onStatusClick: () -> Unit,
+    onPlayClick: (String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ConstraintLayout(
@@ -48,7 +53,7 @@ fun AnimeDetailsTitle(
         val (backgroundRef, scoreRef, titleRef, infoRow, statusItem) = createRefs()
 
         GradientImage(
-            model = animeDetails?.poster?.originalUrl,
+            model = animeDetails.poster?.originalUrl,
             gradientFraction = 0.9f,
             imageType = ImageType.Poster(
                 defaultClip = RoundedCornerShape(0.dp)
@@ -62,9 +67,9 @@ fun AnimeDetailsTitle(
                 }
         )
 
-        if (animeDetails?.status != AnimeStatusEnum.anons) {
+        if (animeDetails.status != AnimeStatusEnum.anons) {
             ScoreItem(
-                score = animeDetails?.score?.toFloat() ?: 0f,
+                score = animeDetails.score?.toFloat() ?: 0f,
                 modifier = Modifier
                     .constrainAs(scoreRef) {
                         bottom.linkTo(titleRef.top)
@@ -74,7 +79,7 @@ fun AnimeDetailsTitle(
         }
 
         Text(
-            text = animeDetails?.name ?: "emptiness",
+            text = animeDetails.name,
             style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier
                 .constrainAs(titleRef) {
@@ -97,25 +102,30 @@ fun AnimeDetailsTitle(
             )
             ShortInfoItem(
                 infoType = "Episodes",
-                infoItem = if (animeDetails?.status != AnimeStatusEnum.ongoing) {
-                    "${animeDetails?.episodes} ep."
+                infoItem = if (animeDetails.status != AnimeStatusEnum.ongoing) {
+                    "${animeDetails.episodes} ep."
                 } else {
                     "${animeDetails.episodesAired} of ${animeDetails.episodes.takeIf { it != 0 } ?: "?"} ep."
                 }
             )
             ShortInfoItem(
                 infoType = "Age Rating",
-                infoItem = Converter.convertRatingToString(animeDetails?.rating)
+                infoItem = Converter.convertRatingToString(animeDetails.rating)
             )
         }
 
         UserStatusItem(
             onStatusClick = onStatusClick,
-            status = animeDetails?.userRate?.status,
-            allEpisodes = if(animeDetails?.status == AnimeStatusEnum.released) animeDetails.episodes
-                else animeDetails?.episodesAired,
-            watchedEpisodes = animeDetails?.userRate?.episodes,
-            score = animeDetails?.userRate?.score,
+            onPlayClick = { onPlayClick(
+                animeDetails.name,
+                animeDetails.id,
+                animeDetails.userRate?.episodes ?: 0
+            ) },
+            status = animeDetails.userRate?.status,
+            allEpisodes = if(animeDetails.status == AnimeStatusEnum.released) animeDetails.episodes
+                else animeDetails.episodesAired,
+            watchedEpisodes = animeDetails.userRate?.episodes,
+            score = animeDetails.userRate?.score,
             modifier = Modifier
                 .constrainAs(statusItem) {
                     bottom.linkTo(parent.bottom)
@@ -170,43 +180,62 @@ private fun UserStatusItem(
     watchedEpisodes: Int?,
     score: Int?,
     onStatusClick: () -> Unit,
-    modifier: Modifier
+    onPlayClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(
-                Brush.horizontalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.tertiary
+        modifier = modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    Brush.horizontalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.tertiary
+                        )
                     )
                 )
-            )
-            .clickable { onStatusClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        val icon = RateStatus.fromStatus(status ?: UserRateStatusEnum.UNKNOWN__)?.icon
-            ?: IconResource.Vector(Icons.Outlined.Clear)
+                .clickable { onStatusClick() }
+                .padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val icon = RateStatus.fromStatus(status ?: UserRateStatusEnum.UNKNOWN__)?.icon
+                ?: IconResource.Vector(Icons.Outlined.Clear)
 
-        icon.toIcon(
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.surface
-        )
-        Text(
-            text = UserRateMapper.mapStatusToString(
-                status = status ?: UserRateStatusEnum.UNKNOWN__,
-                allEpisodes = allEpisodes,
-                watchedEpisodes = watchedEpisodes,
-                score = score
-            ),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.surface,
-                fontWeight = FontWeight.SemiBold
+            icon.toIcon(
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.surface
             )
-        )
+            Text(
+                text = UserRateMapper.mapStatusToString(
+                    status = status ?: UserRateStatusEnum.UNKNOWN__,
+                    allEpisodes = allEpisodes,
+                    watchedEpisodes = watchedEpisodes,
+                    score = score
+                ),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.surface,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+        }
+        Box(
+            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                .clickable { onPlayClick() }
+                .background(MaterialTheme.colorScheme.primaryContainer)
+                .padding(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+        }
     }
 }

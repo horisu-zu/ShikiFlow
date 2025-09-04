@@ -8,15 +8,13 @@ sealed interface MangaReadNavRoute : NavKey {
     @Serializable
     data class MangaSelectionScreen(
         val mangaDexIds: List<String>,
-        val title: String,
-        val completedChapters: Int
+        val title: String
     ) : MangaReadNavRoute
 
     @Serializable
     data class ChaptersScreen(
         val mangaDexId: String,
         val title: String,
-        val completedChapters: Int,
         val source: ChaptersScreenSource
     ) : MangaReadNavRoute
 

@@ -11,4 +11,5 @@ interface MediaNavOptions: MainNavOptions {
     fun navigateToLinksPage(id: String, mediaType: MediaType)
     fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int)
     fun navigateToComments(screenMode: CommentsScreenMode, id: String)
+    fun navigateToAnimeWatch(title: String, shikimoriId: String, completedEpisodes: Int)
 }

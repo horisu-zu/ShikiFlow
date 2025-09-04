@@ -1,3 +1,9 @@
 /build
 
-/src/main/java/com/example/shikiflow/utils/BuildConfig.kt
+/src/main/java/com/example/shikiflow/domain/repository/KodikRepository.kt
+/src/main/java/com/example/shikiflow/data/remote/KodikApi.kt
+/src/main/java/com/example/shikiflow/domain/model/kodik/
+/src/main/java/com/example/shikiflow/data/response/
+/src/main/java/com/example/shikiflow/data/repository/KodikRepositoryImpl.kt
+/src/main/java/com/example/shikiflow/data/mapper/KodikMapper.kt
+/src/main/java/com/example/shikiflow/data/parser/

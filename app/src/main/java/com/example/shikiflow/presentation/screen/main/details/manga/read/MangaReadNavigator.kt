@@ -20,14 +20,12 @@ fun MangaReadNavigator(
         1 -> rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
             mangaDexId = mangaDexIds[0],
             title = title,
-            completedChapters = completedChapters,
             source = ChaptersScreenSource.AUTOMATED
         ))
         else -> {
             rememberNavBackStack(MangaReadNavRoute.MangaSelectionScreen(
                 mangaDexIds = mangaDexIds,
-                title = title,
-                completedChapters = completedChapters
+                title = title
             ))
         }
     }
@@ -36,10 +34,9 @@ fun MangaReadNavigator(
         override fun navigateToChapters(
             mangaDexId: String,
             title: String,
-            completedChapters: Int,
             source: ChaptersScreenSource
         ) {
-            mangaReadBackstack.add(MangaReadNavRoute.ChaptersScreen(mangaDexId, title, completedChapters, source))
+            mangaReadBackstack.add(MangaReadNavRoute.ChaptersScreen(mangaDexId, title, source))
         }
 
         override fun navigateToChapterTranslations(chapterTranslationIds: List<String>, chapterNumber: String) {
@@ -67,7 +64,6 @@ fun MangaReadNavigator(
                 MangaSelectionScreen(
                     mangaDexIds = route.mangaDexIds,
                     title = route.title,
-                    completedChapters = route.completedChapters,
                     navOptions = navOptions,
                     onNavigateBack = onNavigateBack
                 )
@@ -76,7 +72,7 @@ fun MangaReadNavigator(
                 MangaChaptersScreen(
                     mangaDexId = route.mangaDexId,
                     title = route.title,
-                    completedChapters = route.completedChapters,
+                    completedChapters = completedChapters,
                     navOptions = navOptions,
                     onNavigateBack = onNavigateBack,
                     mangaChaptersViewModel = mangaChaptersViewModel,

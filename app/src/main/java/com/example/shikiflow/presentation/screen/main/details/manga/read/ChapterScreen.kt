@@ -232,8 +232,7 @@ private fun ChapterScrollModeComponent(
                     scaleY = scale,
                     translationX = offsetX,
                     translationY = offsetY
-                )
-                .zoomable(rememberZoomState()), //Well, it's easier this way I guess
+                ).zoomable(rememberZoomState()), //Well, it's easier this way I guess
             verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {

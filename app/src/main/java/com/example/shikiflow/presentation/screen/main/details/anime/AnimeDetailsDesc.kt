@@ -49,7 +49,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 
 @Composable
 fun AnimeDetailsDesc(
-    animeDetails: AnimeDetailsQuery.Anime?,
+    animeDetails: AnimeDetailsQuery.Anime,
     onSimilarClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -66,7 +66,7 @@ fun AnimeDetailsDesc(
         val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef) = createRefs()
 
         ExpandableText(
-            descriptionHtml = animeDetails?.descriptionHtml ?: "No Description",
+            descriptionHtml = animeDetails.descriptionHtml ?: "No Description",
             modifier = Modifier.constrainAs(descRef) {
                 top.linkTo(parent.top)
                 start.linkTo(parent.start)
@@ -81,17 +81,19 @@ fun AnimeDetailsDesc(
             }, onLinkClick = onLinkClick
         )
 
-        LazyRow(
-            modifier = Modifier.constrainAs(genresRef) {
-                top.linkTo(descRef.bottom, margin = 2.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }.padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(animeDetails?.genres ?: emptyList()) { genreItem ->
-                CardItem(genreItem.name)
+        if(animeDetails.genres?.isNotEmpty() == true) {
+            LazyRow(
+                modifier = Modifier.constrainAs(genresRef) {
+                    top.linkTo(descRef.bottom, margin = 2.dp)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    width = Dimension.fillToConstraints
+                }.padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(animeDetails.genres) { genreItem ->
+                    CardItem(genreItem.name)
+                }
             }
         }
 
@@ -111,7 +113,7 @@ fun AnimeDetailsDesc(
             LazyRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(animeDetails?.characterRoles ?: emptyList()) { characterItem ->
+                items(animeDetails.characterRoles ?: emptyList()) { characterItem ->
                     CharacterCard(
                         characterPoster = characterItem.character.characterShort.poster
                             ?.posterShort?.previewUrl,
@@ -123,7 +125,7 @@ fun AnimeDetailsDesc(
         }
 
         RelatedSection(
-            relatedItems = animeDetails?.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
+            relatedItems = animeDetails.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
             onArrowClick = { showRelatedBottomSheet = true },
             onItemClick = onItemClick,
             modifier = Modifier.constrainAs(relatedRef) {
@@ -135,7 +137,7 @@ fun AnimeDetailsDesc(
         )
 
         ScreenshotSection(
-            screenshots = animeDetails?.screenshots ?: emptyList(),
+            screenshots = animeDetails.screenshots,
             modifier = Modifier.constrainAs(screenshotsRef) {
                 top.linkTo(relatedRef.bottom, margin = 12.dp)
                 start.linkTo(parent.start)
@@ -144,26 +146,24 @@ fun AnimeDetailsDesc(
             }
         )
 
-        animeDetails?.let {
-            AnimeDetailsInfo(
-                animeDetails = it,
-                onLinkClick = onLinkClick,
-                onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
-                onExternalLinksClick = onExternalLinksClick,
-                onEntityClick = onEntityClick,
-                onTopicNavigate = onTopicNavigate,
-                modifier = Modifier.constrainAs(additionalRef) {
-                    top.linkTo(screenshotsRef.bottom, margin = 12.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }
-            )
-        }
+        AnimeDetailsInfo(
+            animeDetails = animeDetails,
+            onLinkClick = onLinkClick,
+            onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
+            onExternalLinksClick = onExternalLinksClick,
+            onEntityClick = onEntityClick,
+            onTopicNavigate = onTopicNavigate,
+            modifier = Modifier.constrainAs(additionalRef) {
+                top.linkTo(screenshotsRef.bottom, margin = 12.dp)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                width = Dimension.fillToConstraints
+            }
+        )
     }
 
     RelatedBottomSheet(
-        relatedItems = animeDetails?.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
+        relatedItems = animeDetails.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
         showBottomSheet = showRelatedBottomSheet,
         onItemClick = onItemClick,
         onDismiss = { showRelatedBottomSheet = false }

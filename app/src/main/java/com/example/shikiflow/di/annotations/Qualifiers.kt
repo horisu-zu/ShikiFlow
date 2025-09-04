@@ -16,6 +16,10 @@ annotation class GithubOkHttpClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class KodikOkHttpClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class AuthRetrofit
 
 @Qualifier
@@ -29,3 +33,7 @@ annotation class MangaDexRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class GithubRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class KodikRetrofit

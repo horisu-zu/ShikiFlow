@@ -26,7 +26,7 @@ class GetMangaDexUseCase @Inject constructor(
                 //I tested and looks like this one works in 100% of cases
                 //(ofc I'm not sure if it really does)
                 //val matchesTitle = !enTitle.contains("colored", ignoreCase = true)
-                item.attributes.links.mal == malId
+                item.attributes.links?.mal == malId
             }.map { it.id }
 
             when {

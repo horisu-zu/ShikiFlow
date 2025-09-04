@@ -1,3 +1,7 @@
+@file:OptIn(KspExperimental::class)
+
+import com.google.devtools.ksp.KspExperimental
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -36,11 +40,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "21"
     }
     buildFeatures {
         compose = true
@@ -62,13 +66,11 @@ android {
             packageName.set("com.example.graphql")
             schemaFile.set(file("src/main/graphql/schema.graphql"))
             srcDir("src/main/graphql/sources")
-//            mapScalar("ISO8601Date", "kotlinx.datetime.Instant")
-//            mapScalar("ISO8601DateTime", "kotlinx.datetime.Instant")
-//            mapScalar("ID", "kotlin.Long")
-//            mapScalar("PositiveInt", "kotlin.Int")
-//            mapScalar("AnimeKindString", "com.example.shikiflow.data.mapper.AnimeKind")
             generateKotlinModels.set(true)
         }
+    }
+    ksp {
+        ksp.useKsp2 = false // PSI issue with KSP2 I don't know how to fix
     }
 }
 
@@ -131,6 +133,7 @@ dependencies {
 
     //Ksoup — HTML Parser
     implementation(libs.ksoup)
+    implementation(libs.ksoup.network)
 
     //Navigation 3
     implementation(libs.androidx.navigation3.runtime)
@@ -141,4 +144,7 @@ dependencies {
 
     //Zoomable
     implementation(libs.zoomable)
+
+    //Exoplayer
+    implementation(libs.androidx.media3.exoplayer)
 }

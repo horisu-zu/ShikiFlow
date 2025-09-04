@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity
@@ -31,6 +32,7 @@ interface AnimeTracksDao {
     @Query("DELETE FROM anime_short WHERE status = :status")
     fun clearAnimeItems(status: String)
 
+    @Transaction
     @Query("SELECT * FROM anime_track WHERE status = :status ORDER BY updatedAt DESC")
     fun getTracksByStatus(status: String): PagingSource<Int, AnimeTrackDto>
 }

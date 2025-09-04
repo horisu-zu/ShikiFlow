@@ -183,6 +183,26 @@ object Converter {
             ?: UserRateStatusConstants.convertStatus(status)
     }
 
+    fun String.toAbbreviation(maxLetters: Int = 2): String {
+        val words = this.split(Regex("\\s+")).filter { it.isNotBlank() }
+
+        return when {
+            words.size == 1 -> {
+                val capitals = words[0].filter { it.isUpperCase() }
+                when {
+                    capitals.length >= maxLetters -> capitals.take(maxLetters)
+                    capitals.isNotEmpty() -> capitals + words[0]
+                        .filter { it.isLetter() && !it.isUpperCase() }
+                        .take(maxLetters - capitals.length)
+                        .map { it.uppercaseChar() }
+                        .joinToString("").uppercase()
+                    else -> words[0].take(maxLetters).uppercase()
+                }
+            }
+            else -> words.take(maxLetters).map { it.first().uppercaseChar() }.joinToString("")
+        }
+    }
+
     /*fun formatText(
         text: String,
         linkColor: Color
@@ -453,6 +473,11 @@ object Converter {
                                 || node.tagName() == "a" && node.hasClass("b-image")
                             )
                         ) { return@forEach }
+
+                    if (node.tagName().lowercase() == "br") {
+                        builder.append("\n")
+                        return@forEach
+                    }
 
                     val spanStyle = getSpanStyleForElement(node, linkColor)
 

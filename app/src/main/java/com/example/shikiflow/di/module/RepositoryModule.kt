@@ -8,6 +8,7 @@ import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.data.remote.GithubApi
+import com.example.shikiflow.data.remote.KodikApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.MangaDexApi
 import com.example.shikiflow.data.remote.ShikimoriAuthApi
@@ -18,6 +19,7 @@ import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
 import com.example.shikiflow.data.repository.GithubRepositoryImpl
+import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MangaRepositoryImpl
 import com.example.shikiflow.data.repository.MangaTracksRepositoryImpl
@@ -29,6 +31,7 @@ import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.GithubRepository
+import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.domain.repository.MangaTracksRepository
@@ -97,7 +100,6 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideCharacterRepository(
-        apolloClient: ApolloClient,
         characterApi: CharacterApi
     ): CharacterRepository = CharacterRepositoryImpl(characterApi)
 
@@ -112,4 +114,10 @@ object RepositoryModule {
     fun provideGithubRepository(
         githubApi: GithubApi
     ): GithubRepository = GithubRepositoryImpl(githubApi)
+
+    @Provides
+    @Singleton
+    fun provideKodikRepository(
+        kodikApi: KodikApi
+    ): KodikRepository = KodikRepositoryImpl(kodikApi)
 }

@@ -14,7 +14,7 @@ data class Attributes(
     val lastChapter: String,
     val lastVolume: String,
     val latestUploadedChapter: String,*/
-    val links: Links,
+    val links: Links? = null,
     //val officialLinks: Links?,
     //val originalLanguage: String,
     //val publicationDemographic: String,

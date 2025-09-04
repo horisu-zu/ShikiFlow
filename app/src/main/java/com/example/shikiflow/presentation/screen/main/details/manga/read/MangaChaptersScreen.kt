@@ -125,7 +125,7 @@ fun MangaChaptersScreen(
                 ) {
                     val startsFromZero = sortedChapters.firstOrNull()?.toFloat() == 0f
 
-                    items(sortedChapters){ chapterNumber ->
+                    items(sortedChapters) { chapterNumber ->
                         ChapterItem(
                             chapterNumber = chapterNumber,
                             onChapterClick = {

@@ -55,7 +55,6 @@ import com.example.shikiflow.utils.StatusColor
 fun MangaSelectionScreen(
     mangaDexIds: List<String>,
     title: String,
-    completedChapters: Int,
     navOptions: MangaReadNavOptions,
     onNavigateBack: () -> Unit,
     mangaSelectionViewModel: MangaSelectionViewModel = hiltViewModel()
@@ -96,7 +95,7 @@ fun MangaSelectionScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                    else MaterialTheme.colorScheme.surfaceVariant
+                        else MaterialTheme.colorScheme.surfaceVariant
                 )
             )
         }
@@ -123,7 +122,6 @@ fun MangaSelectionScreen(
                                     navOptions.navigateToChapters(
                                         mangaDexId = mangaDexId,
                                         title = title,
-                                        completedChapters = completedChapters,
                                         source = ChaptersScreenSource.MANUAL
                                     )
                                 }

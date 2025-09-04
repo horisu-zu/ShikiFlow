@@ -123,4 +123,10 @@
     <string name="more_screen_settings">Settings</string>
     <string name="more_screen_about_app">About App</string>
 
+    <string name="translation_updated_at">Updated %1$s</string>
+    <string name="episodes">%1s ep.</string>
+    <string name="translation_filter_all">All</string>
+    <string name="translation_filter_voice">Voice</string>
+    <string name="translation_filter_subtitles">Subtitles</string>
+
 </resources>

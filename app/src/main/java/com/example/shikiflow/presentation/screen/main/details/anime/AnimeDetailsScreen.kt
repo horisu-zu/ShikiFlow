@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -54,7 +55,8 @@ fun AnimeDetailsScreen(
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel(),
     userViewModel: UserViewModel = hiltViewModel()
 ) {
-    val animeDetails = animeDetailsViewModel.animeDetails.collectAsState()
+    val animeDetails = animeDetailsViewModel.animeDetails.collectAsStateWithLifecycle()
+
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -111,65 +113,68 @@ fun AnimeDetailsScreen(
                     ) {
                         val (titleRef, descriptionRef) = createRefs()
 
-                        AnimeDetailsTitle(
-                            animeDetails = animeDetails.value.data,
-                            onStatusClick = { rateBottomSheet = true },
-                            modifier = Modifier.constrainAs(titleRef) {
-                                top.linkTo(parent.top)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                bottom.linkTo(descriptionRef.top)
-                            }
-                        )
-
-                        AnimeDetailsDesc(
-                            animeDetails = animeDetails.value.data,
-                            onItemClick = { id, mediaType ->
-                                if(mediaType == MediaType.ANIME) {
-                                    navOptions.navigateToAnimeDetails(id)
-                                } else navOptions.navigateToMangaDetails(id)
-                            },
-                            onEntityClick = { entityType, id ->
-                                when(entityType) {
-                                    EntityType.CHARACTER -> {
-                                        navOptions.navigateToCharacterDetails(id)
-                                    }
-                                    EntityType.PERSON -> {
-                                        customTabIntent.launchUrl(context,
-                                            "${BuildConfig.BASE_URL}/person/$id".toUri()
-                                        )
-                                    }
-                                    EntityType.ANIME -> {
-                                        navOptions.navigateToAnimeDetails(id)
-                                    }
-                                    EntityType.MANGA -> {
-                                        navOptions.navigateToMangaDetails(id)
-                                    }
-                                    EntityType.COMMENT -> {
-                                        navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
-                                    }
+                        animeDetails.value.data?.let { details ->
+                            AnimeDetailsTitle(
+                                animeDetails = details,
+                                onStatusClick = { rateBottomSheet = true },
+                                onPlayClick = { title, id, completedEpisodes ->
+                                    navOptions.navigateToAnimeWatch(title, id, completedEpisodes)
+                                },
+                                modifier = Modifier.constrainAs(titleRef) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                    end.linkTo(parent.end)
+                                    bottom.linkTo(descriptionRef.top)
                                 }
-                            },
-                            onLinkClick = { url ->
-                                customTabIntent.launchUrl(context, url.toUri())
-                            },
-                            onTopicNavigate = { topicId ->
-                                navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
-                            },
-                            onSimilarClick = { animeId, title ->
-                                navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)
-                            },
-                            onExternalLinksClick = { animeId ->
-                                navOptions.navigateToLinksPage(id, MediaType.ANIME)
-                            },
-                            modifier = Modifier.constrainAs(descriptionRef) {
-                                top.linkTo(titleRef.bottom, margin = 12.dp)
-                            }.padding(horizontal = 12.dp)
-                        )
+                            )
+                            AnimeDetailsDesc(
+                                animeDetails = details,
+                                onItemClick = { id, mediaType ->
+                                    if(mediaType == MediaType.ANIME) {
+                                        navOptions.navigateToAnimeDetails(id)
+                                    } else navOptions.navigateToMangaDetails(id)
+                                },
+                                onEntityClick = { entityType, id ->
+                                    when(entityType) {
+                                        EntityType.CHARACTER -> {
+                                            navOptions.navigateToCharacterDetails(id)
+                                        }
+                                        EntityType.PERSON -> {
+                                            customTabIntent.launchUrl(context,
+                                                "${BuildConfig.BASE_URL}/person/$id".toUri()
+                                            )
+                                        }
+                                        EntityType.ANIME -> {
+                                            navOptions.navigateToAnimeDetails(id)
+                                        }
+                                        EntityType.MANGA -> {
+                                            navOptions.navigateToMangaDetails(id)
+                                        }
+                                        EntityType.COMMENT -> {
+                                            navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
+                                        }
+                                    }
+                                },
+                                onLinkClick = { url ->
+                                    customTabIntent.launchUrl(context, url.toUri())
+                                },
+                                onTopicNavigate = { topicId ->
+                                    navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
+                                },
+                                onSimilarClick = { animeId, title ->
+                                    navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)
+                                },
+                                onExternalLinksClick = { animeId ->
+                                    navOptions.navigateToLinksPage(id, MediaType.ANIME)
+                                },
+                                modifier = Modifier.constrainAs(descriptionRef) {
+                                    top.linkTo(titleRef.bottom, margin = 12.dp)
+                                }.padding(horizontal = 12.dp)
+                            )
+                        }
                     }
                 }
             }
-
             is Resource.Error -> { /*TODO*/ }
         }
     }

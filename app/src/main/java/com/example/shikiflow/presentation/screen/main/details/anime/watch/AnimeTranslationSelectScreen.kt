@@ -1,0 +1,235 @@
+package com.example.shikiflow.presentation.screen.main.details.anime.watch
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.kodik.KodikAnime
+import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeTranslationsViewModel
+import com.example.shikiflow.utils.Converter
+import com.example.shikiflow.utils.Converter.toAbbreviation
+import com.example.shikiflow.utils.Resource
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AnimeTranslationSelectScreen(
+    title: String,
+    shikimoriId: String,
+    navOptions: AnimeWatchNavOptions,
+    onNavigateBack: () -> Unit,
+    animeTranslationsViewModel: AnimeTranslationsViewModel = hiltViewModel()
+) {
+
+    val filters = TranslationFilter.entries
+    val translationFilter = remember { mutableStateOf(TranslationFilter.ALL) }
+    val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
+
+    LaunchedEffect(shikimoriId) {
+        animeTranslationsViewModel.getAnimeTranslation(shikimoriId)
+    }
+
+    val lazyListState = rememberLazyListState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = title,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { onNavigateBack() }) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Back"
+                        )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = if(isAtTop) MaterialTheme.colorScheme.background
+                        else MaterialTheme.colorScheme.surfaceVariant
+                )
+            )
+        }
+    ) { paddingValues ->
+        LazyColumn(
+            state = lazyListState,
+            modifier = Modifier.fillMaxSize()
+                .padding(
+                    top = paddingValues.calculateTopPadding(),
+                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            item {
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                ) {
+                    items(filters.size) { index ->
+                        FilterChip(
+                            selected = translationFilter.value == filters[index],
+                            label = {
+                                Text(
+                                    text = stringResource(id = filters[index].displayValue),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            },
+                            onClick = {
+                                if (filters[index] != translationFilter.value)
+                                    translationFilter.value = filters[index]
+                            }
+                        )
+                    }
+                }
+            }
+            when(val translations = translationsState.value) {
+                is Resource.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
+                    }
+                }
+                is Resource.Success -> {
+                    translations.data?.let { animeTranslations ->
+                        items(
+                            count = animeTranslations.size,
+                            key = { index -> animeTranslations[index].id }
+                        ) { index ->
+                            AnimeTranslationItem(
+                                kodikAnime = animeTranslations[index],
+                                onTranslationClick = { link ->
+                                    navOptions.navigateToEpisodeSelection(link)
+                                }, modifier = Modifier.padding(horizontal = 12.dp)
+                            )
+                        }
+                    }
+                }
+                is Resource.Error -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { animeTranslationsViewModel.getAnimeTranslation(shikimoriId) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun AnimeTranslationItem(
+    kodikAnime: KodikAnime,
+    onTranslationClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onTranslationClick(kodikAnime.link) }
+            .padding(horizontal = 4.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = kodikAnime.translation.title.toAbbreviation(),
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
+            Text(
+                text = kodikAnime.translation.title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Text(
+                text = stringResource(
+                    R.string.translation_updated_at,
+                    Converter.formatInstant(kodikAnime.updatedAt, includeTime = true)
+                ),
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+        Text(
+            text = stringResource(R.string.episodes, kodikAnime.episodesCount),
+            style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
