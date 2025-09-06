@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.anime.watch
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -11,17 +12,19 @@ fun AnimeWatchNavigator(
     title: String,
     shikimoriId: String,
     completedEpisodes: Int,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onEpisodeNavigate: (String, Int) -> Unit,
+    source: String
 ) {
-    val watchBackstack = rememberNavBackStack(AnimeWatchNavRoute.TranslationSelect(title, shikimoriId))
+    val watchBackstack = rememberNavBackStack(AnimeWatchNavRoute.TranslationSelect(shikimoriId))
 
     val options = object : AnimeWatchNavOptions {
-        override fun navigateToEpisodeSelection(link: String) {
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link))
+        override fun navigateToEpisodeSelection(link: String, episodesCount: Int) {
+            watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link, episodesCount))
         }
 
-        override fun navigateToEpisode(hlsUrl: String) {
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(hlsUrl))
+        override fun navigateToEpisode(link: String, serialNum: Int) {
+            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(link, serialNum))
         }
 
         override fun navigateBack() {
@@ -37,23 +40,21 @@ fun AnimeWatchNavigator(
         entryProvider = entryProvider {
             entry<AnimeWatchNavRoute.TranslationSelect> { route ->
                 AnimeTranslationSelectScreen(
-                    title = route.title,
+                    title = title,
                     shikimoriId = route.shikimoriId,
                     navOptions = options,
-                    onNavigateBack = onNavigateBack
+                    onNavigateBack = onNavigateBack,
+                    animeTranslationsViewModel = hiltViewModel(key = "${source}_translations")
                 )
             }
             entry<AnimeWatchNavRoute.EpisodeSelection> { route ->
                 EpisodeSelectionScreen(
+                    title = title,
+                    episodesCount = route.episodesCount,
                     link = route.link,
                     completedEpisodes = completedEpisodes,
-                    navOptions = options
-                )
-            }
-            entry<AnimeWatchNavRoute.EpisodeScreen> { route ->
-                EpisodeScreen(
-                    hlsUrl = route.hlsUrl,
-                    navOptions = options
+                    navOptions = options,
+                    onEpisodeNavigate = onEpisodeNavigate
                 )
             }
         }

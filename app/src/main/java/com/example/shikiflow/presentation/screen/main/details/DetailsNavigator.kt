@@ -28,7 +28,8 @@ fun DetailsNavigator(
     currentUserData: CurrentUserQuery.Data?,
     mediaId: String,
     mediaType: MediaType,
-    source: String
+    source: String,
+    onEpisodeNavigate: (String, Int) -> Unit
 ) {
     val detailsBackstack = rememberNavBackStack(when(mediaType) {
         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)
@@ -122,7 +123,7 @@ fun DetailsNavigator(
                     title = route.title,
                     completedChapters = route.completedChapters,
                     onNavigateBack = { options.navigateBack() },
-                    mangaChaptersViewModel = hiltViewModel(key = "read_${route.mangaDexIds}")
+                    source = source
                 )
             }
             entry<DetailsNavRoute.Comments> { route ->
@@ -138,7 +139,9 @@ fun DetailsNavigator(
                     title = route.title,
                     shikimoriId = route.shikimoriId,
                     completedEpisodes = route.completedEpisodes,
-                    onNavigateBack = { options.navigateBack() }
+                    onNavigateBack = { options.navigateBack() },
+                    onEpisodeNavigate = onEpisodeNavigate,
+                    source = source
                 )
             }
         },

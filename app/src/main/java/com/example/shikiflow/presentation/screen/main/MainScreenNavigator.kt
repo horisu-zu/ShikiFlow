@@ -13,7 +13,8 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 
 @Composable
 fun MainScreenNavigator(
-    currentUserData: CurrentUserQuery.Data?
+    currentUserData: CurrentUserQuery.Data?,
+    onEpisodeNavigate: (String, Int) -> Unit
 ) {
     val mainScreenBackstack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
     val options = object : MainScreenNavOptions {
@@ -41,7 +42,8 @@ fun MainScreenNavigator(
                     currentUserData = currentUserData,
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    source = "main"
+                    source = "main",
+                    onEpisodeNavigate = onEpisodeNavigate
                 )
             }
         }

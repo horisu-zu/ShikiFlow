@@ -14,7 +14,7 @@ fun MangaReadNavigator(
     title: String,
     completedChapters: Int,
     onNavigateBack: () -> Unit,
-    mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
+    source: String
 ) {
     val mangaReadBackstack = when(mangaDexIds.size) {
         1 -> rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
@@ -65,7 +65,8 @@ fun MangaReadNavigator(
                     mangaDexIds = route.mangaDexIds,
                     title = route.title,
                     navOptions = navOptions,
-                    onNavigateBack = onNavigateBack
+                    onNavigateBack = onNavigateBack,
+                    mangaSelectionViewModel = hiltViewModel(key = "${source}_selection")
                 )
             }
             entry<MangaReadNavRoute.ChaptersScreen> { route ->
@@ -75,7 +76,7 @@ fun MangaReadNavigator(
                     completedChapters = completedChapters,
                     navOptions = navOptions,
                     onNavigateBack = onNavigateBack,
-                    mangaChaptersViewModel = mangaChaptersViewModel,
+                    mangaChaptersViewModel = hiltViewModel(key = "${source}_chapters"),
                     navigationSource = route.source
                 )
             }
@@ -84,7 +85,8 @@ fun MangaReadNavigator(
                     chapterTranslationIds = route.chapterTranslationIds,
                     title = route.title,
                     chapterNumber = route.chapterNumber,
-                    navOptions = navOptions
+                    navOptions = navOptions,
+                    chapterTranslationsViewModel = hiltViewModel(key = "${source}_translations")
                 )
             }
             entry<MangaReadNavRoute.ChapterScreen> { route ->
@@ -92,7 +94,8 @@ fun MangaReadNavigator(
                     mangaDexChapterId = route.mangaDexChapterId,
                     chapterNumber = route.chapterNumber,
                     title = route.title,
-                    navOptions = navOptions
+                    navOptions = navOptions,
+                    chapterViewModel = hiltViewModel(key = "${source}_chapter")
                 )
             }
         }

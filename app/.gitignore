@@ -7,3 +7,4 @@
 /src/main/java/com/example/shikiflow/data/repository/KodikRepositoryImpl.kt
 /src/main/java/com/example/shikiflow/data/mapper/KodikMapper.kt
 /src/main/java/com/example/shikiflow/data/parser/
+/src/main/java/com/example/shikiflow/domain/usecase/GetEpisodesUseCase.kt

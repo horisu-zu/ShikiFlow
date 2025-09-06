@@ -39,11 +39,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
 import com.example.shikiflow.utils.Resource
 
@@ -126,9 +130,9 @@ fun MangaChaptersScreen(
                     val startsFromZero = sortedChapters.firstOrNull()?.toFloat() == 0f
 
                     items(sortedChapters) { chapterNumber ->
-                        ChapterItem(
-                            chapterNumber = chapterNumber,
-                            onChapterClick = {
+                        MediaItem(
+                            mediaNumber = chapterNumber,
+                            onItemClick = {
                                 val chapterIds = chapters?.get(chapterNumber) ?: emptyList()
                                 Log.d("ChapterClick", "Chapter: $chapterNumber, IDs count: ${chapterIds.size}, IDs: $chapterIds")
 
@@ -137,6 +141,7 @@ fun MangaChaptersScreen(
                                     chapterNumber = chapterNumber
                                 )
                             },
+                            mediaType = MediaType.MANGA,
                             isCompleted = if(startsFromZero) {
                                 (chapterNumber.toFloat()) < completedChapters
                             } else (chapterNumber.toFloat()) <= completedChapters
@@ -144,38 +149,56 @@ fun MangaChaptersScreen(
                     }
                 }
             }
-            is Resource.Error -> { /*TODO*/ }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { mangaChaptersViewModel.getMangaChapters(mangaDexId) }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-private fun ChapterItem(
-    chapterNumber: String,
-    onChapterClick: (String) -> Unit,
+fun MediaItem(
+    mediaNumber: String,
+    onItemClick: () -> Unit,
     isCompleted: Boolean,
+    mediaType: MediaType,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-            .clickable { onChapterClick(chapterNumber) }
+            .clickable { onItemClick() }
             .padding(horizontal = 6.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        val mediaTypeText = when(mediaType) {
+            MediaType.ANIME -> stringResource(id = R.string.media_item_episode)
+            MediaType.MANGA -> stringResource(id = R.string.media_item_chapter)
+        }
+
         if(isCompleted) {
             Icon(
                 imageVector = Icons.Default.Check,
                 tint = MaterialTheme.colorScheme.onSurface,
-                contentDescription = "Completed Chapter",
+                contentDescription = "Completed Chapter/Episode",
                 modifier = Modifier.size(24.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.75f))
                     .padding(4.dp)
             )
         }
+
         Text(
-            text = "Chapter $chapterNumber",
+            text = "$mediaTypeText $mediaNumber",
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold
             )

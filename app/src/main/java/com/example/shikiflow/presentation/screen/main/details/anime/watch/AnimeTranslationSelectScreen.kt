@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -31,11 +33,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,7 +68,7 @@ fun AnimeTranslationSelectScreen(
 ) {
 
     val filters = TranslationFilter.entries
-    val translationFilter = remember { mutableStateOf(TranslationFilter.ALL) }
+    var translationFilter by remember { mutableStateOf(TranslationFilter.ALL) }
     val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
 
     LaunchedEffect(shikimoriId) {
@@ -122,7 +126,16 @@ fun AnimeTranslationSelectScreen(
                 ) {
                     items(filters.size) { index ->
                         FilterChip(
-                            selected = translationFilter.value == filters[index],
+                            selected = translationFilter == filters[index],
+                            leadingIcon = {
+                                if(translationFilter == filters[index]) {
+                                    Icon(
+                                        imageVector = Icons.Default.Check,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(16.dp)
+                                    )
+                                }
+                            },
                             label = {
                                 Text(
                                     text = stringResource(id = filters[index].displayValue),
@@ -130,8 +143,8 @@ fun AnimeTranslationSelectScreen(
                                 )
                             },
                             onClick = {
-                                if (filters[index] != translationFilter.value)
-                                    translationFilter.value = filters[index]
+                                if (filters[index] != translationFilter)
+                                    translationFilter = filters[index]
                             }
                         )
                     }
@@ -141,22 +154,26 @@ fun AnimeTranslationSelectScreen(
                 is Resource.Loading -> {
                     item {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillParentMaxSize(),
                             contentAlignment = Alignment.Center
                         ) { CircularProgressIndicator() }
                     }
                 }
                 is Resource.Success -> {
                     translations.data?.let { animeTranslations ->
+                        val currentTranslations = animeTranslations[translationFilter] ?: emptyList()
+
                         items(
-                            count = animeTranslations.size,
-                            key = { index -> animeTranslations[index].id }
+                            count = currentTranslations.size,
+                            key = { index -> currentTranslations[index].id }
                         ) { index ->
                             AnimeTranslationItem(
-                                kodikAnime = animeTranslations[index],
-                                onTranslationClick = { link ->
-                                    navOptions.navigateToEpisodeSelection(link)
-                                }, modifier = Modifier.padding(horizontal = 12.dp)
+                                kodikAnime = currentTranslations[index],
+                                onTranslationClick = { link, episodesCount ->
+                                    navOptions.navigateToEpisodeSelection(link, episodesCount)
+                                }, modifier = Modifier
+                                    .padding(horizontal = 12.dp)
+                                    .animateItem()
                             )
                         }
                     }
@@ -183,14 +200,14 @@ fun AnimeTranslationSelectScreen(
 @Composable
 private fun AnimeTranslationItem(
     kodikAnime: KodikAnime,
-    onTranslationClick: (String) -> Unit,
+    onTranslationClick: (String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onTranslationClick(kodikAnime.link) }
+            .clickable { onTranslationClick(kodikAnime.link, kodikAnime.episodesCount ?: 1) }
             .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
@@ -228,7 +245,7 @@ private fun AnimeTranslationItem(
             )
         }
         Text(
-            text = stringResource(R.string.episodes, kodikAnime.episodesCount),
+            text = stringResource(R.string.episodes, kodikAnime.episodesCount ?: 1),
             style = MaterialTheme.typography.labelMedium
         )
     }

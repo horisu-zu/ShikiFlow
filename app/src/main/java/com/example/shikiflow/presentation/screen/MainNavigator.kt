@@ -30,14 +30,15 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.navigation.AppNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
-import com.example.shikiflow.utils.AppSettingsManager
 
 @Composable
 fun MainNavigator(
+    appNavOptions: AppNavOptions,
     onFinishActivity: () -> Unit,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -90,12 +91,18 @@ fun MainNavigator(
             entryProvider = entryProvider {
                 entry<MainNavRoute.Home> {
                     MainScreenNavigator(
-                        currentUserData = currentUser.data
+                        currentUserData = currentUser.data,
+                        onEpisodeNavigate = { link, serialNum ->
+                            appNavOptions.navigateToPlayer(link, serialNum)
+                        }
                     )
                 }
                 entry<MainNavRoute.Browse> {
                     BrowseScreenNavigator(
-                        currentUserData = currentUser.data
+                        currentUserData = currentUser.data,
+                        onEpisodeNavigate = { link, serialNum ->
+                            appNavOptions.navigateToPlayer(link, serialNum)
+                        }
                     )
                 }
                 entry<MainNavRoute.More> {
