@@ -14,5 +14,11 @@ sealed interface AppNavRoute : NavKey {
     data object Main : AppNavRoute
 
     @Serializable
-    data class Player(val link: String, val serialNum: Int) : AppNavRoute
+    data class Player(
+        val title: String,
+        val link: String,
+        val translationGroup: String,
+        val serialNum: Int,
+        val episodesCount: Int
+    ) : AppNavRoute
 }

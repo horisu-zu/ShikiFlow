@@ -169,8 +169,8 @@ fun AnimeTranslationSelectScreen(
                         ) { index ->
                             AnimeTranslationItem(
                                 kodikAnime = currentTranslations[index],
-                                onTranslationClick = { link, episodesCount ->
-                                    navOptions.navigateToEpisodeSelection(link, episodesCount)
+                                onTranslationClick = { link, translationGroup, episodesCount ->
+                                    navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
                                 }, modifier = Modifier
                                     .padding(horizontal = 12.dp)
                                     .animateItem()
@@ -200,14 +200,14 @@ fun AnimeTranslationSelectScreen(
 @Composable
 private fun AnimeTranslationItem(
     kodikAnime: KodikAnime,
-    onTranslationClick: (String, Int) -> Unit,
+    onTranslationClick: (String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onTranslationClick(kodikAnime.link, kodikAnime.episodesCount ?: 1) }
+            .clickable { onTranslationClick(kodikAnime.link, kodikAnime.translation.title, kodikAnime.episodesCount ?: 1) }
             .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically

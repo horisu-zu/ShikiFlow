@@ -34,11 +34,12 @@ import com.example.shikiflow.presentation.screen.main.details.manga.read.MediaIt
 @Composable
 fun EpisodeSelectionScreen(
     title: String,
+    translationGroup: String,
     episodesCount: Int,
     link: String,
     completedEpisodes: Int,
     navOptions: AnimeWatchNavOptions,
-    onEpisodeNavigate: (String, Int) -> Unit
+    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -91,7 +92,7 @@ fun EpisodeSelectionScreen(
                     mediaNumber = serialNum.toString(),
                     onItemClick = {
                         Log.d("EpisodeSelectionScreen", "Navigating to episode $serialNum")
-                        onEpisodeNavigate(link, serialNum)
+                        onEpisodeNavigate(title, link, translationGroup, serialNum, episodesCount)
                     },
                     isCompleted = serialNum <= completedEpisodes,
                     mediaType = MediaType.ANIME

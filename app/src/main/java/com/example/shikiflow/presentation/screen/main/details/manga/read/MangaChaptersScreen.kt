@@ -181,8 +181,8 @@ fun MediaItem(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         val mediaTypeText = when(mediaType) {
-            MediaType.ANIME -> stringResource(id = R.string.media_item_episode)
-            MediaType.MANGA -> stringResource(id = R.string.media_item_chapter)
+            MediaType.ANIME -> stringResource(id = R.string.media_item_episode, mediaNumber)
+            MediaType.MANGA -> stringResource(id = R.string.media_item_chapter, mediaNumber)
         }
 
         if(isCompleted) {
@@ -198,7 +198,7 @@ fun MediaItem(
         }
 
         Text(
-            text = "$mediaTypeText $mediaNumber",
+            text = mediaTypeText,
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold
             )

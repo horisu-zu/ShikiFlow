@@ -92,16 +92,16 @@ fun MainNavigator(
                 entry<MainNavRoute.Home> {
                     MainScreenNavigator(
                         currentUserData = currentUser.data,
-                        onEpisodeNavigate = { link, serialNum ->
-                            appNavOptions.navigateToPlayer(link, serialNum)
+                        onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
+                            appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
                         }
                     )
                 }
                 entry<MainNavRoute.Browse> {
                     BrowseScreenNavigator(
                         currentUserData = currentUser.data,
-                        onEpisodeNavigate = { link, serialNum ->
-                            appNavOptions.navigateToPlayer(link, serialNum)
+                        onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
+                            appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
                         }
                     )
                 }

@@ -13,7 +13,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 @Composable
 fun BrowseScreenNavigator(
     currentUserData: CurrentUserQuery.Data?,
-    onEpisodeNavigate: (String, Int) -> Unit
+    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
 ) {
     val browseBackstack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val browseNavOptions = object: BrowseNavOptions {

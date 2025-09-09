@@ -129,6 +129,6 @@
     <string name="translation_filter_voice">Voice</string>
     <string name="translation_filter_subtitles">Subtitles</string>
 
-    <string name ="media_item_episode">Episode</string>
-    <string name ="media_item_chapter">Chapter</string>
+    <string name ="media_item_episode">Episode %1s</string>
+    <string name ="media_item_chapter">Chapter %1s</string>
 </resources>

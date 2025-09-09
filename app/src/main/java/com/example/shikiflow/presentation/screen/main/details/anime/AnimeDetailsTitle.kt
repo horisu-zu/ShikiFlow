@@ -98,20 +98,22 @@ fun AnimeDetailsTitle(
         ) {
             ShortInfoItem(
                 infoType = "Type",
-                infoItem = "${mapAnimeKind(animeDetails?.kind)} ∙ ${mapAnimeStatus(animeDetails?.status)}"
+                infoItem = "${mapAnimeKind(animeDetails.kind)} ∙ ${mapAnimeStatus(animeDetails.status)}"
             )
             ShortInfoItem(
                 infoType = "Episodes",
                 infoItem = if (animeDetails.status != AnimeStatusEnum.ongoing) {
-                    "${animeDetails.episodes} ep."
+                    "${animeDetails.episodes.takeIf { it != 0 } ?: "?"} ep."
                 } else {
                     "${animeDetails.episodesAired} of ${animeDetails.episodes.takeIf { it != 0 } ?: "?"} ep."
                 }
             )
-            ShortInfoItem(
-                infoType = "Age Rating",
-                infoItem = Converter.convertRatingToString(animeDetails.rating)
-            )
+            animeDetails.rating?.let { ratingEnum ->
+                ShortInfoItem(
+                    infoType = "Age Rating",
+                    infoItem = Converter.convertRatingToString(ratingEnum)
+                )
+            }
         }
 
         UserStatusItem(

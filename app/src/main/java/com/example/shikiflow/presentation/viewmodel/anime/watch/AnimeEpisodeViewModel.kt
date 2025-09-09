@@ -1,6 +1,9 @@
 package com.example.shikiflow.presentation.viewmodel.anime.watch
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
@@ -28,32 +31,56 @@ class AnimeEpisodeViewModel @Inject constructor(
     private val _episodeState = MutableStateFlow<Resource<KodikLink>>(Resource.Loading())
     val episodeState = _episodeState.asStateFlow()
 
+    var currentQuality by mutableStateOf<String>("")
+        private set
+
     private val _mediaSource = MutableStateFlow<MediaSource?>(null)
     val mediaSource = _mediaSource.asStateFlow()
 
     fun getEpisode(link: String, serialNum: Int) {
-        getEpisodesUseCase(link, serialNum).onEach { result ->
+        getEpisodesUseCase(
+            url = link,
+            serialNum = serialNum
+        ).onEach { result ->
             _episodeState.value = result
             when(result) {
                 is Resource.Loading -> {
-                    Log.d("AnimeEpisodesViewModel","Loading episode with URL: $link")
+                    Log.d("AnimeEpisodeViewModel","Loading episode with URL: $link")
                 }
                 is Resource.Success -> {
                     result.data?.let { kodikLink ->
                         _mediaSource.value = createMediaSource(kodikLink.qualityLink)
                     }
-                    Log.d("AnimeEpisodesViewModel","Result: ${result.data}")
+                    Log.d("AnimeEpisodeViewModel","Result: ${result.data}")
                 }
                 is Resource.Error -> {
-                    Log.d("AnimeEpisodesViewModel", "Error: ${result.message}")
+                    Log.d("AnimeEpisodeViewModel", "Error: ${result.message}")
                 }
             }
         }.launchIn(viewModelScope)
     }
 
+    fun clearMediaSource() {
+        _mediaSource.value = null
+    }
+
     private fun createMediaSource(qualityLinks: Map<String, String>): MediaSource? {
         val videoUrl = qualityLinks.maxBy { it.key.toInt() }.value
+        currentQuality = extractQualityFromUrl(videoUrl)
+        return createMediaSourceFromUrl(videoUrl)
+    }
 
+    fun createMediaSource(quality: String) {
+        Log.d("AnimeEpisodeViewModel", "Changing Quality to $quality")
+        val episodeData = _episodeState.value.data?.qualityLink ?: return
+        val videoUrl = episodeData[quality] ?: return
+        currentQuality = quality
+
+        Log.d("AnimeEpisodeViewModel", "Current Quality: $currentQuality")
+        _mediaSource.value = createMediaSourceFromUrl(videoUrl)
+    }
+
+    private fun createMediaSourceFromUrl(videoUrl: String): MediaSource? {
         val dataSourceFactory = DefaultHttpDataSource.Factory()
         return when {
             videoUrl.contains("m3u8") -> {
@@ -65,5 +92,13 @@ class AnimeEpisodeViewModel @Inject constructor(
                     .createMediaSource(MediaItem.fromUri(videoUrl))
             }
         }
+    }
+
+    private fun extractQualityFromUrl(videoUrl: String): String {
+        return videoUrl
+            .substringAfterLast("/")
+            .substringBefore(":")
+            .substringBefore(".mp4")
+            .takeIf { it.matches(Regex("\\d+p?")) } ?: "unknown"
     }
 }

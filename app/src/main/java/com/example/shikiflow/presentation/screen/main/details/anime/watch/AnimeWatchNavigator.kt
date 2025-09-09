@@ -13,18 +13,14 @@ fun AnimeWatchNavigator(
     shikimoriId: String,
     completedEpisodes: Int,
     onNavigateBack: () -> Unit,
-    onEpisodeNavigate: (String, Int) -> Unit,
+    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit,
     source: String
 ) {
     val watchBackstack = rememberNavBackStack(AnimeWatchNavRoute.TranslationSelect(shikimoriId))
 
     val options = object : AnimeWatchNavOptions {
-        override fun navigateToEpisodeSelection(link: String, episodesCount: Int) {
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link, episodesCount))
-        }
-
-        override fun navigateToEpisode(link: String, serialNum: Int) {
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(link, serialNum))
+        override fun navigateToEpisodeSelection(link: String, translationGroup: String, episodesCount: Int) {
+            watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link, translationGroup, episodesCount))
         }
 
         override fun navigateBack() {
@@ -50,6 +46,7 @@ fun AnimeWatchNavigator(
             entry<AnimeWatchNavRoute.EpisodeSelection> { route ->
                 EpisodeSelectionScreen(
                     title = title,
+                    translationGroup = route.translationGroup,
                     episodesCount = route.episodesCount,
                     link = route.link,
                     completedEpisodes = completedEpisodes,

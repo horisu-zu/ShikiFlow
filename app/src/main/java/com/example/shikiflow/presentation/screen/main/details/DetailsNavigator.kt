@@ -29,7 +29,7 @@ fun DetailsNavigator(
     mediaId: String,
     mediaType: MediaType,
     source: String,
-    onEpisodeNavigate: (String, Int) -> Unit
+    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
 ) {
     val detailsBackstack = rememberNavBackStack(when(mediaType) {
         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)

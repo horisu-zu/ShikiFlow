@@ -14,7 +14,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 @Composable
 fun MainScreenNavigator(
     currentUserData: CurrentUserQuery.Data?,
-    onEpisodeNavigate: (String, Int) -> Unit
+    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
 ) {
     val mainScreenBackstack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
     val options = object : MainScreenNavOptions {

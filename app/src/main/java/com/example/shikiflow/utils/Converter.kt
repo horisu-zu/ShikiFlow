@@ -136,6 +136,21 @@ object Converter {
         }
     }
 
+    fun formatDuration(durationMs: Long): String {
+        if (durationMs <= 0) return "00:00"
+
+        val totalSeconds = durationMs / 1000
+        val seconds = totalSeconds % 60
+        val minutes = (totalSeconds / 60) % 60
+        val hours = totalSeconds / 3600
+
+        return if (hours > 0) {
+            "%02d:%02d:%02d".format(hours, minutes, seconds)
+        } else {
+            "%02d:%02d".format(minutes, seconds)
+        }
+    }
+
     fun convertStatus(status: String, mediaType: MediaType): String {
         return when (status) {
             "watching" -> if(mediaType == MediaType.ANIME) "Watching" else "Reading"
@@ -153,7 +168,7 @@ object Converter {
             MangaKindEnum.manhua, MangaKindEnum.one_shot, MangaKindEnum.doujin)
     }
 
-    fun convertRatingToString(rating: AnimeRatingEnum?): String {
+    fun convertRatingToString(rating: AnimeRatingEnum): String {
         return when(rating) {
             AnimeRatingEnum.none -> "None"
             AnimeRatingEnum.g -> "G"
