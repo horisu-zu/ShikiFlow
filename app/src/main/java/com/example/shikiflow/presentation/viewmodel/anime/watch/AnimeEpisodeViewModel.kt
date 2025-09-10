@@ -66,17 +66,16 @@ class AnimeEpisodeViewModel @Inject constructor(
 
     private fun createMediaSource(qualityLinks: Map<String, String>): MediaSource? {
         val videoUrl = qualityLinks.maxBy { it.key.toInt() }.value
+        Log.d("AnimeEpisodeViewModel", "Quality Links: $qualityLinks")
         currentQuality = extractQualityFromUrl(videoUrl)
         return createMediaSourceFromUrl(videoUrl)
     }
 
     fun createMediaSource(quality: String) {
-        Log.d("AnimeEpisodeViewModel", "Changing Quality to $quality")
         val episodeData = _episodeState.value.data?.qualityLink ?: return
         val videoUrl = episodeData[quality] ?: return
         currentQuality = quality
 
-        Log.d("AnimeEpisodeViewModel", "Current Quality: $currentQuality")
         _mediaSource.value = createMediaSourceFromUrl(videoUrl)
     }
 

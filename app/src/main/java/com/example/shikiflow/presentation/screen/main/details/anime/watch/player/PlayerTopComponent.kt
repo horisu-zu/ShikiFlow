@@ -1,11 +1,13 @@
 package com.example.shikiflow.presentation.screen.main.details.anime.watch.player
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.kodik.KodikLink
@@ -37,11 +40,14 @@ import com.example.shikiflow.domain.model.kodik.KodikLink
 fun PlayerTopComponent(
     title: String,
     episodeNum: Int,
+    episodesCount: Int,
     currentQuality: String,
     translationGroup: String,
     qualityData: KodikLink?,
     onNavigateBack: () -> Unit,
     onQualityChange: (String) -> Unit,
+    onEpisodeChange: (Int) -> Unit,
+    onExpand: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -53,7 +59,8 @@ fun PlayerTopComponent(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Navigate Back",
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
+                tint = Color.White
             )
         }
         Column(
@@ -62,27 +69,44 @@ fun PlayerTopComponent(
         ) {
             Text(
                 text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White
                 )
             )
             Text(
-                text = buildString {
-                    append(stringResource(R.string.media_item_episode, episodeNum))
-                    append(" • ")
-                    append(translationGroup)
-                },
+                text = translationGroup,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodySmall.copy(
                     color = Color.White.copy(alpha = 0.65f)
                 )
             )
         }
         qualityData?.let {
+            val qualities = qualityData.qualityLink.entries.toList()
+
+            if(episodesCount > 1) {
+                PlayerDropdown(
+                    label = stringResource(R.string.media_item_episode, episodeNum),
+                    values = (1..episodesCount).map { epNum ->
+                        stringResource(R.string.media_item_episode, epNum)
+                    },
+                    onValueChange = { index ->
+                        onEpisodeChange(index + 1)
+                    },
+                    onExpand = onExpand
+                )
+            }
             PlayerDropdown(
-                label = currentQuality,
-                values = qualityData.qualityLink.map { it.key },
-                onValueChange = { quality -> onQualityChange(quality) }
+                label = "${currentQuality}P",
+                values = qualities.map { "${it.key}P" },
+                onValueChange = { index ->
+                    onQualityChange(qualities[index].key)
+                },
+                onExpand = onExpand
             )
         }
     }
@@ -92,7 +116,8 @@ fun PlayerTopComponent(
 private fun PlayerDropdown(
     label: String,
     values: List<String>,
-    onValueChange: (String) -> Unit,
+    onValueChange: (Int) -> Unit,
+    onExpand: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
@@ -103,37 +128,53 @@ private fun PlayerDropdown(
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(6.dp))
-                .clickable { dropdownExpanded = true }
-                .padding(horizontal = 6.dp, vertical = 4.dp),
+                .clickable {
+                    dropdownExpanded = true
+                    onExpand(true)
+                }.padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = Color.White
+                )
             )
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Expand Dropdown"
+                contentDescription = "Expand Dropdown",
+                tint = Color.White
             )
         }
         DropdownMenu(
             expanded = dropdownExpanded,
-            onDismissRequest = { dropdownExpanded = false }
+            onDismissRequest = {
+                dropdownExpanded = false
+                onExpand(false)
+            },
+            modifier = Modifier.heightIn(max = 200.dp),
+            containerColor = Color.Black.copy(alpha = 0.75f),
         ) {
-            values.forEach { value ->
+            values.forEachIndexed { index, value ->
                 DropdownMenuItem(
                     text = {
                         Text(
                             text = value,
-                            style = MaterialTheme.typography.bodySmall.copy(
+                            style = MaterialTheme.typography.labelMedium.copy(
                                 color = Color.White
                             )
                         )
                     },
+                    modifier = Modifier.background(
+                        color = if(value != label) {
+                            Color.Transparent
+                        } else { Color.White.copy(alpha = 0.25f) }
+                    ),
                     onClick = {
-                        if(value != label) onValueChange(value)
+                        if(value != label) onValueChange(index)
                         dropdownExpanded = false
+                        onExpand(false)
                     }
                 )
             }

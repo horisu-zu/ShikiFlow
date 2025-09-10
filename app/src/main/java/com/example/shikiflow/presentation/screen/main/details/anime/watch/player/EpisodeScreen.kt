@@ -77,8 +77,8 @@ fun PlayerScreen(
             qualityData = episodeState.data,
             context = context,
             isLoadingEpisode = episodeState is Resource.Loading,
-            onSeekToEpisode = { offset ->
-                navOptions.navigateToPlayer(title, link, translationGroup, serialNum, offset, episodesCount)
+            onSeekToEpisode = { episodeNum, offset ->
+                navOptions.navigateToPlayer(title, link, translationGroup, episodeNum, offset, episodesCount)
             },
             onQualityChange = { quality ->
                 animeEpisodeViewModel.createMediaSource(quality)

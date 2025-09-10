@@ -44,9 +44,10 @@ fun AppNavigator(
             link: String,
             translationGroup: String,
             serialNum: Int,
-            offset: Int, episodesCount: Int
+            offset: Int,
+            episodesCount: Int
         ) {
-            if(offset != 0) {
+            if(appBackstack.lastOrNull() is AppNavRoute.Player) {
                 appBackstack.removeLastOrNull()
             }
             appBackstack.add(AppNavRoute.Player(title, link, translationGroup, serialNum + offset, episodesCount))

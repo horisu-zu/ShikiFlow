@@ -106,10 +106,10 @@ private fun PlayerSlider(
     modifier: Modifier = Modifier
 ) {
     var sliderPosition by remember { mutableFloatStateOf(0f) }
-    var isDragging by remember { mutableStateOf(false) }
+    var isSeeking by remember { mutableStateOf(false) }
 
     LaunchedEffect(currentProgress, duration) {
-        if (!isDragging && duration > 0) {
+        if (!isSeeking && duration > 0) {
             sliderPosition = currentProgress / duration.toFloat()
         }
     }
@@ -117,13 +117,13 @@ private fun PlayerSlider(
     Slider(
         value = sliderPosition,
         onValueChange = { newValue ->
-            isDragging = true
+            isSeeking = true
             sliderPosition = newValue
         },
         onValueChangeFinished = {
-            isDragging = false
             val newPosition = (duration * sliderPosition).toLong()
             onSeek(newPosition)
+            isSeeking = false
         },
         thumb = {
             SliderDefaults.Thumb(

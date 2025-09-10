@@ -15,10 +15,8 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -30,13 +28,15 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.C
-import androidx.media3.common.Player
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.example.shikiflow.domain.model.kodik.KodikLink
+import com.example.shikiflow.presentation.viewmodel.anime.watch.PlayerViewModel
+import com.example.shikiflow.utils.systemBarsVisibility
 import kotlinx.coroutines.delay
 
 @OptIn(UnstableApi::class)
@@ -51,54 +51,35 @@ fun Player(
     qualityData: KodikLink?,
     context: Context,
     isLoadingEpisode: Boolean,
-    onSeekToEpisode: (Int) -> Unit,
+    onSeekToEpisode: (Int, Int) -> Unit,
     onQualityChange: (String) -> Unit,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    playerViewModel: PlayerViewModel = hiltViewModel(),
 ) {
     var isFit by remember { mutableStateOf(true) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
-    var duration by remember { mutableLongStateOf(0L) }
-    var currentPosition by remember { mutableLongStateOf(0L) }
-    var isPlaying by remember { mutableStateOf(false) }
-    var isBuffering by remember { mutableStateOf(true) }
     var showControls by remember { mutableStateOf(false) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
 
-    val isLoading = isBuffering || isLoadingEpisode
+    val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
+    val isLoading = playerState.isBuffering || isLoadingEpisode
 
-    DisposableEffect(exoPlayer) {
-        val listener = object : Player.Listener {
-            override fun onIsPlayingChanged(isMediaPlaying: Boolean) {
-                isPlaying = isMediaPlaying
-            }
-
-            override fun onPlaybackStateChanged(playbackState: Int) {
-                isBuffering = playbackState == Player.STATE_BUFFERING
-                duration = exoPlayer.duration.takeIf { it != C.TIME_UNSET } ?: 0L
-            }
-        }
-        exoPlayer.addListener(listener)
-
-        onDispose { exoPlayer.removeListener(listener) }
+    LaunchedEffect(exoPlayer) {
+        playerViewModel.initPlayer(exoPlayer)
     }
 
-    LaunchedEffect(isPlaying, showControls) {
-        while (isPlaying) {
-            currentPosition = exoPlayer.currentPosition
-            val updateInterval = if (showControls) 250L else 500L
-            delay(updateInterval)
-        }
-    }
-
-    LaunchedEffect(showControls) {
-        if(!isLoading) {
-            delay(3000)
+    LaunchedEffect(showControls, playerState.isPlaying, isDropdownExpanded) {
+        delay(3000)
+        if (playerState.isPlaying && !isDropdownExpanded) {
             showControls = false
         }
     }
 
     Box(
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
+            .fillMaxSize()
+            .systemBarsVisibility(showControls)
             .onSizeChanged { containerSize = it }
             .background(Color.Black)
             .pointerInput(Unit) {
@@ -107,10 +88,10 @@ fun Player(
                         showControls = !showControls
                     },
                     onDoubleTap = { offset ->
-                        if(offset.x > containerSize.width / 2) {
-                            exoPlayer.seekTo(exoPlayer.currentPosition + 15000L)
+                        if (offset.x > containerSize.width / 2) {
+                            playerViewModel.seekForward()
                         } else {
-                            exoPlayer.seekTo(exoPlayer.currentPosition - 15000L)
+                            playerViewModel.seekBackward()
                         }
                     }
                 )
@@ -155,22 +136,31 @@ fun Player(
             PlayerTopComponent(
                 title = title,
                 episodeNum = currentEpisode,
+                episodesCount = episodesCount,
                 currentQuality = currentQuality,
                 translationGroup = translationGroup,
                 qualityData = qualityData,
                 onNavigateBack = onNavigateBack,
-                onQualityChange = onQualityChange
+                onQualityChange = onQualityChange,
+                onEpisodeChange = { episodeNum ->
+                    onSeekToEpisode(episodeNum, 0)
+                },
+                onExpand = { value ->
+                    isDropdownExpanded = value
+                }
             )
         }
 
         PlayerControls(
-            isPlaying = isPlaying,
+            isPlaying = playerState.isPlaying,
             isLoading = isLoading,
             isPreviousAvailable = currentEpisode > 1,
             isNextAvailable = currentEpisode < episodesCount,
-            onSeekToEpisode = onSeekToEpisode,
+            onSeekToEpisode = { offset ->
+                onSeekToEpisode(currentEpisode, offset)
+            },
             onPlay = {
-                if(isPlaying) exoPlayer.pause() else exoPlayer.play()
+                if(playerState.isPlaying) playerViewModel.pause() else playerViewModel.play()
             },
             showControls = showControls,
             modifier = Modifier.align(Alignment.Center)
@@ -195,14 +185,14 @@ fun Player(
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             PlayerBottomComponent(
-                duration = duration,
-                currentProgress = currentPosition,
+                duration = playerState.duration,
+                currentProgress = playerState.currentPosition,
                 isFit = isFit,
                 onSeek = { position ->
-                    exoPlayer.seekTo(position)
+                    playerViewModel.seekTo(position)
                 },
                 onSkip = {
-                    exoPlayer.seekTo(exoPlayer.currentPosition + 85000L)
+                    playerViewModel.seekForward(87500L)
                 },
                 onResize = { isFit = !isFit }
             )

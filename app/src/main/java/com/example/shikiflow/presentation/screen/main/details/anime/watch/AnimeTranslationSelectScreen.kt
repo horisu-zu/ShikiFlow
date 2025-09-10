@@ -122,13 +122,15 @@ fun AnimeTranslationSelectScreen(
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(start = 16.dp, end = 16.dp)
+                    contentPadding = PaddingValues(horizontal = 16.dp)
                 ) {
                     items(filters.size) { index ->
+                        val filter = filters[index]
+
                         FilterChip(
-                            selected = translationFilter == filters[index],
+                            selected = translationFilter == filter,
                             leadingIcon = {
-                                if(translationFilter == filters[index]) {
+                                if(translationFilter == filter) {
                                     Icon(
                                         imageVector = Icons.Default.Check,
                                         contentDescription = null,
@@ -138,13 +140,14 @@ fun AnimeTranslationSelectScreen(
                             },
                             label = {
                                 Text(
-                                    text = stringResource(id = filters[index].displayValue),
-                                    style = MaterialTheme.typography.labelMedium
+                                    text = stringResource(id = filter.displayValue),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    modifier = Modifier.padding(vertical = 8.dp)
                                 )
                             },
                             onClick = {
-                                if (filters[index] != translationFilter)
-                                    translationFilter = filters[index]
+                                if (filter != translationFilter)
+                                    translationFilter = filter
                             }
                         )
                     }
