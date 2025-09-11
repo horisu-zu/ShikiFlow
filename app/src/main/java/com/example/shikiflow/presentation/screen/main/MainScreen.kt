@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -46,13 +45,6 @@ fun MainScreen(
     val currentTrackMode by mainViewModel.currentTrackMode.collectAsStateWithLifecycle()
     val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
 
-    BackHandler {
-        if(screenState.isSearchActive) {
-            searchViewModel.onSearchActiveChange(false)
-            searchViewModel.clearSearchState()
-        }
-    }
-
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -64,7 +56,8 @@ fun MainScreen(
                 isSearchActive = screenState.isSearchActive,
                 onModeChange = { trackMode -> mainViewModel.setCurrentTrackMode(trackMode) },
                 onQueryChange = searchViewModel::onQueryChange,
-                onSearchToggle = searchViewModel::onSearchActiveChange
+                onSearchToggle = searchViewModel::onSearchActiveChange,
+                onExitSearch = searchViewModel::exitSearchState
             )
         }
     ) { innerPadding ->

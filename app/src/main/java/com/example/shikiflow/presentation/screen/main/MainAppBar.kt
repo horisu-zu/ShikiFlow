@@ -42,6 +42,7 @@ fun MainAppBar(
     onQueryChange: (String) -> Unit,
     onModeChange: (MainTrackMode) -> Unit,
     onSearchToggle: (Boolean) -> Unit,
+    onExitSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
@@ -67,7 +68,8 @@ fun MainAppBar(
                                 query = query,
                                 onQueryChange = onQueryChange,
                                 isActive = isSearchActive,
-                                onActiveChange = onSearchToggle
+                                onActiveChange = onSearchToggle,
+                                onExitSearch = onExitSearch
                             )
                         }
                         MainTrackMode.MANGA -> {

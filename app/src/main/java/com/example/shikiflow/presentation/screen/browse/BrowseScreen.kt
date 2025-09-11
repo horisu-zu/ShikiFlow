@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.browse
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -23,11 +22,6 @@ fun BrowseScreen(
     val searchQuery by searchViewModel.screenState.collectAsState()
     val screenState by searchViewModel.screenState.collectAsState()
 
-    BackHandler(enabled = screenState.isSearchActive) {
-        searchViewModel.onSearchActiveChange(false)
-        searchViewModel.clearSearchState()
-    }
-
     Scaffold(
         topBar = {
             BrowseAppBar(
@@ -35,9 +29,9 @@ fun BrowseScreen(
                 searchQuery = searchQuery.query,
                 onSearchQueryChange = searchViewModel::onQueryChange,
                 isSearchActive = screenState.isSearchActive,
+                onExitSearch = { searchViewModel.exitSearchState() },
                 onSearchActiveChange = { isActive ->
                     searchViewModel.onSearchActiveChange(isActive)
-                    searchViewModel.clearSearchState()
                 }, //modifier = Modifier.padding(top = 24.dp)
             )
         }

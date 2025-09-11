@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.local.source
 
-import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.domain.model.comment.CommentItem

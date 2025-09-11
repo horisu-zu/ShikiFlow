@@ -26,6 +26,7 @@ fun BrowseAppBar(
     onSearchQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     onSearchActiveChange: (Boolean) -> Unit,
+    onExitSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TopAppBar(
@@ -42,6 +43,7 @@ fun BrowseAppBar(
                         onQueryChange = onSearchQueryChange,
                         isActive = isSearchActive,
                         onActiveChange = onSearchActiveChange,
+                        onExitSearch = onExitSearch,
                         modifier = Modifier.fillMaxWidth()
                     )
                 } else {

@@ -1,6 +1,8 @@
 package com.example.shikiflow.presentation.common
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -34,10 +36,16 @@ fun CustomSearchField(
     onQueryChange: (String) -> Unit,
     isActive: Boolean,
     onActiveChange: (Boolean) -> Unit,
+    onExitSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
+
+    BackHandler(enabled = isActive) {
+        focusManager.clearFocus()
+        onExitSearch()
+    }
 
     Box(
         modifier = modifier
@@ -60,8 +68,8 @@ fun CustomSearchField(
             ) {
                 if(isActive) {
                     IconButton(onClick = {
-                        onActiveChange(false)
                         focusManager.clearFocus()
+                        onActiveChange(false)
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -71,7 +79,7 @@ fun CustomSearchField(
                 } else {
                     IconButton(onClick = { onActiveChange(true) }) {
                         Icon(
-                            Icons.Filled.Search,
+                            imageVector = Icons.Filled.Search,
                             contentDescription = null,
                         )
                     }
@@ -85,8 +93,8 @@ fun CustomSearchField(
                     .weight(1f)
                     .padding(horizontal = 8.dp)
                     .focusRequester(focusRequester)
-                    .onFocusEvent {
-                        if (it.isFocused && !isActive) {
+                    .onFocusEvent { focusState ->
+                        if (focusState.isFocused && !isActive) {
                             onActiveChange(true)
                         }
                     },

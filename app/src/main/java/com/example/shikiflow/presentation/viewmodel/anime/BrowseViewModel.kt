@@ -60,18 +60,17 @@ class BrowseViewModel @Inject constructor(
 
     private data class BrowseKey(
         val type: BrowseType,
-        val options: BrowseOptions,
-        val name: String?
+        val options: BrowseOptions
     )
 
     fun paginatedBrowse(
         type: BrowseType = BrowseType.AnimeBrowseType.ONGOING,
         options: BrowseOptions = BrowseOptions(),
-        name: String? = null,
+        name: String = "",
     ): Flow<PagingData<Browse>> {
-        val key = BrowseKey(type, options, name)
+        val key = BrowseKey(type, options)
 
-        return _browseMap.getOrPut(key) {
+        val pagerFlow = {
             Pager(
                 config = PagingConfig(
                     pageSize = 45,
@@ -79,14 +78,22 @@ class BrowseViewModel @Inject constructor(
                     prefetchDistance = 12,
                     initialLoadSize = 45
                 ),
-                pagingSourceFactory = { BrowsePagingSource(
-                    animeRepository = animeRepository,
-                    mangaRepository = mangaRepository,
-                    name = name,
-                    type = type,
-                    options = options
-                ) }
+                pagingSourceFactory = {
+                    BrowsePagingSource(
+                        animeRepository = animeRepository,
+                        mangaRepository = mangaRepository,
+                        name = name,
+                        type = type,
+                        options = options
+                    )
+                }
             ).flow.cachedIn(viewModelScope)
+        }
+
+        return if (name.isEmpty()) {
+            _browseMap.getOrPut(key, pagerFlow)
+        } else {
+            pagerFlow()
         }
     }
 

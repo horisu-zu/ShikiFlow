@@ -19,20 +19,24 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.MyListString
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
@@ -43,9 +47,6 @@ fun SearchPage(
     onAnimeClick: (String) -> Unit
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
-    val searchResults by tracksViewModel.searchResults.collectAsState()
-    val isSearching by tracksViewModel.isSearching.collectAsState()
-    val hasMorePages by tracksViewModel.searchHasMorePages.collectAsState()
     val chips = listOf("All") + UserRateStatusConstants.getStatusChips(MediaType.ANIME)
 
     var selectedTabSearch by remember { mutableStateOf(0) }
@@ -60,22 +61,10 @@ fun SearchPage(
         else -> null
     }
 
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            hasMorePages[selectedStatus] == true && isSearching[selectedStatus] != true
-        }
-    }
-
-    LaunchedEffect(searchQuery.query, selectedTabSearch) {
-        if (searchQuery.query.isNotEmpty()) {
-            tracksViewModel.searchAnimeTracks(
-                name = searchQuery.query,
-                status = selectedStatus
-            )
-        } else {
-            tracksViewModel.clearSearchResults()
-        }
-    }
+    val trackItems = tracksViewModel.getPaginatedTracks(
+        title = searchQuery.query,
+        userStatus = selectedStatus
+    ).collectAsLazyPagingItems()
 
     Column {
         LazyRow(
@@ -97,47 +86,47 @@ fun SearchPage(
                                 modifier = Modifier.size(FilterChipDefaults.IconSize)
                             )
                         }
-                    } else {
-                        null
-                    }
+                    } else { null }
                 )
             }
         }
 
         Box(modifier = Modifier.fillMaxSize()) {
-            val isCurrentStatusSearching = isSearching[selectedStatus] == true
-
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                val items = searchResults[selectedStatus] ?: emptyList()
-
-                items(items.size) { index ->
-                    val userRate = items[index]
-                    SearchAnimeTrackItem(
-                        animeItem = userRate,
-                        onItemClick = { id -> onAnimeClick(id) }
-                    )
-
-                    if (index >= items.size - 5 && shouldLoadMore.value) {
-                        LaunchedEffect(selectedStatus) {
-                            selectedStatus?.let {
-                                tracksViewModel.searchAnimeTracks(searchQuery.query, status = it)
-                            }
-                        }
-                    }
-                }
-
-                if (isCurrentStatusSearching) {
+                if(trackItems.loadState.refresh is LoadState.Loading) {
                     item {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            modifier = Modifier.fillParentMaxSize(),
                             contentAlignment = Alignment.Center
                         ) { CircularProgressIndicator() }
+                    }
+                } else if(trackItems.loadState.refresh is LoadState.Error) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.atp_loading_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { trackItems.refresh() }
+                            )
+                        }
+                    }
+                } else {
+                    items(
+                        count = trackItems.itemCount,
+                        key = trackItems.itemKey { it.id }
+                    ) { index ->
+                        val item = trackItems[index] ?: return@items
+                        SearchAnimeTrackItem(
+                            animeItem = item,
+                            onItemClick = { id -> onAnimeClick(id) }
+                        )
                     }
                 }
             }

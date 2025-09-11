@@ -41,11 +41,13 @@ fun BrowseSearchPage(
     var currentType by rememberSaveable { mutableStateOf<BrowseType>(BrowseType.AnimeBrowseType.SEARCH) }
     var searchOptions by remember { mutableStateOf(BrowseOptions()) }
 
-    val browseSearchData = browseViewModel.paginatedBrowse(
-        type = currentType,
-        options = searchOptions,
-        name = query
-    ).collectAsLazyPagingItems()
+    val browseSearchData = remember(query, currentType, searchOptions) {
+        browseViewModel.paginatedBrowse(
+            type = currentType,
+            options = searchOptions,
+            name = query
+        )
+    }.collectAsLazyPagingItems()
 
     Box {
         if(browseSearchData.loadState.refresh is LoadState.Loading) {

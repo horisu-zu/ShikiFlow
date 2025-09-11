@@ -40,6 +40,7 @@ fun MoreScreen(
                 onQueryChange = searchViewModel::onQueryChange,
                 isActive = screenState.isSearchActive,
                 onActiveChange = searchViewModel::onSearchActiveChange,
+                onExitSearch = searchViewModel::exitSearchState,
                 modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 32.dp, bottom = 12.dp)
             )
         }

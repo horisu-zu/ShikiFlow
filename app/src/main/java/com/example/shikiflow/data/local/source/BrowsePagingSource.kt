@@ -16,7 +16,7 @@ import javax.inject.Inject
 class BrowsePagingSource @Inject constructor(
     private val animeRepository: AnimeRepository,
     private val mangaRepository: MangaRepository,
-    private val name: String?,
+    private val name: String,
     private val type: BrowseType,
     private val options: BrowseOptions
 ): PagingSource<Int, Browse>() {
@@ -31,6 +31,10 @@ class BrowsePagingSource @Inject constructor(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Browse> {
         return try {
             val page = params.key ?: 1
+
+            if(name.isEmpty() && (type == BrowseType.AnimeBrowseType.SEARCH || type == BrowseType.MangaBrowseType.SEARCH)) {
+                return LoadResult.Page(emptyList(), null, null)
+            }
 
             when(type) {
                 is BrowseType.AnimeBrowseType -> {
