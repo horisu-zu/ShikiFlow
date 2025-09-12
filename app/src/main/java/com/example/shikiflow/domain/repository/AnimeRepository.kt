@@ -11,7 +11,7 @@ import com.example.shikiflow.domain.model.anime.SimilarAnime
 import com.example.shikiflow.domain.model.common.ExternalLink
 
 interface AnimeRepository {
-    suspend fun getAnimeDetails(id: String): Result<AnimeDetailsQuery.Anime>
+    suspend fun getAnimeDetails(id: String): AnimeDetailsQuery.Anime?
     suspend fun browseAnime(
         name: String? = null,
         page: Int = 1,

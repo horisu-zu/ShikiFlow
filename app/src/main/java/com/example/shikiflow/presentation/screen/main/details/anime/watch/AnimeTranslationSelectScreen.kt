@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -43,11 +43,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.kodik.KodikAnime
@@ -69,6 +70,7 @@ fun AnimeTranslationSelectScreen(
 
     val filters = TranslationFilter.entries
     var translationFilter by remember { mutableStateOf(TranslationFilter.ALL) }
+    var isNavigating by remember { mutableStateOf(false) }
     val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
 
     LaunchedEffect(shikimoriId) {
@@ -78,34 +80,92 @@ fun AnimeTranslationSelectScreen(
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
+            if (isNavigating) true
+                else lazyListState.firstVisibleItemIndex == 0 &&
+                    lazyListState.firstVisibleItemScrollOffset == 0
         }
+    }
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    LaunchedEffect(translationFilter) {
+        isNavigating = true
+        lazyListState.animateScrollToItem(0)
+        isNavigating = false
     }
 
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = title,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { onNavigateBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+            Column {
+                TopAppBar(
+                    expandedHeight = 48.dp,
+                    title = {
+                        Text(
+                            text = title,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.titleMedium
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.surfaceVariant
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = if(isAtTop) MaterialTheme.colorScheme.background
+                            else MaterialTheme.colorScheme.surfaceVariant
+                    )
                 )
-            )
+                TopAppBar(
+                    windowInsets = WindowInsets(),
+                    expandedHeight = 48.dp,
+                    title = {
+                        LazyRow(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            contentPadding = PaddingValues(horizontal = 16.dp)
+                        ) {
+                            items(filters.size) { index ->
+                                val filter = filters[index]
+
+                                FilterChip(
+                                    selected = translationFilter == filter,
+                                    leadingIcon = {
+                                        if(translationFilter == filter) {
+                                            Icon(
+                                                imageVector = Icons.Default.Check,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        }
+                                    },
+                                    label = {
+                                        Text(
+                                            text = stringResource(id = filter.displayValue),
+                                            style = MaterialTheme.typography.labelMedium,
+                                            modifier = Modifier.padding(vertical = 8.dp)
+                                        )
+                                    },
+                                    onClick = {
+                                        if (filter != translationFilter)
+                                            translationFilter = filter
+                                    }
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    ),
+                    scrollBehavior = scrollBehavior
+                )
+                if(isAtTop) {
+                    HorizontalDivider()
+                }
+            }
         }
     ) { paddingValues ->
         LazyColumn(
@@ -116,43 +176,9 @@ fun AnimeTranslationSelectScreen(
                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                 ),
+            contentPadding = PaddingValues(vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            item {
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp)
-                ) {
-                    items(filters.size) { index ->
-                        val filter = filters[index]
-
-                        FilterChip(
-                            selected = translationFilter == filter,
-                            leadingIcon = {
-                                if(translationFilter == filter) {
-                                    Icon(
-                                        imageVector = Icons.Default.Check,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = filter.displayValue),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    modifier = Modifier.padding(vertical = 8.dp)
-                                )
-                            },
-                            onClick = {
-                                if (filter != translationFilter)
-                                    translationFilter = filter
-                            }
-                        )
-                    }
-                }
-            }
             when(val translations = translationsState.value) {
                 is Resource.Loading -> {
                     item {
@@ -174,7 +200,8 @@ fun AnimeTranslationSelectScreen(
                                 kodikAnime = currentTranslations[index],
                                 onTranslationClick = { link, translationGroup, episodesCount ->
                                     navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
-                                }, modifier = Modifier
+                                },
+                                modifier = Modifier
                                     .padding(horizontal = 12.dp)
                                     .animateItem()
                             )

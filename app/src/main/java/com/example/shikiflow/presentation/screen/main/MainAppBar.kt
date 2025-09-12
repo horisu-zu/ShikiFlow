@@ -26,9 +26,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.CustomSearchField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,8 +54,7 @@ fun MainAppBar(
         scrollBehavior = scrollBehavior,
         title = {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -74,7 +75,7 @@ fun MainAppBar(
                         }
                         MainTrackMode.MANGA -> {
                             Text(
-                                text = "Manga",
+                                text = stringResource(R.string.browse_search_media_manga),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         } null -> { /**/ }

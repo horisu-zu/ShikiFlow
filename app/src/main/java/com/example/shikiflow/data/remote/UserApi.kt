@@ -1,7 +1,7 @@
 package com.example.shikiflow.data.remote
 
 import com.example.shikiflow.domain.model.anime.ShortAnimeRate
-import com.example.shikiflow.data.manga.ShortMangaRate
+import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.model.tracks.UserRate

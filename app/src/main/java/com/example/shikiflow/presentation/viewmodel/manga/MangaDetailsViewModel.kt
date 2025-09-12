@@ -35,21 +35,16 @@ class MangaDetailsViewModel @Inject constructor(
 
             try {
                 val result = mangaRepository.getMangaDetails(id)
-                _mangaDetails.value = when {
-                    result.isSuccess -> {
-                        currentId = id
 
-                        getMangaDexId(
-                            title = result.getOrNull()?.name ?: "",
-                            malId = result.getOrNull()?.malId ?: ""
-                        )
+                result?.let { mangaDetails ->
 
-                        Resource.Success(result.getOrNull())
-                    }
-                    result.isFailure -> Resource.Error(
-                        result.exceptionOrNull()?.message ?: "Unknown error"
+                    getMangaDexId(
+                        title = mangaDetails.name,
+                        malId = mangaDetails.malId ?: ""
                     )
-                    else -> Resource.Error("Unknown error")
+
+                    _mangaDetails.value = Resource.Success(mangaDetails)
+                    currentId = id
                 }
             } catch (e: Exception) {
                 _mangaDetails.value = Resource.Error(e.message ?: "Unknown error")

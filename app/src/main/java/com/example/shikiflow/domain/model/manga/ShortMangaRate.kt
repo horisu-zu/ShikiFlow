@@ -1,4 +1,4 @@
-package com.example.shikiflow.data.manga
+package com.example.shikiflow.domain.model.manga
 
 import kotlinx.serialization.Serializable
 

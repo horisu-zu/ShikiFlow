@@ -5,7 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -35,6 +35,7 @@ fun DetailsNavigator(
         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)
         MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId)
     })
+
     val options = object : MediaNavOptions {
         override fun navigateToCharacterDetails(characterId: String) {
             detailsBackstack.add(DetailsNavRoute.CharacterDetails(characterId))
@@ -96,8 +97,7 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
-                    navOptions = options,
-                    characterDetailsViewModel = hiltViewModel(key = "${source}_${route.characterId}")
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.SimilarPage> { route ->
@@ -105,16 +105,14 @@ fun DetailsNavigator(
                     mediaTitle = route.title,
                     mediaId = route.id,
                     mediaType = route.mediaType,
-                    navOptions = options,
-                    similarMediaViewModel = hiltViewModel(key = "similar_${route.id}")
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.ExternalLinks> { route ->
                 ExternalLinksScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    navOptions = options,
-                    externalLinksViewModel = hiltViewModel(key = "links_${route.mediaId}")
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.MangaRead> { route ->
@@ -131,7 +129,7 @@ fun DetailsNavigator(
                     screenMode = route.screenMode,
                     id = route.id,
                     navOptions = options,
-                    commentViewModel = hiltViewModel(key = "comments_${route.screenMode}_${route.id}")
+                    commentViewModel = hiltViewModel(key = "comments_${route.screenMode}")
                 )
             }
             entry<DetailsNavRoute.AnimeWatch> { route ->

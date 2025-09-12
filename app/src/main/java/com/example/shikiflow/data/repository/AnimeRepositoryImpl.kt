@@ -22,19 +22,14 @@ class AnimeRepositoryImpl @Inject constructor(
     private val animeApi: AnimeApi
 ): AnimeRepository {
 
-    override suspend fun getAnimeDetails(id: String): Result<AnimeDetailsQuery.Anime> {
+    override suspend fun getAnimeDetails(id: String): AnimeDetailsQuery.Anime? {
         val query = AnimeDetailsQuery(
             ids = Optional.presentIfNotNull(id)
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let {
-                Result.success(it.animes.first())
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val response = apolloClient.query(query).execute()
+
+        return response.data?.animes?.firstOrNull()
     }
 
     override suspend fun browseAnime(

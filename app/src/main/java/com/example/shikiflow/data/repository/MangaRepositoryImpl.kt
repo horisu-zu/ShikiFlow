@@ -23,19 +23,14 @@ class MangaRepositoryImpl @Inject constructor(
     private val mangaApi: MangaApi
 ): MangaRepository {
 
-    override suspend fun getMangaDetails(id: String): Result<MangaDetailsQuery.Manga?> {
+    override suspend fun getMangaDetails(id: String): MangaDetailsQuery.Manga? {
         val query = MangaDetailsQuery(
             ids = Optional.presentIfNotNull(id)
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let {
-                Result.success(it.mangas.first())
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val response = apolloClient.query(query).execute()
+
+        return response.data?.mangas?.firstOrNull()
     }
 
     override suspend fun browseManga(

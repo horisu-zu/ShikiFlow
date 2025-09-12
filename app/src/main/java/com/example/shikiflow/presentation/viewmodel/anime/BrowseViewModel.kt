@@ -33,7 +33,14 @@ class BrowseViewModel @Inject constructor(
     private val appSettingsManager: AppSettingsManager
 ) : ViewModel() {
 
-    private val _browseMap = mutableMapOf<BrowseKey, Flow<PagingData<Browse>>>()
+    private data class SearchState(
+        val query: String,
+        val type: BrowseType,
+        val options: BrowseOptions
+    )
+
+    private var _searchState: SearchState? = null
+    private val _browseMap = mutableMapOf<BrowseType, Flow<PagingData<Browse>>>()
 
     private val _browseUiMode = MutableStateFlow(BrowseUiMode.AUTO)
     val browseUiMode = _browseUiMode.asStateFlow()
@@ -58,18 +65,11 @@ class BrowseViewModel @Inject constructor(
         }
     }
 
-    private data class BrowseKey(
-        val type: BrowseType,
-        val options: BrowseOptions
-    )
-
     fun paginatedBrowse(
         type: BrowseType = BrowseType.AnimeBrowseType.ONGOING,
         options: BrowseOptions = BrowseOptions(),
         name: String = "",
     ): Flow<PagingData<Browse>> {
-        val key = BrowseKey(type, options)
-
         val pagerFlow = {
             Pager(
                 config = PagingConfig(
@@ -90,10 +90,17 @@ class BrowseViewModel @Inject constructor(
             ).flow.cachedIn(viewModelScope)
         }
 
-        return if (name.isEmpty()) {
-            _browseMap.getOrPut(key, pagerFlow)
+        //Caching only latest options set for search state
+        return if (type == BrowseType.AnimeBrowseType.SEARCH || type == BrowseType.MangaBrowseType.SEARCH) {
+            val currentState = SearchState(name, type, options)
+            if (currentState != _searchState) {
+                _searchState = currentState
+                pagerFlow().also { _browseMap[type] = it }
+            } else {
+                _browseMap.getValue(type)
+            }
         } else {
-            pagerFlow()
+            _browseMap.getOrPut(type, pagerFlow)
         }
     }
 

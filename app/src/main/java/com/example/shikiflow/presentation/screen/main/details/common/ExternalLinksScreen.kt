@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.common.ExternalLink
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -44,7 +45,7 @@ fun ExternalLinksScreen(
     mediaId: String,
     mediaType: MediaType,
     navOptions: MediaNavOptions,
-    externalLinksViewModel: ExternalLinksViewModel
+    externalLinksViewModel: ExternalLinksViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val externalLinks = externalLinksViewModel.externalLinks.collectAsStateWithLifecycle()

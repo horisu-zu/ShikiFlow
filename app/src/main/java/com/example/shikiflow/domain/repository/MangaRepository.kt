@@ -11,7 +11,7 @@ import com.example.shikiflow.domain.model.anime.ShortMangaTracksResponse
 import com.example.shikiflow.domain.model.common.ExternalLink
 
 interface MangaRepository {
-    suspend fun getMangaDetails(id: String): Result<MangaDetailsQuery.Manga?>
+    suspend fun getMangaDetails(id: String): MangaDetailsQuery.Manga?
     suspend fun browseManga(
         name: String? = null,
         page: Int = 1,

@@ -2,7 +2,6 @@ package com.example.shikiflow.presentation.common
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -69,7 +68,7 @@ fun CustomSearchField(
                 if(isActive) {
                     IconButton(onClick = {
                         focusManager.clearFocus()
-                        onActiveChange(false)
+                        onExitSearch()
                     }) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,

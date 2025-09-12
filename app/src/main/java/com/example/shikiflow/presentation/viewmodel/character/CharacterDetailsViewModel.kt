@@ -17,16 +17,22 @@ class CharacterDetailsViewModel @Inject constructor(
     private val characterRepository: CharacterRepository
 ): ViewModel() {
 
+    private var _characterId: String? = null
     private val _characterDetails = MutableStateFlow<Resource<ShikiCharacter>>(Resource.Loading())
     val characterDetails = _characterDetails.asStateFlow()
 
     fun getCharacterDetails(characterId: String) {
         viewModelScope.launch {
+            if(characterId == _characterId) return@launch
+
             _characterDetails.value = Resource.Loading()
             try {
                 val result = characterRepository.getCharacterDetails(characterId)
                 _characterDetails.value = when {
-                    result.isSuccess -> Resource.Success(result.getOrNull())
+                    result.isSuccess -> {
+                        _characterId = characterId
+                        Resource.Success(result.getOrNull())
+                    }
                     result.isFailure -> Resource.Error(result.exceptionOrNull()?.message ?: "Unknown error")
                     else -> Resource.Error("Unknown error")
                 }

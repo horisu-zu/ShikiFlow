@@ -2,7 +2,7 @@ package com.example.shikiflow.domain.repository
 
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.anime.ShortAnimeRate
-import com.example.shikiflow.data.manga.ShortMangaRate
+import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
 import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.user.UserHistoryResponse

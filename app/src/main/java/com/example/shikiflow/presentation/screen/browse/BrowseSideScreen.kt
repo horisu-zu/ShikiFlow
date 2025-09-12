@@ -17,7 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.domain.model.anime.BrowseType
@@ -81,8 +81,8 @@ fun BrowseSideScreen(
                     navOptions.navigateToDetails(id, mediaType)
                 },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 12.dp,
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 12.dp),
             )
         }
     }
