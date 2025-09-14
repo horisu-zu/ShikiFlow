@@ -3,7 +3,6 @@ agp = "8.9.3"
 apollo = "4.3.3"
 browser = "1.9.0"
 coilCompose = "3.3.0"
-constraintlayoutCompose = "1.1.1"
 converterGson = "3.0.0"
 datastorePreferences = "1.1.7"
 kotlin = "2.2.20"
@@ -34,7 +33,6 @@ zoomable = "2.8.1"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
-androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-media3-exoplayer = { module = "androidx.media3:media3-exoplayer", version.ref = "media3Exoplayer" }
 androidx-media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3Exoplayer" }
 androidx-media3-exoplayer-hls = { module = "androidx.media3:media3-exoplayer-hls", version.ref = "media3Exoplayer" }

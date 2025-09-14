@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.screen.main.details.manga
 
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
@@ -97,16 +97,13 @@ fun MangaDetailsScreen(
                         }
                     }
                 ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxSize()
+                    Column(
+                        modifier = Modifier.fillMaxSize()
                             .padding(
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                 end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                             ).verticalScroll(rememberScrollState())
                     ) {
-                        val (headerRef, descriptionRef) = createRefs()
-
                         MangaDetailsHeader(
                             mangaDetails = mangaDetails.value.data,
                             mangaDexResource = mangaDexIds,
@@ -119,13 +116,7 @@ fun MangaDetailsScreen(
                                         ?.userRate?.chapters ?: 0
                                 )
                             },
-                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) },
-                            modifier = Modifier.constrainAs(headerRef) {
-                                top.linkTo(parent.top)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                                bottom.linkTo(descriptionRef.top)
-                            }
+                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) }
                         )
 
                         MangaDetailsDesc(
@@ -157,11 +148,7 @@ fun MangaDetailsScreen(
                             onLinkClick = { url ->
                                 customTabIntent.launchUrl(context, url.toUri())
                             },
-                            modifier = Modifier.constrainAs(descriptionRef) {
-                                top.linkTo(headerRef.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }.padding(12.dp)
+                            modifier = Modifier.padding(12.dp)
                         )
                     }
                 }

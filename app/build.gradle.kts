@@ -21,8 +21,8 @@ android {
         applicationId = "com.example.shikiflow"
         minSdk = 26
         targetSdk = 36
-        versionCode = 10
-        versionName = "0.3.0"
+        versionCode = 11
+        versionName = "0.3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -109,9 +109,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
-
-    //ConstraintLayout
-    implementation (libs.androidx.constraintlayout.compose)
 
     //Custom Tabs
     implementation (libs.androidx.browser)

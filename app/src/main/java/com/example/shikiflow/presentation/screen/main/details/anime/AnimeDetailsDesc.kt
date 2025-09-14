@@ -30,12 +30,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.AnimeDetailsQuery
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.RelatedInfo
 import com.example.shikiflow.domain.model.mapper.RelatedMapper
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -60,35 +60,25 @@ fun AnimeDetailsDesc(
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
-    ConstraintLayout(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        val (descRef, genresRef, charactersRef, relatedRef, screenshotsRef, additionalRef) = createRefs()
-
-        ExpandableText(
-            descriptionHtml = animeDetails.descriptionHtml ?: "No Description",
-            modifier = Modifier.constrainAs(descRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
-            style = MaterialTheme.typography.bodySmall,
-            linkColor = MaterialTheme.colorScheme.primary,
-            brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
-            onEntityClick = { entityType, id ->
-                onEntityClick(entityType, id)
-            }, onLinkClick = onLinkClick
-        )
+    Column(modifier = modifier.fillMaxWidth()) {
+        animeDetails.descriptionHtml?.let { descriptionHtml ->
+            ExpandableText(
+                descriptionHtml = descriptionHtml,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodySmall,
+                linkColor = MaterialTheme.colorScheme.primary,
+                brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
+                onEntityClick = { entityType, id ->
+                    onEntityClick(entityType, id)
+                }, onLinkClick = onLinkClick
+            )
+        }
 
         if(animeDetails.genres?.isNotEmpty() == true) {
             LazyRow(
-                modifier = Modifier.constrainAs(genresRef) {
-                    top.linkTo(descRef.bottom, margin = 2.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }.padding(vertical = 4.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(animeDetails.genres) { genreItem ->
@@ -97,29 +87,28 @@ fun AnimeDetailsDesc(
             }
         }
 
-        Column(
-            modifier = Modifier.constrainAs(charactersRef) {
-                top.linkTo(genresRef.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Characters",
-                style = MaterialTheme.typography.titleMedium
-            )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        animeDetails.characterRoles?.let { characterRoles ->
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(animeDetails.characterRoles ?: emptyList()) { characterItem ->
-                    CharacterCard(
-                        characterPoster = characterItem.character.characterShort.poster
-                            ?.posterShort?.previewUrl,
-                        characterName = characterItem.character.characterShort.name,
-                        onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
-                    )
+                Text(
+                    text = stringResource(R.string.details_characters),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(animeDetails.characterRoles) { characterItem ->
+                        CharacterCard(
+                            characterPoster = characterItem.character.characterShort.poster
+                                ?.posterShort?.previewUrl,
+                            characterName = characterItem.character.characterShort.name,
+                            onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
+                        )
+                    }
                 }
             }
         }
@@ -128,22 +117,16 @@ fun AnimeDetailsDesc(
             relatedItems = animeDetails.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
             onArrowClick = { showRelatedBottomSheet = true },
             onItemClick = onItemClick,
-            modifier = Modifier.constrainAs(relatedRef) {
-                top.linkTo(charactersRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
         )
 
         ScreenshotSection(
             screenshots = animeDetails.screenshots,
-            modifier = Modifier.constrainAs(screenshotsRef) {
-                top.linkTo(relatedRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
         )
 
         AnimeDetailsInfo(
@@ -153,12 +136,9 @@ fun AnimeDetailsDesc(
             onExternalLinksClick = onExternalLinksClick,
             onEntityClick = onEntityClick,
             onTopicNavigate = onTopicNavigate,
-            modifier = Modifier.constrainAs(additionalRef) {
-                top.linkTo(screenshotsRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp)
         )
     }
 
@@ -216,7 +196,7 @@ fun RelatedSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Related",
+                text = stringResource(R.string.details_related),
                 style = MaterialTheme.typography.titleMedium
             )
             Box(
@@ -265,53 +245,42 @@ fun RelatedItem(
     onItemClick: (String, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ConstraintLayout(
-        modifier = modifier.fillMaxWidth()
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val (posterRef, titleRef, infoRef) = createRefs()
-
         RoundedImage(
             model = relatedInfo.media?.poster?.mainUrl,
             clip = RoundedCornerShape(8.dp),
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .size(48.dp)
-                .clickable { onItemClick(
-                    relatedInfo.media?.id ?: "",
-                    relatedInfo.media?.mediaType ?: MediaType.ANIME
-                ) }
-                .constrainAs(posterRef) {
-                    start.linkTo(parent.start)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
+                .clickable {
+                    onItemClick(
+                        relatedInfo.media?.id ?: "",
+                        relatedInfo.media?.mediaType ?: MediaType.ANIME
+                    )
                 }
         )
-
-        Text(
-            text = relatedInfo.media?.name ?: "Unknown",
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(infoRef.top)
-                start.linkTo(posterRef.end, margin = 12.dp)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
+        relatedInfo.media?.name?.let { title ->
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                Text(
+                    text = title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelMedium
+                )
+                Text(
+                    text = "${relatedInfo.media?.kind} ${relatedInfo.relationKind}",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    )
+                )
             }
-        )
-
-        Text(
-            text = "${relatedInfo.media?.kind} ${relatedInfo.relationKind}",
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-            ),
-            modifier = Modifier.constrainAs(infoRef) {
-                top.linkTo(titleRef.bottom)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(titleRef.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
-        )
+        }
     }
 }
 
@@ -325,7 +294,7 @@ private fun ScreenshotSection(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = "Screenshots",
+            text = stringResource(R.string.anime_details_screenshots),
             style = MaterialTheme.typography.titleMedium
         )
         LazyRow(

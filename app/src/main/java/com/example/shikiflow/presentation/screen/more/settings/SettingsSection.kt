@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -22,8 +21,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
@@ -34,9 +31,9 @@ fun SettingsSection(
     title: String,
     items: List<SectionItem>
 ) {
-    ConstraintLayout(
+    Column(
         modifier = modifier.fillMaxWidth()
-            .padding(horizontal = 24.dp)
+            //.padding(horizontal = 24.dp)
             .clip(RoundedCornerShape(12.dp))
             .border(
                 width = 1.dp,
@@ -44,75 +41,54 @@ fun SettingsSection(
                 shape = RoundedCornerShape(12.dp)
             )
     ) {
-        val (titleRef, itemsRef) = createRefs()
-
         Text(
             text = title,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }.padding(start = 12.dp, end = 12.dp, top = 8.dp, bottom = 4.dp),
+            modifier = Modifier.padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 4.dp
+            ),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colorScheme.secondary,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
-        Column(
-            modifier = Modifier.constrainAs(itemsRef) {
-                top.linkTo(titleRef.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
-        ) {
-            items.fastForEachIndexed { index, item ->
-                when(item) {
-                    is SectionItem.Default -> {
-                        TextItem(
-                            title = item.title,
-                            subtitle = item.displayValue,
-                            onClick = item.onClick,
-                            showDivider = index != items.lastIndex
-                        )
-                    }
-                    is SectionItem.Image -> {
-                        ImageItem(
-                            title = item.title,
-                            displayValue = item.displayValue,
-                            imageUrl = item.imageUrl,
-                            onClick = item.onClick,
-                            showDivider = index != items.lastIndex
-                        )
-                    }
-                    is SectionItem.Switch -> {
-                        SwitchItem(
-                            title = item.title,
-                            displayValue = item.displayValue,
-                            isChecked = item.isChecked,
-                            onClick = item.onClick,
-                            showDivider = index != items.lastIndex
-                        )
-                    }
-                    /*is SectionItem.Theme -> {
-                        ThemeItem(
-                            title = item.title,
-                            currentTheme = item.themeMode,
-                            onClick = item.onClick
-                        )
-                    }*/
-                    is SectionItem.Mode -> {
-                        ModeItem(
-                            title = item.title,
-                            entries = item.entries,
-                            iconResources = item.iconResources,
-                            weights = item.weights,
-                            mode = item.mode,
-                            onClick = item.onClick
-                        )
-                    }
+        items.fastForEachIndexed { index, item ->
+            when(item) {
+                is SectionItem.Default -> {
+                    TextItem(
+                        title = item.title,
+                        subtitle = item.displayValue,
+                        onClick = item.onClick
+                    )
+                }
+                is SectionItem.Image -> {
+                    ImageItem(
+                        title = item.title,
+                        displayValue = item.displayValue,
+                        imageUrl = item.imageUrl,
+                        onClick = item.onClick
+                    )
+                }
+                is SectionItem.Switch -> {
+                    SwitchItem(
+                        title = item.title,
+                        displayValue = item.displayValue,
+                        isChecked = item.isChecked,
+                        onClick = item.onClick
+                    )
+                }
+                is SectionItem.Mode -> {
+                    ModeItem(
+                        title = item.title,
+                        entries = item.entries,
+                        iconResources = item.iconResources,
+                        weights = item.weights,
+                        mode = item.mode,
+                        onClick = item.onClick
+                    )
                 }
             }
         }
@@ -123,57 +99,29 @@ fun SettingsSection(
 private fun TextItem(
     title: String,
     subtitle: String,
-    onClick: () -> Unit,
-    showDivider: Boolean = true
+    onClick: () -> Unit
 ) {
-    ConstraintLayout(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        val (titleRef, subtitleRef, divider) = createRefs()
-
         Text(
             text = title,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top, margin = 4.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
             style = MaterialTheme.typography.bodyMedium,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
         Text(
             text = subtitle,
-            modifier = Modifier.constrainAs(subtitleRef) {
-                top.linkTo(titleRef.bottom, margin = 4.dp)
-                bottom.linkTo(parent.bottom, margin = 4.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
+            modifier = Modifier,
             style = MaterialTheme.typography.labelSmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-
-        if(showDivider) {
-            HorizontalDivider(
-                modifier = Modifier.constrainAs(divider) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
-                color = MaterialTheme.colorScheme.background
-            )
-        }
     }
 }
 
@@ -182,65 +130,34 @@ private fun ImageItem(
     title: String,
     displayValue: String,
     imageUrl: String,
-    onClick: () -> Unit,
-    showDivider: Boolean = true
+    onClick: () -> Unit
 ) {
-    ConstraintLayout(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val (titleRef, iconRef, valueRef, divider) = createRefs()
-
         RoundedImage(
             model = imageUrl,
             contentDescription = null,
-            size = 36.dp,
-            modifier = Modifier.constrainAs(iconRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-            }
+            size = 36.dp
         )
-
-        Text(
-            text = title,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(valueRef.top)
-                start.linkTo(iconRef.end, margin = 16.dp)
-                width = Dimension.fillToConstraints
-            },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Text(
-            text = displayValue,
-            modifier = Modifier.constrainAs(valueRef) {
-                top.linkTo(titleRef.bottom)
-                bottom.linkTo(parent.bottom, margin = 4.dp)
-                start.linkTo(iconRef.end, margin = 16.dp)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        if(showDivider) {
-            HorizontalDivider(
-                modifier = Modifier.constrainAs(divider) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(titleRef.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
-                color = MaterialTheme.colorScheme.background
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = displayValue,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
         }
     }
@@ -251,66 +168,35 @@ private fun SwitchItem(
     title: String,
     displayValue: String,
     isChecked: Boolean,
-    onClick: () -> Unit,
-    showDivider: Boolean = true
+    onClick: () -> Unit
 ) {
-    ConstraintLayout(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val (titleRef, valueRef, switchRef, divider) = createRefs()
-
-        Text(
-            text = title,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(valueRef.top)
-                start.linkTo(parent.start)
-                end.linkTo(switchRef.start, margin = 4.dp)
-                width = Dimension.fillToConstraints
-            },
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Text(
-            text = displayValue,
-            modifier = Modifier.constrainAs(valueRef) {
-                top.linkTo(titleRef.bottom)
-                bottom.linkTo(parent.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(switchRef.start, margin = 4.dp)
-                width = Dimension.fillToConstraints
-            },
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
-            ),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
-        )
-
-        Switch(
-            checked = isChecked,
-            onCheckedChange = { onClick() },
-            modifier = Modifier.constrainAs(switchRef) {
-                top.linkTo(parent.top)
-                bottom.linkTo(parent.bottom)
-                end.linkTo(parent.end)
-            }
-        )
-
-        if(showDivider) {
-            HorizontalDivider(
-                modifier = Modifier.constrainAs(divider) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(titleRef.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
-                color = MaterialTheme.colorScheme.background
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Text(
+                text = displayValue,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
         }
+        Switch(
+            checked = isChecked,
+            onCheckedChange = { onClick() }
+        )
     }
 }
 
@@ -326,7 +212,7 @@ private fun <T> ModeItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Text(

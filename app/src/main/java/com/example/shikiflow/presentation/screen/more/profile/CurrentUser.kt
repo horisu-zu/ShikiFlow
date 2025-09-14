@@ -1,20 +1,20 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
 import android.content.Context
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -28,31 +28,18 @@ fun CurrentUser(
     context: Context,
     modifier: Modifier = Modifier
 ) {
-    ConstraintLayout(
-        modifier = modifier.fillMaxWidth()
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val (avatar, userInfoBlock) = createRefs()
-
         BaseImage(
             model = userData?.currentUser?.avatarUrl,
             contentDescription = "Avatar",
             imageType = ImageType.Square(),
-            modifier = Modifier
-                .constrainAs(avatar) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    bottom.linkTo(parent.bottom)
-                }
-                .size(96.dp)
+            modifier = Modifier.size(96.dp)
         )
-
-        Column(
-            modifier = Modifier.constrainAs(userInfoBlock) {
-                top.linkTo(parent.top)
-                start.linkTo(avatar.end, margin = 18.dp)
-                bottom.linkTo(parent.bottom)
-            }
-        ) {
+        Column {
             Text(
                 text = userData?.currentUser?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
                 fontSize = 18.sp,

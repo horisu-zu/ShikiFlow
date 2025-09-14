@@ -1,14 +1,16 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.TargetType
@@ -30,41 +32,28 @@ fun TrackSection(
     val mangaItemsCount = mangaTrackData.size
     val groupedMangaData = mangaTrackData.groupAndSortByStatus(MediaType.MANGA)
 
-    ConstraintLayout(
-        modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
-        val (titleRef, animeDataRef, mangaDataRef) = createRefs()
-
         Text(
             text = stringResource(R.string.profile_screen_track_lists_label),
             style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-            }
+            fontWeight = FontWeight.Bold
         )
 
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_anime),
             type = stringResource(R.string.main_track_mode_anime),
             groupedData = groupedAnimeData,
-            itemsCount = animeItemsCount,
-            modifier = Modifier.constrainAs(animeDataRef) {
-                top.linkTo(titleRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-            }
+            itemsCount = animeItemsCount
         )
 
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_manga),
             type = stringResource(R.string.main_track_mode_manga),
             groupedData = groupedMangaData,
-            itemsCount = mangaItemsCount,
-            modifier = Modifier.constrainAs(mangaDataRef) {
-                top.linkTo(animeDataRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-            }
+            itemsCount = mangaItemsCount
         )
     }
 }

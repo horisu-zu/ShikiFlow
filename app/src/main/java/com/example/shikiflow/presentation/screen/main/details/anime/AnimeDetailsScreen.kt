@@ -2,10 +2,13 @@ package com.example.shikiflow.presentation.screen.main.details.anime
 
 import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -103,28 +105,20 @@ fun AnimeDetailsScreen(
                         }
                     }
                 ) {
-                    ConstraintLayout(
-                        modifier = Modifier
-                            .fillMaxSize()
+                    Column(
+                        modifier = Modifier.fillMaxSize()
                             .padding(
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                 end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                            ).verticalScroll(rememberScrollState())
+                            ).verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
-                        val (titleRef, descriptionRef) = createRefs()
-
                         animeDetails.value.data?.let { details ->
                             AnimeDetailsTitle(
                                 animeDetails = details,
                                 onStatusClick = { rateBottomSheet = true },
                                 onPlayClick = { title, id, completedEpisodes ->
                                     navOptions.navigateToAnimeWatch(title, id, completedEpisodes)
-                                },
-                                modifier = Modifier.constrainAs(titleRef) {
-                                    top.linkTo(parent.top)
-                                    start.linkTo(parent.start)
-                                    end.linkTo(parent.end)
-                                    bottom.linkTo(descriptionRef.top)
                                 }
                             )
                             AnimeDetailsDesc(
@@ -167,9 +161,7 @@ fun AnimeDetailsScreen(
                                 onExternalLinksClick = { animeId ->
                                     navOptions.navigateToLinksPage(id, MediaType.ANIME)
                                 },
-                                modifier = Modifier.constrainAs(descriptionRef) {
-                                    top.linkTo(titleRef.bottom, margin = 12.dp)
-                                }.padding(horizontal = 12.dp)
+                                modifier = Modifier.padding(horizontal = 12.dp)
                             )
                         }
                     }

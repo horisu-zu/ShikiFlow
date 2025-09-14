@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -19,8 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.utils.StatusColor
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -30,21 +29,14 @@ fun SegmentedProgressBar(
     totalCount: Int,
     modifier: Modifier = Modifier
 ) {
-    ConstraintLayout(
-        modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
-        val (progressBarRef, dataRef) = createRefs()
-
         Row(
-            modifier = Modifier
+            modifier = Modifier.fillMaxWidth()
                 .clip(CircleShape)
-                .height(8.dp)
-                .constrainAs(progressBarRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
+                .height(8.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             groupedData.forEach { (status, count) ->
@@ -61,13 +53,7 @@ fun SegmentedProgressBar(
         }
 
         FlowRow(
-            modifier = Modifier
-                .constrainAs(dataRef) {
-                    top.linkTo(progressBarRef.bottom, margin = 12.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                },
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {

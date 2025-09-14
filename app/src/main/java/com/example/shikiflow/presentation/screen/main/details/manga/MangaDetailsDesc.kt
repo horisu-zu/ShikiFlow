@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details.manga
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
@@ -12,11 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.graphql.MangaDetailsQuery
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.RelatedMapper
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -37,65 +39,52 @@ fun MangaDetailsDesc(
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
-    ConstraintLayout(
-        modifier = modifier.fillMaxWidth()
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
-        val (descRef, charactersRef, listRef ,relatedRef) = createRefs()
-
-        ExpandableText(
-            descriptionHtml = mangaDetails?.descriptionHtml ?: "No Description",
-            modifier = Modifier.constrainAs(descRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
-            style = MaterialTheme.typography.bodySmall,
-            linkColor = MaterialTheme.colorScheme.primary,
-            brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
-            onEntityClick = { entityType, id ->
-                onEntityClick(entityType, id)
-            }, onLinkClick = onLinkClick
-        )
-
-        Column(
-            modifier = Modifier.constrainAs(charactersRef) {
-                top.linkTo(descRef.bottom, margin = 8.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            },
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Characters",
-                style = MaterialTheme.typography.titleMedium
+        mangaDetails?.descriptionHtml?.let { descriptionHtml ->
+            ExpandableText(
+                descriptionHtml = descriptionHtml,
+                modifier = Modifier.fillMaxWidth(),
+                style = MaterialTheme.typography.bodySmall,
+                linkColor = MaterialTheme.colorScheme.primary,
+                brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
+                onEntityClick = { entityType, id ->
+                    onEntityClick(entityType, id)
+                }, onLinkClick = onLinkClick
             )
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+        }
+
+        mangaDetails?.characterRoles?.let { characterRoles ->
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(mangaDetails?.characterRoles ?: emptyList()) { characterItem ->
-                    CharacterCard(
-                        characterPoster = characterItem.character.characterShort.poster
-                            ?.posterShort?.previewUrl,
-                        characterName = characterItem.character.characterShort.name,
-                        onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
-                    )
+                Text(
+                    text = stringResource(R.string.details_characters),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(characterRoles) { characterItem ->
+                        CharacterCard(
+                            characterPoster = characterItem.character.characterShort.poster
+                                ?.posterShort?.previewUrl,
+                            characterName = characterItem.character.characterShort.name,
+                            onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
+                        )
+                    }
                 }
             }
         }
-
         SegmentedProgressBar(
             groupedData = mangaDetails?.statusesStats?.associate {
                 mapStatusToString(it.status, MediaType.MANGA) to it.count
             } ?: emptyMap(),
             totalCount = mangaDetails?.statusesStats?.size ?: 0,
-            modifier = Modifier.constrainAs(listRef) {
-                top.linkTo(charactersRef.bottom, margin = 12.dp)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
+            modifier = Modifier.padding(top = 4.dp)
         )
 
         if(mangaDetails?.related != null && mangaDetails.related.isNotEmpty()) {
@@ -103,12 +92,7 @@ fun MangaDetailsDesc(
                 relatedItems = mangaDetails.related.map { RelatedMapper.fromMangaRelated(it) },
                 onItemClick = onItemClick,
                 onArrowClick = { showRelatedBottomSheet = true },
-                modifier = Modifier.constrainAs(relatedRef) {
-                    top.linkTo(listRef.bottom, margin = 12.dp)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }
+                modifier = Modifier.padding(top = 4.dp)
             )
         }
     }

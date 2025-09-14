@@ -67,9 +67,9 @@ fun SettingsScreen(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(
-                    top = innerPadding.calculateTopPadding() + 12.dp,
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    top = innerPadding.calculateTopPadding(),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
                     bottom = 12.dp
                 ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {

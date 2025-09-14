@@ -21,13 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeKind
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeStatus
@@ -37,7 +38,6 @@ import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.toIcon
 
 @Composable
@@ -47,93 +47,77 @@ fun AnimeDetailsTitle(
     onPlayClick: (String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    ConstraintLayout(
+    Box(
         modifier = modifier.fillMaxWidth()
     ) {
-        val (backgroundRef, scoreRef, titleRef, infoRow, statusItem) = createRefs()
-
         GradientImage(
             model = animeDetails.poster?.originalUrl,
             gradientFraction = 0.9f,
-            imageType = ImageType.Poster(
-                defaultClip = RoundedCornerShape(0.dp)
-            ),
-            modifier = Modifier
-                .constrainAs(backgroundRef) {
-                    top.linkTo(parent.top)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                }
+            imageType = ImageType.Poster(defaultClip = RoundedCornerShape(0.dp))
         )
 
-        if (animeDetails.status != AnimeStatusEnum.anons) {
-            ScoreItem(
-                score = animeDetails.score?.toFloat() ?: 0f,
-                modifier = Modifier
-                    .constrainAs(scoreRef) {
-                        bottom.linkTo(titleRef.top)
-                        start.linkTo(parent.start)
-                    }.padding(horizontal = 12.dp)
-            )
-        }
-
-        Text(
-            text = animeDetails.name,
-            style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier
-                .constrainAs(titleRef) {
-                    bottom.linkTo(infoRow.top, margin = 4.dp)
-                    start.linkTo(parent.start)
-                }.padding(horizontal = 12.dp)
-        )
-
-        Row(
-            modifier = Modifier
-                .constrainAs(infoRow) {
-                    bottom.linkTo(statusItem.top, margin = 4.dp)
-                    start.linkTo(parent.start)
-                }.padding(horizontal = 12.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter)
         ) {
-            ShortInfoItem(
-                infoType = "Type",
-                infoItem = "${mapAnimeKind(animeDetails.kind)} ∙ ${mapAnimeStatus(animeDetails.status)}"
-            )
-            ShortInfoItem(
-                infoType = "Episodes",
-                infoItem = if (animeDetails.status != AnimeStatusEnum.ongoing) {
-                    "${animeDetails.episodes.takeIf { it != 0 } ?: "?"} ep."
-                } else {
-                    "${animeDetails.episodesAired} of ${animeDetails.episodes.takeIf { it != 0 } ?: "?"} ep."
-                }
-            )
-            animeDetails.rating?.let { ratingEnum ->
-                ShortInfoItem(
-                    infoType = "Age Rating",
-                    infoItem = Converter.convertRatingToString(ratingEnum)
+            if (animeDetails.status != AnimeStatusEnum.anons) {
+                ScoreItem(
+                    score = animeDetails.score?.toFloat() ?: 0f,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                 )
             }
-        }
 
-        UserStatusItem(
-            onStatusClick = onStatusClick,
-            onPlayClick = { onPlayClick(
-                animeDetails.name,
-                animeDetails.id,
-                animeDetails.userRate?.episodes ?: 0
-            ) },
-            status = animeDetails.userRate?.status,
-            allEpisodes = if(animeDetails.status == AnimeStatusEnum.released) animeDetails.episodes
+            Text(
+                text = animeDetails.name,
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                ShortInfoItem(
+                    infoType = stringResource(id = R.string.details_short_info_type),
+                    infoItem = "${mapAnimeKind(animeDetails.kind)} ∙ ${mapAnimeStatus(animeDetails.status)}"
+                )
+                ShortInfoItem(
+                    infoType = stringResource(id = R.string.details_short_info_episodes),
+                    infoItem = if (animeDetails.status != AnimeStatusEnum.ongoing) {
+                        stringResource(
+                            id = R.string.episodes,
+                            animeDetails.episodes.takeIf { it != 0 } ?: "?"
+                        )
+                    } else {
+                        stringResource(
+                            id = R.string.ongoing_episodes,
+                            animeDetails.episodesAired,
+                            animeDetails.episodes.takeIf { it != 0 } ?: "?"
+                        )
+                    }
+                )
+                animeDetails.rating?.let { ratingEnum ->
+                    ShortInfoItem(
+                        infoType = stringResource(id = R.string.details_short_info_age_rating),
+                        infoItem = Converter.convertRatingToString(ratingEnum)
+                    )
+                }
+            }
+
+            UserStatusItem(
+                onStatusClick = onStatusClick,
+                onPlayClick = { onPlayClick(
+                    animeDetails.name,
+                    animeDetails.id,
+                    animeDetails.userRate?.episodes ?: 0
+                ) },
+                status = animeDetails.userRate?.status,
+                allEpisodes = if(animeDetails.status == AnimeStatusEnum.released) animeDetails.episodes
                 else animeDetails.episodesAired,
-            watchedEpisodes = animeDetails.userRate?.episodes,
-            score = animeDetails.userRate?.score,
-            modifier = Modifier
-                .constrainAs(statusItem) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                }.padding(horizontal = 12.dp)
-        )
+                watchedEpisodes = animeDetails.userRate?.episodes,
+                score = animeDetails.userRate?.score,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+        }
     }
 }
 
@@ -228,7 +212,8 @@ private fun UserStatusItem(
             )
         }
         Box(
-            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
                 .clickable { onPlayClick() }
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .padding(12.dp)

@@ -125,10 +125,44 @@
 
     <string name="translation_updated_at">Updated %1$s</string>
     <string name="episodes">%1s ep.</string>
+    <string name="ongoing_episodes">%1s of %2s ep.</string>
     <string name="translation_filter_all">All</string>
     <string name="translation_filter_voice">Voice</string>
     <string name="translation_filter_subtitles">Subtitles</string>
 
     <string name ="media_item_episode">Episode %1s</string>
     <string name ="media_item_chapter">Chapter %1s</string>
+    <string name="chapters">%1$d ch.</string>
+    <string name="volumes">%1$d vol.</string>
+
+    <string name="details_info_studio">Studio</string>
+    <string name="details_info_duration">Duration</string>
+    <string name="details_info_aired_on">Aired On</string>
+    <string name="details_info_next_episode_at">Next Episode at</string>
+    <string name="details_info_released_on">Released on</string>
+    <string name="details_info_title_romaji">Romaji</string>
+    <string name="details_info_title_japanese">Japanese</string>
+    <string name="details_info_title_synonyms">Synonyms</string>
+    <string name="details_info_similar">Similar</string>
+    <string name="details_info_links">Links</string>
+    <string name="details_info_score_stats">Score stats ∙ %1$s ★</string>
+    <string name="details_info_statuses_stats">Statuses stats</string>
+    <string name="details_characters">Characters</string>
+    <string name="details_short_info_type">Type</string>
+    <string name="details_short_info_episodes">Episodes</string>
+    <string name="details_short_info_age_rating">Age Rating</string>
+    <string name="anime_details_screenshots">Screenshots</string>
+    <string name="details_short_info_manga_type">Type</string>
+    <string name="details_short_info_manga_published">Published</string>
+    <string name="details_short_info_manga_volumes">Volumes</string>
+    <string name="details_short_info_manga_chapters">Chapters</string>
+    <string name="details_short_info_manga_started">Started</string>
+
+    <string name="rate_decrement">-</string>
+    <string name="rate_increment">+</string>
+    <string name="rewatches">Rewatches</string>
+    <string name="rereads">Rereads</string>
+    <string name="user_rate_add_to_list">Add to List</string>
+    <string name="rate_progress">Progress</string>
+    <string name="details_related">Related</string>
 </resources>

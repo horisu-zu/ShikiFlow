@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -47,11 +48,13 @@ fun AnimeDetailsInfo(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth().padding(vertical = 8.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         DetailRow(
-            label = "Studio",
+            label = stringResource(R.string.details_info_studio),
             verticalAlignment = Alignment.Top,
             content = {
                 FlowRow(
@@ -64,7 +67,7 @@ fun AnimeDetailsInfo(
         )
         if (animeDetails.duration != null && animeDetails.duration != 0) {
             DetailRow(
-                label = "Duration",
+                label = stringResource(R.string.details_info_duration),
                 content = {
                     Text(
                         text = "${animeDetails.duration} min.",
@@ -77,7 +80,7 @@ fun AnimeDetailsInfo(
         }
         animeDetails.airedOn?.date?.let {
             DetailRow(
-                label = "Aired On",
+                label = stringResource(R.string.details_info_aired_on),
                 content = {
                     Text(
                         text = formatInstant(
@@ -95,7 +98,7 @@ fun AnimeDetailsInfo(
         if (animeDetails.status == AnimeStatusEnum.ongoing) {
             animeDetails.nextEpisodeAt?.let { nextEpisode ->
                 DetailRow(
-                    label = "Next Episode at",
+                    label = stringResource(R.string.details_info_next_episode_at),
                     content = {
                         Text(
                             text = formatInstant(
@@ -111,7 +114,7 @@ fun AnimeDetailsInfo(
             }
         } else if (animeDetails.status == AnimeStatusEnum.released && animeDetails.releasedOn?.date != null) {
             DetailRow(
-                label = "Released on",
+                label = stringResource(R.string.details_info_released_on),
                 content = {
                     Text(
                         text = formatInstant(
@@ -128,7 +131,7 @@ fun AnimeDetailsInfo(
         }
         HorizontalDivider()
         DetailRow(
-            label = "Romaji",
+            label = stringResource(R.string.details_info_title_romaji),
             content = {
                 Text(
                     text = animeDetails.name,
@@ -140,7 +143,7 @@ fun AnimeDetailsInfo(
         )
         if (animeDetails.japanese != null) {
             DetailRow(
-                label = "Japanese",
+                label = stringResource(R.string.details_info_title_japanese),
                 content = {
                     Text(
                         text = animeDetails.japanese,
@@ -153,7 +156,7 @@ fun AnimeDetailsInfo(
         }
         if (animeDetails.synonyms.isNotEmpty()) {
             DetailRow(
-                label = "Synonyms",
+                label = stringResource(R.string.details_info_title_synonyms),
                 content = {
                     Column(
                         horizontalAlignment = Alignment.End,
@@ -174,18 +177,20 @@ fun AnimeDetailsInfo(
 
         HorizontalDivider()
         Column(
-            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(12.dp)),
             verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
         ) {
             GeneralItem(
                 icon = IconResource.Drawable(resId = R.drawable.ic_intersection),
-                title = "Similar",
+                title = stringResource(R.string.details_info_similar),
                 onClick = { onSimilarClick(animeDetails.id, animeDetails.name) }
             )
             GeneralItem(
                 icon = IconResource.Drawable(resId = R.drawable.ic_link),
-                title = "Links",
+                title = stringResource(R.string.details_info_links),
                 onClick = { onExternalLinksClick(animeDetails.id) }
             )
         }
@@ -197,7 +202,7 @@ fun AnimeDetailsInfo(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Score stats ∙ ${animeDetails.score} ★",
+                    text = stringResource(R.string.details_info_score_stats, animeDetails.score ?: 0.0),
                     style = MaterialTheme.typography.titleMedium
                 )
                 Graph(
@@ -209,11 +214,13 @@ fun AnimeDetailsInfo(
             }
         }
         Column(
-            modifier = modifier.fillMaxWidth().padding(top = 12.dp),
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
-                text = "Statuses stats",
+                text = stringResource(R.string.details_info_statuses_stats),
                 style = MaterialTheme.typography.titleMedium
             )
             Graph(

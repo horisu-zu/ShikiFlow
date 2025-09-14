@@ -1,7 +1,9 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -11,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -31,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
@@ -76,11 +76,6 @@ fun ProfileScreen(
                         )
                     }
                 },
-                actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.MoreVert, contentDescription = "More")
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 ),
@@ -95,47 +90,32 @@ fun ProfileScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
-                ConstraintLayout(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(
                             top = innerPadding.calculateTopPadding(),
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                        )
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                 ) {
-                    val (currentUserBlock, redirectBlock, listsBlock) = createRefs()
-
                     CurrentUser(
                         userData = currentUser,
-                        context = context,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                            .constrainAs(currentUserBlock) {
-                                top.linkTo(parent.top)
-                                start.linkTo(parent.start)
-                            }
+                        context = context
                     )
-
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
                             .clip(RoundedCornerShape(12.dp))
                             .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-                            .padding(horizontal = 8.dp, vertical = 6.dp)
-                            .constrainAs(redirectBlock) {
-                                top.linkTo(currentUserBlock.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }
                     ) {
-                        CircleShapeButton(
+                        /*CircleShapeButton(
                             label = stringResource(R.string.more_screen_clubs),
                             icon = IconResource.Drawable(R.drawable.ic_group),
-                            onClick = { /**/ },
+                            onClick = { *//**//* },
                             modifier = Modifier.weight(1f)
-                        )
+                        )*/
                         CircleShapeButton(
                             label = stringResource(R.string.more_screen_history),
                             icon = IconResource.Drawable(R.drawable.ic_history),
@@ -143,17 +123,7 @@ fun ProfileScreen(
                             modifier = Modifier.weight(1f)
                         )
                     }
-
-                    TrackSection(
-                        userRateData = userRate.data ?: emptyList(),
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp, vertical = 12.dp)
-                            .constrainAs(listsBlock) {
-                                top.linkTo(redirectBlock.bottom)
-                                start.linkTo(parent.start)
-                                end.linkTo(parent.end)
-                            }
-                    )
+                    TrackSection(userRateData = userRate.data ?: emptyList())
                 }
             }
             is Resource.Error -> {

@@ -16,27 +16,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
-
-@Composable
-fun SectionTitle(
-    title: String,
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = title,
-        modifier = modifier,
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.SemiBold,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis
-    )
-}
 
 @Composable
 fun ExpandedItem(
@@ -45,50 +28,36 @@ fun ExpandedItem(
     subtitle: String,
     onClick: () -> Unit
 ) {
-    ConstraintLayout(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
-        val (avatarRef, titleRef, subtitleRef) = createRefs()
-
         BaseImage(
             model = avatar,
             contentDescription = "Avatar",
             imageType = ImageType.Square(),
-            modifier = Modifier
-                .size(48.dp)
-                .constrainAs(avatarRef) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                }
+            modifier = Modifier.size(48.dp)
         )
-
-        Text(
-            text = title,
-            fontWeight = FontWeight.Bold,
-            fontSize = 16.sp,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                start.linkTo(avatarRef.end, margin = 16.dp)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
-        )
-
-        Text(
-            text = subtitle,
-            fontWeight = FontWeight.Normal,
-            fontSize = 12.sp,
-            modifier = Modifier.constrainAs(subtitleRef) {
-                bottom.linkTo(parent.bottom)
-                start.linkTo(titleRef.start)
-                end.linkTo(parent.end)
-                width = Dimension.fillToConstraints
-            }
-        )
+        Column {
+            Text(
+                text = title,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            )
+            Text(
+                text = subtitle,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                fontWeight = FontWeight.Normal,
+                fontSize = 12.sp
+            )
+        }
     }
 }
 

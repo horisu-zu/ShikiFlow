@@ -2,6 +2,8 @@ package com.example.shikiflow.presentation.auth
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -11,13 +13,11 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.FeatureItem
@@ -26,68 +26,53 @@ import com.example.shikiflow.utils.IconResource
 
 @Composable
 fun AuthMain(onStartAuth: () -> Unit) {
-    val context = LocalContext.current
-
-    ConstraintLayout(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val (logoSection, featuresItem, signInButton) = createRefs()
+
+        Spacer(modifier = Modifier.weight(1f))
 
         Text(
-            text = "ShikiFlow",
+            text = stringResource(id = R.string.app_name),
             style = MaterialTheme.typography.headlineLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.constrainAs(logoSection) {
-                top.linkTo(parent.top)
-                bottom.linkTo(featuresItem.top)
-                start.linkTo(parent.start)
-                end.linkTo(parent.end)
-            }
+            color = MaterialTheme.colorScheme.onSurface
         )
 
+        Spacer(modifier = Modifier.weight(1f))
+
         FeaturesGroup(
+            modifier = Modifier.padding(horizontal = 24.dp),
             items = listOf(
                 {
                     FeatureItem(
                         icon = IconResource.Drawable(resId = R.drawable.shiki_logo),
-                        title = context.getString(R.string.auth_features_shiki_integration_label),
-                        subtitle = context.getString(R.string.auth_features_shiki_integration_desc)
+                        title = stringResource(R.string.auth_features_shiki_integration_label),
+                        subtitle = stringResource(R.string.auth_features_shiki_integration_desc)
                     )
                 },
                 {
                     FeatureItem(
                         icon = IconResource.Vector(imageVector = Icons.Default.Favorite),
-                        title = context.getString(R.string.auth_features_personalize_label),
-                        subtitle = context.getString(R.string.auth_features_personalize_desc)
+                        title = stringResource(R.string.auth_features_personalize_label),
+                        subtitle = stringResource(R.string.auth_features_personalize_desc)
                     )
                 },
                 {
                     FeatureItem(
                         icon = IconResource.Drawable(resId = R.drawable.ic_manga),
-                        title = context.getString(R.string.auth_features_mangadex_integration_label),
-                        subtitle = context.getString(R.string.auth_features_mangadex_integration_desc)
+                        title = stringResource(R.string.auth_features_mangadex_integration_label),
+                        subtitle = stringResource(R.string.auth_features_mangadex_integration_desc)
                     )
                 }
-            ),
-            modifier = Modifier
-                .constrainAs(featuresItem) {
-                    top.linkTo(logoSection.bottom)
-                    start.linkTo(parent.start)
-                    bottom.linkTo(signInButton.top)
-                }
-                .padding(horizontal = 24.dp, vertical = 12.dp)
+            )
         )
 
+        Spacer(modifier = Modifier.weight(1f))
+
         Box(
-            Modifier
-                .constrainAs(signInButton) {
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    width = Dimension.fillToConstraints
-                }
+            modifier = Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                 .background(color = MaterialTheme.colorScheme.surfaceVariant)
         ) {

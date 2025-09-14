@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.common
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -42,10 +41,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
@@ -132,8 +135,10 @@ fun UserRateBottomSheet(
                 )
             } else {
                 Button(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)),
-                    label = "Add to List",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp)),
+                    label = stringResource(R.string.user_rate_add_to_list),
                     onClick = { onCreateRate(userRate.mediaId, selectedStatus) },
                     enabled = selectedStatus != -1
                 )
@@ -165,7 +170,7 @@ private fun SheetHeader(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Progress",
+                text = stringResource(R.string.rate_progress),
                 style = MaterialTheme.typography.bodyLarge
             )
             Text(
@@ -256,10 +261,10 @@ private fun ProgressColumn(
 ) {
     val isAnime = userRate.mediaType == MediaType.ANIME
     val totalCount = if (isAnime) userRate.totalEpisodes else userRate.totalChapters
-    val progressTitle = if (isAnime) "Episodes" else "Chapters"
-    val rewatchTitle = if (isAnime) "Rewatches" else "Rereads"
-
-    Log.d("UserRateBottomSheet", "totalCount = $totalCount")
+    val progressTitle = if (isAnime) stringResource(id = R.string.details_short_info_episodes)
+        else stringResource(id = R.string.details_short_info_manga_chapters)
+    val rewatchTitle = if (isAnime) stringResource(R.string.rewatches)
+        else stringResource(R.string.rereads)
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -296,55 +301,44 @@ private fun ProgressCard(
     canDecrement: Boolean,
     modifier: Modifier = Modifier
 ) {
-    ConstraintLayout(
+    Row(
         modifier = modifier
             .fillMaxWidth()
             .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(12.dp))
-            .padding(horizontal = 12.dp, vertical = 16.dp)
+            .padding(horizontal = 12.dp, vertical = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        val (titleRef, countRef, buttonsRow) = createRefs()
-
         Text(
-            text = title,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.constrainAs(titleRef) {
-                top.linkTo(parent.top)
-                start.linkTo(parent.start)
-                end.linkTo(buttonsRow.start)
-                width = Dimension.fillToConstraints
-            }
-        )
-        Text(
-            text = count.toString(),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.constrainAs(countRef) {
-                top.linkTo(titleRef.bottom)
-                start.linkTo(parent.start)
-                end.linkTo(buttonsRow.start)
-                width = Dimension.fillToConstraints
-            }
-        )
-        Row(
-            modifier = Modifier.constrainAs(buttonsRow) {
-                top.linkTo(titleRef.top)
-                bottom.linkTo(countRef.bottom)
-                start.linkTo(titleRef.end)
-                end.linkTo(parent.end)
-                width = Dimension.preferredWrapContent
+            //text = "$title — $count",
+            text = buildAnnotatedString {
+                withStyle(style = SpanStyle(
+                    fontWeight = FontWeight.Medium
+                )) {
+                    append(title)
+                }
+                append(" — ")
+                withStyle(style = SpanStyle(
+                    fontWeight = FontWeight.Bold
+                )) {
+                    append(count.toString())
+                }
             },
-            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
-        ) {
-            RoundBox(
-                text = "-",
-                onClick = onDecrement,
-                enabled = canDecrement
-            )
-            RoundBox(
-                text = "+",
-                onClick = onIncrement,
-                enabled = canIncrement
-            )
-        }
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.weight(1f)
+        )
+        RoundBox(
+            text = stringResource(R.string.rate_decrement),
+            onClick = onDecrement,
+            enabled = canDecrement
+        )
+        RoundBox(
+            text = stringResource(R.string.rate_increment),
+            onClick = onIncrement,
+            enabled = canIncrement
+        )
     }
 }
 
@@ -360,7 +354,7 @@ private fun RoundBox(
             .clip(CircleShape)
             .background(
                 if (enabled) MaterialTheme.colorScheme.surface
-                    else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
             )
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
