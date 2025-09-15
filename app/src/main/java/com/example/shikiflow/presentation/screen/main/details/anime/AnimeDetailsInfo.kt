@@ -32,10 +32,10 @@ import com.example.shikiflow.presentation.screen.more.GeneralItem
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Instant
 
 @Composable
 fun AnimeDetailsInfo(

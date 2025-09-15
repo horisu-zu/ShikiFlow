@@ -7,14 +7,16 @@ import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.tracks.MediaType
-import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+
+import kotlin.time.Instant
 
 @Serializable
 sealed interface BrowseType {
     enum class AnimeBrowseType: BrowseType { ONGOING, SEARCH, ANIME_TOP }
     enum class MangaBrowseType: BrowseType { SEARCH, MANGA_TOP }
 }
+
 
 sealed interface Browse {
     val id: String
@@ -55,6 +57,7 @@ sealed interface Browse {
     }
 }
 
+
 fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
     return Browse.Anime(
         id = this.id,
@@ -70,6 +73,7 @@ fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
         genres = this.genres?.map { it.name } ?: emptyList()
     )
 }
+
 
 fun MangaBrowseQuery.Manga.toBrowseManga(): Browse.Manga {
     return Browse.Manga(

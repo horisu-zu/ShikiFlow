@@ -21,7 +21,10 @@ class AggregateMangaUseCase @Inject constructor(
                     chapters.flatMap { chapter ->
                         listOf(chapter.id) + chapter.others
                     }
-                }
+                }.toList()
+                .sortedBy { (chapterKey, _) ->
+                    chapterKey.split("-", "–").first().toFloatOrNull() ?: 0f
+                }.toMap(LinkedHashMap())
 
             emit(Resource.Success(chaptersMap))
         } catch (e: HttpException) {

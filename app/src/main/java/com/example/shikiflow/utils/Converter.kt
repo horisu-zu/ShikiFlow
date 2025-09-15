@@ -22,8 +22,6 @@ import com.example.shikiflow.domain.model.tracks.UserRate
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toJavaLocalDate
@@ -33,6 +31,8 @@ import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Clock
+import kotlin.time.Instant
 
 object Converter {
     fun formatInstant(
@@ -216,6 +216,13 @@ object Converter {
             }
             else -> words.take(maxLetters).map { it.first().uppercaseChar() }.joinToString("")
         }
+    }
+
+    fun parseChapterNumber(chapterNumber: String): Float {
+        return chapterNumber.split("-", "–", "—")
+            .first()
+            .trim()
+            .toFloatOrNull() ?: 0f
     }
 
     /*fun formatText(

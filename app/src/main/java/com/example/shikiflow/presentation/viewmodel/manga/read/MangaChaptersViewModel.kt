@@ -8,7 +8,8 @@ import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,28 +17,28 @@ class MangaChaptersViewModel @Inject constructor(
     private val aggregateMangaUseCase: AggregateMangaUseCase
 ): ViewModel() {
 
+    private var currentId: String? = null
     private val _mangaChapters =
         MutableStateFlow<Resource<Map<String, List<String>>>>(Resource.Loading())
     val mangaChapters = _mangaChapters.asStateFlow()
 
     fun getMangaChapters(mangaDexId: String) {
-        viewModelScope.launch {
-            Log.d("MangaReadViewModel", "Aggregating manga for MangaDex ID: $mangaDexId")
-            aggregateMangaUseCase(mangaDexId).collect { result ->
-                when (result) {
-                    is Resource.Loading -> {
-                        Log.d("MangaReadViewModel", "Aggregation in progress...")
-                    }
-                    is Resource.Success -> {
-                        _mangaChapters.value = result
-                        Log.d("MangaReadViewModel", "Aggregation successful: ${result.data}")
-                    }
-                    is Resource.Error -> {
-                        _mangaChapters.value = result
-                        Log.e("MangaReadViewModel", "Aggregation failed: ${result.message}")
-                    }
+        if(currentId == mangaDexId) return
+
+        aggregateMangaUseCase(mangaDexId).onEach { result ->
+            _mangaChapters.value = result
+            when (result) {
+                is Resource.Loading -> {
+                    Log.d("MangaReadViewModel", "Aggregation in progress...")
+                }
+                is Resource.Success -> {
+                    currentId = mangaDexId
+                    Log.d("MangaReadViewModel", "Aggregation successful: ${result.data}")
+                }
+                is Resource.Error -> {
+                    Log.e("MangaReadViewModel", "Aggregation failed: ${result.message}")
                 }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 }

@@ -5,9 +5,9 @@ import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.MangaTracksQuery
 import com.example.graphql.type.AnimeStatusEnum
-import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
-import kotlinx.datetime.toInstant
+import kotlin.time.Clock
+import kotlin.time.Instant
+import kotlin.toString
 
 enum class MediaType { ANIME, MANGA }
 
@@ -60,8 +60,8 @@ fun AnimeTracksQuery.UserRate.toUiModel() = UserRateData(
     mediaId = animeUserRateWithModel.anime?.animeShort?.id.toString(),
     title = animeUserRateWithModel.anime?.animeShort?.name.toString(),
     posterUrl = animeUserRateWithModel.anime?.animeShort?.poster?.posterShort?.previewUrl,
-    createDate = animeUserRateWithModel.createdAt.toString().toInstant(),
-    updateDate = animeUserRateWithModel.updatedAt.toString().toInstant(),
+    createDate = Instant.parse(animeUserRateWithModel.createdAt.toString()),
+    updateDate = Instant.parse(animeUserRateWithModel.updatedAt.toString()),
     totalEpisodes = animeUserRateWithModel.anime?.animeShort?.episodesAired,
     totalChapters = null
 )
@@ -76,42 +76,62 @@ fun MangaTracksQuery.UserRate.toUiModel() = UserRateData(
     mediaId = mangaUserRateWithModel.manga?.mangaShort?.id.toString(),
     title = mangaUserRateWithModel.manga?.mangaShort?.name.toString(),
     posterUrl = mangaUserRateWithModel.manga?.mangaShort?.poster?.posterShort?.previewUrl,
-    createDate = mangaUserRateWithModel.createdAt.toString().toInstant(),
-    updateDate = mangaUserRateWithModel.updatedAt.toString().toInstant(),
+    createDate = Instant.parse(mangaUserRateWithModel.createdAt.toString()),
+    updateDate = Instant.parse(mangaUserRateWithModel.updatedAt.toString()),
     totalEpisodes = null,
     totalChapters = mangaUserRateWithModel.manga?.mangaShort?.chapters
 )
 
-fun AnimeDetailsQuery.UserRate.toUiModel(media: AnimeDetailsQuery.Anime?) = UserRateData(
-    id = id,
-    mediaType = MediaType.ANIME,
-    status = status.rawValue,
-    progress = episodes,
-    rewatches = rewatches,
-    score = score,
-    mediaId = media?.id.toString(),
-    title = media?.name.toString(),
-    posterUrl = media?.poster?.originalUrl,
-    createDate = createdAt.toString().toInstant(),
-    updateDate = updatedAt.toString().toInstant(),
-    totalEpisodes = if(media?.status == AnimeStatusEnum.released) media.episodes else media?.episodesAired,
-    totalChapters = null
-)
+fun AnimeDetailsQuery.Anime.toUiModel(): UserRateData {
+    return if(this.userRate != null) {
+        UserRateData(
+            id = id,
+            mediaType = MediaType.ANIME,
+            status = userRate.status.rawValue,
+            progress = episodes,
+            rewatches = userRate.rewatches,
+            score = userRate.score,
+            mediaId = id,
+            title = name,
+            posterUrl = poster?.originalUrl,
+            createDate = Instant.parse(createdAt.toString()),
+            updateDate = Instant.parse(updatedAt.toString()),
+            totalEpisodes = if(status == AnimeStatusEnum.released) episodes else episodesAired,
+            totalChapters = null
+        )
+    } else {
+        UserRateData.createEmpty(
+            mediaId = id,
+            mediaTitle = name,
+            mediaPosterUrl = poster?.originalUrl ?: "",
+            mediaType = MediaType.ANIME
+        )
+    }
+}
 
-fun MangaDetailsQuery.UserRate.toUiModel(media: MangaDetailsQuery.Manga) = media.userRate?.let {
-    UserRateData(
-        id = media.userRate.id,
-        mediaType = MediaType.MANGA,
-        status = media.userRate.status.rawValue,
-        progress = media.userRate.chapters,
-        rewatches = media.userRate.rewatches,
-        score = media.userRate.score,
-        mediaId = media.id,
-        title = media.name,
-        posterUrl = media.poster?.posterShort?.previewUrl,
-        createDate = media.userRate.createdAt.toString().toInstant(),
-        updateDate = media.userRate.updatedAt.toString().toInstant(),
-        totalEpisodes = null,
-        totalChapters = media.chapters
-    )
+fun MangaDetailsQuery.Manga.toUiModel(): UserRateData {
+    return if(userRate != null) {
+        UserRateData(
+            id = userRate.id,
+            mediaType = MediaType.MANGA,
+            status = userRate.status.rawValue,
+            progress = userRate.chapters,
+            rewatches = userRate.rewatches,
+            score = userRate.score,
+            mediaId = id,
+            title = name,
+            posterUrl = poster?.posterShort?.previewUrl,
+            createDate = Instant.parse(userRate.createdAt.toString()),
+            updateDate = Instant.parse(userRate.updatedAt.toString()),
+            totalEpisodes = null,
+            totalChapters = chapters
+        )
+    } else {
+        UserRateData.createEmpty(
+            mediaId = id,
+            mediaTitle = name,
+            mediaPosterUrl = poster?.posterShort?.originalUrl ?: "",
+            mediaType = MediaType.MANGA
+        )
+    }
 }

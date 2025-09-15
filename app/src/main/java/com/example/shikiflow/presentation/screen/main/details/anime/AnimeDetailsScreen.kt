@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -27,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -34,10 +34,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.TargetType
-import com.example.shikiflow.domain.model.tracks.UserRateData
 import com.example.shikiflow.domain.model.tracks.toUiModel
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
@@ -167,7 +168,21 @@ fun AnimeDetailsScreen(
                     }
                 }
             }
-            is Resource.Error -> { /*TODO*/ }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(
+                            id = R.string.details_error,
+                            R.string.browse_search_media_anime
+                        ),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { animeDetailsViewModel.getAnimeDetails(id) }
+                    )
+                }
+            }
         }
     }
 
@@ -175,33 +190,30 @@ fun AnimeDetailsScreen(
         val isUpdating by userViewModel.isUpdating.collectAsState()
         val animeDetailsData = animeDetails.value.data
 
-        UserRateBottomSheet(
-            userRate = animeDetailsData?.userRate?.toUiModel(animeDetailsData) ?: UserRateData.createEmpty(
-                mediaId = animeDetailsData?.id ?: "",
-                mediaTitle = animeDetailsData?.name ?: "",
-                mediaPosterUrl = animeDetailsData?.poster?.originalUrl ?: "",
-                mediaType = MediaType.ANIME
-            ),
-            isLoading = isUpdating,
-            onDismiss = { rateBottomSheet = false },
-            onSave = { rateId, status, score, episodes, rewatches, mediaType ->
-                userViewModel.updateUserRate(
-                    id = rateId,
-                    status = status,
-                    score = score,
-                    progress = episodes,
-                    rewatches = rewatches,
-                    mediaType = mediaType
-                )
-            },
-            onCreateRate = { mediaId, status ->
-                userViewModel.createUserRate(
-                    userId = currentUser?.currentUser?.id ?: "",
-                    targetId = mediaId,
-                    status = status,
-                    targetType = TargetType.ANIME
-                )
-            }
-        )
+        animeDetailsData?.let {
+            UserRateBottomSheet(
+                userRate = animeDetailsData.toUiModel(),
+                isLoading = isUpdating,
+                onDismiss = { rateBottomSheet = false },
+                onSave = { rateId, status, score, episodes, rewatches, mediaType ->
+                    userViewModel.updateUserRate(
+                        id = rateId,
+                        status = status,
+                        score = score,
+                        progress = episodes,
+                        rewatches = rewatches,
+                        mediaType = mediaType
+                    )
+                },
+                onCreateRate = { mediaId, status ->
+                    userViewModel.createUserRate(
+                        userId = currentUser?.currentUser?.id ?: "",
+                        targetId = mediaId,
+                        status = status,
+                        targetType = TargetType.ANIME
+                    )
+                }
+            )
+        }
     }
 }

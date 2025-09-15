@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.common.ShikiImage
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class SimilarAnime(
     val id: Long,
@@ -21,12 +22,13 @@ data class SimilarAnime(
     @SerialName("released_on") val releasedOn: String? = null,
 )
 
+
 fun SimilarAnime.toBrowseAnime(): Browse.Anime {
     return Browse.Anime(
         id = this.id.toString(),
         title = this.name,
         posterUrl = "${BuildConfig.BASE_URL}${this.image.original}",
-        score = this.score?.toDouble() ?: 0.0,
+        score = this.score ?: 0.0,
         animeKind = AnimeKindEnum.valueOf(this.kind ?: "UNKNOWN__"),
         episodesAired = this.episodesAired ?: 0,
         episodes = this.episodes,

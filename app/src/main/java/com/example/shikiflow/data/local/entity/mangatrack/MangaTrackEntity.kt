@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.graphql.fragment.MangaUserRateWithModel
 import com.example.graphql.type.UserRateStatusEnum
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "manga_track")
 data class MangaTrackEntity(

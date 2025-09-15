@@ -124,7 +124,7 @@ fun AnimeDetailsTitle(
 @Composable
 fun ScoreItem(
     score: Float,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,

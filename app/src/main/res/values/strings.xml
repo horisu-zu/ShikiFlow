@@ -29,6 +29,8 @@
     <string name="b_oss_error">Error Loading Ongoings</string>
     <string name="b_mss_error">Error Loading Browse Data</string>
 
+    <string name="details_error">Error Loading %1s Details</string>
+
     <string name="common_error">Error Loading Data</string>
     <string name="common_retry">Retry</string>
     <string name="common_unknown">Unknown</string>

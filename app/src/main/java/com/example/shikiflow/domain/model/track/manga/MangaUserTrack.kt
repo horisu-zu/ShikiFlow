@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.model.track.manga
 
 import com.example.graphql.type.UserRateStatusEnum
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class MangaUserTrack(
     val id: String,

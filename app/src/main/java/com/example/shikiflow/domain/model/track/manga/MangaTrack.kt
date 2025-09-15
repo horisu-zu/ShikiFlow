@@ -4,7 +4,7 @@ import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
-import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 data class MangaTrack(
     val track: MangaUserTrack,
@@ -21,8 +21,8 @@ data class MangaTrack(
             mediaId = manga.id,
             title = manga.name,
             posterUrl = manga.poster?.previewUrl,
-            createDate = track.createdAt.toString().toInstant(),
-            updateDate = track.updatedAt.toString().toInstant(),
+            createDate = Instant.parse(track.createdAt.toString()),
+            updateDate = Instant.parse(track.updatedAt.toString()),
             totalEpisodes = null,
             totalChapters = manga.chapters
         )

@@ -17,13 +17,13 @@ class MangaChapterTranslationViewModel @Inject constructor(
     private val getChapterDataUseCase: GetChapterDataUseCase
 ): ViewModel() {
 
-    private var currentChapterIds: List<String> = emptyList()
+    private var firstChapterId: String? = null
     private val _chapterTranslations = MutableStateFlow<Resource<List<MangaDexChapterMetadata>>>(Resource.Loading())
     val chapterTranslations = _chapterTranslations.asStateFlow()
 
     fun getChapterTranslations(chapterIds: List<String>) {
         viewModelScope.launch {
-            if(currentChapterIds == chapterIds) return@launch
+            if(firstChapterId == chapterIds.first()) return@launch
 
             getChapterDataUseCase(chapterIds).collect { result ->
                 when (result) {
@@ -32,7 +32,7 @@ class MangaChapterTranslationViewModel @Inject constructor(
                     }
                     is Resource.Success -> {
                         Log.d("MangaChapterTranslationViewModel", "Chapter translations fetched successfully: ${result.data}")
-                        currentChapterIds = chapterIds
+                        firstChapterId = chapterIds.first()
                         _chapterTranslations.value = result
                     }
                     is Resource.Error -> {

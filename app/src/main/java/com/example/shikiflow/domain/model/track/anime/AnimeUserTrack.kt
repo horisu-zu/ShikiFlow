@@ -3,7 +3,7 @@ package com.example.shikiflow.domain.model.track.anime
 import com.example.graphql.fragment.AnimeUserRateWithModel
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 data class AnimeUserTrack(
     val id: String,
@@ -25,8 +25,8 @@ data class AnimeUserTrack(
                 rewatches = this.rewatches,
                 score = this.score,
                 text = this.text,
-                createdAt = Instant.Companion.parse(this.createdAt.toString()),
-                updatedAt = Instant.Companion.parse(this.updatedAt.toString()),
+                createdAt = Instant.parse(this.createdAt.toString()),
+                updatedAt = Instant.parse(this.updatedAt.toString()),
                 animeId = this.anime?.animeShort?.id.toString()
             )
         }
@@ -39,8 +39,8 @@ data class AnimeUserTrack(
                 rewatches = this.rewatches,
                 score = this.score,
                 text = this.text,
-                createdAt = Instant.Companion.parse(this.createdAt),
-                updatedAt = Instant.Companion.parse(this.updatedAt),
+                createdAt = Instant.parse(this.createdAt),
+                updatedAt = Instant.parse(this.updatedAt),
                 animeId = this.targetId.toString()
             )
         }

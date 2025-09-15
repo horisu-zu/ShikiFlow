@@ -11,7 +11,7 @@ import com.example.shikiflow.data.local.entity.PosterEntity
 import com.example.shikiflow.data.local.entity.PosterEntity.Companion.toEntity
 import com.example.shikiflow.data.local.entity.ReleaseDateEntity
 import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toEntity
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "anime_short")
 data class AnimeShortEntity(

@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+
 @Serializable
 data class ShikiAnime(
     val id: Int? = null,
@@ -24,6 +25,7 @@ data class ShikiAnime(
     val roles: List<String>? = null,
     val role: String? = null
 )
+
 
 fun ShikiAnime.toBrowseAnime(): Browse.Anime {
     return Browse.Anime(

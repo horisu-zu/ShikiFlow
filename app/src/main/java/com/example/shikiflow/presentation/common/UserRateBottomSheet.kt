@@ -57,7 +57,7 @@ import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.convertStatus
 import com.example.shikiflow.utils.toIcon
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -370,6 +370,7 @@ private fun RoundBox(
     }
 }
 
+
 @Composable
 private fun ChangeRow(
     onSave: () -> Unit,
@@ -426,6 +427,7 @@ private fun ChangeRow(
         }
     }
 }
+
 
 @Composable
 private fun DateItem(

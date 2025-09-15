@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,7 +75,7 @@ fun AnimeTranslationSelectScreen(
     val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
 
     LaunchedEffect(shikimoriId) {
-        animeTranslationsViewModel.getAnimeTranslation(shikimoriId)
+        animeTranslationsViewModel.getAnimeTranslations(shikimoriId)
     }
 
     val lazyListState = rememberLazyListState()
@@ -203,7 +204,7 @@ fun AnimeTranslationSelectScreen(
                                 },
                                 modifier = Modifier
                                     .padding(horizontal = 12.dp)
-                                    .animateItem()
+                                    .animateItem() //this modifier is the reason of weird blick behavior
                             )
                         }
                     }
@@ -217,7 +218,7 @@ fun AnimeTranslationSelectScreen(
                             ErrorItem(
                                 message = stringResource(R.string.common_error),
                                 buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { animeTranslationsViewModel.getAnimeTranslation(shikimoriId) }
+                                onButtonClick = { animeTranslationsViewModel.getAnimeTranslations(shikimoriId) }
                             )
                         }
                     }

@@ -1,6 +1,7 @@
 @file:OptIn(KspExperimental::class)
 
 import com.google.devtools.ksp.KspExperimental
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.application)
@@ -43,8 +44,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlinOptions {
-        jvmTarget = "21"
+    kotlin {
+        compilerOptions {
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+            optIn.add("kotlin.time.ExperimentalTime")
+        }
     }
     buildFeatures {
         compose = true

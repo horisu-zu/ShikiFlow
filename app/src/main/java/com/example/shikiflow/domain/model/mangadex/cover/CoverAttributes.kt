@@ -10,5 +10,5 @@ data class CoverAttributes(
     val locale: String,
     val updatedAt: String,
     val version: Int,
-    val volume: String
+    val volume: String? = null
 )

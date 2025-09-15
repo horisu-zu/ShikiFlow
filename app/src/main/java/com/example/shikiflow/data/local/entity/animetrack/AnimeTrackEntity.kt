@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import com.example.graphql.fragment.AnimeUserRateWithModel
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 @Entity(tableName = "anime_track")
 data class AnimeTrackEntity(
@@ -42,8 +42,8 @@ data class AnimeTrackEntity(
                 rewatches = this.rewatches,
                 score = this.score,
                 text = this.text,
-                createdAt = Instant.parse(this.createdAt.toString()),
-                updatedAt = Instant.parse(this.updatedAt.toString()),
+                createdAt = Instant.parse(this.createdAt),
+                updatedAt = Instant.parse(this.updatedAt),
                 animeId = this.targetId.toString()
             )
         }

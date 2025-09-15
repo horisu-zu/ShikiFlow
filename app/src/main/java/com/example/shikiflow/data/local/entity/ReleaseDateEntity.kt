@@ -2,10 +2,10 @@ package com.example.shikiflow.data.local.entity
 
 import com.example.graphql.fragment.AnimeShort
 import com.example.graphql.fragment.MangaShort
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Instant
 
 data class ReleaseDateEntity(
     val year: Int?,

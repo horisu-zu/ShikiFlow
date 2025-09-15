@@ -18,7 +18,7 @@ import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.Converter
-import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 @Composable
 fun HistoryItem(
@@ -49,11 +49,13 @@ fun HistoryItem(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
             )
-            Text(
-                text = Converter.formatInstant(historyItem?.created_at?.toInstant()),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-            )
+            historyItem?.createdAt?.let { createdAt ->
+                Text(
+                    text = Converter.formatInstant(Instant.parse(createdAt)),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                )
+            }
         }
     }
 }

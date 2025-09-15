@@ -1,10 +1,9 @@
 package com.example.shikiflow.domain.model.track.anime
 
 import com.example.graphql.type.AnimeStatusEnum
-import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
-import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 data class AnimeTrack(
     val track: AnimeUserTrack,
@@ -21,8 +20,8 @@ data class AnimeTrack(
             mediaId = anime.id,
             title = anime.name,
             posterUrl = anime.poster?.previewUrl,
-            createDate = track.createdAt.toString().toInstant(),
-            updateDate = track.updatedAt.toString().toInstant(),
+            createDate = Instant.parse(track.createdAt.toString()),
+            updateDate = Instant.parse(track.updatedAt.toString()),
             totalEpisodes = if (anime.status == AnimeStatusEnum.released) anime.episodes
                 else anime.episodesAired,
             totalChapters = null

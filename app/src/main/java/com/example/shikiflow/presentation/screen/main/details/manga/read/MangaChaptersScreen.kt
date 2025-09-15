@@ -49,6 +49,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
+import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -115,8 +116,7 @@ fun MangaChaptersScreen(
             }
             is Resource.Success -> {
                 val chapters = mangaChapters.value.data
-                val sortedChapters = chapters?.keys
-                    ?.sortedBy { it.toFloat() } ?: emptyList()
+                val sortedChapters = chapters?.keys?.toList() ?: emptyList()
 
                 LazyColumn(
                     state = lazyListState,
@@ -130,6 +130,8 @@ fun MangaChaptersScreen(
                     val startsFromZero = sortedChapters.firstOrNull()?.toFloat() == 0f
 
                     items(sortedChapters) { chapterNumber ->
+                        val chapterNum = Converter.parseChapterNumber(chapterNumber)
+
                         MediaItem(
                             mediaNumber = chapterNumber,
                             onItemClick = {
@@ -143,8 +145,8 @@ fun MangaChaptersScreen(
                             },
                             mediaType = MediaType.MANGA,
                             isCompleted = if(startsFromZero) {
-                                (chapterNumber.toFloat()) < completedChapters
-                            } else (chapterNumber.toFloat()) <= completedChapters
+                                chapterNum < completedChapters
+                            } else chapterNum <= completedChapters
                         )
                     }
                 }

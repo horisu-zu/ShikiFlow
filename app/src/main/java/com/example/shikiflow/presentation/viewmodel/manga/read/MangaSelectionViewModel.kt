@@ -18,18 +18,18 @@ class MangaSelectionViewModel @Inject constructor(
     private val getMangaDexUseCase: GetMangaDexUseCase
 ): ViewModel() {
 
-    private var currentIds: List<String> = emptyList()
+    private var currentId: String? = null
     private val _mangaList = MutableStateFlow<Resource<List<MangaData>>>(Resource.Loading())
     val mangaList = _mangaList.asStateFlow()
 
     fun fetchMangaByIds(mangaDexIds: List<String>) {
-        if(currentIds == mangaDexIds) return
+        if(currentId == mangaDexIds.first()) return
 
         getMangaDexUseCase(mangaDexIds).onEach { result ->
             _mangaList.value = result
             when(result) {
                 is Resource.Loading -> {
-                    currentIds = mangaDexIds
+                    currentId = mangaDexIds.first()
                     Log.d("MangaSelectionScreen", "Loading manga for IDs: $mangaDexIds")
                 }
                 is Resource.Success -> {

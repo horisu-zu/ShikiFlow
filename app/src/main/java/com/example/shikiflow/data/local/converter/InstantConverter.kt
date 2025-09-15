@@ -1,7 +1,7 @@
 package com.example.shikiflow.data.local.converter
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
+import kotlin.time.Instant
 
 class InstantConverter {
     @TypeConverter

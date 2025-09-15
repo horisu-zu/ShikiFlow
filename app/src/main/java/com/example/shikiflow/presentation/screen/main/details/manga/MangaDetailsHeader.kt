@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -74,34 +75,26 @@ fun MangaDetailsHeader(
         BaseImage(
             model = mangaDetails?.poster?.posterShort?.originalUrl,
             modifier = Modifier.align(Alignment.TopCenter),
-            contentScale = ContentScale.Fit,
             imageType = ImageType.Poster(
-                defaultWidth = 240.dp,
-                defaultClip = RoundedCornerShape(16.dp)
-            ),
+                defaultWidth = 240.dp
+            )
         )
 
         Column(
-            modifier = Modifier.align(Alignment.BottomCenter),
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .padding(horizontal = 12.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             if (mangaDetails?.status != MangaStatusEnum.anons) {
-                ScoreItem(
-                    score = mangaDetails?.score?.toFloat() ?: 0f,
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                )
+                ScoreItem(score = mangaDetails?.score?.toFloat() ?: 0f)
             }
 
             Text(
                 text = mangaDetails?.name ?: "",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                style = MaterialTheme.typography.headlineSmall
             )
 
-            Row(
-                modifier = Modifier.padding(horizontal = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 ShortInfoItem(
                     infoType = stringResource(R.string.details_short_info_manga_type),
                     infoItem = "${mapMangaKind(mangaDetails?.kind)} ∙ ${mapMangaStatus(mangaDetails?.status)}"
@@ -152,12 +145,11 @@ fun MangaDetailsHeader(
                 mangaDexResource = mangaDexResource,
                 onStatusClick = { onStatusClick() },
                 onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails?.name ?: "") },
-                onMangaDexRefreshClick = onMangaDexRefreshClick,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                onMangaDexRefreshClick = onMangaDexRefreshClick
             )
 
             LazyRow(
-                modifier = Modifier.padding(start = 12.dp, end = 12.dp, top = 4.dp),
+                modifier = Modifier.padding(top = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(mangaDetails?.genres ?: emptyList()) { genreItem ->
@@ -179,7 +171,7 @@ fun MangaUserRateItem(
     onStatusClick: () -> Unit,
     onMangaDexNavigateClick: () -> Unit,
     onMangaDexRefreshClick: () -> Unit,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),

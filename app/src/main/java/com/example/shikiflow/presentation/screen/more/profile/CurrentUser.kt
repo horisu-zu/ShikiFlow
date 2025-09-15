@@ -20,7 +20,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
-import kotlinx.datetime.toInstant
+import kotlin.time.Instant
 
 @Composable
 fun CurrentUser(
@@ -48,7 +48,7 @@ fun CurrentUser(
             Text(
                 text = Converter.convertInstantToString(
                     context = context,
-                    lastSeenInstant = userData?.currentUser?.lastOnlineAt.toString().toInstant()
+                    lastSeenInstant = Instant.parse(userData?.currentUser?.lastOnlineAt.toString())
                 ),
                 style = MaterialTheme.typography.bodySmall
             )

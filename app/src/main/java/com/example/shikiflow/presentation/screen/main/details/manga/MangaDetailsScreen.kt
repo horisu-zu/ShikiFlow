@@ -24,6 +24,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -31,7 +32,6 @@ import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.TargetType
-import com.example.shikiflow.domain.model.tracks.UserRateData
 import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MediaNavOptions
@@ -42,6 +42,8 @@ import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.ErrorItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -153,7 +155,21 @@ fun MangaDetailsScreen(
                     }
                 }
             }
-            is Resource.Error -> { /*TODO*/ }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(
+                            id = R.string.details_error,
+                            R.string.browse_search_media_manga
+                        ),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { mangaDetailsViewModel.getMangaDetails(id) }
+                    )
+                }
+            }
         }
     }
 
@@ -161,33 +177,30 @@ fun MangaDetailsScreen(
         val isUpdating by userViewModel.isUpdating.collectAsState()
         val mangaDetailsData = mangaDetails.value.data
 
-        UserRateBottomSheet(
-            userRate = mangaDetailsData?.userRate?.toUiModel(mangaDetailsData) ?: UserRateData.createEmpty(
-                mediaId = mangaDetailsData?.id ?: "",
-                mediaTitle = mangaDetailsData?.name ?: "",
-                mediaPosterUrl = mangaDetailsData?.poster?.posterShort?.originalUrl ?: "",
-                mediaType = MediaType.MANGA
-            ),
-            isLoading = isUpdating,
-            onDismiss = { rateBottomSheet = false },
-            onSave = { rateId, status, score, episodes, rewatches, mediaType ->
-                userViewModel.updateUserRate(
-                    id = rateId,
-                    status = status,
-                    score = score,
-                    progress = episodes,
-                    rewatches = rewatches,
-                    mediaType = mediaType
-                )
-            },
-            onCreateRate = { mediaId, status ->
-                userViewModel.createUserRate(
-                    userId = currentUser?.currentUser?.id ?: "",
-                    targetId = mediaId,
-                    status = status,
-                    targetType = TargetType.MANGA
-                )
-            }
-        )
+        mangaDetailsData?.let {
+            UserRateBottomSheet(
+                userRate = mangaDetailsData.toUiModel(),
+                isLoading = isUpdating,
+                onDismiss = { rateBottomSheet = false },
+                onSave = { rateId, status, score, episodes, rewatches, mediaType ->
+                    userViewModel.updateUserRate(
+                        id = rateId,
+                        status = status,
+                        score = score,
+                        progress = episodes,
+                        rewatches = rewatches,
+                        mediaType = mediaType
+                    )
+                },
+                onCreateRate = { mediaId, status ->
+                    userViewModel.createUserRate(
+                        userId = currentUser?.currentUser?.id ?: "",
+                        targetId = mediaId,
+                        status = status,
+                        targetType = TargetType.MANGA
+                    )
+                }
+            )
+        }
     }
 }

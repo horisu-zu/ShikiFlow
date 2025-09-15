@@ -20,10 +20,10 @@ class AnimeTranslationsViewModel @Inject constructor(
 ): ViewModel() {
 
     private var currentId: String? = null
-    private val _translations = MutableStateFlow<Resource<Map< TranslationFilter, List<KodikAnime>>>>(Resource.Loading())
+    private val _translations = MutableStateFlow<Resource<Map<TranslationFilter, List<KodikAnime>>>>(Resource.Loading())
     val translations = _translations.asStateFlow()
 
-    fun getAnimeTranslation(id: String) {
+    fun getAnimeTranslations(id: String) {
         if(currentId == id) return
 
         getAnimeTranslationsUseCase(id).onEach { result ->
@@ -41,9 +41,5 @@ class AnimeTranslationsViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
-    }
-
-    fun clearData() {
-        _translations.value = Resource.Loading()
     }
 }

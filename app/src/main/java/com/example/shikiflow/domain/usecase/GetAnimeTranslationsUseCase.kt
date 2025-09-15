@@ -15,6 +15,7 @@ class GetAnimeTranslationsUseCase @Inject constructor(
     operator fun invoke(id: String): Flow<Resource<Map<TranslationFilter, List<KodikAnime>>>> = flow {
         try {
             emit(Resource.Loading())
+
             val response = kodikRepository.getAnimeTranslations(id)
             val sortedResponse = response.sortedWith(
                 compareByDescending<KodikAnime> { it.episodesCount }
