@@ -37,7 +37,7 @@ import com.example.shikiflow.presentation.common.CustomSearchField
 @Composable
 fun MainAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    currentTrackMode: MainTrackMode?,
+    currentTrackMode: MainTrackMode,
     user: CurrentUserQuery.Data?,
     query: String,
     isSearchActive: Boolean,
@@ -48,6 +48,9 @@ fun MainAppBar(
     modifier: Modifier = Modifier
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
+    val containerColor = if (scrollBehavior.state.collapsedFraction >= 1f) {
+        MaterialTheme.colorScheme.surfaceVariant
+    } else { MaterialTheme.colorScheme.background }
 
     TopAppBar(
         modifier = modifier,
@@ -60,7 +63,6 @@ fun MainAppBar(
             ) {
                 AnimatedContent(
                     targetState = currentTrackMode,
-                    transitionSpec = { fadeIn() togetherWith fadeOut() },
                     modifier = Modifier.weight(1f)
                 ) { trackMode ->
                     when(trackMode) {
@@ -78,7 +80,7 @@ fun MainAppBar(
                                 text = stringResource(R.string.browse_search_media_manga),
                                 style = MaterialTheme.typography.titleMedium
                             )
-                        } null -> { /**/ }
+                        }
                     }
                 }
 
@@ -110,7 +112,8 @@ fun MainAppBar(
             )
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = containerColor,
+            scrolledContainerColor = containerColor
         )
     )
 }

@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.anime
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -12,10 +13,12 @@ import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
+import com.example.shikiflow.domain.usecase.GetOngoingsCalendarUseCase
 import com.example.shikiflow.utils.AppSettingsManager
 import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,6 +26,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,7 +35,8 @@ import javax.inject.Inject
 class BrowseViewModel @Inject constructor(
     private val animeRepository: AnimeRepository,
     private val mangaRepository: MangaRepository,
-    private val appSettingsManager: AppSettingsManager
+    private val appSettingsManager: AppSettingsManager,
+    private val getOngoingsCalendarUseCase: GetOngoingsCalendarUseCase,
 ) : ViewModel() {
 
     private data class SearchState(
@@ -41,6 +47,9 @@ class BrowseViewModel @Inject constructor(
 
     private var _searchState: SearchState? = null
     private val _browseMap = mutableMapOf<BrowseType, Flow<PagingData<Browse>>>()
+
+    private val _ongoingBrowseState = MutableStateFlow<Resource<Map<String, List<Browse>>>>(Resource.Loading())
+    val ongoingBrowseState = _ongoingBrowseState.asStateFlow()
 
     private val _browseUiMode = MutableStateFlow(BrowseUiMode.AUTO)
     val browseUiMode = _browseUiMode.asStateFlow()
@@ -102,6 +111,25 @@ class BrowseViewModel @Inject constructor(
         } else {
             _browseMap.getOrPut(type, pagerFlow)
         }
+    }
+
+    fun getOngoingsCalendar(isRefresh: Boolean = false) {
+        if(!isRefresh && _ongoingBrowseState.value is Resource.Success) return
+
+        getOngoingsCalendarUseCase().onEach { result ->
+            _ongoingBrowseState.value = result
+            when(result) {
+                is Resource.Loading -> {
+                    Log.d("BrowseViewModel", "Loading Ongoings...")
+                }
+                is Resource.Success -> {
+                    Log.d("BrowseViewModel", "Result Size: ${result.data?.size}")
+                }
+                is Resource.Error -> {
+                    Log.d("BrowseViewModel", "Error Loading Ongoings: ${result.message}")
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun setBrowseUiMode(mode: BrowseUiMode) {

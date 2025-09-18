@@ -159,6 +159,7 @@
     <string name="details_short_info_manga_volumes">Volumes</string>
     <string name="details_short_info_manga_chapters">Chapters</string>
     <string name="details_short_info_manga_started">Started</string>
+    <string name="details_related">Related</string>
 
     <string name="rate_decrement">-</string>
     <string name="rate_increment">+</string>
@@ -166,5 +167,6 @@
     <string name="rereads">Rereads</string>
     <string name="user_rate_add_to_list">Add to List</string>
     <string name="rate_progress">Progress</string>
-    <string name="details_related">Related</string>
+
+    <string name="tracks_page_search">Search Tracks…</string>
 </resources>

@@ -17,29 +17,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseSideScreen(
     browseType: BrowseType,
     navOptions: BrowseNavOptions,
-    onBackNavigate: () -> Unit,
-    browseViewModel: BrowseViewModel = hiltViewModel()
+    onBackNavigate: () -> Unit
 ) {
-    val sideScreenData = browseViewModel.paginatedBrowse(
-        type = browseType,
-        options = BrowseOptions(
-            status = if(browseType == BrowseType.AnimeBrowseType.ONGOING) AnimeStatusEnum.ongoing else null
-        )
-    ).collectAsLazyPagingItems()
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -68,15 +55,15 @@ fun BrowseSideScreen(
     ) { innerPadding ->
         if (browseType == BrowseType.AnimeBrowseType.ONGOING) {
             OngoingSideScreen(
-                ongoingData = sideScreenData,
                 onNavigate = { id -> navOptions.navigateToDetails(id, MediaType.ANIME) },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)).padding(horizontal = 12.dp),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 12.dp,
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 12.dp
+                )
             )
         } else {
             MainSideScreen(
-                browseData = sideScreenData,
+                browseType = browseType,
                 onMediaNavigate = { id, mediaType ->
                     navOptions.navigateToDetails(id, mediaType)
                 },

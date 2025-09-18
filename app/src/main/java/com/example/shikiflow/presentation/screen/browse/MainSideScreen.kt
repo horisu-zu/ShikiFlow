@@ -12,19 +12,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @Composable
 fun MainSideScreen(
-    browseData: LazyPagingItems<Browse>,
+    browseType: BrowseType,
     onMediaNavigate: (String, MediaType) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
+    val browseData = browseViewModel.paginatedBrowse(
+        type = browseType
+    ).collectAsLazyPagingItems()
+
     if(browseData.loadState.refresh is LoadState.Loading) {
         Box(
             modifier = Modifier.fillMaxSize(),

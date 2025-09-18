@@ -45,50 +45,53 @@ fun MainScreen(
     val currentTrackMode by mainViewModel.currentTrackMode.collectAsStateWithLifecycle()
     val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            MainAppBar(
-                currentTrackMode = currentTrackMode,
-                scrollBehavior = scrollBehavior,
-                user = currentUser,
-                query = screenState.query,
-                isSearchActive = screenState.isSearchActive,
-                onModeChange = { trackMode -> mainViewModel.setCurrentTrackMode(trackMode) },
-                onQueryChange = searchViewModel::onQueryChange,
-                onSearchToggle = searchViewModel::onSearchActiveChange,
-                onExitSearch = searchViewModel::exitSearchState
-            )
-        }
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    top = innerPadding.calculateTopPadding(),
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+    currentTrackMode?.let { trackMode ->
+        Scaffold(
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            topBar = {
+                MainAppBar(
+                    currentTrackMode = trackMode,
+                    scrollBehavior = scrollBehavior,
+                    user = currentUser,
+                    query = screenState.query,
+                    isSearchActive = screenState.isSearchActive,
+                    onModeChange = { trackMode -> mainViewModel.setCurrentTrackMode(trackMode) },
+                    onQueryChange = searchViewModel::onQueryChange,
+                    onSearchToggle = searchViewModel::onSearchActiveChange,
+                    onExitSearch = searchViewModel::exitSearchState
                 )
-        ) {
-            Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
-                if(isSearchActive) {
-                    SearchPage(onAnimeClick = { animeId ->
-                        navOptions.navigateToDetails(animeId, MediaType.ANIME)
-                    })
-                } else {
-                    currentTrackMode?.let { trackMode ->
-                        MainPage(
-                            mediaType = when(trackMode) {
-                                MainTrackMode.ANIME -> MediaType.ANIME
-                                MainTrackMode.MANGA -> MediaType.MANGA
-                            },
-                            onAnimeClick = { animeId ->
-                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
-                            },
-                            onMangaClick = { mangaId ->
-                                navOptions.navigateToDetails(mangaId, MediaType.MANGA)
-                            }
-                        )
+            }
+        ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                    )
+            ) {
+                Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
+                    if(isSearchActive) {
+                        SearchPage(onAnimeClick = { animeId ->
+                            navOptions.navigateToDetails(animeId, MediaType.ANIME)
+                        })
+                    } else {
+                        currentTrackMode?.let { trackMode ->
+                            MainPage(
+                                mediaType = when(trackMode) {
+                                    MainTrackMode.ANIME -> MediaType.ANIME
+                                    MainTrackMode.MANGA -> MediaType.MANGA
+                                },
+                                isAtTop = scrollBehavior.state.collapsedFraction < 1f,
+                                onAnimeClick = { animeId ->
+                                    navOptions.navigateToDetails(animeId, MediaType.ANIME)
+                                },
+                                onMangaClick = { mangaId ->
+                                    navOptions.navigateToDetails(mangaId, MediaType.MANGA)
+                                }
+                            )
+                        }
                     }
                 }
             }

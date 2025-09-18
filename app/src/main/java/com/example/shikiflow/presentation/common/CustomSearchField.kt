@@ -27,7 +27,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.R
 
 @Composable
 fun CustomSearchField(
@@ -50,8 +52,8 @@ fun CustomSearchField(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .background(
-                if(isActive) MaterialTheme.colorScheme.background
-                    else MaterialTheme.colorScheme.surface
+                if (isActive) MaterialTheme.colorScheme.background
+                else MaterialTheme.colorScheme.surface
             )
     ) {
         Row(
@@ -106,7 +108,7 @@ fun CustomSearchField(
                     Box {
                         if (query.isEmpty()) {
                             Text(
-                                "Search...",
+                                stringResource(R.string.tracks_page_search),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

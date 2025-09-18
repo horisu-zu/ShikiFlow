@@ -21,7 +21,9 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            _currentTrackMode.value = appSettingsManager.trackModeFlow.first()
+            appSettingsManager.trackModeFlow.collect { trackMode ->
+                _currentTrackMode.value = trackMode
+            }
         }
     }
 

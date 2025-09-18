@@ -48,7 +48,7 @@ fun BrowseGridItem(
             text = browseItem.title,
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
+            maxLines = 2,
             modifier = Modifier.padding(top = 4.dp)
         )
 

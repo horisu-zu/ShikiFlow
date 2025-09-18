@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPage(
     mediaType: MediaType,
+    isAtTop: Boolean,
     animeTrackViewModel: AnimeTracksViewModel = hiltViewModel(),
     mangaTrackViewModel: MangaTracksViewModel = hiltViewModel(),
     onAnimeClick: (String) -> Unit,
@@ -57,7 +59,7 @@ fun MainPage(
                         )
                     )
                 }
-            }
+            }, isAtTop = isAtTop
         )
         HorizontalPager(
             state = pagerState,

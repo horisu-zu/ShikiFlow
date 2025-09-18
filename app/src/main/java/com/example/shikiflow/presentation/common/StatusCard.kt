@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,7 +20,7 @@ fun StatusCard(
     text: String,
     modifier: Modifier = Modifier,
     fontSize: TextUnit = 12.sp,
-    color: Color = Color.DarkGray
+    color: Color = MaterialTheme.colorScheme.surface
 ) {
     Card(
         modifier = modifier.clip(RoundedCornerShape(8.dp)),
