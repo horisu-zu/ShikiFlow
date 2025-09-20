@@ -128,8 +128,7 @@ fun DetailsNavigator(
                 CommentsScreen(
                     screenMode = route.screenMode,
                     id = route.id,
-                    navOptions = options,
-                    commentViewModel = hiltViewModel(key = "comments_${route.screenMode}")
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.AnimeWatch> { route ->

@@ -184,18 +184,13 @@ object Converter {
     fun List<UserRate?>.groupAndSortByStatus(
         contentType: MediaType
     ): Map<String, Int> {
-        val order = getStatusOrder(contentType)
+        val order = getStatusOrder()
 
         return this
-            .groupBy { getStatusKey(contentType, it?.status ?: "unknown") }
+            .groupBy { it?.status ?: "unknown" }
             .mapValues { it.value.size }
             .toSortedMap(compareBy { order.indexOf(it) })
             .mapKeys { convertStatus(it.key, contentType) }
-    }
-
-    private fun getStatusKey(mediaType: MediaType, status: String): String {
-        return getStatusOrder(mediaType).firstOrNull { it == status }
-            ?: UserRateStatusConstants.convertStatus(status)
     }
 
     fun String.toAbbreviation(maxLetters: Int = 2): String {
@@ -532,9 +527,15 @@ object Converter {
                     builder.pushStyle(spanStyle)
 
                     if (node.tagName() == "a" && node.hasClass("b-link") && node.hasAttr("data-attrs")) {
-                        val json = JSONObject(node.attr("data-attrs"))
-                        val display = json.optString("russian").ifBlank { json.optString("name") }
-                        builder.append(display)
+                        val hasNameSpans = node.select("span.name-en, span.name-ru").isNotEmpty()
+
+                        if (hasNameSpans) {
+                            val json = JSONObject(node.attr("data-attrs"))
+                            val display = json.optString("russian").ifBlank { json.optString("name") }
+                            builder.append(display)
+                        } else {
+                            processInlineContent(node, builder, linkColor)
+                        }
                     } else {
                         processInlineContent(node, builder, linkColor)
                     }

@@ -70,7 +70,10 @@ fun AnimeDetailsInfo(
                 label = stringResource(R.string.details_info_duration),
                 content = {
                     Text(
-                        text = "${animeDetails.duration} min.",
+                        text = stringResource(
+                            R.string.details_info_duration_min,
+                            animeDetails.duration
+                        ),
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
                         modifier = Modifier.padding(start = 12.dp)

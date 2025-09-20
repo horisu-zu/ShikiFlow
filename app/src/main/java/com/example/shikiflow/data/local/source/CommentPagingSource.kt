@@ -27,7 +27,7 @@ class CommentPagingSource @Inject constructor(
                 topicId = topicId,
                 page = page,
                 limit = params.loadSize
-            )
+            ).take(params.loadSize) //Idk why and since when, but API returns loadSize + 1
 
             val prevKey = if (page > 1) page - 1 else null
             val nextKey = if (response.isNotEmpty()) page + 1 else null

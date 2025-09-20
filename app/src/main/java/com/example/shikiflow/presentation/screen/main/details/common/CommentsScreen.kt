@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.common
 
 import android.content.Context
-import android.util.Log
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +19,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -166,7 +166,7 @@ private fun CommentThreadSection(
     commentViewModel: CommentViewModel,
     modifier: Modifier = Modifier
 ) {
-    val commentsState = commentViewModel.commentsWithReplies.collectAsStateWithLifecycle()
+    val commentsState by commentViewModel.commentsWithReplies.collectAsStateWithLifecycle()
 
     LaunchedEffect(commentId) {
         commentViewModel.getCommentWithReplies(commentId)
@@ -177,7 +177,7 @@ private fun CommentThreadSection(
         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        when(val comments = commentsState.value) {
+        when(commentsState) {
             is Resource.Loading -> {
                 item {
                     Box(
@@ -187,7 +187,7 @@ private fun CommentThreadSection(
                 }
             }
             is Resource.Success -> {
-                comments.data?.let { commentsMap ->
+                commentsState.data?.let { commentsMap ->
                     commentsMap.forEach { commentType, comments ->
                         item {
                             CommentsMapSection(
@@ -230,7 +230,7 @@ private fun CommentThreadSection(
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(
-                            message = "Error: ${comments.message}",
+                            message = "Error: ${commentsState.message}",
                             buttonLabel = "Retry",
                             onButtonClick = { commentViewModel.getCommentWithReplies(commentId) }
                         )

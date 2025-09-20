@@ -33,7 +33,7 @@ object UserRateStatusConstants {
     fun convertStatus(status: String): String =
         statusConvertMap[status] ?: status
 
-    fun getStatusOrder(contentType: MediaType): List<String> =
+    fun getStatusOrder(contentType: MediaType = MediaType.ANIME): List<String> =
         statusOrderMap[contentType] ?: emptyList()
 
     fun getStatusChips(contentType: MediaType): List<String> =

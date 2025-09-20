@@ -65,7 +65,7 @@ fun OngoingSideScreen(
                         }
                         item {
                             LazyRow(
-                                modifier = Modifier.height(240.dp),
+                                modifier = Modifier.height(230.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
                                 items(animeValues) { anime ->

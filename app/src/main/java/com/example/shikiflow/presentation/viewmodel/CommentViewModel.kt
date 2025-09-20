@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.mutableMapOf
 
 @HiltViewModel
 class CommentViewModel @Inject constructor(
@@ -28,8 +29,10 @@ class CommentViewModel @Inject constructor(
     private val commentsRepository: CommentRepository
 ): ViewModel() {
 
-    private var currentMediaId: String? = null
-    private var currentCommentId: String? = null
+    private var _currentTopicId: String? = null
+    private var _paginatedTopicId: String? = null
+    private var _pagingCache: Flow<PagingData<CommentItem>>? = null
+    private val _commentsCache = mutableMapOf<String, Map<CommentType, List<CommentItem>>>()
 
     private val _comments = MutableStateFlow<Resource<List<CommentItem>>>(Resource.Loading())
     val comments = _comments.asStateFlow()
@@ -37,18 +40,17 @@ class CommentViewModel @Inject constructor(
     private val _commentsWithReplies = MutableStateFlow<Resource<Map<CommentType, List<CommentItem>>>>(Resource.Loading())
     val commentsWithReplies = _commentsWithReplies.asStateFlow()
 
-    private val _pagingComments = mutableMapOf<String, Flow<PagingData<CommentItem>>>()
-
-    fun getComments(mediaId: String, page: Int = 1, limit: Int = 30) {
+    fun getComments(topicId: String, page: Int = 1, limit: Int = 30) {
         viewModelScope.launch {
-            if(currentMediaId == mediaId) { return@launch }
+            if(_currentTopicId == topicId) { return@launch }
 
-            getCommentsUseCase(mediaId, page, limit).collect { result ->
+            getCommentsUseCase(topicId, page, limit).collect { result ->
                 _comments.value = result
                 when (result) {
                     is Resource.Success -> {
+                        _currentTopicId = topicId
+                        _commentsCache.clear()
                         Log.d("CommentViewModel", "Comments fetched successfully: ${result.data}")
-                        currentMediaId = mediaId
                     }
                     is Resource.Error -> {
                         Log.d("CommentViewModel", "Error fetching comments: ${result.message}")
@@ -62,31 +64,43 @@ class CommentViewModel @Inject constructor(
     }
 
     fun paginatedComments(topicId: String): Flow<PagingData<CommentItem>> {
-        return _pagingComments.getOrPut(topicId) {
-            Pager(
-                config = PagingConfig(
-                    pageSize = 15, //30 max for comments
-                    enablePlaceholders = true,
-                    prefetchDistance = 5,
-                    initialLoadSize = 15
-                ),
-                pagingSourceFactory = { CommentPagingSource(
-                    commentsRepository,
-                    topicId
-                ) }
-            ).flow.cachedIn(viewModelScope)
+        if(_pagingCache != null && topicId == _paginatedTopicId) {
+            _pagingCache?.let { cache ->
+                return cache
+            }
+        }
+
+        val pagerFlow = Pager(
+            config = PagingConfig(
+                pageSize = 15, //30 max for comments
+                enablePlaceholders = true,
+                prefetchDistance = 5,
+                initialLoadSize = 15
+            ),
+            pagingSourceFactory = { CommentPagingSource(
+                commentsRepository,
+                topicId
+            ) }
+        ).flow.cachedIn(viewModelScope)
+
+        return pagerFlow.also { pagingData ->
+            _pagingCache = pagingData
+            _paginatedTopicId = topicId
         }
     }
 
     fun getCommentWithReplies(commentId: String) {
         viewModelScope.launch {
-            if(currentCommentId == commentId) { return@launch }
+            if(_commentsCache.containsKey(commentId)) {
+                _commentsWithReplies.value = Resource.Success(_commentsCache[commentId])
+                return@launch
+            }
 
             getCommentTopicUseCase(commentId).collect { result ->
                 _commentsWithReplies.value = result
                 when (result) {
                     is Resource.Success -> {
-                        currentCommentId = commentId
+                        _commentsCache.put(commentId, result.data ?: emptyMap())
                         Log.d("CommentViewModel", "Comment topic fetched successfully: ${result.data}")
                     }
                     is Resource.Error -> {

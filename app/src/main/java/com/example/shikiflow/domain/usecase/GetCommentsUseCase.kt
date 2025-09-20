@@ -11,15 +11,14 @@ import javax.inject.Inject
 class GetCommentsUseCase @Inject constructor(
     private val commentRepository: CommentRepository
 ) {
-
     operator fun invoke(
-        mediaId: String,
+        topicId: String,
         page: Int = 1,
         limit: Int = 30
     ): Flow<Resource<List<CommentItem>>> = flow {
         try {
             emit(Resource.Loading())
-            val commentResponse = commentRepository.getComments(mediaId, page, limit)
+            val commentResponse = commentRepository.getComments(topicId, page, limit)
             emit(Resource.Success(commentResponse))
         } catch (e: HttpException) {
             emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))

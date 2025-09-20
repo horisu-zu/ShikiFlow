@@ -69,6 +69,7 @@ fun MainAppBar(
                         MainTrackMode.ANIME -> {
                             CustomSearchField(
                                 query = query,
+                                label = stringResource(R.string.tracks_page_search),
                                 onQueryChange = onQueryChange,
                                 isActive = isSearchActive,
                                 onActiveChange = onSearchToggle,

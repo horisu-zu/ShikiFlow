@@ -25,6 +25,7 @@
 
     <string name="mtp_loading_error">Error loading tracked manga</string>
     <string name="atp_loading_error">Error Loading Anime Tracks</string>
+    <string name="tracks_empty">There\'re no tracks in this category</string>
 
     <string name="b_oss_error">Error Loading Ongoings</string>
     <string name="b_mss_error">Error Loading Browse Data</string>
@@ -139,6 +140,7 @@
 
     <string name="details_info_studio">Studio</string>
     <string name="details_info_duration">Duration</string>
+    <string name="details_info_duration_min">%1$d min.</string>
     <string name="details_info_aired_on">Aired On</string>
     <string name="details_info_next_episode_at">Next Episode at</string>
     <string name="details_info_released_on">Released on</string>
@@ -169,4 +171,5 @@
     <string name="rate_progress">Progress</string>
 
     <string name="tracks_page_search">Search Tracks…</string>
+    <string name="browse_page_search">Search…</string>
 </resources>

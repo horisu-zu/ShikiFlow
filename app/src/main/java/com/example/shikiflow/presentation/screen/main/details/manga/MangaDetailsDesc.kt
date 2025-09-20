@@ -4,8 +4,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -84,7 +86,10 @@ fun MangaDetailsDesc(
                 mapStatusToString(it.status, MediaType.MANGA) to it.count
             } ?: emptyMap(),
             totalCount = mangaDetails?.statusesStats?.size ?: 0,
-            modifier = Modifier.padding(top = 4.dp)
+            modifier = Modifier.padding(top = 4.dp),
+            itemShape = RoundedCornerShape(3.dp),
+            rowHeight = 16.dp,
+            rowShape = RoundedCornerShape(4.dp)
         )
 
         if(mangaDetails?.related != null && mangaDetails.related.isNotEmpty()) {

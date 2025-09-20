@@ -27,13 +27,12 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.R
 
 @Composable
 fun CustomSearchField(
     query: String,
+    label: String,
     onQueryChange: (String) -> Unit,
     isActive: Boolean,
     onActiveChange: (Boolean) -> Unit,
@@ -108,7 +107,7 @@ fun CustomSearchField(
                     Box {
                         if (query.isEmpty()) {
                             Text(
-                                stringResource(R.string.tracks_page_search),
+                                text = label,
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

@@ -16,6 +16,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.CustomSearchField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,15 +42,14 @@ fun BrowseAppBar(
                 if (isSearch) {
                     CustomSearchField(
                         query = searchQuery,
+                        label = stringResource(R.string.browse_page_search),
                         onQueryChange = onSearchQueryChange,
                         isActive = isSearchActive,
                         onActiveChange = onSearchActiveChange,
                         onExitSearch = onExitSearch,
                         modifier = Modifier.fillMaxWidth()
                     )
-                } else {
-                    Text(title)
-                }
+                } else { Text(title) }
             }
         },
         actions = {

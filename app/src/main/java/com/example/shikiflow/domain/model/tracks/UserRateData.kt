@@ -1,13 +1,10 @@
 package com.example.shikiflow.domain.model.tracks
 
 import com.example.graphql.AnimeDetailsQuery
-import com.example.graphql.AnimeTracksQuery
 import com.example.graphql.MangaDetailsQuery
-import com.example.graphql.MangaTracksQuery
 import com.example.graphql.type.AnimeStatusEnum
 import kotlin.time.Clock
 import kotlin.time.Instant
-import kotlin.toString
 
 enum class MediaType { ANIME, MANGA }
 
@@ -50,7 +47,7 @@ data class UserRateData(
     }
 }
 
-fun AnimeTracksQuery.UserRate.toUiModel() = UserRateData(
+/*fun AnimeTracksQuery.UserRate.toUiModel() = UserRateData(
     id = animeUserRateWithModel.id,
     mediaType = MediaType.ANIME,
     status = animeUserRateWithModel.status.rawValue,
@@ -80,15 +77,15 @@ fun MangaTracksQuery.UserRate.toUiModel() = UserRateData(
     updateDate = Instant.parse(mangaUserRateWithModel.updatedAt.toString()),
     totalEpisodes = null,
     totalChapters = mangaUserRateWithModel.manga?.mangaShort?.chapters
-)
+)*/
 
 fun AnimeDetailsQuery.Anime.toUiModel(): UserRateData {
     return if(this.userRate != null) {
         UserRateData(
-            id = id,
+            id = userRate.id,
             mediaType = MediaType.ANIME,
             status = userRate.status.rawValue,
-            progress = episodes,
+            progress = userRate.episodes,
             rewatches = userRate.rewatches,
             score = userRate.score,
             mediaId = id,

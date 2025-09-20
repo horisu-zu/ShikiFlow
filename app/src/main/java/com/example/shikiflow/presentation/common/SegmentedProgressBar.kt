@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,6 +20,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.StatusColor
 
@@ -27,7 +30,11 @@ import com.example.shikiflow.utils.StatusColor
 fun SegmentedProgressBar(
     groupedData: Map<String, Int>,
     totalCount: Int,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    rowHeight: Dp = 12.dp,
+    rowShape: Shape = CircleShape,
+    itemShape: Shape = CircleShape,
+    itemSize: Dp = 12.dp
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -35,8 +42,8 @@ fun SegmentedProgressBar(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth()
-                .clip(CircleShape)
-                .height(8.dp),
+                .height(rowHeight)
+                .clip(rowShape),
             horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             groupedData.forEach { (status, count) ->
@@ -61,6 +68,8 @@ fun SegmentedProgressBar(
                 SegmentedDataItem(
                     status = status,
                     count = count,
+                    shape = itemShape,
+                    size = itemSize,
                     color = StatusColor.getStatusBrightColor(status)
                 )
             }
@@ -73,17 +82,18 @@ fun SegmentedDataItem(
     status: String,
     count: Int,
     color: Color,
-    modifier: Modifier = Modifier
+    shape: Shape,
+    size: Dp
 ) {
     Row(
-        modifier = modifier,
+        modifier = Modifier,
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(8.dp)
-                .clip(CircleShape)
+                .size(size)
+                .clip(shape)
                 .background(color)
         )
         Text(
