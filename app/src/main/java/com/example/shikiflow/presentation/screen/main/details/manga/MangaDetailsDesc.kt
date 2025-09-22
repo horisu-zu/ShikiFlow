@@ -29,6 +29,7 @@ import com.example.shikiflow.presentation.common.SegmentedProgressBar
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedSection
+import com.example.shikiflow.presentation.screen.main.details.common.CommentSection
 import com.example.shikiflow.utils.Converter.EntityType
 
 @Composable
@@ -37,6 +38,7 @@ fun MangaDetailsDesc(
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     onLinkClick: (String) -> Unit,
+    onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
@@ -98,6 +100,15 @@ fun MangaDetailsDesc(
                 onItemClick = onItemClick,
                 onArrowClick = { showRelatedBottomSheet = true },
                 modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        mangaDetails?.topic?.id?.let { topicId ->
+            CommentSection(
+                topicId = topicId,
+                onEntityClick = onEntityClick,
+                onTopicNavigate = onTopicNavigate,
+                onLinkClick = onLinkClick
             )
         }
     }

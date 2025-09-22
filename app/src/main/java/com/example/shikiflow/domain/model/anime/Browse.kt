@@ -1,10 +1,12 @@
 package com.example.shikiflow.domain.model.anime
 
+import android.content.Context
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.MangaBrowseQuery
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
@@ -13,10 +15,19 @@ import kotlin.time.Instant
 
 @Serializable
 sealed interface BrowseType {
-    enum class AnimeBrowseType: BrowseType { ONGOING, SEARCH, ANIME_TOP }
-    enum class MangaBrowseType: BrowseType { SEARCH, MANGA_TOP }
-}
+    val displayValueRes: Int
 
+    enum class AnimeBrowseType(override val displayValueRes: Int): BrowseType {
+        ONGOING(R.string.browse_type_anime_ongoing),
+        SEARCH(R.string.browse_type_search),
+        ANIME_TOP(R.string.browse_type_anime_top)
+    }
+
+    enum class MangaBrowseType(override val displayValueRes: Int): BrowseType {
+        SEARCH(R.string.browse_type_search),
+        MANGA_TOP(R.string.browse_type_manga_top)
+    }
+}
 
 sealed interface Browse {
     val id: String

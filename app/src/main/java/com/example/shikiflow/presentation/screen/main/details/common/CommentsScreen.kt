@@ -121,7 +121,7 @@ private fun TopicCommentsSection(
                             EntityType.ANIME -> {
                                 navOptions.navigateToAnimeDetails(id)
                             }
-                            EntityType.MANGA -> {
+                            EntityType.MANGA, EntityType.RANOBE -> {
                                 navOptions.navigateToMangaDetails(id)
                             }
                             EntityType.COMMENT -> {
@@ -206,7 +206,7 @@ private fun CommentThreadSection(
                                         EntityType.ANIME -> {
                                             navOptions.navigateToAnimeDetails(id)
                                         }
-                                        EntityType.MANGA -> {
+                                        EntityType.MANGA, EntityType.RANOBE -> {
                                             navOptions.navigateToMangaDetails(id)
                                         }
                                         EntityType.COMMENT -> {

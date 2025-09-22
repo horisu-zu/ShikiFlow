@@ -31,19 +31,19 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
-import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,11 +51,10 @@ fun MangaDetailsScreen(
     id: String,
     currentUser: CurrentUserQuery.Data?,
     navOptions: MediaNavOptions,
-    mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel()
+    mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel()
 ) {
-    val mangaDetails = mangaDetailsViewModel.mangaDetails.collectAsState()
-    val mangaDexIds = mangaDetailsViewModel.mangaDexIds.collectAsState().value
+    val mangaDetails by mangaDetailsViewModel.mangaDetails.collectAsStateWithLifecycle()
+    val mangaDexIds by mangaDetailsViewModel.mangaDexIds.collectAsStateWithLifecycle()
 
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
@@ -64,8 +63,7 @@ fun MangaDetailsScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        userViewModel.updateEvent.collect {
-            mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
+        mangaDetailsViewModel.updateEvent.collect {
             rateBottomSheet = false
         }
     }
@@ -77,7 +75,7 @@ fun MangaDetailsScreen(
     Scaffold(
         topBar = { /*TODO*/ }
     ) { paddingValues ->
-        when (mangaDetails.value) {
+        when (mangaDetails) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -107,14 +105,14 @@ fun MangaDetailsScreen(
                             ).verticalScroll(rememberScrollState())
                     ) {
                         MangaDetailsHeader(
-                            mangaDetails = mangaDetails.value.data,
+                            mangaDetails = mangaDetails.data,
                             mangaDexResource = mangaDexIds,
                             onStatusClick = { rateBottomSheet = true },
                             onMangaDexNavigateClick = { title ->
                                 navOptions.navigateToMangaRead(
                                     mangaDexIds = mangaDexIds.data ?: emptyList(),
                                     title = title,
-                                    completedChapters = mangaDetails.value.data
+                                    completedChapters = mangaDetails.data
                                         ?.userRate?.chapters ?: 0
                                 )
                             },
@@ -122,7 +120,7 @@ fun MangaDetailsScreen(
                         )
 
                         MangaDetailsDesc(
-                            mangaDetails = mangaDetails.value.data,
+                            mangaDetails = mangaDetails.data,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
                                     navOptions.navigateToAnimeDetails(id)
@@ -141,14 +139,19 @@ fun MangaDetailsScreen(
                                     EntityType.ANIME -> {
                                         navOptions.navigateToAnimeDetails(id)
                                     }
-                                    EntityType.MANGA -> {
-                                        navOptions.navigateToMangaDetails(id)
+                                    EntityType.MANGA, EntityType.RANOBE -> {
+                                            navOptions.navigateToMangaDetails(id)
                                     }
-                                    EntityType.COMMENT -> { /**/ }
+                                    EntityType.COMMENT -> {
+                                        navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
+                                    }
                                 }
                             },
                             onLinkClick = { url ->
                                 customTabIntent.launchUrl(context, url.toUri())
+                            },
+                            onTopicNavigate = { topicId ->
+                                navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
                             },
                             modifier = Modifier.padding(12.dp)
                         )
@@ -174,31 +177,31 @@ fun MangaDetailsScreen(
     }
 
     if(rateBottomSheet) {
-        val isUpdating by userViewModel.isUpdating.collectAsState()
-        val mangaDetailsData = mangaDetails.value.data
+        val isUpdating by mangaDetailsViewModel.isUpdating.collectAsState()
+        val mangaDetailsData = mangaDetails.data
 
         mangaDetailsData?.let {
             UserRateBottomSheet(
                 userRate = mangaDetailsData.toUiModel(),
                 isLoading = isUpdating,
                 onDismiss = { rateBottomSheet = false },
-                onSave = { rateId, status, score, episodes, rewatches, mediaType ->
-                    userViewModel.updateUserRate(
+                onSave = { rateId, status, score, episodes, rewatches ->
+                    mangaDetailsViewModel.updateUserRate(
                         id = rateId,
                         status = status,
                         score = score,
                         progress = episodes,
-                        rewatches = rewatches,
-                        mediaType = mediaType
+                        rewatches = rewatches
                     )
                 },
                 onCreateRate = { mediaId, status ->
-                    userViewModel.createUserRate(
-                        userId = currentUser?.currentUser?.id ?: "",
-                        targetId = mediaId,
-                        status = status,
-                        targetType = TargetType.MANGA
-                    )
+                    currentUser?.currentUser?.id?.let { userId ->
+                        mangaDetailsViewModel.createUserRate(
+                            userId = userId,
+                            targetId = mediaId,
+                            status = status
+                        )
+                    }
                 }
             )
         }

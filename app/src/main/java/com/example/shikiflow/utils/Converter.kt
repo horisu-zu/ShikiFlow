@@ -316,6 +316,7 @@ object Converter {
         PERSON,
         ANIME,
         MANGA,
+        RANOBE,
         COMMENT
     }
 
@@ -359,7 +360,8 @@ object Converter {
                     || node.hasClass("b-spoiler_block"))
             val isVideo = node.tagName() == "div" && node.hasClass("b-video")
             val isImage = (node.tagName() == "a" || node.tagName() == "span") && node.hasClass("b-image")
-            val isQuote = node.tagName() == "div" && node.hasClass("b-quote")
+            val isQuote = (node.tagName() == "div" && node.hasClass("b-quote")
+                    || node.tagName() == "blockquote")
             val isReply = node.tagName() == "div" && node.hasClass("b-replies")
 
             when {
@@ -420,7 +422,9 @@ object Converter {
                     val senderAvatarUrl = node.selectFirst("img")
                         ?.attr("srcset") ?: node.selectFirst("img")?.attr("src")
                     val senderNickname = node.selectFirst("span")?.text()
-                    val content = node.selectFirst(".quote-content")?.text() ?: ""
+                    val content = if(!node.selectFirst(".quote-content")?.text().isNullOrEmpty()) {
+                        node.selectFirst(".quote-content")?.text() ?: ""
+                    } else { node.text() }
 
                     elements.add(DescriptionElement.Quote(senderAvatarUrl, senderNickname, content))
                 }

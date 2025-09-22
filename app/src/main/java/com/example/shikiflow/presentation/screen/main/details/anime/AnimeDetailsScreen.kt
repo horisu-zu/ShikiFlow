@@ -17,7 +17,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,14 +35,12 @@ import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
-import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.delay
@@ -55,8 +52,7 @@ fun AnimeDetailsScreen(
     id: String,
     currentUser: CurrentUserQuery.Data?,
     navOptions: MediaNavOptions,
-    animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel(),
-    userViewModel: UserViewModel = hiltViewModel()
+    animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
     val animeDetails = animeDetailsViewModel.animeDetails.collectAsStateWithLifecycle()
 
@@ -67,8 +63,7 @@ fun AnimeDetailsScreen(
     val context = LocalContext.current
 
     LaunchedEffect(Unit) {
-        userViewModel.updateEvent.collect { response ->
-            animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
+        animeDetailsViewModel.updateEvent.collect { response ->
             rateBottomSheet = false
         }
     }
@@ -142,7 +137,7 @@ fun AnimeDetailsScreen(
                                         EntityType.ANIME -> {
                                             navOptions.navigateToAnimeDetails(id)
                                         }
-                                        EntityType.MANGA -> {
+                                        EntityType.MANGA, EntityType.RANOBE -> {
                                             navOptions.navigateToMangaDetails(id)
                                         }
                                         EntityType.COMMENT -> {
@@ -187,31 +182,31 @@ fun AnimeDetailsScreen(
     }
 
     if (rateBottomSheet) {
-        val isUpdating by userViewModel.isUpdating.collectAsState()
         val animeDetailsData = animeDetails.value.data
+        val isUpdating by animeDetailsViewModel.isUpdating.collectAsStateWithLifecycle()
 
         animeDetailsData?.let {
             UserRateBottomSheet(
                 userRate = animeDetailsData.toUiModel(),
                 isLoading = isUpdating,
                 onDismiss = { rateBottomSheet = false },
-                onSave = { rateId, status, score, episodes, rewatches, mediaType ->
-                    userViewModel.updateUserRate(
+                onSave = { rateId, status, score, episodes, rewatches ->
+                    animeDetailsViewModel.updateUserRate(
                         id = rateId,
                         status = status,
                         score = score,
                         progress = episodes,
-                        rewatches = rewatches,
-                        mediaType = mediaType
+                        rewatches = rewatches
                     )
                 },
                 onCreateRate = { mediaId, status ->
-                    userViewModel.createUserRate(
-                        userId = currentUser?.currentUser?.id ?: "",
-                        targetId = mediaId,
-                        status = status,
-                        targetType = TargetType.ANIME
-                    )
+                    currentUser?.currentUser?.id?.let { userId ->
+                        animeDetailsViewModel.createUserRate(
+                            userId = userId,
+                            targetId = mediaId,
+                            status = status
+                        )
+                    }
                 }
             )
         }

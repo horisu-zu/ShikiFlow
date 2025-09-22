@@ -74,6 +74,7 @@ fun MangaTracksPage(
                             ErrorItem(
                                 message = stringResource(R.string.mtp_loading_error),
                                 buttonLabel = stringResource(R.string.common_retry),
+                                showFace = false,
                                 onButtonClick = { trackItems.retry() }
                             )
                         }

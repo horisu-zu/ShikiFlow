@@ -14,6 +14,7 @@ import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.usecase.GetCommentTopicUseCase
 import com.example.shikiflow.domain.usecase.GetCommentsUseCase
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.SortDirection
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +41,16 @@ class CommentViewModel @Inject constructor(
     private val _commentsWithReplies = MutableStateFlow<Resource<Map<CommentType, List<CommentItem>>>>(Resource.Loading())
     val commentsWithReplies = _commentsWithReplies.asStateFlow()
 
-    fun getComments(topicId: String, page: Int = 1, limit: Int = 30) {
+    fun getComments(
+        topicId: String,
+        sortDirection: SortDirection = SortDirection.DESCENDING,
+        page: Int = 1,
+        limit: Int = 30
+    ) {
         viewModelScope.launch {
             if(_currentTopicId == topicId) { return@launch }
 
-            getCommentsUseCase(topicId, page, limit).collect { result ->
+            getCommentsUseCase(topicId, sortDirection, page, limit).collect { result ->
                 _comments.value = result
                 when (result) {
                     is Resource.Success -> {

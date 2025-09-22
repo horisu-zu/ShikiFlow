@@ -39,21 +39,18 @@ import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack.Companion.toUserRateData
-import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack.Companion.toEntity
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
-import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 import com.example.shikiflow.utils.AppUiMode
 
 @Composable
 fun AnimeTracksPage(
     trackItems: LazyPagingItems<AnimeTrack>?,
     tracksViewModel: AnimeTracksViewModel,
-    userViewModel: UserViewModel = hiltViewModel(),
     settingsViewModel: SettingsViewModel = hiltViewModel(),
     onAnimeClick: (String) -> Unit
 ) {
@@ -63,8 +60,7 @@ fun AnimeTracksPage(
     val rateBottomSheet = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        userViewModel.updateEvent.collect { userRate ->
-            tracksViewModel.updateAnimeTrack(userRate.toEntity())
+        tracksViewModel.updateEvent.collect { userRate ->
             rateBottomSheet.value = false
         }
     }
@@ -106,21 +102,20 @@ fun AnimeTracksPage(
             }
 
             if (rateBottomSheet.value) {
-                val isUpdating by userViewModel.isUpdating.collectAsState()
+                val isUpdating by tracksViewModel.isUpdating.collectAsState()
 
                 selectedItem?.let {
                     UserRateBottomSheet(
                         userRate = it.toUserRateData(),
                         isLoading = isUpdating,
                         onDismiss = { if (!isUpdating) rateBottomSheet.value = false },
-                        onSave = { id, rateStatus, score, episodes, rewatches, mediaType ->
-                            userViewModel.updateUserRate(
+                        onSave = { id, rateStatus, score, episodes, rewatches ->
+                            tracksViewModel.updateUserRate(
                                 id = id,
                                 status = rateStatus,
                                 score = score,
                                 progress = episodes,
-                                rewatches = rewatches,
-                                mediaType = mediaType
+                                rewatches = rewatches
                             )
                         }
                     )
@@ -168,6 +163,7 @@ private fun AnimeTracksListComponent(
                     ErrorItem(
                         message = stringResource(R.string.atp_loading_error),
                         buttonLabel = stringResource(R.string.common_retry),
+                        showFace = false,
                         onButtonClick = { trackItems.retry() }
                     )
                 }

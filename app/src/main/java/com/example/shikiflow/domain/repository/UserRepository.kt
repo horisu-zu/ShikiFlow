@@ -48,7 +48,7 @@ interface UserRepository {
     suspend fun updateUserRate(
         id: Long,
         request: UserRateRequest
-    ): Result<UserRateResponse>
+    ): UserRateResponse
 
-    suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse>
+    suspend fun createUserRate(createRequest: CreateUserRateRequest): UserRateResponse
 }

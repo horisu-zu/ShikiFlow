@@ -28,6 +28,7 @@ import com.example.shikiflow.utils.toIcon
 fun ErrorItem(
     message: String,
     modifier: Modifier = Modifier,
+    showFace: Boolean = true,
     icon: IconResource = IconResource.Vector(Icons.Default.Refresh),
     buttonLabel: String? = null,
     onButtonClick: () -> Unit = { /**/ }
@@ -39,11 +40,13 @@ fun ErrorItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
     ) {
-        Text(
-            text = errorFace,
-            style = MaterialTheme.typography.displayMedium,
-            textAlign = TextAlign.Center
-        )
+        if(showFace) {
+            Text(
+                text = errorFace,
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center
+            )
+        }
         Text(
             text = message,
             style = MaterialTheme.typography.bodyMedium,

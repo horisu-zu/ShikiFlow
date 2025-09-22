@@ -145,9 +145,9 @@ fun CharacterDetailsScreen(
                                     EntityType.ANIME -> {
                                         navOptions.navigateToAnimeDetails(id)
                                     }
-                                    EntityType.MANGA -> {
-                                        navOptions.navigateToMangaDetails(id)
-                                    }
+                                    EntityType.MANGA, EntityType.RANOBE -> {
+                                            navOptions.navigateToMangaDetails(id)
+                                        }
                                     EntityType.COMMENT -> { /**/ }
                                 }
                             }, onLinkClick = { url ->

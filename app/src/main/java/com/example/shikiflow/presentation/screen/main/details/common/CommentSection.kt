@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.RoundedImage
@@ -32,6 +34,7 @@ import com.example.shikiflow.presentation.viewmodel.CommentViewModel
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.SortDirection
 
 @Composable
 fun CommentSection(
@@ -45,7 +48,7 @@ fun CommentSection(
     val commentsState = commentViewModel.comments.collectAsStateWithLifecycle()
 
     LaunchedEffect(topicId) {
-        commentViewModel.getComments(topicId, limit = 5)
+        commentViewModel.getComments(topicId, sortDirection = SortDirection.ASCENDING, limit = 5)
     }
 
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -74,7 +77,7 @@ fun CommentSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Comments",
+                        text = stringResource(id = R.string.details_comments),
                         style = MaterialTheme.typography.titleMedium
                     )
                     IconButton(
@@ -86,7 +89,7 @@ fun CommentSection(
                         )
                     }
                 }
-                value.data?.forEach { comment ->
+                value.data?.forEachIndexed { index, comment ->
                     CommentItem(
                         comment = comment,
                         onEntityClick = onEntityClick,

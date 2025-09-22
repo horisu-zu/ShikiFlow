@@ -152,6 +152,7 @@
     <string name="details_info_score_stats">Score stats ∙ %1$s ★</string>
     <string name="details_info_statuses_stats">Statuses stats</string>
     <string name="details_characters">Characters</string>
+    <string name="details_comments">Comments</string>
     <string name="details_short_info_type">Type</string>
     <string name="details_short_info_episodes">Episodes</string>
     <string name="details_short_info_age_rating">Age Rating</string>
@@ -172,4 +173,12 @@
 
     <string name="tracks_page_search">Search Tracks…</string>
     <string name="browse_page_search">Search…</string>
+
+    <string name="browse_type_anime_ongoing">Ongoing</string>
+    <string name="browse_type_search">Search</string>
+    <string name="browse_type_anime_top">Anime Top</string>
+    <string name="browse_type_manga_top">Manga Top</string>
+    <string name="bottom_navigator_main">Main</string>
+    <string name="bottom_navigator_browse">Browse</string>
+    <string name="bottom_navigator_more">More</string>
 </resources>

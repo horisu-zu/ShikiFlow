@@ -22,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
@@ -65,11 +66,11 @@ fun MainNavigator(
                                     id = if (isSelected) navItem.selectedIconRes
                                         else navItem.unselectedIconRes
                                 ),
-                                contentDescription = navItem.title,
+                                contentDescription = stringResource(id = navItem.title),
                                 modifier = Modifier.size(24.dp)
                             )
                         },
-                        label = { Text(navItem.title) },
+                        label = { Text(stringResource(id = navItem.title)) },
                         selected = isSelected,
                         onClick = {
                             if (!isSelected) {
@@ -135,27 +136,27 @@ fun MainNavigator(
 }
 
 sealed class BottomNavItem(
-    var title: String,
+    var title: Int,
     @DrawableRes var selectedIconRes: Int,
     @DrawableRes var unselectedIconRes: Int,
     var route: MainNavRoute
 ): NavKey {
     object Home : BottomNavItem(
-        "Main",
+        R.string.bottom_navigator_main,
         R.drawable.ic_selected_book,
         R.drawable.ic_unselected_book,
         MainNavRoute.Home
     )
 
     object Browse : BottomNavItem(
-        "Browse",
+        R.string.bottom_navigator_browse,
         R.drawable.ic_selected_browse,
         R.drawable.ic_unselected_browse,
         MainNavRoute.Browse
     )
 
     object More : BottomNavItem(
-        "More",
+        R.string.bottom_navigator_more,
         R.drawable.ic_selected_dots,
         R.drawable.ic_unselected_dots,
         MainNavRoute.More

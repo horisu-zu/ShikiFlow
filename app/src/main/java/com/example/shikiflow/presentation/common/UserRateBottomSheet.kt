@@ -64,7 +64,7 @@ import kotlin.time.Instant
 fun UserRateBottomSheet(
     userRate: UserRateData,
     onDismiss: () -> Unit,
-    onSave: (Long, Int, Int, Int, Int, MediaType) -> Unit,
+    onSave: (Long, Int, Int, Int, Int) -> Unit,
     modifier: Modifier = Modifier,
     onCreateRate: (String, Int) -> Unit = { _, _ -> },
     isLoading: Boolean = false
@@ -124,8 +124,7 @@ fun UserRateBottomSheet(
                             selectedStatus,
                             selectedScore,
                             progress,
-                            rewatches,
-                            userRate.mediaType
+                            rewatches
                         )
                     },
                     createDate = userRate.createDate,

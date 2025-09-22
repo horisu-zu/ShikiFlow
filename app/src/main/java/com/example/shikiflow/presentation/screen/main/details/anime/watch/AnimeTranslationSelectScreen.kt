@@ -34,12 +34,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,6 +60,9 @@ import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeTranslation
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.toAbbreviation
 import com.example.shikiflow.utils.Resource
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,9 +74,11 @@ fun AnimeTranslationSelectScreen(
     animeTranslationsViewModel: AnimeTranslationsViewModel = hiltViewModel()
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
     val filters = TranslationFilter.entries
     var translationFilter by remember { mutableStateOf(TranslationFilter.ALL) }
     var isNavigating by remember { mutableStateOf(false) }
+    var isRefreshing by remember { mutableStateOf(false) }
     val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
 
     LaunchedEffect(shikimoriId) {
@@ -169,57 +176,73 @@ fun AnimeTranslationSelectScreen(
             }
         }
     ) { paddingValues ->
-        LazyColumn(
-            state = lazyListState,
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                coroutineScope.launch {
+                    try {
+                        isRefreshing = true
+                        delay(100)
+                        animeTranslationsViewModel.getAnimeTranslations(shikimoriId, true)
+                    } finally {
+                        isRefreshing = false
+                    }
+                }
+            },
             modifier = Modifier.fillMaxSize()
                 .padding(
                     top = paddingValues.calculateTopPadding(),
                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                ),
-            contentPadding = PaddingValues(vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                )
         ) {
-            when(val translations = translationsState.value) {
-                is Resource.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
-                    }
-                }
-                is Resource.Success -> {
-                    translations.data?.let { animeTranslations ->
-                        val currentTranslations = animeTranslations[translationFilter] ?: emptyList()
-
-                        items(
-                            count = currentTranslations.size,
-                            key = { index -> currentTranslations[index].id }
-                        ) { index ->
-                            AnimeTranslationItem(
-                                kodikAnime = currentTranslations[index],
-                                onTranslationClick = { link, translationGroup, episodesCount ->
-                                    navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
-                                },
-                                modifier = Modifier
-                                    .padding(horizontal = 12.dp)
-                                    .animateItem() //this modifier is the reason of weird blick behavior
-                            )
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                when(val translations = translationsState.value) {
+                    is Resource.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier.fillParentMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
                         }
                     }
-                }
-                is Resource.Error -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = stringResource(R.string.common_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { animeTranslationsViewModel.getAnimeTranslations(shikimoriId) }
-                            )
+                    is Resource.Success -> {
+                        translations.data?.let { animeTranslations ->
+                            val currentTranslations = animeTranslations[translationFilter] ?: emptyList()
+
+                            items(
+                                count = currentTranslations.size,
+                                key = { index -> currentTranslations[index].id }
+                            ) { index ->
+                                AnimeTranslationItem(
+                                    kodikAnime = currentTranslations[index],
+                                    onTranslationClick = { link, translationGroup, episodesCount ->
+                                        navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
+                                    },
+                                    modifier = Modifier
+                                        .padding(horizontal = 12.dp)
+                                        .animateItem() //this modifier is the reason of weird blick behavior
+                                )
+                            }
+                        }
+                    }
+                    is Resource.Error -> {
+                        item {
+                            Box(
+                                modifier = Modifier.fillParentMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { animeTranslationsViewModel.getAnimeTranslations(shikimoriId) }
+                                )
+                            }
                         }
                     }
                 }

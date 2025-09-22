@@ -104,14 +104,11 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun updateUserRate(
         id: Long,
         request: UserRateRequest
-    ): Result<UserRateResponse> = runCatching {
-        userApi.updateUserRate(
-            id = id,
-            request = request
-        )
-    }
+    ): UserRateResponse = userApi.updateUserRate(
+        id = id,
+        request = request
+    )
 
-    override suspend fun createUserRate(createRequest: CreateUserRateRequest): Result<UserRateResponse> = runCatching {
+    override suspend fun createUserRate(createRequest: CreateUserRateRequest): UserRateResponse =
         userApi.createUserRate(createRequest)
-    }
 }

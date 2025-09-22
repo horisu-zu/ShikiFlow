@@ -209,6 +209,7 @@ private fun BrowseListComponent(
                 item {
                     ErrorItem(
                         message = stringResource(R.string.b_mss_error),
+                        showFace = false,
                         buttonLabel = stringResource(R.string.common_retry),
                         onButtonClick = { browseState.retry() }
                     )
@@ -288,6 +289,7 @@ private fun BrowseGridComponent(
                     item(span = { GridItemSpan(3) }) {
                         ErrorItem(
                             message = stringResource(R.string.b_mss_error),
+                            showFace = false,
                             buttonLabel = stringResource(R.string.common_retry),
                             onButtonClick = { browseState.retry() }
                         )

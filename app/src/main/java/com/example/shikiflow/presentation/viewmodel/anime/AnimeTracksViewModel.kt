@@ -1,26 +1,41 @@
 package com.example.shikiflow.presentation.viewmodel.anime
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack
+import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack.Companion.toEntity
+import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
+import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 @HiltViewModel
 class AnimeTracksViewModel @Inject constructor(
-    private val animeTracksRepository: AnimeTracksRepository
+    private val animeTracksRepository: AnimeTracksRepository,
+    private val userRepository: UserRepository
 ): ViewModel() {
 
     private val _pagingDataMap = mutableMapOf<UserRateStatusEnum, Flow<PagingData<AnimeTrack>>>()
+
+    private val _isUpdating = MutableStateFlow(false)
+    val isUpdating = _isUpdating.asStateFlow()
+
+    private val _updateEvent = MutableSharedFlow<Unit>()
+    val updateEvent = _updateEvent.asSharedFlow()
 
     fun getAnimeTracks(status: UserRateStatusEnum): Flow<PagingData<AnimeTrack>> {
         return _pagingDataMap.getOrPut(status) {
@@ -28,9 +43,31 @@ class AnimeTracksViewModel @Inject constructor(
         }
     }
 
-    fun updateAnimeTrack(animeTrack: AnimeUserTrack) {
-        viewModelScope.launch {
-            animeTracksRepository.updateAnimeTrack(animeTrack)
+    fun updateUserRate(
+        id: Long,
+        status: Int,
+        score: Int,
+        progress: Int,
+        rewatches: Int
+    ) = viewModelScope.launch {
+        _isUpdating.value = true
+
+        try {
+            val request = UserRateRequest(
+                status = UserRateStatusConstants.convertToApiStatus(status),
+                score = score.takeIf { it > 0 },
+                rewatches = rewatches,
+                episodes = progress
+            )
+
+            val result = userRepository.updateUserRate(id, request)
+
+            animeTracksRepository.updateAnimeTrack(result.toEntity())
+        } catch (e: Exception) {
+            Log.e("AnimeTracksViewModel", "Error updating user rate", e)
+        } finally {
+            _updateEvent.emit(Unit)
+            _isUpdating.value = false
         }
     }
 }

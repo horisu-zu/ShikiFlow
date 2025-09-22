@@ -2,12 +2,19 @@ package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,12 +34,26 @@ import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 fun MainSideScreen(
     browseType: BrowseType,
     onMediaNavigate: (String, MediaType) -> Unit,
+    onScrollStateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
     val browseData = browseViewModel.paginatedBrowse(
         type = browseType
     ).collectAsLazyPagingItems()
+
+    val lazyGridState = rememberLazyGridState()
+
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex == 0 &&
+            lazyGridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isAtTop) {
+        onScrollStateChange(isAtTop)
+    }
 
     if(browseData.loadState.refresh is LoadState.Loading) {
         Box(
@@ -53,7 +74,9 @@ fun MainSideScreen(
     } else {
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
+            state = lazyGridState,
             modifier = modifier,
+            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -71,6 +94,16 @@ fun MainSideScreen(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) { CircularProgressIndicator() }
+                    }
+                }
+                if(loadState.append is LoadState.Error) {
+                    item {
+                        ErrorItem(
+                            message = stringResource(R.string.b_mss_error),
+                            showFace = false,
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { browseData.retry() }
+                        )
                     }
                 }
             }

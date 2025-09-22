@@ -31,12 +31,6 @@ class UserViewModel @Inject constructor(
         MutableStateFlow<Resource<CurrentUserQuery.Data?>>(Resource.Loading())
     val currentUserData = _currentUserData.asStateFlow()
 
-    private val _isUpdating = MutableStateFlow(false)
-    val isUpdating = _isUpdating.asStateFlow()
-
-    private val _updateEvent = MutableSharedFlow<UserRateResponse>(0)
-    val updateEvent = _updateEvent.asSharedFlow()
-
     init {
         fetchCurrentUser()
     }
@@ -54,73 +48,6 @@ class UserViewModel @Inject constructor(
                 )
                 Log.e("UserViewModel", "Error: ${result.exceptionOrNull()?.message}")
             }
-        }
-    }
-
-    fun updateUserRate(
-        id: Long,
-        status: Int,
-        score: Int,
-        progress: Int,
-        rewatches: Int,
-        mediaType: MediaType
-    ) = viewModelScope.launch {
-        _isUpdating.value = true
-
-        try {
-            val request = UserRateRequest(
-                status = UserRateStatusConstants.convertToApiStatus(status),
-                score = score.takeIf { it > 0 },
-                rewatches = rewatches,
-                episodes = if (mediaType == MediaType.ANIME) progress else null,
-                chapters = if (mediaType == MediaType.MANGA) progress else null
-            )
-
-            val result = withContext(Dispatchers.IO) {
-                userRepository.updateUserRate(id, request)
-            }
-
-            if (result.isSuccess) {
-                _updateEvent.emit(result.getOrThrow())
-            } else {
-                Log.e("UserViewModel", "Error updating user rate")
-            }
-        } catch (e: Exception) {
-            Log.e("UserViewModel", "Error updating user rate", e)
-        } finally {
-            _isUpdating.value = false
-        }
-    }
-
-    fun createUserRate(
-        userId: String,
-        targetId: String,
-        status: Int,
-        targetType: TargetType
-    ) = viewModelScope.launch {
-        _isUpdating.value = true
-
-        try {
-            val request = CreateUserRateRequest(
-                userId = userId.toLong(),
-                targetId = targetId.toLong(),
-                status = UserRateStatusConstants.convertToApiStatus(status),
-                targetType = targetType
-            )
-
-            val result = withContext(Dispatchers.IO) {
-                userRepository.createUserRate(request)
-            }
-
-            if (result.isSuccess) {
-                _updateEvent.emit(result.getOrNull()!!)
-            } else {
-                Log.e("UserViewModel", "Error creating user rate")
-            }
-        } catch (e: Exception) {
-            Log.e("UserViewModel", "Error creating user rate: ${e.message}")
-        } finally {
-            _isUpdating.value = false
         }
     }
 }
