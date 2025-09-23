@@ -1,57 +1,66 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.settings.MangaChapterSettings
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.DownloadChapterUseCase
-import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
-import com.example.shikiflow.utils.AppSettingsManager
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ChapterViewModel @Inject constructor(
     private val downloadChapterUseCase: DownloadChapterUseCase,
-    private val appSettingsManager: AppSettingsManager
+    private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
-    val chapterUiMode = appSettingsManager.chapterUiFlow
-        .stateIn(viewModelScope, SharingStarted.Lazily, initialValue = ChapterUIMode.SCROLL)
+    val mangaSettings: StateFlow<MangaChapterSettings> = settingsRepository.mangaSettingsFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = MangaChapterSettings()
+        )
 
-    private val _chapterPages = MutableStateFlow<Resource<List<String>>>(Resource.Loading())
-    val chapterPages = _chapterPages.asStateFlow()
+    private var currentChapterId = MutableStateFlow<String?>(null)
 
-    private var currentChapterId: String? = null
+    val chapterPages: StateFlow<Resource<List<String>>> =
+        combine(
+            settingsRepository.mangaSettingsFlow,
+            currentChapterId
+        ) { settings, chapterId ->
+            if (chapterId == null) {
+                flowOf(Resource.Loading())
+            } else {
+                downloadChapterUseCase(chapterId, settings.isDataSaverEnabled)
+            }
+        }.flatMapLatest { it }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.Lazily,
+                initialValue = Resource.Loading()
+            )
 
-    fun downloadMangaChapter(mangaDexChapterId: String) {
+    fun downloadMangaChapter(mangaDexChapterId: String, isRefresh: Boolean = false) {
+        if(isRefresh) {
+            currentChapterId.value = null
+        }
+        currentChapterId.value = mangaDexChapterId
+    }
+
+    fun updateSettings(newSettings: MangaChapterSettings) {
         viewModelScope.launch {
-            if (currentChapterId != mangaDexChapterId) {
-                currentChapterId = mangaDexChapterId
-                _chapterPages.value = Resource.Loading()
-            }
-
-            appSettingsManager.dataSaverFlow.collectLatest { isDataSaver ->
-                _chapterPages.value = downloadChapterUseCase(mangaDexChapterId, isDataSaver)
-                when(val result = _chapterPages.value) {
-                    is Resource.Loading -> {
-                        Log.d("ChapterViewModel", "Loading chapter pages for ID: $mangaDexChapterId")
-                    }
-                    is Resource.Success -> {
-                        currentChapterId = mangaDexChapterId
-                        Log.d("ChapterViewModel", "Result: ${result.data}")
-                    }
-                    is Resource.Error -> {
-                        Log.d("ChapterViewModel", "Error: ${result.message}")
-                    }
-                }
-            }
+            settingsRepository.updateMangaSettings(newSettings)
         }
     }
 }

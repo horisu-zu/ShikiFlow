@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -43,7 +42,6 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import com.example.shikiflow.utils.AppUiMode
 
@@ -51,11 +49,9 @@ import com.example.shikiflow.utils.AppUiMode
 fun AnimeTracksPage(
     trackItems: LazyPagingItems<AnimeTrack>?,
     tracksViewModel: AnimeTracksViewModel,
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
     onAnimeClick: (String) -> Unit
 ) {
-    val appUiMode = settingsViewModel.appUiMode.collectAsStateWithLifecycle()
-
+    val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
     val rateBottomSheet = remember { mutableStateOf(false) }
 
@@ -78,7 +74,7 @@ fun AnimeTracksPage(
                 onButtonClick = { trackItems.refresh() }
             )
         } else {
-            when(appUiMode.value) {
+            when(appUiMode) {
                 AppUiMode.LIST -> {
                     AnimeTracksListComponent(
                         trackItems = trackItems,

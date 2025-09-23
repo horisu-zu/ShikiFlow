@@ -181,4 +181,7 @@
     <string name="bottom_navigator_main">Main</string>
     <string name="bottom_navigator_browse">Browse</string>
     <string name="bottom_navigator_more">More</string>
+
+    <string name="chapter_empty_title">Ch. %1$s</string>
+    <string name="chapter_title">Ch. %1$s — %2$s</string>
 </resources>

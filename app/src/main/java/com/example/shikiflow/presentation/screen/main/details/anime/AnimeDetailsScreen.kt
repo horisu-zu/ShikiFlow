@@ -80,10 +80,7 @@ fun AnimeDetailsScreen(
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
-                ) {
-                    Log.d("Details Screen", "Loading Anime ID: $id")
-                    CircularProgressIndicator()
-                }
+                ) { CircularProgressIndicator() }
             }
 
             is Resource.Success -> {
@@ -119,6 +116,7 @@ fun AnimeDetailsScreen(
                             )
                             AnimeDetailsDesc(
                                 animeDetails = details,
+                                isRefreshing = isRefreshing,
                                 onItemClick = { id, mediaType ->
                                     if(mediaType == MediaType.ANIME) {
                                         navOptions.navigateToAnimeDetails(id)

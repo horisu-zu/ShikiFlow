@@ -10,16 +10,17 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import com.example.shikiflow.presentation.navigation.AppNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
-import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
+import com.example.shikiflow.presentation.viewmodel.ThemeViewModel
 import com.example.shikiflow.ui.theme.ShikiFlowTheme
 import com.example.shikiflow.utils.ThemeMode
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val settingsViewModel: SettingsViewModel by viewModels()
+    private val themeViewModel: ThemeViewModel by viewModels()
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +44,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun observeTheme(): Pair<Boolean, Boolean> {
-        val theme = settingsViewModel.appTheme.collectAsState()
-        val isOledEnabled = settingsViewModel.isOLEDModeEnabled.collectAsState()
+        val settings by themeViewModel.themeSettings.collectAsState()
 
         val systemTheme =
             when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
@@ -53,14 +53,14 @@ class MainActivity : ComponentActivity() {
                 else -> false
             }
 
-        Log.d("MainActivity", "Theme: ${theme.value}, OLED: ${isOledEnabled.value}")
-        val isDarkTheme = when (theme.value) {
+        Log.d("MainActivity", "Theme: ${settings.themeMode}, OLED: ${settings.isOledEnabled}")
+        val isDarkTheme = when (settings.themeMode) {
             ThemeMode.SYSTEM -> systemTheme
             ThemeMode.LIGHT -> false
             ThemeMode.DARK -> true
         }
 
-        return Pair(isDarkTheme, isOledEnabled.value && isDarkTheme)
+        return Pair(isDarkTheme, settings.isOledEnabled && isDarkTheme)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -37,13 +38,11 @@ fun SettingsScreen(
 ) {
     val context = LocalContext.current
 
-    val themeMode = settingsViewModel.appTheme.collectAsStateWithLifecycle().value
-    val isOLEDModeEnabled = settingsViewModel.isOLEDModeEnabled.collectAsStateWithLifecycle().value
-    val isDataSaverEnabled = settingsViewModel.isDataSaver.collectAsStateWithLifecycle().value
-    val chapterUIMode = settingsViewModel.chapterUIMode.collectAsStateWithLifecycle().value
-    val appUiMode = settingsViewModel.appUiMode.collectAsStateWithLifecycle().value
-    val trackMode = settingsViewModel.trackMode.collectAsStateWithLifecycle().value
-    val cacheSize = settingsViewModel.cacheSize.collectAsStateWithLifecycle().value
+    val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
+    val themeSettings by settingsViewModel.themeSettings.collectAsStateWithLifecycle()
+    val mangaSettings by settingsViewModel.mangaSettings.collectAsStateWithLifecycle()
+
+    val cacheSize by settingsViewModel.cacheSize.collectAsStateWithLifecycle()
 
     val openCacheDialog = remember { mutableStateOf(false) }
     val bottomSheetConfig = remember { mutableStateOf<BottomSheetConfig?>(null) }
@@ -89,7 +88,7 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Mode(
                         title = stringResource(R.string.settings_app_theme),
-                        mode = stringResource(themeMode.displayValue),
+                        mode = stringResource(themeSettings.themeMode.displayValue),
                         entries = ThemeMode.entries.map { stringResource(it.displayValue) },
                         iconResources = ThemeMode.entries.map { it.icon },
                         weights = listOf(3f, 2f, 2f),
@@ -100,9 +99,9 @@ fun SettingsScreen(
                     SectionItem.Switch(
                         title = stringResource(R.string.settings_oled_theme),
                         displayValue = stringResource(R.string.settings_oled_desc),
-                        isChecked = isOLEDModeEnabled,
+                        isChecked = themeSettings.isOledEnabled,
                         onClick = {
-                            settingsViewModel.setOled(!isOLEDModeEnabled)
+                            settingsViewModel.setOled(!themeSettings.isOledEnabled)
                         }
                     )
                 )
@@ -112,12 +111,12 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Default(
                         title = stringResource(R.string.settings_track_mode),
-                        displayValue = stringResource(trackMode.displayValue),
+                        displayValue = stringResource(settings.trackMode.displayValue),
                         onClick = {
                             bottomSheetConfig.value = BottomSheetConfig(
                                 title = context.getString(R.string.settings_track_mode_select),
                                 options = MainTrackMode.entries.map { context.getString(it.displayValue) },
-                                currentValue = context.getString(trackMode.displayValue),
+                                currentValue = context.getString(settings.trackMode.displayValue),
                                 onOptionClick = { selectedIndex ->
                                     settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
                                     bottomSheetConfig.value = null
@@ -127,12 +126,12 @@ fun SettingsScreen(
                     ),
                     SectionItem.Default(
                         title = stringResource(R.string.settings_app_ui_mode),
-                        displayValue = context.getString(appUiMode.displayValue),
+                        displayValue = context.getString(settings.appUiMode.displayValue),
                         onClick = {
                             bottomSheetConfig.value = BottomSheetConfig(
                                 title = context.getString(R.string.settings_app_mode_select),
                                 options = AppUiMode.entries.map { context.getString(it.displayValue) },
-                                currentValue = context.getString(appUiMode.displayValue),
+                                currentValue = context.getString(settings.appUiMode.displayValue),
                                 onOptionClick = { selectedIndex ->
                                     settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
                                     bottomSheetConfig.value = null
@@ -157,7 +156,7 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Mode(
                         title = stringResource(R.string.settings_chapter_ui_mode),
-                        mode = stringResource(chapterUIMode.displayValue),
+                        mode = stringResource(mangaSettings.chapterUIMode.displayValue),
                         entries = ChapterUIMode.entries.map { stringResource(it.displayValue) },
                         iconResources = ChapterUIMode.entries.map { it.icon },
                         onClick = { newMode ->
@@ -168,9 +167,9 @@ fun SettingsScreen(
                         title = stringResource(R.string.settings_data_saver_mode),
                         displayValue = stringResource(R.string.settings_data_saver_desc),
                         onClick = {
-                            settingsViewModel.setDataSaver(!isDataSaverEnabled)
+                            settingsViewModel.setDataSaver(!mangaSettings.isDataSaverEnabled)
                         },
-                        isChecked = isDataSaverEnabled
+                        isChecked = mangaSettings.isDataSaverEnabled
                     )
                 )
             )

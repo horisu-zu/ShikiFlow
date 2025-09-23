@@ -40,6 +40,7 @@ import kotlin.time.Instant
 @Composable
 fun AnimeDetailsInfo(
     animeDetails: AnimeDetailsQuery.Anime,
+    isRefreshing: Boolean,
     onLinkClick: (String) -> Unit,
     onSimilarClick: (String, String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -240,6 +241,7 @@ fun AnimeDetailsInfo(
             HorizontalDivider()
             CommentSection(
                 topicId = topicId,
+                isRefreshing = isRefreshing,
                 onEntityClick = onEntityClick,
                 onTopicNavigate = onTopicNavigate,
                 onLinkClick = onLinkClick

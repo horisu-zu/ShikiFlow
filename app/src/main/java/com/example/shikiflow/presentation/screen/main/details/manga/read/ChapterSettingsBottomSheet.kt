@@ -16,16 +16,14 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.R
-import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
+import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -33,12 +31,10 @@ import com.example.shikiflow.utils.toIcon
 @Composable
 fun ChapterSettingsBottomSheet(
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier,
-    settingsViewModel: SettingsViewModel = hiltViewModel(),
+    mangaSettings: MangaChapterSettings,
+    onSettingsChange: (MangaChapterSettings) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val isDataSaverEnabled = settingsViewModel.isDataSaver.collectAsState().value
-    val chapterUIMode = settingsViewModel.chapterUIMode.collectAsState().value
-
     val sheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
@@ -54,23 +50,27 @@ fun ChapterSettingsBottomSheet(
         ) {
             ChapterSettingsRow(
                 title = stringResource(R.string.settings_app_ui_mode),
-                currentValue = stringResource(chapterUIMode.displayValue),
+                currentValue = stringResource(mangaSettings.chapterUIMode.displayValue),
                 values = ChapterUIMode.entries.map { stringResource(it.displayValue)  },
                 iconResources = ChapterUIMode.entries.map { it.icon },
-                onSettingClick = { selectedMode ->
-                    settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(selectedMode.uppercase()))
+                onSettingClick = { selectedIndex ->
+                    onSettingsChange(mangaSettings.copy(
+                        chapterUIMode = ChapterUIMode.entries[selectedIndex]
+                    ))
                 }
             )
             ChapterSettingsRow(
                 title = stringResource(R.string.settings_data_saver_mode),
-                currentValue = if(isDataSaverEnabled) stringResource(R.string.settings_data_saver_mode_enabled)
+                currentValue = if(mangaSettings.isDataSaverEnabled) stringResource(R.string.settings_data_saver_mode_enabled)
                     else stringResource(R.string.settings_data_saver_mode_disabled),
                 values = listOf(
                     stringResource(R.string.settings_data_saver_mode_enabled),
                     stringResource(R.string.settings_data_saver_mode_disabled)
                 ),
-                onSettingClick = { selectedValue ->
-                    settingsViewModel.setDataSaver(!isDataSaverEnabled)
+                onSettingClick = { selectedIndex ->
+                    onSettingsChange(mangaSettings.copy(
+                        isDataSaverEnabled = selectedIndex == 0)
+                    )
                 }
             )
         }
@@ -82,7 +82,7 @@ private fun ChapterSettingsRow(
     title: String,
     currentValue: String,
     values: List<String>,
-    onSettingClick: (String) -> Unit,
+    onSettingClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     iconResources: List<IconResource>? = null,
 ) {
@@ -101,12 +101,12 @@ private fun ChapterSettingsRow(
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.background)
         ) {
-            values.forEach { settingValue ->
+            values.forEachIndexed { index, settingValue ->
                 ChapterSettingsItem(
                     title = settingValue,
                     icon = iconResources?.get(values.indexOf(settingValue)),
                     isChecked = settingValue == currentValue,
-                    onClick = { onSettingClick(settingValue) },
+                    onClick = { onSettingClick(index) },
                     modifier = Modifier
                         .weight(1f)
                         .padding(4.dp)

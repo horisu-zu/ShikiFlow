@@ -4,16 +4,19 @@ import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.utils.Resource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class DownloadChapterUseCase @Inject constructor(
     private val mangaDexRepository: MangaDexRepository
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         mangaDexChapterId: String,
         isDataSaver: Boolean
-    ): Resource<List<String>> {
-        return try {
+    ): Flow<Resource<List<String>>> = flow {
+        try {
+            emit(Resource.Loading())
             val response = mangaDexRepository.getChapter(mangaDexChapterId)
 
             if(response.result == "ok") {
@@ -22,15 +25,15 @@ class DownloadChapterUseCase @Inject constructor(
                     .map { response.baseUrl + "/$dataString/${response.chapter.hash}/" + it }
                 Log.d("DownloadChapterUseCase", "Chapter URLs: $chapterPages")
 
-                Resource.Success(chapterPages)
+                emit(Resource.Success(chapterPages))
             } else {
-                Resource.Error("Failed loading chapter with ID: $mangaDexChapterId. " +
-                        "Result: ${response.result}")
+                emit(Resource.Error("Failed loading chapter with ID: $mangaDexChapterId. " +
+                        "Result: ${response.result}"))
             }
         } catch (e: HttpException) {
-            Resource.Error(e.localizedMessage ?: "Network error: ${e.message}")
+            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            Resource.Error("An unexpected error occurred: ${e.message}")
+            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

@@ -121,6 +121,7 @@ fun MangaDetailsScreen(
 
                         MangaDetailsDesc(
                             mangaDetails = mangaDetails.data,
+                            isRefreshing = isRefreshing,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
                                     navOptions.navigateToAnimeDetails(id)

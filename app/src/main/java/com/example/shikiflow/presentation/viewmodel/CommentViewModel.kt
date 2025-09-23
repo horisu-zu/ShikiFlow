@@ -45,10 +45,11 @@ class CommentViewModel @Inject constructor(
         topicId: String,
         sortDirection: SortDirection = SortDirection.DESCENDING,
         page: Int = 1,
-        limit: Int = 30
+        limit: Int = 30,
+        isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
-            if(_currentTopicId == topicId) { return@launch }
+            if(_currentTopicId == topicId && !isRefresh) { return@launch }
 
             getCommentsUseCase(topicId, sortDirection, page, limit).collect { result ->
                 _comments.value = result

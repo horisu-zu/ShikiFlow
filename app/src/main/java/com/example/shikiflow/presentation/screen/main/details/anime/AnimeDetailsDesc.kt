@@ -50,6 +50,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 @Composable
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime,
+    isRefreshing: Boolean,
     onSimilarClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -131,6 +132,7 @@ fun AnimeDetailsDesc(
 
         AnimeDetailsInfo(
             animeDetails = animeDetails,
+            isRefreshing = isRefreshing,
             onLinkClick = onLinkClick,
             onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
             onExternalLinksClick = onExternalLinksClick,

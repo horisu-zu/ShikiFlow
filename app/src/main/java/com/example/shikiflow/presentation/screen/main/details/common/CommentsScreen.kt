@@ -64,7 +64,6 @@ fun CommentsScreen(
                     context = context,
                     commentViewModel = commentViewModel,
                     modifier = Modifier.padding(
-                        top = paddingValues.calculateTopPadding(),
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                     )
@@ -78,7 +77,6 @@ fun CommentsScreen(
                     context = context,
                     commentViewModel = commentViewModel,
                     modifier = Modifier.padding(
-                        top = paddingValues.calculateTopPadding(),
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                     )
@@ -101,7 +99,7 @@ private fun TopicCommentsSection(
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 30.dp, bottom = 6.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(paginatedComments.itemCount) { index ->
@@ -174,7 +172,7 @@ private fun CommentThreadSection(
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 30.dp, bottom = 6.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         when(commentsState) {

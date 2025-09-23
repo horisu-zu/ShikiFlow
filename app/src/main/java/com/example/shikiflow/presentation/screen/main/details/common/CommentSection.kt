@@ -28,6 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentItem
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.viewmodel.CommentViewModel
@@ -39,6 +40,7 @@ import com.example.shikiflow.utils.SortDirection
 @Composable
 fun CommentSection(
     topicId: String,
+    isRefreshing: Boolean,
     onEntityClick: (Converter.EntityType, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onTopicNavigate: (String) -> Unit,
@@ -51,6 +53,17 @@ fun CommentSection(
         commentViewModel.getComments(topicId, sortDirection = SortDirection.ASCENDING, limit = 5)
     }
 
+    LaunchedEffect(isRefreshing) {
+        if(isRefreshing) {
+            commentViewModel.getComments(
+                topicId,
+                sortDirection = SortDirection.ASCENDING,
+                limit = 5,
+                isRefresh = true
+            )
+        }
+    }
+
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         when(val value = commentsState.value) {
             is Resource.Error -> {
@@ -58,9 +71,10 @@ fun CommentSection(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = "Error: ${value.message}",
-                        style = MaterialTheme.typography.bodyLarge
+                    ErrorItem(
+                        message = value.message ?: stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
             }
@@ -85,7 +99,7 @@ fun CommentSection(
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "Add Comment"
+                            contentDescription = "Navigate to Topic Comments Screen"
                         )
                     }
                 }

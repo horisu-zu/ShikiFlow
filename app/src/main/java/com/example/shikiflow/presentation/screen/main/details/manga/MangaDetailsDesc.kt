@@ -35,6 +35,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 @Composable
 fun MangaDetailsDesc(
     mangaDetails: MangaDetailsQuery.Manga?,
+    isRefreshing: Boolean,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     onLinkClick: (String) -> Unit,
@@ -106,6 +107,7 @@ fun MangaDetailsDesc(
         mangaDetails?.topic?.id?.let { topicId ->
             CommentSection(
                 topicId = topicId,
+                isRefreshing = isRefreshing,
                 onEntityClick = onEntityClick,
                 onTopicNavigate = onTopicNavigate,
                 onLinkClick = onLinkClick

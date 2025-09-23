@@ -27,7 +27,7 @@ fun MainTabRow(
     ScrollableTabRow(
         selectedTabIndex = selectedTab,
         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-            else MaterialTheme.colorScheme.surfaceVariant,
+            else MaterialTheme.colorScheme.surface,
         edgePadding = 0.dp,
         indicator = { tabPositions ->
             Box(

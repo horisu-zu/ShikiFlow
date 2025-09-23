@@ -1,23 +1,17 @@
-package com.example.shikiflow.utils
+package com.example.shikiflow.data.repository
 
 import android.content.Context
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.repository.CacheRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
-import javax.inject.Singleton
 
-interface CacheManager {
-    suspend fun getCacheSize(): String
-    suspend fun clearCache(): Boolean
-}
-
-@Singleton
-class CacheManagerImpl @Inject constructor(
+class CacheRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
-): CacheManager {
+): CacheRepository {
 
     override suspend fun getCacheSize(): String {
         return withContext(Dispatchers.IO) {

@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -49,7 +48,7 @@ fun MainAppBar(
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val containerColor = if (scrollBehavior.state.collapsedFraction >= 1f) {
-        MaterialTheme.colorScheme.surfaceVariant
+        MaterialTheme.colorScheme.surface
     } else { MaterialTheme.colorScheme.background }
 
     TopAppBar(
@@ -105,7 +104,7 @@ fun MainAppBar(
         actions = {
             MainDropdown(
                 expanded = dropdownExpanded,
-                currentTrackMode = currentTrackMode ?: MainTrackMode.ANIME,
+                currentTrackMode = currentTrackMode,
                 onModeChange = { trackMode ->
                     onModeChange(trackMode)
                 },

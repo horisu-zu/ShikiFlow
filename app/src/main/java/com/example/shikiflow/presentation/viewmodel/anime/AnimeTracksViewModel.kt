@@ -12,19 +12,26 @@ import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack.Companion.toEntity
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.utils.AppUiMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 @HiltViewModel
 class AnimeTracksViewModel @Inject constructor(
+    private val settingsRepository: SettingsRepository,
     private val animeTracksRepository: AnimeTracksRepository,
     private val userRepository: UserRepository
 ): ViewModel() {
@@ -36,6 +43,14 @@ class AnimeTracksViewModel @Inject constructor(
 
     private val _updateEvent = MutableSharedFlow<Unit>()
     val updateEvent = _updateEvent.asSharedFlow()
+
+    val appUiMode: StateFlow<AppUiMode> = settingsRepository.settingsFlow
+        .map { it.appUiMode }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = AppUiMode.LIST
+        )
 
     fun getAnimeTracks(status: UserRateStatusEnum): Flow<PagingData<AnimeTrack>> {
         return _pagingDataMap.getOrPut(status) {

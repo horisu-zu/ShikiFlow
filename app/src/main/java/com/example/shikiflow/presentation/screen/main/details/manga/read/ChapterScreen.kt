@@ -52,6 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.ChapterItem
@@ -73,8 +74,8 @@ fun ChapterScreen(
     navOptions: MangaReadNavOptions,
     chapterViewModel: ChapterViewModel = hiltViewModel()
 ) {
-    val chapterUiMode = chapterViewModel.chapterUiMode.collectAsState()
-    val chapterPages = chapterViewModel.chapterPages.collectAsState()
+    val chapterSettings by chapterViewModel.mangaSettings.collectAsStateWithLifecycle()
+    val chapterPages by chapterViewModel.chapterPages.collectAsStateWithLifecycle()
 
     val showBottomSheet = remember { mutableStateOf(false) }
     val topAppBarState = rememberTopAppBarState()
@@ -95,10 +96,12 @@ fun ChapterScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = buildAnnotatedString {
-                        append("Ch. $chapterNumber")
-                        if(!title.isNullOrEmpty()) { append(" - $title") }
-                    },
+                    Text(
+                        text = if(!title.isNullOrEmpty()) {
+                            stringResource(id = R.string.chapter_title, chapterNumber, title)
+                        } else {
+                            stringResource(id = R.string.chapter_empty_title, chapterNumber)
+                        },
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         style = MaterialTheme.typography.titleMedium
@@ -129,7 +132,7 @@ fun ChapterScreen(
             )
         }
     ) { paddingValues ->
-        when(val pageUrls = chapterPages.value) {
+        when(val pageUrls = chapterPages) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -153,7 +156,7 @@ fun ChapterScreen(
                         )
                     }
                 } else {
-                    when(chapterUiMode.value) {
+                    when(chapterSettings.chapterUIMode) {
                         ChapterUIMode.PAGE -> {
                             ChapterPageModeComponent(
                                 chapterPageUrls = pageUrls.data,
@@ -179,14 +182,29 @@ fun ChapterScreen(
                             )
                         }
                     }
-                    if(showBottomSheet.value) {
-                        ChapterSettingsBottomSheet(
-                            onDismiss = { showBottomSheet.value = false }
-                        )
-                    }
                 }
             }
-            is Resource.Error -> { /**/ }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = pageUrls.message ?: stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { chapterViewModel.downloadMangaChapter(mangaDexChapterId, true) }
+                    )
+                }
+            }
+        }
+        if(showBottomSheet.value) {
+            ChapterSettingsBottomSheet(
+                mangaSettings = chapterSettings,
+                onDismiss = { showBottomSheet.value = false },
+                onSettingsChange = { newSettings ->
+                    chapterViewModel.updateSettings(newSettings)
+                }
+            )
         }
     }
 }

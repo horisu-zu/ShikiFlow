@@ -9,8 +9,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
@@ -25,7 +27,7 @@ fun BrowseScreen(
     Scaffold(
         topBar = {
             BrowseAppBar(
-                title = "Browse",
+                title = stringResource(id = R.string.bottom_navigator_browse),
                 searchQuery = searchQuery.query,
                 onSearchQueryChange = searchViewModel::onQueryChange,
                 isSearchActive = screenState.isSearchActive,

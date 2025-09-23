@@ -19,6 +19,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -32,11 +33,9 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
@@ -50,23 +49,14 @@ fun BrowseMainPage(
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
-    val browseUiMode = browseViewModel.browseUiMode.collectAsStateWithLifecycle()
-    val appUiMode = browseViewModel.appUiMode.collectAsStateWithLifecycle()
-    val browseOngoingOrder = browseViewModel.browseOngoingMode.collectAsStateWithLifecycle()
-
-    val ongoingBrowseState = browseViewModel.paginatedBrowse(
-        type = BrowseType.AnimeBrowseType.ONGOING,
-        options = BrowseOptions(
-            status = AnimeStatusEnum.ongoing,
-            order = browseOngoingOrder.value.orderEnum
-        )
-    ).collectAsLazyPagingItems()
+    val browseUiSettings by browseViewModel.browseUiSettings.collectAsStateWithLifecycle()
+    val ongoingBrowseState = browseViewModel.browseMainOngoingsState.collectAsLazyPagingItems()
 
     val showBottomSheet = remember { mutableStateOf(false) }
 
     BrowseComponent(
-        browseUiMode = browseUiMode.value,
-        appUiMode = appUiMode.value,
+        browseUiMode = browseUiSettings.browseUiMode,
+        appUiMode = browseUiSettings.appUiMode,
         browseState = ongoingBrowseState,
         onSideScreenNavigate = onSideScreenNavigate,
         onNavigate = onNavigate,
@@ -75,8 +65,8 @@ fun BrowseMainPage(
     )
     if(showBottomSheet.value) {
         BrowseMainBottomSheet(
-            currentBrowseMode = browseUiMode.value,
-            currentOngoingMode = browseOngoingOrder.value,
+            currentBrowseMode = browseUiSettings.browseUiMode,
+            currentOngoingMode = browseUiSettings.browseOngoingOrder,
             onDismiss = { showBottomSheet.value = false },
             onModeSelect = { newMode ->
                 browseViewModel.setBrowseUiMode(newMode)
