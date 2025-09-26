@@ -26,6 +26,9 @@ sealed interface DetailsNavRoute : NavKey {
 
     @Serializable
     data class Comments(val screenMode: CommentsScreenMode, val id: String) : DetailsNavRoute
+    
+    @Serializable
+    data class Person(val personId: String) : DetailsNavRoute
 
     @Serializable
     data class AnimeWatch(val title: String, val shikimoriId: String, val completedEpisodes: Int) : DetailsNavRoute

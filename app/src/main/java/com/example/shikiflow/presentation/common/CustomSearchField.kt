@@ -34,10 +34,10 @@ fun CustomSearchField(
     query: String,
     label: String,
     onQueryChange: (String) -> Unit,
-    isActive: Boolean,
     onActiveChange: (Boolean) -> Unit,
     onExitSearch: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isActive: Boolean = true,
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current

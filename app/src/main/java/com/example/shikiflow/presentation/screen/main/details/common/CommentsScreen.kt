@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -32,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentItem
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -55,6 +57,13 @@ fun CommentsScreen(
     val context = LocalContext.current
 
     Scaffold { paddingValues ->
+        val contentPadding = PaddingValues(
+            start = 12.dp,
+            end = 12.dp,
+            top = paddingValues.calculateTopPadding(),
+            bottom = 6.dp
+        )
+
         when(screenMode) {
             CommentsScreenMode.TOPIC -> {
                 TopicCommentsSection(
@@ -66,7 +75,7 @@ fun CommentsScreen(
                     modifier = Modifier.padding(
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                    )
+                    ), contentPadding = contentPadding
                 )
             }
             CommentsScreenMode.COMMENT -> {
@@ -79,7 +88,7 @@ fun CommentsScreen(
                     modifier = Modifier.padding(
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                    )
+                    ), contentPadding = contentPadding
                 )
             }
         }
@@ -93,13 +102,14 @@ private fun TopicCommentsSection(
     customTabIntent: CustomTabsIntent,
     context: Context,
     commentViewModel: CommentViewModel,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     val paginatedComments = commentViewModel.paginatedComments(topicId).collectAsLazyPagingItems()
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 30.dp, bottom = 6.dp),
+        contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(paginatedComments.itemCount) { index ->
@@ -107,25 +117,7 @@ private fun TopicCommentsSection(
                 CommentItem(
                     comment = comment,
                     onEntityClick = { entityType, id ->
-                        when(entityType) {
-                            EntityType.CHARACTER -> {
-                                navOptions.navigateToCharacterDetails(id)
-                            }
-                            EntityType.PERSON -> {
-                                customTabIntent.launchUrl(context,
-                                    "${BuildConfig.BASE_URL}/person/$id".toUri()
-                                )
-                            }
-                            EntityType.ANIME -> {
-                                navOptions.navigateToAnimeDetails(id)
-                            }
-                            EntityType.MANGA, EntityType.RANOBE -> {
-                                navOptions.navigateToMangaDetails(id)
-                            }
-                            EntityType.COMMENT -> {
-                                navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
-                            }
-                        }
+                        navOptions.navigateByEntity(entityType, id)
                     },
                     onLinkClick = { url -> customTabIntent.launchUrl(context, url.toUri()) },
                     modifier = Modifier
@@ -162,6 +154,7 @@ private fun CommentThreadSection(
     customTabIntent: CustomTabsIntent,
     context: Context,
     commentViewModel: CommentViewModel,
+    contentPadding: PaddingValues,
     modifier: Modifier = Modifier
 ) {
     val commentsState by commentViewModel.commentsWithReplies.collectAsStateWithLifecycle()
@@ -172,7 +165,7 @@ private fun CommentThreadSection(
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(start = 12.dp, end = 12.dp, top = 30.dp, bottom = 6.dp),
+        contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         when(commentsState) {
@@ -192,27 +185,7 @@ private fun CommentThreadSection(
                                 title = commentType,
                                 comments = comments,
                                 onEntityClick = { entityType, id ->
-                                    when(entityType) {
-                                        EntityType.CHARACTER -> {
-                                            navOptions.navigateToCharacterDetails(id)
-                                        }
-                                        EntityType.PERSON -> {
-                                            customTabIntent.launchUrl(context,
-                                                "${BuildConfig.BASE_URL}/person/$id".toUri()
-                                            )
-                                        }
-                                        EntityType.ANIME -> {
-                                            navOptions.navigateToAnimeDetails(id)
-                                        }
-                                        EntityType.MANGA, EntityType.RANOBE -> {
-                                            navOptions.navigateToMangaDetails(id)
-                                        }
-                                        EntityType.COMMENT -> {
-                                            if(id != commentId) {
-                                                navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
-                                            }
-                                        }
-                                    }
+                                    navOptions.navigateByEntity(entityType, id)
                                 }, onLinkClick = { url ->
                                     customTabIntent.launchUrl(context, url.toUri())
                                 }
@@ -228,8 +201,8 @@ private fun CommentThreadSection(
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(
-                            message = "Error: ${commentsState.message}",
-                            buttonLabel = "Retry",
+                            message = commentsState.message ?: stringResource(id = R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
                             onButtonClick = { commentViewModel.getCommentWithReplies(commentId) }
                         )
                     }

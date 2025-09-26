@@ -4,6 +4,7 @@ import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,27 +26,29 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.toBrowseAnime
 import com.example.shikiflow.domain.model.anime.toBrowseManga
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.screen.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
+import com.example.shikiflow.presentation.screen.main.details.common.CommentSection
+import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
-import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,8 +58,7 @@ fun CharacterDetailsScreen(
     navOptions: MediaNavOptions,
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
-    val isInitialized = rememberSaveable { mutableStateOf(false) }
-    val characterDetailsState = characterDetailsViewModel.characterDetails.collectAsState()
+    val characterDetailsState by characterDetailsViewModel.characterDetails.collectAsStateWithLifecycle()
     val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
 
@@ -68,10 +70,7 @@ fun CharacterDetailsScreen(
     }
 
     LaunchedEffect(characterId) {
-        if(!isInitialized.value) {
-            characterDetailsViewModel.getCharacterDetails(characterId)
-            isInitialized.value = true
-        }
+        characterDetailsViewModel.getCharacterDetails(characterId)
     }
 
     Scaffold(
@@ -79,8 +78,8 @@ fun CharacterDetailsScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if(isAtTop) "Character"
-                            else characterDetailsState.value.data?.name ?: "Character",
+                        text = if(isAtTop) stringResource(R.string.character_title)
+                            else characterDetailsState.data?.name ?: stringResource(R.string.character_title),
                         style = MaterialTheme.typography.titleLarge
                     )
                 },
@@ -102,7 +101,7 @@ fun CharacterDetailsScreen(
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        when(characterDetailsState.value) {
+        when(characterDetailsState) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize().padding(innerPadding),
@@ -112,87 +111,106 @@ fun CharacterDetailsScreen(
                 }
             }
             is Resource.Success -> {
-                val characterDetails = characterDetailsState.value.data
-
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
-                    ).verticalScroll(scrollState).padding(horizontal = 12.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
-                ) {
-                    CharacterTitleSection(
-                        avatarUrl = "${BuildConfig.BASE_URL}${characterDetails?.image?.original}",
-                        name = characterDetails?.name,
-                        japaneseName = characterDetails?.japanese
-                    )
-                    characterDetails?.descriptionHtml?.let { description ->
-                        ExpandableText(
-                            descriptionHtml = description,
-                            style = MaterialTheme.typography.bodySmall,
-                            collapsedMaxLines = 3,
-                            onEntityClick = { entityType, id ->
-                                when(entityType) {
-                                    EntityType.CHARACTER -> {
-                                        navOptions.navigateToCharacterDetails(id)
-                                    }
-                                    EntityType.PERSON -> {
-                                        customTabIntent.launchUrl(context,
-                                            "${BuildConfig.BASE_URL}/person/$id".toUri()
-                                        )
-                                    }
-                                    EntityType.ANIME -> {
-                                        navOptions.navigateToAnimeDetails(id)
-                                    }
-                                    EntityType.MANGA, EntityType.RANOBE -> {
-                                            navOptions.navigateToMangaDetails(id)
-                                        }
-                                    EntityType.COMMENT -> { /**/ }
-                                }
-                            }, onLinkClick = { url ->
-                                customTabIntent.launchUrl(context, url.toUri())
-                            }
-                        )
-                    }
-                    LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                characterDetailsState.data?.let { characterDetails ->
+                    Column(
+                        modifier = Modifier.fillMaxSize().padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                        ).verticalScroll(scrollState),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
-                        items(characterDetails?.seyu ?: emptyList()) { seyuItem ->
-                            CharacterCard(
-                                characterPoster = "${BuildConfig.BASE_URL}${seyuItem.image?.original}",
-                                characterName = seyuItem.name ?: "Unknown",
-                                onClick = { /**/ }
+                        CharacterTitleSection(
+                            avatarUrl = "${BuildConfig.BASE_URL}${characterDetails.image.original}",
+                            name = characterDetails.name,
+                            japaneseName = characterDetails.japanese,
+                            modifier = Modifier.padding(horizontal = 12.dp)
+                        )
+                        characterDetails.descriptionHtml?.let { description ->
+                            ExpandableText(
+                                descriptionHtml = description,
+                                style = MaterialTheme.typography.bodySmall,
+                                collapsedMaxLines = 3,
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                }, onLinkClick = { url ->
+                                    customTabIntent.launchUrl(context, url.toUri())
+                                },
+                                modifier = Modifier.padding(horizontal = 12.dp)
+                            )
+                        }
+                        LazyRow(
+                            contentPadding = PaddingValues(horizontal = 12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(characterDetails.seyu ?: emptyList()) { seyuItem ->
+                                CharacterCard(
+                                    characterPoster = "${BuildConfig.BASE_URL}${seyuItem.image?.original}",
+                                    characterName = seyuItem.name ?: "Unknown",
+                                    onClick = { navOptions.navigateToPerson(seyuItem.id.toString()) }
+                                )
+                            }
+                        }
+                        if(!characterDetails.animes.isNullOrEmpty()) {
+                            val browseItems = characterDetails.animes.map { item ->
+                                item.toBrowseAnime()
+                            }
+                            CharacterMediaSection(
+                                sectionTitle = stringResource(R.string.main_track_mode_anime),
+                                items = browseItems,
+                                onItemClick = { id, mediaType ->
+                                    navOptions.navigateToAnimeDetails(id)
+                                }
+                            )
+                        }
+                        if(!characterDetails.mangas.isNullOrEmpty()) {
+                            val browseItems = characterDetails.mangas.map { item ->
+                                item.toBrowseManga()
+                            }
+                            CharacterMediaSection(
+                                sectionTitle = stringResource(R.string.settings_manga_section_title),
+                                items = browseItems,
+                                onItemClick = { id, mediaType ->
+                                    navOptions.navigateToMangaDetails(id)
+                                }
+                            )
+                        }
+                        characterDetails.topicId?.let { topicId ->
+                            CommentSection(
+                                topicId = topicId.toString(),
+                                isRefreshing = false,
+                                onTopicNavigate = {
+                                    navOptions.navigateToComments(
+                                        screenMode = CommentsScreenMode.TOPIC,
+                                        id = topicId.toString()
+                                    )
+                                },
+                                onLinkClick = { url ->
+                                    customTabIntent.launchUrl(context, url.toUri())
+                                },
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                }, modifier = Modifier.padding(horizontal = 12.dp)
                             )
                         }
                     }
-                    if(!characterDetails?.animes.isNullOrEmpty()) {
-                        val browseItems = characterDetails.animes.map { item ->
-                            item.toBrowseAnime()
-                        }
-                        CharacterMediaSection(
-                            sectionTitle = "Anime",
-                            items = browseItems,
-                            onItemClick = { id, mediaType ->
-                                navOptions.navigateToAnimeDetails(id)
-                            }
-                        )
-                    }
-                    if(!characterDetails?.mangas.isNullOrEmpty()) {
-                        val browseItems = characterDetails.mangas.map { item ->
-                            item.toBrowseManga()
-                        }
-                        CharacterMediaSection(
-                            sectionTitle = "Manga",
-                            items = browseItems,
-                            onItemClick = { id, mediaType ->
-                                navOptions.navigateToMangaDetails(id)
-                            }
-                        )
-                    }
                 }
             }
-            is Resource.Error -> { /**/ }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = characterDetailsState.message
+                            ?: stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = {
+                            characterDetailsViewModel.getCharacterDetails(characterId, isRefresh = true)
+                        }
+                    )
+                }
+            }
         }
     }
 }

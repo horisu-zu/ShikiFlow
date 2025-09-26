@@ -39,9 +39,9 @@ class AnimeDetailsViewModel @Inject constructor(
     private val _updateEvent = MutableSharedFlow<Unit>()
     val updateEvent = _updateEvent.asSharedFlow()
 
-    fun getAnimeDetails(id: String, isRefresh: Boolean = false) {
+    fun getAnimeDetails(id: String) {
         viewModelScope.launch {
-            if (!isRefresh && currentId != id) {
+            if (currentId == id) { return@launch } else {
                 _animeDetails.value = Resource.Loading()
             }
 
@@ -84,7 +84,7 @@ class AnimeDetailsViewModel @Inject constructor(
             } finally {
                 _updateEvent.emit(Unit)
                 currentId?.let { id ->
-                    getAnimeDetails(id, isRefresh = true)
+                    getAnimeDetails(id)
                 }
                 _isUpdating.value = false
             }
@@ -114,7 +114,7 @@ class AnimeDetailsViewModel @Inject constructor(
                 Log.e("AnimeDetailsViewModel", "Error creating user rate: ${e.message}")
             } finally {
                 _updateEvent.emit(Unit)
-                getAnimeDetails(targetId, isRefresh = true)
+                getAnimeDetails(targetId)
                 _isUpdating.value = false
             }
         }

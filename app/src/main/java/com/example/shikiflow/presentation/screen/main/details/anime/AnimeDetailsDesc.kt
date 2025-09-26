@@ -1,10 +1,16 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -47,9 +54,12 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.utils.Converter.EntityType
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime,
+    selectedScreenshotIndex: Int?,
+    sharedTransitionScope: SharedTransitionScope,
     isRefreshing: Boolean,
     onSimilarClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
@@ -57,15 +67,19 @@ fun AnimeDetailsDesc(
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     onTopicNavigate: (String) -> Unit,
+    onScreenshotClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+    ) {
         animeDetails.descriptionHtml?.let { descriptionHtml ->
             ExpandableText(
                 descriptionHtml = descriptionHtml,
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
                 style = MaterialTheme.typography.bodySmall,
                 linkColor = MaterialTheme.colorScheme.primary,
                 brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
@@ -80,6 +94,7 @@ fun AnimeDetailsDesc(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
+                contentPadding = PaddingValues(horizontal = 12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(animeDetails.genres) { genreItem ->
@@ -92,7 +107,7 @@ fun AnimeDetailsDesc(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(horizontal = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
@@ -120,14 +135,15 @@ fun AnimeDetailsDesc(
             onItemClick = onItemClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 12.dp)
+                .padding(horizontal = 12.dp)
         )
 
         ScreenshotSection(
             screenshots = animeDetails.screenshots,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
+            selectedIndex = selectedScreenshotIndex,
+            onScreenshotClick = onScreenshotClick,
+            sharedTransitionScope = sharedTransitionScope,
+            modifier = Modifier.fillMaxWidth()
         )
 
         AnimeDetailsInfo(
@@ -138,9 +154,7 @@ fun AnimeDetailsDesc(
             onExternalLinksClick = onExternalLinksClick,
             onEntityClick = onEntityClick,
             onTopicNavigate = onTopicNavigate,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp)
+            modifier = Modifier.fillMaxWidth()
         )
     }
 
@@ -286,9 +300,13 @@ fun RelatedItem(
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun ScreenshotSection(
     screenshots: List<AnimeDetailsQuery.Screenshot>,
+    selectedIndex: Int?,
+    sharedTransitionScope: SharedTransitionScope,
+    onScreenshotClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -297,17 +315,33 @@ private fun ScreenshotSection(
     ) {
         Text(
             text = stringResource(R.string.anime_details_screenshots),
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 12.dp)
         )
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(horizontal = 12.dp)
         ) {
-            items(screenshots) { screenshot ->
-                BaseImage(
-                    model = screenshot.originalUrl,
-                    modifier = Modifier.width(280.dp),
-                    imageType = ImageType.Screenshot()
-                )
+            itemsIndexed(screenshots) { index, screenshot ->
+                AnimatedVisibility(
+                    visible = index != selectedIndex,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.animateItem()
+                ) {
+                    with(sharedTransitionScope) {
+                        BaseImage(
+                            model = screenshot.originalUrl,
+                            modifier = Modifier
+                                .clickable { onScreenshotClick(index) }
+                                .sharedElement(
+                                    sharedContentState = rememberSharedContentState(key = screenshot.originalUrl),
+                                    animatedVisibilityScope = this@AnimatedVisibility
+                                ),
+                            imageType = ImageType.Screenshot()
+                        )
+                    }
+                }
             }
         }
     }

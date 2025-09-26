@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.repository
 
-import android.util.Log
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.domain.model.character.ShikiCharacter
 import com.example.shikiflow.domain.repository.CharacterRepository
@@ -11,15 +10,7 @@ class CharacterRepositoryImpl @Inject constructor(
 ): CharacterRepository {
     override suspend fun getCharacterDetails(
         characterId: String
-    ): Result<ShikiCharacter> {
-        return try {
-            val response = characterApi.getCharacterDetails(characterId)
-
-            Result.success(response)
-        } catch (e: Exception) {
-            Log.e("CharacterRepository", "Error: ${e.message}")
-            Result.failure(e)
-        }
+    ): ShikiCharacter = characterApi.getCharacterDetails(characterId)
         /*val query = CharacterDetailsQuery(
             ids = Optional.presentIfNotNull(listOf(characterId))
         )
@@ -33,5 +24,4 @@ class CharacterRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             Result.failure(e)
         }*/
-    }
 }

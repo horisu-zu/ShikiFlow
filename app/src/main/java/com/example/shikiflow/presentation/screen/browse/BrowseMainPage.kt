@@ -11,6 +11,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,6 +21,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +51,7 @@ fun BrowseMainPage(
     onNavigate: (String, MediaType) -> Unit,
     onSideScreenNavigate: (BrowseType) -> Unit,
     modifier: Modifier = Modifier,
+    onIsAtTopChange: (Boolean) -> Unit,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
     val browseUiSettings by browseViewModel.browseUiSettings.collectAsStateWithLifecycle()
@@ -60,6 +65,7 @@ fun BrowseMainPage(
         browseState = ongoingBrowseState,
         onSideScreenNavigate = onSideScreenNavigate,
         onNavigate = onNavigate,
+        onIsAtTopChange = onIsAtTopChange,
         onSettingClick = { showBottomSheet.value = true },
         modifier = modifier
     )
@@ -87,6 +93,7 @@ private fun BrowseComponent(
     browseState: LazyPagingItems<Browse>,
     onSideScreenNavigate: (BrowseType) -> Unit,
     onNavigate: (String, MediaType) -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     onSettingClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -99,6 +106,7 @@ private fun BrowseComponent(
                         onSideScreenNavigate = onSideScreenNavigate,
                         onNavigate = onNavigate,
                         onSettingClick = onSettingClick,
+                        onIsAtTopChange = onIsAtTopChange,
                         modifier = modifier
                     )
                 }
@@ -108,6 +116,7 @@ private fun BrowseComponent(
                         onSideScreenNavigate = onSideScreenNavigate,
                         onNavigate = onNavigate,
                         onSettingClick = onSettingClick,
+                        onIsAtTopChange = onIsAtTopChange,
                         modifier = modifier
                     )
                 }
@@ -119,6 +128,7 @@ private fun BrowseComponent(
                 onSideScreenNavigate = onSideScreenNavigate,
                 onNavigate = onNavigate,
                 onSettingClick = onSettingClick,
+                onIsAtTopChange = onIsAtTopChange,
                 modifier = modifier
             )
         }
@@ -128,6 +138,7 @@ private fun BrowseComponent(
                 onSideScreenNavigate = onSideScreenNavigate,
                 onNavigate = onNavigate,
                 onSettingClick = onSettingClick,
+                onIsAtTopChange = onIsAtTopChange,
                 modifier = modifier
             )
         }
@@ -140,9 +151,23 @@ private fun BrowseListComponent(
     onSideScreenNavigate: (BrowseType) -> Unit,
     onNavigate: (String, MediaType) -> Unit,
     onSettingClick: () -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lazyListState = rememberLazyListState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex == 0 &&
+            lazyListState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isAtTop) {
+        onIsAtTopChange(isAtTop)
+    }
+
     LazyColumn(
+        state = lazyListState,
         modifier = modifier,
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -215,9 +240,23 @@ private fun BrowseGridComponent(
     onSideScreenNavigate: (BrowseType) -> Unit,
     onNavigate: (String, MediaType) -> Unit,
     onSettingClick: () -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lazyGridState = rememberLazyGridState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex == 0 &&
+            lazyGridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isAtTop) {
+        onIsAtTopChange(isAtTop)
+    }
+
     LazyVerticalGrid(
+        state = lazyGridState,
         columns = GridCells.Fixed(3),
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),

@@ -6,10 +6,13 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.rememberSceneSetupNavEntryDecorator
 import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MediaNavOptions
@@ -22,6 +25,8 @@ import com.example.shikiflow.presentation.screen.main.details.common.CommentsScr
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MangaReadNavigator
+import com.example.shikiflow.presentation.screen.main.details.person.PersonScreen
+import com.example.shikiflow.utils.Converter.EntityType
 
 @Composable
 fun DetailsNavigator(
@@ -65,8 +70,32 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id))
         }
 
+        override fun navigateToPerson(personId: String) {
+            detailsBackstack.add(DetailsNavRoute.Person(personId))
+        }
+
         override fun navigateToAnimeWatch(title: String, shikimoriId: String, completedEpisodes: Int) {
             detailsBackstack.add(DetailsNavRoute.AnimeWatch(title, shikimoriId, completedEpisodes))
+        }
+
+        override fun navigateByEntity(entityType: EntityType, id: String) {
+            when (entityType) {
+                EntityType.CHARACTER -> {
+                    navigateToCharacterDetails(id)
+                }
+                EntityType.PERSON -> {
+                    navigateToPerson(id)
+                }
+                EntityType.ANIME -> {
+                    navigateToAnimeDetails(id)
+                }
+                EntityType.MANGA, EntityType.RANOBE -> {
+                    navigateToMangaDetails(id)
+                }
+                EntityType.COMMENT -> {
+                    navigateToComments(CommentsScreenMode.COMMENT, id)
+                }
+            }
         }
 
         override fun navigateBack() {
@@ -131,6 +160,12 @@ fun DetailsNavigator(
                     navOptions = options
                 )
             }
+            entry<DetailsNavRoute.Person> { route ->
+                PersonScreen(
+                    personId = route.personId,
+                    navOptions = options
+                )
+            }
             entry<DetailsNavRoute.AnimeWatch> { route ->
                 AnimeWatchNavigator(
                     title = route.title,
@@ -147,6 +182,11 @@ fun DetailsNavigator(
                 initialOffsetX = { it },
                 animationSpec = tween(300)
             ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-        }
+        },
+        entryDecorators = listOf(
+            rememberSceneSetupNavEntryDecorator(),
+            rememberSavedStateNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        )
     )
 }

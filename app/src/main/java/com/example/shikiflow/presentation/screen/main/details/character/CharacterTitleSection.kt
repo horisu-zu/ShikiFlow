@@ -18,10 +18,11 @@ import com.example.shikiflow.presentation.common.image.RoundedImage
 fun CharacterTitleSection(
     avatarUrl: String,
     name: String?,
-    japaneseName: String?
+    japaneseName: String?,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+        modifier = modifier.fillMaxWidth().padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {

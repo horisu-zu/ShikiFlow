@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.character
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.character.ShikiCharacter
@@ -17,29 +16,23 @@ class CharacterDetailsViewModel @Inject constructor(
     private val characterRepository: CharacterRepository
 ): ViewModel() {
 
-    private var _characterId: String? = null
+    private var _currentId: String? = null
     private val _characterDetails = MutableStateFlow<Resource<ShikiCharacter>>(Resource.Loading())
     val characterDetails = _characterDetails.asStateFlow()
 
-    fun getCharacterDetails(characterId: String) {
+    fun getCharacterDetails(characterId: String, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if(characterId == _characterId) return@launch
+            if(characterId == _currentId && !isRefresh) return@launch else {
+                _characterDetails.value = Resource.Loading()
+            }
 
-            _characterDetails.value = Resource.Loading()
             try {
                 val result = characterRepository.getCharacterDetails(characterId)
-                _characterDetails.value = when {
-                    result.isSuccess -> {
-                        _characterId = characterId
-                        Resource.Success(result.getOrNull())
-                    }
-                    result.isFailure -> Resource.Error(result.exceptionOrNull()?.message ?: "Unknown error")
-                    else -> Resource.Error("Unknown error")
-                }
+
+                _characterDetails.value = Resource.Success(result)
+                _currentId = characterId
             } catch (e: Exception) {
                 _characterDetails.value = Resource.Error(e.message ?: "Unknown error")
-            } finally {
-                Log.d("CharacterDetailsViewModel", "getCharacterDetails: ${_characterDetails.value}")
             }
         }
     }

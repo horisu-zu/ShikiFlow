@@ -128,25 +128,7 @@ fun MangaDetailsScreen(
                                 } else navOptions.navigateToMangaDetails(id)
                             },
                             onEntityClick = { entityType, id ->
-                                when(entityType) {
-                                    EntityType.CHARACTER -> {
-                                        navOptions.navigateToCharacterDetails(id)
-                                    }
-                                    EntityType.PERSON -> {
-                                        customTabIntent.launchUrl(context,
-                                            "${BuildConfig.BASE_URL}/person/$id".toUri()
-                                        )
-                                    }
-                                    EntityType.ANIME -> {
-                                        navOptions.navigateToAnimeDetails(id)
-                                    }
-                                    EntityType.MANGA, EntityType.RANOBE -> {
-                                            navOptions.navigateToMangaDetails(id)
-                                    }
-                                    EntityType.COMMENT -> {
-                                        navOptions.navigateToComments(CommentsScreenMode.COMMENT, id)
-                                    }
-                                }
+                                navOptions.navigateByEntity(entityType, id)
                             },
                             onLinkClick = { url ->
                                 customTabIntent.launchUrl(context, url.toUri())

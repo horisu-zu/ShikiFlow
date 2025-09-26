@@ -184,4 +184,6 @@
 
     <string name="chapter_empty_title">Ch. %1$s</string>
     <string name="chapter_title">Ch. %1$s — %2$s</string>
+
+    <string name="character_title">Character</string>
 </resources>

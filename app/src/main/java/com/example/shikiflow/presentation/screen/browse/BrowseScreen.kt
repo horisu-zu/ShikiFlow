@@ -8,6 +8,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
@@ -23,12 +26,14 @@ fun BrowseScreen(
 ) {
     val searchQuery by searchViewModel.screenState.collectAsState()
     val screenState by searchViewModel.screenState.collectAsState()
+    var isAtTop by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
             BrowseAppBar(
                 title = stringResource(id = R.string.bottom_navigator_browse),
                 searchQuery = searchQuery.query,
+                isAtTop = isAtTop,
                 onSearchQueryChange = searchViewModel::onQueryChange,
                 isSearchActive = screenState.isSearchActive,
                 onExitSearch = { searchViewModel.exitSearchState() },
@@ -57,6 +62,7 @@ fun BrowseScreen(
                     onSideScreenNavigate = { sideScreen ->
                         browseNavOptions.navigateToSideScreen(sideScreen)
                     },
+                    onIsAtTopChange = { isAtTop = it },
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)

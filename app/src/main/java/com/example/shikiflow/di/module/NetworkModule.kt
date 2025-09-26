@@ -18,6 +18,7 @@ import com.example.shikiflow.data.remote.GithubApi
 import com.example.shikiflow.data.remote.KodikApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.MangaDexApi
+import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.di.annotations.KodikOkHttpClient
 import com.example.shikiflow.di.annotations.KodikRetrofit
@@ -180,6 +181,11 @@ class NetworkModule {
     @Provides
     @Singleton
     fun provideCharacterApi(@MainRetrofit retrofit: Retrofit): CharacterApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun providePersonApi(@MainRetrofit retrofit: Retrofit): PersonApi =
         retrofit.create()
 
     @Provides

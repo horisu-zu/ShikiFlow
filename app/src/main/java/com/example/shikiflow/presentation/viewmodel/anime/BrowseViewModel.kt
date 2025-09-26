@@ -21,19 +21,19 @@ import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
     private val animeRepository: AnimeRepository,
@@ -61,13 +61,14 @@ class BrowseViewModel @Inject constructor(
             initialValue = BrowseUiSettings()
         )
 
-    val browseMainOngoingsState = browseUiSettings
-        .flatMapLatest { settings ->
+    val browseMainOngoingsState = browseUiSettings.map { it.browseOngoingOrder }
+        .distinctUntilChanged()
+        .flatMapLatest { order ->
             paginatedBrowse(
                 type = BrowseType.AnimeBrowseType.ONGOING,
                 options = BrowseOptions(
                     status = AnimeStatusEnum.ongoing,
-                    order = settings.browseOngoingOrder.orderEnum
+                    order = order.orderEnum
                 )
             )
         }.cachedIn(viewModelScope)

@@ -1,13 +1,12 @@
 package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,48 +24,47 @@ import com.example.shikiflow.presentation.common.CustomSearchField
 fun BrowseAppBar(
     title: String,
     searchQuery: String,
+    isAtTop: Boolean,
     onSearchQueryChange: (String) -> Unit,
     isSearchActive: Boolean,
     onSearchActiveChange: (Boolean) -> Unit,
     onExitSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    TopAppBar(
-        title = {
-            AnimatedContent(
-                targetState = isSearchActive,
-                transitionSpec = {
-                    fadeIn() togetherWith fadeOut()
+    Column {
+        TopAppBar(
+            title = {
+                AnimatedContent(targetState = isSearchActive) { isSearch ->
+                    if (isSearch) {
+                        CustomSearchField(
+                            query = searchQuery,
+                            label = stringResource(R.string.browse_page_search),
+                            onQueryChange = onSearchQueryChange,
+                            onActiveChange = onSearchActiveChange,
+                            onExitSearch = onExitSearch,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else { Text(title) }
                 }
-            ) { isSearch ->
-                if (isSearch) {
-                    CustomSearchField(
-                        query = searchQuery,
-                        label = stringResource(R.string.browse_page_search),
-                        onQueryChange = onSearchQueryChange,
-                        isActive = isSearchActive,
-                        onActiveChange = onSearchActiveChange,
-                        onExitSearch = onExitSearch,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                } else { Text(title) }
-            }
-        },
-        actions = {
-            if(!isSearchActive) {
-                IconButton(
-                    onClick = { onSearchActiveChange(true) }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Search,
-                        contentDescription = "Search"
-                    )
+            },
+            actions = {
+                if(!isSearchActive) {
+                    IconButton(
+                        onClick = { onSearchActiveChange(true) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    }
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.background
-        ),
-        modifier = modifier
-    )
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = if(isAtTop || isSearchActive) MaterialTheme.colorScheme.background
+                    else MaterialTheme.colorScheme.surface
+            ),
+            modifier = modifier
+        )
+        if(!isAtTop && !isSearchActive) HorizontalDivider()
+    }
 }

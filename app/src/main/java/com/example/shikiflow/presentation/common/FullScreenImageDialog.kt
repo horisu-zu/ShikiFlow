@@ -1,0 +1,144 @@
+package com.example.shikiflow.presentation.common
+
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
+import kotlinx.coroutines.delay
+import net.engawapg.lib.zoomable.rememberZoomState
+import net.engawapg.lib.zoomable.zoomable
+
+@OptIn(ExperimentalSharedTransitionApi::class)
+@Composable
+fun SharedTransitionScope.FullScreenImageDialog(
+    imageUrls: List<String>,
+    initialIndex: Int,
+    visibilityScope: AnimatedVisibilityScope,
+    modifier: Modifier = Modifier,
+    onDismiss: () -> Unit,
+    imageType: ImageType = ImageType.Screenshot(),
+) {
+    var isInitCompleted by remember { mutableStateOf(false) }
+
+    LaunchedEffect(visibilityScope.transition.isRunning) {
+        if(!visibilityScope.transition.isRunning) {
+            delay(100)
+            isInitCompleted = true
+        }
+    }
+
+    BackHandler {
+        onDismiss()
+    }
+
+    val pagerState = rememberPagerState(
+        initialPage = initialIndex,
+        pageCount = { imageUrls.size }
+    )
+
+    Box(modifier = modifier.background(Color.Black.copy(alpha = 0.7f))) {
+        HorizontalPager(state = pagerState) { pageIndex ->
+            BaseImage(
+                model = imageUrls[pageIndex],
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+                    .zoomable(rememberZoomState())
+                    .clickable { onDismiss() }
+                    .then(
+                        if(!isInitCompleted) {
+                            Modifier.sharedElement(
+                                sharedContentState = rememberSharedContentState(key = imageUrls[pageIndex]),
+                                animatedVisibilityScope = visibilityScope
+                            )
+                        } else Modifier
+                    ),
+                imageType = imageType
+            )
+        }
+        if (imageUrls.size > 1) {
+            Box(
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(all = 32.dp)
+                    .clip(CircleShape)
+                    .background(Color.Black.copy(alpha = 0.85f))
+            ) {
+                PagerIndicator(
+                    currentIndex = pagerState.currentPage,
+                    totalCount = pagerState.pageCount,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
+        }
+    }
+}
+
+private enum class IndicatorState {
+    START, MIDDLE, END
+}
+
+@Composable
+private fun PagerIndicator(
+    currentIndex: Int,
+    totalCount: Int,
+    modifier: Modifier = Modifier,
+    dotSize: Dp = 12.dp,
+    spacing: Dp = 6.dp,
+    activeAlpha: Float = 1f,
+    inactiveAlpha: Float = 0.3f,
+    animationDuration: Int = 300,
+    color: Color = Color.White
+) {
+    val indicatorState = when (currentIndex) {
+        0 -> IndicatorState.START
+        totalCount - 1 -> IndicatorState.END
+        else -> IndicatorState.MIDDLE
+    }
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(spacing),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        IndicatorState.entries.forEach { dotState ->
+            val alpha by animateFloatAsState(
+                targetValue = if (indicatorState == dotState) activeAlpha else inactiveAlpha,
+                animationSpec = tween(animationDuration)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(dotSize)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = alpha))
+            )
+        }
+    }
+}
