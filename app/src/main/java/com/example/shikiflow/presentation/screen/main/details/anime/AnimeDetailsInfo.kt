@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeDetailsQuery
@@ -140,7 +141,8 @@ fun AnimeDetailsInfo(
                 Text(
                     text = animeDetails.name,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 1,
+                    maxLines = 2,
+                    textAlign = TextAlign.End,
                     modifier = Modifier.padding(start = 12.dp)
                 )
             }
@@ -152,7 +154,8 @@ fun AnimeDetailsInfo(
                     Text(
                         text = animeDetails.japanese,
                         overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
+                        maxLines = 2,
+                        textAlign = TextAlign.End,
                         modifier = Modifier.padding(start = 12.dp)
                     )
                 }
@@ -170,7 +173,8 @@ fun AnimeDetailsInfo(
                             Text(
                                 text = synonym,
                                 overflow = TextOverflow.Ellipsis,
-                                maxLines = 1,
+                                maxLines = 2,
+                                textAlign = TextAlign.End,
                                 modifier = Modifier.padding(start = 12.dp)
                             )
                         }
@@ -241,6 +245,7 @@ fun AnimeDetailsInfo(
             HorizontalDivider()
             CommentSection(
                 topicId = topicId,
+                commentsCount = animeDetails.topic.commentsCount,
                 isRefreshing = isRefreshing,
                 onEntityClick = onEntityClick,
                 onTopicNavigate = onTopicNavigate,

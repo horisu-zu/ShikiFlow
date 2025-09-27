@@ -111,12 +111,14 @@ fun CharacterDetailsScreen(
                 }
             }
             is Resource.Success -> {
+                val horizontalPadding = 12.dp
+
                 characterDetailsState.data?.let { characterDetails ->
                     Column(
                         modifier = Modifier.fillMaxSize().padding(
                             top = innerPadding.calculateTopPadding(),
                             start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                         ).verticalScroll(scrollState),
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
@@ -124,7 +126,7 @@ fun CharacterDetailsScreen(
                             avatarUrl = "${BuildConfig.BASE_URL}${characterDetails.image.original}",
                             name = characterDetails.name,
                             japaneseName = characterDetails.japanese,
-                            modifier = Modifier.padding(horizontal = 12.dp)
+                            modifier = Modifier.padding(horizontal = horizontalPadding)
                         )
                         characterDetails.descriptionHtml?.let { description ->
                             ExpandableText(
@@ -136,11 +138,11 @@ fun CharacterDetailsScreen(
                                 }, onLinkClick = { url ->
                                     customTabIntent.launchUrl(context, url.toUri())
                                 },
-                                modifier = Modifier.padding(horizontal = 12.dp)
+                                modifier = Modifier.padding(horizontal = horizontalPadding)
                             )
                         }
                         LazyRow(
-                            contentPadding = PaddingValues(horizontal = 12.dp),
+                            contentPadding = PaddingValues(horizontal = horizontalPadding),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             items(characterDetails.seyu ?: emptyList()) { seyuItem ->
@@ -160,7 +162,7 @@ fun CharacterDetailsScreen(
                                 items = browseItems,
                                 onItemClick = { id, mediaType ->
                                     navOptions.navigateToAnimeDetails(id)
-                                }
+                                }, horizontalPadding = horizontalPadding
                             )
                         }
                         if(!characterDetails.mangas.isNullOrEmpty()) {
@@ -172,7 +174,7 @@ fun CharacterDetailsScreen(
                                 items = browseItems,
                                 onItemClick = { id, mediaType ->
                                     navOptions.navigateToMangaDetails(id)
-                                }
+                                }, horizontalPadding = horizontalPadding
                             )
                         }
                         characterDetails.topicId?.let { topicId ->
@@ -190,7 +192,12 @@ fun CharacterDetailsScreen(
                                 },
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
-                                }, modifier = Modifier.padding(horizontal = 12.dp)
+                                },
+                                modifier = Modifier.padding(
+                                    start = horizontalPadding,
+                                    end = horizontalPadding,
+                                    bottom = 8.dp
+                                )
                             )
                         }
                     }

@@ -91,8 +91,8 @@ fun AnimeDetailsQuery.Anime.toUiModel(): UserRateData {
             mediaId = id,
             title = name,
             posterUrl = poster?.originalUrl,
-            createDate = Instant.parse(createdAt.toString()),
-            updateDate = Instant.parse(updatedAt.toString()),
+            createDate = Instant.parse(userRate.createdAt.toString()),
+            updateDate = Instant.parse(userRate.updatedAt.toString()),
             totalEpisodes = if(status == AnimeStatusEnum.released) episodes else episodesAired,
             totalChapters = null
         )

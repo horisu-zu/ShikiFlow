@@ -16,19 +16,16 @@ query AnimeDetails(
         episodes
         episodesAired
         duration
-        airedOn { year month day date }
-        releasedOn { year month day date }
+        airedOn { date }
+        releasedOn { date }
         url
         season
 
         poster { originalUrl }
 
-        franchise
-        createdAt,
-        updatedAt,
         nextEpisodeAt,
 
-        genres { id name russian kind }
+        genres { id name kind }
         studios { id name imageUrl }
 
         characterRoles {
@@ -53,7 +50,7 @@ query AnimeDetails(
             relationKind
         }
 
-        screenshots { id originalUrl x166Url x332Url }
+        screenshots { id originalUrl }
 
         scoresStats { score count }
         statusesStats { status count }

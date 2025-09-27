@@ -11,6 +11,7 @@ import com.example.shikiflow.data.remote.GithubApi
 import com.example.shikiflow.data.remote.KodikApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.MangaDexApi
+import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.data.remote.ShikimoriAuthApi
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.data.repository.AnimeRepositoryImpl
@@ -23,6 +24,7 @@ import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MangaRepositoryImpl
 import com.example.shikiflow.data.repository.MangaTracksRepositoryImpl
+import com.example.shikiflow.data.repository.PersonRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
 import com.example.shikiflow.domain.auth.TokenManager
 import com.example.shikiflow.domain.repository.AnimeRepository
@@ -35,6 +37,7 @@ import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.domain.repository.MangaTracksRepository
+import com.example.shikiflow.domain.repository.PersonRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
@@ -102,6 +105,12 @@ object RepositoryModule {
     fun provideCharacterRepository(
         characterApi: CharacterApi
     ): CharacterRepository = CharacterRepositoryImpl(characterApi)
+
+    @Provides
+    @Singleton
+    fun providePersonRepository(
+        personApi: PersonApi
+    ): PersonRepository = PersonRepositoryImpl(personApi)
 
     @Provides
     @Singleton

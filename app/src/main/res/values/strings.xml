@@ -186,4 +186,8 @@
     <string name="chapter_title">Ch. %1$s — %2$s</string>
 
     <string name="character_title">Character</string>
+    <string name="person_title">Person</string>
+    <string name="works_title">Works</string>
+    <string name="person_stats_expand">Stats</string>
+    <string name="details_comments_count">— %1s total</string>
 </resources>

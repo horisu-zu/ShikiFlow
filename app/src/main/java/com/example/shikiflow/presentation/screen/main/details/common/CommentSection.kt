@@ -45,6 +45,7 @@ fun CommentSection(
     onLinkClick: (String) -> Unit,
     onTopicNavigate: (String) -> Unit,
     modifier: Modifier = Modifier,
+    commentsCount: Int? = null,
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
     val commentsState = commentViewModel.comments.collectAsStateWithLifecycle()
@@ -90,10 +91,17 @@ fun CommentSection(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.details_comments),
-                        style = MaterialTheme.typography.titleMedium
-                    )
+                    Column {
+                        Text(
+                            text = buildString {
+                                append(stringResource(id = R.string.details_comments))
+                                commentsCount?.let { count ->
+                                    append(stringResource(id = R.string.details_comments_count, count))
+                                }
+                            },
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                     IconButton(
                         onClick = { onTopicNavigate(topicId) }
                     ) {

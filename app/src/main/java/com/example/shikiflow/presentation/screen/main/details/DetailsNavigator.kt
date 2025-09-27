@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -182,6 +183,15 @@ fun DetailsNavigator(
                 initialOffsetX = { it },
                 animationSpec = tween(300)
             ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+        },
+        popTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = tween(300)
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(300)
+            )
         },
         entryDecorators = listOf(
             rememberSceneSetupNavEntryDecorator(),

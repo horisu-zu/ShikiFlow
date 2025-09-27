@@ -39,6 +39,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.graphql.AnimeDetailsQuery
@@ -70,6 +71,7 @@ fun AnimeDetailsDesc(
     onScreenshotClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val horizontalPadding = 12.dp
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
     Column(
@@ -79,7 +81,7 @@ fun AnimeDetailsDesc(
         animeDetails.descriptionHtml?.let { descriptionHtml ->
             ExpandableText(
                 descriptionHtml = descriptionHtml,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
                 style = MaterialTheme.typography.bodySmall,
                 linkColor = MaterialTheme.colorScheme.primary,
                 brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
@@ -94,7 +96,7 @@ fun AnimeDetailsDesc(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp),
+                contentPadding = PaddingValues(horizontal = horizontalPadding),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(animeDetails.genres) { genreItem ->
@@ -106,15 +108,16 @@ fun AnimeDetailsDesc(
         animeDetails.characterRoles?.let { characterRoles ->
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
+                    .fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
                     text = stringResource(R.string.details_characters),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = horizontalPadding)
                 )
                 LazyRow(
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(animeDetails.characterRoles) { characterItem ->
@@ -135,7 +138,7 @@ fun AnimeDetailsDesc(
             onItemClick = onItemClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp)
+                .padding(horizontal = horizontalPadding)
         )
 
         ScreenshotSection(
@@ -143,7 +146,8 @@ fun AnimeDetailsDesc(
             selectedIndex = selectedScreenshotIndex,
             onScreenshotClick = onScreenshotClick,
             sharedTransitionScope = sharedTransitionScope,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            horizontalPadding = horizontalPadding
         )
 
         AnimeDetailsInfo(
@@ -307,7 +311,8 @@ private fun ScreenshotSection(
     selectedIndex: Int?,
     sharedTransitionScope: SharedTransitionScope,
     onScreenshotClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    horizontalPadding: Dp = 12.dp,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -316,11 +321,11 @@ private fun ScreenshotSection(
         Text(
             text = stringResource(R.string.anime_details_screenshots),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 12.dp)
+            modifier = Modifier.padding(horizontal = horizontalPadding)
         )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(horizontal = 12.dp)
+            contentPadding = PaddingValues(horizontalPadding)
         ) {
             itemsIndexed(screenshots) { index, screenshot ->
                 AnimatedVisibility(
