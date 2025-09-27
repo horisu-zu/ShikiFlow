@@ -48,7 +48,7 @@ class MangaDetailsViewModel @Inject constructor(
         viewModelScope.launch {
             if(!isRefresh && currentId != id) {
                 _mangaDetails.value = Resource.Loading()
-            }
+            } else if(!isRefresh) { return@launch }
 
             try {
                 val result = mangaRepository.getMangaDetails(id)

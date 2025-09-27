@@ -39,11 +39,11 @@ class AnimeDetailsViewModel @Inject constructor(
     private val _updateEvent = MutableSharedFlow<Unit>()
     val updateEvent = _updateEvent.asSharedFlow()
 
-    fun getAnimeDetails(id: String) {
+    fun getAnimeDetails(id: String, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if (currentId == id) { return@launch } else {
+            if (!isRefresh && currentId != id) {
                 _animeDetails.value = Resource.Loading()
-            }
+            } else if(!isRefresh) { return@launch }
 
             try {
                 val result = animeRepository.getAnimeDetails(id)
@@ -84,7 +84,7 @@ class AnimeDetailsViewModel @Inject constructor(
             } finally {
                 _updateEvent.emit(Unit)
                 currentId?.let { id ->
-                    getAnimeDetails(id)
+                    getAnimeDetails(id, isRefresh = true)
                 }
                 _isUpdating.value = false
             }
@@ -114,7 +114,7 @@ class AnimeDetailsViewModel @Inject constructor(
                 Log.e("AnimeDetailsViewModel", "Error creating user rate: ${e.message}")
             } finally {
                 _updateEvent.emit(Unit)
-                getAnimeDetails(targetId)
+                getAnimeDetails(targetId, isRefresh = true)
                 _isUpdating.value = false
             }
         }

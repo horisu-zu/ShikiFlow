@@ -112,7 +112,7 @@ fun AnimeDetailsScreen(
                                 try {
                                     isRefreshing = true
                                     delay(300)
-                                    animeDetailsViewModel.getAnimeDetails(id)
+                                    animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
                                 } finally {
                                     isRefreshing = false
                                 }
@@ -180,7 +180,7 @@ fun AnimeDetailsScreen(
                             R.string.browse_search_media_anime
                         ),
                         buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { animeDetailsViewModel.getAnimeDetails(id) }
+                        onButtonClick = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
                     )
                 }
             }
