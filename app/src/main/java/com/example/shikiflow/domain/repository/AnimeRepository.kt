@@ -22,7 +22,7 @@ interface AnimeRepository {
         kind: String? = null,
         status: String? = null,
         season: SeasonString? = null,
-        score: Int? = 1,
+        score: Int? = null,
         duration: DurationString? = null,
         rating: RatingString? = null,
         genre: String? = null,

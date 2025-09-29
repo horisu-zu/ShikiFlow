@@ -15,26 +15,24 @@ object RelatedMapper {
     fun fromAnimeRelated(related: AnimeDetailsQuery.Related): RelatedInfo {
         return MediaRelatedInfo(
             relationKind = mapRelationKind(related.relationKind),
-            media = if(related.anime != null) {
+            media = related.anime?.let { anime ->
                 MediaBasicInfo(
-                    id = related.anime.id,
-                    name = related.anime.name,
-                    kind = mapAnimeKind(related.anime.kind),
-                    poster = related.anime.poster?.let { poster ->
+                    id = anime.id,
+                    name = anime.name,
+                    kind = mapAnimeKind(anime.kind),
+                    poster = anime.poster?.let { poster ->
                         PosterInfo(mainUrl = poster.mainUrl)
                     }, mediaType = MediaType.ANIME
                 )
-            } else {
-                related.manga?.let { manga ->
-                    MediaBasicInfo(
-                        id = manga.id,
-                        name = manga.name,
-                        kind = mapMangaKind(manga.kind),
-                        poster = manga.poster?.let { poster ->
-                            PosterInfo(mainUrl = poster.mainUrl)
-                        }, mediaType = MediaType.MANGA
-                    )
-                }
+            } ?: related.manga?.let { manga ->
+                MediaBasicInfo(
+                    id = manga.id,
+                    name = manga.name,
+                    kind = mapMangaKind(manga.kind),
+                    poster = manga.poster?.let { poster ->
+                        PosterInfo(mainUrl = poster.mainUrl)
+                    }, mediaType = MediaType.MANGA
+                )
             }
         )
     }
@@ -42,26 +40,24 @@ object RelatedMapper {
     fun fromMangaRelated(related: MangaDetailsQuery.Related): RelatedInfo {
         return MediaRelatedInfo(
             relationKind = mapRelationKind(related.relationKind),
-            media = if(related.anime != null) {
+            media = related.anime?.let { anime ->
                 MediaBasicInfo(
-                    id = related.anime.id,
-                    name = related.anime.name,
-                    kind = mapAnimeKind(related.anime.kind),
-                    poster = related.anime.poster?.let { poster ->
+                    id = anime.id,
+                    name = anime.name,
+                    kind = mapAnimeKind(anime.kind),
+                    poster = anime.poster?.let { poster ->
                         PosterInfo(mainUrl = poster.mainUrl)
                     }, mediaType = MediaType.ANIME
                 )
-            } else {
-                related.manga?.let { manga ->
-                    MediaBasicInfo(
-                        id = manga.id,
-                        name = manga.name,
-                        kind = mapMangaKind(manga.kind),
-                        poster = manga.poster?.let { poster ->
-                            PosterInfo(mainUrl = poster.mainUrl)
-                        }, mediaType = MediaType.MANGA
-                    )
-                }
+            } ?: related.manga?.let { manga ->
+                MediaBasicInfo(
+                    id = manga.id,
+                    name = manga.name,
+                    kind = mapMangaKind(manga.kind),
+                    poster = manga.poster?.let { poster ->
+                        PosterInfo(mainUrl = poster.mainUrl)
+                    }, mediaType = MediaType.MANGA
+                )
             }
         )
     }

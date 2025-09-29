@@ -12,11 +12,11 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
 import com.example.graphql.type.AnimeRatingEnum
 import com.example.graphql.type.MangaKindEnum
+import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentType
-import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
-import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants.getStatusOrder
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.fleeksoft.ksoup.Ksoup
@@ -151,46 +151,34 @@ object Converter {
         }
     }
 
-    fun convertStatus(status: String, mediaType: MediaType): String {
-        return when (status) {
-            "watching" -> if(mediaType == MediaType.ANIME) "Watching" else "Reading"
-            "completed" -> "Completed"
-            "on_hold" -> "On Hold"
-            "dropped" -> "Dropped"
-            "planned" -> "Planned"
-            "rewatching" -> if(mediaType == MediaType.ANIME) "Rewatching" else "Rereading"
-            else -> "Unknown"
-        }
-    }
-
     fun MangaKindEnum.isManga(): Boolean {
         return this in setOf(MangaKindEnum.manga, MangaKindEnum.manhwa,
             MangaKindEnum.manhua, MangaKindEnum.one_shot, MangaKindEnum.doujin)
     }
 
-    fun convertRatingToString(rating: AnimeRatingEnum): String {
+    fun convertRatingToString(rating: AnimeRatingEnum): Int {
         return when(rating) {
-            AnimeRatingEnum.none -> "None"
-            AnimeRatingEnum.g -> "G"
-            AnimeRatingEnum.pg -> "PG"
-            AnimeRatingEnum.pg_13 -> "PG-13"
-            AnimeRatingEnum.r -> "R-17"
-            AnimeRatingEnum.r_plus -> "R+"
-            AnimeRatingEnum.rx -> "Rx"
-            else -> "Unknown"
+            AnimeRatingEnum.none -> R.string.rating_none
+            AnimeRatingEnum.g -> R.string.rating_g
+            AnimeRatingEnum.pg -> R.string.rating_pg
+            AnimeRatingEnum.pg_13 -> R.string.rating_pg_13
+            AnimeRatingEnum.r -> R.string.rating_r_17
+            AnimeRatingEnum.r_plus -> R.string.rating_r_plus
+            AnimeRatingEnum.rx -> R.string.rating_rx
+            else -> R.string.common_unknown
         }
     }
 
     fun List<UserRate?>.groupAndSortByStatus(
         contentType: MediaType
-    ): Map<String, Int> {
-        val order = getStatusOrder()
+    ): Map<Int, Int> {
+        val order = UserRateStatusEnum.knownEntries
 
         return this
-            .groupBy { it?.status ?: "unknown" }
+            .groupBy { it?.status ?: UserRateStatusEnum.UNKNOWN__ }
             .mapValues { it.value.size }
             .toSortedMap(compareBy { order.indexOf(it) })
-            .mapKeys { convertStatus(it.key, contentType) }
+            .mapKeys { simpleMapUserRateStatusToString(it.key, contentType) }
     }
 
     fun String.toAbbreviation(maxLetters: Int = 2): String {

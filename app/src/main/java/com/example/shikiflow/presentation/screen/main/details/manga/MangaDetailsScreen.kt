@@ -116,12 +116,14 @@ fun MangaDetailsScreen(
                                         ?.userRate?.chapters ?: 0
                                 )
                             },
-                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) }
+                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) },
+                            context = context
                         )
 
                         MangaDetailsDesc(
                             mangaDetails = mangaDetails.data,
                             isRefreshing = isRefreshing,
+                            context = context,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
                                     navOptions.navigateToAnimeDetails(id)

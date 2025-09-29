@@ -69,9 +69,9 @@ fun AnimeTrackItem(
 
             Text(
                 text = buildString {
-                    append(mapAnimeStatus(userRate.anime.status))
+                    append(stringResource(id = mapAnimeStatus(userRate.anime.status)))
                     append(" • ")
-                    append(mapAnimeKind(userRate.anime.kind))
+                    append(stringResource(id = mapAnimeKind(userRate.anime.kind)))
                     append(" • ")
                     append(
                         stringResource(
@@ -114,7 +114,14 @@ fun AnimeTrackItem(
                     )
                 }
             } else {
-                StatusCard(text = determineSeason(userRate.anime.airedOn))
+                userRate.anime.airedOn?.let { date ->
+                    StatusCard(
+                        text = buildString {
+                            append(stringResource(id = determineSeason(userRate.anime.airedOn)))
+                            append(" ${date.year}")
+                        }
+                    )
+                }
             }
         }
     }

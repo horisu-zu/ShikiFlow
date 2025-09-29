@@ -3,16 +3,8 @@ package com.example.shikiflow.domain.model.common
 import com.example.shikiflow.domain.model.tracks.MediaType
 
 interface RelatedInfo {
-    val relationKind: String
+    val relationKind: Int
     val media: MediaBasicInfo?
-}
-
-interface BasicInfo {
-    val id: String
-    val name: String
-    val kind: String?
-    val poster: PosterInfo?
-    val mediaType: MediaType
 }
 
 data class PosterInfo(
@@ -20,14 +12,14 @@ data class PosterInfo(
 )
 
 data class MediaRelatedInfo(
-    override val relationKind: String,
+    override val relationKind: Int,
     override val media: MediaBasicInfo?,
 ): RelatedInfo
 
 data class MediaBasicInfo(
-    override val id: String,
-    override val name: String,
-    override val kind: String?,
-    override val poster: PosterInfo?,
-    override val mediaType: MediaType
-): BasicInfo
+    val id: String,
+    val name: String,
+    val kind: Int,
+    val poster: PosterInfo?,
+    val mediaType: MediaType
+)

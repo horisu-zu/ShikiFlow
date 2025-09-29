@@ -13,7 +13,7 @@ data class AnimeTrack(
         fun AnimeTrack.toUserRateData() = UserRateData(
             id = track.id,
             mediaType = MediaType.ANIME,
-            status = track.status.name,
+            status = track.status,
             progress = track.episodes,
             rewatches = track.rewatches,
             score = track.score,

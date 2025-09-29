@@ -49,13 +49,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.tracks.RateStatus
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
-import com.example.shikiflow.utils.Converter.convertStatus
 import com.example.shikiflow.utils.toIcon
 import kotlin.time.Instant
 
@@ -71,8 +71,8 @@ fun UserRateBottomSheet(
 ) {
     val sheetState = rememberModalBottomSheetState()
     val chips = UserRateStatusConstants.getStatusChips(userRate.mediaType)
-    val initialStatusIndex = chips.indexOfFirst {
-        it.equals(convertStatus(userRate.status, userRate.mediaType), ignoreCase = true)
+    val initialStatusIndex = chips.indexOfFirst { chip ->
+        chip == simpleMapUserRateStatusToString(userRate.status, userRate.mediaType)
     }
 
     var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
@@ -97,7 +97,7 @@ fun UserRateBottomSheet(
             )
 
             StatusChips(
-                chips = chips,
+                chips = chips.map { resId -> stringResource(id = resId) },
                 selectedStatus = selectedStatus,
                 onStatusSelected = { selectedStatus = it }
             )

@@ -44,6 +44,7 @@ fun MainScreen(
 
     val currentTrackMode by mainViewModel.currentTrackMode.collectAsStateWithLifecycle()
     val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
+    val searchQuery by searchViewModel.searchQuery.collectAsStateWithLifecycle()
 
     currentTrackMode?.let { trackMode ->
         Scaffold(
@@ -73,9 +74,13 @@ fun MainScreen(
             ) {
                 Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                     if(isSearchActive) {
-                        SearchPage(onAnimeClick = { animeId ->
-                            navOptions.navigateToDetails(animeId, MediaType.ANIME)
-                        })
+                        SearchPage(
+                            searchQuery = searchQuery,
+                            isAtTop = scrollBehavior.state.collapsedFraction < 1f,
+                            onAnimeClick = { animeId ->
+                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
+                            }
+                        )
                     } else {
                         currentTrackMode?.let { trackMode ->
                             MainPage(

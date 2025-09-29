@@ -1,11 +1,13 @@
 package com.example.shikiflow.domain.model.mapper
 
+import android.content.Context
 import com.example.graphql.type.AnimeKindEnum
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.MangaStatusEnum
 import com.example.graphql.type.RelationKindEnum
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.ReleaseDate
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlin.reflect.KClass
@@ -28,57 +30,74 @@ object EnumUtils {
 
 class UserRateMapper {
     companion object {
-        fun mapStringToStatus(tab: String): UserRateStatusEnum? {
+        fun mapStringResToStatus(resId: Int): UserRateStatusEnum? {
             return mapOf(
-                "Watching" to UserRateStatusEnum.watching,
-                "Reading" to UserRateStatusEnum.watching,
-                "Planned" to UserRateStatusEnum.planned,
-                "Completed" to UserRateStatusEnum.completed,
-                "Rewatching" to UserRateStatusEnum.rewatching,
-                "Rereading" to UserRateStatusEnum.rewatching,
-                "On Hold" to UserRateStatusEnum.on_hold,
-                "Dropped" to UserRateStatusEnum.dropped
-            )[tab]
+                R.string.media_user_status_anime_watching to UserRateStatusEnum.watching,
+                R.string.media_user_status_manga_reading to UserRateStatusEnum.watching,
+                R.string.media_user_status_planned to UserRateStatusEnum.planned,
+                R.string.media_user_status_completed to UserRateStatusEnum.completed,
+                R.string.media_user_status_anime_rewatching to UserRateStatusEnum.rewatching,
+                R.string.media_user_status_manga_rereading to UserRateStatusEnum.rewatching,
+                R.string.media_user_status_on_hold to UserRateStatusEnum.on_hold,
+                R.string.media_user_status_dropped to UserRateStatusEnum.dropped
+            )[resId]
         }
 
-        fun mapStatusToString(status: UserRateStatusEnum, mediaType: MediaType = MediaType.ANIME): String {
+        fun simpleMapUserRateStatusToString(status: UserRateStatusEnum, mediaType: MediaType = MediaType.ANIME): Int {
             return when(status) {
-                UserRateStatusEnum.watching -> if(mediaType == MediaType.ANIME) "Watching" else "Reading"
-                UserRateStatusEnum.planned -> "Planned"
-                UserRateStatusEnum.completed -> "Completed"
-                UserRateStatusEnum.rewatching -> if(mediaType == MediaType.ANIME) "Rewatching" else "Rereading"
-                UserRateStatusEnum.on_hold -> "On Hold"
-                UserRateStatusEnum.dropped -> "Dropped"
-                UserRateStatusEnum.UNKNOWN__ -> "Unknown"
+                UserRateStatusEnum.watching -> if(mediaType == MediaType.ANIME) {
+                   R.string.media_user_status_anime_watching
+                } else { R.string.media_user_status_manga_reading }
+                UserRateStatusEnum.planned -> R.string.media_user_status_planned
+                UserRateStatusEnum.completed -> R.string.media_user_status_completed
+                UserRateStatusEnum.rewatching -> if(mediaType == MediaType.ANIME) {
+                    R.string.media_user_status_anime_rewatching
+                } else { R.string.media_user_status_manga_rereading }
+                UserRateStatusEnum.on_hold -> R.string.media_user_status_on_hold
+                UserRateStatusEnum.dropped -> R.string.media_user_status_dropped
+                UserRateStatusEnum.UNKNOWN__ -> R.string.media_user_status_unknown
             }
         }
 
-        fun mapStatusToString(
+        fun mapUserRateStatusToString(
             status: UserRateStatusEnum,
-            watchedEpisodes: Int? = null,
-            allEpisodes: Int? = null,
+            watchedEpisodes: Int? = 0,
+            allEpisodes: Int,
             score: Int? = null,
-            mediaType: MediaType = MediaType.ANIME
+            mediaType: MediaType = MediaType.ANIME,
+            context: Context
         ): String {
-            val watchingVerb = if (mediaType == MediaType.ANIME) "Watching" else "Reading"
-            val rewatchVerb = if (mediaType == MediaType.ANIME) "Rewatching" else "Rereading"
+            val progressSuffix = if (allEpisodes != 0) {
+                context.getString(R.string.progress_suffix, watchedEpisodes, allEpisodes)
+            } else ""
+
+            val scoreSuffix = if (score != null && score > 0) {
+                context.getString(R.string.score_suffix, score.toString())
+            } else ""
 
             return when (status) {
-                UserRateStatusEnum.watching ->
-                    if (watchedEpisodes != null) "$watchingVerb ∙ $watchedEpisodes/$allEpisodes"
-                    else watchingVerb
-                UserRateStatusEnum.planned -> "Planned"
-                UserRateStatusEnum.completed ->
-                    if (score != null) "Completed ∙ $score ★" else "Completed"
-                UserRateStatusEnum.rewatching -> rewatchVerb
-                UserRateStatusEnum.on_hold ->
-                    if (watchedEpisodes != null) "On Hold ∙ $watchedEpisodes/$allEpisodes"
-                    else "On Hold"
-                UserRateStatusEnum.dropped ->
-                    if (score != null && score != 0) "Dropped ∙ $score ★"
-                    else if(watchedEpisodes != null) "Dropped ∙ $watchedEpisodes/$allEpisodes"
-                    else "Dropped"
-                UserRateStatusEnum.UNKNOWN__ -> "Add to List"
+                UserRateStatusEnum.watching -> {
+                    val resId = if (mediaType == MediaType.ANIME) R.string.media_user_status_anime_watching
+                        else R.string.media_user_status_manga_reading
+                    context.getString(resId) + progressSuffix
+                }
+                UserRateStatusEnum.planned -> context.getString(R.string.media_user_status_planned)
+                UserRateStatusEnum.completed -> {
+                    context.getString(R.string.media_user_status_completed) + scoreSuffix
+                }
+                UserRateStatusEnum.rewatching -> {
+                    val resId = if (mediaType == MediaType.ANIME) R.string.media_user_status_anime_rewatching
+                        else R.string.media_user_status_manga_rereading
+                    context.getString(resId)
+                }
+                UserRateStatusEnum.on_hold -> {
+                    context.getString(R.string.media_user_status_on_hold) + progressSuffix
+                }
+                UserRateStatusEnum.dropped -> {
+                    val base = context.getString(R.string.media_user_status_dropped)
+                    base + (scoreSuffix.takeIf { it.isNotEmpty() } ?: progressSuffix)
+                }
+                UserRateStatusEnum.UNKNOWN__ -> context.getString(R.string.media_user_status_unknown)
             }
         }
 
@@ -90,84 +109,81 @@ class UserRateMapper {
             ).contains(status)
         }
 
-        fun mapAnimeStatus(status: AnimeStatusEnum?): String {
+        fun mapAnimeStatus(status: AnimeStatusEnum?): Int {
             return when(status) {
-                AnimeStatusEnum.anons -> "Announced"
-                AnimeStatusEnum.ongoing -> "Ongoing"
-                AnimeStatusEnum.released -> "Released"
-                else -> "Unknown"
+                AnimeStatusEnum.anons -> R.string.media_status_announced
+                AnimeStatusEnum.ongoing -> R.string.media_status_ongoing
+                AnimeStatusEnum.released -> R.string.media_status_released
+                else -> R.string.common_unknown
             }
         }
 
-        fun mapMangaStatus(status: MangaStatusEnum?): String {
+        fun mapMangaStatus(status: MangaStatusEnum?): Int {
             return when(status) {
-                MangaStatusEnum.anons -> "Announced"
-                MangaStatusEnum.ongoing -> "Ongoing"
-                MangaStatusEnum.released -> "Released"
-                MangaStatusEnum.paused -> "Paused"
-                MangaStatusEnum.discontinued -> "Discontinued"
-                else -> "Unknown"
+                MangaStatusEnum.anons -> R.string.media_status_announced
+                MangaStatusEnum.ongoing -> R.string.media_status_ongoing
+                MangaStatusEnum.released -> R.string.media_status_released
+                MangaStatusEnum.paused -> R.string.media_status_manga_paused
+                MangaStatusEnum.discontinued -> R.string.media_status_manga_discontinued
+                else -> R.string.common_unknown
             }
         }
 
-        fun mapAnimeKind(status: AnimeKindEnum?): String {
+        fun mapAnimeKind(status: AnimeKindEnum?): Int {
             return when(status) {
-                AnimeKindEnum.tv -> "TV"
-                AnimeKindEnum.ona -> "ONA"
-                AnimeKindEnum.ova -> "OVA"
-                AnimeKindEnum.cm -> "CM"
-                AnimeKindEnum.pv -> "PV"
-                AnimeKindEnum.movie -> "Movie"
-                AnimeKindEnum.music -> "Music"
-                AnimeKindEnum.special -> "Special"
-                AnimeKindEnum.tv_special -> "TV Special"
-                else -> "Unknown"
+                AnimeKindEnum.tv -> R.string.anime_kind_tv
+                AnimeKindEnum.ona -> R.string.anime_kind_ona
+                AnimeKindEnum.ova -> R.string.anime_kind_ova
+                AnimeKindEnum.cm -> R.string.anime_kind_cm
+                AnimeKindEnum.pv -> R.string.anime_kind_pv
+                AnimeKindEnum.movie -> R.string.anime_kind_movie
+                AnimeKindEnum.music -> R.string.anime_kind_music
+                AnimeKindEnum.special -> R.string.anime_kind_special
+                AnimeKindEnum.tv_special -> R.string.anime_kind_tv_special
+                else -> R.string.common_unknown
             }
         }
 
-        fun mapMangaKind(kind: MangaKindEnum?): String {
+        fun mapMangaKind(kind: MangaKindEnum?): Int {
             return when(kind) {
-                MangaKindEnum.manga -> "Manga"
-                MangaKindEnum.manhwa -> "Manhwa"
-                MangaKindEnum.manhua -> "Manhua"
-                MangaKindEnum.light_novel -> "Ranobe"
-                MangaKindEnum.novel -> "Novel"
-                MangaKindEnum.one_shot -> "One Shot"
-                MangaKindEnum.doujin -> "Doujin"
-                else -> "Unknown"
+                MangaKindEnum.manga -> R.string.manga_kind_manga
+                MangaKindEnum.manhwa -> R.string.manga_kind_manhwa
+                MangaKindEnum.manhua -> R.string.manga_kind_manhua
+                MangaKindEnum.light_novel -> R.string.manga_kind_ranobe
+                MangaKindEnum.novel -> R.string.manga_kind_novel
+                MangaKindEnum.one_shot -> R.string.manga_kind_one_shot
+                MangaKindEnum.doujin -> R.string.manga_kind_doujin
+                else -> R.string.common_unknown
             }
         }
 
-        fun mapRelationKind(kind: RelationKindEnum?): String {
+        fun mapRelationKind(kind: RelationKindEnum?): Int {
             return when(kind) {
-                RelationKindEnum.adaptation -> "Adaptation"
-                RelationKindEnum.alternative_setting -> "Alternative Setting"
-                RelationKindEnum.alternative_version -> "Alternative version"
-                RelationKindEnum.character -> "Character"
-                RelationKindEnum.full_story -> "Full Story"
-                RelationKindEnum.other -> "Other"
-                RelationKindEnum.parent_story -> "Parent Story"
-                RelationKindEnum.prequel -> "Prequel"
-                RelationKindEnum.sequel -> "Sequel"
-                RelationKindEnum.side_story -> "Side Story"
-                RelationKindEnum.spin_off -> "Spin Off"
-                RelationKindEnum.summary -> "Summary"
-                else -> "Unknown"
+                RelationKindEnum.adaptation -> R.string.relation_kind_adaptation
+                RelationKindEnum.alternative_setting -> R.string.relation_kind_alternative_setting
+                RelationKindEnum.alternative_version -> R.string.relation_kind_alternative_version
+                RelationKindEnum.character -> R.string.relation_kind_character
+                RelationKindEnum.full_story -> R.string.relation_kind_full_story
+                RelationKindEnum.other -> R.string.relation_kind_other
+                RelationKindEnum.parent_story -> R.string.relation_kind_parent_story
+                RelationKindEnum.prequel -> R.string.relation_kind_prequel
+                RelationKindEnum.sequel -> R.string.relation_kind_sequel
+                RelationKindEnum.side_story -> R.string.relation_kind_side_story
+                RelationKindEnum.spin_off -> R.string.relation_kind_spin_off
+                RelationKindEnum.summary -> R.string.relation_kind_summary
+                else -> R.string.common_unknown
             }
         }
 
-        fun determineSeason(airedOn: ReleaseDate?): String {
-            val year = airedOn?.year
-            val month = airedOn?.month
+        fun determineSeason(releaseDate: ReleaseDate): Int {
+            val month = releaseDate.month
 
-            return when {
-                year == null && month == null -> "Unknown"
-                year != null && month == null -> year.toString()
-                month in 3..5 -> "Spring $year"
-                month in 6..8 -> "Summer $year "
-                month in 9..11 -> "Autumn $year "
-                month in listOf(1, 2, 12) -> "Winter $year"
-                else -> "Unknown"
+            return when (month) {
+                in 3..5 -> R.string.season_spring
+                in 6..8 -> R.string.season_summer
+                in 9..11 -> R.string.season_fall
+                in listOf(1, 2, 12) -> R.string.season_winter
+                else -> R.string.common_unknown
             }
         }
     }

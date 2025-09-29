@@ -14,7 +14,7 @@ data class MangaTrack(
         fun MangaTrack.toUserRateData() = UserRateData(
             id = track.id,
             mediaType = MediaType.MANGA,
-            status = track.status.name,
+            status = track.status,
             progress = track.chapters,
             rewatches = 0,
             score = track.score,

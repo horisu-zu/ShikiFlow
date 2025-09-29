@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -66,7 +66,10 @@ fun BrowseListItem(
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = mapStatusToString(browseItem.userRateStatus),
+                        text = stringResource(id = simpleMapUserRateStatusToString(
+                            browseItem.userRateStatus,
+                            mediaType = browseItem.mediaType
+                        )),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.scrim,
@@ -107,11 +110,10 @@ fun BrowseListItem(
             }
             Text(
                 text = buildString {
-                    append(browseItem.kind)
+                    append(stringResource(id = browseItem.kindResId))
                     append(" • ")
                     append("${browseItem.episodesAired} / ${browseItem.episodes.takeIf { it != 0 } ?: "?"}" )
-                    append(" • ")
-                    append("${browseItem.score}★")
+                    append(stringResource(id = R.string.score_suffix, browseItem.score))
                 }, style = MaterialTheme.typography.labelSmall
             )
             if(browseItem.genres.isNotEmpty()) {

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.SearchViewModel
@@ -24,15 +24,15 @@ fun BrowseScreen(
     searchViewModel: SearchViewModel = hiltViewModel(key = "browse_search"),
     browseNavOptions: BrowseNavOptions
 ) {
-    val searchQuery by searchViewModel.screenState.collectAsState()
-    val screenState by searchViewModel.screenState.collectAsState()
+    val searchQuery by searchViewModel.searchQuery.collectAsStateWithLifecycle()
+    val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
     var isAtTop by remember { mutableStateOf(true) }
 
     Scaffold(
         topBar = {
             BrowseAppBar(
                 title = stringResource(id = R.string.bottom_navigator_browse),
-                searchQuery = searchQuery.query,
+                searchQuery = screenState.query,
                 isAtTop = isAtTop,
                 onSearchQueryChange = searchViewModel::onQueryChange,
                 isSearchActive = screenState.isSearchActive,
@@ -46,7 +46,7 @@ fun BrowseScreen(
         Crossfade(screenState.isSearchActive) { isSearchActive ->
             if (isSearchActive) {
                 BrowseSearchPage(
-                    query = searchQuery.query,
+                    query = searchQuery,
                     modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)),

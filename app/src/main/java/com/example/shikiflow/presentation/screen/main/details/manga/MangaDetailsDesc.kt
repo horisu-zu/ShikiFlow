@@ -1,10 +1,10 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import com.example.graphql.MangaDetailsQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.RelatedMapper
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
@@ -36,6 +36,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 fun MangaDetailsDesc(
     mangaDetails: MangaDetailsQuery.Manga?,
     isRefreshing: Boolean,
+    context: Context,
     onItemClick: (String, MediaType) -> Unit,
     onEntityClick: (EntityType, String) -> Unit,
     onLinkClick: (String) -> Unit,
@@ -43,6 +44,11 @@ fun MangaDetailsDesc(
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
+    val statusesStats = remember {
+        mangaDetails?.statusesStats?.associate {
+            context.getString(simpleMapUserRateStatusToString(it.status, MediaType.MANGA)) to it.count
+        }
+    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -84,16 +90,16 @@ fun MangaDetailsDesc(
                 }
             }
         }
-        SegmentedProgressBar(
-            groupedData = mangaDetails?.statusesStats?.associate {
-                mapStatusToString(it.status, MediaType.MANGA) to it.count
-            } ?: emptyMap(),
-            totalCount = mangaDetails?.statusesStats?.size ?: 0,
-            modifier = Modifier.padding(top = 4.dp),
-            itemShape = RoundedCornerShape(3.dp),
-            rowHeight = 16.dp,
-            rowShape = RoundedCornerShape(4.dp)
-        )
+        statusesStats?.let {
+            SegmentedProgressBar(
+                groupedData = statusesStats,
+                totalCount = mangaDetails?.statusesStats?.size ?: 0,
+                modifier = Modifier.padding(top = 4.dp),
+                itemShape = RoundedCornerShape(3.dp),
+                rowHeight = 16.dp,
+                rowShape = RoundedCornerShape(4.dp)
+            )
+        }
 
         if(mangaDetails?.related != null && mangaDetails.related.isNotEmpty()) {
             RelatedSection(

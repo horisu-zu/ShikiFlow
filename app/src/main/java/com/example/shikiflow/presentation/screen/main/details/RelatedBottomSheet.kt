@@ -14,7 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.RelatedInfo
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedItem
@@ -40,7 +42,7 @@ fun RelatedBottomSheet(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 Text(
-                    text = "Related",
+                    text = stringResource(R.string.details_related),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )

@@ -3,6 +3,7 @@ package com.example.shikiflow.domain.model.tracks
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
+import com.example.graphql.type.UserRateStatusEnum
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -11,7 +12,7 @@ enum class MediaType { ANIME, MANGA }
 data class UserRateData(
     val id: String? = null,
     val mediaType: MediaType,
-    val status: String,
+    val status: UserRateStatusEnum,
     val progress: Int,
     val rewatches: Int,
     val score: Int,
@@ -32,7 +33,7 @@ data class UserRateData(
         ) = UserRateData(
             id = null,
             mediaType = mediaType,
-            status = "",
+            status = UserRateStatusEnum.UNKNOWN__,
             progress = 0,
             rewatches = 0,
             score = 0,
@@ -84,7 +85,7 @@ fun AnimeDetailsQuery.Anime.toUiModel(): UserRateData {
         UserRateData(
             id = userRate.id,
             mediaType = MediaType.ANIME,
-            status = userRate.status.rawValue,
+            status = userRate.status,
             progress = userRate.episodes,
             rewatches = userRate.rewatches,
             score = userRate.score,
@@ -111,7 +112,7 @@ fun MangaDetailsQuery.Manga.toUiModel(): UserRateData {
         UserRateData(
             id = userRate.id,
             mediaType = MediaType.MANGA,
-            status = userRate.status.rawValue,
+            status = userRate.status,
             progress = userRate.chapters,
             rewatches = userRate.rewatches,
             score = userRate.score,

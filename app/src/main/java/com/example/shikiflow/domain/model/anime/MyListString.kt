@@ -3,8 +3,8 @@ package com.example.shikiflow.domain.model.anime
 import com.example.graphql.type.UserRateStatusEnum
 
 enum class MyListString {
-    PLANNED,
     WATCHING,
+    PLANNED,
     REWATCHING,
     COMPLETED,
     ON_HOLD,

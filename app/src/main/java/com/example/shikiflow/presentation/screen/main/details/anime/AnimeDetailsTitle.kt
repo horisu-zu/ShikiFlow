@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -45,6 +46,7 @@ fun AnimeDetailsTitle(
     animeDetails: AnimeDetailsQuery.Anime,
     onStatusClick: () -> Unit,
     onPlayClick: (String, String, Int) -> Unit,
+    context: Context,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -78,7 +80,11 @@ fun AnimeDetailsTitle(
             ) {
                 ShortInfoItem(
                     infoType = stringResource(id = R.string.details_short_info_type),
-                    infoItem = "${mapAnimeKind(animeDetails.kind)} ∙ ${mapAnimeStatus(animeDetails.status)}"
+                    infoItem = buildString {
+                        append(stringResource(id = mapAnimeKind(animeDetails.kind)))
+                        append(" ∙ ")
+                        append(stringResource(id = mapAnimeStatus(animeDetails.status)))
+                    }
                 )
                 ShortInfoItem(
                     infoType = stringResource(id = R.string.details_short_info_episodes),
@@ -98,7 +104,7 @@ fun AnimeDetailsTitle(
                 animeDetails.rating?.let { ratingEnum ->
                     ShortInfoItem(
                         infoType = stringResource(id = R.string.details_short_info_age_rating),
-                        infoItem = Converter.convertRatingToString(ratingEnum)
+                        infoItem = stringResource(Converter.convertRatingToString(ratingEnum))
                     )
                 }
             }
@@ -112,9 +118,10 @@ fun AnimeDetailsTitle(
                 ) },
                 status = animeDetails.userRate?.status,
                 allEpisodes = if(animeDetails.status == AnimeStatusEnum.released) animeDetails.episodes
-                else animeDetails.episodesAired,
+                    else animeDetails.episodesAired,
                 watchedEpisodes = animeDetails.userRate?.episodes,
                 score = animeDetails.userRate?.score,
+                context = context,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
         }
@@ -162,11 +169,12 @@ fun ShortInfoItem(
 @Composable
 private fun UserStatusItem(
     status: UserRateStatusEnum?,
-    allEpisodes: Int?,
+    allEpisodes: Int,
     watchedEpisodes: Int?,
     score: Int?,
     onStatusClick: () -> Unit,
     onPlayClick: () -> Unit,
+    context: Context,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -199,11 +207,12 @@ private fun UserStatusItem(
                 tint = MaterialTheme.colorScheme.surface
             )
             Text(
-                text = UserRateMapper.mapStatusToString(
+                text = UserRateMapper.mapUserRateStatusToString(
                     status = status ?: UserRateStatusEnum.UNKNOWN__,
                     allEpisodes = allEpisodes,
                     watchedEpisodes = watchedEpisodes,
-                    score = score
+                    score = score,
+                    context = context
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.surface,

@@ -11,9 +11,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -53,7 +55,10 @@ fun BrowseGridItem(
         )
 
         Text(
-            text = "${browseItem.kind} • ${browseItem.score}★",
+            text = buildString {
+                append(stringResource(id = browseItem.kindResId))
+                append(stringResource(id = R.string.score_suffix, browseItem.score))
+            },
             style = MaterialTheme.typography.labelSmall.copy(
                 fontSize = 10.sp
             )

@@ -1,51 +1,38 @@
 package com.example.shikiflow.domain.model.mapper
 
+import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 
 object UserRateStatusConstants {
-    private val statusOrderMap = mapOf(
-        MediaType.ANIME to listOf(
-            "planned", "watching", "completed",
-            "rewatching", "on_hold", "dropped"
-        ),
-        MediaType.MANGA to listOf(
-            "planned", "reading", "completed",
-            "rereading", "on_hold", "dropped"
-        )
-    )
-
-    private val statusConvertMap = mapOf(
-        "watching" to "reading",
-        "rewatching" to "rereading"
-    )
-
     private val statusChipsMap = mapOf(
         MediaType.ANIME to listOf(
-            "Watching", "Planned", "Completed",
-            "Rewatching", "On Hold", "Dropped"
+            R.string.media_user_status_anime_watching,
+            R.string.media_user_status_planned,
+            R.string.media_user_status_completed,
+            R.string.media_user_status_anime_rewatching,
+            R.string.media_user_status_on_hold,
+            R.string.media_user_status_dropped
         ),
         MediaType.MANGA to listOf(
-            "Reading", "Planned", "Completed",
-            "Rereading", "On Hold", "Dropped"
+            R.string.media_user_status_manga_reading,
+            R.string.media_user_status_planned,
+            R.string.media_user_status_completed,
+            R.string.media_user_status_manga_rereading,
+            R.string.media_user_status_on_hold,
+            R.string.media_user_status_dropped
         )
     )
 
-    fun convertStatus(status: String): String =
-        statusConvertMap[status] ?: status
-
-    fun getStatusOrder(contentType: MediaType = MediaType.ANIME): List<String> =
-        statusOrderMap[contentType] ?: emptyList()
-
-    fun getStatusChips(contentType: MediaType): List<String> =
+    fun getStatusChips(contentType: MediaType): List<Int> =
         statusChipsMap[contentType] ?: emptyList()
 
-    fun convertToApiStatus(index: Int): String = when(index) {
-        0 -> "watching"
-        1 -> "planned"
-        2 -> "completed"
-        3 -> "rewatching"
-        4 -> "on_hold"
-        5 -> "dropped"
-        else -> "planned"
+    fun convertToApiStatus(index: Int): UserRateStatusEnum = when(index) {
+        0 -> UserRateStatusEnum.watching
+        1 -> UserRateStatusEnum.planned
+        2 -> UserRateStatusEnum.completed
+        3 -> UserRateStatusEnum.rewatching
+        4 -> UserRateStatusEnum.on_hold
+        else ->  UserRateStatusEnum.dropped
     }
 }

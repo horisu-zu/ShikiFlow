@@ -1,6 +1,5 @@
 package com.example.shikiflow.domain.model.anime
 
-import android.content.Context
 import com.example.graphql.AnimeBrowseQuery
 import com.example.graphql.MangaBrowseQuery
 import com.example.graphql.type.AnimeKindEnum
@@ -34,7 +33,7 @@ sealed interface Browse {
     val title: String
     val posterUrl: String?
     val score: Double
-    val kind: String
+    val kindResId: Int
     val nextEpisodeAt: Instant?
     val mediaType: MediaType
 
@@ -52,7 +51,7 @@ sealed interface Browse {
         val studios: List<String> = emptyList(),
         val genres: List<String> = emptyList()
     ): Browse {
-        override val kind: String get() = UserRateMapper.mapAnimeKind(animeKind)
+        override val kindResId: Int get() = UserRateMapper.mapAnimeKind(animeKind)
     }
 
     data class Manga(
@@ -64,7 +63,7 @@ sealed interface Browse {
         override val mediaType: MediaType = MediaType.MANGA,
         val mangaKind: MangaKindEnum
     ): Browse {
-        override val kind: String get() = UserRateMapper.mapMangaKind(mangaKind)
+        override val kindResId: Int get() = UserRateMapper.mapMangaKind(mangaKind)
     }
 }
 

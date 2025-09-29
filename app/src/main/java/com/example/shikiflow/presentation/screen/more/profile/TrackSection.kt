@@ -45,14 +45,18 @@ fun TrackSection(
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_anime),
             type = stringResource(R.string.main_track_mode_anime),
-            groupedData = groupedAnimeData,
+            groupedData = groupedAnimeData.mapKeys { (resId, size) ->
+                stringResource(resId)
+            },
             itemsCount = animeItemsCount
         )
 
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_manga),
             type = stringResource(R.string.main_track_mode_manga),
-            groupedData = groupedMangaData,
+            groupedData = groupedMangaData.mapKeys { (resId, size) ->
+                stringResource(resId)
+            },
             itemsCount = mangaItemsCount
         )
     }

@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -46,7 +47,7 @@ fun MainPage(
 
     Column {
         MainTabRow(
-            tabs = tabs,
+            tabs = tabs.map { stringResource(id = it) },
             selectedTab = pagerState.currentPage,
             onTabSelected = {
                 coroutineScope.launch {
@@ -64,7 +65,7 @@ fun MainPage(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
-            val status = UserRateMapper.mapStringToStatus(tabs[page])
+            val status = UserRateMapper.mapStringResToStatus(tabs[page])
             val mediaTrackItems = status?.let { statusEnum ->
                 when(mediaType) {
                     MediaType.ANIME -> MediaTrackItems.AnimeItems(

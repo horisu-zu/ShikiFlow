@@ -14,14 +14,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeBrowseQuery
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.isWatched
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapStatusToString
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.StatusColor
@@ -54,19 +54,26 @@ fun SearchAnimeTrackItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                StatusCard(
-                    text = mapStatusToString(
-                        status = animeItem.userRate?.animeUserRate?.status ?: UserRateStatusEnum.UNKNOWN__
-                    ),
-                    color = animeItem.userRate?.animeUserRate?.status?.let {
-                        StatusColor.getAnimeStatusColor(it)
-                    } ?: Color(0xFF8C8C8C)
-                )
-                if(isWatched(animeItem.userRate?.animeUserRate?.status ?: UserRateStatusEnum.UNKNOWN__)) {
+            animeItem.userRate?.let {
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     StatusCard(
-                        text = "Episodes: ${animeItem.userRate?.animeUserRate?.episodes}"
+                        text = stringResource(
+                            id = simpleMapUserRateStatusToString(
+                                status = animeItem.userRate.animeUserRate.status
+                            )
+                        ) ,
+                        color = animeItem.userRate.animeUserRate.status.let {
+                            StatusColor.getAnimeStatusColor(it)
+                        }
                     )
+                    if(isWatched(animeItem.userRate.animeUserRate.status)) {
+                        StatusCard(
+                            text = stringResource(
+                                id = R.string.episodes_watched,
+                                animeItem.userRate.animeUserRate.episodes
+                            )
+                        )
+                    }
                 }
             }
         }

@@ -128,6 +128,7 @@
 
     <string name="translation_updated_at">Updated %1$s</string>
     <string name="episodes">%1s ep.</string>
+    <string name="episodes_watched">Episodes: %1s</string>
     <string name="ongoing_episodes">%1s of %2s ep.</string>
     <string name="translation_filter_all">All</string>
     <string name="translation_filter_voice">Voice</string>
@@ -190,4 +191,65 @@
     <string name="works_title">Works</string>
     <string name="person_stats_expand">Stats</string>
     <string name="details_comments_count">— %1s total</string>
+
+    <string name="media_user_status_all">All</string>
+    <string name="media_user_status_anime_watching">Watching</string>
+    <string name="media_user_status_manga_reading">Reading</string>
+    <string name="media_user_status_anime_rewatching">Rewatching</string>
+    <string name="media_user_status_manga_rereading">Rereading</string>
+    <string name="media_user_status_planned">Planned</string>
+    <string name="media_user_status_completed">Completed</string>
+    <string name="media_user_status_on_hold">On Hold</string>
+    <string name="media_user_status_unknown">Add to List</string>
+    <string name="media_user_status_dropped">Dropped</string>
+    <string name="progress_suffix">" ∙ %1$d/%2$d"</string>
+    <string name="score_suffix">" ∙ %1$s ★"</string>
+
+    <string name="media_status_announced">Announced</string>
+    <string name="media_status_ongoing">Ongoing</string>
+    <string name="media_status_released">Released</string>
+    <string name="media_status_manga_discontinued">Discontinued\n</string>
+    <string name="media_status_manga_paused">Paused</string>
+
+    <string name="anime_kind_tv">TV</string>
+    <string name="anime_kind_ona">ONA</string>
+    <string name="anime_kind_ova">OVA</string>
+    <string name="anime_kind_cm">CM</string>
+    <string name="anime_kind_pv">PV</string>
+    <string name="anime_kind_movie">Movie</string>
+    <string name="anime_kind_music">Music</string>
+    <string name="anime_kind_special">Special</string>
+    <string name="anime_kind_tv_special">TV Special</string>
+    <string name="manga_kind_manga">Manga</string>
+    <string name="manga_kind_manhwa">Manhwa</string>
+    <string name="manga_kind_manhua">Manhua</string>
+    <string name="manga_kind_ranobe">Ranobe</string>
+    <string name="manga_kind_novel">Novel</string>
+    <string name="manga_kind_one_shot">One Shot</string>
+    <string name="manga_kind_doujin">Doujin</string>
+
+    <string name="relation_kind_adaptation">Adaptation</string>
+    <string name="relation_kind_alternative_setting">Alternative Setting</string>
+    <string name="relation_kind_alternative_version">Alternative version</string>
+    <string name="relation_kind_character">Character</string>
+    <string name="relation_kind_full_story">Full Story</string>
+    <string name="relation_kind_other">Other</string>
+    <string name="relation_kind_parent_story">Parent Story</string>
+    <string name="relation_kind_prequel">Prequel</string>
+    <string name="relation_kind_sequel">Sequel</string>
+    <string name="relation_kind_side_story">Side Story</string>
+    <string name="relation_kind_spin_off">Spin Off</string>
+    <string name="relation_kind_summary">Summary</string>
+
+    <string name="season_spring">Spring</string>
+    <string name="season_summer">"Summer"</string>
+    <string name="season_fall">"Fall"</string>
+    <string name="season_winter">Winter</string>
+    <string name="rating_none">None</string>
+    <string name="rating_g">G</string>
+    <string name="rating_pg">PG</string>
+    <string name="rating_pg_13">PG-13</string>
+    <string name="rating_r_17">R-17</string>
+    <string name="rating_r_plus">R+</string>
+    <string name="rating_rx">Rx</string>
 </resources>

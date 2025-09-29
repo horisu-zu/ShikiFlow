@@ -41,7 +41,7 @@ fun CharacterMediaSection(
                 BrowseGridItem(
                     browseItem = mediaItem,
                     onItemClick = onItemClick,
-                    modifier = Modifier.width(96.dp)
+                    modifier = Modifier.width(120.dp)
                 )
             }
         }

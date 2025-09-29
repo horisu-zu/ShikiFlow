@@ -131,6 +131,7 @@ fun AnimeDetailsScreen(
                                 AnimeDetailsTitle(
                                     animeDetails = details,
                                     onStatusClick = { rateBottomSheet = true },
+                                    context = context,
                                     onPlayClick = { title, id, completedEpisodes ->
                                         navOptions.navigateToAnimeWatch(title, id, completedEpisodes)
                                     }
@@ -140,6 +141,7 @@ fun AnimeDetailsScreen(
                                     selectedScreenshotIndex = selectedScreenshotIndex,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     isRefreshing = isRefreshing,
+                                    context = context,
                                     onItemClick = { id, mediaType ->
                                         if (mediaType == MediaType.ANIME) {
                                             navOptions.navigateToAnimeDetails(id)

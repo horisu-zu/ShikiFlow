@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -62,6 +63,7 @@ fun AnimeDetailsDesc(
     selectedScreenshotIndex: Int?,
     sharedTransitionScope: SharedTransitionScope,
     isRefreshing: Boolean,
+    context: Context,
     onSimilarClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -132,23 +134,27 @@ fun AnimeDetailsDesc(
             }
         }
 
-        RelatedSection(
-            relatedItems = animeDetails.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
-            onArrowClick = { showRelatedBottomSheet = true },
-            onItemClick = onItemClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = horizontalPadding)
-        )
+        animeDetails.related?.let {
+            RelatedSection(
+                relatedItems = animeDetails.related.map { RelatedMapper.fromAnimeRelated(it) },
+                onArrowClick = { showRelatedBottomSheet = true },
+                onItemClick = onItemClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = horizontalPadding)
+            )
+        }
 
-        ScreenshotSection(
-            screenshots = animeDetails.screenshots,
-            selectedIndex = selectedScreenshotIndex,
-            onScreenshotClick = onScreenshotClick,
-            sharedTransitionScope = sharedTransitionScope,
-            modifier = Modifier.fillMaxWidth(),
-            horizontalPadding = horizontalPadding
-        )
+        if(animeDetails.screenshots.isNotEmpty()) {
+            ScreenshotSection(
+                screenshots = animeDetails.screenshots,
+                selectedIndex = selectedScreenshotIndex,
+                onScreenshotClick = onScreenshotClick,
+                sharedTransitionScope = sharedTransitionScope,
+                modifier = Modifier.fillMaxWidth(),
+                horizontalPadding = horizontalPadding
+            )
+        }
 
         AnimeDetailsInfo(
             animeDetails = animeDetails,
@@ -158,6 +164,7 @@ fun AnimeDetailsDesc(
             onExternalLinksClick = onExternalLinksClick,
             onEntityClick = onEntityClick,
             onTopicNavigate = onTopicNavigate,
+            context = context,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -293,12 +300,20 @@ fun RelatedItem(
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.labelMedium
                 )
-                Text(
-                    text = "${relatedInfo.media?.kind} ${relatedInfo.relationKind}",
-                    style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                relatedInfo.media?.let { media ->
+                    Text(
+                        text = buildString {
+                            append(stringResource(id = media.kind))
+                            append(" ∙ ")
+                            append(stringResource(id = relatedInfo.relationKind))
+                        },
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                        )
                     )
-                )
+                }
             }
         }
     }

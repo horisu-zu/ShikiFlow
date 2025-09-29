@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -61,97 +62,105 @@ fun MangaDetailsHeader(
     onStatusClick: () -> Unit,
     onMangaDexNavigateClick: (String) -> Unit,
     onMangaDexRefreshClick: () -> Unit,
+    context: Context,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
-        GradientImage(
-            model = mangaDetails?.poster?.posterShort?.originalUrl,
-            modifier = Modifier.alpha(0.25f),
-            gradientFraction = 0.8f
-        )
-
-        BaseImage(
-            model = mangaDetails?.poster?.posterShort?.originalUrl,
-            modifier = Modifier.align(Alignment.TopCenter),
-            imageType = ImageType.Poster(
-                defaultWidth = 240.dp
-            )
-        )
-
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter)
-                .padding(horizontal = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            if (mangaDetails?.status != MangaStatusEnum.anons) {
-                ScoreItem(score = mangaDetails?.score?.toFloat() ?: 0f)
-            }
-
-            Text(
-                text = mangaDetails?.name ?: "",
-                style = MaterialTheme.typography.headlineSmall
+        mangaDetails?.let {
+            GradientImage(
+                model = mangaDetails.poster?.posterShort?.originalUrl,
+                modifier = Modifier.alpha(0.25f),
+                gradientFraction = 0.8f
             )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                ShortInfoItem(
-                    infoType = stringResource(R.string.details_short_info_manga_type),
-                    infoItem = "${mapMangaKind(mangaDetails?.kind)} ∙ ${mapMangaStatus(mangaDetails?.status)}"
+            BaseImage(
+                model = mangaDetails.poster?.posterShort?.originalUrl,
+                modifier = Modifier.align(Alignment.TopCenter),
+                imageType = ImageType.Poster(
+                    defaultWidth = 240.dp
                 )
-                if (mangaDetails?.status != MangaStatusEnum.ongoing && mangaDetails?.status != MangaStatusEnum.anons) {
-                    mangaDetails?.releasedOn?.date?.let {
-                        ShortInfoItem(
-                            infoType = stringResource(R.string.details_short_info_manga_published),
-                            infoItem = formatInstant(
-                                LocalDate.parse(mangaDetails.releasedOn.date.toString())
-                                    .atStartOfDayIn(TimeZone.currentSystemDefault()),
-                                includeTime = false
+            )
+
+            Column(
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .padding(horizontal = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                if (mangaDetails.status != MangaStatusEnum.anons) {
+                    ScoreItem(score = mangaDetails.score?.toFloat() ?: 0f)
+                }
+
+                Text(
+                    text = mangaDetails.name,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    ShortInfoItem(
+                        infoType = stringResource(R.string.details_short_info_manga_type),
+                        infoItem = buildString {
+                            append(stringResource(mapMangaKind(mangaDetails.kind)))
+                            append(" ∙ ")
+                            append(stringResource(id = mapMangaStatus(mangaDetails.status)))
+                        }
+                    )
+                    if (mangaDetails.status != MangaStatusEnum.ongoing && mangaDetails.status != MangaStatusEnum.anons) {
+                        mangaDetails.releasedOn?.date?.let {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_published),
+                                infoItem = formatInstant(
+                                    LocalDate.parse(mangaDetails.releasedOn.date.toString())
+                                        .atStartOfDayIn(TimeZone.currentSystemDefault()),
+                                    includeTime = false
+                                )
                             )
-                        )
-                    }
-                    mangaDetails?.volumes?.let { volumes ->
-                        ShortInfoItem(
-                            infoType = stringResource(R.string.details_short_info_manga_volumes),
-                            infoItem = stringResource(R.string.volumes, volumes)
-                        )
-                    }
-                    mangaDetails?.chapters?.let { chapters ->
-                        ShortInfoItem(
-                            infoType = stringResource(R.string.details_short_info_manga_chapters),
-                            infoItem = stringResource(R.string.chapters, chapters)
-                        )
-                    }
-                } else {
-                    mangaDetails.airedOn?.date?.let {
-                        ShortInfoItem(
-                            infoType = stringResource(R.string.details_short_info_manga_started),
-                            infoItem = formatInstant(
-                                LocalDate.parse(it.toString())
-                                    .atStartOfDayIn(TimeZone.currentSystemDefault()),
-                                includeTime = false
+                        }
+                        if(mangaDetails.volumes != 0) {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_volumes),
+                                infoItem = stringResource(R.string.volumes, mangaDetails.volumes)
                             )
-                        )
+                        }
+                        if(mangaDetails.chapters != 0) {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_chapters),
+                                infoItem = stringResource(R.string.chapters, mangaDetails.chapters)
+                            )
+                        }
+                    } else {
+                        mangaDetails.airedOn?.date?.let {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_started),
+                                infoItem = formatInstant(
+                                    LocalDate.parse(it.toString())
+                                        .atStartOfDayIn(TimeZone.currentSystemDefault()),
+                                    includeTime = false
+                                )
+                            )
+                        }
                     }
                 }
-            }
 
-            MangaUserRateItem(
-                userRate = mangaDetails?.userRate?.status,
-                allChapters = mangaDetails?.chapters ?: 0,
-                readChapters = mangaDetails?.userRate?.chapters ?: 0,
-                score = mangaDetails?.userRate?.score ?: 0,
-                isManga = mangaDetails?.kind?.isManga() ?: false,
-                mangaDexResource = mangaDexResource,
-                onStatusClick = { onStatusClick() },
-                onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails?.name ?: "") },
-                onMangaDexRefreshClick = onMangaDexRefreshClick
-            )
+                MangaUserRateItem(
+                    userRate = mangaDetails.userRate?.status,
+                    allChapters = mangaDetails.chapters,
+                    readChapters = mangaDetails.userRate?.chapters ?: 0,
+                    score = mangaDetails.userRate?.score ?: 0,
+                    isManga = mangaDetails.kind?.isManga() ?: false,
+                    mangaDexResource = mangaDexResource,
+                    onStatusClick = { onStatusClick() },
+                    onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails.name) },
+                    onMangaDexRefreshClick = onMangaDexRefreshClick,
+                    context = context
+                )
 
-            LazyRow(
-                modifier = Modifier.padding(top = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(mangaDetails?.genres ?: emptyList()) { genreItem ->
-                    CardItem(genreItem.name)
+                LazyRow(
+                    modifier = Modifier.padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(mangaDetails.genres ?: emptyList()) { genreItem ->
+                        CardItem(genreItem.name)
+                    }
                 }
             }
         }
@@ -169,6 +178,7 @@ fun MangaUserRateItem(
     onStatusClick: () -> Unit,
     onMangaDexNavigateClick: () -> Unit,
     onMangaDexRefreshClick: () -> Unit,
+    context: Context,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -202,12 +212,13 @@ fun MangaUserRateItem(
                 tint = color
             )
             Text(
-                text = UserRateMapper.mapStatusToString(
+                text = UserRateMapper.mapUserRateStatusToString(
                     status = userRate ?: UserRateStatusEnum.UNKNOWN__,
                     allEpisodes = allChapters,
                     watchedEpisodes = readChapters,
                     score = score,
-                    mediaType = MediaType.MANGA
+                    mediaType = MediaType.MANGA,
+                    context = context
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = color,
