@@ -1,7 +1,10 @@
 package com.example.shikiflow.domain.model.mapper
 
 import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.example.graphql.type.AnimeKindEnum
+import com.example.graphql.type.AnimeOriginEnum
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.graphql.type.MangaKindEnum
 import com.example.graphql.type.MangaStatusEnum
@@ -59,45 +62,67 @@ class UserRateMapper {
             }
         }
 
+        fun mapOriginToString(origin: AnimeOriginEnum): Int {
+            return when(origin) {
+                AnimeOriginEnum.original -> R.string.anime_origin_original
+                AnimeOriginEnum.manga -> R.string.anime_origin_manga
+                AnimeOriginEnum.web_manga -> R.string.anime_origin_web_manga
+                AnimeOriginEnum.four_koma_manga -> R.string.anime_origin_4_koma_manga
+                AnimeOriginEnum.novel -> R.string.anime_origin_novel
+                AnimeOriginEnum.web_novel -> R.string.anime_origin_web_novel
+                AnimeOriginEnum.visual_novel -> R.string.anime_origin_visual_novel
+                AnimeOriginEnum.light_novel -> R.string.anime_origin_light_novel
+                AnimeOriginEnum.game -> R.string.anime_origin_game
+                AnimeOriginEnum.card_game -> R.string.anime_origin_card_game
+                AnimeOriginEnum.music -> R.string.anime_origin_music
+                AnimeOriginEnum.radio -> R.string.anime_origin_radio
+                AnimeOriginEnum.book -> R.string.anime_origin_book
+                AnimeOriginEnum.picture_book -> R.string.anime_origin_picture_book
+                AnimeOriginEnum.mixed_media -> R.string.anime_origin_mixed_media
+                AnimeOriginEnum.other -> R.string.anime_origin_other
+                else -> R.string.common_unknown
+            }
+        }
+
+        @Composable
         fun mapUserRateStatusToString(
             status: UserRateStatusEnum,
-            watchedEpisodes: Int? = 0,
+            watchedEpisodes: Int?,
             allEpisodes: Int,
             score: Int? = null,
-            mediaType: MediaType = MediaType.ANIME,
-            context: Context
+            mediaType: MediaType = MediaType.ANIME
         ): String {
             val progressSuffix = if (allEpisodes != 0) {
-                context.getString(R.string.progress_suffix, watchedEpisodes, allEpisodes)
+                stringResource(R.string.progress_suffix, watchedEpisodes ?: 0, allEpisodes)
             } else ""
 
             val scoreSuffix = if (score != null && score > 0) {
-                context.getString(R.string.score_suffix, score.toString())
+                stringResource(R.string.score_suffix, score.toString())
             } else ""
 
             return when (status) {
                 UserRateStatusEnum.watching -> {
                     val resId = if (mediaType == MediaType.ANIME) R.string.media_user_status_anime_watching
-                        else R.string.media_user_status_manga_reading
-                    context.getString(resId) + progressSuffix
+                    else R.string.media_user_status_manga_reading
+                    stringResource(resId) + progressSuffix
                 }
-                UserRateStatusEnum.planned -> context.getString(R.string.media_user_status_planned)
+                UserRateStatusEnum.planned -> stringResource(R.string.media_user_status_planned)
                 UserRateStatusEnum.completed -> {
-                    context.getString(R.string.media_user_status_completed) + scoreSuffix
+                    stringResource(R.string.media_user_status_completed) + scoreSuffix
                 }
                 UserRateStatusEnum.rewatching -> {
                     val resId = if (mediaType == MediaType.ANIME) R.string.media_user_status_anime_rewatching
-                        else R.string.media_user_status_manga_rereading
-                    context.getString(resId)
+                    else R.string.media_user_status_manga_rereading
+                    stringResource(resId)
                 }
                 UserRateStatusEnum.on_hold -> {
-                    context.getString(R.string.media_user_status_on_hold) + progressSuffix
+                    stringResource(R.string.media_user_status_on_hold) + progressSuffix
                 }
                 UserRateStatusEnum.dropped -> {
-                    val base = context.getString(R.string.media_user_status_dropped)
+                    val base = stringResource(R.string.media_user_status_dropped)
                     base + (scoreSuffix.takeIf { it.isNotEmpty() } ?: progressSuffix)
                 }
-                UserRateStatusEnum.UNKNOWN__ -> context.getString(R.string.media_user_status_unknown)
+                UserRateStatusEnum.UNKNOWN__ -> stringResource(R.string.media_user_status_unknown)
             }
         }
 

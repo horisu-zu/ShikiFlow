@@ -1,12 +1,12 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,6 +29,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.graphql.MangaDetailsQuery
 import com.example.graphql.type.MangaStatusEnum
@@ -59,10 +60,10 @@ import kotlinx.datetime.atStartOfDayIn
 fun MangaDetailsHeader(
     mangaDetails: MangaDetailsQuery.Manga?,
     mangaDexResource: Resource<List<String>>,
+    horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onMangaDexNavigateClick: (String) -> Unit,
     onMangaDexRefreshClick: () -> Unit,
-    context: Context,
     modifier: Modifier = Modifier
 ) {
     Box(modifier = modifier.fillMaxWidth()) {
@@ -82,20 +83,26 @@ fun MangaDetailsHeader(
             )
 
             Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .padding(horizontal = 12.dp),
+                modifier = Modifier.align(Alignment.BottomCenter),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 if (mangaDetails.status != MangaStatusEnum.anons) {
-                    ScoreItem(score = mangaDetails.score?.toFloat() ?: 0f)
+                    ScoreItem(
+                        score = mangaDetails.score?.toFloat() ?: 0f,
+                        modifier = Modifier.padding(horizontal = horizontalPadding)
+                    )
                 }
 
                 Text(
                     text = mangaDetails.name,
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(horizontal = horizontalPadding)
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(
+                    modifier = Modifier.padding(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     ShortInfoItem(
                         infoType = stringResource(R.string.details_short_info_manga_type),
                         infoItem = buildString {
@@ -151,11 +158,12 @@ fun MangaDetailsHeader(
                     onStatusClick = { onStatusClick() },
                     onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails.name) },
                     onMangaDexRefreshClick = onMangaDexRefreshClick,
-                    context = context
+                    modifier = Modifier.padding(horizontal = horizontalPadding)
                 )
 
                 LazyRow(
                     modifier = Modifier.padding(top = 4.dp),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(mangaDetails.genres ?: emptyList()) { genreItem ->
@@ -178,7 +186,6 @@ fun MangaUserRateItem(
     onStatusClick: () -> Unit,
     onMangaDexNavigateClick: () -> Unit,
     onMangaDexRefreshClick: () -> Unit,
-    context: Context,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -217,8 +224,7 @@ fun MangaUserRateItem(
                     allEpisodes = allChapters,
                     watchedEpisodes = readChapters,
                     score = score,
-                    mediaType = MediaType.MANGA,
-                    context = context
+                    mediaType = MediaType.MANGA
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = color,

@@ -51,6 +51,7 @@ type Anime {
     url: String!
     userRate: UserRate
     videos: [Video!]!
+    origin: AnimeOriginEnum
 }
 
 enum AnimeKindEnum {
@@ -1026,4 +1027,57 @@ enum VideoKindEnum {
 
     # Episode preview
     episode_preview
+}
+
+enum AnimeOriginEnum {
+    original
+    # Original
+
+    manga
+    # Manga
+
+    web_manga
+    # Web manga
+
+    four_koma_manga
+    # 4-koma manga
+
+    novel
+    # Novel
+
+    web_novel
+    # Web novel
+
+    visual_novel
+    # Visual novel
+
+    light_novel
+    # Light novel
+
+    game
+    # Game
+
+    card_game
+    # Card game
+
+    music
+    # Music
+
+    radio
+    # Radio
+
+    book
+    # Book
+
+    picture_book
+    # Picture book
+
+    mixed_media
+    # Mixed media
+
+    other
+    # Other
+
+    unknown
+    # Unknown
 }

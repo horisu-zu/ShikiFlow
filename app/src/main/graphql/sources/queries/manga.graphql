@@ -19,12 +19,16 @@ query MangaDetails(
 
         poster { ...PosterShort }
 
-        genres { id name russian kind }
-        publishers { id name }
+        genres { id name kind }
 
         characterRoles {
             id
             character { ...CharacterShort }
+        }
+        personRoles {
+            id
+            rolesEn
+            person { id name poster { id originalUrl } }
         }
 
         related {
@@ -64,7 +68,6 @@ query MangaDetails(
         topic {
             id
             commentsCount
-            title
         }
     }
 }

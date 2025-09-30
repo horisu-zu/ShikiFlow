@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.StatusColor
@@ -44,7 +46,7 @@ fun SegmentedProgressBar(
             modifier = Modifier.fillMaxWidth()
                 .height(rowHeight)
                 .clip(rowShape),
-            horizontalArrangement = Arrangement.spacedBy(2.dp)
+            horizontalArrangement = Arrangement.spacedBy(rowHeight / 4)
         ) {
             groupedData.forEach { (status, count) ->
                 val progress = count.toFloat() / totalCount
@@ -97,7 +99,16 @@ fun SegmentedDataItem(
                 .background(color)
         )
         Text(
-            text = "$status $count",
+            text = buildAnnotatedString {
+                append(status)
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                    )
+                ) {
+                    append(" $count")
+                }
+            },
             style = MaterialTheme.typography.bodyMedium
         )
     }

@@ -24,6 +24,7 @@ query AnimeDetails(
         poster { originalUrl }
 
         nextEpisodeAt,
+        origin
 
         genres { id name kind }
         studios { id name imageUrl }

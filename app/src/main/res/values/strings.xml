@@ -141,6 +141,7 @@
 
     <string name="details_info_studio">Studio</string>
     <string name="details_info_duration">Duration</string>
+    <string name="details_info_origin">Origin</string>
     <string name="details_info_duration_min">%1$d min.</string>
     <string name="details_info_aired_on">Aired On</string>
     <string name="details_info_next_episode_at">Next Episode at</string>
@@ -252,4 +253,26 @@
     <string name="rating_r_17">R-17</string>
     <string name="rating_r_plus">R+</string>
     <string name="rating_rx">Rx</string>
+
+    <string name="anime_origin_original">Original</string>
+    <string name="anime_origin_manga">Manga</string>
+    <string name="anime_origin_web_manga">Web Manga</string>
+    <string name="anime_origin_4_koma_manga">4-Koma Manga</string>
+    <string name="anime_origin_novel">Novel</string>
+    <string name="anime_origin_web_novel">Web Novel</string>
+    <string name="anime_origin_visual_novel">Visual Novel</string>
+    <string name="anime_origin_light_novel">Light Novel</string>
+    <string name="anime_origin_game">Game</string>
+    <string name="anime_origin_card_game">Card Game</string>
+    <string name="anime_origin_music">Music</string>
+    <string name="anime_origin_radio">Radio</string>
+    <string name="anime_origin_book">Book</string>
+    <string name="anime_origin_picture_book">Picture Book</string>
+    <string name="anime_origin_mixed_media">Mixed Media</string>
+    <string name="anime_origin_other">Other</string>
+
+    <plurals name="author_plural_form">
+        <item quantity="one">Author</item>
+        <item quantity="other">Authors</item>
+    </plurals>
 </resources>

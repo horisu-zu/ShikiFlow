@@ -67,7 +67,7 @@ import com.example.shikiflow.domain.model.person.GroupedRole
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.RoundedImage
-import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterMediaSection
 import com.example.shikiflow.presentation.screen.main.details.common.CommentSection
@@ -112,7 +112,7 @@ fun PersonScreen(
                         onClick = { navOptions.navigateBack() }
                     ) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back to Main"
                         )
                     }
@@ -289,7 +289,9 @@ private fun PersonTitleSection(
                 .height(componentHeight)
                 .clip(RoundedCornerShape(
                     topStart = 12.dp,
-                    bottomStart = 12.dp
+                    bottomStart = 12.dp,
+                    topEnd = if(isExpanded) 0.dp else 4.dp,
+                    bottomEnd = if(isExpanded) 0.dp else 4.dp,
                 ))
                 .clickable(
                     interactionSource = mutableInteractionSource,

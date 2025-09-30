@@ -34,7 +34,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.common.ExternalLink
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.ExternalLinksViewModel
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent.openUrlCustomTab

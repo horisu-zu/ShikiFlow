@@ -2,8 +2,8 @@ package com.example.shikiflow.presentation.screen.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -42,10 +42,10 @@ fun MangaTracksPage(
         } else {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier.fillMaxSize()
-                    .padding(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 items(
                     count = trackItems.itemCount,

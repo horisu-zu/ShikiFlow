@@ -29,13 +29,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.graphql.CurrentUserQuery
-import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
-import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
-import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -56,6 +54,7 @@ fun MangaDetailsScreen(
     val mangaDetails by mangaDetailsViewModel.mangaDetails.collectAsStateWithLifecycle()
     val mangaDexIds by mangaDetailsViewModel.mangaDexIds.collectAsStateWithLifecycle()
 
+    val horizontalPadding = 12.dp
     var rateBottomSheet by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
@@ -72,9 +71,7 @@ fun MangaDetailsScreen(
         mangaDetailsViewModel.getMangaDetails(id)
     }
 
-    Scaffold(
-        topBar = { /*TODO*/ }
-    ) { paddingValues ->
+    Scaffold { paddingValues ->
         when (mangaDetails) {
             is Resource.Loading -> {
                 Box(
@@ -107,6 +104,7 @@ fun MangaDetailsScreen(
                         MangaDetailsHeader(
                             mangaDetails = mangaDetails.data,
                             mangaDexResource = mangaDexIds,
+                            horizontalPadding = horizontalPadding,
                             onStatusClick = { rateBottomSheet = true },
                             onMangaDexNavigateClick = { title ->
                                 navOptions.navigateToMangaRead(
@@ -116,14 +114,13 @@ fun MangaDetailsScreen(
                                         ?.userRate?.chapters ?: 0
                                 )
                             },
-                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) },
-                            context = context
+                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) }
                         )
 
                         MangaDetailsDesc(
                             mangaDetails = mangaDetails.data,
+                            horizontalPadding = horizontalPadding,
                             isRefreshing = isRefreshing,
-                            context = context,
                             onItemClick = { id, mediaType ->
                                 if(mediaType == MediaType.ANIME) {
                                     navOptions.navigateToAnimeDetails(id)
@@ -138,7 +135,7 @@ fun MangaDetailsScreen(
                             onTopicNavigate = { topicId ->
                                 navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
                             },
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(vertical = 12.dp)
                         )
                     }
                 }

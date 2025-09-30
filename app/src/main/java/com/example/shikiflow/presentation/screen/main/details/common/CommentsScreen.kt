@@ -37,7 +37,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentItem
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.CommentViewModel
 import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Resource

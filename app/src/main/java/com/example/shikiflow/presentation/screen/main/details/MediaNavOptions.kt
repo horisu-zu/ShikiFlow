@@ -1,6 +1,7 @@
-package com.example.shikiflow.presentation.screen
+package com.example.shikiflow.presentation.screen.main.details
 
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.utils.Converter
 

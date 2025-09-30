@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import android.content.Context
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
@@ -63,7 +62,6 @@ fun AnimeDetailsDesc(
     selectedScreenshotIndex: Int?,
     sharedTransitionScope: SharedTransitionScope,
     isRefreshing: Boolean,
-    context: Context,
     onSimilarClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -78,7 +76,7 @@ fun AnimeDetailsDesc(
 
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
         animeDetails.descriptionHtml?.let { descriptionHtml ->
             ExpandableText(
@@ -95,9 +93,7 @@ fun AnimeDetailsDesc(
 
         if(animeDetails.genres?.isNotEmpty() == true) {
             LazyRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = horizontalPadding),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
@@ -164,7 +160,6 @@ fun AnimeDetailsDesc(
             onExternalLinksClick = onExternalLinksClick,
             onEntityClick = onEntityClick,
             onTopicNavigate = onTopicNavigate,
-            context = context,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -340,7 +335,7 @@ private fun ScreenshotSection(
         )
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(horizontalPadding)
+            contentPadding = PaddingValues(horizontal = horizontalPadding)
         ) {
             itemsIndexed(screenshots) { index, screenshot ->
                 AnimatedVisibility(

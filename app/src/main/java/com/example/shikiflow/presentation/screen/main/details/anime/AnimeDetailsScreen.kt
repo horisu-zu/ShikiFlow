@@ -43,7 +43,7 @@ import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.FullScreenImageDialog
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
-import com.example.shikiflow.presentation.screen.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
 import com.example.shikiflow.utils.Resource
@@ -125,13 +125,12 @@ fun AnimeDetailsScreen(
                                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                                 ).verticalScroll(rememberScrollState()),
-                            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+                            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
                         ) {
                             animeDetails.data?.let { details ->
                                 AnimeDetailsTitle(
                                     animeDetails = details,
                                     onStatusClick = { rateBottomSheet = true },
-                                    context = context,
                                     onPlayClick = { title, id, completedEpisodes ->
                                         navOptions.navigateToAnimeWatch(title, id, completedEpisodes)
                                     }
@@ -141,7 +140,6 @@ fun AnimeDetailsScreen(
                                     selectedScreenshotIndex = selectedScreenshotIndex,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     isRefreshing = isRefreshing,
-                                    context = context,
                                     onItemClick = { id, mediaType ->
                                         if (mediaType == MediaType.ANIME) {
                                             navOptions.navigateToAnimeDetails(id)

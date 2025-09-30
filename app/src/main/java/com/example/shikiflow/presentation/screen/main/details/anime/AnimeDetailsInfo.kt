@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -26,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapOriginToString
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.Graph
@@ -49,7 +49,6 @@ fun AnimeDetailsInfo(
     onExternalLinksClick: (String) -> Unit,
     onEntityClick: (Converter.EntityType, String) -> Unit,
     onTopicNavigate: (String) -> Unit,
-    context: Context,
     modifier: Modifier = Modifier
 ) {
     val scoresStats = remember {
@@ -58,8 +57,9 @@ fun AnimeDetailsInfo(
         }
     }
     val statusesStats = remember {
-        animeDetails.statusesStats?.associate {
-            context.getString(simpleMapUserRateStatusToString(it.status)) to it.count.toFloat()
+        animeDetails.statusesStats?.associate { statusesStat ->
+            simpleMapUserRateStatusToString(statusesStat.status) to
+                statusesStat.count.toFloat()
         }
     }
     Column(
@@ -68,18 +68,34 @@ fun AnimeDetailsInfo(
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        DetailRow(
-            label = stringResource(R.string.details_info_studio),
-            verticalAlignment = Alignment.Top,
-            content = {
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
-                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
-                ) {
-                    animeDetails.studios.forEach { CardItem(it.name) }
+        if(animeDetails.studios.isNotEmpty()) {
+            DetailRow(
+                label = stringResource(R.string.details_info_studio),
+                verticalAlignment = Alignment.CenterVertically,
+                content = {
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+                    ) {
+                        animeDetails.studios.forEach { CardItem(it.name) }
+                    }
                 }
+            )
+        } else {
+            animeDetails.origin?.let {
+                DetailRow(
+                    label = stringResource(R.string.details_info_origin),
+                    content = {
+                        Text(
+                            text = stringResource(id = mapOriginToString(animeDetails.origin)),
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.padding(start = 12.dp)
+                        )
+                    }
+                )
             }
-        )
+        }
         if (animeDetails.duration != null && animeDetails.duration != 0) {
             DetailRow(
                 label = stringResource(R.string.details_info_duration),
@@ -246,7 +262,9 @@ fun AnimeDetailsInfo(
                     style = MaterialTheme.typography.titleMedium
                 )
                 Graph(
-                    data = statusesStats,
+                    data = statusesStats.mapKeys { statusEntry ->
+                        stringResource(id = statusEntry.key)
+                    },
                     gridType = GraphGridType.VERTICAL,
                     modifier = Modifier.fillMaxWidth(),
                     height = 180.dp

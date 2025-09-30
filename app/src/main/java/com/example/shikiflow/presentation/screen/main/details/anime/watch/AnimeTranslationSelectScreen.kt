@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +60,6 @@ import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeTranslation
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.toAbbreviation
 import com.example.shikiflow.utils.Resource
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -76,7 +75,7 @@ fun AnimeTranslationSelectScreen(
 
     val coroutineScope = rememberCoroutineScope()
     val filters = TranslationFilter.entries
-    var translationFilter by remember { mutableStateOf(TranslationFilter.ALL) }
+    var translationFilter by rememberSaveable { mutableStateOf(TranslationFilter.ALL) }
     var isNavigating by remember { mutableStateOf(false) }
     var isRefreshing by remember { mutableStateOf(false) }
     val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
@@ -170,9 +169,7 @@ fun AnimeTranslationSelectScreen(
                     ),
                     scrollBehavior = scrollBehavior
                 )
-                if(isAtTop) {
-                    HorizontalDivider()
-                }
+                HorizontalDivider()
             }
         }
     ) { paddingValues ->
