@@ -25,7 +25,8 @@ import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 @Composable
 fun MangaTracksPage(
     trackItems: LazyPagingItems<MangaTrack>?,
-    onMangaClick: (String) -> Unit
+    onMangaClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     trackItems?.let { items ->
         if(trackItems.loadState.refresh is LoadState.Loading) {

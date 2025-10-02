@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.dao.AnimeTracksDao
 import com.example.shikiflow.data.local.dao.MangaTracksDao
+import com.example.shikiflow.data.local.dao.VersionDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,5 +37,11 @@ object RoomModule {
     @Singleton
     fun provideMangaTracksDao(database: AppRoomDatabase): MangaTracksDao {
         return database.mangaTracksDao()
+    }
+
+    @Provides
+    @Singleton
+    fun provideVersionDao(database: AppRoomDatabase): VersionDao {
+        return database.versionDao()
     }
 }

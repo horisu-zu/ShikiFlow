@@ -4,6 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.dao.AnimeTracksDao
 import com.example.shikiflow.data.local.dao.MangaTracksDao
+import com.example.shikiflow.data.local.dao.VersionDao
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
@@ -121,8 +122,9 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideGithubRepository(
-        githubApi: GithubApi
-    ): GithubRepository = GithubRepositoryImpl(githubApi)
+        githubApi: GithubApi,
+        versionDao: VersionDao
+    ): GithubRepository = GithubRepositoryImpl(githubApi, versionDao)
 
     @Provides
     @Singleton

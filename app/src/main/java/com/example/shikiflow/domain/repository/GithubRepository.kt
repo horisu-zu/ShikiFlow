@@ -6,11 +6,19 @@ interface GithubRepository {
     suspend fun getLatestRelease(
         owner: String,
         repo: String
-    ): Result<GithubRelease?>
+    ): GithubRelease
 
     suspend fun getReleaseByVersion(
         owner: String,
         repo: String,
         versionTag: String
-    ): Result<GithubRelease?>
+    ): GithubRelease?
+
+    suspend fun getLatestLocalVersion(
+        versionTag: String
+    ): GithubRelease?
+
+    suspend fun saveLocalVersion(
+        githubRelease: GithubRelease
+    )
 }

@@ -34,6 +34,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -56,6 +58,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.kodik.KodikAnime
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeTranslationsViewModel
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.toAbbreviation
@@ -124,7 +127,7 @@ fun AnimeTranslationSelectScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            else MaterialTheme.colorScheme.surface
                     )
                 )
                 TopAppBar(
@@ -173,14 +176,15 @@ fun AnimeTranslationSelectScreen(
             }
         }
     ) { paddingValues ->
-        PullToRefreshBox(
+        PullToRefreshCustomBox(
             isRefreshing = isRefreshing,
+            enabled = scrollBehavior.state.collapsedFraction == 0f,
             onRefresh = {
                 coroutineScope.launch {
                     try {
                         isRefreshing = true
-                        delay(100)
                         animeTranslationsViewModel.getAnimeTranslations(shikimoriId, true)
+                        delay(100)
                     } finally {
                         isRefreshing = false
                     }
@@ -237,7 +241,10 @@ fun AnimeTranslationSelectScreen(
                                 ErrorItem(
                                     message = stringResource(R.string.common_error),
                                     buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { animeTranslationsViewModel.getAnimeTranslations(shikimoriId) }
+                                    onButtonClick = { animeTranslationsViewModel.getAnimeTranslations(
+                                        shikimoriId,
+                                        isRefresh = true
+                                    ) }
                                 )
                             }
                         }

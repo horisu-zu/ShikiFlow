@@ -213,6 +213,9 @@ private fun StatusChips(
                     onStatusSelected(if (selectedStatus == newIndex) -1 else newIndex)
                 },
                 label = { Text(tab) },
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
                 leadingIcon = {
                     statusMap[tab.lowercase()]?.icon?.toIcon(
                         tint = MaterialTheme.colorScheme.onSurface,

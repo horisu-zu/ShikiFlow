@@ -23,13 +23,11 @@ import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.viewmodel.MainViewModel
-import com.example.shikiflow.presentation.viewmodel.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     currentUser: CurrentUserQuery.Data?,
-    searchViewModel: SearchViewModel = hiltViewModel(key = "main_search"),
     mainViewModel: MainViewModel = hiltViewModel(),
     navOptions: MainScreenNavOptions
 ) {
@@ -43,8 +41,8 @@ fun MainScreen(
     )
 
     val currentTrackMode by mainViewModel.currentTrackMode.collectAsStateWithLifecycle()
-    val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
-    val searchQuery by searchViewModel.searchQuery.collectAsStateWithLifecycle()
+    val screenState by mainViewModel.screenState.collectAsStateWithLifecycle()
+    val searchQuery by mainViewModel.searchQuery.collectAsStateWithLifecycle()
 
     currentTrackMode?.let { trackMode ->
         Scaffold(
@@ -57,9 +55,9 @@ fun MainScreen(
                     query = screenState.query,
                     isSearchActive = screenState.isSearchActive,
                     onModeChange = { trackMode -> mainViewModel.setCurrentTrackMode(trackMode) },
-                    onQueryChange = searchViewModel::onQueryChange,
-                    onSearchToggle = searchViewModel::onSearchActiveChange,
-                    onExitSearch = searchViewModel::exitSearchState
+                    onQueryChange = mainViewModel::onQueryChange,
+                    onSearchToggle = mainViewModel::onSearchActiveChange,
+                    onExitSearch = mainViewModel::exitSearchState
                 )
             }
         ) { innerPadding ->
@@ -89,6 +87,7 @@ fun MainScreen(
                                     MainTrackMode.MANGA -> MediaType.MANGA
                                 },
                                 isAtTop = scrollBehavior.state.collapsedFraction < 1f,
+                                isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
                                 onAnimeClick = { animeId ->
                                     navOptions.navigateToDetails(animeId, MediaType.ANIME)
                                 },

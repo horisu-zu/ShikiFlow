@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.usecase
 
+import android.util.Log
 import coil3.network.HttpException
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.domain.model.anime.Browse
@@ -27,12 +28,17 @@ class GetOngoingsCalendarUseCase @Inject constructor(
             while(currentSize == limit) {
                 animeRepository.browseAnime(
                     page = currentPage,
-                    status = AnimeStatusEnum.ongoing.name
+                    status = AnimeStatusEnum.ongoing.name,
+                    score = 1
                 ).onSuccess { result ->
                     val browseResponse = result.map { it.toBrowseAnime() }
                     ongoings.addAll(browseResponse)
                     currentSize = browseResponse.size
                     currentPage++
+                }.onFailure { result ->
+                    Log.d("GetOngoingsCalendarUseCase", "Error Loading Ongoings: ${result.message}")
+                    emit(Resource.Error(result.localizedMessage ?: "Error: ${result.message}"))
+                    return@onFailure
                 }
             }
 

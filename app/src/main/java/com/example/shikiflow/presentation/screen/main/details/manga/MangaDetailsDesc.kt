@@ -64,9 +64,9 @@ fun MangaDetailsDesc(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
-        mangaDetails?.descriptionHtml?.let { descriptionHtml ->
+        mangaDetails?.description?.let {
             ExpandableText(
-                descriptionHtml = descriptionHtml,
+                descriptionHtml = mangaDetails.descriptionHtml ?: "",
                 modifier = Modifier.fillMaxWidth()
                     .padding(horizontal = horizontalPadding),
                 style = MaterialTheme.typography.bodySmall,

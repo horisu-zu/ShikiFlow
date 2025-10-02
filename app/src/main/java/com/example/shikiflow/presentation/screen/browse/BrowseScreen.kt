@@ -17,15 +17,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.viewmodel.SearchViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @Composable
 fun BrowseScreen(
-    searchViewModel: SearchViewModel = hiltViewModel(key = "browse_search"),
-    browseNavOptions: BrowseNavOptions
+    browseNavOptions: BrowseNavOptions,
+    browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
-    val searchQuery by searchViewModel.searchQuery.collectAsStateWithLifecycle()
-    val screenState by searchViewModel.screenState.collectAsStateWithLifecycle()
+    val searchQuery by browseViewModel.searchQuery.collectAsStateWithLifecycle()
+    val screenState by browseViewModel.screenState.collectAsStateWithLifecycle()
     var isAtTop by remember { mutableStateOf(true) }
 
     Scaffold(
@@ -34,12 +34,12 @@ fun BrowseScreen(
                 title = stringResource(id = R.string.bottom_navigator_browse),
                 searchQuery = screenState.query,
                 isAtTop = isAtTop,
-                onSearchQueryChange = searchViewModel::onQueryChange,
+                onSearchQueryChange = browseViewModel::onQueryChange,
                 isSearchActive = screenState.isSearchActive,
-                onExitSearch = { searchViewModel.exitSearchState() },
+                onExitSearch = { browseViewModel.exitSearchState() },
                 onSearchActiveChange = { isActive ->
-                    searchViewModel.onSearchActiveChange(isActive)
-                }, //modifier = Modifier.padding(top = 24.dp)
+                    browseViewModel.onSearchActiveChange(isActive)
+                },
             )
         }
     ) { innerPadding ->
@@ -52,7 +52,8 @@ fun BrowseScreen(
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)),
                     onMediaNavigate = { id, mediaType ->
                         browseNavOptions.navigateToDetails(id, mediaType)
-                    }
+                    },
+                    onIsAtTopChange = { isAtTop = it },
                 )
             } else {
                 BrowseMainPage(

@@ -1,11 +1,6 @@
 package com.example.shikiflow.presentation.screen.more
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.navigation3.runtime.NavEntry
-import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -14,15 +9,12 @@ import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
-import com.example.shikiflow.presentation.viewmodel.AboutViewModel
 
 @Composable
 fun MoreScreenNavigator(
     currentUser: CurrentUserQuery.Data?
 ) {
     val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
-    //val moreNavController = rememberNavController()
-    val aboutViewModel = hiltViewModel<AboutViewModel>()
 
     val moreNavOptions = object : MoreNavOptions {
         override fun navigateToProfile() {
@@ -70,7 +62,7 @@ fun MoreScreenNavigator(
                 )
             }
             entry<MoreNavRoute.AboutAppScreen> {
-                AboutAppScreen(aboutViewModel)
+                AboutAppScreen()
             }
         }
     )

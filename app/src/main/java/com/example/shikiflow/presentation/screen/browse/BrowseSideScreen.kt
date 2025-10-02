@@ -1,11 +1,13 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,28 +37,31 @@ fun BrowseSideScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = browseType.displayValueRes),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { onBackNavigate() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(id = browseType.displayValueRes),
+                            style = MaterialTheme.typography.headlineSmall
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = if(isAtTop) MaterialTheme.colorScheme.background
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { onBackNavigate() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = if(isAtTop) MaterialTheme.colorScheme.background
                         else MaterialTheme.colorScheme.surface
+                    )
                 )
-            )
+                if(!isAtTop) HorizontalDivider()
+            }
         }
     ) { innerPadding ->
         if (browseType == BrowseType.AnimeBrowseType.ONGOING) {

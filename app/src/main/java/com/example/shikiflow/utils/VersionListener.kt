@@ -17,43 +17,16 @@ class VersionListener @Inject constructor(
     suspend fun getReleaseByVersion(versionTag: String): GithubRelease? {
         return try {
             Log.d("VersionListener", "Version Tag: $versionTag")
-            val result = githubRepository.getReleaseByVersion(owner, repo, versionTag)
-
-            if(result.isSuccess) {
-                return result.getOrNull()
-            } else {
-                Log.e("VersionListener", "Failed to get release by version: ${result.exceptionOrNull()}")
-                null
-            }
+            githubRepository.getReleaseByVersion(owner, repo, versionTag)
         } catch (e: Exception) {
             Log.e("VersionListener", "Failed to get release by version", e)
             null
         }
     }
 
-    fun isUpdateAvailable(currentVersion: String, remoteVersion: String): Boolean {
-        val current = currentVersion.split(".").map { it.toIntOrNull() ?: 0 }
-        val remote = remoteVersion.split(".").map { it.toIntOrNull() ?: 0 }
-        Log.d("VersionListener", "Current Version: $currentVersion, Remote Version: $remoteVersion")
-
-        for (i in 0 until minOf(current.size, remote.size)) {
-            if (remote[i] > current[i]) return true
-            if (remote[i] < current[i]) return false
-        }
-
-        return remote.size > current.size
-    }
-
     suspend fun getLatestRelease(): GithubRelease? {
         return try {
-            val result = githubRepository.getLatestRelease(owner, repo)
-
-            if(result.isSuccess) {
-                return result.getOrNull()
-            } else {
-                Log.e("VersionListener", "Failed to check for updates: ${result.exceptionOrNull()}")
-                null
-            }
+            githubRepository.getLatestRelease(owner, repo)
         } catch (e: Exception) {
             Log.e("VersionListener", "Failed to check for updates", e)
             null

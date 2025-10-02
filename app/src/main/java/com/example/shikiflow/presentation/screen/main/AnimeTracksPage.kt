@@ -49,7 +49,8 @@ import com.example.shikiflow.utils.AppUiMode
 fun AnimeTracksPage(
     trackItems: LazyPagingItems<AnimeTrack>?,
     tracksViewModel: AnimeTracksViewModel,
-    onAnimeClick: (String) -> Unit
+    onAnimeClick: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
@@ -82,7 +83,7 @@ fun AnimeTracksPage(
                         onLongClick = { item ->
                             rateBottomSheet.value = true
                             selectedItem = item
-                        }
+                        }, modifier = modifier
                     )
                 }
                 AppUiMode.GRID -> {
@@ -92,7 +93,7 @@ fun AnimeTracksPage(
                         onLongClick = { item ->
                             rateBottomSheet.value = true
                             selectedItem = item
-                        }
+                        }, modifier = modifier
                     )
                 }
             }

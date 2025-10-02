@@ -51,8 +51,8 @@ fun CustomSearchField(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
             .background(
-                if (isActive) MaterialTheme.colorScheme.background
-                else MaterialTheme.colorScheme.surface
+                color = if (isActive) MaterialTheme.colorScheme.background
+                    else MaterialTheme.colorScheme.surface
             )
     ) {
         Row(

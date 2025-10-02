@@ -12,6 +12,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -26,7 +27,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.NavKey
-import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
@@ -70,7 +70,12 @@ fun MainNavigator(
                                 modifier = Modifier.size(24.dp)
                             )
                         },
-                        label = { Text(stringResource(id = navItem.title)) },
+                        label = { Text(
+                            text = stringResource(id = navItem.title),
+                            style = LocalTextStyle.current.copy(
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        ) },
                         selected = isSelected,
                         onClick = {
                             if (!isSelected) {

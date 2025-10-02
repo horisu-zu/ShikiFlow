@@ -78,9 +78,9 @@ fun AnimeDetailsDesc(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
-        animeDetails.descriptionHtml?.let { descriptionHtml ->
+        if(!animeDetails.description.isNullOrEmpty()) {
             ExpandableText(
-                descriptionHtml = descriptionHtml,
+                descriptionHtml = animeDetails.descriptionHtml ?: "",
                 modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
                 style = MaterialTheme.typography.bodySmall,
                 linkColor = MaterialTheme.colorScheme.primary,
@@ -98,15 +98,16 @@ fun AnimeDetailsDesc(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(animeDetails.genres) { genreItem ->
-                    CardItem(genreItem.name)
+                    CardItem(
+                        item = genreItem.name
+                    )
                 }
             }
         }
 
         animeDetails.characterRoles?.let { characterRoles ->
             Column(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(

@@ -125,7 +125,7 @@ fun AnimeDetailsScreen(
                                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                                 ).verticalScroll(rememberScrollState()),
-                            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+                            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                         ) {
                             animeDetails.data?.let { details ->
                                 AnimeDetailsTitle(

@@ -10,12 +10,12 @@ interface GithubApi {
     suspend fun getLatestRelease(
         @Path("owner") owner: String,
         @Path("repo") repo: String
-    ): GithubRelease?
+    ): GithubRelease
 
     @GET("/repos/{owner}/{repo}/releases/tags/v{versionTag}")
     suspend fun getReleaseByVersion(
         @Path("owner") owner: String,
         @Path("repo") repo: String,
         @Path("versionTag") versionTag: String
-    ): GithubRelease?
+    ): GithubRelease
 }

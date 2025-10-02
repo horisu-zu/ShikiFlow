@@ -12,6 +12,7 @@ import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.mapper.BrowseOptions
+import com.example.shikiflow.domain.model.search.ScreenSearchState
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.MangaRepository
@@ -21,19 +22,25 @@ import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
     private val animeRepository: AnimeRepository,
@@ -54,6 +61,9 @@ class BrowseViewModel @Inject constructor(
     private val _ongoingBrowseState = MutableStateFlow<Resource<Map<String, List<Browse>>>>(Resource.Loading())
     val ongoingBrowseState = _ongoingBrowseState.asStateFlow()
 
+    private val _screenState = MutableStateFlow(ScreenSearchState())
+    val screenState: StateFlow<ScreenSearchState> = _screenState.asStateFlow()
+
     val browseUiSettings = settingsRepository.browseUiSettingsFlow
         .stateIn(
             scope = viewModelScope,
@@ -72,6 +82,15 @@ class BrowseViewModel @Inject constructor(
                 )
             )
         }.cachedIn(viewModelScope)
+
+    val searchQuery = _screenState
+        .map { it.query }
+        .debounce(500L)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = ""
+        )
 
     fun paginatedBrowse(
         type: BrowseType = BrowseType.AnimeBrowseType.ONGOING,
@@ -143,5 +162,20 @@ class BrowseViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.saveBrowseOngoingOrder(order)
         }
+    }
+
+    fun onQueryChange(newQuery: String) {
+        _screenState.update { it.copy(query = newQuery) }
+    }
+
+    fun onSearchActiveChange(isActive: Boolean) {
+        _screenState.update { it.copy(isSearchActive = isActive) }
+    }
+
+    fun exitSearchState() {
+        _screenState.update { it.copy(
+            isSearchActive = false,
+            query = ""
+        ) }
     }
 }

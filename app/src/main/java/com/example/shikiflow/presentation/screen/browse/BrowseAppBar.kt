@@ -60,7 +60,7 @@ fun BrowseAppBar(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = if(isAtTop || isSearchActive) MaterialTheme.colorScheme.background
+                containerColor = if(isAtTop) MaterialTheme.colorScheme.background
                     else MaterialTheme.colorScheme.surface
             ),
             modifier = modifier

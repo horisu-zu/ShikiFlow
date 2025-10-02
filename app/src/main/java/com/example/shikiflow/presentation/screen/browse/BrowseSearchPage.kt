@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.CircularProgressIndicator
@@ -15,6 +16,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,12 +38,20 @@ import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 fun BrowseSearchPage(
     query: String,
     onMediaNavigate: (String, MediaType) -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
+    val lazyGridState = rememberLazyGridState()
     var showBottomSheet by remember { mutableStateOf(false) }
     var currentType by rememberSaveable { mutableStateOf<BrowseType>(BrowseType.AnimeBrowseType.SEARCH) }
     var searchOptions by remember { mutableStateOf(BrowseOptions()) }
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex == 0 &&
+            lazyGridState.firstVisibleItemScrollOffset == 0
+        }
+    }
 
     val browseSearchData = remember(query, currentType, searchOptions) {
         browseViewModel.paginatedBrowse(
@@ -50,6 +61,10 @@ fun BrowseSearchPage(
         )
     }.collectAsLazyPagingItems()
 
+    LaunchedEffect(isAtTop) {
+        onIsAtTopChange(isAtTop)
+    }
+
     Box {
         if(browseSearchData.loadState.refresh is LoadState.Loading) {
             Box(
@@ -58,6 +73,7 @@ fun BrowseSearchPage(
             ) { CircularProgressIndicator() }
         } else {
             LazyVerticalGrid(
+                state = lazyGridState,
                 columns = GridCells.Fixed(3),
                 modifier = modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),

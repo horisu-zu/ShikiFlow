@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,6 +24,7 @@ import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import com.example.shikiflow.presentation.viewmodel.manga.MangaTracksViewModel
 import kotlinx.coroutines.delay
@@ -35,6 +35,7 @@ import kotlinx.coroutines.launch
 fun MainPage(
     mediaType: MediaType,
     isAtTop: Boolean,
+    isAppBarVisible: Boolean,
     animeTrackViewModel: AnimeTracksViewModel = hiltViewModel(),
     mangaTrackViewModel: MangaTracksViewModel = hiltViewModel(),
     onAnimeClick: (String) -> Unit,
@@ -77,8 +78,9 @@ fun MainPage(
                 }
             }
 
-            PullToRefreshBox(
+            PullToRefreshCustomBox(
                 isRefreshing = isRefreshing,
+                enabled = isAppBarVisible,
                 onRefresh = {
                     status?.let {
                         coroutineScope.launch {
