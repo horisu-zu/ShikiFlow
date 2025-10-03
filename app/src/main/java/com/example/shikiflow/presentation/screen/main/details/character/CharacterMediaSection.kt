@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details.character
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -32,6 +33,7 @@ fun CharacterMediaSection(
             modifier = Modifier.padding(horizontal = horizontalPadding)
         )
         LazyRow(
+            modifier = Modifier.height(230.dp),
             contentPadding = PaddingValues(horizontal = horizontalPadding),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {

@@ -7,14 +7,14 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 
 @Composable
 fun BrowseScreenNavigator(
-    currentUserData: CurrentUserQuery.Data?,
+    currentUserData: User?,
     onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
 ) {
     val browseBackstack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)

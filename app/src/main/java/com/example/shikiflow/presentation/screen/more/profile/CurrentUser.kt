@@ -1,12 +1,9 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,17 +12,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.utils.Converter
-import kotlin.time.Instant
 
 @Composable
 fun CurrentUser(
-    userData: CurrentUserQuery.Data?,
-    context: Context,
+    userData: User?,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -34,24 +28,15 @@ fun CurrentUser(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BaseImage(
-            model = userData?.currentUser?.avatarUrl,
+            model = userData?.avatarUrl,
             contentDescription = "Avatar",
             imageType = ImageType.Square(),
             modifier = Modifier.size(96.dp)
         )
-        Column {
-            Text(
-                text = userData?.currentUser?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold
-            )
-            Text(
-                text = Converter.convertInstantToString(
-                    context = context,
-                    lastSeenInstant = Instant.parse(userData?.currentUser?.lastOnlineAt.toString())
-                ),
-                style = MaterialTheme.typography.bodySmall
-            )
-        }
+        Text(
+            text = userData?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }

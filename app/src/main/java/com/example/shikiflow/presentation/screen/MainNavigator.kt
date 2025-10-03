@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen
 
+import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -19,6 +20,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -49,7 +51,12 @@ fun MainNavigator(
         BottomNavItem.More
     )
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Home)
-    val currentUser by userViewModel.currentUserData.collectAsState()
+    val currentUser by userViewModel.userFlow.collectAsState()
+
+    LaunchedEffect(Unit) {
+        Log.d("MainNavigator", "Fetching Current User")
+        userViewModel.fetchCurrentUser()
+    }
 
     Scaffold(
         bottomBar = {
@@ -97,7 +104,7 @@ fun MainNavigator(
             entryProvider = entryProvider {
                 entry<MainNavRoute.Home> {
                     MainScreenNavigator(
-                        currentUserData = currentUser.data,
+                        currentUserData = currentUser,
                         onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
                             appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
                         }
@@ -105,14 +112,14 @@ fun MainNavigator(
                 }
                 entry<MainNavRoute.Browse> {
                     BrowseScreenNavigator(
-                        currentUserData = currentUser.data,
+                        currentUserData = currentUser,
                         onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
                             appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
                         }
                     )
                 }
                 entry<MainNavRoute.More> {
-                    MoreScreenNavigator(currentUser = currentUser.data)
+                    MoreScreenNavigator(currentUser = currentUser)
                 }
             },
             transitionSpec = {

@@ -28,8 +28,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomSearchField
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +37,7 @@ import com.example.shikiflow.presentation.common.CustomSearchField
 fun MainAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
     currentTrackMode: MainTrackMode,
-    user: CurrentUserQuery.Data?,
+    user: User?,
     query: String,
     isSearchActive: Boolean,
     onQueryChange: (String) -> Unit,
@@ -90,7 +90,7 @@ fun MainAppBar(
                     exit = fadeOut()
                 ) {
                     AsyncImage(
-                        model = user?.currentUser?.avatarUrl,
+                        model = user?.avatarUrl,
                         contentDescription = "Avatar",
                         modifier = Modifier
                             .padding(end = 12.dp)

@@ -36,7 +36,6 @@ import androidx.compose.ui.zIndex
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.toUiModel
@@ -54,7 +53,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun AnimeDetailsScreen(
     id: String,
-    currentUser: CurrentUserQuery.Data?,
+    userId: String?,
     navOptions: MediaNavOptions,
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
@@ -205,7 +204,7 @@ fun AnimeDetailsScreen(
                     )
                 },
                 onCreateRate = { mediaId, status ->
-                    currentUser?.currentUser?.id?.let { userId ->
+                    userId?.let {
                         animeDetailsViewModel.createUserRate(
                             userId = userId,
                             targetId = mediaId,

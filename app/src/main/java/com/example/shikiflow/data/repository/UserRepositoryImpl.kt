@@ -10,6 +10,8 @@ import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
+import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.User.Companion.toDomain
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.repository.UserRepository
 import javax.inject.Inject
@@ -19,22 +21,10 @@ class UserRepositoryImpl @Inject constructor(
     private val userApi: UserApi
 ): UserRepository {
 
-    override suspend fun fetchCurrentUser(): Result<CurrentUserQuery.Data> {
-        return try {
-            val response = apolloClient.query(CurrentUserQuery()).execute()
+    override suspend fun fetchCurrentUser(): User? {
+        val response = apolloClient.query(CurrentUserQuery()).execute()
 
-            if (response.hasErrors()) {
-                val errorMessage = response.errors?.joinToString { it.message }
-                    ?: "Unknown error occurred"
-                Result.failure(Exception(errorMessage))
-            } else {
-                response.data?.let { data ->
-                    Result.success(data)
-                } ?: Result.failure(Exception("No data received"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        return response.data?.currentUser?.toDomain()
     }
 
     override suspend fun getUserHistory(

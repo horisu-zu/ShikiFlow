@@ -28,13 +28,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CircleShapeButton
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
@@ -46,15 +45,13 @@ import com.example.shikiflow.utils.Resource
 @Composable
 fun ProfileScreen(
     userRateViewModel: AnimeUserRateViewModel = hiltViewModel(),
-    currentUser: CurrentUserQuery.Data?,
+    currentUser: User?,
     moreNavOptions: MoreNavOptions
 ) {
-    val context = LocalContext.current
-
     val userRateData = userRateViewModel.userRateData.collectAsState()
 
     LaunchedEffect(Unit) {
-        currentUser?.currentUser?.id?.let { userId ->
+        currentUser?.id?.let { userId ->
             userRateViewModel.loadUserRates(userId.toLong())
         }
     }
@@ -64,7 +61,7 @@ fun ProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Profile",
+                        text = stringResource(id = R.string.profile),
                         style = MaterialTheme.typography.headlineSmall
                     )
                 },
@@ -101,8 +98,7 @@ fun ProfileScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                 ) {
                     CurrentUser(
-                        userData = currentUser,
-                        context = context
+                        userData = currentUser
                     )
                     Row(
                         modifier = Modifier
@@ -135,7 +131,7 @@ fun ProfileScreen(
                         message = stringResource(R.string.common_error),
                         buttonLabel = stringResource(R.string.common_retry),
                         onButtonClick = {
-                            currentUser?.currentUser?.id?.let { userId ->
+                            currentUser?.id?.let { userId ->
                                 userRateViewModel.loadUserRates(userId.toLong(), true)
                             }
                         }

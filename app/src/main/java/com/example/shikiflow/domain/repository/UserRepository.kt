@@ -1,6 +1,5 @@
 package com.example.shikiflow.domain.repository
 
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.anime.ShortAnimeRate
 import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
@@ -9,9 +8,10 @@ import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
+import com.example.shikiflow.domain.model.user.User
 
 interface UserRepository {
-    suspend fun fetchCurrentUser(): Result<CurrentUserQuery.Data>
+    suspend fun fetchCurrentUser(): User?
     suspend fun getUserHistory(
         userId: Long,
         page: Int? = null,

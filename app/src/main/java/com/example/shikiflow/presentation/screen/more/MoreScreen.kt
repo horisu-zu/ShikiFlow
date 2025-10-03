@@ -16,14 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.SectionItem
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.utils.IconResource
 
 @Composable
 fun MoreScreen(
-    currentUser: CurrentUserQuery.Data?,
+    currentUser: User?,
     moreNavOptions: MoreNavOptions
 ) {
     Scaffold { innerPadding ->
@@ -40,8 +40,8 @@ fun MoreScreen(
             Section(
                 items = listOf(
                     SectionItem.Expanded(
-                        avatar = currentUser?.currentUser?.avatarUrl ?: "NoUrl?",
-                        title = currentUser?.currentUser?.nickname
+                        avatar = currentUser?.avatarUrl ?: "NoUrl?",
+                        title = currentUser?.nickname
                             ?: stringResource(R.string.profile_screen_missing_nickname),
                         subtitle = stringResource(R.string.more_screen_profile),
                         onClick = { moreNavOptions.navigateToProfile() }

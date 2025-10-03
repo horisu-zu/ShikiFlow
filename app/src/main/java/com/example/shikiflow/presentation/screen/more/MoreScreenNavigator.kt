@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
-import com.example.graphql.CurrentUserQuery
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
@@ -12,7 +12,7 @@ import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
 fun MoreScreenNavigator(
-    currentUser: CurrentUserQuery.Data?
+    currentUser: User?
 ) {
     val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 

@@ -1,6 +1,5 @@
 package com.example.shikiflow.utils
 
-import android.content.Context
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -89,7 +88,7 @@ object Converter {
         }
     }
 
-    fun convertInstantToString(context: Context, lastSeenInstant: Instant?): String {
+    /*fun convertInstantToString(context: Context, lastSeenInstant: Instant?): String {
         val currentTimeInstant = Clock.System.now()
         val duration = currentTimeInstant - lastSeenInstant!!
         val diffMillis = duration.inWholeMilliseconds
@@ -125,7 +124,7 @@ object Converter {
                 context.getString(R.string.status_days, formattedDate)
             }
         }
-    }
+    }*/
 
     fun formatFileSize(size: Double): String {
         return when {
@@ -459,8 +458,8 @@ object Converter {
 
         processInlineContent(doc.body(), builder, linkColor)
 
-        Log.d("ParserAnnotations", "Final Annotations: ${builder.toAnnotatedString().getStringAnnotations(0, builder.length)}")
-        Log.d("ParseAnnotations", "Content: ${builder.toAnnotatedString()}")
+        /*Log.d("ParserAnnotations", "Final Annotations: ${builder.toAnnotatedString().getStringAnnotations(0, builder.length)}")
+        Log.d("ParseAnnotations", "Content: ${builder.toAnnotatedString()}")*/
         return builder.toAnnotatedString()
     }
 

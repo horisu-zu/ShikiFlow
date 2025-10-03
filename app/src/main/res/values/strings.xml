@@ -270,6 +270,7 @@
     <string name="anime_origin_picture_book">Picture Book</string>
     <string name="anime_origin_mixed_media">Mixed Media</string>
     <string name="anime_origin_other">Other</string>
+    <string name="profile">Profile</string>
 
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>

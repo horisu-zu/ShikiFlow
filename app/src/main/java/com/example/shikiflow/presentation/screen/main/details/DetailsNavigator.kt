@@ -13,8 +13,8 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavigator
@@ -29,7 +29,7 @@ import com.example.shikiflow.utils.Converter.EntityType
 
 @Composable
 fun DetailsNavigator(
-    currentUserData: CurrentUserQuery.Data?,
+    currentUserData: User?,
     mediaId: String,
     mediaType: MediaType,
     source: String,
@@ -109,7 +109,7 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
                     id = route.id,
-                    currentUser = currentUserData,
+                    userId = currentUserData?.id,
                     navOptions = options,
                     animeDetailsViewModel = hiltViewModel(key = "${source}_${route.id}")
                 )
@@ -117,8 +117,8 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.MangaDetails> { route ->
                 MangaDetailsScreen(
                     id = route.id,
+                    userId = currentUserData?.id,
                     navOptions = options,
-                    currentUser = currentUserData,
                     mangaDetailsViewModel = hiltViewModel(key = "${source}_${route.id}")
                 )
             }

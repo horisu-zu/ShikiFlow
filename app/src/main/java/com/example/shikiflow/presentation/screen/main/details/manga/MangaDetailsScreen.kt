@@ -28,7 +28,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.toUiModel
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
@@ -47,7 +46,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CommentsScr
 @Composable
 fun MangaDetailsScreen(
     id: String,
-    currentUser: CurrentUserQuery.Data?,
+    userId: String?,
     navOptions: MediaNavOptions,
     mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel()
 ) {
@@ -177,7 +176,7 @@ fun MangaDetailsScreen(
                     )
                 },
                 onCreateRate = { mediaId, status ->
-                    currentUser?.currentUser?.id?.let { userId ->
+                    userId?.let {
                         mangaDetailsViewModel.createUserRate(
                             userId = userId,
                             targetId = mediaId,

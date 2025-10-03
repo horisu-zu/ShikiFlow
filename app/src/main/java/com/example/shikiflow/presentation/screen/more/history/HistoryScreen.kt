@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
@@ -51,11 +51,11 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    userData: CurrentUserQuery.Data?,
+    userData: User?,
     moreNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
-    val currentUserId = userData?.currentUser?.id?.toLong() ?: 0L
+    val currentUserId = userData?.id?.toLong() ?: 0L
     val historyData = userHistoryViewModel.loadPaginatedHistory(currentUserId).collectAsLazyPagingItems()
 
     val coroutineScope = rememberCoroutineScope()

@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
@@ -33,7 +33,7 @@ import com.example.shikiflow.utils.ThemeMode
 
 @Composable
 fun SettingsScreen(
-    userData: CurrentUserQuery.Data?,
+    userData: User?,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -76,9 +76,9 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_account_section_title),
                 items = listOf(
                     SectionItem.Image(
-                        title = userData?.currentUser?.nickname ?: stringResource(R.string.common_unknown),
+                        title = userData?.nickname ?: stringResource(R.string.common_unknown),
                         displayValue = stringResource(R.string.settings_sign_out),
-                        imageUrl = userData?.currentUser?.avatarUrl ?: stringResource(R.string.common_unknown),
+                        imageUrl = userData?.avatarUrl ?: stringResource(R.string.common_unknown),
                         onClick = { settingsViewModel.logout() }
                     )
                 )

@@ -19,15 +19,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.graphql.CurrentUserQuery
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    currentUser: CurrentUserQuery.Data?,
+    currentUser: User?,
     mainViewModel: MainViewModel = hiltViewModel(),
     navOptions: MainScreenNavOptions
 ) {

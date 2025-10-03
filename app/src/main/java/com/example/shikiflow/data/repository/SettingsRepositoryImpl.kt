@@ -11,6 +11,7 @@ import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
@@ -30,6 +31,10 @@ class SettingsRepositoryImpl @Inject constructor(
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("app_settings")
 
     companion object {
+        private val USER_AVATAR_URL = stringPreferencesKey("user_avatar_url")
+        private val USER_ID = stringPreferencesKey("user_id")
+        private val USER_NICKNAME = stringPreferencesKey("user_nickname")
+
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
         private val BROWSE_UI_MODE = stringPreferencesKey("browse_ui_mode")
         private val BROWSE_ONGOING_ORDER = stringPreferencesKey("browse_ongoing_order")
@@ -41,12 +46,23 @@ class SettingsRepositoryImpl @Inject constructor(
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
     }
 
-    override val settingsFlow: Flow<Settings> = context.dataStore.data.map { preferences ->
-        Settings(
-            appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
-            browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
-            trackMode = preferences[TRACK_MODE]?.let { MainTrackMode.valueOf(it) } ?: MainTrackMode.ANIME,
-        )
+    override val userFlow: Flow<User> = context.dataStore.data
+        .map { preferences ->
+            User(
+                id = preferences[USER_ID] ?: "",
+                nickname = preferences[USER_NICKNAME] ?: "",
+                avatarUrl = preferences[USER_AVATAR_URL] ?: ""
+            )
+    }
+
+    override val settingsFlow: Flow<Settings> = context.dataStore.data
+        .map { preferences ->
+            Settings(
+                appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
+                browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
+                trackMode = preferences[TRACK_MODE]?.let { MainTrackMode.valueOf(it) }
+                    ?: MainTrackMode.ANIME,
+                )
     }
 
     override val themeSettingsFlow: Flow<ThemeSettings> = context.dataStore.data
@@ -79,6 +95,14 @@ class SettingsRepositoryImpl @Inject constructor(
         .map { preferences ->
             preferences[LOCALE_KEY] ?: Locale.getDefault().language
         }
+
+    override suspend fun saveUserData(user: User) {
+        context.dataStore.edit { preferences ->
+            preferences[USER_ID] = user.id
+            preferences[USER_NICKNAME] = user.nickname
+            preferences[USER_AVATAR_URL] = user.avatarUrl
+        }
+    }
 
     override suspend fun saveAppUiMode(appUiMode: AppUiMode) {
         context.dataStore.edit { preferences ->
