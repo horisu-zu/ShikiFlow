@@ -15,11 +15,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,8 +32,6 @@ import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
 import com.example.shikiflow.utils.Resource
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
@@ -52,16 +48,16 @@ fun MangaDetailsScreen(
 ) {
     val mangaDetails by mangaDetailsViewModel.mangaDetails.collectAsStateWithLifecycle()
     val mangaDexIds by mangaDetailsViewModel.mangaDexIds.collectAsStateWithLifecycle()
+    val isUpdating by mangaDetailsViewModel.isUpdating
+    val isRefreshing by mangaDetailsViewModel.isRefreshing
 
     val horizontalPadding = 12.dp
     var rateBottomSheet by remember { mutableStateOf(false) }
-    var isRefreshing by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
     val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        mangaDetailsViewModel.updateEvent.collect {
+    LaunchedEffect(isUpdating) {
+        if(!isUpdating) {
             rateBottomSheet = false
         }
     }
@@ -81,17 +77,7 @@ fun MangaDetailsScreen(
             is Resource.Success -> {
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
-                    onRefresh = {
-                        coroutineScope.launch {
-                            try {
-                                isRefreshing = true
-                                delay(300)
-                                mangaDetailsViewModel.getMangaDetails(id, isRefresh = true)
-                            } finally {
-                                isRefreshing = false
-                            }
-                        }
-                    }
+                    onRefresh = { mangaDetailsViewModel.getMangaDetails(id, isRefresh = true) }
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize()
@@ -158,7 +144,6 @@ fun MangaDetailsScreen(
     }
 
     if(rateBottomSheet) {
-        val isUpdating by mangaDetailsViewModel.isUpdating.collectAsState()
         val mangaDetailsData = mangaDetails.data
 
         mangaDetailsData?.let {

@@ -32,8 +32,8 @@ fun MoreScreen(
                 .fillMaxSize()
                 .padding(
                     top = innerPadding.calculateTopPadding() + 12.dp,
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp
                 ),
             verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.Top)
         ) {

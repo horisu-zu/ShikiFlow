@@ -13,7 +13,11 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -81,7 +85,6 @@ fun Player(
             .fillMaxSize()
             .systemBarsVisibility(showControls)
             .onSizeChanged { containerSize = it }
-            .background(Color.Black)
             .pointerInput(Unit) {
                 detectTapGestures(
                     onTap = {
@@ -112,7 +115,7 @@ fun Player(
                 } else {
                     AspectRatioFrameLayout.RESIZE_MODE_ZOOM
                 }
-            }, modifier = Modifier.fillMaxSize()
+            }, modifier = Modifier.fillMaxSize().background(Color.Black)
         )
 
         AnimatedVisibility(
@@ -132,6 +135,7 @@ fun Player(
                 targetOffsetY = { offset -> -offset / 2 }
             ),
             modifier = Modifier.align(Alignment.TopCenter)
+                .windowInsetsPadding(WindowInsets.statusBars)
         ) {
             PlayerTopComponent(
                 title = title,
@@ -183,6 +187,7 @@ fun Player(
                 targetOffsetY = { offset -> offset / 2 }
             ),
             modifier = Modifier.align(Alignment.BottomCenter)
+                .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             PlayerBottomComponent(
                 duration = playerState.duration,

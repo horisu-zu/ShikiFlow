@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.SectionItem
@@ -37,8 +37,8 @@ fun AboutAppScreen(
     aboutViewModel: AboutViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val latestRelease = aboutViewModel.latestRelease
-    val currentVersion by aboutViewModel.currentVersion.collectAsState()
+    val latestRelease by aboutViewModel.latestRelease.collectAsStateWithLifecycle()
+    val currentVersion by aboutViewModel.currentVersion.collectAsStateWithLifecycle()
     val showBottomSheet = remember { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
@@ -47,8 +47,8 @@ fun AboutAppScreen(
                 .fillMaxWidth()
                 .padding(
                     top = innerPadding.calculateTopPadding() + 12.dp,
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
                 ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
             when(currentVersion) {
@@ -60,6 +60,10 @@ fun AboutAppScreen(
                 }
                 is Resource.Success -> {
                     val currentVersion = currentVersion.data
+                    val latestVersion = latestRelease.data
+                    val isLatest = if (latestVersion == null) { true } else {
+                        currentVersion?.tagName == latestVersion.tagName
+                    }
 
                     currentVersion?.let { version ->
                         CurrentVersionItem(
@@ -67,16 +71,15 @@ fun AboutAppScreen(
                             modifier = Modifier
                         )
                     }
-                    latestRelease?.let {
-                        if(currentVersion != latestRelease) {
-                            LatestReleaseItem(
-                                latestRelease = latestRelease,
-                                showBottomSheet = { showBottomSheet.value = true },
-                                context = context,
-                                modifier = Modifier
-                            )
-                        }
-                    }
+                    CheckUpdateSection(
+                        releaseState = latestRelease,
+                        isLatest = isLatest,
+                        onButtonClick = { aboutViewModel.checkForUpdates() },
+                        onDownloadClick = { url ->
+                            WebIntent.openUrlCustomTab(context, url)
+                        },
+                        onShowBottomSheet = { showBottomSheet.value = true }
+                    )
                     Section(
                         items = listOf(
                             SectionItem.General(
@@ -106,7 +109,7 @@ fun AboutAppScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(
-                            message = currentVersion.message ?: "?",
+                            message = currentVersion.message ?: stringResource(id = R.string.common_error),
                             buttonLabel = stringResource(id = R.string.common_retry),
                             onButtonClick = {
                                 aboutViewModel.getLocalVersion()
@@ -118,15 +121,15 @@ fun AboutAppScreen(
         }
     }
 
-    latestRelease?.let {
+    latestRelease.data?.let { release ->
         ReleaseNotesBottomSheet(
             currentVersion = currentVersion.data?.tagName ?: stringResource(R.string.common_unknown),
-            release = latestRelease,
+            release = release,
             onDismiss = { showBottomSheet.value = false },
             onDownloadReleaseClick = {
                 WebIntent.openUrlCustomTab(
                     context = context,
-                    url = latestRelease.assets.first().downloadUrl
+                    url = release.assets.first().downloadUrl
                 )
             }, showBottomSheet = showBottomSheet.value
         )

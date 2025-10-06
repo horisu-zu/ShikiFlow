@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.history
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,10 +27,7 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -41,26 +37,26 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    userData: User?,
+    currentUserId: String?,
     moreNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
-    val currentUserId = userData?.id?.toLong() ?: 0L
+    val currentUserId = currentUserId?.toLong() ?: 0L
     val historyData = userHistoryViewModel.loadPaginatedHistory(currentUserId).collectAsLazyPagingItems()
 
-    val coroutineScope = rememberCoroutineScope()
     val lazyListState = rememberLazyListState()
-    var isRefreshing by remember { mutableStateOf(false) }
+    val isRefreshing by remember {
+        derivedStateOf {
+            historyData.loadState.refresh is LoadState.Loading && historyData.itemCount > 0
+        }
+    }
     val isAtTop by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemIndex == 0 &&
@@ -102,19 +98,7 @@ fun HistoryScreen(
                 start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                 end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
             ),
-            onRefresh = {
-                coroutineScope.launch {
-                    try {
-                        Log.d("PullToRefresh", "Refreshing...")
-                        isRefreshing = true
-                        historyData.refresh()
-                        delay(300)
-                    } finally {
-                        Log.d("PullToRefresh", "Refresh completed")
-                        isRefreshing = false
-                    }
-                }
-            }
+            onRefresh = { historyData.refresh() }
         ) {
             LazyColumn(
                 state = lazyListState,

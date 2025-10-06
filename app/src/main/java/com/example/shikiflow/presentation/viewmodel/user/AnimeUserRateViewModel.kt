@@ -1,6 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.user
 
-import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.tracks.UserRate
@@ -19,29 +19,28 @@ class AnimeUserRateViewModel @Inject constructor(
     private val _userRateData = MutableStateFlow<Resource<List<UserRate>>>(Resource.Loading())
     val userRateData = _userRateData.asStateFlow()
 
-    private val _hasMorePages = MutableStateFlow(true)
+    var isRefreshing = mutableStateOf(false)
+        private set
 
     fun loadUserRates(
         userId: Long,
         isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
-
-            if (isRefresh) {
+            if (!isRefresh && _userRateData.value is Resource.Success) {
+                return@launch
+            } else if(!isRefresh){
                 _userRateData.value = Resource.Loading()
-                _hasMorePages.value = true
+            } else {
+                isRefreshing.value = true
             }
-
-            val tempList = mutableListOf<UserRate>()
 
             try {
                 val result = userRepository.getUserRates(userId)
-
-                Log.d("UserRateViewModel", "UserRateData: $tempList")
                 _userRateData.value = Resource.Success(result)
+                if(isRefreshing.value) { isRefreshing.value = false }
             } catch (e: Exception) {
                 _userRateData.value = Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
-                _hasMorePages.value = false
             }
         }
     }

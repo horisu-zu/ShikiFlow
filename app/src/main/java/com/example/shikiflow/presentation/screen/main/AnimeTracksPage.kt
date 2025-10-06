@@ -17,7 +17,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,11 +52,12 @@ fun AnimeTracksPage(
     modifier: Modifier = Modifier
 ) {
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
+    val isUpdating by tracksViewModel.isUpdating
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
     val rateBottomSheet = remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        tracksViewModel.updateEvent.collect { userRate ->
+    LaunchedEffect(isUpdating) {
+        if(!isUpdating) {
             rateBottomSheet.value = false
         }
     }
@@ -99,8 +99,6 @@ fun AnimeTracksPage(
             }
 
             if (rateBottomSheet.value) {
-                val isUpdating by tracksViewModel.isUpdating.collectAsState()
-
                 selectedItem?.let {
                     UserRateBottomSheet(
                         userRate = it.toUserRateData(),

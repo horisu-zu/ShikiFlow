@@ -24,6 +24,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -69,11 +70,15 @@ fun PlayerBottomComponent(
             ) {
                 Text(
                     text = Converter.formatDuration(currentProgress),
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = Color.White
+                    )
                 )
                 Text(
                     text = Converter.formatDuration(duration),
-                    style = MaterialTheme.typography.labelMedium
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = Color.White
+                    )
                 )
             }
         }
@@ -81,7 +86,8 @@ fun PlayerBottomComponent(
             Icon(
                 painter = painterResource(id = R.drawable.ic_double_arrow),
                 contentDescription = null,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
+                tint = Color.White
             )
         }
         IconButton(onClick = onResize) {
@@ -90,7 +96,8 @@ fun PlayerBottomComponent(
                     id = if(isFit) R.drawable.ic_exit_full_screen else R.drawable.ic_open_full_screen
                 ),
                 contentDescription = null,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
+                tint = Color.White
             )
         }
     }

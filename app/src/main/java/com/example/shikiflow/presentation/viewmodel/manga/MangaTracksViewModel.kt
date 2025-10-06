@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.manga
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi

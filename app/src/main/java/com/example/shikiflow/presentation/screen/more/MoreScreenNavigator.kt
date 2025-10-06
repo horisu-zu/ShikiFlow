@@ -52,7 +52,7 @@ fun MoreScreenNavigator(
             }
             entry<MoreNavRoute.HistoryScreen> {
                 HistoryScreen(
-                    userData = currentUser,
+                    currentUserId = currentUser?.id,
                     moreNavOptions = moreNavOptions,
                 )
             }

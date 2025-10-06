@@ -17,5 +17,5 @@ interface GithubApi {
         @Path("owner") owner: String,
         @Path("repo") repo: String,
         @Path("versionTag") versionTag: String
-    ): GithubRelease
+    ): GithubRelease?
 }

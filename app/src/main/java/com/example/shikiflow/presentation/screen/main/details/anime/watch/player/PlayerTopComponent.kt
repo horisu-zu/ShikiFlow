@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -21,7 +22,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,7 +55,7 @@ fun PlayerTopComponent(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().padding(top = 24.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
     ) {
@@ -121,6 +125,14 @@ private fun PlayerDropdown(
     modifier: Modifier = Modifier
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
+    var itemHeight by remember { mutableIntStateOf(0) }
+    val scrollState = rememberScrollState()
+
+    LaunchedEffect(dropdownExpanded) {
+        if(dropdownExpanded) {
+            scrollState.scrollTo(value = itemHeight * values.indexOf(label))
+        }
+    }
 
     Box(
         modifier = modifier
@@ -148,6 +160,7 @@ private fun PlayerDropdown(
             )
         }
         DropdownMenu(
+            scrollState = scrollState,
             expanded = dropdownExpanded,
             onDismissRequest = {
                 dropdownExpanded = false
@@ -166,11 +179,16 @@ private fun PlayerDropdown(
                             )
                         )
                     },
-                    modifier = Modifier.background(
-                        color = if(value != label) {
-                            Color.Transparent
-                        } else { Color.White.copy(alpha = 0.25f) }
-                    ),
+                    modifier = Modifier
+                        .background(
+                            color = if(value != label) {
+                                Color.Transparent
+                            } else { Color.White.copy(alpha = 0.25f) }
+                        )
+                        .onSizeChanged { intSize ->
+                            itemHeight = intSize.height
+                        }
+                    ,
                     onClick = {
                         if(value != label) onValueChange(index)
                         dropdownExpanded = false

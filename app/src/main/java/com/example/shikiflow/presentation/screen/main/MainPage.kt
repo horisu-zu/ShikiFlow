@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main
 
-import android.util.Log
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
@@ -27,7 +26,6 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import com.example.shikiflow.presentation.viewmodel.manga.MangaTracksViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,28 +75,21 @@ fun MainPage(
                     )
                 }
             }
+            val pagingItems = mediaTrackItems?.let {
+                when(mediaTrackItems) {
+                    is MediaTrackItems.AnimeItems -> mediaTrackItems.items
+                    is MediaTrackItems.MangaItems -> mediaTrackItems.items
+                }
+            }
 
             PullToRefreshCustomBox(
                 isRefreshing = isRefreshing,
                 enabled = isAppBarVisible,
                 onRefresh = {
                     status?.let {
-                        coroutineScope.launch {
-                            try {
-                                Log.d("PullToRefresh", "Refreshing...")
-                                isRefreshing = true
-                                mediaTrackItems?.let { trackItems ->
-                                    when(trackItems) {
-                                        is MediaTrackItems.AnimeItems -> trackItems.items?.refresh()
-                                        is MediaTrackItems.MangaItems -> trackItems.items?.refresh()
-                                    }
-                                }
-                                delay(100)
-                            } finally {
-                                Log.d("PullToRefresh", "Refresh completed")
-                                isRefreshing = false
-                            }
-                        }
+                        isRefreshing = true
+                        pagingItems?.refresh()
+                        isRefreshing = false
                     }
                 }
             ) {

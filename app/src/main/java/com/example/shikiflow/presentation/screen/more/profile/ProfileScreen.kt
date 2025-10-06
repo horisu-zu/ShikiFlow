@@ -10,7 +10,9 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -22,9 +24,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CircleShapeButton
@@ -48,7 +52,8 @@ fun ProfileScreen(
     currentUser: User?,
     moreNavOptions: MoreNavOptions
 ) {
-    val userRateData = userRateViewModel.userRateData.collectAsState()
+    val userRateData by userRateViewModel.userRateData.collectAsStateWithLifecycle()
+    val isRefreshing by userRateViewModel.isRefreshing
 
     LaunchedEffect(Unit) {
         currentUser?.id?.let { userId ->
@@ -79,7 +84,7 @@ fun ProfileScreen(
             )
         }
     ) { innerPadding ->
-        when(val userRate = userRateData.value) {
+        when(userRateData) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -87,39 +92,49 @@ fun ProfileScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
+                PullToRefreshBox(
+                    modifier = Modifier.fillMaxSize()
                         .padding(
                             top = innerPadding.calculateTopPadding(),
                             start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
                             end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp
                         ),
-                    verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+                    isRefreshing = isRefreshing,
+                    onRefresh = {
+                        currentUser?.id?.let { userId ->
+                            userRateViewModel.loadUserRates(userId.toLong(), true)
+                        }
+                    }
                 ) {
-                    CurrentUser(
-                        userData = currentUser
-                    )
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                    Column(
+                        modifier = Modifier.fillMaxSize()
+                            .verticalScroll(rememberScrollState()),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
-                        /*CircleShapeButton(
-                            label = stringResource(R.string.more_screen_clubs),
-                            icon = IconResource.Drawable(R.drawable.ic_group),
-                            onClick = { *//**//* },
+                        CurrentUser(
+                            userData = currentUser
+                        )
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                        ) {
+                            /*CircleShapeButton(
+                                label = stringResource(R.string.more_screen_clubs),
+                                icon = IconResource.Drawable(R.drawable.ic_group),
+                                onClick = { *//**//* },
                             modifier = Modifier.weight(1f)
                         )*/
-                        CircleShapeButton(
-                            label = stringResource(R.string.more_screen_history),
-                            icon = IconResource.Drawable(R.drawable.ic_history),
-                            onClick = { moreNavOptions.navigateToHistory() },
-                            modifier = Modifier.weight(1f)
-                        )
+                            CircleShapeButton(
+                                label = stringResource(R.string.more_screen_history),
+                                icon = IconResource.Drawable(R.drawable.ic_history),
+                                onClick = { moreNavOptions.navigateToHistory() },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        TrackSection(userRateData = userRateData.data ?: emptyList())
                     }
-                    TrackSection(userRateData = userRate.data ?: emptyList())
                 }
             }
             is Resource.Error -> {

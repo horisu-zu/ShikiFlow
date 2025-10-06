@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
@@ -24,7 +23,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
@@ -46,8 +43,7 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
 import com.example.shikiflow.utils.Resource
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.shikiflow.utils.WebIntent
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -58,16 +54,15 @@ fun AnimeDetailsScreen(
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
     val animeDetails by animeDetailsViewModel.animeDetails.collectAsStateWithLifecycle()
+    val isUpdating by animeDetailsViewModel.isUpdating
+    val isRefreshing by animeDetailsViewModel.isRefreshing
 
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
     var rateBottomSheet by remember { mutableStateOf(false) }
-    var isRefreshing by remember { mutableStateOf(false) }
-    val coroutineScope = rememberCoroutineScope()
-    val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
 
-    LaunchedEffect(Unit) {
-        animeDetailsViewModel.updateEvent.collect { response ->
+    LaunchedEffect(isUpdating) {
+        if(!isUpdating) {
             rateBottomSheet = false
         }
     }
@@ -106,17 +101,7 @@ fun AnimeDetailsScreen(
                     }
                     PullToRefreshBox(
                         isRefreshing = isRefreshing,
-                        onRefresh = {
-                            coroutineScope.launch {
-                                try {
-                                    isRefreshing = true
-                                    delay(300)
-                                    animeDetailsViewModel.getAnimeDetails(id, isRefresh = true)
-                                } finally {
-                                    isRefreshing = false
-                                }
-                            }
-                        }
+                        onRefresh = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
                     ) {
                         Column(
                             modifier = Modifier.fillMaxSize()
@@ -148,7 +133,7 @@ fun AnimeDetailsScreen(
                                         navOptions.navigateByEntity(entityType, id)
                                     },
                                     onLinkClick = { url ->
-                                        customTabIntent.launchUrl(context, url.toUri())
+                                        WebIntent.openUrlCustomTab(context, url)
                                     },
                                     onTopicNavigate = { topicId ->
                                         navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
@@ -186,10 +171,8 @@ fun AnimeDetailsScreen(
         }
     }
 
-    if (rateBottomSheet) {
-        val isUpdating by animeDetailsViewModel.isUpdating.collectAsStateWithLifecycle()
-
-        animeDetails.data?.let { details ->
+    animeDetails.data?.let { details ->
+        if (rateBottomSheet) {
             UserRateBottomSheet(
                 userRate = details.toUiModel(),
                 isLoading = isUpdating,

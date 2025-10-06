@@ -33,16 +33,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
-import androidx.compose.material3.pulltorefresh.pullToRefresh
-import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -63,8 +59,6 @@ import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeTranslation
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.toAbbreviation
 import com.example.shikiflow.utils.Resource
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,12 +69,10 @@ fun AnimeTranslationSelectScreen(
     onNavigateBack: () -> Unit,
     animeTranslationsViewModel: AnimeTranslationsViewModel = hiltViewModel()
 ) {
-
-    val coroutineScope = rememberCoroutineScope()
     val filters = TranslationFilter.entries
     var translationFilter by rememberSaveable { mutableStateOf(TranslationFilter.ALL) }
     var isNavigating by remember { mutableStateOf(false) }
-    var isRefreshing by remember { mutableStateOf(false) }
+    val isRefreshing by animeTranslationsViewModel.isRefreshing
     val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
 
     LaunchedEffect(shikimoriId) {
@@ -90,9 +82,10 @@ fun AnimeTranslationSelectScreen(
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
-            if (isNavigating) true
-                else lazyListState.firstVisibleItemIndex == 0 &&
-                    lazyListState.firstVisibleItemScrollOffset == 0
+            if (isNavigating) { true } else {
+                lazyListState.firstVisibleItemIndex == 0 &&
+                lazyListState.firstVisibleItemScrollOffset == 0
+            }
         }
     }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -179,17 +172,7 @@ fun AnimeTranslationSelectScreen(
         PullToRefreshCustomBox(
             isRefreshing = isRefreshing,
             enabled = scrollBehavior.state.collapsedFraction == 0f,
-            onRefresh = {
-                coroutineScope.launch {
-                    try {
-                        isRefreshing = true
-                        animeTranslationsViewModel.getAnimeTranslations(shikimoriId, true)
-                        delay(100)
-                    } finally {
-                        isRefreshing = false
-                    }
-                }
-            },
+            onRefresh = { animeTranslationsViewModel.getAnimeTranslations(shikimoriId, true) },
             modifier = Modifier.fillMaxSize()
                 .padding(
                     top = paddingValues.calculateTopPadding(),

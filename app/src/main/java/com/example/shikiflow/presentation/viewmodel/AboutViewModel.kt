@@ -1,9 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel
 
 import android.util.Log
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.BuildConfig
@@ -20,23 +17,30 @@ import javax.inject.Inject
 class AboutViewModel @Inject constructor(
     private val githubRepository: GithubRepository
 ): ViewModel() {
-    var latestRelease by mutableStateOf<GithubRelease?>(null)
-        private set
+
+    private val _latestRelease  = MutableStateFlow<Resource<GithubRelease?>>(Resource.Success(null))
+    val latestRelease = _latestRelease.asStateFlow()
 
     private val _currentVersion = MutableStateFlow<Resource<GithubRelease>>(Resource.Loading())
     val currentVersion = _currentVersion.asStateFlow()
 
     init {
         getLocalVersion()
-        checkForUpdates()
     }
 
     fun checkForUpdates() {
         viewModelScope.launch {
-            latestRelease = githubRepository.getLatestRelease(
-                owner = BuildConfig.OWNER,
-                repo = BuildConfig.REPO
-            )
+            _latestRelease.value = Resource.Loading()
+            runCatching {
+                githubRepository.getLatestRelease(
+                    owner = BuildConfig.OWNER,
+                    repo = BuildConfig.REPO
+                )
+            }.onSuccess { release ->
+                _latestRelease.value = Resource.Success(release)
+            }.onFailure { error ->
+                _latestRelease.value = Resource.Error("Failed to check for updates: ${error.message}")
+            }
         }
     }
 

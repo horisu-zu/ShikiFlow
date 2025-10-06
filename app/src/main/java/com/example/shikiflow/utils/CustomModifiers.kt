@@ -3,7 +3,7 @@ package com.example.shikiflow.utils
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -59,7 +59,7 @@ fun Modifier.systemBarsVisibility(visible: Boolean): Modifier = composed {
     val activity = LocalActivity.current
     val window = activity?.window
 
-    LaunchedEffect(visible) {
+    DisposableEffect(visible) {
         window?.let { w ->
             val controller = WindowCompat.getInsetsController(w, w.decorView)
             if (visible) {
@@ -68,6 +68,15 @@ fun Modifier.systemBarsVisibility(visible: Boolean): Modifier = composed {
                 controller.hide(WindowInsetsCompat.Type.systemBars())
                 controller.systemBarsBehavior =
                     WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+        }
+
+        onDispose {
+            window?.let { w ->
+                val controller = WindowCompat.getInsetsController(w, w.decorView)
+                controller.show(WindowInsetsCompat.Type.systemBars())
+                controller.systemBarsBehavior =
+                    WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
             }
         }
     }

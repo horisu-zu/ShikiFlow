@@ -1,19 +1,17 @@
 package com.example.shikiflow.presentation.screen.main.details.anime.watch.player
 
 import androidx.annotation.OptIn
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
@@ -64,9 +62,9 @@ fun PlayerScreen(
         }
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+    Box(
+        modifier = Modifier.fillMaxSize().background(Color.Black)
+    ) {
         Player(
             exoPlayer = exoPlayer,
             title = title,
@@ -83,11 +81,7 @@ fun PlayerScreen(
             onQualityChange = { quality ->
                 animeEpisodeViewModel.createMediaSource(quality)
             },
-            onNavigateBack = { navOptions.navigateBack() },
-            modifier = Modifier.padding(
-                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-            )
+            onNavigateBack = { navOptions.navigateBack() }
         )
     }
 }

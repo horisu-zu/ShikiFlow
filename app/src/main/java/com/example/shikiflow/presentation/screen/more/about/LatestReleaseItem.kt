@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.about
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -28,19 +27,17 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.GithubRelease
-import com.example.shikiflow.utils.WebIntent
 
 @Composable
 fun LatestReleaseItem(
     latestRelease: GithubRelease,
-    context: Context,
+    onDownloadClick: (String) -> Unit,
     showBottomSheet: () -> Unit,
     modifier: Modifier
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 12.dp)
             .clip(RoundedCornerShape(24.dp))
             .background(MaterialTheme.colorScheme.surface)
             .padding(horizontal = 16.dp, vertical = 12.dp),
@@ -83,10 +80,7 @@ fun LatestReleaseItem(
                 )
             }
             Button(
-                onClick = { WebIntent.openUrlCustomTab(
-                    context = context,
-                    url = latestRelease.assets.first().downloadUrl)
-                },
+                onClick = { onDownloadClick(latestRelease.assets.first().downloadUrl) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSurface

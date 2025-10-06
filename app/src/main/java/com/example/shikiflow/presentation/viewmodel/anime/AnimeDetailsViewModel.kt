@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.anime
 
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.AnimeDetailsQuery
@@ -14,9 +15,7 @@ import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,17 +32,21 @@ class AnimeDetailsViewModel @Inject constructor(
     private val _animeDetails = MutableStateFlow<Resource<AnimeDetailsQuery.Anime>>(Resource.Loading())
     val animeDetails = _animeDetails.asStateFlow()
 
-    private val _isUpdating = MutableStateFlow(false)
-    val isUpdating = _isUpdating.asStateFlow()
+    var isUpdating = mutableStateOf(false)
+        private set
 
-    private val _updateEvent = MutableSharedFlow<Unit>()
-    val updateEvent = _updateEvent.asSharedFlow()
+    var isRefreshing = mutableStateOf(false)
+        private set
 
     fun getAnimeDetails(id: String, isRefresh: Boolean = false) {
         viewModelScope.launch {
             if (!isRefresh && currentId != id) {
                 _animeDetails.value = Resource.Loading()
-            } else if(!isRefresh) { return@launch }
+            } else if(!isRefresh) {
+                return@launch
+            } else {
+                isRefreshing.value = true
+            }
 
             try {
                 val result = animeRepository.getAnimeDetails(id)
@@ -51,6 +54,7 @@ class AnimeDetailsViewModel @Inject constructor(
                 result?.let { animeDetails ->
                     _animeDetails.value = Resource.Success(animeDetails)
                     currentId = id
+                    isRefreshing.value = false
                 }
             } catch (e: Exception) {
                 _animeDetails.value = Resource.Error(e.message ?: "Unknown error")
@@ -67,7 +71,7 @@ class AnimeDetailsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                _isUpdating.value = true
+                isUpdating.value = true
 
                 val request = UserRateRequest(
                     status = UserRateStatusConstants.convertToApiStatus(status),
@@ -82,11 +86,10 @@ class AnimeDetailsViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("AnimeDetailsViewModel", "Error updating user rate", e)
             } finally {
-                _updateEvent.emit(Unit)
                 currentId?.let { id ->
                     getAnimeDetails(id, isRefresh = true)
                 }
-                _isUpdating.value = false
+                isUpdating.value = false
             }
         }
     }
@@ -98,7 +101,7 @@ class AnimeDetailsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                _isUpdating.value = true
+                isUpdating.value = true
 
                 val request = CreateUserRateRequest(
                     userId = userId.toLong(),
@@ -113,9 +116,8 @@ class AnimeDetailsViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e("AnimeDetailsViewModel", "Error creating user rate: ${e.message}")
             } finally {
-                _updateEvent.emit(Unit)
                 getAnimeDetails(targetId, isRefresh = true)
-                _isUpdating.value = false
+                isUpdating.value = false
             }
         }
     }
