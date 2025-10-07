@@ -24,6 +24,7 @@ abstract class VersionDao {
         insertAssets(versionDto.assets)
     }
 
+    @Transaction
     @Query("SELECT * FROM version WHERE versionTag = :localVersionTag")
     abstract suspend fun getLatestLocalVersion(localVersionTag: String): VersionDto?
 }

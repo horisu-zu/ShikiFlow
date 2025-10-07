@@ -270,10 +270,12 @@
     <string name="anime_origin_picture_book">Picture Book</string>
     <string name="anime_origin_mixed_media">Mixed Media</string>
     <string name="anime_origin_other">Other</string>
+
     <string name="profile">Profile</string>
+
     <string name="about_check_updates">Check for Updates</string>
-    <string name="about_checking_updates">Checking for updates...</string>
-    <string name="about_latest_version">You\'re using latest version</string>
+    <string name="about_checking_updates">Checking for updates…</string>
+    <string name="about_latest_version">You\'re using the latest version</string>
     <string name="about_latest_error">Error checking for updates, try to refresh</string>
 
     <plurals name="author_plural_form">

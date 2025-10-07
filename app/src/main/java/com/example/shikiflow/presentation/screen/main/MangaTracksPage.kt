@@ -46,7 +46,7 @@ fun MangaTracksPage(
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
+                modifier = modifier.fillMaxSize()
             ) {
                 items(
                     count = trackItems.itemCount,

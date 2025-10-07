@@ -23,7 +23,7 @@ android {
         minSdk = 26
         targetSdk = 36
         versionCode = 13
-        versionName = "0.3.2a"
+        versionName = "0.3.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -53,9 +53,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
     }
     packaging {
         resources {
@@ -101,11 +98,11 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    implementation (libs.okhttp)
+    implementation(libs.okhttp)
     implementation(libs.jetbrains.kotlinx.serialization.json)
-    implementation (libs.retrofit.kotlinx.serialization)
-    implementation (libs.androidx.datastore.preferences)
-    implementation (libs.retrofit)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.kotlinx.serialization)
     implementation(libs.kotlinx.datetime)
 
     //Hilt
@@ -114,7 +111,7 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     //Custom Tabs
-    implementation (libs.androidx.browser)
+    implementation(libs.androidx.browser)
 
     //Apollo (GraphQL)
     implementation(libs.apollo.runtime)

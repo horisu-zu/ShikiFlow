@@ -90,6 +90,7 @@ class AnimeTracksMediator(
                 val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize
                 return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
             } else {
+                Log.e("AnimeTracksMediator", "Error Loading data: ${response.exceptionOrNull()}")
                 return MediatorResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
             }
         } catch (e: IOException) {

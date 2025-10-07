@@ -56,6 +56,7 @@ class MangaTracksMediator(
                 }
             }
 
+            Log.d("MangaTracksMediator", "Attempting to load tracks for status: $userRateStatus")
             val response = mangaTracksRepository.getMangaTracks(
                 page = page,
                 limit = state.config.pageSize,

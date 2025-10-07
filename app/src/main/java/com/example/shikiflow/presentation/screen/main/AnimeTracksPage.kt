@@ -54,11 +54,11 @@ fun AnimeTracksPage(
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
     val isUpdating by tracksViewModel.isUpdating
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
-    val rateBottomSheet = remember { mutableStateOf(false) }
+    var rateBottomSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(isUpdating) {
         if(!isUpdating) {
-            rateBottomSheet.value = false
+            rateBottomSheet = false
         }
     }
 
@@ -81,7 +81,7 @@ fun AnimeTracksPage(
                         trackItems = trackItems,
                         onAnimeClick = onAnimeClick,
                         onLongClick = { item ->
-                            rateBottomSheet.value = true
+                            rateBottomSheet = true
                             selectedItem = item
                         }, modifier = modifier
                     )
@@ -91,19 +91,19 @@ fun AnimeTracksPage(
                         trackItems = trackItems,
                         onAnimeClick = onAnimeClick,
                         onLongClick = { item ->
-                            rateBottomSheet.value = true
+                            rateBottomSheet = true
                             selectedItem = item
                         }, modifier = modifier
                     )
                 }
             }
 
-            if (rateBottomSheet.value) {
+            if (rateBottomSheet) {
                 selectedItem?.let {
                     UserRateBottomSheet(
                         userRate = it.toUserRateData(),
                         isLoading = isUpdating,
-                        onDismiss = { if (!isUpdating) rateBottomSheet.value = false },
+                        onDismiss = { if (!isUpdating) rateBottomSheet = false },
                         onSave = { id, rateStatus, score, episodes, rewatches ->
                             tracksViewModel.updateUserRate(
                                 id = id,
