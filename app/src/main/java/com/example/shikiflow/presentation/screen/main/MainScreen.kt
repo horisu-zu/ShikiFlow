@@ -80,22 +80,20 @@ fun MainScreen(
                             }
                         )
                     } else {
-                        currentTrackMode?.let { trackMode ->
-                            MainPage(
-                                mediaType = when(trackMode) {
-                                    MainTrackMode.ANIME -> MediaType.ANIME
-                                    MainTrackMode.MANGA -> MediaType.MANGA
-                                },
-                                isAtTop = scrollBehavior.state.collapsedFraction < 1f,
-                                isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
-                                onAnimeClick = { animeId ->
-                                    navOptions.navigateToDetails(animeId, MediaType.ANIME)
-                                },
-                                onMangaClick = { mangaId ->
-                                    navOptions.navigateToDetails(mangaId, MediaType.MANGA)
-                                }
-                            )
-                        }
+                        MainPage(
+                            mediaType = when(trackMode) {
+                                MainTrackMode.ANIME -> MediaType.ANIME
+                                MainTrackMode.MANGA -> MediaType.MANGA
+                            },
+                            isAtTop = scrollBehavior.state.collapsedFraction < 1f,
+                            isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
+                            onAnimeClick = { animeId ->
+                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
+                            },
+                            onMangaClick = { mangaId ->
+                                navOptions.navigateToDetails(mangaId, MediaType.MANGA)
+                            }
+                        )
                     }
                 }
             }

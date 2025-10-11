@@ -47,7 +47,8 @@ fun BrowseScreen(
             if (isSearchActive) {
                 BrowseSearchPage(
                     query = searchQuery,
-                    modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)),
                     onMediaNavigate = { id, mediaType ->
@@ -64,7 +65,8 @@ fun BrowseScreen(
                         browseNavOptions.navigateToSideScreen(sideScreen)
                     },
                     onIsAtTopChange = { isAtTop = it },
-                    modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                     ),

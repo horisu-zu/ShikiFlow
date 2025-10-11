@@ -128,20 +128,20 @@ fun MainNavigator(
                     animationSpec = tween(300)
                 ) + fadeIn(
                     initialAlpha = 0.1f,
-                    animationSpec = tween(500)
+                    animationSpec = tween(300)
                 ) togetherWith ExitTransition.KeepUntilTransitionsFinished
             },
             popTransitionSpec = {
                 EnterTransition.None togetherWith slideOutVertically(
                     targetOffsetY = { it },
                     animationSpec = tween(300)
-                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(500))
+                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(300))
             },
             predictivePopTransitionSpec = {
                 EnterTransition.None togetherWith slideOutVertically(
                     targetOffsetY = { it },
                     animationSpec = tween(300)
-                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(500))
+                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(300))
             }
         )
     }

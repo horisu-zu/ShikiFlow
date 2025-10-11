@@ -179,16 +179,16 @@ fun DetailsNavigator(
         transitionSpec = {
             slideInHorizontally(
                 initialOffsetX = { it },
-                animationSpec = tween(300)
+                animationSpec = tween(250)
             ) togetherWith ExitTransition.KeepUntilTransitionsFinished
         },
         popTransitionSpec = {
             slideInHorizontally(
                 initialOffsetX = { -it },
-                animationSpec = tween(300)
+                animationSpec = tween(250)
             ) togetherWith slideOutHorizontally(
                 targetOffsetX = { it },
-                animationSpec = tween(300)
+                animationSpec = tween(250)
             )
         },
         entryDecorators = listOf(

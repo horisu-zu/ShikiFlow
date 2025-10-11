@@ -99,16 +99,14 @@ fun AppNavigator(
             }
         },
         transitionSpec = {
-            fadeIn(initialAlpha = 0.1f, animationSpec = tween(500)) togetherWith
-                    ExitTransition.KeepUntilTransitionsFinished
+            fadeIn(initialAlpha = 0.1f, animationSpec = tween(300)) togetherWith
+                ExitTransition.KeepUntilTransitionsFinished
         },
         popTransitionSpec = {
-            EnterTransition.None togetherWith
-                    fadeOut(targetAlpha = 0.1f, animationSpec = tween(500))
+            EnterTransition.None togetherWith fadeOut(targetAlpha = 0.5f)
         },
         predictivePopTransitionSpec = {
-            EnterTransition.None togetherWith
-                    fadeOut(targetAlpha = 0.1f, animationSpec = tween(500))
+            EnterTransition.None togetherWith fadeOut(targetAlpha = 0.5f)
         }
     )
 }

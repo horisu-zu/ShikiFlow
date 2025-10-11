@@ -3,8 +3,12 @@ package com.example.shikiflow.utils
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -14,6 +18,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Velocity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -82,4 +87,16 @@ fun Modifier.systemBarsVisibility(visible: Boolean): Modifier = composed {
     }
 
     this@systemBarsVisibility
+}
+
+@Composable
+fun rememberKeyboardState(): State<Boolean> {
+    val ime = WindowInsets.ime
+    val density = LocalDensity.current
+
+    return remember {
+        derivedStateOf {
+            ime.getBottom(density) > 0
+        }
+    }
 }

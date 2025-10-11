@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.heightIn
@@ -13,9 +14,12 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.RelatedInfo
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -37,6 +41,13 @@ fun RelatedBottomSheet(
             sheetState = sheetState,
             modifier = Modifier.heightIn(min = 480.dp)
         ) {
+            (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
+                LaunchedEffect(Unit) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        window.isNavigationBarContrastEnforced = false
+                    }
+                }
+            }
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.verticalScroll(rememberScrollState())

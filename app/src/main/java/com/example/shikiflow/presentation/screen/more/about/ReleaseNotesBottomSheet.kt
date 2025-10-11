@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.about
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,12 +18,15 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.utils.Converter
@@ -44,6 +48,13 @@ fun ReleaseNotesBottomSheet(
             sheetState = sheetState,
             onDismissRequest = onDismiss
         ) {
+            (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
+                LaunchedEffect(Unit) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        window.isNavigationBarContrastEnforced = false
+                    }
+                }
+            }
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -53,7 +64,7 @@ fun ReleaseNotesBottomSheet(
                 ReleaseNotesHeader(
                     currentVersion = currentVersion,
                     latestVersion = release.tagName,
-                    releaseDate = release.publishedAt ?: Instant.DISTANT_PAST,
+                    releaseDate = release.publishedAt,
                     latestSize = release.assets.firstOrNull()?.size ?: 0L
                 )
                 if(!release.body.isNullOrBlank()) {
