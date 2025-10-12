@@ -37,7 +37,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil3.ImageLoader
 import coil3.compose.SubcomposeAsyncImage
 import coil3.imageLoader
 import coil3.memory.MemoryCache
@@ -194,7 +193,7 @@ fun ChapterItem(
     val imageLoader = context.imageLoader
 
     key(retryKey) {
-        val imageRequest = remember {
+        val imageRequest = remember(pageUrl) {
             ImageRequest.Builder(context)
                 .data(pageUrl)
                 .allowHardware(false)
@@ -215,13 +214,15 @@ fun ChapterItem(
                         .fillMaxWidth()
                         .aspectRatio(0.85f),
                     contentAlignment = Alignment.Center
-                ) { Text(
-                    text = pageNumber.toString(),
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+                ) {
+                    Text(
+                        text = pageNumber.toString(),
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.25f)
+                        )
                     )
-                ) }
+                }
             },
             error = {
                 Column(

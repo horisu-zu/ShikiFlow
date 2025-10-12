@@ -5,5 +5,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class AggregateResponse(
     val result: String,
-    val volumes: Map<String, AggregateVolume>
+    @Serializable(with = VolumesSerializer::class)
+    val volumes: Map<String, AggregateVolume> //If empty, response returns '[]' instead of '{}'
 )

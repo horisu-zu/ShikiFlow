@@ -30,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
@@ -60,7 +59,7 @@ fun ChapterNavigationComponent(
 
     Row(
         modifier = modifier.wrapContentWidth().clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.onPrimary),
+            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
     ) {
@@ -100,7 +99,9 @@ fun ChapterNavigationComponent(
                     if (isEditing) {
                         pageInput.toIntOrNull()?.let { targetPage ->
                             if (targetPage in 1..pageCount) {
-                                onNavigateClick(targetPage)
+                                if(targetPage != currentPage) {
+                                    onNavigateClick(targetPage)
+                                }
                             }
                         }
                         isEditing = false

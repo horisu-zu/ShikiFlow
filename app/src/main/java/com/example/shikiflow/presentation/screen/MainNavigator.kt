@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.screen
 
 import android.util.Log
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
@@ -10,6 +11,9 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
@@ -39,6 +43,7 @@ import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainNavigator(
     appNavOptions: AppNavOptions,
@@ -52,6 +57,7 @@ fun MainNavigator(
     )
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Home)
     val currentUser by userViewModel.userFlow.collectAsState()
+    val isKeyboardVisible = WindowInsets.isImeVisible
 
     LaunchedEffect(Unit) {
         Log.d("MainNavigator", "Fetching Current User")
@@ -60,46 +66,56 @@ fun MainNavigator(
 
     Scaffold(
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface
+            AnimatedVisibility(
+                visible = !isKeyboardVisible,
+                enter = slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = tween(200)
+                ) + fadeIn(),
+                exit = fadeOut(animationSpec = tween(50))
             ) {
-                items.forEach { navItem ->
-                    val isSelected = mainNavBackStack.last() == navItem.route
+                NavigationBar(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ) {
+                    items.forEach { navItem ->
+                        val isSelected = mainNavBackStack.last() == navItem.route
 
-                    NavigationBarItem(
-                        icon = {
-                            Icon(
-                                painterResource(
-                                    id = if (isSelected) navItem.selectedIconRes
+                        NavigationBarItem(
+                            icon = {
+                                Icon(
+                                    painterResource(
+                                        id = if (isSelected) navItem.selectedIconRes
                                         else navItem.unselectedIconRes
-                                ),
-                                contentDescription = stringResource(id = navItem.title),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        },
-                        label = { Text(
-                            text = stringResource(id = navItem.title),
-                            style = LocalTextStyle.current.copy(
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                        ) },
-                        selected = isSelected,
-                        onClick = {
-                            if (!isSelected) {
-                                mainNavBackStack.add(navItem.route)
-                                //topLevelBackStack.switchTopLevel(topLevelRoute.route)
+                                    ),
+                                    contentDescription = stringResource(id = navItem.title),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = stringResource(id = navItem.title),
+                                    style = LocalTextStyle.current.copy(
+                                        color = MaterialTheme.colorScheme.onSurface
+                                    )
+                                )
+                            },
+                            selected = isSelected,
+                            onClick = {
+                                if (!isSelected) {
+                                    mainNavBackStack.add(navItem.route)
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         NavDisplay(
             backStack = mainNavBackStack,
             onBack = { onFinishActivity() },
             modifier = Modifier.padding(
-                bottom = innerPadding.calculateBottomPadding()
+                bottom = if (isKeyboardVisible) 0.dp else paddingValues.calculateBottomPadding()
             ),
             entryProvider = entryProvider {
                 entry<MainNavRoute.Home> {

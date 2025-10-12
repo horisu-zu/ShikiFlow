@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -76,9 +77,10 @@ fun MangaDetailsHeader(
 
             BaseImage(
                 model = mangaDetails.poster?.posterShort?.originalUrl,
-                modifier = Modifier.align(Alignment.TopCenter),
+                modifier = Modifier.align(Alignment.TopCenter)
+                    .statusBarsPadding(),
                 imageType = ImageType.Poster(
-                    defaultWidth = 240.dp
+                    defaultWidth = 216.dp
                 )
             )
 

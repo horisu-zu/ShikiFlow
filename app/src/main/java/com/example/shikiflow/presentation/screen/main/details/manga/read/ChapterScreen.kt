@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
@@ -23,6 +24,7 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -33,10 +35,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -44,10 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -86,50 +85,58 @@ fun ChapterScreen(
             stiffness = Spring.StiffnessVeryLow
         )
     )
+    var chapterPage by remember { mutableIntStateOf(1) }
 
     LaunchedEffect(mangaDexChapterId) {
         chapterViewModel.downloadMangaChapter(mangaDexChapterId)
     }
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.then(
+            other = if(chapterSettings.chapterUIMode == ChapterUIMode.SCROLL) {
+                Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            } else Modifier
+        ),
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = if(!title.isNullOrEmpty()) {
-                            stringResource(id = R.string.chapter_title, chapterNumber, title)
-                        } else {
-                            stringResource(id = R.string.chapter_empty_title, chapterNumber)
-                        },
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                },
-                scrollBehavior = scrollBehavior,
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navOptions.navigateBack() }
-                    ) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back to Main"
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = if(!title.isNullOrEmpty()) {
+                                stringResource(id = R.string.chapter_title, chapterNumber, title)
+                            } else {
+                                stringResource(id = R.string.chapter_empty_title, chapterNumber)
+                            },
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            style = MaterialTheme.typography.titleMedium
                         )
+                    },
+                    scrollBehavior = scrollBehavior,
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { navOptions.navigateBack() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back to Main"
+                            )
+                        }
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = { showBottomSheet.value = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Settings,
+                                contentDescription = "Chapter UI Settings",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { showBottomSheet.value = true }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Chapter UI Settings",
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            )
+                )
+                HorizontalDivider()
+            }
         }
     ) { paddingValues ->
         when(val pageUrls = chapterPages) {
@@ -160,18 +167,22 @@ fun ChapterScreen(
                         ChapterUIMode.PAGE -> {
                             ChapterPageModeComponent(
                                 chapterPageUrls = pageUrls.data,
+                                chapterPage = chapterPage,
+                                onPageChange = { pageNumber -> chapterPage = pageNumber },
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(
                                         top = paddingValues.calculateTopPadding(),
                                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
                                     )
                             )
                         }
                         ChapterUIMode.SCROLL -> {
                             ChapterScrollModeComponent(
                                 chapterPageUrls = pageUrls.data,
+                                initialPage = chapterPage,
+                                onPageChange = { pageNumber -> chapterPage = pageNumber },
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(
@@ -212,15 +223,15 @@ fun ChapterScreen(
 @Composable
 private fun ChapterScrollModeComponent(
     chapterPageUrls: List<String>,
+    initialPage: Int,
+    onPageChange: (Int) -> Unit,
     modifier: Modifier = Modifier,
     chapterNavigationViewModel: ChapterNavigationViewModel = hiltViewModel()
 ) {
-    var scale by remember { mutableFloatStateOf(1f) }
-    var offsetX by remember { mutableFloatStateOf(0f) }
-    var offsetY by remember { mutableFloatStateOf(0f) }
-
-    val isNavigationVisible = chapterNavigationViewModel.isNavigationVisible.collectAsState()
-    val lazyListState = rememberLazyListState()
+    val isNavigationVisible by chapterNavigationViewModel.isNavigationVisible.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListState(
+        initialFirstVisibleItemIndex = initialPage - 1
+    )
     val scope = rememberCoroutineScope()
 
     val currentPage by remember {
@@ -229,8 +240,12 @@ private fun ChapterScrollModeComponent(
         }
     }
 
+    LaunchedEffect(currentPage) {
+        onPageChange(currentPage)
+    }
+
     LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
+        snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
             .distinctUntilChanged()
             .collect {
                 chapterNavigationViewModel.onScrollDetected()
@@ -245,12 +260,7 @@ private fun ChapterScrollModeComponent(
             state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
-                .graphicsLayer(
-                    scaleX = scale,
-                    scaleY = scale,
-                    translationX = offsetX,
-                    translationY = offsetY
-                ).zoomable(rememberZoomState()), //Well, it's easier this way I guess
+                .zoomable(rememberZoomState()), //Well, it's easier this way I guess
             verticalArrangement = Arrangement.spacedBy(4.dp),
             contentPadding = PaddingValues(vertical = 8.dp)
         ) {
@@ -264,7 +274,7 @@ private fun ChapterScrollModeComponent(
             }
         }
         AnimatedVisibility(
-            visible = isNavigationVisible.value,
+            visible = isNavigationVisible,
             enter = fadeIn(),
             exit = fadeOut()
         ) {
@@ -276,7 +286,7 @@ private fun ChapterScrollModeComponent(
                 pageCount = chapterPageUrls.size,
                 onNavigateClick = { pageNumber ->
                     scope.launch {
-                        lazyListState.scrollToItem(pageNumber - 1)
+                        lazyListState.animateScrollToItem(pageNumber - 1)
                     }
                 },
                 onInteractionStart = chapterNavigationViewModel::onUserInteractionStart,

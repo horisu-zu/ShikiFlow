@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.browse
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -16,6 +17,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.CustomSearchField
 
@@ -42,7 +44,9 @@ fun BrowseAppBar(
                             onQueryChange = onSearchQueryChange,
                             onActiveChange = onSearchActiveChange,
                             onExitSearch = onExitSearch,
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
+                            activeContainerColor = MaterialTheme.colorScheme.surface,
+                            inactiveContainerColor = MaterialTheme.colorScheme.background
                         )
                     } else { Text(title) }
                 }
@@ -60,11 +64,11 @@ fun BrowseAppBar(
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = if(isAtTop) MaterialTheme.colorScheme.background
+                containerColor = if(isAtTop && !isSearchActive) MaterialTheme.colorScheme.background
                     else MaterialTheme.colorScheme.surface
             ),
             modifier = modifier
         )
-        if(!isAtTop && !isSearchActive) HorizontalDivider()
+        if(!isAtTop || isSearchActive) HorizontalDivider()
     }
 }

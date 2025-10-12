@@ -69,30 +69,32 @@ class AnimeTracksMediator(
                 )
             )
 
-            if (response.isSuccess) {
-                val data = response.getOrThrow()
-                val tracks = data.map { userRate ->
-                    userRate.animeUserRateWithModel.toEntity()
-                }
-                val animeItems = data
-                    .mapNotNull { it.animeUserRateWithModel.anime?.animeShort }
-                    .map { it.toEntity() }
-
-                appRoomDatabase.withTransaction {
-                    if (loadType == LoadType.REFRESH) {
-                        animeTracksDao.clearTracks(userRateStatus.name)
-                        animeTracksDao.clearAnimeItems(userRateStatus.name)
+            return response.fold(
+                onSuccess = { data ->
+                    val tracks = data.map { userRate ->
+                        userRate.animeUserRateWithModel.toEntity()
                     }
-                    appRoomDatabase.animeTracksDao().insertTracks(tracks)
-                    appRoomDatabase.animeTracksDao().insertAnimeItems(animeItems)
-                }
+                    val animeItems = data
+                        .mapNotNull { it.animeUserRateWithModel.anime?.animeShort }
+                        .map { it.toEntity() }
 
-                val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize
-                return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
-            } else {
-                Log.e("AnimeTracksMediator", "Error Loading data: ${response.exceptionOrNull()}")
-                return MediatorResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
-            }
+                    appRoomDatabase.withTransaction {
+                        if (loadType == LoadType.REFRESH) {
+                            animeTracksDao.clearTracks(userRateStatus.name)
+                            animeTracksDao.clearAnimeItems(userRateStatus.name)
+                        }
+                        appRoomDatabase.animeTracksDao().insertTracks(tracks)
+                        appRoomDatabase.animeTracksDao().insertAnimeItems(animeItems)
+                    }
+
+                    val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize
+                    MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+                },
+                onFailure = {
+                    Log.e("AnimeTracksMediator", "Error Loading data: ${response.exceptionOrNull()}")
+                    MediatorResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
+                }
+            )
         } catch (e: IOException) {
             Log.e("AnimeTracksMediator", "Error loading data: ${e.message}")
             MediatorResult.Error(e)

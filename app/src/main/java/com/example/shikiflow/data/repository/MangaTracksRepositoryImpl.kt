@@ -66,7 +66,7 @@ class MangaTracksRepositoryImpl @Inject constructor(
             val response = apolloClient.query(query).execute()
             response.data?.let {
                 Result.success(it.userRates)
-            } ?: Result.failure(Exception("No data"))
+            } ?: Result.failure(Exception(response.exception))
         } catch (e: Exception) {
             Result.failure(e)
         }

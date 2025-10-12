@@ -3,11 +3,9 @@ package com.example.shikiflow.presentation.screen.browse
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -37,7 +35,6 @@ import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
-import com.example.shikiflow.utils.rememberKeyboardState
 
 @Composable
 fun BrowseSearchPage(
@@ -57,7 +54,6 @@ fun BrowseSearchPage(
             lazyGridState.firstVisibleItemScrollOffset == 0
         }
     }
-    val keyboardState by rememberKeyboardState()
 
     val browseSearchData = remember(query, currentType, searchOptions) {
         browseViewModel.paginatedBrowse(
@@ -110,6 +106,7 @@ fun BrowseSearchPage(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
+                .navigationBarsPadding()
                 .imePadding()
         ) {
             Icon(Icons.AutoMirrored.Filled.List, "Show filters")

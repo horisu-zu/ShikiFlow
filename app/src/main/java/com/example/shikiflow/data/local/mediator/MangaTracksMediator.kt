@@ -67,29 +67,30 @@ class MangaTracksMediator(
                 )
             )
 
-            if (response.isSuccess) {
-                val data = response.getOrThrow()
-                val tracks = data.map { userRate ->
-                    userRate.mangaUserRateWithModel.toEntity()
-                }
-                val mangaItems = data
-                    .mapNotNull { it.mangaUserRateWithModel.manga?.mangaShort }
-                    .map { it.toEntity() }
+            return response.fold(
+                onSuccess = { data ->
+                    val tracks = data.map { it.mangaUserRateWithModel.toEntity() }
+                    val mangaItems = data
+                        .mapNotNull { it.mangaUserRateWithModel.manga?.mangaShort }
+                        .map { it.toEntity() }
 
-                appRoomDatabase.withTransaction {
-                    if (loadType == LoadType.REFRESH) {
-                        mangaTracksDao.clearTracks(userRateStatus.name)
-                        mangaTracksDao.clearMangaItems(userRateStatus.name)
+                    appRoomDatabase.withTransaction {
+                        if (loadType == LoadType.REFRESH) {
+                            mangaTracksDao.clearTracks(userRateStatus.name)
+                            mangaTracksDao.clearMangaItems(userRateStatus.name)
+                        }
+                        appRoomDatabase.mangaTracksDao().insertTracks(tracks)
+                        appRoomDatabase.mangaTracksDao().insertMangaItems(mangaItems)
                     }
-                    appRoomDatabase.mangaTracksDao().insertTracks(tracks)
-                    appRoomDatabase.mangaTracksDao().insertMangaItems(mangaItems)
-                }
 
-                val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize
-                return MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
-            } else {
-                return MediatorResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
-            }
+                    val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize
+                    MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
+                },
+                onFailure = { exception ->
+                    Log.e("MangaTracksMediator", "Error: $exception")
+                    MediatorResult.Error(exception)
+                }
+            )
         } catch (e: IOException) {
             Log.e("MangaTracksMediator", "Error loading data: ${e.message}")
             MediatorResult.Error(e)

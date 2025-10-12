@@ -41,8 +41,7 @@ fun BrowseSideScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = stringResource(id = browseType.displayValueRes),
-                            style = MaterialTheme.typography.headlineSmall
+                            text = stringResource(id = browseType.displayValueRes)
                         )
                     },
                     navigationIcon = {
@@ -57,7 +56,7 @@ fun BrowseSideScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surface
                     )
                 )
                 if(!isAtTop) HorizontalDivider()
