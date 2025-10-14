@@ -54,18 +54,12 @@ fun AnimeDetailsScreen(
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
     val animeDetails by animeDetailsViewModel.animeDetails.collectAsStateWithLifecycle()
-    val isUpdating by animeDetailsViewModel.isUpdating
+    val rateUpdateState by animeDetailsViewModel.rateUpdateState
     val isRefreshing by animeDetailsViewModel.isRefreshing
 
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
     var rateBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-    LaunchedEffect(isUpdating) {
-        if(!isUpdating) {
-            rateBottomSheet = false
-        }
-    }
 
     LaunchedEffect(id) {
         animeDetailsViewModel.getAnimeDetails(id)
@@ -175,7 +169,7 @@ fun AnimeDetailsScreen(
         if (rateBottomSheet) {
             UserRateBottomSheet(
                 userRate = details.toUiModel(),
-                isLoading = isUpdating,
+                rateUpdateState = rateUpdateState,
                 onDismiss = { rateBottomSheet = false },
                 onSave = { rateId, status, score, episodes, rewatches ->
                     animeDetailsViewModel.updateUserRate(

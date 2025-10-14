@@ -37,6 +37,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.RateUpdateState
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
@@ -61,19 +63,22 @@ import com.example.shikiflow.domain.model.tracks.RateStatus
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.toIcon
+import kotlinx.coroutines.launch
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserRateBottomSheet(
     userRate: UserRateData,
+    rateUpdateState: RateUpdateState,
     onDismiss: () -> Unit,
     onSave: (Long, Int, Int, Int, Int) -> Unit,
     modifier: Modifier = Modifier,
-    onCreateRate: (String, Int) -> Unit = { _, _ -> },
-    isLoading: Boolean = false
+    onCreateRate: (String, Int) -> Unit = { _, _ -> }
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+
     val chips = UserRateStatusConstants.getStatusChips(userRate.mediaType)
     val initialStatusIndex = chips.indexOfFirst { chip ->
         chip == simpleMapUserRateStatusToString(userRate.status, userRate.mediaType)
@@ -83,6 +88,14 @@ fun UserRateBottomSheet(
     var selectedScore by remember { mutableIntStateOf(userRate.score) }
     var progress by remember { mutableIntStateOf(userRate.progress) }
     var rewatches by remember { mutableIntStateOf(userRate.rewatches) }
+
+    LaunchedEffect(rateUpdateState) {
+        if(sheetState.isVisible && rateUpdateState == RateUpdateState.FINISHED) {
+            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                onDismiss()
+            }
+        }
+    }
 
     ModalBottomSheet(
         modifier = modifier,
@@ -140,8 +153,8 @@ fun UserRateBottomSheet(
                     },
                     createDate = userRate.createDate,
                     updateDate = userRate.updateDate,
-                    isLoading = isLoading,
-                    enabled = !isLoading
+                    isLoading = rateUpdateState == RateUpdateState.LOADING,
+                    enabled = rateUpdateState != RateUpdateState.LOADING
                 )
             } else {
                 Button(
@@ -440,7 +453,6 @@ private fun ChangeRow(
         }
     }
 }
-
 
 @Composable
 private fun DateItem(

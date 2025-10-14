@@ -15,9 +15,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -36,14 +36,13 @@ import com.example.shikiflow.utils.toIcon
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseMainBottomSheet(
+    sheetState: SheetState,
     currentBrowseMode: BrowseUiMode,
     currentOngoingMode: BrowseOngoingOrder,
     onDismiss: () -> Unit,
     onModeSelect: (BrowseUiMode) -> Unit,
     onOrderSelect: (BrowseOngoingOrder) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
-
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss

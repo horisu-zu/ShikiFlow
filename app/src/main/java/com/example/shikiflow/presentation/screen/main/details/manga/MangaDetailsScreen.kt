@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -32,11 +31,11 @@ import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
 import com.example.shikiflow.utils.Resource
-import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
+import com.example.shikiflow.utils.WebIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,19 +47,12 @@ fun MangaDetailsScreen(
 ) {
     val mangaDetails by mangaDetailsViewModel.mangaDetails.collectAsStateWithLifecycle()
     val mangaDexIds by mangaDetailsViewModel.mangaDexIds.collectAsStateWithLifecycle()
-    val isUpdating by mangaDetailsViewModel.isUpdating
+    val rateUpdateState by mangaDetailsViewModel.rateUpdateState
     val isRefreshing by mangaDetailsViewModel.isRefreshing
 
     val horizontalPadding = 12.dp
     var rateBottomSheet by remember { mutableStateOf(false) }
-    val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
-
-    LaunchedEffect(isUpdating) {
-        if(!isUpdating) {
-            rateBottomSheet = false
-        }
-    }
 
     LaunchedEffect(id) {
         mangaDetailsViewModel.getMangaDetails(id)
@@ -115,7 +107,7 @@ fun MangaDetailsScreen(
                                 navOptions.navigateByEntity(entityType, id)
                             },
                             onLinkClick = { url ->
-                                customTabIntent.launchUrl(context, url.toUri())
+                                WebIntent.openUrlCustomTab(context, url)
                             },
                             onTopicNavigate = { topicId ->
                                 navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
@@ -149,7 +141,7 @@ fun MangaDetailsScreen(
         mangaDetailsData?.let {
             UserRateBottomSheet(
                 userRate = mangaDetailsData.toUiModel(),
-                isLoading = isUpdating,
+                rateUpdateState = rateUpdateState,
                 onDismiss = { rateBottomSheet = false },
                 onSave = { rateId, status, score, episodes, rewatches ->
                     mangaDetailsViewModel.updateUserRate(

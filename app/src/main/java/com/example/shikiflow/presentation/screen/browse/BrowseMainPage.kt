@@ -16,16 +16,19 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -45,7 +48,9 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.BrowseUiMode
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseMainPage(
     onNavigate: (String, MediaType) -> Unit,
@@ -57,6 +62,8 @@ fun BrowseMainPage(
     val browseUiSettings by browseViewModel.browseUiSettings.collectAsStateWithLifecycle()
     val ongoingBrowseState = browseViewModel.browseMainOngoingsState.collectAsLazyPagingItems()
 
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
     val showBottomSheet = remember { mutableStateOf(false) }
 
     BrowseComponent(
@@ -71,16 +78,23 @@ fun BrowseMainPage(
     )
     if(showBottomSheet.value) {
         BrowseMainBottomSheet(
+            sheetState = sheetState,
             currentBrowseMode = browseUiSettings.browseUiMode,
             currentOngoingMode = browseUiSettings.browseOngoingOrder,
             onDismiss = { showBottomSheet.value = false },
             onModeSelect = { newMode ->
-                browseViewModel.setBrowseUiMode(newMode)
-                showBottomSheet.value = false
+                scope.launch {
+                    sheetState.hide()
+                }.invokeOnCompletion {
+                    showBottomSheet.value = false
+                    browseViewModel.setBrowseUiMode(newMode)
+                }
             },
             onOrderSelect = { newOrder ->
                 browseViewModel.setBrowseOngoingOrder(newOrder)
-                showBottomSheet.value = false
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    showBottomSheet.value = false
+                }
             }
         )
     }
@@ -97,32 +111,14 @@ private fun BrowseComponent(
     onSettingClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    when(browseUiMode) {
-        BrowseUiMode.AUTO -> {
-            when(appUiMode) {
-                AppUiMode.LIST -> {
-                    BrowseListComponent(
-                        browseState = browseState,
-                        onSideScreenNavigate = onSideScreenNavigate,
-                        onNavigate = onNavigate,
-                        onSettingClick = onSettingClick,
-                        onIsAtTopChange = onIsAtTopChange,
-                        modifier = modifier
-                    )
-                }
-                AppUiMode.GRID -> {
-                    BrowseGridComponent(
-                        browseState = browseState,
-                        onSideScreenNavigate = onSideScreenNavigate,
-                        onNavigate = onNavigate,
-                        onSettingClick = onSettingClick,
-                        onIsAtTopChange = onIsAtTopChange,
-                        modifier = modifier
-                    )
-                }
-            }
-        }
-        BrowseUiMode.LIST -> {
+    val uiMode = when(browseUiMode) {
+        BrowseUiMode.AUTO -> appUiMode
+        BrowseUiMode.LIST -> AppUiMode.LIST
+        BrowseUiMode.GRID -> AppUiMode.GRID
+    }
+
+    when (uiMode) {
+        AppUiMode.LIST -> {
             BrowseListComponent(
                 browseState = browseState,
                 onSideScreenNavigate = onSideScreenNavigate,
@@ -132,7 +128,7 @@ private fun BrowseComponent(
                 modifier = modifier
             )
         }
-        BrowseUiMode.GRID -> {
+        AppUiMode.GRID -> {
             BrowseGridComponent(
                 browseState = browseState,
                 onSideScreenNavigate = onSideScreenNavigate,

@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,7 +33,9 @@ import com.example.shikiflow.presentation.screen.main.details.manga.read.Chapter
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.ThemeMode
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     userData: User?,
@@ -43,8 +48,10 @@ fun SettingsScreen(
     val mangaSettings by settingsViewModel.mangaSettings.collectAsStateWithLifecycle()
 
     val cacheSize by settingsViewModel.cacheSize.collectAsStateWithLifecycle()
-
     val openCacheDialog = remember { mutableStateOf(false) }
+
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
     val bottomSheetConfig = remember { mutableStateOf<BottomSheetConfig?>(null) }
 
     LaunchedEffect(userData) {
@@ -119,7 +126,9 @@ fun SettingsScreen(
                                 currentValue = context.getString(settings.trackMode.displayValue),
                                 onOptionClick = { selectedIndex ->
                                     settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
-                                    bottomSheetConfig.value = null
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        bottomSheetConfig.value = null
+                                    }
                                 }
                             )
                         }
@@ -134,7 +143,9 @@ fun SettingsScreen(
                                 currentValue = context.getString(settings.appUiMode.displayValue),
                                 onOptionClick = { selectedIndex ->
                                     settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
-                                    bottomSheetConfig.value = null
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        bottomSheetConfig.value = null
+                                    }
                                 }
                             )
                         }
@@ -176,6 +187,7 @@ fun SettingsScreen(
         }
         bottomSheetConfig.value?.let { config ->
             SettingsBottomSheet(
+                sheetState = sheetState,
                 title = config.title,
                 currentValue = config.currentValue,
                 options = config.options,

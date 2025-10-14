@@ -8,6 +8,7 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.common.RateUpdateState
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack.Companion.toEntity
@@ -35,7 +36,7 @@ class AnimeTracksViewModel @Inject constructor(
 
     private val _pagingDataMap = mutableMapOf<UserRateStatusEnum, Flow<PagingData<AnimeTrack>>>()
 
-    var isUpdating = mutableStateOf(false)
+    var rateUpdateState = mutableStateOf<RateUpdateState>(RateUpdateState.INITIAL)
         private set
 
     val appUiMode: StateFlow<AppUiMode> = settingsRepository.settingsFlow
@@ -59,7 +60,7 @@ class AnimeTracksViewModel @Inject constructor(
         progress: Int,
         rewatches: Int
     ) = viewModelScope.launch {
-        isUpdating.value = true
+        rateUpdateState.value = RateUpdateState.LOADING
 
         try {
             val request = UserRateRequest(
@@ -75,7 +76,7 @@ class AnimeTracksViewModel @Inject constructor(
         } catch (e: Exception) {
             Log.e("AnimeTracksViewModel", "Error updating user rate", e)
         } finally {
-            isUpdating.value = false
+            rateUpdateState.value = RateUpdateState.FINISHED
         }
     }
 }

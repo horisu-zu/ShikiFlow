@@ -13,10 +13,10 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +35,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.RateUpdateState
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack.Companion.toUserRateData
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -44,6 +45,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
 import com.example.shikiflow.utils.AppUiMode
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeTracksPage(
     trackItems: LazyPagingItems<AnimeTrack>?,
@@ -52,15 +54,9 @@ fun AnimeTracksPage(
     modifier: Modifier = Modifier
 ) {
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
-    val isUpdating by tracksViewModel.isUpdating
+    val rateUpdateState by tracksViewModel.rateUpdateState
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
     var rateBottomSheet by remember { mutableStateOf(false) }
-
-    LaunchedEffect(isUpdating) {
-        if(!isUpdating) {
-            rateBottomSheet = false
-        }
-    }
 
     trackItems?.let {
         if(trackItems.loadState.refresh is LoadState.Loading) {
@@ -102,8 +98,12 @@ fun AnimeTracksPage(
                 selectedItem?.let {
                     UserRateBottomSheet(
                         userRate = it.toUserRateData(),
-                        isLoading = isUpdating,
-                        onDismiss = { if (!isUpdating) rateBottomSheet = false },
+                        rateUpdateState = rateUpdateState,
+                        onDismiss = {
+                            if (rateUpdateState != RateUpdateState.LOADING) {
+                                rateBottomSheet = false
+                            }
+                        },
                         onSave = { id, rateStatus, score, episodes, rewatches ->
                             tracksViewModel.updateUserRate(
                                 id = id,

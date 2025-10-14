@@ -5,11 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.graphql.MangaDetailsQuery
+import com.example.shikiflow.domain.model.common.RateUpdateState
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.track.manga.MangaUserTrack.Companion.toEntity
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
 import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
+import com.example.shikiflow.domain.model.tracks.UserRateResponse.Companion.toMangaUserRate
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.domain.repository.MangaTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
@@ -18,6 +20,7 @@ import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -37,7 +40,7 @@ class MangaDetailsViewModel @Inject constructor(
     private val _mangaDexIds = MutableStateFlow<Resource<List<String>>>(Resource.Loading())
     val mangaDexIds = _mangaDexIds.asStateFlow()
 
-    var isUpdating = mutableStateOf(false)
+    var rateUpdateState = mutableStateOf<RateUpdateState>(RateUpdateState.INITIAL)
         private set
 
     var isRefreshing = mutableStateOf(false)
@@ -65,7 +68,7 @@ class MangaDetailsViewModel @Inject constructor(
 
                     _mangaDetails.value = Resource.Success(mangaDetails)
                     currentId = id
-                    isRefreshing.value = false
+                    if(isRefreshing.value) { isRefreshing.value = false }
                 }
             } catch (e: Exception) {
                 _mangaDetails.value = Resource.Error(e.message ?: "Unknown error")
@@ -100,7 +103,7 @@ class MangaDetailsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                isUpdating.value = true
+                rateUpdateState.value = RateUpdateState.LOADING
 
                 val request = UserRateRequest(
                     status = UserRateStatusConstants.convertToApiStatus(status),
@@ -112,13 +115,16 @@ class MangaDetailsViewModel @Inject constructor(
                 val result = userRepository.updateUserRate(id, request)
 
                 mangaTracksRepository.updateMangaTrack(result.toEntity())
+
+                _mangaDetails.update { resource ->
+                    if (resource is Resource.Success) {
+                        Resource.Success(resource.data?.copy(userRate = result.toMangaUserRate()))
+                    } else { resource }
+                }
             } catch (e: Exception) {
                 Log.e("MangaDetailsViewModel", "Error updating user rate", e)
             } finally {
-                currentId?.let { id ->
-                    getMangaDetails(id, isRefresh = true)
-                }
-                isUpdating.value = false
+                rateUpdateState.value = RateUpdateState.FINISHED
             }
         }
     }
@@ -130,7 +136,7 @@ class MangaDetailsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                isUpdating.value = true
+                rateUpdateState.value = RateUpdateState.LOADING
 
                 val request = CreateUserRateRequest(
                     userId = userId.toLong(),
@@ -142,11 +148,16 @@ class MangaDetailsViewModel @Inject constructor(
                 val result = userRepository.createUserRate(request)
 
                 mangaTracksRepository.updateMangaTrack(result.toEntity())
+
+                _mangaDetails.update { resource ->
+                    if (resource is Resource.Success) {
+                        Resource.Success(resource.data?.copy(userRate = result.toMangaUserRate()))
+                    } else { resource }
+                }
             } catch (e: Exception) {
                 Log.e("MangaDetailsViewModel", "Error creating user rate: ${e.message}")
             } finally {
-                getMangaDetails(targetId, isRefresh = true)
-                isUpdating.value = false
+                rateUpdateState.value = RateUpdateState.FINISHED
             }
         }
     }
