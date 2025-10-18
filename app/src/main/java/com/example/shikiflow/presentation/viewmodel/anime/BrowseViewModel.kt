@@ -50,7 +50,6 @@ class BrowseViewModel @Inject constructor(
 ) : ViewModel() {
 
     private data class SearchState(
-        val query: String,
         val type: BrowseType,
         val options: BrowseOptions
     )
@@ -94,8 +93,7 @@ class BrowseViewModel @Inject constructor(
 
     fun paginatedBrowse(
         type: BrowseType = BrowseType.AnimeBrowseType.ONGOING,
-        options: BrowseOptions = BrowseOptions(),
-        name: String = "",
+        options: BrowseOptions = BrowseOptions()
     ): Flow<PagingData<Browse>> {
         val pagerFlow = {
             Pager(
@@ -109,7 +107,6 @@ class BrowseViewModel @Inject constructor(
                     BrowsePagingSource(
                         animeRepository = animeRepository,
                         mangaRepository = mangaRepository,
-                        name = name,
                         type = type,
                         options = options
                     )
@@ -119,7 +116,7 @@ class BrowseViewModel @Inject constructor(
 
         //Caching only latest options set for search state
         return if (type == BrowseType.AnimeBrowseType.SEARCH || type == BrowseType.MangaBrowseType.SEARCH) {
-            val currentState = SearchState(name, type, options)
+            val currentState = SearchState(type, options)
             if (currentState != _searchState) {
                 _searchState = currentState
                 pagerFlow().also { _browseMap[type] = it }

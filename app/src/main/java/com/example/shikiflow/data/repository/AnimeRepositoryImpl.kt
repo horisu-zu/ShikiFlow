@@ -60,7 +60,7 @@ class AnimeRepositoryImpl @Inject constructor(
                 else -> Optional.present(userStatus.joinToString(",") { it?.toGraphQLValue() ?: "" })
             },
             order = Optional.presentIfNotNull(order),
-            censored = Optional.presentIfNotNull(censored ?: true),
+            censored = Optional.presentIfNotNull(censored ?: studio.isNullOrEmpty()),
             kind = Optional.presentIfNotNull(kind),
             status = Optional.presentIfNotNull(status),
             season = Optional.presentIfNotNull(season),

@@ -24,11 +24,16 @@ import com.example.shikiflow.utils.toIcon
 fun CardItem(
     item: String,
     modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
     style: TextStyle = MaterialTheme.typography.labelMedium,
 ) {
     Box(
         modifier = modifier.clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer),
+            .then(
+                other = if(onClick != null) {
+                    Modifier.clickable(onClick = onClick)
+                } else Modifier
+            ).background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(

@@ -16,4 +16,5 @@ interface MediaNavOptions: MainNavOptions {
     fun navigateToAnimeWatch(title: String, shikimoriId: String, completedEpisodes: Int)
     fun navigateByEntity(entityType: Converter.EntityType, id: String)
     fun navigateToPerson(personId: String)
+    fun navigateToStudio(id: String, studioName: String)
 }

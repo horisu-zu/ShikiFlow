@@ -58,8 +58,7 @@ fun BrowseSearchPage(
     val browseSearchData = remember(query, currentType, searchOptions) {
         browseViewModel.paginatedBrowse(
             type = currentType,
-            options = searchOptions,
-            name = query
+            options = searchOptions.copy(name = query)
         )
     }.collectAsLazyPagingItems()
 
@@ -80,7 +79,7 @@ fun BrowseSearchPage(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp)
+                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
             ) {
                 items(browseSearchData.itemCount) { index ->
                     browseSearchData[index]?.let { browseItem ->

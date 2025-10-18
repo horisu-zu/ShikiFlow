@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.local.source
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.domain.model.anime.Browse
@@ -16,7 +17,6 @@ import javax.inject.Inject
 class BrowsePagingSource @Inject constructor(
     private val animeRepository: AnimeRepository,
     private val mangaRepository: MangaRepository,
-    private val name: String,
     private val type: BrowseType,
     private val options: BrowseOptions
 ): PagingSource<Int, Browse>() {
@@ -32,45 +32,54 @@ class BrowsePagingSource @Inject constructor(
         return try {
             val page = params.key ?: 1
 
-            if(name.isEmpty() && (type == BrowseType.AnimeBrowseType.SEARCH || type == BrowseType.MangaBrowseType.SEARCH)) {
+            if(
+                options.name.isNullOrEmpty() && options.studio.isNullOrEmpty()
+                && type in setOf(BrowseType.AnimeBrowseType.SEARCH, BrowseType.MangaBrowseType.SEARCH)
+            ) {
                 return LoadResult.Page(emptyList(), null, null)
             }
 
             when(type) {
                 is BrowseType.AnimeBrowseType -> {
                     val response = animeRepository.browseAnime(
-                        name = name,
+                        name = options.name,
                         page = page,
                         limit = params.loadSize,
-                        searchInUserList = false,
+                        searchInUserList = !options.userListStatus.isEmpty(),
                         status = options.status?.name,
                         order = options.order,
                         kind = options.kind?.name,
                         season = options.season,
                         genre = options.genre,
-                        userStatus = options.userListStatus
+                        userStatus = options.userListStatus,
+                        studio = options.studio
                     )
 
-                    if (response.isSuccess) {
-                        val data = response.getOrNull()?.map { anime ->
-                            anime.toBrowseAnime()
-                        } ?: emptyList()
+                    response.fold(
+                        onSuccess = { data ->
+                            Log.d("BrowsePagingSource", "Results: $data")
+                            val data = data.map { anime ->
+                                anime.toBrowseAnime()
+                            }
 
-                        val prevKey = if (page > 1) page - 1 else null
-                        val nextKey = if (data.isNotEmpty()) page + 1 else null
+                            val prevKey = if (page > 1) page - 1 else null
+                            val nextKey = if (data.isNotEmpty()) page + 1 else null
 
-                        LoadResult.Page(
-                            data = data,
-                            prevKey = prevKey,
-                            nextKey = nextKey
-                        )
-                    } else {
-                        LoadResult.Error(response.exceptionOrNull() ?: Exception("Unknown error"))
-                    }
+                            LoadResult.Page(
+                                data = data,
+                                prevKey = prevKey,
+                                nextKey = nextKey
+                            )
+                        },
+                        onFailure = { error ->
+                            Log.d("BrowsePagingSource", "Error: ${error.message}")
+                            LoadResult.Error(error)
+                        }
+                    )
                 }
                 is BrowseType.MangaBrowseType -> {
                     val response = mangaRepository.browseManga(
-                        name = name,
+                        name = options.name,
                         page = page,
                         limit = params.loadSize,
                         searchInUserList = false,

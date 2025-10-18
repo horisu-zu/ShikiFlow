@@ -17,6 +17,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.anime.studio.StudioScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavigator
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreen
@@ -77,6 +78,10 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.AnimeWatch(title, shikimoriId, completedEpisodes))
         }
 
+        override fun navigateToStudio(id: String, studioName: String) {
+            detailsBackstack.add(DetailsNavRoute.Studio(id, studioName))
+        }
+
         override fun navigateByEntity(entityType: EntityType, id: String) {
             when (entityType) {
                 EntityType.CHARACTER -> {
@@ -111,7 +116,7 @@ fun DetailsNavigator(
                     id = route.id,
                     userId = currentUserData?.id,
                     navOptions = options,
-                    animeDetailsViewModel = hiltViewModel(key = "${source}_${route.id}")
+                    animeDetailsViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.MangaDetails> { route ->
@@ -119,7 +124,7 @@ fun DetailsNavigator(
                     id = route.id,
                     userId = currentUserData?.id,
                     navOptions = options,
-                    mangaDetailsViewModel = hiltViewModel(key = "${source}_${route.id}")
+                    mangaDetailsViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.CharacterDetails> { route ->
@@ -173,6 +178,16 @@ fun DetailsNavigator(
                     onNavigateBack = { options.navigateBack() },
                     onEpisodeNavigate = onEpisodeNavigate,
                     source = source
+                )
+            }
+            entry<DetailsNavRoute.Studio> { route ->
+                StudioScreen(
+                    id = route.id,
+                    studioName = route.studioName,
+                    onNavigateBack = { options.navigateBack() },
+                    onMediaNavigate = { animeId ->
+                        options.navigateToAnimeDetails(animeId)
+                    }
                 )
             }
         },

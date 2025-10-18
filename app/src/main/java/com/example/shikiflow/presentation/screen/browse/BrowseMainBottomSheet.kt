@@ -18,8 +18,10 @@ import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,17 +34,20 @@ import com.example.shikiflow.R
 import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.toIcon
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseMainBottomSheet(
-    sheetState: SheetState,
     currentBrowseMode: BrowseUiMode,
     currentOngoingMode: BrowseOngoingOrder,
     onDismiss: () -> Unit,
     onModeSelect: (BrowseUiMode) -> Unit,
     onOrderSelect: (BrowseOngoingOrder) -> Unit
 ) {
+    val sheetState = rememberModalBottomSheetState()
+    val scope = rememberCoroutineScope()
+
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss
@@ -73,7 +78,14 @@ fun BrowseMainBottomSheet(
                 BrowseUiMode.entries.forEachIndexed { index, browseEntry ->
                     SegmentedButton(
                         selected = browseEntry == currentBrowseMode,
-                        onClick = { if(browseEntry != currentBrowseMode) onModeSelect(browseEntry) },
+                        onClick = {
+                            if(browseEntry != currentBrowseMode) {
+                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                    onModeSelect(browseEntry)
+                                    onDismiss()
+                                }
+                            }
+                        },
                         shape = SegmentedButtonDefaults.itemShape(
                             index = index,
                             count = BrowseUiMode.entries.size
@@ -107,7 +119,12 @@ fun BrowseMainBottomSheet(
                         modifier = Modifier.fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))
                             .clickable {
-                                if(option != currentOngoingMode) onOrderSelect(option)
+                                if(option != currentOngoingMode) {
+                                    onOrderSelect(option)
+                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                        onDismiss()
+                                    }
+                                }
                             },
                         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                         verticalAlignment = Alignment.CenterVertically

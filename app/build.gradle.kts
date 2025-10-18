@@ -71,7 +71,8 @@ android {
         }
     }
     ksp {
-        ksp.useKsp2 = false // PSI issue with KSP2 I don't know how to fix
+        //Set ksp.incremental.log = true in gradle.properties and now KSP2 works fine...
+        ksp.useKsp2 = true // PSI issue with KSP2 I don't know how to fix
     }
 }
 

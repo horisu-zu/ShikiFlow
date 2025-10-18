@@ -5,6 +5,8 @@ import com.example.graphql.type.SeasonString
 import com.example.shikiflow.domain.model.anime.MyListString
 
 data class BrowseOptions(
+    val name: String? = null,
+    val studio: String? = null,
     val status: Enum<*>? = null,
     val order: OrderEnum? = OrderEnum.ranked,
     val kind: Enum<*>? = null,

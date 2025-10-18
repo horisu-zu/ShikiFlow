@@ -118,6 +118,9 @@ fun AnimeDetailsScreen(
                                     selectedScreenshotIndex = selectedScreenshotIndex,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     isRefreshing = isRefreshing,
+                                    onStudioClick = { id, studioName ->
+                                        navOptions.navigateToStudio(id, studioName)
+                                    },
                                     onItemClick = { id, mediaType ->
                                         if (mediaType == MediaType.ANIME) {
                                             navOptions.navigateToAnimeDetails(id)

@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -44,6 +45,7 @@ import kotlin.time.Instant
 fun AnimeDetailsInfo(
     animeDetails: AnimeDetailsQuery.Anime,
     isRefreshing: Boolean,
+    onStudioClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onSimilarClick: (String, String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -77,7 +79,12 @@ fun AnimeDetailsInfo(
                         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
                         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                     ) {
-                        animeDetails.studios.forEach { CardItem(it.name) }
+                        animeDetails.studios.forEach { studio ->
+                            CardItem(
+                                item = studio.name,
+                                onClick = { onStudioClick(studio.id, studio.name) }
+                            )
+                        }
                     }
                 }
             )

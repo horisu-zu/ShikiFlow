@@ -62,6 +62,7 @@ fun AnimeDetailsDesc(
     selectedScreenshotIndex: Int?,
     sharedTransitionScope: SharedTransitionScope,
     isRefreshing: Boolean,
+    onStudioClick: (String, String) -> Unit,
     onSimilarClick: (String, String) -> Unit,
     onLinkClick: (String) -> Unit,
     onExternalLinksClick: (String) -> Unit,
@@ -156,6 +157,7 @@ fun AnimeDetailsDesc(
         AnimeDetailsInfo(
             animeDetails = animeDetails,
             isRefreshing = isRefreshing,
+            onStudioClick = onStudioClick,
             onLinkClick = onLinkClick,
             onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
             onExternalLinksClick = onExternalLinksClick,
