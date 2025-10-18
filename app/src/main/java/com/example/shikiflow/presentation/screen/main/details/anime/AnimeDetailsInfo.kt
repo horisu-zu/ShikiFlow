@@ -1,9 +1,9 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,11 +17,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.graphql.AnimeDetailsQuery
 import com.example.graphql.type.AnimeStatusEnum
@@ -73,7 +73,7 @@ fun AnimeDetailsInfo(
         if(animeDetails.studios.isNotEmpty()) {
             DetailRow(
                 label = stringResource(R.string.details_info_studio),
-                verticalAlignment = Alignment.CenterVertically,
+                labelVerticalPadding = 3.dp,
                 content = {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
@@ -298,19 +298,19 @@ fun DetailRow(
     label: String,
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    labelVerticalPadding: Dp = 0.dp,
     style: TextStyle = MaterialTheme.typography.labelMedium
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = verticalAlignment
+        verticalAlignment = Alignment.Top
     ) {
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.Gray
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.75f),
+            modifier = Modifier.padding(vertical = labelVerticalPadding)
         )
 
         ProvideTextStyle(value = style) {

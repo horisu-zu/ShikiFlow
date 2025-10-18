@@ -138,7 +138,7 @@ fun StudioScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(
-                        //top = paddingValues.calculateTopPadding(),
+                        top = paddingValues.calculateTopPadding(),
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
                     ),
