@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -56,7 +54,6 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.ChapterItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterNavigationViewModel
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel
-import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
@@ -73,12 +70,10 @@ fun ChapterScreen(
     chapterViewModel: ChapterViewModel = hiltViewModel()
 ) {
     val chapterSettings by chapterViewModel.mangaSettings.collectAsStateWithLifecycle()
-    val chapterPages by chapterViewModel.chapterPages.collectAsStateWithLifecycle()
+    val chapterContent by chapterViewModel.chapterContent.collectAsStateWithLifecycle()
 
     val showBottomSheet = remember { mutableStateOf(false) }
-    val topAppBarState = rememberTopAppBarState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
-        state = topAppBarState,
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
     var chapterPage by remember { mutableIntStateOf(1) }
@@ -135,7 +130,7 @@ fun ChapterScreen(
             }
         }
     ) { paddingValues ->
-        when(val pageUrls = chapterPages) {
+        when(chapterContent) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -143,26 +138,11 @@ fun ChapterScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
-                if(pageUrls.data.isNullOrEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize().padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                        ), contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = stringResource(R.string.chp_mangadex_empty),
-                            icon = IconResource.Vector(Icons.AutoMirrored.Filled.KeyboardArrowLeft),
-                            buttonLabel = stringResource(R.string.chp_navigate_back),
-                            onButtonClick = { navOptions.navigateBack() }
-                        )
-                    }
-                } else {
+                chapterContent.data?.let { pageUrls ->
                     when(chapterSettings.chapterUIMode) {
                         ChapterUIMode.PAGE -> {
                             ChapterPageModeComponent(
-                                chapterPageUrls = pageUrls.data,
+                                chapterPageUrls = pageUrls,
                                 chapterPage = chapterPage,
                                 onPageChange = { pageNumber -> chapterPage = pageNumber },
                                 modifier = Modifier
@@ -176,7 +156,7 @@ fun ChapterScreen(
                         }
                         ChapterUIMode.SCROLL -> {
                             ChapterScrollModeComponent(
-                                chapterPageUrls = pageUrls.data,
+                                chapterPageUrls = pageUrls,
                                 initialPage = chapterPage,
                                 onPageChange = { pageNumber -> chapterPage = pageNumber },
                                 modifier = Modifier
@@ -197,7 +177,7 @@ fun ChapterScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     ErrorItem(
-                        message = pageUrls.message ?: stringResource(R.string.common_error),
+                        message = chapterContent.message ?: stringResource(R.string.common_error),
                         buttonLabel = stringResource(R.string.common_retry),
                         onButtonClick = { chapterViewModel.downloadMangaChapter(mangaDexChapterId, true) }
                     )

@@ -34,7 +34,7 @@ class ChapterViewModel @Inject constructor(
 
     private var currentChapterId = MutableStateFlow<String?>(null)
 
-    val chapterPages: StateFlow<Resource<List<String>>> =
+    val chapterContent: StateFlow<Resource<List<String>>> =
         combine(
             settingsRepository.mangaSettingsFlow,
             currentChapterId

@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
@@ -44,6 +45,7 @@ import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChap
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.WebIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,14 +56,14 @@ fun ChapterTranslationsScreen(
     navOptions: MangaReadNavOptions,
     chapterTranslationsViewModel: MangaChapterTranslationViewModel = hiltViewModel()
 ) {
-
+    val context = LocalContext.current
     val chapterTranslations = chapterTranslationsViewModel.chapterTranslations.collectAsState()
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
             lazyListState.firstVisibleItemIndex == 0 &&
-                    lazyListState.firstVisibleItemScrollOffset == 0
+            lazyListState.firstVisibleItemScrollOffset == 0
         }
     }
 
@@ -125,7 +127,9 @@ fun ChapterTranslationsScreen(
                         ChapterTranslationItem(
                             mangaDexChapter = translations[index],
                             onTranslationClick = { translationId, chapterTitle ->
-                                navOptions.navigateToChapter(
+                                translations[index].attributes.externalUrl?.let { externalUrl ->
+                                    WebIntent.openUrlCustomTab(context, externalUrl)
+                                } ?: navOptions.navigateToChapter(
                                     mangaDexChapterId = translationId,
                                     title = chapterTitle,
                                     chapterNumber = chapterNumber

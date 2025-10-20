@@ -25,6 +25,18 @@ class DownloadChapterUseCase @Inject constructor(
                     .map { response.baseUrl + "/$dataString/${response.chapter.hash}/" + it }
                 Log.d("DownloadChapterUseCase", "Chapter URLs: $chapterPages")
 
+                /*if(chapterPages.isEmpty()) {
+                    val externalUrl = mangaDexRepository.getChapterMetadata(mangaDexChapterId)
+                        .data.attributes.externalUrl
+
+                    externalUrl?.let {
+                        emit(Resource.Success(ChapterContent.ExternalLink(externalUrl)))
+                    } ?: run {
+                        emit(Resource.Error(message = "Empty Response"))
+                    }
+                } else {
+                    emit(Resource.Success(chapterPages))
+                }*/
                 emit(Resource.Success(chapterPages))
             } else {
                 emit(Resource.Error("Failed loading chapter with ID: $mangaDexChapterId. " +

@@ -238,10 +238,14 @@ fun MangaUserRateItem(
             Box(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable {
-                        if (mangaDexResource is Resource.Success) onMangaDexNavigateClick()
-                        else if (mangaDexResource is Resource.Error) onMangaDexRefreshClick()
-                    }
+                    .clickable(
+                        enabled = mangaDexResource !is Resource.Loading,
+                        onClick = {
+                            if (mangaDexResource is Resource.Success) {
+                                onMangaDexNavigateClick()
+                            } else onMangaDexRefreshClick()
+                        }
+                    )
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(12.dp),
                 contentAlignment = Alignment.Center

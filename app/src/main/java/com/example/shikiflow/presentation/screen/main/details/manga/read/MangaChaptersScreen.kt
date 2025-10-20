@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import android.util.Log
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +25,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,27 +36,33 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.SortDirection
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MangaChaptersScreen(
     mangaDexId: String,
@@ -65,7 +73,12 @@ fun MangaChaptersScreen(
     navigationSource: ChaptersScreenSource,
     mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
 ) {
-    val mangaChapters = mangaChaptersViewModel.mangaChapters.collectAsState()
+    val mangaChapters = mangaChaptersViewModel.mangaChapters.collectAsStateWithLifecycle()
+    var sortDirection by rememberSaveable { mutableStateOf(SortDirection.ASCENDING) }
+    val rotationState by animateFloatAsState(
+        targetValue = if (sortDirection == SortDirection.ASCENDING) 180f else 0f,
+        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
+    )
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -103,6 +116,21 @@ fun MangaChaptersScreen(
                             )
                         }
                     },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                sortDirection = if(sortDirection == SortDirection.ASCENDING) {
+                                    SortDirection.DESCENDING
+                                } else SortDirection.ASCENDING
+                            },
+                            modifier = Modifier.rotate(rotationState)
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_list_filter),
+                                contentDescription = "Sort Direction"
+                            )
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
                             else MaterialTheme.colorScheme.surface
@@ -112,7 +140,7 @@ fun MangaChaptersScreen(
             }
         }, modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        when(mangaChapters.value) {
+        when(val chapters = mangaChapters.value) {
             is Resource.Loading -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -120,8 +148,14 @@ fun MangaChaptersScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
-                val chapters = mangaChapters.value.data
-                val sortedChapters = chapters?.keys?.toList() ?: emptyList()
+                val chapters = chapters.data
+                val sortedChapters = remember(sortDirection) {
+                    val baseList = chapters?.keys?.toList() ?: emptyList()
+                    when(sortDirection) {
+                        SortDirection.ASCENDING -> baseList
+                        SortDirection.DESCENDING -> baseList.sortedByDescending { it.toFloat() }
+                    }
+                }
 
                 LazyColumn(
                     state = lazyListState,
