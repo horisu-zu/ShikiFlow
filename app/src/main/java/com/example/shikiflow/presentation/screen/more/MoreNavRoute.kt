@@ -1,21 +1,22 @@
 package com.example.shikiflow.presentation.screen.more
 
 import androidx.navigation3.runtime.NavKey
+import com.example.shikiflow.domain.model.user.User
 import kotlinx.serialization.Serializable
 
 sealed interface MoreNavRoute : NavKey {
     @Serializable
-    object MoreScreen : MoreNavRoute
+    data object MoreScreen : MoreNavRoute
 
     @Serializable
-    object ProfileScreen : MoreNavRoute
+    data class ProfileScreen(val user: User?) : MoreNavRoute
 
     @Serializable
-    object HistoryScreen : MoreNavRoute
+    data object HistoryScreen : MoreNavRoute
 
     @Serializable
-    object SettingsScreen : MoreNavRoute
+    data object SettingsScreen : MoreNavRoute
 
     @Serializable
-    object AboutAppScreen : MoreNavRoute
+    data object AboutAppScreen : MoreNavRoute
 }

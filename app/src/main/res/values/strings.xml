@@ -11,14 +11,15 @@
         Access a vast manga library with multilingual support and tracking across your reading list.
     </string>
 
-    <string name="status_online">Online</string>
+    <string name="online_status">Online — %1s</string>
+    <!--<string name="status_online">Online</string>
     <string name="status_now">Last seen — just now</string>
     <string name="status_minute_ago">Last seen — %1$d minute ago</string>
     <string name="status_minutes_ago">Last seen — %1$d minutes ago</string>
     <string name="status_hour_ago">Last seen — %1$d hour ago</string>
     <string name="status_hours_ago">Last seen — %1$d hours ago</string>
     <string name="status_hours_ago_v2">Last seen — %1$d hours ago</string>
-    <string name="status_days">Last seen on — %1$s</string>
+    <string name="status_days">Last seen on — %1$s</string>-->
 
     <string name="mtp_loading_error">Error loading tracked manga</string>
     <string name="atp_loading_error">Error Loading Anime Tracks</string>
@@ -274,6 +275,7 @@
     <string name="about_checking_updates">Checking for updates…</string>
     <string name="about_latest_version">You\'re using the latest version</string>
     <string name="about_latest_error">Error checking for updates, try to refresh</string>
+    <string name="more_search_users">Search Users...</string>
 
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>

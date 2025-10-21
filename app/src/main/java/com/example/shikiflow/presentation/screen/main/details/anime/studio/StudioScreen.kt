@@ -46,6 +46,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
@@ -146,7 +147,10 @@ fun StudioScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(studioAnimeData.itemCount) { index ->
+                items(
+                    count = studioAnimeData.itemCount,
+                    key = { index -> studioAnimeData.itemKey { it.id } }
+                ) { index ->
                     studioAnimeData[index]?.let { browseItem ->
                         BrowseGridItem(
                             browseItem = browseItem,

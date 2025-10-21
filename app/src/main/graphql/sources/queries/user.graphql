@@ -7,3 +7,18 @@ query CurrentUser {
         lastOnlineAt
     }
 }
+
+query Users(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $ids: [ID!],
+    $search: String
+) {
+    users(page: $page, limit: $limit, ids: $ids, search: $search) {
+        id
+        avatarUrl,
+        nickname
+        url
+        lastOnlineAt
+    }
+}

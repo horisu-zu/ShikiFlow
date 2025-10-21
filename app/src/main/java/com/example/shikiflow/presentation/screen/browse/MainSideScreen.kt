@@ -97,7 +97,7 @@ fun MainSideScreen(
                     }
                 }
                 if(loadState.append is LoadState.Error) {
-                    item {
+                    item(span = { GridItemSpan(3) }) {
                         ErrorItem(
                             message = stringResource(R.string.b_mss_error),
                             showFace = false,

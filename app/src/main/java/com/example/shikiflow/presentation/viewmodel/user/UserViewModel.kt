@@ -25,10 +25,11 @@ class UserViewModel @Inject constructor(
 
     fun fetchCurrentUser() {
         viewModelScope.launch {
+            val currentData = userFlow.value
             val result = userRepository.fetchCurrentUser()
 
             result?.let { currentUser ->
-                if(currentUser.id != userFlow.value?.id) {
+                if(currentUser.id != currentData?.id && currentUser.lastOnlineAt != currentData?.lastOnlineAt) {
                     settingsRepository.saveUserData(currentUser)
                 }
             }

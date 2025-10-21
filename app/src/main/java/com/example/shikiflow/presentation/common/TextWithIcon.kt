@@ -29,10 +29,10 @@ fun TextWithIcon(
                 iconResources.forEachIndexed { index, _ ->
                     appendInlineContent("icon_$index")
                 }
-                append(text)
+                append(" $text")
             }
             else -> {
-                append(text)
+                append("$text ")
                 iconResources.forEachIndexed { index, _ ->
                     appendInlineContent("icon_$index")
                 }

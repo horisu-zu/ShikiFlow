@@ -1,7 +1,9 @@
 package com.example.shikiflow.data.repository
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
 import com.example.graphql.CurrentUserQuery
+import com.example.graphql.UsersQuery
 import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.domain.model.anime.ShortAnimeRate
@@ -90,6 +92,28 @@ class UserRepositoryImpl @Inject constructor(
         targetType = targetType,
         censored = censored
     )
+
+    override suspend fun getUsersByNickname(
+        page: Int,
+        limit: Int,
+        nickname: String
+    ): Result<List<User>> {
+        val query = UsersQuery(
+            page = Optional.present(page),
+            limit = Optional.present(limit),
+            search = Optional.present(nickname)
+        )
+
+        return try {
+            val response = apolloClient.query(query).execute()
+
+            response.data?.let { users ->
+                Result.success(users.users.map { it.toDomain() })
+            } ?: Result.failure(Exception("No data"))
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 
     override suspend fun updateUserRate(
         id: Long,

@@ -1,9 +1,11 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,6 +18,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.utils.Converter
 
 @Composable
 fun CurrentUser(
@@ -33,10 +36,19 @@ fun CurrentUser(
             imageType = ImageType.Square(),
             modifier = Modifier.size(96.dp)
         )
-        Text(
-            text = userData?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+        Column {
+            Text(
+                text = userData?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+            Text(
+                text = stringResource(R.string.online_status, Converter.formatInstant(
+                    instant = userData?.lastOnlineAt,
+                    includeTime = true
+                )),
+                style = MaterialTheme.typography.bodySmall
+            )
+        }
     }
 }

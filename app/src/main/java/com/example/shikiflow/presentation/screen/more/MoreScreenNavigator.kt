@@ -17,8 +17,8 @@ fun MoreScreenNavigator(
     val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
     val moreNavOptions = object : MoreNavOptions {
-        override fun navigateToProfile() {
-            moreBackstack.add(MoreNavRoute.ProfileScreen)
+        override fun navigateToProfile(user: User?) {
+            moreBackstack.add(MoreNavRoute.ProfileScreen(user))
         }
         override fun navigateToHistory() {
             moreBackstack.add(MoreNavRoute.HistoryScreen)
@@ -44,10 +44,10 @@ fun MoreScreenNavigator(
                     currentUser = currentUser
                 )
             }
-            entry<MoreNavRoute.ProfileScreen> {
+            entry<MoreNavRoute.ProfileScreen> { route ->
                 ProfileScreen(
-                    moreNavOptions = moreNavOptions,
-                    currentUser = currentUser
+                    userData = route.user,
+                    moreNavOptions = moreNavOptions
                 )
             }
             entry<MoreNavRoute.HistoryScreen> {

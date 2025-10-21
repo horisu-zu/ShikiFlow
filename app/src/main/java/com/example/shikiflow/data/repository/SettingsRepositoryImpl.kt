@@ -34,6 +34,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private val USER_AVATAR_URL = stringPreferencesKey("user_avatar_url")
         private val USER_ID = stringPreferencesKey("user_id")
         private val USER_NICKNAME = stringPreferencesKey("user_nickname")
+        private val USER_LAST_ONLINE_AT = stringPreferencesKey("last_online_at")
 
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
         private val BROWSE_UI_MODE = stringPreferencesKey("browse_ui_mode")
@@ -101,6 +102,7 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences[USER_ID] = user.id
             preferences[USER_NICKNAME] = user.nickname
             preferences[USER_AVATAR_URL] = user.avatarUrl
+            preferences[USER_LAST_ONLINE_AT] = user.lastOnlineAt.toString()
         }
     }
 

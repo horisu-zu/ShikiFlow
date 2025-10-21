@@ -16,6 +16,8 @@ import javax.inject.Inject
 class AnimeUserRateViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
+
+    private var _userId: Long? = null
     private val _userRateData = MutableStateFlow<Resource<List<UserRate>>>(Resource.Loading())
     val userRateData = _userRateData.asStateFlow()
 
@@ -27,9 +29,9 @@ class AnimeUserRateViewModel @Inject constructor(
         isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
-            if (!isRefresh && _userRateData.value is Resource.Success) {
+            if (!isRefresh && _userId == userId) {
                 return@launch
-            } else if(!isRefresh){
+            } else if(!isRefresh) {
                 _userRateData.value = Resource.Loading()
             } else {
                 isRefreshing.value = true
@@ -38,6 +40,7 @@ class AnimeUserRateViewModel @Inject constructor(
             try {
                 val result = userRepository.getUserRates(userId)
                 _userRateData.value = Resource.Success(result)
+                _userId = userId
                 if(isRefreshing.value) { isRefreshing.value = false }
             } catch (e: Exception) {
                 _userRateData.value = Resource.Error(e.localizedMessage ?: "An unexpected error occurred")

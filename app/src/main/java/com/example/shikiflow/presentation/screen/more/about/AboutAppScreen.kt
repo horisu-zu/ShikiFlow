@@ -27,7 +27,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.SectionItem
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.Section
-import com.example.shikiflow.presentation.viewmodel.AboutViewModel
+import com.example.shikiflow.presentation.viewmodel.more.AboutViewModel
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent

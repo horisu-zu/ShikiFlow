@@ -48,15 +48,15 @@ import com.example.shikiflow.utils.Resource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    userRateViewModel: AnimeUserRateViewModel = hiltViewModel(),
-    currentUser: User?,
-    moreNavOptions: MoreNavOptions
+    userData: User?,
+    moreNavOptions: MoreNavOptions,
+    userRateViewModel: AnimeUserRateViewModel = hiltViewModel()
 ) {
     val userRateData by userRateViewModel.userRateData.collectAsStateWithLifecycle()
     val isRefreshing by userRateViewModel.isRefreshing
 
     LaunchedEffect(Unit) {
-        currentUser?.id?.let { userId ->
+        userData?.id?.let { userId ->
             userRateViewModel.loadUserRates(userId.toLong())
         }
     }
@@ -101,7 +101,7 @@ fun ProfileScreen(
                         ),
                     isRefreshing = isRefreshing,
                     onRefresh = {
-                        currentUser?.id?.let { userId ->
+                        userData?.id?.let { userId ->
                             userRateViewModel.loadUserRates(userId.toLong(), true)
                         }
                     }
@@ -112,7 +112,7 @@ fun ProfileScreen(
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
                         CurrentUser(
-                            userData = currentUser
+                            userData = userData
                         )
                         Row(
                             modifier = Modifier
@@ -146,8 +146,8 @@ fun ProfileScreen(
                         message = stringResource(R.string.common_error),
                         buttonLabel = stringResource(R.string.common_retry),
                         onButtonClick = {
-                            currentUser?.id?.let { userId ->
-                                userRateViewModel.loadUserRates(userId.toLong(), true)
+                            userData?.id?.let { userId ->
+                                userRateViewModel.loadUserRates(userId.toLong())
                             }
                         }
                     )

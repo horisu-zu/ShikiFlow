@@ -27,13 +27,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 
 @Composable
@@ -72,6 +75,17 @@ fun BrowseSearchPage(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
+        } else if(browseSearchData.loadState.refresh is LoadState.Error) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(R.string.b_mss_error),
+                    buttonLabel = stringResource(id = R.string.common_retry),
+                    onButtonClick = { browseSearchData.refresh() }
+                )
+            }
         } else {
             LazyVerticalGrid(
                 state = lazyGridState,
@@ -89,12 +103,23 @@ fun BrowseSearchPage(
                         )
                     }
                 }
-                if(browseSearchData.loadState.append is LoadState.Loading) {
-                    item(span = { GridItemSpan(3) }) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
+                browseSearchData.apply {
+                    if(loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(3) }) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        }
+                    } else if(loadState.append is LoadState.Error) {
+                        item(span = { GridItemSpan(3) }) {
+                            ErrorItem(
+                                message = stringResource(R.string.b_mss_error),
+                                showFace = false,
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { browseSearchData.retry() }
+                            )
+                        }
                     }
                 }
             }

@@ -45,6 +45,12 @@ interface UserRepository {
         censored: Boolean? = true
     ): List<UserRate>
 
+    suspend fun getUsersByNickname(
+        page: Int,
+        limit: Int,
+        nickname: String
+    ): Result<List<User>>
+
     suspend fun updateUserRate(
         id: Long,
         request: UserRateRequest
