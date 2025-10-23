@@ -1,31 +1,30 @@
-package com.example.shikiflow.presentation.screen.main
+package com.example.shikiflow.presentation.screen.more.compare
 
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PrimaryScrollableTabRow
+import androidx.compose.material3.PrimaryTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MainTabRow(
+fun CompareTabRow(
     tabs: List<String>,
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
-    isAtTop: Boolean,
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.background
 ) {
-    PrimaryScrollableTabRow(
+    PrimaryTabRow(
         selectedTabIndex = selectedTab,
-        containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-            else MaterialTheme.colorScheme.surface,
-        edgePadding = 0.dp,
+        containerColor = containerColor,
         indicator = {
             TabRowDefaults.PrimaryIndicator(
                 Modifier.tabIndicatorOffset(selectedTab, matchContentSize = true),
@@ -33,7 +32,8 @@ fun MainTabRow(
                 shape = RoundedCornerShape(topStart = 2.dp, topEnd = 2.dp),
             )
         },
-        divider = { if(!isAtTop) HorizontalDivider() }
+        divider = { /**/ },
+        modifier = modifier
     ) {
         tabs.forEachIndexed { index, title ->
             Tab(

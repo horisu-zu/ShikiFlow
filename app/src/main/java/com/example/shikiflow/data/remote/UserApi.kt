@@ -1,12 +1,11 @@
 package com.example.shikiflow.data.remote
 
-import com.example.shikiflow.domain.model.anime.ShortAnimeRate
-import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
+import com.example.shikiflow.domain.model.userrate.ShortUserRate
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -31,7 +30,7 @@ interface UserApi {
         @Query("limit") limit: Int? = null,
         @Query("status") status: String? = null,
         @Query("censored") censored: Boolean? = true
-    ): List<ShortAnimeRate>
+    ): List<ShortUserRate.ShortAnimeRate>
 
     @GET("/api/users/{userId}/manga_rates")
     suspend fun getUserMangaRates(
@@ -40,7 +39,7 @@ interface UserApi {
         @Query("limit") limit: Int? = null,
         @Query("status") status: String? = null,
         @Query("censored") censored: Boolean? = true
-    ): List<ShortMangaRate>
+    ): List<ShortUserRate.ShortMangaRate>
 
     @GET("/api/v2/user_rates")
     suspend fun getUserRates(

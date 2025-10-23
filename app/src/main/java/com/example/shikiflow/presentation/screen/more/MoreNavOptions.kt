@@ -8,4 +8,5 @@ interface MoreNavOptions: MainNavOptions {
     fun navigateToHistory()
     fun navigateToSettings()
     fun navigateToAbout()
+    fun navigateToCompare(targetUser: User)
 }

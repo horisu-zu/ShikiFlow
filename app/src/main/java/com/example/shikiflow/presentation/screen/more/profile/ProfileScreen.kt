@@ -41,16 +41,17 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CircleShapeButton
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
-import com.example.shikiflow.presentation.viewmodel.user.AnimeUserRateViewModel
+import com.example.shikiflow.presentation.viewmodel.user.UserRateViewModel
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
+    currentUserId: String,
     userData: User?,
     moreNavOptions: MoreNavOptions,
-    userRateViewModel: AnimeUserRateViewModel = hiltViewModel()
+    userRateViewModel: UserRateViewModel = hiltViewModel()
 ) {
     val userRateData by userRateViewModel.userRateData.collectAsStateWithLifecycle()
     val isRefreshing by userRateViewModel.isRefreshing
@@ -84,73 +85,77 @@ fun ProfileScreen(
             )
         }
     ) { innerPadding ->
-        when(userRateData) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
-            is Resource.Success -> {
-                PullToRefreshBox(
-                    modifier = Modifier.fillMaxSize()
-                        .padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp
-                        ),
-                    isRefreshing = isRefreshing,
-                    onRefresh = {
-                        userData?.id?.let { userId ->
-                            userRateViewModel.loadUserRates(userId.toLong(), true)
-                        }
-                    }
-                ) {
-                    Column(
+        userData?.let {
+            when(userRateData) {
+                is Resource.Loading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
+                }
+                is Resource.Success -> {
+                    PullToRefreshBox(
                         modifier = Modifier.fillMaxSize()
-                            .verticalScroll(rememberScrollState()),
-                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+                            .padding(
+                                top = innerPadding.calculateTopPadding(),
+                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp
+                            ),
+                        isRefreshing = isRefreshing,
+                        onRefresh = {
+                            userRateViewModel.loadUserRates(userData.id.toLong())
+                        }
                     ) {
-                        CurrentUser(
-                            userData = userData
-                        )
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                        Column(
+                            modifier = Modifier.fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                         ) {
-                            /*CircleShapeButton(
-                                label = stringResource(R.string.more_screen_clubs),
-                                icon = IconResource.Drawable(R.drawable.ic_group),
-                                onClick = { *//**//* },
+                            CurrentUser(
+                                userData = userData
+                            )
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
+                            ) {
+                                /*CircleShapeButton(
+                                    label = stringResource(R.string.more_screen_clubs),
+                                    icon = IconResource.Drawable(R.drawable.ic_group),
+                                    onClick = { *//**//* },
                             modifier = Modifier.weight(1f)
                         )*/
-                            CircleShapeButton(
-                                label = stringResource(R.string.more_screen_history),
-                                icon = IconResource.Drawable(R.drawable.ic_history),
-                                onClick = { moreNavOptions.navigateToHistory() },
-                                modifier = Modifier.weight(1f)
+                                CircleShapeButton(
+                                    label = stringResource(R.string.more_screen_history),
+                                    icon = IconResource.Drawable(R.drawable.ic_history),
+                                    onClick = { moreNavOptions.navigateToHistory() },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
+                            TrackSection(
+                                isCurrentUser = currentUserId == userData.id,
+                                userRateData = userRateData.data ?: emptyList(),
+                                onCompareClick = {
+                                    moreNavOptions.navigateToCompare(userData)
+                                }
                             )
                         }
-                        TrackSection(userRateData = userRateData.data ?: emptyList())
                     }
                 }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = {
-                            userData?.id?.let { userId ->
-                                userRateViewModel.loadUserRates(userId.toLong())
+                is Resource.Error -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = stringResource(R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = {
+                                userRateViewModel.loadUserRates(userData.id.toLong())
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }

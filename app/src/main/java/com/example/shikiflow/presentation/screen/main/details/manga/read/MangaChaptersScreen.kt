@@ -127,7 +127,8 @@ fun MangaChaptersScreen(
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_list_filter),
-                                contentDescription = "Sort Direction"
+                                contentDescription = "Sort Direction",
+                                modifier = Modifier.size(24.dp)
                             )
                         }
                     },

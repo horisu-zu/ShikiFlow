@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AnimeUserRateViewModel @Inject constructor(
+class UserRateViewModel @Inject constructor(
     private val userRepository: UserRepository
 ) : ViewModel() {
 

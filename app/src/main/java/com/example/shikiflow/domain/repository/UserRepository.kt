@@ -1,7 +1,5 @@
 package com.example.shikiflow.domain.repository
 
-import com.example.shikiflow.domain.model.anime.ShortAnimeRate
-import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
 import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
@@ -9,6 +7,7 @@ import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.userrate.ShortUserRate
 
 interface UserRepository {
     suspend fun fetchCurrentUser(): User?
@@ -23,18 +22,18 @@ interface UserRepository {
     suspend fun getUserAnimeRates(
         userId: Long,
         page: Int? = null,
-        limit: Int? = null,
+        limit: Int? = 2000,
         status: String? = null,
         censored: Boolean? = true
-    ): Result<List<ShortAnimeRate>>
+    ): List<ShortUserRate.ShortAnimeRate>
 
     suspend fun getUserMangaRates(
         userId: Long,
         page: Int? = null,
-        limit: Int? = null,
+        limit: Int? = 2000,
         status: String? = null,
         censored: Boolean? = true
-    ): Result<List<ShortMangaRate>>
+    ): List<ShortUserRate.ShortMangaRate>
 
     suspend fun getUserRates(
         userId: Long,

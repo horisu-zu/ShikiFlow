@@ -19,4 +19,7 @@ sealed interface MoreNavRoute : NavKey {
 
     @Serializable
     data object AboutAppScreen : MoreNavRoute
+
+    @Serializable
+    data class CompareScreen(val targetUser: User) : MoreNavRoute
 }

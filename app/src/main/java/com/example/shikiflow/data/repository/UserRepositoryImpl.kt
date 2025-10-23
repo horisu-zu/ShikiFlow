@@ -4,9 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.example.graphql.CurrentUserQuery
 import com.example.graphql.UsersQuery
-import com.example.shikiflow.domain.model.manga.ShortMangaRate
 import com.example.shikiflow.data.remote.UserApi
-import com.example.shikiflow.domain.model.anime.ShortAnimeRate
 import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
 import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.tracks.UserRate
@@ -15,6 +13,7 @@ import com.example.shikiflow.domain.model.tracks.UserRateResponse
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.User.Companion.toDomain
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
+import com.example.shikiflow.domain.model.userrate.ShortUserRate
 import com.example.shikiflow.domain.repository.UserRepository
 import javax.inject.Inject
 
@@ -51,15 +50,13 @@ class UserRepositoryImpl @Inject constructor(
         limit: Int?,
         status: String?,
         censored: Boolean?
-    ): Result<List<ShortAnimeRate>> = runCatching {
-        userApi.getUserAnimeRates(
-            userId = userId,
-            page = page,
-            limit = limit,
-            status = status,
-            censored = censored
-        )
-    }
+    ): List<ShortUserRate.ShortAnimeRate> = userApi.getUserAnimeRates(
+        userId = userId,
+        page = page,
+        limit = limit,
+        status = status,
+        censored = censored
+    )
 
     override suspend fun getUserMangaRates(
         userId: Long,
@@ -67,15 +64,13 @@ class UserRepositoryImpl @Inject constructor(
         limit: Int?,
         status: String?,
         censored: Boolean?
-    ): Result<List<ShortMangaRate>> = runCatching {
-        userApi.getUserMangaRates(
-            userId = userId,
-            page = page,
-            limit = limit,
-            status = status,
-            censored = censored
-        )
-    }
+    ): List<ShortUserRate.ShortMangaRate> = userApi.getUserMangaRates(
+        userId = userId,
+        page = page,
+        limit = limit,
+        status = status,
+        censored = censored
+    )
 
     override suspend fun getUserRates(
         userId: Long,

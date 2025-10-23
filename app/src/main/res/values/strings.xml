@@ -123,6 +123,8 @@
     <string name="more_screen_history">History</string>
     <string name="more_screen_settings">Settings</string>
     <string name="more_screen_about_app">About App</string>
+    <string name="more_search_users">Search Users…</string>
+    <string name="more_profile_compare">Compare</string>
 
     <string name="translation_updated_at">Updated %1$s</string>
     <string name="episodes">%1s ep.</string>
@@ -275,7 +277,10 @@
     <string name="about_checking_updates">Checking for updates…</string>
     <string name="about_latest_version">You\'re using the latest version</string>
     <string name="about_latest_error">Error checking for updates, try to refresh</string>
-    <string name="more_search_users">Search Users...</string>
+
+    <string name="compare_label">Compare User Rates</string>
+    <string name="compare_unique_rates">%1$s\'s Unique Rates</string>
+    <string name="compare_shared_rates">Shared Rates</string>
 
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>

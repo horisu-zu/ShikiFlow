@@ -6,6 +6,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
+import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
@@ -29,43 +30,58 @@ fun MoreScreenNavigator(
         override fun navigateToAbout() {
             moreBackstack.add(MoreNavRoute.AboutAppScreen)
         }
+
+        override fun navigateToCompare(targetUser: User) {
+            moreBackstack.add(MoreNavRoute.CompareScreen(targetUser))
+        }
+
         override fun navigateBack() {
             moreBackstack.removeLastOrNull()
         }
     }
 
-    NavDisplay(
-        backStack = moreBackstack,
-        onBack = { moreBackstack.removeLastOrNull() },
-        entryProvider = entryProvider {
-            entry<MoreNavRoute.MoreScreen> {
-                MoreScreen(
-                    moreNavOptions = moreNavOptions,
-                    currentUser = currentUser
-                )
+    currentUser?.let {
+        NavDisplay(
+            backStack = moreBackstack,
+            onBack = { moreBackstack.removeLastOrNull() },
+            entryProvider = entryProvider {
+                entry<MoreNavRoute.MoreScreen> {
+                    MoreScreen(
+                        moreNavOptions = moreNavOptions,
+                        currentUser = currentUser
+                    )
+                }
+                entry<MoreNavRoute.ProfileScreen> { route ->
+                    ProfileScreen(
+                        currentUserId = currentUser.id,
+                        userData = route.user,
+                        moreNavOptions = moreNavOptions
+                    )
+                }
+                entry<MoreNavRoute.HistoryScreen> {
+                    HistoryScreen(
+                        currentUserId = currentUser.id,
+                        moreNavOptions = moreNavOptions,
+                    )
+                }
+                entry<MoreNavRoute.SettingsScreen> {
+                    SettingsScreen(
+                        userData = currentUser
+                    )
+                }
+                entry<MoreNavRoute.CompareScreen> { route ->
+                    CompareScreen(
+                        currentUser = currentUser,
+                        targetUser = route.targetUser,
+                        moreNavOptions = moreNavOptions
+                    )
+                }
+                entry<MoreNavRoute.AboutAppScreen> {
+                    AboutAppScreen()
+                }
             }
-            entry<MoreNavRoute.ProfileScreen> { route ->
-                ProfileScreen(
-                    userData = route.user,
-                    moreNavOptions = moreNavOptions
-                )
-            }
-            entry<MoreNavRoute.HistoryScreen> {
-                HistoryScreen(
-                    currentUserId = currentUser?.id,
-                    moreNavOptions = moreNavOptions,
-                )
-            }
-            entry<MoreNavRoute.SettingsScreen> {
-                SettingsScreen(
-                    userData = currentUser
-                )
-            }
-            entry<MoreNavRoute.AboutAppScreen> {
-                AboutAppScreen()
-            }
-        }
-    )
+        )
+    }
 
     /*NavHost(
         navController = moreNavController,

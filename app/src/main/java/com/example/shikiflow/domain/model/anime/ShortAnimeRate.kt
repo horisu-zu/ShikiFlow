@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ShortAnimeRate(
+    val score: Int,
     val status: String,
     val anime: ShortAnime
 )

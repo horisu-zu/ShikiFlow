@@ -44,11 +44,11 @@ import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    currentUserId: String?,
+    currentUserId: String,
     moreNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
-    val currentUserId = currentUserId?.toLong() ?: 0L
+    val currentUserId = currentUserId.toLong()
     val historyData = userHistoryViewModel.loadPaginatedHistory(currentUserId).collectAsLazyPagingItems()
 
     val lazyListState = rememberLazyListState()

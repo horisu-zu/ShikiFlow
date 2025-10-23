@@ -22,7 +22,7 @@ import com.example.shikiflow.utils.Converter
 
 @Composable
 fun CurrentUser(
-    userData: User?,
+    userData: User,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -31,24 +31,26 @@ fun CurrentUser(
         verticalAlignment = Alignment.CenterVertically
     ) {
         BaseImage(
-            model = userData?.avatarUrl,
+            model = userData.avatarUrl,
             contentDescription = "Avatar",
             imageType = ImageType.Square(),
             modifier = Modifier.size(96.dp)
         )
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.CenterVertically)) {
             Text(
-                text = userData?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
+                text = userData.nickname,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold
             )
-            Text(
-                text = stringResource(R.string.online_status, Converter.formatInstant(
-                    instant = userData?.lastOnlineAt,
-                    includeTime = true
-                )),
-                style = MaterialTheme.typography.bodySmall
-            )
+            userData.lastOnlineAt?.let { lastOnlineInstant ->
+                Text(
+                    text = stringResource(R.string.online_status, Converter.formatInstant(
+                        instant = lastOnlineInstant,
+                        includeTime = true
+                    )),
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
