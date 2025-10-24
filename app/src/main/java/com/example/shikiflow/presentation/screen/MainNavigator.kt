@@ -83,9 +83,9 @@ fun MainNavigator(
                         NavigationBarItem(
                             icon = {
                                 Icon(
-                                    painterResource(
+                                    painter = painterResource(
                                         id = if (isSelected) navItem.selectedIconRes
-                                        else navItem.unselectedIconRes
+                                            else navItem.unselectedIconRes
                                     ),
                                     contentDescription = stringResource(id = navItem.title),
                                     modifier = Modifier.size(24.dp)
@@ -103,6 +103,8 @@ fun MainNavigator(
                             onClick = {
                                 if (!isSelected) {
                                     mainNavBackStack.add(navItem.route)
+                                } else {
+                                    /**/
                                 }
                             }
                         )

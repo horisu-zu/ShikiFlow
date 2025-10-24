@@ -35,7 +35,15 @@ class CompareScreenViewModel @Inject constructor(
         mediaType: MediaType
     ) {
         viewModelScope.launch {
-            if(_targetUserId[mediaType] == targetUserId) { return@launch }
+            if(_targetUserId[mediaType] == targetUserId) {
+                return@launch
+            } else {
+                _userRates.update { currentMap ->
+                    currentMap.toMutableMap().apply {
+                        put(mediaType, Resource.Loading())
+                    }
+                }
+            }
 
             val response = groupUserRatesUseCase(currentUserId, targetUserId, mediaType)
 

@@ -1,5 +1,13 @@
 package com.example.shikiflow.presentation.screen.more
 
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -40,11 +48,11 @@ fun MoreScreenNavigator(
         }
     }
 
-    currentUser?.let {
-        NavDisplay(
-            backStack = moreBackstack,
-            onBack = { moreBackstack.removeLastOrNull() },
-            entryProvider = entryProvider {
+    NavDisplay(
+        backStack = moreBackstack,
+        onBack = { moreBackstack.removeLastOrNull() },
+        entryProvider = entryProvider {
+            currentUser?.let {
                 entry<MoreNavRoute.MoreScreen> {
                     MoreScreen(
                         moreNavOptions = moreNavOptions,
@@ -69,7 +77,24 @@ fun MoreScreenNavigator(
                         userData = currentUser
                     )
                 }
-                entry<MoreNavRoute.CompareScreen> { route ->
+                entry<MoreNavRoute.CompareScreen>(
+                    metadata = NavDisplay.transitionSpec {
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = tween(300)
+                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                    } + NavDisplay.popTransitionSpec {
+                        EnterTransition.None togetherWith slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(300)
+                        )
+                    } + NavDisplay.predictivePopTransitionSpec {
+                        EnterTransition.None togetherWith slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = tween(300)
+                        )
+                    }
+                ) { route ->
                     CompareScreen(
                         currentUser = currentUser,
                         targetUser = route.targetUser,
@@ -80,8 +105,23 @@ fun MoreScreenNavigator(
                     AboutAppScreen()
                 }
             }
-        )
-    }
+        },
+        transitionSpec = {
+            fadeIn(
+                animationSpec = tween(300)
+            ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+        },
+        popTransitionSpec = {
+            EnterTransition.None togetherWith fadeOut(
+                animationSpec = tween(300)
+            )
+        },
+        predictivePopTransitionSpec = {
+            EnterTransition.None togetherWith fadeOut(
+                animationSpec = tween(300)
+            )
+        }
+    )
 
     /*NavHost(
         navController = moreNavController,

@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    userData: User?,
+    userData: User,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -83,9 +83,9 @@ fun SettingsScreen(
                 title = stringResource(R.string.settings_account_section_title),
                 items = listOf(
                     SectionItem.Image(
-                        title = userData?.nickname ?: stringResource(R.string.common_unknown),
+                        title = userData.nickname,
                         displayValue = stringResource(R.string.settings_sign_out),
-                        imageUrl = userData?.avatarUrl ?: stringResource(R.string.common_unknown),
+                        imageUrl = userData.avatarUrl,
                         onClick = { settingsViewModel.logout() }
                     )
                 )

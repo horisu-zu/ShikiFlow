@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.anime
 
+import com.example.graphql.type.AnimeKindEnum
 import com.example.shikiflow.domain.model.common.ShikiImage
 import kotlinx.serialization.Serializable
 
@@ -7,6 +8,6 @@ import kotlinx.serialization.Serializable
 data class ShortAnime(
     val id: Long,
     val name: String,
-    val kind: String,
+    val kind: AnimeKindEnum?,
     val image: ShikiImage
 )

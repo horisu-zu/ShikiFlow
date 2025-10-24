@@ -1,6 +1,6 @@
 package com.example.shikiflow.presentation.screen.more
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,7 +52,7 @@ import com.example.shikiflow.utils.IconResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    currentUser: User?,
+    currentUser: User,
     moreNavOptions: MoreNavOptions,
     moreScreenViewModel: MoreScreenViewModel = hiltViewModel()
 ) {
@@ -89,29 +89,30 @@ fun MoreScreen(
             }
         }
     ) { innerPadding ->
-        AnimatedContent(
-            targetState = screenState.isSearchActive
-        ) { isSearchActive ->
-            if(isSearchActive) {
-                MoreSearchContent(
-                    query = searchQuery,
-                    moreNavOptions = moreNavOptions,
-                    modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+        Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
+            when(isSearchActive) {
+                true -> {
+                    MoreSearchContent(
+                        query = searchQuery,
+                        moreNavOptions = moreNavOptions,
+                        modifier = Modifier.padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                        )
                     )
-                )
-            } else {
-                MoreMainContent(
-                    currentUser = currentUser,
-                    moreNavOptions = moreNavOptions,
-                    modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding() + 12.dp,
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + horizontalPadding,
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + horizontalPadding
+                }
+                false -> {
+                    MoreMainContent(
+                        currentUser = currentUser,
+                        moreNavOptions = moreNavOptions,
+                        modifier = Modifier.padding(
+                            top = innerPadding.calculateTopPadding() + 12.dp,
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + horizontalPadding,
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + horizontalPadding
+                        )
                     )
-                )
+                }
             }
         }
     }
@@ -119,19 +120,19 @@ fun MoreScreen(
 
 @Composable
 private fun MoreMainContent(
-    currentUser: User?,
+    currentUser: User,
     moreNavOptions: MoreNavOptions,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.Top)
     ) {
         Section(
             items = listOf(
                 SectionItem.Expanded(
-                    avatar = currentUser?.avatarUrl ?: "NoUrl?",
-                    title = currentUser?.nickname ?: stringResource(R.string.profile_screen_missing_nickname),
+                    avatar = currentUser.avatarUrl,
+                    title = currentUser.nickname,
                     subtitle = stringResource(R.string.more_screen_profile),
                     onClick = { moreNavOptions.navigateToProfile(currentUser) }
                 ),
