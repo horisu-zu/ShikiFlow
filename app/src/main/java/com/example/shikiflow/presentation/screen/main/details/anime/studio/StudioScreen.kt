@@ -149,7 +149,7 @@ fun StudioScreen(
             ) {
                 items(
                     count = studioAnimeData.itemCount,
-                    key = { index -> studioAnimeData.itemKey { it.id } }
+                    key = studioAnimeData.itemKey { it.id }
                 ) { index ->
                     studioAnimeData[index]?.let { browseItem ->
                         BrowseGridItem(
