@@ -2,10 +2,10 @@ package com.example.shikiflow.presentation.screen.main
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -15,23 +15,23 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 
 @Composable
 fun MainScreenNavigator(
+    mainScreenBackStack: NavBackStack<NavKey>,
     currentUserData: User?,
     onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
 ) {
-    val mainScreenBackstack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
     val options = object : MainScreenNavOptions {
         override fun navigateToDetails(mediaId: String, mediaType: MediaType) {
-            mainScreenBackstack.add(MainScreenNavRoute.Details(mediaId, mediaType))
+            mainScreenBackStack.add(MainScreenNavRoute.Details(mediaId, mediaType))
         }
 
         override fun navigateBack() {
-            mainScreenBackstack.removeLastOrNull()
+            mainScreenBackStack.removeLastOrNull()
         }
     }
 
     NavDisplay(
-        backStack = mainScreenBackstack,
-        onBack = { mainScreenBackstack.removeLastOrNull() },
+        backStack = mainScreenBackStack,
+        onBack = { mainScreenBackStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<MainScreenNavRoute.MainTracks> {
                 MainScreen(
@@ -49,8 +49,7 @@ fun MainScreenNavigator(
                 )
             }
         }, entryDecorators = listOf(
-            rememberSceneSetupNavEntryDecorator(),
-            rememberSavedStateNavEntryDecorator(),
+            rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         )
     )

@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -36,14 +39,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
+import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
 
@@ -77,7 +86,11 @@ fun ChapterTranslationsScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = "Chapter $chapterNumber — $title",
+                            text = stringResource(
+                                R.string.translation_chapter_label,
+                                chapterNumber,
+                                title
+                            ),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             style = MaterialTheme.typography.titleMedium
@@ -88,7 +101,7 @@ fun ChapterTranslationsScreen(
                             onClick = { navOptions.navigateBack() }
                         ) {
                             Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back to Main"
                             )
                         }
@@ -112,63 +125,119 @@ fun ChapterTranslationsScreen(
             is Resource.Success -> {
                 LazyColumn(
                     state = lazyListState,
-                    modifier = Modifier.fillMaxSize().padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                    ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = paddingValues.calculateTopPadding(),
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                        ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val translations = translations.data?.sortedBy {
-                        it.attributes.publishAt
-                    } ?: emptyList()
-
-                    items(translations.size) { index ->
-                        ChapterTranslationItem(
-                            mangaDexChapter = translations[index],
-                            onTranslationClick = { translationId, chapterTitle ->
-                                translations[index].attributes.externalUrl?.let { externalUrl ->
-                                    WebIntent.openUrlCustomTab(context, externalUrl)
-                                } ?: navOptions.navigateToChapter(
-                                    mangaDexChapterId = translationId,
-                                    title = chapterTitle,
-                                    chapterNumber = chapterNumber
-                                )
-                            }
-                        )
+                    translations.data?.let { chapterTranslations ->
+                        items(chapterTranslations.size) { index ->
+                            ChapterTranslationItem(
+                                mangaDexChapter = chapterTranslations[index],
+                                onTranslationClick = { translationId, chapterTitle ->
+                                    chapterTranslations[index].externalUrl?.let { externalUrl ->
+                                        WebIntent.openUrlCustomTab(context, externalUrl)
+                                    } ?: navOptions.navigateToChapter(
+                                        mangaDexChapterId = translationId,
+                                        title = chapterTitle,
+                                        chapterNumber = chapterNumber
+                                    )
+                                }
+                            )
+                        }
                     }
                 }
             }
-            is Resource.Error -> { /**/ }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = translations.message ?: stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = {
+                            chapterTranslationsViewModel.getChapterTranslations(chapterTranslationIds)
+                        }
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
 private fun ChapterTranslationItem(
-    mangaDexChapter: MangaDexChapterMetadata,
+    mangaDexChapter: ChapterMetadata,
     onTranslationClick: (String, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
-            .clickable { onTranslationClick(mangaDexChapter.id, mangaDexChapter.attributes.title) }
+    Column(
+        modifier = modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onTranslationClick(mangaDexChapter.id, mangaDexChapter.title) }
             .padding(horizontal = 6.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.CenterVertically,
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
-        Text(
-            text = FlagConverter.getFlag(mangaDexChapter.attributes.translatedLanguage),
-            style = MaterialTheme.typography.titleLarge
-        )
-        Text(
-            text = if(!mangaDexChapter.attributes.title.isNullOrEmpty()) mangaDexChapter.attributes.title
-                else "Ch. ${mangaDexChapter.attributes.chapter}",
-            style = MaterialTheme.typography.bodyLarge.copy(
-                fontWeight = FontWeight.SemiBold
-            ),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = FlagConverter.getFlag(mangaDexChapter.translatedLanguage),
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = if(!mangaDexChapter.title.isNullOrEmpty()) mangaDexChapter.title
+                    else stringResource(R.string.chapter_empty_title, mangaDexChapter.chapterNumber ?: "?"),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
+        ) {
+            if(mangaDexChapter.scanlationGroups.isNotEmpty()) {
+                mangaDexChapter.scanlationGroups.forEach { scanlationGroup ->
+                    TextWithIcon(
+                        text = scanlationGroup.name,
+                        iconResources = listOf(
+                            if(scanlationGroup.isOfficial) {
+                                IconResource.Vector(imageVector = Icons.Default.Check)
+                            } else {
+                                IconResource.Vector(imageVector = Icons.Default.Person)
+                            }
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = if(scanlationGroup.isOfficial) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            } else {
+                mangaDexChapter.uploaderNickname?.let { uploaderName ->
+                    TextWithIcon(
+                        text = uploaderName,
+                        iconResources = listOf(
+                            IconResource.Vector(imageVector = Icons.Default.Person)
+                        ),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+        }
     }
 }

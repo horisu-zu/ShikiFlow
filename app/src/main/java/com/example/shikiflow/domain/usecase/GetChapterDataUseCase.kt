@@ -1,8 +1,8 @@
 package com.example.shikiflow.domain.usecase
 
-import android.util.Log
 import coil3.network.HttpException
-import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata.Companion.toDomain
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.async
@@ -15,7 +15,7 @@ import javax.inject.Inject
 class GetChapterDataUseCase @Inject constructor(
     private val mangaDexRepository: MangaDexRepository
 ) {
-    operator fun invoke(chapterIds: List<String>): Flow<Resource<List<MangaDexChapterMetadata>>> = flow {
+    operator fun invoke(chapterIds: List<String>): Flow<Resource<List<ChapterMetadata>>> = flow {
         try {
             emit(Resource.Loading())
 
@@ -23,18 +23,36 @@ class GetChapterDataUseCase @Inject constructor(
                 chapterIds.map { chapterId ->
                     async {
                         val response = mangaDexRepository.getChapterMetadata(chapterId)
-                        if (response.result == "ok") {
-                            Log.d("GetChapterDataUseCase", "Chapter data for ID: ${response.data}")
-                            response.data
-                        } else {
-                            Log.d("GetChapterDataUseCase", "Failed to fetch chapter data for ID: $chapterId, Result: ${response.result}")
-                            null
+                        response.data.let { chapterMetadata ->
+                            val scanlationGroupIds = chapterMetadata.relationships
+                                .filter { it.type == "scanlation_group" }
+                                .map { it.id }
+
+                            if(scanlationGroupIds.isNotEmpty()) {
+                                val scanlationGroups = scanlationGroupIds.map { groupId ->
+                                    async { mangaDexRepository.getScanlationGroup(groupId) }
+                                }.awaitAll()
+
+                                chapterMetadata.toDomain(scanlationGroups = scanlationGroups)
+                            } else {
+                                val uploaderId = chapterMetadata.relationships
+                                    .firstOrNull { it.type == "user" }?.id
+
+                                uploaderId?.let {
+                                    val user = mangaDexRepository.getUser(uploaderId)
+                                    chapterMetadata.toDomain(uploader = user)
+                                } ?: chapterMetadata.toDomain()
+                            }
                         }
                     }
-                }.awaitAll().filterNotNull()
+                }.awaitAll()
             }
 
-            emit(Resource.Success(chapters))
+            val sortedChapters = chapters.sortedBy { chapter ->
+                chapter.publishAt
+            }
+
+            emit(Resource.Success(sortedChapters))
         } catch (e: HttpException) {
             emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {

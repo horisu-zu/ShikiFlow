@@ -282,6 +282,8 @@
     <string name="compare_unique_rates">%1$s\'s Unique Rates</string>
     <string name="compare_shared_rates">Shared Rates</string>
 
+    <string name="translation_chapter_label">Chapter %1$s — %2$s</string>
+
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

@@ -1,6 +1,8 @@
 package com.example.shikiflow.domain.model.mangadex.chapter_metadata
 
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import kotlin.time.Instant
 
 @Serializable
 data class ChapterMetadataAttributes(
@@ -14,7 +16,7 @@ data class ChapterMetadataAttributes(
     val version: Int,
     val createdAt: String,
     val updatedAt: String,
-    val publishAt: String,
+    @Contextual val publishAt: Instant,
     val readableAt: String,
     val isUnavailable: Boolean
 )

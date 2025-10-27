@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
@@ -38,8 +37,10 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.navigation.AppNavOptions
+import com.example.shikiflow.presentation.screen.browse.BrowseNavRoute
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
+import com.example.shikiflow.presentation.screen.more.MoreNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
 import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 
@@ -56,11 +57,14 @@ fun MainNavigator(
         BottomNavItem.More
     )
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Home)
+    val mainScreenBackStack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
+    val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
+    val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
+
     val currentUser by userViewModel.userFlow.collectAsState()
     val isKeyboardVisible = WindowInsets.isImeVisible
 
     LaunchedEffect(Unit) {
-        Log.d("MainNavigator", "Fetching Current User")
         userViewModel.fetchCurrentUser()
     }
 
@@ -104,7 +108,17 @@ fun MainNavigator(
                                 if (!isSelected) {
                                     mainNavBackStack.add(navItem.route)
                                 } else {
-                                    /**/
+                                    when(navItem) {
+                                        BottomNavItem.Home -> {
+                                            mainScreenBackStack.subList(1, mainScreenBackStack.size).clear()
+                                        }
+                                        BottomNavItem.Browse -> {
+                                            browseScreenBackStack.subList(1, browseScreenBackStack.size).clear()
+                                        }
+                                        BottomNavItem.More -> {
+                                            moreScreenBackStack.subList(1, moreScreenBackStack.size).clear()
+                                        }
+                                    }
                                 }
                             }
                         )
@@ -122,6 +136,7 @@ fun MainNavigator(
             entryProvider = entryProvider {
                 entry<MainNavRoute.Home> {
                     MainScreenNavigator(
+                        mainScreenBackStack = mainScreenBackStack,
                         currentUserData = currentUser,
                         onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
                             appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
@@ -130,6 +145,7 @@ fun MainNavigator(
                 }
                 entry<MainNavRoute.Browse> {
                     BrowseScreenNavigator(
+                        browseScreenBackStack = browseScreenBackStack,
                         currentUserData = currentUser,
                         onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
                             appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
@@ -137,7 +153,10 @@ fun MainNavigator(
                     )
                 }
                 entry<MainNavRoute.More> {
-                    MoreScreenNavigator(currentUser = currentUser)
+                    MoreScreenNavigator(
+                        moreScreenBackStack = moreScreenBackStack,
+                        currentUser = currentUser
+                    )
                 }
             },
             transitionSpec = {
@@ -166,29 +185,29 @@ fun MainNavigator(
 }
 
 sealed class BottomNavItem(
-    var title: Int,
-    @DrawableRes var selectedIconRes: Int,
-    @DrawableRes var unselectedIconRes: Int,
-    var route: MainNavRoute
+    val title: Int,
+    val selectedIconRes: Int,
+    val unselectedIconRes: Int,
+    val route: MainNavRoute
 ): NavKey {
     object Home : BottomNavItem(
-        R.string.bottom_navigator_main,
-        R.drawable.ic_selected_book,
-        R.drawable.ic_unselected_book,
-        MainNavRoute.Home
+        title = R.string.bottom_navigator_main,
+        selectedIconRes = R.drawable.ic_selected_book,
+        unselectedIconRes = R.drawable.ic_unselected_book,
+        route = MainNavRoute.Home
     )
 
     object Browse : BottomNavItem(
-        R.string.bottom_navigator_browse,
-        R.drawable.ic_selected_browse,
-        R.drawable.ic_unselected_browse,
-        MainNavRoute.Browse
+        title = R.string.bottom_navigator_browse,
+        selectedIconRes = R.drawable.ic_selected_browse,
+        unselectedIconRes = R.drawable.ic_unselected_browse,
+        route = MainNavRoute.Browse
     )
 
     object More : BottomNavItem(
-        R.string.bottom_navigator_more,
-        R.drawable.ic_selected_dots,
-        R.drawable.ic_unselected_dots,
-        MainNavRoute.More
+        title = R.string.bottom_navigator_more,
+        selectedIconRes = R.drawable.ic_selected_dots,
+        unselectedIconRes = R.drawable.ic_unselected_dots,
+        route = MainNavRoute.More
     )
 }

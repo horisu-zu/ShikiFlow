@@ -11,6 +11,7 @@ import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -21,7 +22,9 @@ fun TextWithIcon(
     modifier: Modifier = Modifier,
     placeIconAtTheBeginning: Boolean = true,
     style: TextStyle = MaterialTheme.typography.titleMedium,
-    color: Color = MaterialTheme.colorScheme.onSurface
+    color: Color = MaterialTheme.colorScheme.onSurface,
+    maxLines: Int = Int.MAX_VALUE,
+    overflow: TextOverflow = TextOverflow.Clip
 ) {
     val textValue = buildAnnotatedString {
         when {
@@ -56,6 +59,8 @@ fun TextWithIcon(
         text = textValue,
         inlineContent = inlineContent,
         modifier = modifier,
-        style = style.copy(color = color)
+        style = style.copy(color = color),
+        maxLines = maxLines,
+        overflow = overflow
     )
 }

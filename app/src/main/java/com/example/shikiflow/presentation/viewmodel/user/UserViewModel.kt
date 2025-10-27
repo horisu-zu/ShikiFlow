@@ -29,7 +29,7 @@ class UserViewModel @Inject constructor(
             val result = userRepository.fetchCurrentUser()
 
             result?.let { currentUser ->
-                if(currentUser.id != currentData?.id && currentUser.lastOnlineAt != currentData?.lastOnlineAt) {
+                if(currentUser.id != currentData?.id) {
                     settingsRepository.saveUserData(currentUser)
                 }
             }

@@ -5,6 +5,8 @@ import com.example.shikiflow.domain.model.mangadex.chapter.ChapterResponse
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadataResponse
 import com.example.shikiflow.domain.model.mangadex.cover.CoverResponse
 import com.example.shikiflow.domain.model.mangadex.manga.MangaDexResponse
+import com.example.shikiflow.domain.model.mangadex.scanlation_group.ScanlationGroupResponse
+import com.example.shikiflow.domain.model.mangadex.user.MangaDexUserResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -37,4 +39,14 @@ interface MangaDexApi {
     suspend fun getCover(
         @Path("id") coverId: String
     ): CoverResponse
+
+    @GET("group/{id}")
+    suspend fun getScanlationGroup(
+        @Path("id") groupId: String
+    ): ScanlationGroupResponse
+
+    @GET("user/{id}")
+    suspend fun getUser(
+        @Path("id") userId: String
+    ): MangaDexUserResponse
 }

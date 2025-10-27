@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.manga.read
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.domain.usecase.GetChapterDataUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +18,7 @@ class MangaChapterTranslationViewModel @Inject constructor(
 ): ViewModel() {
 
     private var firstChapterId: String? = null
-    private val _chapterTranslations = MutableStateFlow<Resource<List<MangaDexChapterMetadata>>>(Resource.Loading())
+    private val _chapterTranslations = MutableStateFlow<Resource<List<ChapterMetadata>>>(Resource.Loading())
     val chapterTranslations = _chapterTranslations.asStateFlow()
 
     fun getChapterTranslations(chapterIds: List<String>) {

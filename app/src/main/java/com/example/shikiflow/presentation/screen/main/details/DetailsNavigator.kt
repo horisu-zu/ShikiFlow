@@ -10,8 +10,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
-import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
-import androidx.navigation3.scene.rememberSceneSetupNavEntryDecorator
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -130,7 +129,8 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
-                    navOptions = options
+                    navOptions = options,
+                    characterDetailsViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.SimilarPage> { route ->
@@ -138,14 +138,16 @@ fun DetailsNavigator(
                     mediaTitle = route.title,
                     mediaId = route.id,
                     mediaType = route.mediaType,
-                    navOptions = options
+                    navOptions = options,
+                    similarMediaViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.ExternalLinks> { route ->
                 ExternalLinksScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    navOptions = options
+                    navOptions = options,
+                    externalLinksViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.MangaRead> { route ->
@@ -161,13 +163,15 @@ fun DetailsNavigator(
                 CommentsScreen(
                     screenMode = route.screenMode,
                     id = route.id,
-                    navOptions = options
+                    navOptions = options,
+                    commentViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.Person> { route ->
                 PersonScreen(
                     personId = route.personId,
-                    navOptions = options
+                    navOptions = options,
+                    personViewModel = hiltViewModel(key = source)
                 )
             }
             entry<DetailsNavRoute.AnimeWatch> { route ->
@@ -187,7 +191,8 @@ fun DetailsNavigator(
                     onNavigateBack = { options.navigateBack() },
                     onMediaNavigate = { animeId ->
                         options.navigateToAnimeDetails(animeId)
-                    }
+                    },
+                    studioViewModel = hiltViewModel(key = source)
                 )
             }
         },
@@ -207,8 +212,7 @@ fun DetailsNavigator(
             )
         },
         entryDecorators = listOf(
-            rememberSceneSetupNavEntryDecorator(),
-            rememberSavedStateNavEntryDecorator(),
+            rememberSaveableStateHolderNavEntryDecorator(),
             rememberViewModelStoreNavEntryDecorator()
         )
     )

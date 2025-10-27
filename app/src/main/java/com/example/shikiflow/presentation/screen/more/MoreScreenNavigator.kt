@@ -9,8 +9,9 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
@@ -21,36 +22,37 @@ import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
 fun MoreScreenNavigator(
+    moreScreenBackStack: NavBackStack<NavKey>,
     currentUser: User?
 ) {
-    val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
+    //val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
     val moreNavOptions = object : MoreNavOptions {
         override fun navigateToProfile(user: User?) {
-            moreBackstack.add(MoreNavRoute.ProfileScreen(user))
+            moreScreenBackStack.add(MoreNavRoute.ProfileScreen(user))
         }
         override fun navigateToHistory() {
-            moreBackstack.add(MoreNavRoute.HistoryScreen)
+            moreScreenBackStack.add(MoreNavRoute.HistoryScreen)
         }
         override fun navigateToSettings() {
-            moreBackstack.add(MoreNavRoute.SettingsScreen)
+            moreScreenBackStack.add(MoreNavRoute.SettingsScreen)
         }
         override fun navigateToAbout() {
-            moreBackstack.add(MoreNavRoute.AboutAppScreen)
+            moreScreenBackStack.add(MoreNavRoute.AboutAppScreen)
         }
 
         override fun navigateToCompare(targetUser: User) {
-            moreBackstack.add(MoreNavRoute.CompareScreen(targetUser))
+            moreScreenBackStack.add(MoreNavRoute.CompareScreen(targetUser))
         }
 
         override fun navigateBack() {
-            moreBackstack.removeLastOrNull()
+            moreScreenBackStack.removeLastOrNull()
         }
     }
 
     NavDisplay(
-        backStack = moreBackstack,
-        onBack = { moreBackstack.removeLastOrNull() },
+        backStack = moreScreenBackStack,
+        onBack = { moreScreenBackStack.removeLastOrNull() },
         entryProvider = entryProvider {
             currentUser?.let {
                 entry<MoreNavRoute.MoreScreen> {
