@@ -59,9 +59,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    hilt {
-        enableAggregatingTask = false
-    }
     apollo {
         service("shikimori-api") {
             packageName.set("com.example.graphql")
@@ -71,9 +68,14 @@ android {
         }
     }
     ksp {
-        //Set ksp.incremental.log = true in gradle.properties and now KSP2 works fine...
+        //[OUTDATED] Set ksp.incremental.log = true in gradle.properties and now KSP2 works fine...
+        //Enabled aggregating task for Hilt and there're no problems now...
         ksp.useKsp2 = true // PSI issue with KSP2 I don't know how to fix
     }
+}
+
+hilt {
+    enableAggregatingTask = true
 }
 
 secrets {
@@ -148,4 +150,7 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.hls)
+
+    //Pager Indicator
+    implementation(libs.pager.indicator)
 }

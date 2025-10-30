@@ -54,11 +54,13 @@ import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.utils.Converter.EntityType
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun AnimeDetailsDesc(
     animeDetails: AnimeDetailsQuery.Anime,
+    horizontalPadding: Dp,
     selectedScreenshotIndex: Int?,
     sharedTransitionScope: SharedTransitionScope,
     isRefreshing: Boolean,
@@ -72,7 +74,6 @@ fun AnimeDetailsDesc(
     onScreenshotClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val horizontalPadding = 12.dp
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
     Column(
@@ -82,7 +83,7 @@ fun AnimeDetailsDesc(
         if(!animeDetails.description.isNullOrEmpty()) {
             ExpandableText(
                 descriptionHtml = animeDetails.descriptionHtml ?: "",
-                modifier = Modifier.fillMaxWidth().padding(horizontal = horizontalPadding),
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.bodySmall,
                 linkColor = MaterialTheme.colorScheme.primary,
                 brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
@@ -92,11 +93,11 @@ fun AnimeDetailsDesc(
             )
         }
 
-        if(animeDetails.genres?.isNotEmpty() == true) {
+        if(!animeDetails.genres.isNullOrEmpty()) {
             LazyRow(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding).fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
             ) {
                 items(animeDetails.genres) { genreItem ->
                     CardItem(
@@ -113,10 +114,11 @@ fun AnimeDetailsDesc(
             ) {
                 Text(
                     text = stringResource(R.string.details_characters),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = horizontalPadding)
+                    style = MaterialTheme.typography.titleMedium
                 )
                 LazyRow(
+                    modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -137,9 +139,7 @@ fun AnimeDetailsDesc(
                 relatedItems = animeDetails.related.map { RelatedMapper.fromAnimeRelated(it) },
                 onArrowClick = { showRelatedBottomSheet = true },
                 onItemClick = onItemClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = horizontalPadding)
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -149,8 +149,7 @@ fun AnimeDetailsDesc(
                 selectedIndex = selectedScreenshotIndex,
                 onScreenshotClick = onScreenshotClick,
                 sharedTransitionScope = sharedTransitionScope,
-                modifier = Modifier.fillMaxWidth(),
-                horizontalPadding = horizontalPadding
+                modifier = Modifier.fillMaxWidth()
             )
         }
 
@@ -325,7 +324,7 @@ private fun ScreenshotSection(
     sharedTransitionScope: SharedTransitionScope,
     onScreenshotClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    horizontalPadding: Dp = 12.dp,
+    horizontalPadding: Dp = 12.dp
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -333,10 +332,11 @@ private fun ScreenshotSection(
     ) {
         Text(
             text = stringResource(R.string.anime_details_screenshots),
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = horizontalPadding)
+            style = MaterialTheme.typography.titleMedium
         )
         LazyRow(
+            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(horizontal = horizontalPadding)
         ) {

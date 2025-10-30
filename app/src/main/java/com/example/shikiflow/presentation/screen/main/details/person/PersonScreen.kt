@@ -34,6 +34,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -75,6 +76,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CommentsScr
 import com.example.shikiflow.presentation.viewmodel.person.PersonViewModel
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -141,17 +143,19 @@ fun PersonScreen(
                                 top = paddingValues.calculateTopPadding(),
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                 end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            ).verticalScroll(scrollState),
+                            ).padding(horizontal = horizontalPadding)
+                            .verticalScroll(scrollState),
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
                         PersonTitleSection(
                             avatarUrl = "${BuildConfig.BASE_URL}${details.image.original}",
                             name = details.name,
                             japaneseName = details.japanese,
-                            groupedRoles = details.groupedRoles,
-                            modifier = Modifier.padding(horizontal = horizontalPadding)
+                            groupedRoles = details.groupedRoles
                         )
                         LazyRow(
+                            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                                .fillMaxWidth(),
                             contentPadding = PaddingValues(horizontal = horizontalPadding),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -200,11 +204,7 @@ fun PersonScreen(
                                         id = topicId
                                     )
                                 },
-                                modifier = Modifier.padding(
-                                    start = horizontalPadding,
-                                    end = horizontalPadding,
-                                    bottom = 8.dp
-                                )
+                                modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
                     }
@@ -226,6 +226,7 @@ fun PersonScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun PersonTitleSection(
     avatarUrl: String,
@@ -239,7 +240,8 @@ private fun PersonTitleSection(
     val mutableInteractionSource = remember { MutableInteractionSource() }
     var isExpanded by remember { mutableStateOf(false) }
     val rotationState by animateFloatAsState(
-        targetValue = if (isExpanded) 180f else 0f
+        targetValue = if (isExpanded) 180f else 0f,
+        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
 
     Row(

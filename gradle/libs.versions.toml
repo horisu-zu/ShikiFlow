@@ -1,12 +1,12 @@
 [versions]
-agp = "8.11.2"
+agp = "8.13.0"
 apollo = "4.3.3"
 material3 = "1.5.0-alpha07"
 material-icons = "1.7.8"
 browser = "1.9.0"
 coilCompose = "3.3.0"
 datastorePreferences = "1.1.7"
-kotlin = "2.2.20"
+kotlin = "2.2.21"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -29,6 +29,7 @@ hilt-navigation-compose = "1.3.0"
 zoomable = "2.8.2"
 navigation3 = "1.0.0-beta01"
 lifecycleViewmodelNavigation3Android = "2.10.0-beta01"
+pagerIndicator = "0.0.8"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -41,6 +42,7 @@ androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "ro
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
+pager-indicator = { group = "mx.platacard", name = "compose-pager-indicator", version.ref = "pagerIndicator" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 ksoup = { module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }

@@ -89,7 +89,7 @@ fun BrowseSearchPage(
         } else {
             LazyVerticalGrid(
                 state = lazyGridState,
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Adaptive(120.dp),
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),

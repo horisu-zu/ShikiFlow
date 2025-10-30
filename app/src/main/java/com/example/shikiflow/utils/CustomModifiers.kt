@@ -18,7 +18,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -87,6 +89,16 @@ fun Modifier.systemBarsVisibility(visible: Boolean): Modifier = composed {
     }
 
     this@systemBarsVisibility
+}
+
+fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
+    return this.layout { measurable, constraints ->
+        val overridenWidth = constraints.maxWidth + 2 * horizontal.roundToPx()
+        val placeable = measurable.measure(constraints.copy(maxWidth = overridenWidth))
+        layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
 }
 
 @Composable

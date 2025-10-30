@@ -41,6 +41,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.CharacterCar
 import com.example.shikiflow.presentation.screen.main.details.anime.RelatedSection
 import com.example.shikiflow.presentation.screen.main.details.common.CommentSection
 import com.example.shikiflow.utils.Converter.EntityType
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun MangaDetailsDesc(
@@ -67,8 +68,7 @@ fun MangaDetailsDesc(
         mangaDetails?.description?.let {
             ExpandableText(
                 descriptionHtml = mangaDetails.descriptionHtml ?: "",
-                modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = horizontalPadding),
+                modifier = Modifier.fillMaxWidth(),
                 style = MaterialTheme.typography.bodySmall,
                 linkColor = MaterialTheme.colorScheme.primary,
                 brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
@@ -84,7 +84,6 @@ fun MangaDetailsDesc(
                     onEntityClick(EntityType.PERSON, id)
                 },
                 modifier = Modifier.fillMaxWidth()
-                    .padding(horizontal = horizontalPadding)
             )
         }
         mangaDetails?.characterRoles?.let { characterRoles ->
@@ -94,10 +93,10 @@ fun MangaDetailsDesc(
             ) {
                 Text(
                     text = stringResource(R.string.details_characters),
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(horizontal = horizontalPadding)
+                    style = MaterialTheme.typography.titleMedium
                 )
                 LazyRow(
+                    modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -115,7 +114,7 @@ fun MangaDetailsDesc(
         statusesStats?.let {
             Box(
                 modifier = Modifier.fillMaxWidth()
-                    .padding(horizontalPadding)
+                    .padding(vertical = 12.dp)
                     .clip(RoundedCornerShape(8.dp))
                     .background(MaterialTheme.colorScheme.surface)
             ) {
@@ -136,8 +135,7 @@ fun MangaDetailsDesc(
             RelatedSection(
                 relatedItems = mangaDetails.related.map { RelatedMapper.fromMangaRelated(it) },
                 onItemClick = onItemClick,
-                onArrowClick = { showRelatedBottomSheet = true },
-                modifier = Modifier.padding(horizontal = horizontalPadding)
+                onArrowClick = { showRelatedBottomSheet = true }
             )
         }
 
@@ -147,8 +145,7 @@ fun MangaDetailsDesc(
                 isRefreshing = isRefreshing,
                 onEntityClick = onEntityClick,
                 onTopicNavigate = onTopicNavigate,
-                onLinkClick = onLinkClick,
-                modifier = Modifier.padding(horizontal = horizontalPadding)
+                onLinkClick = onLinkClick
             )
         }
     }

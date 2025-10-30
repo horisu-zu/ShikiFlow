@@ -3,8 +3,8 @@ package com.example.shikiflow.presentation.screen.main.details.character
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun CharacterMediaSection(
@@ -29,11 +30,12 @@ fun CharacterMediaSection(
     ) {
         Text(
             text = sectionTitle,
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = horizontalPadding)
+            style = MaterialTheme.typography.titleMedium
         )
         LazyRow(
-            modifier = Modifier.height(230.dp),
+            modifier = Modifier.height(230.dp)
+                .ignoreHorizontalParentPadding(horizontalPadding)
+                .fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = horizontalPadding),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {

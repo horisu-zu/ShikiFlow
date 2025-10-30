@@ -34,10 +34,9 @@ fun MainPage(
     mediaType: MediaType,
     isAtTop: Boolean,
     isAppBarVisible: Boolean,
+    onMediaClick: (String, MediaType) -> Unit,
     animeTrackViewModel: AnimeTracksViewModel = hiltViewModel(),
-    mangaTrackViewModel: MangaTracksViewModel = hiltViewModel(),
-    onAnimeClick: (String) -> Unit,
-    onMangaClick: (String) -> Unit
+    mangaTrackViewModel: MangaTracksViewModel = hiltViewModel()
 ) {
     val coroutineScope = rememberCoroutineScope()
     val tabs = UserRateStatusConstants.getStatusChips(mediaType)
@@ -68,10 +67,10 @@ fun MainPage(
             val mediaTrackItems = status?.let { statusEnum ->
                 when(mediaType) {
                     MediaType.ANIME -> MediaTrackItems.AnimeItems(
-                        animeTrackViewModel.getAnimeTracks(statusEnum).collectAsLazyPagingItems()
+                        items = animeTrackViewModel.getAnimeTracks(statusEnum).collectAsLazyPagingItems()
                     )
                     MediaType.MANGA -> MediaTrackItems.MangaItems(
-                        mangaTrackViewModel.getMangaTracks(statusEnum).collectAsLazyPagingItems()
+                        items = mangaTrackViewModel.getMangaTracks(statusEnum).collectAsLazyPagingItems()
                     )
                 }
             }
@@ -99,13 +98,17 @@ fun MainPage(
                             AnimeTracksPage(
                                 trackItems = trackItems.items,
                                 tracksViewModel = animeTrackViewModel,
-                                onAnimeClick = onAnimeClick
+                                onAnimeClick = { animeId ->
+                                    onMediaClick(animeId, mediaType)
+                                }
                             )
                         }
                         is MediaTrackItems.MangaItems -> {
                             MangaTracksPage(
                                 trackItems = trackItems.items,
-                                onMangaClick = onMangaClick
+                                onMangaClick = { mangaId ->
+                                    onMediaClick(mangaId, mediaType)
+                                }
                             )
                         }
                     }
@@ -115,7 +118,7 @@ fun MainPage(
     }
 }
 
-sealed class MediaTrackItems {
+private sealed class MediaTrackItems {
     data class AnimeItems(val items: LazyPagingItems<AnimeTrack>?) : MediaTrackItems()
     data class MangaItems(val items: LazyPagingItems<MangaTrack>?) : MediaTrackItems()
 }

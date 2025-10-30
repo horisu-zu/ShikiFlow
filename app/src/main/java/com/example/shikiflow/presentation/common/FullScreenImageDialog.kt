@@ -4,16 +4,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -28,11 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import kotlinx.coroutines.delay
+import mx.platacard.pagerindicator.PagerIndicatorOrientation
+import mx.platacard.pagerindicator.PagerWormIndicator
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -90,16 +86,21 @@ fun SharedTransitionScope.FullScreenImageDialog(
                     .clip(CircleShape)
                     .background(Color.Black.copy(alpha = 0.85f))
             ) {
-                PagerIndicator(
-                    currentIndex = pagerState.currentPage,
-                    totalCount = pagerState.pageCount,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                PagerWormIndicator(
+                    dotCount = 5,
+                    pagerState = pagerState,
+                    activeDotColor = Color.White,
+                    dotColor = Color.White.copy(alpha = 0.3f),
+                    activeDotSize = 12.dp,
+                    minDotSize = 6.dp,
+                    orientation = PagerIndicatorOrientation.Horizontal
                 )
             }
         }
     }
 }
 
+/*
 private enum class IndicatorState {
     START, MIDDLE, END
 }
@@ -141,4 +142,4 @@ private fun PagerIndicator(
             )
         }
     }
-}
+}*/

@@ -66,7 +66,7 @@ fun AnimeDetailsInfo(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if(animeDetails.studios.isNotEmpty()) {
@@ -124,7 +124,7 @@ fun AnimeDetailsInfo(
                 content = {
                     Text(
                         text = formatInstant(
-                            LocalDate.parse(it.toString())
+                            instant = LocalDate.parse(it.toString())
                                 .atStartOfDayIn(TimeZone.currentSystemDefault()),
                             includeTime = false
                         ),

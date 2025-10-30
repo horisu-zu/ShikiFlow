@@ -81,11 +81,8 @@ fun MainScreen(
                             },
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
                             isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
-                            onAnimeClick = { animeId ->
-                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
-                            },
-                            onMangaClick = { mangaId ->
-                                navOptions.navigateToDetails(mangaId, MediaType.MANGA)
+                            onMediaClick = { mediaId, mediaType ->
+                                navOptions.navigateToDetails(mediaId, mediaType)
                             }
                         )
                     }

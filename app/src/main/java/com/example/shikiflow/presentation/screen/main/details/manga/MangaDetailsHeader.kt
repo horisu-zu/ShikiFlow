@@ -52,6 +52,7 @@ import com.example.shikiflow.utils.Converter.isManga
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.StatusColor
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -71,7 +72,7 @@ fun MangaDetailsHeader(
         mangaDetails?.let {
             GradientImage(
                 model = mangaDetails.poster?.posterShort?.originalUrl,
-                modifier = Modifier.alpha(0.25f),
+                modifier = Modifier.alpha(0.25f).ignoreHorizontalParentPadding(horizontalPadding),
                 gradientFraction = 0.8f
             )
 
@@ -89,22 +90,15 @@ fun MangaDetailsHeader(
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 if (mangaDetails.status != MangaStatusEnum.anons) {
-                    ScoreItem(
-                        score = mangaDetails.score?.toFloat() ?: 0f,
-                        modifier = Modifier.padding(horizontal = horizontalPadding)
-                    )
+                    ScoreItem(score = mangaDetails.score?.toFloat() ?: 0f)
                 }
 
                 Text(
                     text = mangaDetails.name,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(horizontal = horizontalPadding)
+                    style = MaterialTheme.typography.headlineSmall
                 )
 
-                Row(
-                    modifier = Modifier.padding(horizontal = horizontalPadding),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     ShortInfoItem(
                         infoType = stringResource(R.string.details_short_info_manga_type),
                         infoItem = buildString {
@@ -159,12 +153,13 @@ fun MangaDetailsHeader(
                     mangaDexResource = mangaDexResource,
                     onStatusClick = { onStatusClick() },
                     onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails.name) },
-                    onMangaDexRefreshClick = onMangaDexRefreshClick,
-                    modifier = Modifier.padding(horizontal = horizontalPadding)
+                    onMangaDexRefreshClick = onMangaDexRefreshClick
                 )
 
                 LazyRow(
-                    modifier = Modifier.padding(top = 4.dp),
+                    modifier = Modifier.padding(top = 4.dp)
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {

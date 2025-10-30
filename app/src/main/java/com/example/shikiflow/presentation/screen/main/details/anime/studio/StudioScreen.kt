@@ -135,7 +135,7 @@ fun StudioScreen(
         } else {
             LazyVerticalGrid(
                 state = lazyGridState,
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Adaptive(120.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(

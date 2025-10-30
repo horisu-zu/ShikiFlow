@@ -23,6 +23,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.graphql.AnimeDetailsQuery
@@ -38,11 +39,13 @@ import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun AnimeDetailsTitle(
     animeDetails: AnimeDetailsQuery.Anime,
+    horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onPlayClick: (String, String, Int) -> Unit,
     modifier: Modifier = Modifier
@@ -53,7 +56,8 @@ fun AnimeDetailsTitle(
         GradientImage(
             model = animeDetails.poster?.originalUrl,
             gradientFraction = 0.9f,
-            imageType = ImageType.Poster(defaultClip = RoundedCornerShape(0.dp))
+            imageType = ImageType.Poster(defaultClip = RoundedCornerShape(0.dp)),
+            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
         )
 
         Column(
@@ -62,18 +66,17 @@ fun AnimeDetailsTitle(
             if (animeDetails.status != AnimeStatusEnum.anons) {
                 ScoreItem(
                     score = animeDetails.score?.toFloat() ?: 0f,
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
 
             Text(
                 text = animeDetails.name,
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                style = MaterialTheme.typography.headlineSmall
             )
 
             Row(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                modifier = Modifier.padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 ShortInfoItem(
@@ -118,8 +121,7 @@ fun AnimeDetailsTitle(
                 allEpisodes = if(animeDetails.status == AnimeStatusEnum.released) animeDetails.episodes
                     else animeDetails.episodesAired,
                 watchedEpisodes = animeDetails.userRate?.episodes,
-                score = animeDetails.userRate?.score,
-                modifier = Modifier.padding(horizontal = 12.dp)
+                score = animeDetails.userRate?.score
             )
         }
     }

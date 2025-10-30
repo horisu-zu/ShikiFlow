@@ -76,7 +76,8 @@ fun MangaDetailsScreen(
                             .padding(
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                 end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                            ).verticalScroll(rememberScrollState())
+                            ).padding(horizontal = horizontalPadding)
+                            .verticalScroll(rememberScrollState())
                     ) {
                         MangaDetailsHeader(
                             mangaDetails = mangaDetails.data,

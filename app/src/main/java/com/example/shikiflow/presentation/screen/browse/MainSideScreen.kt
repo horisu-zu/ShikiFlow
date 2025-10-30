@@ -73,7 +73,7 @@ fun MainSideScreen(
         }
     } else {
         LazyVerticalGrid(
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Adaptive(120.dp),
             state = lazyGridState,
             modifier = modifier,
             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),

@@ -60,6 +60,7 @@ fun AnimeDetailsScreen(
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
     var rateBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val horizontalPadding = 12.dp
 
     LaunchedEffect(id) {
         animeDetailsViewModel.getAnimeDetails(id)
@@ -102,12 +103,14 @@ fun AnimeDetailsScreen(
                                 .padding(
                                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                                ).verticalScroll(rememberScrollState()),
+                                ).padding(horizontal = horizontalPadding)
+                                .verticalScroll(rememberScrollState()),
                             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                         ) {
                             animeDetails.data?.let { details ->
                                 AnimeDetailsTitle(
                                     animeDetails = details,
+                                    horizontalPadding = horizontalPadding,
                                     onStatusClick = { rateBottomSheet = true },
                                     onPlayClick = { title, id, completedEpisodes ->
                                         navOptions.navigateToAnimeWatch(title, id, completedEpisodes)
@@ -115,6 +118,7 @@ fun AnimeDetailsScreen(
                                 )
                                 AnimeDetailsDesc(
                                     animeDetails = details,
+                                    horizontalPadding = horizontalPadding,
                                     selectedScreenshotIndex = selectedScreenshotIndex,
                                     sharedTransitionScope = this@SharedTransitionLayout,
                                     isRefreshing = isRefreshing,

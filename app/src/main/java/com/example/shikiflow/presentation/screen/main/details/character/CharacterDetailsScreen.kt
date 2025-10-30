@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -50,6 +51,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CommentSect
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -119,14 +121,14 @@ fun CharacterDetailsScreen(
                             top = innerPadding.calculateTopPadding(),
                             start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                             end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                        ).verticalScroll(scrollState),
+                        ).padding(horizontal = horizontalPadding)
+                            .verticalScroll(scrollState),
                         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                     ) {
                         CharacterTitleSection(
                             avatarUrl = "${BuildConfig.BASE_URL}${characterDetails.image.original}",
                             name = characterDetails.name,
-                            japaneseName = characterDetails.japanese,
-                            modifier = Modifier.padding(horizontal = horizontalPadding)
+                            japaneseName = characterDetails.japanese
                         )
                         characterDetails.descriptionHtml?.let { description ->
                             ExpandableText(
@@ -137,11 +139,12 @@ fun CharacterDetailsScreen(
                                     navOptions.navigateByEntity(entityType, id)
                                 }, onLinkClick = { url ->
                                     customTabIntent.launchUrl(context, url.toUri())
-                                },
-                                modifier = Modifier.padding(horizontal = horizontalPadding)
+                                }
                             )
                         }
                         LazyRow(
+                            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                                .fillMaxWidth(),
                             contentPadding = PaddingValues(horizontal = horizontalPadding),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
@@ -193,11 +196,7 @@ fun CharacterDetailsScreen(
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
                                 },
-                                modifier = Modifier.padding(
-                                    start = horizontalPadding,
-                                    end = horizontalPadding,
-                                    bottom = 8.dp
-                                )
+                                modifier = Modifier.padding(bottom = 8.dp)
                             )
                         }
                     }

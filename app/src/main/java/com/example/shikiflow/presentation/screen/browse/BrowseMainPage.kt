@@ -213,7 +213,7 @@ private fun BrowseGridComponent(
 
     LazyVerticalGrid(
         state = lazyGridState,
-        columns = GridCells.Fixed(3),
+        columns = GridCells.Adaptive(120.dp),
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),

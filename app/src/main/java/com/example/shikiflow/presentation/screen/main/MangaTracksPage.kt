@@ -42,7 +42,7 @@ fun MangaTracksPage(
             )
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
+                columns = GridCells.Adaptive(120.dp),
                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
