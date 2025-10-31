@@ -45,7 +45,7 @@ import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun MangaDetailsDesc(
-    mangaDetails: MangaDetailsQuery.Manga?,
+    mangaDetails: MangaDetailsQuery.Manga,
     horizontalPadding: Dp,
     isRefreshing: Boolean,
     onItemClick: (String, MediaType) -> Unit,
@@ -56,7 +56,7 @@ fun MangaDetailsDesc(
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
     val statusesStats = remember {
-        mangaDetails?.statusesStats?.associate {
+        mangaDetails.statusesStats?.associate {
             simpleMapUserRateStatusToString(it.status, MediaType.MANGA) to it.count
         }
     }
@@ -65,7 +65,7 @@ fun MangaDetailsDesc(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
-        mangaDetails?.description?.let {
+        mangaDetails.description?.let {
             ExpandableText(
                 descriptionHtml = mangaDetails.descriptionHtml ?: "",
                 modifier = Modifier.fillMaxWidth(),
@@ -77,7 +77,7 @@ fun MangaDetailsDesc(
                 }, onLinkClick = onLinkClick
             )
         }
-        mangaDetails?.personRoles?.let { personRoles ->
+        mangaDetails.personRoles?.let { personRoles ->
             AuthorSection(
                 personRoles = personRoles,
                 onPersonClick = { id ->
@@ -86,7 +86,7 @@ fun MangaDetailsDesc(
                 modifier = Modifier.fillMaxWidth()
             )
         }
-        mangaDetails?.characterRoles?.let { characterRoles ->
+        mangaDetails.characterRoles?.let { characterRoles ->
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -122,7 +122,7 @@ fun MangaDetailsDesc(
                     groupedData = statusesStats.mapKeys { statusEntry ->
                         stringResource(id = statusEntry.key)
                     },
-                    totalCount = mangaDetails?.statusesStats?.size ?: 0,
+                    totalCount = mangaDetails.statusesStats?.size ?: 0,
                     modifier = Modifier.padding(12.dp),
                     itemShape = RoundedCornerShape(3.dp),
                     rowHeight = 16.dp,
@@ -131,7 +131,7 @@ fun MangaDetailsDesc(
             }
         }
 
-        if(mangaDetails?.related != null && mangaDetails.related.isNotEmpty()) {
+        if(mangaDetails.related != null && mangaDetails.related.isNotEmpty()) {
             RelatedSection(
                 relatedItems = mangaDetails.related.map { RelatedMapper.fromMangaRelated(it) },
                 onItemClick = onItemClick,
@@ -139,7 +139,7 @@ fun MangaDetailsDesc(
             )
         }
 
-        mangaDetails?.topic?.id?.let { topicId ->
+        mangaDetails.topic?.id?.let { topicId ->
             CommentSection(
                 topicId = topicId,
                 isRefreshing = isRefreshing,
@@ -151,7 +151,7 @@ fun MangaDetailsDesc(
     }
 
     RelatedBottomSheet(
-        relatedItems = mangaDetails?.related?.map { RelatedMapper.fromMangaRelated(it) } ?: emptyList(),
+        relatedItems = mangaDetails.related?.map { RelatedMapper.fromMangaRelated(it) } ?: emptyList(),
         showBottomSheet = showRelatedBottomSheet,
         onItemClick = onItemClick,
         onDismiss = { showRelatedBottomSheet = false }

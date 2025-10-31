@@ -63,7 +63,7 @@ fun AnimeTrackItem(
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 //fontSize = 10.sp,
-                maxLines = 1,
+                maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
 
@@ -96,7 +96,8 @@ fun AnimeTrackItem(
                                 else -> null
                             }
                             totalEpisodes?.let { userRate.track.episodes.toFloat() / it } ?: 0f
-                        }
+                        },
+                        modifier = Modifier.fillMaxWidth()
                     )
                     Text(
                         text = stringResource(

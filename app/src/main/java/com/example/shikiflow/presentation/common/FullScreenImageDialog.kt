@@ -85,6 +85,7 @@ fun SharedTransitionScope.FullScreenImageDialog(
                     .padding(all = 32.dp)
                     .clip(CircleShape)
                     .background(Color.Black.copy(alpha = 0.85f))
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 PagerWormIndicator(
                     dotCount = 5,

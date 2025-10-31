@@ -79,42 +79,43 @@ fun MangaDetailsScreen(
                             ).padding(horizontal = horizontalPadding)
                             .verticalScroll(rememberScrollState())
                     ) {
-                        MangaDetailsHeader(
-                            mangaDetails = mangaDetails.data,
-                            mangaDexResource = mangaDexIds,
-                            horizontalPadding = horizontalPadding,
-                            onStatusClick = { rateBottomSheet = true },
-                            onMangaDexNavigateClick = { title ->
-                                navOptions.navigateToMangaRead(
-                                    mangaDexIds = mangaDexIds.data ?: emptyList(),
-                                    title = title,
-                                    completedChapters = mangaDetails.data
-                                        ?.userRate?.chapters ?: 0
-                                )
-                            },
-                            onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) }
-                        )
+                        mangaDetails.data?.let { mangaDetails ->
+                            MangaDetailsHeader(
+                                mangaDetails = mangaDetails,
+                                mangaDexResource = mangaDexIds,
+                                horizontalPadding = horizontalPadding,
+                                onStatusClick = { rateBottomSheet = true },
+                                onMangaDexNavigateClick = { title ->
+                                    navOptions.navigateToMangaRead(
+                                        mangaDexIds = mangaDexIds.data ?: emptyList(),
+                                        title = title,
+                                        completedChapters = mangaDetails.userRate?.chapters ?: 0
+                                    )
+                                },
+                                onMangaDexRefreshClick = { mangaDetailsViewModel.getMangaDetails(id) }
+                            )
 
-                        MangaDetailsDesc(
-                            mangaDetails = mangaDetails.data,
-                            horizontalPadding = horizontalPadding,
-                            isRefreshing = isRefreshing,
-                            onItemClick = { id, mediaType ->
-                                if(mediaType == MediaType.ANIME) {
-                                    navOptions.navigateToAnimeDetails(id)
-                                } else navOptions.navigateToMangaDetails(id)
-                            },
-                            onEntityClick = { entityType, id ->
-                                navOptions.navigateByEntity(entityType, id)
-                            },
-                            onLinkClick = { url ->
-                                WebIntent.openUrlCustomTab(context, url)
-                            },
-                            onTopicNavigate = { topicId ->
-                                navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
-                            },
-                            modifier = Modifier.padding(vertical = 12.dp)
-                        )
+                            MangaDetailsDesc(
+                                mangaDetails = mangaDetails,
+                                horizontalPadding = horizontalPadding,
+                                isRefreshing = isRefreshing,
+                                onItemClick = { id, mediaType ->
+                                    if (mediaType == MediaType.ANIME) {
+                                        navOptions.navigateToAnimeDetails(id)
+                                    } else navOptions.navigateToMangaDetails(id)
+                                },
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                },
+                                onLinkClick = { url ->
+                                    WebIntent.openUrlCustomTab(context, url)
+                                },
+                                onTopicNavigate = { topicId ->
+                                    navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
+                                },
+                                modifier = Modifier.padding(vertical = 12.dp)
+                            )
+                        }
                     }
                 }
             }

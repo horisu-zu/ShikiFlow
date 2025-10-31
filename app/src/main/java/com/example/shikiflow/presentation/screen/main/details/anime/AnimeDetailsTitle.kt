@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -50,13 +52,17 @@ fun AnimeDetailsTitle(
     onPlayClick: (String, String, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
-        modifier = modifier.fillMaxWidth()
-    ) {
+    val orientation = LocalConfiguration.current.orientation
+
+    Box(modifier = modifier.fillMaxWidth()) {
         GradientImage(
             model = animeDetails.poster?.originalUrl,
             gradientFraction = 0.9f,
-            imageType = ImageType.Poster(defaultClip = RoundedCornerShape(0.dp)),
+            imageType = ImageType.Poster(
+                defaultClip = RoundedCornerShape(0.dp),
+                defaultAspectRatio = if(orientation == Configuration.ORIENTATION_PORTRAIT)
+                    2f / 2.85f else 2.25f
+            ),
             modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
         )
 

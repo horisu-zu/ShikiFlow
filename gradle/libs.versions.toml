@@ -3,6 +3,8 @@ agp = "8.13.0"
 apollo = "4.3.3"
 material3 = "1.5.0-alpha07"
 material-icons = "1.7.8"
+material3-adaptive = "1.2.0"
+material3-adaptive-navigation-suite = "1.4.0"
 browser = "1.9.0"
 coilCompose = "3.3.0"
 datastorePreferences = "1.1.7"
@@ -67,6 +69,8 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-material-icons = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "material-icons" }
+androidx-material3-adaptive = { group = "androidx.compose.material3.adaptive", name = "adaptive", version.ref = "material3-adaptive" }
+androidx-material3-navigation-suite = { group = "androidx.compose.material3", name = "material3-adaptive-navigation-suite", version.ref = "material3-adaptive-navigation-suite" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }

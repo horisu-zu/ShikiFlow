@@ -171,39 +171,37 @@ private fun MoreSearchContent(
         userSearchViewModel.paginatedUsers(query)
     }.collectAsLazyPagingItems()
 
-    Box(modifier = modifier.fillMaxSize()) {
-        if(userSearchData.loadState.refresh is LoadState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(userSearchData.loadState.refresh is LoadState.Error) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = stringResource(R.string.common_error),
-                    buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { userSearchData.refresh() }
-                )
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-                contentPadding = PaddingValues(vertical = 12.dp)
-            ) {
-                items(
-                    count = userSearchData.itemCount,
-                    key = userSearchData.itemKey { it.id }
-                ) { index ->
-                    userSearchData[index]?.let { user ->
-                        UserItem(
-                            user = user,
-                            onClick = { userId -> moreNavOptions.navigateToProfile(user) }
-                        )
-                    }
+    if(userSearchData.loadState.refresh is LoadState.Loading) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) { CircularProgressIndicator() }
+    } else if(userSearchData.loadState.refresh is LoadState.Error) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            ErrorItem(
+                message = stringResource(R.string.common_error),
+                buttonLabel = stringResource(R.string.common_retry),
+                onButtonClick = { userSearchData.refresh() }
+            )
+        }
+    } else {
+        LazyColumn(
+            modifier = modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+            contentPadding = PaddingValues(vertical = 12.dp)
+        ) {
+            items(
+                count = userSearchData.itemCount,
+                key = userSearchData.itemKey { it.id }
+            ) { index ->
+                userSearchData[index]?.let { user ->
+                    UserItem(
+                        user = user,
+                        onClick = { userId -> moreNavOptions.navigateToProfile(user) }
+                    )
                 }
             }
         }

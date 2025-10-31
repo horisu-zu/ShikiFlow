@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,7 +28,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,6 +59,14 @@ fun ProfileScreen(
     val userRateData by userRateViewModel.userRateData.collectAsStateWithLifecycle()
     val isRefreshing by userRateViewModel.isRefreshing
 
+    val scrollState = rememberScrollState()
+
+    val isAtTop by remember {
+        derivedStateOf {
+            scrollState.value <= 0
+        }
+    }
+
     LaunchedEffect(Unit) {
         userData?.id?.let { userId ->
             userRateViewModel.loadUserRates(userId.toLong())
@@ -64,25 +75,29 @@ fun ProfileScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(id = R.string.profile),
-                        style = MaterialTheme.typography.headlineSmall
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { moreNavOptions.navigateBack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back to Main"
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(id = R.string.profile),
+                            style = MaterialTheme.typography.headlineSmall
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
-            )
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = { moreNavOptions.navigateBack() }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = "Back to Main"
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = if(isAtTop) MaterialTheme.colorScheme.background
+                            else MaterialTheme.colorScheme.surface
+                    ),
+                )
+                if(!isAtTop) HorizontalDivider()
+            }
         }
     ) { innerPadding ->
         userData?.let {
@@ -96,10 +111,12 @@ fun ProfileScreen(
                 is Resource.Success -> {
                     PullToRefreshBox(
                         modifier = Modifier.fillMaxSize()
+                            .verticalScroll(scrollState)
                             .padding(
                                 top = innerPadding.calculateTopPadding(),
                                 start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
-                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp,
+                                bottom = 16.dp
                             ),
                         isRefreshing = isRefreshing,
                         onRefresh = {
@@ -107,8 +124,7 @@ fun ProfileScreen(
                         }
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxSize()
-                                .verticalScroll(rememberScrollState()),
+                            modifier = Modifier.fillMaxSize(),
                             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                         ) {
                             CurrentUser(
