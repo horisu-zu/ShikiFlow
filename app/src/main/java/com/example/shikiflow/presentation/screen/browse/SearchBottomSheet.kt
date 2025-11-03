@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
@@ -65,7 +67,8 @@ fun SearchBottomSheet(
         }
 
         Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 16.dp),
+            modifier = Modifier.verticalScroll(rememberScrollState())
+                .padding(horizontal = 12.dp, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
             ChipSection(

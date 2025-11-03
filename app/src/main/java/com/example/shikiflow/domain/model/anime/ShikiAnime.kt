@@ -3,10 +3,9 @@ package com.example.shikiflow.domain.model.anime
 import com.example.graphql.type.AnimeKindEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.common.ShikiImage
-import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.common.ShikiImageSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class ShikiAnime(
@@ -14,6 +13,7 @@ data class ShikiAnime(
     val name: String? = null,
     val russian: String? = null,
     val url: String? = null,
+    @Serializable(with = ShikiImageSerializer::class)
     val image: ShikiImage? = null,
     val kind: String? = null,
     val score: String? = null,
@@ -25,7 +25,6 @@ data class ShikiAnime(
     val roles: List<String>? = null,
     val role: String? = null
 )
-
 
 fun ShikiAnime.toBrowseAnime(): Browse.Anime {
     return Browse.Anime(

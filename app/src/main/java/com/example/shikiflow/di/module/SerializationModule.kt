@@ -18,6 +18,7 @@ object SerializationModule {
     fun provideJson(): Json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
+        explicitNulls = false
         serializersModule = kotlinx.serialization.modules.SerializersModule {
             contextual(Instant::class, InstantSerializer)
         }

@@ -38,10 +38,8 @@ fun TrackSection(
     val animeTrackData = userRateData.filter { it.targetType == TargetType.ANIME }
     val mangaTrackData = userRateData.filter { it.targetType == TargetType.MANGA }
 
-    val animeItemsCount = animeTrackData.size
     val groupedAnimeData = animeTrackData.groupAndSortByStatus(MediaType.ANIME)
 
-    val mangaItemsCount = mangaTrackData.size
     val groupedMangaData = mangaTrackData.groupAndSortByStatus(MediaType.MANGA)
 
     Column(
@@ -87,7 +85,7 @@ fun TrackSection(
             groupedData = groupedAnimeData.mapKeys { (resId, size) ->
                 stringResource(resId)
             },
-            itemsCount = animeItemsCount
+            itemsCount = animeTrackData.size
         )
 
         TrackItem(
@@ -96,7 +94,7 @@ fun TrackSection(
             groupedData = groupedMangaData.mapKeys { (resId, size) ->
                 stringResource(resId)
             },
-            itemsCount = mangaItemsCount
+            itemsCount = mangaTrackData.size
         )
     }
 }

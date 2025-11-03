@@ -1,7 +1,6 @@
 package com.example.shikiflow.domain.usecase
 
 import android.util.Log
-import coil3.network.HttpException
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.userrate.ComparisonType
 import com.example.shikiflow.domain.model.userrate.MediaComparison
@@ -13,6 +12,7 @@ import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import retrofit2.HttpException
 import javax.inject.Inject
 
 class GroupUserRatesUseCase @Inject constructor(
@@ -83,7 +83,7 @@ class GroupUserRatesUseCase @Inject constructor(
 
             return Resource.Success(result)
         } catch (e: HttpException) {
-            return if(e.response.code == 403) {
+            return if(e.response()?.code() == 403) {
                 Resource.Error(message = "Target User's rates are private")
             } else {
                 Resource.Error(e.localizedMessage ?: "Network error: ${e.message}")

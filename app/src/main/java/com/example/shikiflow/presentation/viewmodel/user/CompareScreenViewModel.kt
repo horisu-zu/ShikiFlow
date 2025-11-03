@@ -35,7 +35,7 @@ class CompareScreenViewModel @Inject constructor(
         mediaType: MediaType
     ) {
         viewModelScope.launch {
-            if(_targetUserId[mediaType] == targetUserId) {
+            if(_targetUserId[mediaType] == targetUserId && _userRates.value[mediaType] is Resource.Success) {
                 return@launch
             } else {
                 _userRates.update { currentMap ->

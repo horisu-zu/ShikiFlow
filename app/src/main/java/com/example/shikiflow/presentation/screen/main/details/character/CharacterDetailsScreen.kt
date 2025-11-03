@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.character
 
-import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -36,7 +35,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.BuildConfig
@@ -51,6 +49,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CommentSect
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +60,6 @@ fun CharacterDetailsScreen(
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
     val characterDetailsState by characterDetailsViewModel.characterDetails.collectAsStateWithLifecycle()
-    val customTabIntent = CustomTabsIntent.Builder().build()
     val context = LocalContext.current
 
     val scrollState = rememberScrollState()
@@ -90,7 +88,7 @@ fun CharacterDetailsScreen(
                         onClick = { navOptions.navigateBack() }
                     ) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Back to Main"
                         )
                     }
@@ -138,22 +136,24 @@ fun CharacterDetailsScreen(
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
                                 }, onLinkClick = { url ->
-                                    customTabIntent.launchUrl(context, url.toUri())
+                                    WebIntent.openUrlCustomTab(context, url)
                                 }
                             )
                         }
-                        LazyRow(
-                            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
-                                .fillMaxWidth(),
-                            contentPadding = PaddingValues(horizontal = horizontalPadding),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(characterDetails.seyu ?: emptyList()) { seyuItem ->
-                                CharacterCard(
-                                    characterPoster = "${BuildConfig.BASE_URL}${seyuItem.image?.original}",
-                                    characterName = seyuItem.name ?: "Unknown",
-                                    onClick = { navOptions.navigateToPerson(seyuItem.id.toString()) }
-                                )
+                        if(!characterDetails.seyu.isNullOrEmpty()) {
+                            LazyRow(
+                                modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                                    .fillMaxWidth(),
+                                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(items = characterDetails.seyu) { seyuItem ->
+                                    CharacterCard(
+                                        characterPoster = "${BuildConfig.BASE_URL}${seyuItem.image?.original}",
+                                        characterName = seyuItem.name,
+                                        onClick = { navOptions.navigateToPerson(seyuItem.id.toString()) }
+                                    )
+                                }
                             }
                         }
                         if(!characterDetails.animes.isNullOrEmpty()) {
@@ -191,7 +191,7 @@ fun CharacterDetailsScreen(
                                     )
                                 },
                                 onLinkClick = { url ->
-                                    customTabIntent.launchUrl(context, url.toUri())
+                                    WebIntent.openUrlCustomTab(context, url)
                                 },
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)

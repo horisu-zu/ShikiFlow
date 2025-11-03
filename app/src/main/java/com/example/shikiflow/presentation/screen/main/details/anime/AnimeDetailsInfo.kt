@@ -64,9 +64,7 @@ fun AnimeDetailsInfo(
         }
     }
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         if(animeDetails.studios.isNotEmpty()) {

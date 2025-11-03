@@ -161,8 +161,7 @@ fun AnimeDetailsDesc(
             onSimilarClick = { animeId, title -> onSimilarClick(animeId, title) },
             onExternalLinksClick = onExternalLinksClick,
             onEntityClick = onEntityClick,
-            onTopicNavigate = onTopicNavigate,
-            modifier = Modifier.fillMaxWidth()
+            onTopicNavigate = onTopicNavigate
         )
     }
 

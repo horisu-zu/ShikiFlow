@@ -153,7 +153,6 @@ private fun GraphCanvas(
         drawAxes(
             dimensions = dimensions,
             style = axisStyle,
-            textStyle = textStyle,
             gridType = gridType,
             maxValue = roundedMaxValue
         )
@@ -201,7 +200,6 @@ private fun DrawScope.drawAxes(
     dimensions: GraphDimensions,
     style: GraphStyle.Axis,
     gridType: GraphGridType,
-    textStyle: GraphStyle.Text,
     maxValue: Float
 ) {
     val axisPath = Path().apply {

@@ -3,14 +3,16 @@ package com.example.shikiflow.domain.model.character
 import com.example.shikiflow.domain.model.anime.ShikiAnime
 import com.example.shikiflow.domain.model.anime.ShikiManga
 import com.example.shikiflow.domain.model.common.ShikiImage
+import com.example.shikiflow.domain.model.common.ShikiImageSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ShikiCharacter(
-    val id: Int?,
-    val name: String?,
+    val id: Int,
+    val name: String,
     val russian: String?,
+    @Serializable(with = ShikiImageSerializer::class)
     val image: ShikiImage,
     @SerialName("altname") val altName: String?,
     val japanese: String?,

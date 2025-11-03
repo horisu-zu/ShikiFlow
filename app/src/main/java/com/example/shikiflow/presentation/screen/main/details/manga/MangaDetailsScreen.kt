@@ -50,7 +50,6 @@ fun MangaDetailsScreen(
     val rateUpdateState by mangaDetailsViewModel.rateUpdateState
     val isRefreshing by mangaDetailsViewModel.isRefreshing
 
-    val horizontalPadding = 12.dp
     var rateBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
 
@@ -67,17 +66,19 @@ fun MangaDetailsScreen(
                 ) { CircularProgressIndicator() }
             }
             is Resource.Success -> {
+                val horizontalPadding = 12.dp
+
                 PullToRefreshBox(
                     isRefreshing = isRefreshing,
                     onRefresh = { mangaDetailsViewModel.getMangaDetails(id, isRefresh = true) }
                 ) {
                     Column(
                         modifier = Modifier.fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                             .padding(
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                 end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                             ).padding(horizontal = horizontalPadding)
-                            .verticalScroll(rememberScrollState())
                     ) {
                         mangaDetails.data?.let { mangaDetails ->
                             MangaDetailsHeader(

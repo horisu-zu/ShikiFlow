@@ -5,6 +5,7 @@ import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
+import com.example.shikiflow.domain.model.user.UserFavoritesResponse
 import com.example.shikiflow.domain.model.userrate.ShortUserRate
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -61,4 +62,9 @@ interface UserApi {
     suspend fun createUserRate(
         @Body createRequest: CreateUserRateRequest
     ): UserRateResponse
+
+    @GET("/api/users/{id}/favourites")
+    suspend fun getUserFavorites(
+        @Path("id") userId: Long
+    ): UserFavoritesResponse
 }

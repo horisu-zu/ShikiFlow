@@ -153,25 +153,27 @@ fun PersonScreen(
                             japaneseName = details.japanese,
                             groupedRoles = details.groupedRoles
                         )
-                        LazyRow(
-                            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
-                                .fillMaxWidth(),
-                            contentPadding = PaddingValues(horizontal = horizontalPadding),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            items(details.roles) { role ->
-                                role.characters.forEach { character ->
-                                    CharacterCard(
-                                        characterPoster = "${BuildConfig.BASE_URL}${character.image.original}",
-                                        characterName = character.name,
-                                        onClick = { navOptions.navigateToCharacterDetails(
-                                            characterId = character.id.toString()
-                                        ) }
-                                    )
+                        details.roles?.let {
+                            LazyRow(
+                                modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                                    .fillMaxWidth(),
+                                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(details.roles) { role ->
+                                    role.characters.forEach { character ->
+                                        CharacterCard(
+                                            characterPoster = "${BuildConfig.BASE_URL}${character.image.original}",
+                                            characterName = character.name,
+                                            onClick = { navOptions.navigateToCharacterDetails(
+                                                characterId = character.id.toString()
+                                            ) }
+                                        )
+                                    }
                                 }
                             }
                         }
-                        if(details.works.isNotEmpty()) {
+                        if(!details.works.isNullOrEmpty()) {
                             val browseItems = details.works.mapNotNull { work ->
                                 when {
                                     work.anime != null -> work.anime.toBrowseAnime()
@@ -232,7 +234,7 @@ private fun PersonTitleSection(
     avatarUrl: String,
     name: String?,
     japaneseName: String?,
-    groupedRoles: List<GroupedRole>,
+    groupedRoles: List<GroupedRole>?,
     modifier: Modifier = Modifier
 ) {
     val componentHeight = 120.dp
@@ -314,25 +316,27 @@ private fun PersonTitleSection(
             )
         }
 
-        AnimatedVisibility(
-            visible = isExpanded,
-            enter = expandHorizontally(
-                expandFrom = Alignment.Start,
-                animationSpec = spring(
-                    stiffness = Spring.StiffnessMedium
-                )
-            ),
-            exit = shrinkHorizontally(
-                shrinkTowards = Alignment.Start,
-                animationSpec = spring(
-                    stiffness = Spring.StiffnessMedium
-                )
-            ),
-            modifier = Modifier.height(componentHeight)
-                .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
-            PersonGroupedRoles(groupedRoles = groupedRoles)
+        groupedRoles?.let {
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = expandHorizontally(
+                    expandFrom = Alignment.Start,
+                    animationSpec = spring(
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ),
+                exit = shrinkHorizontally(
+                    shrinkTowards = Alignment.Start,
+                    animationSpec = spring(
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ),
+                modifier = Modifier.height(componentHeight)
+                    .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+            ) {
+                PersonGroupedRoles(groupedRoles = groupedRoles)
+            }
         }
     }
 }

@@ -109,13 +109,15 @@ fun ProfileScreen(
                     ) { CircularProgressIndicator() }
                 }
                 is Resource.Success -> {
+                    val horizontalPadding = 16.dp
+
                     PullToRefreshBox(
                         modifier = Modifier.fillMaxSize()
                             .verticalScroll(scrollState)
                             .padding(
                                 top = innerPadding.calculateTopPadding(),
-                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 16.dp,
-                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 16.dp,
+                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + horizontalPadding,
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + horizontalPadding,
                                 bottom = 16.dp
                             ),
                         isRefreshing = isRefreshing,
@@ -149,13 +151,19 @@ fun ProfileScreen(
                                     modifier = Modifier.weight(1f)
                                 )
                             }
-                            TrackSection(
-                                isCurrentUser = currentUserId == userData.id,
-                                userRateData = userRateData.data ?: emptyList(),
-                                onCompareClick = {
-                                    moreNavOptions.navigateToCompare(userData)
-                                }
-                            )
+                            userRateData.data?.let { rateExpanded ->
+                                TrackSection(
+                                    isCurrentUser = currentUserId == userData.id,
+                                    userRateData = rateExpanded.userRates,
+                                    onCompareClick = {
+                                        moreNavOptions.navigateToCompare(userData)
+                                    }
+                                )
+                                FavoritesSection(
+                                    userFavoritesData = rateExpanded.userFavorites,
+                                    horizontalPadding = horizontalPadding
+                                )
+                            }
                         }
                     }
                 }
@@ -165,7 +173,7 @@ fun ProfileScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(
-                            message = stringResource(R.string.common_error),
+                            message = userRateData.message ?: stringResource(R.string.common_error),
                             buttonLabel = stringResource(R.string.common_retry),
                             onButtonClick = {
                                 userRateViewModel.loadUserRates(userData.id.toLong())

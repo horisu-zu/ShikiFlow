@@ -3,6 +3,7 @@ package com.example.shikiflow.domain.model.anime
 import com.example.graphql.type.MangaKindEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.common.ShikiImage
+import com.example.shikiflow.domain.model.common.ShikiImageSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -13,6 +14,7 @@ data class ShikiManga(
     val name: String? = null,
     val russian: String? = null,
     val url: String? = null,
+    @Serializable(with = ShikiImageSerializer::class)
     val image: ShikiImage? = null,
     val kind: String? = null,
     val score: String? = null,

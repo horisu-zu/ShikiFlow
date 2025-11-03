@@ -4,8 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class ShikiImage(
-    val original: String?,
-    val preview: String?,
-    val x96: String?,
-    val x48: String?
+    val original: String? = null,
+    val preview: String? = null,
+    val x96: String? = null,
+    val x48: String? = null
 )

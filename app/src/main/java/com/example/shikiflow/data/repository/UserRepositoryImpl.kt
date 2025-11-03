@@ -12,6 +12,7 @@ import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.User.Companion.toDomain
+import com.example.shikiflow.domain.model.user.UserFavoritesResponse
 import com.example.shikiflow.domain.model.user.UserHistoryResponse
 import com.example.shikiflow.domain.model.userrate.ShortUserRate
 import com.example.shikiflow.domain.repository.UserRepository
@@ -120,4 +121,6 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun createUserRate(createRequest: CreateUserRateRequest): UserRateResponse =
         userApi.createUserRate(createRequest)
+
+    override suspend fun getUserFavorites(userId: Long): UserFavoritesResponse = userApi.getUserFavorites(userId)
 }

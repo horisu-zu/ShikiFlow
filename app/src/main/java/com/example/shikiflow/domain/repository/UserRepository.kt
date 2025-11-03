@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.domain.model.tracks.UserRateRequest
 import com.example.shikiflow.domain.model.tracks.UserRateResponse
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserFavoritesResponse
 import com.example.shikiflow.domain.model.userrate.ShortUserRate
 
 interface UserRepository {
@@ -56,4 +57,6 @@ interface UserRepository {
     ): UserRateResponse
 
     suspend fun createUserRate(createRequest: CreateUserRateRequest): UserRateResponse
+
+    suspend fun getUserFavorites(userId: Long): UserFavoritesResponse
 }

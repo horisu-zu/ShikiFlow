@@ -60,7 +60,6 @@ fun AnimeDetailsScreen(
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
     var rateBottomSheet by remember { mutableStateOf(false) }
     val context = LocalContext.current
-    val horizontalPadding = 12.dp
 
     LaunchedEffect(id) {
         animeDetailsViewModel.getAnimeDetails(id)
@@ -76,6 +75,8 @@ fun AnimeDetailsScreen(
             }
 
             is Resource.Success -> {
+                val horizontalPadding = 12.dp
+
                 SharedTransitionLayout {
                     AnimatedVisibility(
                         visible = selectedScreenshotIndex != null,
@@ -100,11 +101,12 @@ fun AnimeDetailsScreen(
                     ) {
                         Column(
                             modifier = Modifier.fillMaxSize()
+                                .verticalScroll(rememberScrollState())
                                 .padding(
                                     start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                                ).padding(horizontal = horizontalPadding)
-                                .verticalScroll(rememberScrollState()),
+                                    bottom = 12.dp
+                                ).padding(horizontal = horizontalPadding),
                             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                         ) {
                             animeDetails.data?.let { details ->

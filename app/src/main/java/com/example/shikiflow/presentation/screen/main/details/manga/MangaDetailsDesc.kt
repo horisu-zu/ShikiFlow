@@ -55,10 +55,8 @@ fun MangaDetailsDesc(
     modifier: Modifier = Modifier
 ) {
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
-    val statusesStats = remember {
-        mangaDetails.statusesStats?.associate {
-            simpleMapUserRateStatusToString(it.status, MediaType.MANGA) to it.count
-        }
+    val statusesStats = mangaDetails.statusesStats?.associate {
+        simpleMapUserRateStatusToString(it.status, MediaType.MANGA) to it.count
     }
 
     Column(

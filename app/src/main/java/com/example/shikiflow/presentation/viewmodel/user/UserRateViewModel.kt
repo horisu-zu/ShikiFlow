@@ -1,10 +1,11 @@
 package com.example.shikiflow.presentation.viewmodel.user
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.tracks.UserRate
-import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.domain.model.user.UserRateExpanded
+import com.example.shikiflow.domain.usecase.GetUserProfileUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +15,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserRateViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val getUserProfileUseCase: GetUserProfileUseCase
 ) : ViewModel() {
 
     private var _userId: Long? = null
-    private val _userRateData = MutableStateFlow<Resource<List<UserRate>>>(Resource.Loading())
+
+    private val _userRateData = MutableStateFlow<Resource<UserRateExpanded>>(Resource.Loading())
     val userRateData = _userRateData.asStateFlow()
 
     var isRefreshing = mutableStateOf(false)
@@ -37,13 +39,17 @@ class UserRateViewModel @Inject constructor(
                 isRefreshing.value = true
             }
 
-            try {
-                val result = userRepository.getUserRates(userId)
-                _userRateData.value = Resource.Success(result)
-                _userId = userId
-                if(isRefreshing.value) { isRefreshing.value = false }
-            } catch (e: Exception) {
-                _userRateData.value = Resource.Error(e.localizedMessage ?: "An unexpected error occurred")
+            _userRateData.value = getUserProfileUseCase(userId)
+
+            when(val result = _userRateData.value) {
+                is Resource.Loading -> { /**/ }
+                is Resource.Success -> {
+                    _userId = userId
+                    Log.d("UserRateViewModel", "Successfully loaded User Rate Data")
+                }
+                is Resource.Error -> {
+                    Log.e("UserRateViewModel", "Error: ${result.message}")
+                }
             }
         }
     }
