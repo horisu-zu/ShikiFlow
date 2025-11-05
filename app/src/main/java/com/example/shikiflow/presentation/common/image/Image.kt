@@ -166,7 +166,6 @@ fun CoverImage(
 fun RoundedImage(
     model: String?,
     modifier: Modifier = Modifier,
-    size: Dp = 96.dp,
     clip: RoundedCornerShape = CircleShape,
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null
@@ -174,7 +173,7 @@ fun RoundedImage(
     BaseImage(
         model = model,
         modifier = modifier
-            .size(size)
+            .aspectRatio(1f)
             .clip(clip),
         contentScale = contentScale,
         contentDescription = contentDescription

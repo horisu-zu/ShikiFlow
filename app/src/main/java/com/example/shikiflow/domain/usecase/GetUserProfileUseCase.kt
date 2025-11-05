@@ -18,7 +18,8 @@ class GetUserProfileUseCase @Inject constructor(
                 val rates = async { userRepository.getUserRates(userId) }
                 val favorites = async { userRepository.getUserFavorites(userId) }
 
-                UserRateExpanded(rates.await(), favorites.await().toDomain())
+                val userFavorites = favorites.await().toDomain().groupBy { it.category }
+                UserRateExpanded(rates.await(), userFavorites)
             }
 
             Resource.Success(result)

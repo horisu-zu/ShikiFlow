@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,6 +29,7 @@ import com.example.shikiflow.domain.model.tracks.TargetType
 import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun TrackSection(
@@ -39,11 +42,15 @@ fun TrackSection(
     val mangaTrackData = userRateData.filter { it.targetType == TargetType.MANGA }
 
     val groupedAnimeData = animeTrackData.groupAndSortByStatus(MediaType.ANIME)
-
     val groupedMangaData = mangaTrackData.groupAndSortByStatus(MediaType.MANGA)
 
+    val horizontalPadding = 12.dp
+
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = horizontalPadding, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
         Row(
@@ -87,6 +94,8 @@ fun TrackSection(
             },
             itemsCount = animeTrackData.size
         )
+
+        HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding))
 
         TrackItem(
             iconResource = IconResource.Drawable(R.drawable.ic_manga),

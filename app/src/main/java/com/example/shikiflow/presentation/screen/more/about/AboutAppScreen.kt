@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -44,25 +43,24 @@ fun AboutAppScreen(
     val showBottomSheet = remember { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    top = innerPadding.calculateTopPadding() + 12.dp,
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
-                    bottom = 16.dp
-                ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
-        ) {
-            when(currentVersion) {
-                is Resource.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-                is Resource.Success -> {
+        when(currentVersion) {
+            is Resource.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
+            }
+            is Resource.Success -> {
+                Column(
+                    modifier = Modifier
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            top = innerPadding.calculateTopPadding() + 12.dp,
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
+                            bottom = 16.dp
+                        ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+                ) {
                     val currentVersion = currentVersion.data
                     val latestVersion = latestRelease.data
                     val isLatest = if (latestVersion == null) { true } else {
@@ -107,19 +105,19 @@ fun AboutAppScreen(
                         )
                     )
                 }
-                is Resource.Error -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = currentVersion.message ?: stringResource(id = R.string.common_error),
-                            buttonLabel = stringResource(id = R.string.common_retry),
-                            onButtonClick = {
-                                aboutViewModel.getLocalVersion()
-                            }
-                        )
-                    }
+            }
+            is Resource.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = currentVersion.message ?: stringResource(id = R.string.common_error),
+                        buttonLabel = stringResource(id = R.string.common_retry),
+                        onButtonClick = {
+                            aboutViewModel.getLocalVersion()
+                        }
+                    )
                 }
             }
         }

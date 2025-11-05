@@ -143,7 +143,7 @@ private fun ImageItem(
         RoundedImage(
             model = imageUrl,
             contentDescription = null,
-            size = 36.dp
+            modifier = Modifier.size(24.dp),
         )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(

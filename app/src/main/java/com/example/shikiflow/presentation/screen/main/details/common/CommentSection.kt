@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
@@ -138,7 +139,7 @@ fun CommentItem(
     ) {
         RoundedImage(
             model = comment.user.image.x80,
-            size = 40.dp
+            modifier = Modifier.size(24.dp),
         )
         Column(
             modifier = Modifier.weight(1f),

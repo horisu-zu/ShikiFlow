@@ -103,7 +103,8 @@ fun MangaDetailsDesc(
                             characterPoster = characterItem.character.characterShort.poster
                                 ?.posterShort?.previewUrl,
                             characterName = characterItem.character.characterShort.name,
-                            onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
+                            onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) },
+                            modifier = Modifier.width(96.dp)
                         )
                     }
                 }

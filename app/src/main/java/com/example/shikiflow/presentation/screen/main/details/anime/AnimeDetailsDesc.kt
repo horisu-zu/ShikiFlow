@@ -127,7 +127,8 @@ fun AnimeDetailsDesc(
                             characterPoster = characterItem.character.characterShort.poster
                                 ?.posterShort?.previewUrl,
                             characterName = characterItem.character.characterShort.name,
-                            onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) }
+                            onClick = { onEntityClick(EntityType.CHARACTER, characterItem.character.characterShort.id) },
+                            modifier = Modifier.width(96.dp)
                         )
                     }
                 }
@@ -182,7 +183,6 @@ fun CharacterCard(
 ) {
     Column(
         modifier = modifier
-            .width(96.dp)
             .clip(RoundedCornerShape(8.dp))
             .clickable { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -190,7 +190,7 @@ fun CharacterCard(
     ) {
         RoundedImage(
             model = characterPoster, //character.characterShort.poster?.posterShort?.previewUrl,
-            size = 96.dp,
+            modifier = Modifier.fillMaxWidth(),
             clip = CircleShape,
             contentScale = ContentScale.Crop
         )
@@ -198,7 +198,7 @@ fun CharacterCard(
             text = characterName, //character.characterShort.name,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            style = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp)
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }

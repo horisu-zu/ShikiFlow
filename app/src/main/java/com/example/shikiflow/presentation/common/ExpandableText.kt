@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -386,7 +387,7 @@ private fun QuoteItem(
             ) {
                 RoundedImage(
                     model = quoteElement.senderAvatarUrl,
-                    size = 24.dp,
+                    modifier = Modifier.size(24.dp),
                     clip = RoundedCornerShape(8.dp)
                 )
                 Text(

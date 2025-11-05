@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,12 +40,11 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.common.CircleShapeButton
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.UserRateViewModel
-import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -132,25 +130,6 @@ fun ProfileScreen(
                             CurrentUser(
                                 userData = userData
                             )
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
-                            ) {
-                                /*CircleShapeButton(
-                                    label = stringResource(R.string.more_screen_clubs),
-                                    icon = IconResource.Drawable(R.drawable.ic_group),
-                                    onClick = { *//**//* },
-                            modifier = Modifier.weight(1f)
-                        )*/
-                                CircleShapeButton(
-                                    label = stringResource(R.string.more_screen_history),
-                                    icon = IconResource.Drawable(R.drawable.ic_history),
-                                    onClick = { moreNavOptions.navigateToHistory() },
-                                    modifier = Modifier.weight(1f)
-                                )
-                            }
                             userRateData.data?.let { rateExpanded ->
                                 TrackSection(
                                     isCurrentUser = currentUserId == userData.id,
@@ -159,10 +138,11 @@ fun ProfileScreen(
                                         moreNavOptions.navigateToCompare(userData)
                                     }
                                 )
-                                FavoritesSection(
-                                    userFavoritesData = rateExpanded.userFavorites,
-                                    horizontalPadding = horizontalPadding
-                                )
+                                if(rateExpanded.userFavorites.isNotEmpty()) {
+                                    FavoritesSection(
+                                        favoritesMap = rateExpanded.userFavorites
+                                    )
+                                }
                             }
                         }
                     }

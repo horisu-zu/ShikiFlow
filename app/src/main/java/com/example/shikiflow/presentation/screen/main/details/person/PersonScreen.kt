@@ -167,7 +167,8 @@ fun PersonScreen(
                                             characterName = character.name,
                                             onClick = { navOptions.navigateToCharacterDetails(
                                                 characterId = character.id.toString()
-                                            ) }
+                                            ) },
+                                            modifier = Modifier.width(96.dp)
                                         )
                                     }
                                 }

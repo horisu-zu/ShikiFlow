@@ -2,10 +2,8 @@ package com.example.shikiflow.domain.model.userrate
 
 import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.ShortAnime
 import com.example.shikiflow.domain.model.manga.ShortManga
-import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
 
 @Serializable

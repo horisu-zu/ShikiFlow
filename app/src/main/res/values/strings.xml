@@ -285,9 +285,10 @@
 
     <string name="translation_chapter_label">Chapter %1$s — %2$s</string>
 
-    <string name="shiki_person_type_seyu">Seyu</string>
-    <string name="shiki_person_type_mangaka">Mangaka</string>
-    <string name="shiki_person_type_producer">Producer</string>
+    <string name="favorite_prefix">Favorite</string>
+    <string name="shiki_person_type_seyu">Seyus</string>
+    <string name="shiki_person_type_mangaka">Mangakas</string>
+    <string name="shiki_person_type_producer">Producers</string>
     <string name="shiki_person_type_other">Other People</string>
 
     <plurals name="author_plural_form">
