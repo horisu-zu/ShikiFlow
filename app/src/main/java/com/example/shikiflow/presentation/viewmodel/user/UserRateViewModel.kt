@@ -18,7 +18,7 @@ class UserRateViewModel @Inject constructor(
     private val getUserProfileUseCase: GetUserProfileUseCase
 ) : ViewModel() {
 
-    private var _userId: Long? = null
+    private var _userId: String? = null
 
     private val _userRateData = MutableStateFlow<Resource<UserRateExpanded>>(Resource.Loading())
     val userRateData = _userRateData.asStateFlow()
@@ -27,7 +27,7 @@ class UserRateViewModel @Inject constructor(
         private set
 
     fun loadUserRates(
-        userId: Long,
+        userId: String,
         isRefresh: Boolean = false
     ) {
         viewModelScope.launch {
@@ -39,13 +39,13 @@ class UserRateViewModel @Inject constructor(
                 isRefreshing.value = true
             }
 
-            _userRateData.value = getUserProfileUseCase(userId)
+            _userRateData.value = getUserProfileUseCase(userId.toLong())
 
             when(val result = _userRateData.value) {
                 is Resource.Loading -> { /**/ }
                 is Resource.Success -> {
                     _userId = userId
-                    Log.d("UserRateViewModel", "Successfully loaded User Rate Data")
+                    if(isRefreshing.value) isRefreshing.value = false
                 }
                 is Resource.Error -> {
                     Log.e("UserRateViewModel", "Error: ${result.message}")

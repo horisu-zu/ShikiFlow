@@ -1,5 +1,11 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -52,20 +59,19 @@ fun FavoritesSection(
 
     Column(
         modifier = modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Column(
-            modifier = Modifier.clip(RoundedCornerShape(8.dp))
+            modifier = Modifier.fillMaxWidth()
+                .clip(RoundedCornerShape(
+                    topEnd = 8.dp, topStart = 8.dp,
+                    bottomEnd = 4.dp, bottomStart = 4.dp
+                ))
                 .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(horizontal = 4.dp, vertical = 6.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
                 favoritesMap.keys.forEachIndexed { index, type ->
                     ToggleButton(
                         checked = currentSection == type,
@@ -76,12 +82,14 @@ fun FavoritesSection(
                             index == favoritesMap.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                             else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                         },
+                        contentPadding = ButtonDefaults.ExtraSmallContentPadding,
                         colors = ToggleButtonDefaults.toggleButtonColors(
-                            containerColor = MaterialTheme.colorScheme.onSecondary,
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
                             checkedContainerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.secondary,
+                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             checkedContentColor = MaterialTheme.colorScheme.onPrimary
-                        )
+                        ),
+                        modifier = Modifier.weight(1f)
                     ) {
                         type.iconRes.toIcon(modifier = Modifier.size(24.dp))
                     }
@@ -96,44 +104,51 @@ fun FavoritesSection(
                 style = MaterialTheme.typography.titleMedium
             )
         }
-        FlowRow(
-            modifier = modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
-        ) {
-            favoritesMap[currentSection]?.forEach { item ->
-                when(item) {
-                    is ShikiFavorite.FavoriteAnime -> {
-                        FavoriteMediaItem(
-                            browseItem = item.shikiAnime.copy(
-                                image = ShikiImage(original = item.shikiAnime.image?.original?.replace("/x64/", "/original/"))
-                            ).toBrowseAnime(),
-                            modifier = Modifier.width(108.dp)
-                        )
-                    }
-                    is ShikiFavorite.FavoriteManga -> {
-                        FavoriteMediaItem(
-                            browseItem = item.shikiManga.copy(
-                                image = ShikiImage(original = item.shikiManga.image?.original?.replace("/x64/", "/original/"))
-                            ).toBrowseManga(),
-                            modifier = Modifier.width(108.dp)
-                        )
-                    }
-                    is ShikiFavorite.FavoriteCharacter -> {
-                        CharacterCard(
-                            characterPoster = "${BuildConfig.BASE_URL}${item.shikiCharacter.image.original?.replace("/x64/", "/original/")}",
-                            characterName = item.shikiCharacter.name,
-                            onClick = { /**/ },
-                            modifier = Modifier.width(108.dp)
-                        )
-                    }
-                    is ShikiFavorite.FavoritePerson -> {
-                        CharacterCard(
-                            characterPoster = "${BuildConfig.BASE_URL}${item.shikiPerson.image.original?.replace("/x64/", "/original/")}",
-                            characterName = item.shikiPerson.name,
-                            onClick = { /**/ },
-                            modifier = Modifier.width(108.dp)
-                        )
+        AnimatedContent(
+            targetState = currentSection,
+            transitionSpec = {
+                fadeIn() + slideInVertically() togetherWith fadeOut() + slideOutVertically()
+            }
+        ) { currentSection ->
+            FlowRow(
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+            ) {
+                favoritesMap[currentSection]?.forEach { item ->
+                    when(item) {
+                        is ShikiFavorite.FavoriteAnime -> {
+                            FavoriteMediaItem(
+                                browseItem = item.shikiAnime.copy(
+                                    image = ShikiImage(original = item.shikiAnime.image?.original?.replace("/x64/", "/original/"))
+                                ).toBrowseAnime(),
+                                modifier = Modifier.width(108.dp)
+                            )
+                        }
+                        is ShikiFavorite.FavoriteManga -> {
+                            FavoriteMediaItem(
+                                browseItem = item.shikiManga.copy(
+                                    image = ShikiImage(original = item.shikiManga.image?.original?.replace("/x64/", "/original/"))
+                                ).toBrowseManga(),
+                                modifier = Modifier.width(108.dp)
+                            )
+                        }
+                        is ShikiFavorite.FavoriteCharacter -> {
+                            CharacterCard(
+                                characterPoster = "${BuildConfig.BASE_URL}${item.shikiCharacter.image.original?.replace("/x64/", "/original/")}",
+                                characterName = item.shikiCharacter.name,
+                                onClick = { /**/ },
+                                modifier = Modifier.width(108.dp)
+                            )
+                        }
+                        is ShikiFavorite.FavoritePerson -> {
+                            CharacterCard(
+                                characterPoster = "${BuildConfig.BASE_URL}${item.shikiPerson.image.original?.replace("/x64/", "/original/")}",
+                                characterName = item.shikiPerson.name,
+                                onClick = { /**/ },
+                                modifier = Modifier.width(108.dp)
+                            )
+                        }
                     }
                 }
             }

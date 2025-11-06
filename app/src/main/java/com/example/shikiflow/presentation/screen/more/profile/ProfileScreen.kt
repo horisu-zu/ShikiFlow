@@ -44,7 +44,6 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.UserRateViewModel
 import com.example.shikiflow.utils.Resource
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,7 +66,7 @@ fun ProfileScreen(
 
     LaunchedEffect(Unit) {
         userData?.id?.let { userId ->
-            userRateViewModel.loadUserRates(userId.toLong())
+            userRateViewModel.loadUserRates(userId)
         }
     }
 
@@ -108,38 +107,49 @@ fun ProfileScreen(
                 }
                 is Resource.Success -> {
                     val horizontalPadding = 16.dp
+                    val containerModifier = Modifier.fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(12.dp)
 
                     PullToRefreshBox(
                         modifier = Modifier.fillMaxSize()
-                            .verticalScroll(scrollState)
                             .padding(
                                 top = innerPadding.calculateTopPadding(),
-                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + horizontalPadding,
-                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + horizontalPadding,
-                                bottom = 16.dp
+                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                             ),
                         isRefreshing = isRefreshing,
                         onRefresh = {
-                            userRateViewModel.loadUserRates(userData.id.toLong())
+                            userRateViewModel.loadUserRates(userData.id, isRefresh = true)
                         }
                     ) {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.fillMaxSize().verticalScroll(scrollState)
+                                .padding(
+                                    start = horizontalPadding,
+                                    end = horizontalPadding,
+                                    bottom = 16.dp
+                                ),
                             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                         ) {
                             CurrentUser(
                                 userData = userData
                             )
                             userRateData.data?.let { rateExpanded ->
-                                TrackSection(
-                                    isCurrentUser = currentUserId == userData.id,
-                                    userRateData = rateExpanded.userRates,
-                                    onCompareClick = {
-                                        moreNavOptions.navigateToCompare(userData)
-                                    }
-                                )
+                                if(rateExpanded.userRates.isNotEmpty()) {
+                                    TrackSection(
+                                        isCurrentUser = currentUserId == userData.id,
+                                        userRateData = rateExpanded.userRates,
+                                        onCompareClick = {
+                                            moreNavOptions.navigateToCompare(userData)
+                                        },
+                                        modifier = containerModifier
+                                    )
+                                }
                                 if(rateExpanded.userFavorites.isNotEmpty()) {
                                     FavoritesSection(
+                                        modifier = containerModifier,
                                         favoritesMap = rateExpanded.userFavorites
                                     )
                                 }
@@ -156,7 +166,7 @@ fun ProfileScreen(
                             message = userRateData.message ?: stringResource(R.string.common_error),
                             buttonLabel = stringResource(R.string.common_retry),
                             onButtonClick = {
-                                userRateViewModel.loadUserRates(userData.id.toLong())
+                                userRateViewModel.loadUserRates(userData.id)
                             }
                         )
                     }

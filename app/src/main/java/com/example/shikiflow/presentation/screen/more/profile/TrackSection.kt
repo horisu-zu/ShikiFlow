@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
@@ -21,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -47,11 +45,8 @@ fun TrackSection(
     val horizontalPadding = 12.dp
 
     Column(
-        modifier = modifier.fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surface)
-            .padding(horizontal = horizontalPadding, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -60,8 +55,7 @@ fun TrackSection(
         ) {
             Text(
                 text = stringResource(R.string.profile_screen_track_lists_label),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleLarge
             )
 
             if(!isCurrentUser) {
@@ -86,24 +80,30 @@ fun TrackSection(
             }
         }
 
-        TrackItem(
-            iconResource = IconResource.Drawable(R.drawable.ic_anime),
-            type = stringResource(R.string.main_track_mode_anime),
-            groupedData = groupedAnimeData.mapKeys { (resId, size) ->
-                stringResource(resId)
-            },
-            itemsCount = animeTrackData.size
-        )
+        if(groupedAnimeData.isNotEmpty()) {
+            TrackItem(
+                iconResource = IconResource.Drawable(R.drawable.ic_anime),
+                type = stringResource(R.string.main_track_mode_anime),
+                groupedData = groupedAnimeData.mapKeys { (resId, size) ->
+                    stringResource(resId)
+                },
+                itemsCount = animeTrackData.size
+            )
+        }
 
-        HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding))
+        if(groupedAnimeData.isNotEmpty() && groupedMangaData.isNotEmpty()) {
+            HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding))
+        }
 
-        TrackItem(
-            iconResource = IconResource.Drawable(R.drawable.ic_manga),
-            type = stringResource(R.string.main_track_mode_manga),
-            groupedData = groupedMangaData.mapKeys { (resId, size) ->
-                stringResource(resId)
-            },
-            itemsCount = mangaTrackData.size
-        )
+        if(groupedMangaData.isNotEmpty()) {
+            TrackItem(
+                iconResource = IconResource.Drawable(R.drawable.ic_manga),
+                type = stringResource(R.string.main_track_mode_manga),
+                groupedData = groupedMangaData.mapKeys { (resId, size) ->
+                    stringResource(resId)
+                },
+                itemsCount = mangaTrackData.size
+            )
+        }
     }
 }
