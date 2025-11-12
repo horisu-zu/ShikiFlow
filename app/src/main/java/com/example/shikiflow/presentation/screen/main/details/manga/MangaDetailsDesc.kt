@@ -121,7 +121,7 @@ fun MangaDetailsDesc(
                     groupedData = statusesStats.mapKeys { statusEntry ->
                         stringResource(id = statusEntry.key)
                     },
-                    totalCount = mangaDetails.statusesStats?.size ?: 0,
+                    totalCount = mangaDetails.statusesStats.size,
                     modifier = Modifier.padding(12.dp),
                     itemShape = RoundedCornerShape(3.dp),
                     rowHeight = 16.dp,
@@ -177,11 +177,13 @@ private fun AuthorSection(
             verticalArrangement = Arrangement.spacedBy(6.dp),
             maxItemsInEachRow = 2
         ) {
-            personRoles.forEach { personRole ->
+            personRoles.forEachIndexed { index, personRole ->
                 AuthorItem(
                     personRole = personRole,
                     onPersonClick = onPersonClick,
-                    modifier = Modifier.weight(1f)
+                    modifier = if(index % 2 == 0 && index == personRoles.size - 1) {
+                        Modifier.fillMaxWidth(0.5f)
+                    } else Modifier.weight(1f)
                 )
             }
         }

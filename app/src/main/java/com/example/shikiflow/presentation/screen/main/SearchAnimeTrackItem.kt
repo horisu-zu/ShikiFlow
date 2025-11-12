@@ -62,7 +62,7 @@ fun SearchAnimeTrackItem(
                                 status = animeItem.userRate.animeUserRate.status
                             )
                         ) ,
-                        color = animeItem.userRate.animeUserRate.status.let {
+                        containerColor = animeItem.userRate.animeUserRate.status.let {
                             StatusColor.getAnimeStatusColor(it)
                         }
                     )

@@ -247,6 +247,7 @@
     <string name="season_summer">"Summer"</string>
     <string name="season_fall">"Fall"</string>
     <string name="season_winter">Winter</string>
+
     <string name="rating_none">None</string>
     <string name="rating_g">G</string>
     <string name="rating_pg">PG</string>
@@ -290,6 +291,9 @@
     <string name="shiki_person_type_mangaka">Mangakas</string>
     <string name="shiki_person_type_producer">Producers</string>
     <string name="shiki_person_type_other">Other People</string>
+
+    <string name="expandable_text_expand">Expand</string>
+    <string name="expandable_text_collapse">Collapse</string>
 
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>

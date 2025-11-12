@@ -18,11 +18,11 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -151,7 +151,8 @@ fun PersonScreen(
                             avatarUrl = "${BuildConfig.BASE_URL}${details.image.original}",
                             name = details.name,
                             japaneseName = details.japanese,
-                            groupedRoles = details.groupedRoles
+                            groupedRoles = details.groupedRoles,
+                            modifier = Modifier.height(148.dp)
                         )
                         details.roles?.let {
                             LazyRow(
@@ -238,8 +239,6 @@ private fun PersonTitleSection(
     groupedRoles: List<GroupedRole>?,
     modifier: Modifier = Modifier
 ) {
-    val componentHeight = 120.dp
-
     val mutableInteractionSource = remember { MutableInteractionSource() }
     var isExpanded by remember { mutableStateOf(false) }
     val rotationState by animateFloatAsState(
@@ -254,7 +253,7 @@ private fun PersonTitleSection(
     ) {
         RoundedImage(
             model = avatarUrl,
-            modifier = Modifier.size(componentHeight)
+            modifier = Modifier.fillMaxHeight(0.8f)
         )
 
         Spacer(Modifier.width(16.dp))
@@ -264,7 +263,7 @@ private fun PersonTitleSection(
             enter = fadeIn(),
             exit = fadeOut(),
             modifier = Modifier
-                .height(componentHeight)
+                .fillMaxHeight()
                 .weight(1f)
         ) {
             Column(verticalArrangement = Arrangement.Center) {
@@ -291,7 +290,7 @@ private fun PersonTitleSection(
 
         Box(
             modifier = Modifier
-                .height(componentHeight)
+                .fillMaxHeight()
                 .clip(RoundedCornerShape(
                     topStart = 12.dp,
                     bottomStart = 12.dp,
@@ -332,31 +331,23 @@ private fun PersonTitleSection(
                         stiffness = Spring.StiffnessMedium
                     )
                 ),
-                modifier = Modifier.height(componentHeight)
+                modifier = Modifier.fillMaxHeight()
                     .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
                     .background(MaterialTheme.colorScheme.surface)
             ) {
-                PersonGroupedRoles(groupedRoles = groupedRoles)
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+                ) {
+                    groupedRoles.forEach { role ->
+                        Text(
+                            text = "${role.role}: ${role.count}",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                    }
+                }
             }
-        }
-    }
-}
-
-@Composable
-private fun PersonGroupedRoles(
-    groupedRoles: List<GroupedRole>,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
-    ) {
-        groupedRoles.forEach { role ->
-            Text(
-                text = "${role.role}: ${role.count}",
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            )
         }
     }
 }

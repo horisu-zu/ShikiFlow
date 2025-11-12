@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,27 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.TargetType
-import com.example.shikiflow.domain.model.tracks.UserRate
-import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun TrackSection(
     isCurrentUser: Boolean,
-    userRateData: List<UserRate>,
+    userRateData: Map<MediaType, Map<Int, Int>>,
     onCompareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val animeTrackData = userRateData.filter { it.targetType == TargetType.ANIME }
-    val mangaTrackData = userRateData.filter { it.targetType == TargetType.MANGA }
-
-    val groupedAnimeData = animeTrackData.groupAndSortByStatus(MediaType.ANIME)
-    val groupedMangaData = mangaTrackData.groupAndSortByStatus(MediaType.MANGA)
-
-    val horizontalPadding = 12.dp
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
@@ -61,7 +49,6 @@ fun TrackSection(
             if(!isCurrentUser) {
                 Row(
                     modifier = Modifier.clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surface)
                         .clickable { onCompareClick() }
                         .padding(start = 8.dp, top = 4.dp, bottom = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
@@ -80,29 +67,24 @@ fun TrackSection(
             }
         }
 
-        if(groupedAnimeData.isNotEmpty()) {
+        userRateData.entries.forEachIndexed { index, (mediaType, ratesMap) ->
+            if (index > 0) {
+                HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(12.dp))
+            }
+
             TrackItem(
-                iconResource = IconResource.Drawable(R.drawable.ic_anime),
-                type = stringResource(R.string.main_track_mode_anime),
-                groupedData = groupedAnimeData.mapKeys { (resId, size) ->
+                iconResource = when (mediaType) {
+                    MediaType.ANIME -> IconResource.Drawable(R.drawable.ic_anime)
+                    MediaType.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
+                },
+                type = when (mediaType) {
+                    MediaType.ANIME -> stringResource(R.string.main_track_mode_anime)
+                    MediaType.MANGA -> stringResource(R.string.main_track_mode_manga)
+                },
+                groupedData = ratesMap.mapKeys { (resId, _) ->
                     stringResource(resId)
                 },
-                itemsCount = animeTrackData.size
-            )
-        }
-
-        if(groupedAnimeData.isNotEmpty() && groupedMangaData.isNotEmpty()) {
-            HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding))
-        }
-
-        if(groupedMangaData.isNotEmpty()) {
-            TrackItem(
-                iconResource = IconResource.Drawable(R.drawable.ic_manga),
-                type = stringResource(R.string.main_track_mode_manga),
-                groupedData = groupedMangaData.mapKeys { (resId, size) ->
-                    stringResource(resId)
-                },
-                itemsCount = mangaTrackData.size
+                itemsCount = ratesMap.values.sum()
             )
         }
     }

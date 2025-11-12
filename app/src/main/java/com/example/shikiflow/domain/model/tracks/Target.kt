@@ -23,5 +23,14 @@ data class Target(
 @Serializable
 enum class TargetType {
     @SerialName("Anime") ANIME,
-    @SerialName("Manga") MANGA
+    @SerialName("Manga") MANGA;
+
+    companion object {
+        fun TargetType.toMediaType(): MediaType {
+            return when(this) {
+                ANIME -> MediaType.ANIME
+                MANGA -> MediaType.MANGA
+            }
+        }
+    }
 }

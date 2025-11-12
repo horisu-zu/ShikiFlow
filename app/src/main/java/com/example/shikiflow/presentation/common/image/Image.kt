@@ -35,7 +35,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.imageLoader
@@ -43,6 +42,7 @@ import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.crossfade
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 
 @Composable
@@ -52,7 +52,12 @@ fun BaseImage(
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null,
     imageType: ImageType = ImageType.Poster(),
-    error: @Composable () -> Unit = {}
+    error: @Composable () -> Unit = {
+        BaseImage(
+            model = BuildConfig.MISSING_URL,
+            modifier = modifier
+        )
+    }
 ) {
     SubcomposeAsyncImage(
         model = ImageRequest.Builder(LocalContext.current)
@@ -60,9 +65,6 @@ fun BaseImage(
             .memoryCacheKey(model)
             .diskCacheKey(model)
             .listener(
-                onSuccess = { _ , result ->
-                    //Log.d("Image", "Image successfully loaded: $result")
-                },
                 onError = { _ , error ->
                     Log.d("Image", "Error loading image: $error")
                 }

@@ -1,6 +1,5 @@
 package com.example.shikiflow.domain.model.mapper
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.graphql.type.AnimeKindEnum
@@ -200,7 +199,7 @@ class UserRateMapper {
             }
         }
 
-        fun determineSeason(releaseDate: ReleaseDate): Int {
+        fun determineSeason(releaseDate: ReleaseDate): Int? {
             val month = releaseDate.month
 
             return when (month) {
@@ -208,7 +207,7 @@ class UserRateMapper {
                 in 6..8 -> R.string.season_summer
                 in 9..11 -> R.string.season_fall
                 in listOf(1, 2, 12) -> R.string.season_winter
-                else -> R.string.common_unknown
+                else -> null
             }
         }
     }

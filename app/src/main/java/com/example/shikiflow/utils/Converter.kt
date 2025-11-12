@@ -289,7 +289,7 @@ object Converter {
     sealed class DescriptionElement {
         data class Text(val annotatedString: AnnotatedString) : DescriptionElement()
         data class Spoiler(val label: String, val content: List<DescriptionElement>) : DescriptionElement()
-        data class Image(val label: AnnotatedString, val imageUrl: String) : DescriptionElement()
+        data class Image(val imageUrl: String, val aspectRatio: Float) : DescriptionElement()
         data class Video(val videoUrl: String, val thumbnailUrl: String) : DescriptionElement()
         data class Quote(
             val senderAvatarUrl: String?,
@@ -391,17 +391,12 @@ object Converter {
                             node.selectFirst("img")?.attr("src") ?: ""
                         } else -> ""
                     }
-                    val labelText = node.text()
 
-                    val label = AnnotatedString.Builder().apply {
-                        append(labelText)
-                        if (labelText.isNotBlank()) {
-                            addStringAnnotation("URL_LINK", imageUrl, 0, labelText.length)
-                            addStyle(SpanStyle(color = linkColor), 0, labelText.length)
-                        }
-                    }.toAnnotatedString()
+                    val aspectRatio = extractSizeFromUrl(imageUrl)
+                        ?: extractSizeFromNode(node)
+                        ?: (16f / 9f)
 
-                    elements.add(DescriptionElement.Image(label, imageUrl))
+                    elements.add(DescriptionElement.Image(imageUrl, aspectRatio))
                 }
                 isQuote -> {
                     processTextBuffer()
@@ -608,5 +603,37 @@ object Converter {
         }
 
         return result
+    }
+
+    private fun extractSizeFromUrl(url: String): Float? {
+        val regex = """name=(\d+)x(\d+)""".toRegex()
+        val match = regex.find(url)
+
+        return match?.let {
+            val width = it.groupValues[1].toFloatOrNull()
+            val height = it.groupValues[2].toFloatOrNull()
+
+            if (width != null && height != null && height > 0) {
+                width / height
+            } else null
+        }
+    }
+
+    private fun extractSizeFromNode(node: Element): Float? {
+        val img = node.selectFirst("img") ?: return null
+
+        val dataWidth = img.attr("data-width").toFloatOrNull()
+        val dataHeight = img.attr("data-height").toFloatOrNull()
+
+        if (dataWidth != null && dataHeight != null && dataHeight > 0) {
+            return dataWidth / dataHeight
+        }
+
+        val width = img.attr("width").toFloatOrNull()
+        val height = img.attr("height").toFloatOrNull()
+
+        return if (width != null && height != null && height > 0) {
+            width / height
+        } else null
     }
 }

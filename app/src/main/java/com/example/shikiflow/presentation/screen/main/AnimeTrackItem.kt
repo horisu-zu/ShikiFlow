@@ -117,10 +117,9 @@ fun AnimeTrackItem(
             } else {
                 userRate.anime.airedOn?.let { date ->
                     StatusCard(
-                        text = buildString {
-                            append(stringResource(id = determineSeason(userRate.anime.airedOn)))
-                            append(" ${date.year}")
-                        }
+                        text = determineSeason(userRate.anime.airedOn)?.let { seasonRes ->
+                            stringResource(id = seasonRes) + " ${date.year}"
+                        } ?: date.year.toString()
                     )
                 }
             }

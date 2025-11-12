@@ -2,10 +2,8 @@ package com.example.shikiflow.presentation.common
 
 import android.util.Log
 import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -24,15 +22,14 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,24 +41,25 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.utils.Converter.DescriptionElement
 import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Converter.parseDescriptionHtml
-import kotlinx.coroutines.launch
 
 @Composable
 fun ExpandableText(
@@ -74,9 +72,6 @@ fun ExpandableText(
     style: TextStyle = TextStyle.Default,
     brushColor: Color = MaterialTheme.colorScheme.background.copy(0.8f)
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    val lineHeight = style.fontSize * 1.75f
-
     val elements = remember(descriptionHtml) {
         parseDescriptionHtml(descriptionHtml, linkColor)
     }
@@ -85,10 +80,7 @@ fun ExpandableText(
         modifier = modifier,
         elements = elements,
         collapsedMaxLines = collapsedMaxLines,
-        isExpanded = isExpanded,
-        onExpandToggle = { isExpanded = !isExpanded },
         style = style,
-        lineHeight = lineHeight,
         brushColor = brushColor,
         onEntityClick = onEntityClick,
         onLinkClick = onLinkClick
@@ -99,15 +91,14 @@ fun ExpandableText(
 private fun DescriptionElementsList(
     elements: List<DescriptionElement>,
     style: TextStyle,
-    lineHeight: TextUnit,
     brushColor: Color,
     onEntityClick: (EntityType, String) -> Unit,
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
-    collapsedMaxLines: Int = Int.MAX_VALUE,
-    isExpanded: Boolean = true,
-    onExpandToggle: () -> Unit = { }
+    collapsedMaxLines: Int = Int.MAX_VALUE
 ) {
+    var isExpanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -119,10 +110,9 @@ private fun DescriptionElementsList(
                         text = element.annotatedString,
                         collapsedMaxLines = collapsedMaxLines,
                         style = style.copy(),
-                        lineHeight = lineHeight,
                         brushColor = brushColor,
                         isExpanded = isExpanded,
-                        onExpandToggle = onExpandToggle,
+                        onExpandToggle = { isExpanded = !isExpanded },
                         onEntityClick = { entityType, id ->
                             Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
                             onEntityClick(entityType, id)
@@ -135,7 +125,6 @@ private fun DescriptionElementsList(
                         label = element.label,
                         content = element.content,
                         style = style,
-                        lineHeight = lineHeight,
                         brushColor = brushColor,
                         onEntityClick = onEntityClick,
                         onLinkClick = onLinkClick
@@ -143,9 +132,7 @@ private fun DescriptionElementsList(
                 }
                 is DescriptionElement.Image -> {
                     ImageItem(
-                        label = element.label,
-                        imageUrl = element.imageUrl,
-                        onEntityClick = onEntityClick,
+                        imageData = element,
                         onLinkClick = onLinkClick
                     )
                 }
@@ -166,6 +153,7 @@ private fun DescriptionElementsList(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun AnnotatedText(
     text: AnnotatedString,
@@ -176,33 +164,31 @@ private fun AnnotatedText(
     collapsedMaxLines: Int = Int.MAX_VALUE,
     isExpanded: Boolean = false,
     onExpandToggle: () -> Unit = { /**/ },
-    brushColor: Color = MaterialTheme.colorScheme.primary,
-    lineHeight: TextUnit = TextUnit.Unspecified
+    brushColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     val textMeasurer = rememberTextMeasurer()
     val density = LocalDensity.current
 
     BoxWithConstraints {
         val maxWidthPx = with(density) { maxWidth.roundToPx() }
-
-        val fullLineCount = remember(text, style, lineHeight) {
-            val measuredText = textMeasurer.measure(
+        val fullLineCount = remember(text, style) {
+            textMeasurer.measure(
                 text = text,
-                style = style.copy(lineHeight = lineHeight),
+                style = style,
                 constraints = Constraints(maxWidth = maxWidthPx)
-            )
-            measuredText.lineCount
+            ).lineCount
         }
 
         val shouldShowButton = fullLineCount > collapsedMaxLines
 
-        Column(modifier = modifier) {
+        Column(
+            modifier = modifier,
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
             Text(
                 text = text,
-                style = style.copy(lineHeight = lineHeight),
+                style = style.copy(lineHeight = style.lineHeight * 1.2),
                 modifier = Modifier
                     .pointerInput(Unit) {
                         detectTapGestures { offset ->
@@ -233,9 +219,6 @@ private fun AnnotatedText(
                                                 "Error opening URL: ${annotation.item}",
                                                 e
                                             )
-                                            scope.launch {
-                                                snackbarHostState.showSnackbar("Can't open link")
-                                            }
                                         }
                                     }
                             }
@@ -252,10 +235,7 @@ private fun AnnotatedText(
                         }
                     }
                     .animateContentSize(
-                        animationSpec = tween(
-                            durationMillis = 300,
-                            easing = FastOutSlowInEasing
-                        )
+                        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
                     ),
                 maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
                 onTextLayout = { result ->
@@ -264,13 +244,15 @@ private fun AnnotatedText(
             )
             if (shouldShowButton) {
                 Text(
-                    text = if (isExpanded) "Collapse" else "Expand",
+                    text = stringResource(
+                        id = if(isExpanded) R.string.expandable_text_collapse
+                            else R.string.expandable_text_expand
+                    ),
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.SemiBold
                     ),
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
-                        .padding(vertical = 4.dp)
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null
@@ -284,7 +266,6 @@ private fun AnnotatedText(
 @Composable
 private fun SpoilerElement(
     label: String,
-    lineHeight: TextUnit,
     brushColor: Color,
     content: List<DescriptionElement>,
     style: TextStyle,
@@ -321,7 +302,6 @@ private fun SpoilerElement(
             DescriptionElementsList(
                 elements = content,
                 style = style,
-                lineHeight = lineHeight,
                 brushColor = brushColor,
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick
@@ -332,37 +312,30 @@ private fun SpoilerElement(
 
 @Composable
 private fun ImageItem(
-    label: AnnotatedString,
-    imageUrl: String,
-    onEntityClick: (EntityType, String) -> Unit,
+    imageData: DescriptionElement.Image,
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
-    ) {
-        SubcomposeAsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(imageUrl)
-                .memoryCacheKey(imageUrl)
-                .crossfade(true)
-                .build(),
-            modifier = Modifier.weight(1f),
-            contentScale = ContentScale.Crop,
-            contentDescription = imageUrl
-        )
-        AnnotatedText(
-            text = label,
-            collapsedMaxLines = Int.MAX_VALUE,
-            style = MaterialTheme.typography.labelSmall,
-            onEntityClick = onEntityClick,
-            onLinkClick = onLinkClick,
-            isExpanded = false,
-            onExpandToggle = { /**/ }
-        )
-    }
+    SubcomposeAsyncImage(
+        model = ImageRequest.Builder(LocalContext.current)
+            .data(imageData.imageUrl)
+            .memoryCacheKey(imageData.imageUrl)
+            .crossfade(true)
+            .build(),
+        loading = {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+                    .aspectRatio(imageData.aspectRatio)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffect()
+            )
+        },
+        modifier = modifier.fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable { onLinkClick(imageData.imageUrl) },
+        contentScale = ContentScale.Crop,
+        contentDescription = imageData.imageUrl
+    )
 }
 
 @Composable
@@ -419,7 +392,8 @@ private fun VideoItem(
             modifier = Modifier.clickable { onVideoClick() },
             error = {
                 Box(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(12.dp))
                         .background(MaterialTheme.colorScheme.surface),
