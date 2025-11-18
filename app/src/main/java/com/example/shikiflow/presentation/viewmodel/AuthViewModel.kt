@@ -1,54 +1,41 @@
 package com.example.shikiflow.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.auth.TokenManager
 import com.example.shikiflow.domain.repository.AuthRepository
+import com.example.shikiflow.domain.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
-    private val tokenManager: TokenManager
+    private val tokenRepository: TokenRepository,
+    private val authRepository: AuthRepository
 ): ViewModel() {
 
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
-    val authState = _authState.asStateFlow()
-
-    val isAuthenticated: Flow<Boolean> = tokenManager.accessTokenFlow
-        .map { it != null }
-        .distinctUntilChanged()
-
-    init {
-        viewModelScope.launch {
-            isAuthenticated.collect { isAuth ->
-                _authState.value = if (isAuth) {
-                    Log.d("AuthViewModel", "Changing state to 'Success'")
-                    AuthState.Success
-                } else {
-                    Log.d("AuthViewModel", "Changing state to 'Initial'")
-                    AuthState.Initial
-                }
+    val authState: StateFlow<AuthState> = tokenRepository.tokensFlow
+        .map { tokens ->
+            when(tokens.accessToken) {
+                null -> AuthState.Initial
+                else -> AuthState.Success
             }
         }
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = AuthState.Loading
+        )
 
     fun getAuthorizationUrl() = authRepository.getAuthorizationUrl()
 
     fun handleAuthCode(code: String) {
         viewModelScope.launch {
-            _authState.value = AuthState.Loading
             authRepository.handleAuthCode(code)
-                .onSuccess { _authState.value = AuthState.Success }
-                .onFailure { _authState.value = AuthState.Error(it.message ?: "Authentication failed") }
         }
     }
 }

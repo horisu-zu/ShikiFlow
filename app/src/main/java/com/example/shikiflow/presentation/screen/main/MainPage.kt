@@ -8,24 +8,12 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.manga.MangaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
-import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
-import com.example.shikiflow.presentation.viewmodel.manga.MangaTracksViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,14 +22,11 @@ fun MainPage(
     mediaType: MediaType,
     isAtTop: Boolean,
     isAppBarVisible: Boolean,
-    onMediaClick: (String, MediaType) -> Unit,
-    animeTrackViewModel: AnimeTracksViewModel = hiltViewModel(),
-    mangaTrackViewModel: MangaTracksViewModel = hiltViewModel()
+    onMediaClick: (String, MediaType) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
     val tabs = UserRateStatusConstants.getStatusChips(mediaType)
     val pagerState = rememberPagerState { tabs.size }
-    var isRefreshing by remember { mutableStateOf(false) }
 
     Column {
         MainTabRow(
@@ -64,61 +49,27 @@ fun MainPage(
             modifier = Modifier.fillMaxSize()
         ) { page ->
             val status = UserRateMapper.mapStringResToStatus(tabs[page])
-            val mediaTrackItems = status?.let { statusEnum ->
-                when(mediaType) {
-                    MediaType.ANIME -> MediaTrackItems.AnimeItems(
-                        items = animeTrackViewModel.getAnimeTracks(statusEnum).collectAsLazyPagingItems()
-                    )
-                    MediaType.MANGA -> MediaTrackItems.MangaItems(
-                        items = mangaTrackViewModel.getMangaTracks(statusEnum).collectAsLazyPagingItems()
-                    )
-                }
-            }
-            val pagingItems = mediaTrackItems?.let {
-                when(mediaTrackItems) {
-                    is MediaTrackItems.AnimeItems -> mediaTrackItems.items
-                    is MediaTrackItems.MangaItems -> mediaTrackItems.items
-                }
-            }
 
-            PullToRefreshCustomBox(
-                isRefreshing = isRefreshing,
-                enabled = isAppBarVisible,
-                onRefresh = {
-                    status?.let {
-                        isRefreshing = true
-                        pagingItems?.refresh()
-                        isRefreshing = false
-                    }
+            when(mediaType) {
+                MediaType.ANIME -> {
+                    AnimeTracksPage(
+                        userStatus = status,
+                        isAppBarVisible = isAppBarVisible,
+                        onAnimeClick = { animeId ->
+                            onMediaClick(animeId, mediaType)
+                        }
+                    )
                 }
-            ) {
-                mediaTrackItems?.let { trackItems ->
-                    when(trackItems) {
-                        is MediaTrackItems.AnimeItems -> {
-                            AnimeTracksPage(
-                                trackItems = trackItems.items,
-                                tracksViewModel = animeTrackViewModel,
-                                onAnimeClick = { animeId ->
-                                    onMediaClick(animeId, mediaType)
-                                }
-                            )
+                MediaType.MANGA -> {
+                    MangaTracksPage(
+                        userStatus = status,
+                        isAppBarVisible = isAppBarVisible,
+                        onMangaClick = { mangaId ->
+                            onMediaClick(mangaId, mediaType)
                         }
-                        is MediaTrackItems.MangaItems -> {
-                            MangaTracksPage(
-                                trackItems = trackItems.items,
-                                onMangaClick = { mangaId ->
-                                    onMediaClick(mangaId, mediaType)
-                                }
-                            )
-                        }
-                    }
+                    )
                 }
             }
         }
     }
-}
-
-private sealed class MediaTrackItems {
-    data class AnimeItems(val items: LazyPagingItems<AnimeTrack>?) : MediaTrackItems()
-    data class MangaItems(val items: LazyPagingItems<MangaTrack>?) : MediaTrackItems()
 }

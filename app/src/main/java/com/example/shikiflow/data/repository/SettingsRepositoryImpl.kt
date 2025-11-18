@@ -19,15 +19,13 @@ import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.BrowseOngoingOrder
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.ThemeMode
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.util.Locale
 import javax.inject.Inject
-import kotlin.time.Instant
 
 class SettingsRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val context: Context
 ): SettingsRepository {
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("app_settings")
 

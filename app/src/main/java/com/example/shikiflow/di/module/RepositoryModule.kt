@@ -1,5 +1,6 @@
 package com.example.shikiflow.di.module
 
+import android.content.Context
 import com.apollographql.apollo.ApolloClient
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.dao.AnimeTracksDao
@@ -26,8 +27,8 @@ import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MangaRepositoryImpl
 import com.example.shikiflow.data.repository.MangaTracksRepositoryImpl
 import com.example.shikiflow.data.repository.PersonRepositoryImpl
+import com.example.shikiflow.data.repository.TokenRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
-import com.example.shikiflow.domain.auth.TokenManager
 import com.example.shikiflow.domain.repository.AnimeRepository
 import com.example.shikiflow.domain.repository.AnimeTracksRepository
 import com.example.shikiflow.domain.repository.AuthRepository
@@ -39,10 +40,12 @@ import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MangaRepository
 import com.example.shikiflow.domain.repository.MangaTracksRepository
 import com.example.shikiflow.domain.repository.PersonRepository
+import com.example.shikiflow.domain.repository.TokenRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -54,8 +57,14 @@ object RepositoryModule {
     @Singleton
     fun provideAuthRepository(
         authApi: ShikimoriAuthApi,
-        tokenManager: TokenManager
-    ): AuthRepository = AuthRepositoryImpl(authApi, tokenManager)
+        tokenRepository: TokenRepository
+    ): AuthRepository = AuthRepositoryImpl(authApi, tokenRepository)
+
+    @Provides
+    @Singleton
+    fun provideTokenRepository(
+        @ApplicationContext context: Context
+    ): TokenRepository = TokenRepositoryImpl(context)
 
     @Provides
     @Singleton

@@ -8,5 +8,6 @@ import kotlinx.serialization.Serializable
 data class UserRate(
     val id: Long,
     val status: UserRateStatusEnum,
+    val score: Int,
     @SerialName("target_type") val targetType: TargetType
 )

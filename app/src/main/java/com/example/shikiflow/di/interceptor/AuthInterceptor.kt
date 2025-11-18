@@ -2,15 +2,16 @@ package com.example.shikiflow.di.interceptor
 
 import android.util.Log
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.domain.auth.TokenManager
+import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val tokenManager: TokenManager
+    private val tokenRepository: TokenRepository
 ): Interceptor {
 
     override fun intercept(chain: Interceptor.Chain): Response {
@@ -18,7 +19,7 @@ class AuthInterceptor @Inject constructor(
         Log.d("AuthInterceptor", "Original request URL: ${original.url}")
 
         val token = runBlocking {
-            tokenManager.accessTokenFlow.firstOrNull()
+            tokenRepository.tokensFlow.map { it.accessToken }.firstOrNull()
         }
         Log.d("AuthInterceptor", "Token retrieved: $token")
 

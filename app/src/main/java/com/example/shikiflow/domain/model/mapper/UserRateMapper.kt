@@ -32,17 +32,18 @@ object EnumUtils {
 
 class UserRateMapper {
     companion object {
-        fun mapStringResToStatus(resId: Int): UserRateStatusEnum? {
-            return mapOf(
-                R.string.media_user_status_anime_watching to UserRateStatusEnum.watching,
-                R.string.media_user_status_manga_reading to UserRateStatusEnum.watching,
-                R.string.media_user_status_planned to UserRateStatusEnum.planned,
-                R.string.media_user_status_completed to UserRateStatusEnum.completed,
-                R.string.media_user_status_anime_rewatching to UserRateStatusEnum.rewatching,
-                R.string.media_user_status_manga_rereading to UserRateStatusEnum.rewatching,
-                R.string.media_user_status_on_hold to UserRateStatusEnum.on_hold,
-                R.string.media_user_status_dropped to UserRateStatusEnum.dropped
-            )[resId]
+        fun mapStringResToStatus(resId: Int): UserRateStatusEnum {
+            return when(resId) {
+                R.string.media_user_status_anime_watching, R.string.media_user_status_manga_reading
+                     -> UserRateStatusEnum.watching
+                R.string.media_user_status_planned -> UserRateStatusEnum.planned
+                R.string.media_user_status_completed -> UserRateStatusEnum.completed
+                R.string.media_user_status_anime_rewatching, R.string.media_user_status_manga_rereading
+                    -> UserRateStatusEnum.rewatching
+                R.string.media_user_status_on_hold -> UserRateStatusEnum.on_hold
+                R.string.media_user_status_dropped -> UserRateStatusEnum.dropped
+                else -> UserRateStatusEnum.UNKNOWN__
+            }
         }
 
         fun simpleMapUserRateStatusToString(status: UserRateStatusEnum, mediaType: MediaType = MediaType.ANIME): Int {

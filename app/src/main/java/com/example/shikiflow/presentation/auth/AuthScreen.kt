@@ -6,9 +6,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
-import androidx.browser.customtabs.CustomTabsIntent
 import kotlinx.coroutines.launch
-import androidx.core.net.toUri
+import com.example.shikiflow.utils.WebIntent
 
 @Composable
 fun AuthScreen(
@@ -16,14 +15,13 @@ fun AuthScreen(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val customTabsIntent = CustomTabsIntent.Builder().build()
 
     AuthMain(
         onStartAuth = {
             scope.launch {
                 val authUrl = authViewModel.getAuthorizationUrl()
                 Log.d("AuthScreen", "Launching Custom Tab with URL: $authUrl")
-                customTabsIntent.launchUrl(context, authUrl.toUri())
+                WebIntent.openUrlCustomTab(context, authUrl)
             }
         }
     )

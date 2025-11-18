@@ -29,16 +29,20 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.graphql.type.AnimeStatusEnum
+import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.RateUpdateState
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack.Companion.toUserRateData
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -48,33 +52,50 @@ import com.example.shikiflow.utils.AppUiMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeTracksPage(
-    trackItems: LazyPagingItems<AnimeTrack>?,
-    tracksViewModel: AnimeTracksViewModel,
+    userStatus: UserRateStatusEnum,
+    isAppBarVisible: Boolean,
     onAnimeClick: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tracksViewModel: AnimeTracksViewModel = hiltViewModel(),
 ) {
+    val animeTrackItems = tracksViewModel.getAnimeTracks(userStatus).collectAsLazyPagingItems()
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
     val rateUpdateState by tracksViewModel.rateUpdateState
+
+    var isRefreshing by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
     var rateBottomSheet by remember { mutableStateOf(false) }
 
-    trackItems?.let {
-        if(trackItems.loadState.refresh is LoadState.Loading) {
+    PullToRefreshCustomBox(
+        isRefreshing = isRefreshing,
+        enabled = isAppBarVisible,
+        onRefresh = {
+            isRefreshing = true
+            animeTrackItems.refresh()
+            isRefreshing = false
+        }
+    ) {
+        if(animeTrackItems.loadState.refresh is LoadState.Loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-        } else if(trackItems.loadState.refresh is LoadState.Error) {
-            ErrorItem(
-                message = stringResource(R.string.atp_loading_error),
-                buttonLabel = stringResource(R.string.common_retry),
-                onButtonClick = { trackItems.refresh() }
-            )
+        } else if(animeTrackItems.loadState.refresh is LoadState.Error) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(R.string.atp_loading_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { animeTrackItems.refresh() }
+                )
+            }
         } else {
             when(appUiMode) {
                 AppUiMode.LIST -> {
                     AnimeTracksListComponent(
-                        trackItems = trackItems,
+                        trackItems = animeTrackItems,
                         onAnimeClick = onAnimeClick,
                         onLongClick = { item ->
                             rateBottomSheet = true
@@ -84,7 +105,7 @@ fun AnimeTracksPage(
                 }
                 AppUiMode.GRID -> {
                     AnimeTracksGridComponent(
-                        trackItems = trackItems,
+                        trackItems = animeTrackItems,
                         onAnimeClick = onAnimeClick,
                         onLongClick = { item ->
                             rateBottomSheet = true

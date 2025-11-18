@@ -2,7 +2,7 @@ package com.example.shikiflow.di.interceptor
 
 import android.util.Log
 import com.example.shikiflow.data.remote.ShikimoriAuthApi
-import com.example.shikiflow.domain.auth.TokenManager
+import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
@@ -13,13 +13,13 @@ import okhttp3.Route
 import javax.inject.Inject
 
 class TokenAuthenticator @Inject constructor(
-    private val tokenManager: TokenManager,
+    private val tokenRepository: TokenRepository,
     private val authApi: ShikimoriAuthApi
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
 
         val refreshToken = runBlocking {
-            tokenManager.refreshTokenFlow.firstOrNull()
+            tokenRepository.tokensFlow.firstOrNull()?.refreshToken
         }
 
         return try {
@@ -29,7 +29,7 @@ class TokenAuthenticator @Inject constructor(
                     authApi.refreshToken(refreshToken = it).body()
                 }
                 tokenResponse?.let {
-                    tokenManager.saveTokens(it)
+                    tokenRepository.saveTokens(it)
                     response.request.newBuilder()
                         .header("Authorization", "Bearer ${it.accessToken}")
                         .build()

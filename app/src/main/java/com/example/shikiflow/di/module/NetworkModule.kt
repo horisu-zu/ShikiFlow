@@ -26,7 +26,7 @@ import com.example.shikiflow.di.annotations.MangaDexRetrofit
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.KodikInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
-import com.example.shikiflow.domain.auth.TokenManager
+import com.example.shikiflow.domain.repository.TokenRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,11 +48,11 @@ class NetworkModule {
     @Singleton
     @MainOkHttpClient
     fun provideMainOkHttpClient(
-        tokenManager: TokenManager,
+        tokenRepository: TokenRepository,
         tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(tokenManager))
+            .addInterceptor(AuthInterceptor(tokenRepository))
             .authenticator(tokenAuthenticator)
             .build()
     }

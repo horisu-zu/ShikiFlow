@@ -7,6 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
@@ -62,6 +64,7 @@ import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
 import com.example.shikiflow.domain.model.tracks.RateStatus
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.launch
 import kotlin.time.Instant
@@ -103,6 +106,7 @@ fun UserRateBottomSheet(
         dragHandle = null,
         onDismissRequest = { onDismiss() }
     ) {
+        val horizontalPadding = 16.dp
         (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
             LaunchedEffect(Unit) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -111,7 +115,7 @@ fun UserRateBottomSheet(
             }
         }
         Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp),
+            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 16.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
             SheetHeader(
@@ -123,7 +127,8 @@ fun UserRateBottomSheet(
             StatusChips(
                 chips = chips.map { resId -> stringResource(id = resId) },
                 selectedStatus = selectedStatus,
-                onStatusSelected = { selectedStatus = it }
+                onStatusSelected = { selectedStatus = it },
+                horizontalPadding = horizontalPadding
             )
 
             if(userRate.id != null) {
@@ -219,6 +224,7 @@ private fun StatusChips(
     chips: List<String>,
     selectedStatus: Int,
     onStatusSelected: (Int) -> Unit,
+    horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
     val statusMap = RateStatus.entries.associateBy {
@@ -226,7 +232,8 @@ private fun StatusChips(
     }
 
     LazyRow(
-        modifier = modifier,
+        modifier = modifier.ignoreHorizontalParentPadding(horizontalPadding),
+        contentPadding = PaddingValues(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(chips) { tab ->

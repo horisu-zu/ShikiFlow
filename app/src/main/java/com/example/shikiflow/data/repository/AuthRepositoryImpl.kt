@@ -4,14 +4,15 @@ import android.util.Log
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.remote.ShikimoriAuthApi
 import com.example.shikiflow.domain.model.auth.TokenResponse
-import com.example.shikiflow.domain.auth.TokenManager
 import com.example.shikiflow.domain.repository.AuthRepository
+import com.example.shikiflow.domain.repository.TokenRepository
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
     private val authApi: ShikimoriAuthApi,
-    private val tokenManager: TokenManager
+    private val tokenRepository: TokenRepository
 ) : AuthRepository {
+
     override fun getAuthorizationUrl(): String {
         return "${BuildConfig.BASE_URL}/oauth/authorize" +
                 "?client_id=${BuildConfig.CLIENT_ID}" +
@@ -26,7 +27,7 @@ class AuthRepositoryImpl @Inject constructor(
             if (response.isSuccessful) {
                 val tokenResponse = response.body()
                     ?: return Result.failure(IllegalStateException("Empty response body"))
-                tokenManager.saveTokens(tokenResponse)
+                tokenRepository.saveTokens(tokenResponse)
                 Result.success(tokenResponse)
             } else {
                 Result.failure(
@@ -42,6 +43,6 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun logout() {
-        tokenManager.clearTokens()
+        tokenRepository.clearTokens()
     }
 }
