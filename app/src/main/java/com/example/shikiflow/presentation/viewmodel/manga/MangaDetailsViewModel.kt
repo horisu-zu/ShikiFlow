@@ -107,7 +107,7 @@ class MangaDetailsViewModel @Inject constructor(
 
                 val request = UserRateRequest(
                     status = UserRateStatusConstants.convertToApiStatus(status),
-                    score = score.takeIf { it > 0 },
+                    score = score,
                     chapters = progress,
                     rewatches = rewatches
                 )

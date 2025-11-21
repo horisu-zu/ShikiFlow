@@ -294,6 +294,7 @@
 
     <string name="expandable_text_expand">Expand</string>
     <string name="expandable_text_collapse">Collapse</string>
+    <string name="track_average_score">Average Score — %1$s</string>
 
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>

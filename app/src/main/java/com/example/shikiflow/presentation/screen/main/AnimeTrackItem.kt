@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.determineSeason
@@ -56,13 +55,13 @@ fun AnimeTrackItem(
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
         ) {
             Text(
                 text = userRate.anime.name,
-                style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.SemiBold,
-                //fontSize = 10.sp,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
@@ -83,37 +82,35 @@ fun AnimeTrackItem(
                         append(" • ")
                         append("${userRate.anime.score} ★")
                     }
-                }, fontSize = 12.sp
+                }, style = MaterialTheme.typography.labelMedium
             )
 
             if (userRate.anime.status != AnimeStatusEnum.anons) {
-                Column {
-                    ProgressBar(
-                        progress = userRate.anime.let { animeShort ->
+                ProgressBar(
+                    progress = userRate.anime.let { animeShort ->
+                        val totalEpisodes = when {
+                            animeShort.episodes > 0 -> animeShort.episodes
+                            animeShort.episodesAired > 0 -> animeShort.episodesAired
+                            else -> null
+                        }
+                        totalEpisodes?.let { userRate.track.episodes.toFloat() / it } ?: 0f
+                    },
+                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp)
+                )
+                Text(
+                    text = stringResource(
+                        id = R.string.ongoing_episodes,
+                        userRate.track.episodes,
+                        userRate.anime.let { animeShort ->
                             val totalEpisodes = when {
                                 animeShort.episodes > 0 -> animeShort.episodes
                                 animeShort.episodesAired > 0 -> animeShort.episodesAired
-                                else -> null
+                                else -> 0
                             }
-                            totalEpisodes?.let { userRate.track.episodes.toFloat() / it } ?: 0f
-                        },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Text(
-                        text = stringResource(
-                            id = R.string.ongoing_episodes,
-                            userRate.track.episodes,
-                            userRate.anime.let { animeShort ->
-                                val totalEpisodes = when {
-                                    animeShort.episodes > 0 -> animeShort.episodes
-                                    animeShort.episodesAired > 0 -> animeShort.episodesAired
-                                    else -> 0
-                                }
-                                totalEpisodes
-                            }
-                        ), fontSize = 12.sp
-                    )
-                }
+                            totalEpisodes
+                        }
+                    ), style = MaterialTheme.typography.labelMedium
+                )
             } else {
                 userRate.anime.airedOn?.let { date ->
                     StatusCard(

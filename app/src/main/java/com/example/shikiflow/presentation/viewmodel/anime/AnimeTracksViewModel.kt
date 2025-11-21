@@ -65,7 +65,7 @@ class AnimeTracksViewModel @Inject constructor(
         try {
             val request = UserRateRequest(
                 status = UserRateStatusConstants.convertToApiStatus(status),
-                score = score.takeIf { it > 0 },
+                score = score,
                 rewatches = rewatches,
                 episodes = progress
             )

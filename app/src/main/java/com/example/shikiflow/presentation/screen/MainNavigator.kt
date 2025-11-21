@@ -3,11 +3,11 @@ package com.example.shikiflow.presentation.screen
 import android.content.res.Configuration
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
@@ -65,6 +65,7 @@ fun MainNavigator(
     val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
     val currentUser by userViewModel.userFlow.collectAsState()
+
     val isKeyboardVisible = WindowInsets.isImeVisible && LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val customNavType = with(adaptiveInfo) {
@@ -97,7 +98,7 @@ fun MainNavigator(
                         Icon(
                             painter = painterResource(
                                 id = if (isSelected) navItem.selectedIconRes
-                                else navItem.unselectedIconRes
+                                    else navItem.unselectedIconRes
                             ),
                             contentDescription = stringResource(id = navItem.title),
                             modifier = Modifier.size(24.dp)
@@ -165,23 +166,17 @@ fun MainNavigator(
             transitionSpec = {
                 slideInVertically(
                     initialOffsetY = { it },
-                    animationSpec = tween(300)
-                ) + fadeIn(
-                    initialAlpha = 0.1f,
-                    animationSpec = tween(300)
-                ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                ) + fadeIn() togetherWith ExitTransition.None
             },
             popTransitionSpec = {
-                EnterTransition.None togetherWith slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = tween(300)
-                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(300))
+                EnterTransition.None togetherWith fadeOut()
             },
             predictivePopTransitionSpec = {
-                EnterTransition.None togetherWith slideOutVertically(
-                    targetOffsetY = { it },
-                    animationSpec = tween(300)
-                ) + fadeOut(targetAlpha = 0.1f, animationSpec = tween(300))
+                EnterTransition.None togetherWith fadeOut()
             }
         )
     }

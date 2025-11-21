@@ -22,13 +22,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserRate
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun TrackSection(
     isCurrentUser: Boolean,
-    userRateData: Map<MediaType, Map<Int, Int>>,
+    userRateData: Map<MediaType, List<UserRate>>,
     onCompareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -67,12 +68,13 @@ fun TrackSection(
             }
         }
 
-        userRateData.entries.forEachIndexed { index, (mediaType, ratesMap) ->
+        userRateData.entries.forEachIndexed { index, (mediaType, ratesList) ->
             if (index > 0) {
                 HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(12.dp))
             }
 
             TrackItem(
+                mediaType = mediaType,
                 iconResource = when (mediaType) {
                     MediaType.ANIME -> IconResource.Drawable(R.drawable.ic_anime)
                     MediaType.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
@@ -81,10 +83,8 @@ fun TrackSection(
                     MediaType.ANIME -> stringResource(R.string.main_track_mode_anime)
                     MediaType.MANGA -> stringResource(R.string.main_track_mode_manga)
                 },
-                groupedData = ratesMap.mapKeys { (resId, _) ->
-                    stringResource(resId)
-                },
-                itemsCount = ratesMap.values.sum()
+                userRatesList = ratesList,
+                itemsCount = ratesList.size
             )
         }
     }

@@ -1,10 +1,10 @@
 package com.example.shikiflow.domain.usecase
 
+import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.tracks.TargetType.Companion.toMediaType
 import com.example.shikiflow.domain.model.user.UserFavoritesResponse.Companion.toDomain
 import com.example.shikiflow.domain.model.user.UserRateExpanded
 import com.example.shikiflow.domain.repository.UserRepository
-import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -22,9 +22,6 @@ class GetUserProfileUseCase @Inject constructor(
 
                 val userRates = rates.await().groupBy { it.targetType }
                     .mapKeys { it.key.toMediaType() }
-                    .mapValues { (mediaType, ratesList) ->
-                        ratesList.groupAndSortByStatus(mediaType)
-                    }
                 val userFavorites = favorites.await().toDomain().groupBy { it.category }
                 UserRateExpanded(userRates, userFavorites)
             }
