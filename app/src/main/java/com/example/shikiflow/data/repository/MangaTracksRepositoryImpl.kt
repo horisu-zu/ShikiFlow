@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.repository
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -21,6 +22,7 @@ import com.example.shikiflow.domain.model.track.manga.MangaUserTrack
 import com.example.shikiflow.domain.repository.MangaTracksRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.sync.Mutex
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
@@ -29,6 +31,8 @@ class MangaTracksRepositoryImpl @Inject constructor(
     private val appRoomDatabase: AppRoomDatabase,
     private val mangaTracksDao: MangaTracksDao
 ): MangaTracksRepository {
+
+    private val requestMutex = Mutex()
 
     override fun getMangaTracks(status: UserRateStatusEnum): Flow<PagingData<MangaTrack>> {
         return Pager(
@@ -61,6 +65,8 @@ class MangaTracksRepositoryImpl @Inject constructor(
             status = Optional.presentIfNotNull(status),
             order = Optional.presentIfNotNull(order)
         )
+
+        Log.d("MangaTracksRepository", "Query for status $status: $query")
 
         return try {
             val response = apolloClient.query(query).execute()

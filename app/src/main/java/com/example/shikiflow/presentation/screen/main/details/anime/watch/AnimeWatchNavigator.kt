@@ -5,6 +5,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 
 @Composable
 fun AnimeWatchNavigator(
@@ -12,7 +13,7 @@ fun AnimeWatchNavigator(
     shikimoriId: String,
     completedEpisodes: Int,
     onNavigateBack: () -> Unit,
-    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit,
+    onEpisodeNavigate: (PlayerNavigate) -> Unit,
     source: String
 ) {
     val watchBackstack = rememberNavBackStack(AnimeWatchNavRoute.TranslationSelect(shikimoriId))
@@ -39,7 +40,7 @@ fun AnimeWatchNavigator(
                     shikimoriId = route.shikimoriId,
                     navOptions = options,
                     onNavigateBack = onNavigateBack,
-                    animeTranslationsViewModel = hiltViewModel(key = "${source}_translations")
+                    animeTranslationsViewModel = hiltViewModel(key = source)
                 )
             }
             entry<AnimeWatchNavRoute.EpisodeSelection> { route ->

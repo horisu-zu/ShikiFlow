@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MediaItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,7 +42,7 @@ fun EpisodeSelectionScreen(
     link: String,
     completedEpisodes: Int,
     navOptions: AnimeWatchNavOptions,
-    onEpisodeNavigate: (String, String, String, Int, Int) -> Unit
+    onEpisodeNavigate: (PlayerNavigate) -> Unit
 ) {
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -97,7 +98,9 @@ fun EpisodeSelectionScreen(
                     mediaNumber = serialNum.toString(),
                     onItemClick = {
                         Log.d("EpisodeSelectionScreen", "Navigating to episode $serialNum")
-                        onEpisodeNavigate(title, link, translationGroup, serialNum, episodesCount)
+                        onEpisodeNavigate(
+                            PlayerNavigate(title, link, translationGroup, serialNum, episodesCount)
+                        )
                     },
                     isCompleted = serialNum <= completedEpisodes,
                     mediaType = MediaType.ANIME

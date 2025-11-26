@@ -1,7 +1,8 @@
 package com.example.shikiflow.presentation.screen.main
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.HorizontalPager
@@ -36,9 +37,9 @@ fun MainPage(
                 coroutineScope.launch {
                     pagerState.animateScrollToPage(
                         page = it,
-                        animationSpec = tween(
-                            durationMillis = 500,
-                            easing = FastOutSlowInEasing
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
                         )
                     )
                 }
@@ -46,28 +47,32 @@ fun MainPage(
         )
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) { page ->
             val status = UserRateMapper.mapStringResToStatus(tabs[page])
 
-            when(mediaType) {
-                MediaType.ANIME -> {
-                    AnimeTracksPage(
-                        userStatus = status,
-                        isAppBarVisible = isAppBarVisible,
-                        onAnimeClick = { animeId ->
-                            onMediaClick(animeId, mediaType)
-                        }
-                    )
-                }
-                MediaType.MANGA -> {
-                    MangaTracksPage(
-                        userStatus = status,
-                        isAppBarVisible = isAppBarVisible,
-                        onMangaClick = { mangaId ->
-                            onMediaClick(mangaId, mediaType)
-                        }
-                    )
+            AnimatedContent(
+                targetState = mediaType
+            ) { type ->
+                when(type) {
+                    MediaType.ANIME -> {
+                        AnimeTracksPage(
+                            userStatus = status,
+                            isAppBarVisible = isAppBarVisible,
+                            onAnimeClick = { animeId ->
+                                onMediaClick(animeId, mediaType)
+                            }
+                        )
+                    }
+                    MediaType.MANGA -> {
+                        MangaTracksPage(
+                            userStatus = status,
+                            isAppBarVisible = isAppBarVisible,
+                            onMangaClick = { mangaId ->
+                                onMediaClick(mangaId, mediaType)
+                            }
+                        )
+                    }
                 }
             }
         }

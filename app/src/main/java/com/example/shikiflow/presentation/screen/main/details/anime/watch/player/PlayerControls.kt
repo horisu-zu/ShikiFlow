@@ -75,7 +75,7 @@ fun PlayerControls(
                 painter = painterResource(id = R.drawable.ic_next),
                 contentDescription = null,
                 modifier = Modifier.size(36.dp),
-                tint = Color.White
+                tint = Color.White.copy(alpha = if(isNextAvailable) 1f else 0.35f)
             )
         }
     }

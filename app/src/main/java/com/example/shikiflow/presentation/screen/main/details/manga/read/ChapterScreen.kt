@@ -256,7 +256,7 @@ private fun ChapterScrollModeComponent(
         ) {
             ChapterNavigationComponent(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .navigationBarsPadding()
                     .imePadding(),
                 currentPage = currentPage,
                 pageCount = chapterPageUrls.size,

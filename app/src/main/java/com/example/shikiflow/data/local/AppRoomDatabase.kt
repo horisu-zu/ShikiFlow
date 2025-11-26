@@ -6,24 +6,22 @@ import androidx.room.TypeConverters
 import com.example.shikiflow.data.local.converter.InstantConverter
 import com.example.shikiflow.data.local.dao.AnimeTracksDao
 import com.example.shikiflow.data.local.dao.MangaTracksDao
-import com.example.shikiflow.data.local.dao.VersionDao
 import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity
 import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity
-import com.example.shikiflow.data.local.entity.version.AssetsEntity
-import com.example.shikiflow.data.local.entity.version.VersionEntity
 
 @Database(
     entities = [AnimeTrackEntity::class, AnimeShortEntity::class,
         MangaTrackEntity::class, MangaShortEntity::class,
-        VersionEntity::class, AssetsEntity::class],
-    version = 1,
+        //VersionEntity::class, AssetsEntity::class
+        ],
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(InstantConverter::class)
 abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun animeTracksDao(): AnimeTracksDao
     abstract fun mangaTracksDao(): MangaTracksDao
-    abstract fun versionDao(): VersionDao
+    //abstract fun versionDao(): VersionDao
 }

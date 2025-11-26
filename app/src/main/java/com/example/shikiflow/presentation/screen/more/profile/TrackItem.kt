@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,11 +70,15 @@ fun TrackItem(
     itemsCount: Int,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-    val groupedData = userRatesList.groupAndSortByStatus(mediaType)
-    val shouldShowExpand = userRatesList.filter { rate ->
-        rate.status == UserRateStatusEnum.completed
-    }.sumOf { it.score } > 50
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
+    val groupedData = remember(userRatesList) {
+        userRatesList.groupAndSortByStatus(mediaType)
+    }
+    val shouldShowExpand = remember(userRatesList) {
+        userRatesList
+            .filter { it.status == UserRateStatusEnum.completed }
+            .sumOf { it.score } > 50
+    }
 
     Column(
         modifier = modifier.fillMaxWidth()
@@ -96,14 +101,15 @@ fun TrackItem(
         )
 
         AnimatedVisibility(visible = isExpanded) {
-            StatsGraph(
-                completedStats = userRatesList.filter {
-                    it.status == UserRateStatusEnum.completed && it.score > 0
-                }
+            val completedStatsMap = remember(userRatesList) {
+                userRatesList
+                    .filter { it.status == UserRateStatusEnum.completed && it.score > 0 }
                     .groupBy { it.score }
-                    .mapValues { (score, userRates) ->
-                        userRates.size
-                    },
+                    .mapValues { (score, userRates) -> userRates.size }
+            }
+
+            StatsGraph(
+                completedStats = completedStatsMap,
                 modifier = Modifier
                     .height(240.dp)
                     .padding(top = 8.dp)
@@ -190,16 +196,19 @@ private fun StatsGraph(
     modifier: Modifier = Modifier
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
-    val xAxis = (1..10).toList()
-    val yAxis = xAxis.map { score ->
-        completedStats[score]?.toDouble() ?: 0.0
+    val averageScore = remember(completedStats) {
+        completedStats.entries
+            .sumOf { (score, count) ->
+                score * count
+            } / completedStats.values.sum().toDouble()
     }
-    val averageScore = completedStats.entries
-        .sumOf { (score, count) ->
-            score * count
-        } / completedStats.values.sum().toDouble()
 
     LaunchedEffect(completedStats) {
+        val xAxis = (1..10).toList()
+        val yAxis = xAxis.map { score ->
+            completedStats[score]?.toDouble() ?: 0.0
+        }
+
         modelProducer.runTransaction {
             columnSeries {
                 series(x = xAxis, y = yAxis)

@@ -17,7 +17,6 @@ data class VersionDto(
         fun VersionDto.toDomain(): GithubRelease {
             return GithubRelease(
                 tagName = this.version.versionTag,
-                name = this.version.name,
                 body = this.version.body,
                 publishedAt = this.version.publishedAt,
                 assets = this.assets.map { assetEntity -> assetEntity.toDomain() }

@@ -12,7 +12,6 @@ import kotlin.time.Instant
 @Serializable
 data class GithubRelease(
     @SerialName("tag_name") val tagName: String,
-    @SerialName("name") val name: String,
     @SerialName("body") val body: String? = null,
     @Contextual @SerialName("published_at") val publishedAt: Instant,
     val assets: List<Asset> = emptyList()
@@ -27,7 +26,6 @@ data class GithubRelease(
         fun GithubRelease.toVersionEntity(): VersionEntity {
             return VersionEntity(
                 versionTag = this.tagName,
-                name = this.name,
                 body = this.body,
                 publishedAt = this.publishedAt,
             )

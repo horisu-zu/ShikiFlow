@@ -1,16 +1,10 @@
 package com.example.shikiflow.presentation.navigation
 
 import com.example.shikiflow.presentation.screen.MainNavOptions
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 
 interface AppNavOptions : MainNavOptions {
     fun navigateToAuth()
     fun navigateToMain()
-    fun navigateToPlayer(
-        title: String,
-        link: String,
-        translationGroup: String,
-        serialNum: Int,
-        offset: Int = 0,
-        episodesCount: Int
-    )
+    fun navigateToPlayer(playerNavigate: PlayerNavigate)
 }

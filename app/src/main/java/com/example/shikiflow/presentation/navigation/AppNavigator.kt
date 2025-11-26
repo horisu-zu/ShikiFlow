@@ -17,6 +17,7 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerScreen
 import com.example.shikiflow.presentation.viewmodel.AuthState
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
@@ -38,18 +39,11 @@ fun AppNavigator(
             appBackstack.replaceAll { AppNavRoute.Main }
         }
 
-        override fun navigateToPlayer(
-            title: String,
-            link: String,
-            translationGroup: String,
-            serialNum: Int,
-            offset: Int,
-            episodesCount: Int
-        ) {
+        override fun navigateToPlayer(playerNavigate: PlayerNavigate) {
             if(appBackstack.lastOrNull() is AppNavRoute.Player) {
                 appBackstack.removeLastOrNull()
             }
-            appBackstack.add(AppNavRoute.Player(title, link, translationGroup, serialNum + offset, episodesCount))
+            appBackstack.add(AppNavRoute.Player(playerNavigate))
         }
 
         override fun navigateBack() {
@@ -89,11 +83,7 @@ fun AppNavigator(
             }
             entry<AppNavRoute.Player> { route ->
                 PlayerScreen(
-                    title = route.title,
-                    link = route.link,
-                    translationGroup = route.translationGroup,
-                    serialNum = route.serialNum,
-                    episodesCount = route.episodesCount,
+                    playerNavigate = route.playerNavigate,
                     navOptions = options
                 )
             }

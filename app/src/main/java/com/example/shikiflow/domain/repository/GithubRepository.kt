@@ -14,11 +14,11 @@ interface GithubRepository {
         versionTag: String
     ): GithubRelease?
 
-    suspend fun getLatestLocalVersion(
+    /*suspend fun getLatestLocalVersion(
         versionTag: String
     ): GithubRelease?
 
     suspend fun saveLocalVersion(
         githubRelease: GithubRelease
-    )
+    )*/
 }

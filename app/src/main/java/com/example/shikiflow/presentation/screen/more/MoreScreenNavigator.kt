@@ -9,9 +9,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
@@ -122,7 +124,11 @@ fun MoreScreenNavigator(
             EnterTransition.None togetherWith fadeOut(
                 animationSpec = tween(300)
             )
-        }
+        },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        )
     )
 
     /*NavHost(

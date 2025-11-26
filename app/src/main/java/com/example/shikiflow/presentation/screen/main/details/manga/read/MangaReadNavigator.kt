@@ -1,6 +1,10 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -12,6 +16,7 @@ fun MangaReadNavigator(
     title: String,
     completedChapters: Int,
     onNavigateBack: () -> Unit,
+    onChapterScreen: (Boolean) -> Unit,
     source: String
 ) {
     val mangaReadBackstack = when(mangaDexIds.size) {
@@ -26,6 +31,16 @@ fun MangaReadNavigator(
                 title = title
             ))
         }
+    }
+
+    val isChapterScreen by remember {
+        derivedStateOf {
+            mangaReadBackstack.last() is MangaReadNavRoute.ChapterScreen
+        }
+    }
+
+    LaunchedEffect(isChapterScreen) {
+        onChapterScreen(isChapterScreen)
     }
 
     val navOptions = object : MangaReadNavOptions {

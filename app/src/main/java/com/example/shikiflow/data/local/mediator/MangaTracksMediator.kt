@@ -87,7 +87,6 @@ class MangaTracksMediator(
                     MediatorResult.Success(endOfPaginationReached = endOfPaginationReached)
                 },
                 onFailure = { exception ->
-                    Log.e("MangaTracksMediator", "Error: $exception")
                     MediatorResult.Error(exception)
                 }
             )

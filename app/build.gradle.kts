@@ -29,6 +29,8 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField("long", "VERSION_TIMESTAMP", "${System.currentTimeMillis()}")
     }
 
     buildTypes {

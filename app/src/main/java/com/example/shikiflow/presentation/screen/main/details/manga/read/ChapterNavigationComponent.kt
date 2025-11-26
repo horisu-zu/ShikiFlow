@@ -1,21 +1,22 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,6 +36,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ChapterNavigationComponent(
     currentPage: Int,
@@ -57,11 +59,9 @@ fun ChapterNavigationComponent(
         }
     }
 
-    Row(
-        modifier = modifier.wrapContentWidth().clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.75f)),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally)
+    HorizontalFloatingToolbar(
+        expanded = true,
+        modifier = modifier.height(IntrinsicSize.Min)
     ) {
         IconButton(
             onClick = { onNavigateClick(currentPage - 1) },
@@ -109,16 +109,18 @@ fun ChapterNavigationComponent(
                 }
             }, decorationBox = { innerTextField ->
                 Box(
-                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(6.dp))
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
-                        .padding(horizontal = 4.dp),
+                    modifier = Modifier.fillMaxSize()
+                        .padding(vertical = 8.dp)
+                        .clip(RoundedCornerShape(6.dp))
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
                     contentAlignment = Alignment.Center
                 ) { innerTextField() }
             }
         )
         Text(
             text = "/ $pageCount",
-            style = MaterialTheme.typography.bodyMedium
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.align(Alignment.CenterVertically)
         )
         IconButton(
             onClick = { onNavigateClick(currentPage + 1) },

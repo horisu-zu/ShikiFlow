@@ -27,6 +27,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
@@ -67,9 +70,11 @@ fun MainNavigator(
     val currentUser by userViewModel.userFlow.collectAsState()
 
     val isKeyboardVisible = WindowInsets.isImeVisible && LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    var isChapterScreen by remember { mutableStateOf(false) }
+
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val customNavType = with(adaptiveInfo) {
-        if(isKeyboardVisible) {
+        if(isKeyboardVisible || isChapterScreen) {
             NavigationSuiteType.None
         } else if(windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)) {
             NavigationSuiteType.NavigationRail
@@ -118,15 +123,11 @@ fun MainNavigator(
                             mainNavBackStack.add(navItem.route)
                         } else {
                             when(navItem) {
-                                BottomNavItem.Home -> {
-                                    mainScreenBackStack.subList(1, mainScreenBackStack.size).clear()
-                                }
-                                BottomNavItem.Browse -> {
-                                    browseScreenBackStack.subList(1, browseScreenBackStack.size).clear()
-                                }
-                                BottomNavItem.More -> {
-                                    moreScreenBackStack.subList(1, moreScreenBackStack.size).clear()
-                                }
+                                BottomNavItem.Home -> mainScreenBackStack
+                                BottomNavItem.Browse -> browseScreenBackStack
+                                BottomNavItem.More -> moreScreenBackStack
+                            }.also { backstack ->
+                                backstack.subList(1, backstack.size).clear()
                             }
                         }
                     }
@@ -142,18 +143,20 @@ fun MainNavigator(
                     MainScreenNavigator(
                         mainScreenBackStack = mainScreenBackStack,
                         currentUserData = currentUser,
-                        onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
-                            appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
-                        }
+                        onEpisodeNavigate = { playerNavigate ->
+                            appNavOptions.navigateToPlayer(playerNavigate)
+                        },
+                        onChapterScreen = { isChapterScreen = it }
                     )
                 }
                 entry<MainNavRoute.Browse> {
                     BrowseScreenNavigator(
                         browseScreenBackStack = browseScreenBackStack,
                         currentUserData = currentUser,
-                        onEpisodeNavigate = { title, link, translationGroup, serialNum, episodesCount ->
-                            appNavOptions.navigateToPlayer(title, link, translationGroup, serialNum, episodesCount = episodesCount)
-                        }
+                        onEpisodeNavigate = { playerNavigate ->
+                            appNavOptions.navigateToPlayer(playerNavigate)
+                        },
+                        onChapterScreen = { isChapterScreen = it }
                     )
                 }
                 entry<MainNavRoute.More> {
@@ -165,7 +168,7 @@ fun MainNavigator(
             },
             transitionSpec = {
                 slideInVertically(
-                    initialOffsetY = { it },
+                    initialOffsetY = { it / 2 },
                     animationSpec = spring(
                         dampingRatio = Spring.DampingRatioNoBouncy,
                         stiffness = Spring.StiffnessMediumLow

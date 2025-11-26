@@ -1,6 +1,5 @@
 package com.example.shikiflow.domain.usecase
 
-import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.domain.model.tracks.TargetType.Companion.toMediaType
 import com.example.shikiflow.domain.model.user.UserFavoritesResponse.Companion.toDomain
 import com.example.shikiflow.domain.model.user.UserRateExpanded

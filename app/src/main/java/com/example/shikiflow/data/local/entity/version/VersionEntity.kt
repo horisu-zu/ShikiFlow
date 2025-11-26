@@ -7,7 +7,6 @@ import kotlin.time.Instant
 @Entity("version")
 data class VersionEntity(
     @PrimaryKey val versionTag: String,
-    val name: String,
     val body: String? = null,
     val publishedAt: Instant
 )

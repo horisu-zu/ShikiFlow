@@ -55,7 +55,7 @@ fun Player(
     qualityData: KodikLink?,
     context: Context,
     isLoadingEpisode: Boolean,
-    onSeekToEpisode: (Int, Int) -> Unit,
+    onSeekToEpisode: (Int) -> Unit,
     onQualityChange: (String) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
@@ -147,7 +147,7 @@ fun Player(
                 onNavigateBack = onNavigateBack,
                 onQualityChange = onQualityChange,
                 onEpisodeChange = { episodeNum ->
-                    onSeekToEpisode(episodeNum, 0)
+                    onSeekToEpisode(episodeNum)
                 },
                 onExpand = { value ->
                     isDropdownExpanded = value
@@ -161,7 +161,7 @@ fun Player(
             isPreviousAvailable = currentEpisode > 1,
             isNextAvailable = currentEpisode < episodesCount,
             onSeekToEpisode = { offset ->
-                onSeekToEpisode(currentEpisode, offset)
+                onSeekToEpisode(currentEpisode + offset)
             },
             onPlay = {
                 if(playerState.isPlaying) playerViewModel.pause() else playerViewModel.play()

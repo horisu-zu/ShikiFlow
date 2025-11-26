@@ -213,7 +213,7 @@ fun AnimeTranslationSelectScreen(
                                     },
                                     modifier = Modifier
                                         .padding(horizontal = 12.dp)
-                                        .animateItem() //this modifier is the reason of weird blick behavior
+                                        .animateItem()
                                 )
                             }
                         }

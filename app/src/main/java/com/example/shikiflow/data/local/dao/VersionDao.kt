@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import com.example.shikiflow.data.local.entity.version.AssetsEntity
 import com.example.shikiflow.data.local.entity.version.VersionDto
 import com.example.shikiflow.data.local.entity.version.VersionEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class VersionDao {
@@ -27,4 +28,7 @@ abstract class VersionDao {
     @Transaction
     @Query("SELECT * FROM version WHERE versionTag = :localVersionTag")
     abstract suspend fun getLatestLocalVersion(localVersionTag: String): VersionDto?
+
+    @Query("SELECT * FROM version WHERE versionTag = :versionTag LIMIT 1")
+    abstract fun observeReleaseByVersion(versionTag: String): Flow<VersionDto?>
 }

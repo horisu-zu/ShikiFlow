@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -23,11 +24,7 @@ import com.example.shikiflow.utils.Resource
 @OptIn(UnstableApi::class)
 @Composable
 fun PlayerScreen(
-    title: String,
-    link: String,
-    translationGroup: String,
-    serialNum: Int,
-    episodesCount: Int,
+    playerNavigate: PlayerNavigate,
     navOptions: AppNavOptions,
     animeEpisodeViewModel: AnimeEpisodeViewModel = hiltViewModel()
 ) {
@@ -41,6 +38,12 @@ fun PlayerScreen(
         ExoPlayer.Builder(context).build()
     }
 
+    val isLoadingEpisodeData by remember {
+        derivedStateOf {
+            episodeState is Resource.Loading
+        }
+    }
+
     DisposableEffect(exoPlayer) {
         onDispose {
             exoPlayer.stop()
@@ -50,8 +53,8 @@ fun PlayerScreen(
         }
     }
 
-    LaunchedEffect(link, serialNum) {
-        animeEpisodeViewModel.getEpisode(link, serialNum)
+    LaunchedEffect(playerNavigate.link, playerNavigate.serialNum) {
+        animeEpisodeViewModel.getEpisode(playerNavigate.link, playerNavigate.serialNum)
     }
 
     LaunchedEffect(mediaSource) {
@@ -67,16 +70,20 @@ fun PlayerScreen(
     ) {
         Player(
             exoPlayer = exoPlayer,
-            title = title,
+            title = playerNavigate.title,
             currentQuality = currentQuality,
-            translationGroup = translationGroup,
-            currentEpisode = serialNum,
-            episodesCount = episodesCount,
+            translationGroup = playerNavigate.translationGroup,
+            currentEpisode = playerNavigate.serialNum,
+            episodesCount = playerNavigate.episodesCount,
             qualityData = episodeState.data,
             context = context,
-            isLoadingEpisode = episodeState is Resource.Loading,
-            onSeekToEpisode = { episodeNum, offset ->
-                navOptions.navigateToPlayer(title, link, translationGroup, episodeNum, offset, episodesCount)
+            isLoadingEpisode = isLoadingEpisodeData,
+            onSeekToEpisode = { episodeNum ->
+                navOptions.navigateToPlayer(
+                    playerNavigate = playerNavigate.copy(
+                        serialNum = episodeNum
+                    )
+                )
             },
             onQualityChange = { quality ->
                 animeEpisodeViewModel.createMediaSource(quality)

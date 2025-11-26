@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -130,13 +129,11 @@ fun ChapterPageModeComponent(
             visible = isNavigationVisible,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.fillMaxWidth()
-                .align(Alignment.BottomCenter)
-                .padding(16.dp)
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .navigationBarsPadding()
                 .imePadding()
         ) {
             ChapterNavigationComponent(
-                modifier = Modifier.fillMaxWidth(),
                 currentPage = chapterPage,
                 pageCount = pageCount,
                 onNavigateClick = { pageNumber ->
