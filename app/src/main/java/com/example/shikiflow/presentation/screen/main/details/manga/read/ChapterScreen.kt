@@ -37,7 +37,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -56,7 +55,6 @@ import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterNavigation
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import net.engawapg.lib.zoomable.rememberZoomState
 import net.engawapg.lib.zoomable.zoomable
 
@@ -67,10 +65,12 @@ fun ChapterScreen(
     chapterNumber: String,
     title: String?,
     navOptions: MangaReadNavOptions,
-    chapterViewModel: ChapterViewModel = hiltViewModel()
+    chapterViewModel: ChapterViewModel = hiltViewModel(),
+    chapterNavigationViewModel: ChapterNavigationViewModel = hiltViewModel()
 ) {
     val chapterSettings by chapterViewModel.mangaSettings.collectAsStateWithLifecycle()
     val chapterContent by chapterViewModel.chapterContent.collectAsStateWithLifecycle()
+    val isNavigationVisible by chapterNavigationViewModel.isNavigationVisible.collectAsStateWithLifecycle()
 
     val showBottomSheet = remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -139,33 +139,55 @@ fun ChapterScreen(
             }
             is Resource.Success -> {
                 chapterContent.data?.let { pageUrls ->
-                    when(chapterSettings.chapterUIMode) {
-                        ChapterUIMode.PAGE -> {
-                            ChapterPageModeComponent(
-                                chapterPageUrls = pageUrls,
-                                chapterPage = chapterPage,
-                                onPageChange = { pageNumber -> chapterPage = pageNumber },
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(
-                                        top = paddingValues.calculateTopPadding(),
-                                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                                    )
-                            )
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        when(chapterSettings.chapterUIMode) {
+                            ChapterUIMode.PAGE -> {
+                                ChapterPageModeComponent(
+                                    chapterPageUrls = pageUrls,
+                                    chapterPage = chapterPage,
+                                    onPageChange = { pageNumber -> chapterPage = pageNumber },
+                                    onScrollDetected = { chapterNavigationViewModel.onScrollDetected() },
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(
+                                            top = paddingValues.calculateTopPadding(),
+                                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                                        )
+                                )
+                            }
+                            ChapterUIMode.SCROLL -> {
+                                ChapterScrollModeComponent(
+                                    chapterPageUrls = pageUrls,
+                                    initialPage = chapterPage,
+                                    onPageChange = { pageNumber -> chapterPage = pageNumber },
+                                    onScrollDetected = { chapterNavigationViewModel.onScrollDetected() },
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(
+                                            top = paddingValues.calculateTopPadding(),
+                                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                                        )
+                                )
+                            }
                         }
-                        ChapterUIMode.SCROLL -> {
-                            ChapterScrollModeComponent(
-                                chapterPageUrls = pageUrls,
-                                initialPage = chapterPage,
-                                onPageChange = { pageNumber -> chapterPage = pageNumber },
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .padding(
-                                        top = paddingValues.calculateTopPadding(),
-                                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                                    )
+                        AnimatedVisibility(
+                            visible = isNavigationVisible,
+                            enter = fadeIn(),
+                            exit = fadeOut(),
+                            modifier = Modifier.align(Alignment.BottomCenter)
+                                .navigationBarsPadding()
+                                .imePadding()
+                        ) {
+                            ChapterNavigationComponent(
+                                currentPage = chapterPage,
+                                pageCount = pageUrls.size,
+                                onNavigateClick = { pageNumber ->
+                                    chapterPage = pageNumber.coerceIn(1, pageUrls.size)
+                                },
+                                onInteractionStart = chapterNavigationViewModel::onUserInteractionStart,
+                                onInteractionEnd = chapterNavigationViewModel::onUserInteractionEnd
                             )
                         }
                     }
@@ -201,14 +223,12 @@ private fun ChapterScrollModeComponent(
     chapterPageUrls: List<String>,
     initialPage: Int,
     onPageChange: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    chapterNavigationViewModel: ChapterNavigationViewModel = hiltViewModel()
+    onScrollDetected: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val isNavigationVisible by chapterNavigationViewModel.isNavigationVisible.collectAsStateWithLifecycle()
     val lazyListState = rememberLazyListState(
         initialFirstVisibleItemIndex = initialPage - 1
     )
-    val scope = rememberCoroutineScope()
 
     val currentPage by remember {
         derivedStateOf {
@@ -223,50 +243,21 @@ private fun ChapterScrollModeComponent(
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
             .distinctUntilChanged()
-            .collect {
-                chapterNavigationViewModel.onScrollDetected()
-            }
+            .collect { onScrollDetected() }
     }
 
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.BottomCenter
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier.zoomable(rememberZoomState()), //Well, it's easier this way I guess
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        contentPadding = PaddingValues(vertical = 8.dp)
     ) {
-        LazyColumn(
-            state = lazyListState,
-            modifier = Modifier
-                .fillMaxSize()
-                .zoomable(rememberZoomState()), //Well, it's easier this way I guess
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-            contentPadding = PaddingValues(vertical = 8.dp)
-        ) {
-            items(chapterPageUrls.size) { index ->
-                val chapterPageUrl = chapterPageUrls[index]
+        items(chapterPageUrls.size) { index ->
+            val chapterPageUrl = chapterPageUrls[index]
 
-                ChapterItem(
-                    pageUrl = chapterPageUrl,
-                    pageNumber = index + 1
-                )
-            }
-        }
-        AnimatedVisibility(
-            visible = isNavigationVisible,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            ChapterNavigationComponent(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .imePadding(),
-                currentPage = currentPage,
-                pageCount = chapterPageUrls.size,
-                onNavigateClick = { pageNumber ->
-                    scope.launch {
-                        lazyListState.animateScrollToItem(pageNumber - 1)
-                    }
-                },
-                onInteractionStart = chapterNavigationViewModel::onUserInteractionStart,
-                onInteractionEnd = chapterNavigationViewModel::onUserInteractionEnd
+            ChapterItem(
+                pageUrl = chapterPageUrl,
+                pageNumber = index + 1
             )
         }
     }

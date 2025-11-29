@@ -9,6 +9,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import com.example.shikiflow.presentation.screen.LocalBottomBarController
 
 @Composable
 fun MangaReadNavigator(
@@ -16,9 +17,9 @@ fun MangaReadNavigator(
     title: String,
     completedChapters: Int,
     onNavigateBack: () -> Unit,
-    onChapterScreen: (Boolean) -> Unit,
     source: String
 ) {
+    val bottomBarController = LocalBottomBarController.current
     val mangaReadBackstack = when(mangaDexIds.size) {
         1 -> rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
             mangaDexId = mangaDexIds[0],
@@ -33,14 +34,14 @@ fun MangaReadNavigator(
         }
     }
 
-    val isChapterScreen by remember {
+    val isOnChapterScreen by remember {
         derivedStateOf {
             mangaReadBackstack.last() is MangaReadNavRoute.ChapterScreen
         }
     }
 
-    LaunchedEffect(isChapterScreen) {
-        onChapterScreen(isChapterScreen)
+    LaunchedEffect(isOnChapterScreen) {
+        bottomBarController.setVisibility(!isOnChapterScreen)
     }
 
     val navOptions = object : MangaReadNavOptions {

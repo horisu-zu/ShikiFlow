@@ -12,14 +12,11 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.MainScreenNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
-import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 
 @Composable
 fun MainScreenNavigator(
     mainScreenBackStack: NavBackStack<NavKey>,
-    currentUserData: User?,
-    onEpisodeNavigate: (PlayerNavigate) -> Unit,
-    onChapterScreen: (Boolean) -> Unit,
+    currentUserData: User?
 ) {
     val options = object : MainScreenNavOptions {
         override fun navigateToDetails(mediaId: String, mediaType: MediaType) {
@@ -46,9 +43,7 @@ fun MainScreenNavigator(
                     currentUserData = currentUserData,
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    source = "main",
-                    onEpisodeNavigate = onEpisodeNavigate,
-                    onChapterScreen = onChapterScreen
+                    source = "main"
                 )
             }
         }, entryDecorators = listOf(

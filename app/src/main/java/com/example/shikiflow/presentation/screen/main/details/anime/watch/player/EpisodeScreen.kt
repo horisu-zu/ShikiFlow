@@ -17,15 +17,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
-import com.example.shikiflow.presentation.navigation.AppNavOptions
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavOptions
 import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeEpisodeViewModel
 import com.example.shikiflow.utils.Resource
 
 @OptIn(UnstableApi::class)
 @Composable
-fun PlayerScreen(
+fun EpisodeScreen(
     playerNavigate: PlayerNavigate,
-    navOptions: AppNavOptions,
+    navOptions: AnimeWatchNavOptions,
     animeEpisodeViewModel: AnimeEpisodeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -79,7 +79,7 @@ fun PlayerScreen(
             context = context,
             isLoadingEpisode = isLoadingEpisodeData,
             onSeekToEpisode = { episodeNum ->
-                navOptions.navigateToPlayer(
+                navOptions.navigateToEpisodeScreen(
                     playerNavigate = playerNavigate.copy(
                         serialNum = episodeNum
                     )

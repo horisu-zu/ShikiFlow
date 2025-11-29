@@ -41,8 +41,7 @@ fun EpisodeSelectionScreen(
     episodesCount: Int,
     link: String,
     completedEpisodes: Int,
-    navOptions: AnimeWatchNavOptions,
-    onEpisodeNavigate: (PlayerNavigate) -> Unit
+    navOptions: AnimeWatchNavOptions
 ) {
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -98,7 +97,7 @@ fun EpisodeSelectionScreen(
                     mediaNumber = serialNum.toString(),
                     onItemClick = {
                         Log.d("EpisodeSelectionScreen", "Navigating to episode $serialNum")
-                        onEpisodeNavigate(
+                        navOptions.navigateToEpisodeScreen(
                             PlayerNavigate(title, link, translationGroup, serialNum, episodesCount)
                         )
                     },

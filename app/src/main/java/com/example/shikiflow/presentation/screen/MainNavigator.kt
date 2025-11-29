@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
@@ -19,11 +20,12 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -42,7 +44,6 @@ import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
-import com.example.shikiflow.presentation.navigation.AppNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseNavRoute
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
@@ -53,7 +54,6 @@ import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainNavigator(
-    appNavOptions: AppNavOptions,
     onFinishActivity: () -> Unit,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
@@ -70,11 +70,11 @@ fun MainNavigator(
     val currentUser by userViewModel.userFlow.collectAsState()
 
     val isKeyboardVisible = WindowInsets.isImeVisible && LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
-    var isChapterScreen by remember { mutableStateOf(false) }
+    var isBottomBarVisible by remember { mutableStateOf(true) }
 
     val adaptiveInfo = currentWindowAdaptiveInfo()
     val customNavType = with(adaptiveInfo) {
-        if(isKeyboardVisible || isChapterScreen) {
+        if(isKeyboardVisible || !isBottomBarVisible) {
             NavigationSuiteType.None
         } else if(windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)) {
             NavigationSuiteType.NavigationRail
@@ -88,17 +88,13 @@ fun MainNavigator(
     }
 
     NavigationSuiteScaffold(
-        layoutType = customNavType,
-        navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
-            navigationRailContainerColor = MaterialTheme.colorScheme.surface,
-            navigationDrawerContainerColor = MaterialTheme.colorScheme.surface
-        ),
-        navigationSuiteItems = {
+        navigationSuiteType = customNavType,
+        containerColor = MaterialTheme.colorScheme.surface,
+        navigationItems = {
             items.forEach { navItem ->
                 val isSelected = mainNavBackStack.last() == navItem.route
 
-                item(
+                NavigationSuiteItem(
                     icon = {
                         Icon(
                             painter = painterResource(
@@ -135,53 +131,51 @@ fun MainNavigator(
             }
         }
     ) {
-        NavDisplay(
-            backStack = mainNavBackStack,
-            onBack = { onFinishActivity() },
-            entryProvider = entryProvider {
-                entry<MainNavRoute.Home> {
-                    MainScreenNavigator(
-                        mainScreenBackStack = mainScreenBackStack,
-                        currentUserData = currentUser,
-                        onEpisodeNavigate = { playerNavigate ->
-                            appNavOptions.navigateToPlayer(playerNavigate)
-                        },
-                        onChapterScreen = { isChapterScreen = it }
-                    )
+        val controller = remember {
+            BottomBarState { show -> isBottomBarVisible = show }
+        }
+
+        CompositionLocalProvider(LocalBottomBarController provides controller) {
+            NavDisplay(
+                backStack = mainNavBackStack,
+                onBack = { onFinishActivity() },
+                entryProvider = entryProvider {
+                    entry<MainNavRoute.Home> {
+                        MainScreenNavigator(
+                            mainScreenBackStack = mainScreenBackStack,
+                            currentUserData = currentUser
+                        )
+                    }
+                    entry<MainNavRoute.Browse> {
+                        BrowseScreenNavigator(
+                            browseScreenBackStack = browseScreenBackStack,
+                            currentUserData = currentUser
+                        )
+                    }
+                    entry<MainNavRoute.More> {
+                        MoreScreenNavigator(
+                            moreScreenBackStack = moreScreenBackStack,
+                            currentUser = currentUser
+                        )
+                    }
+                },
+                transitionSpec = {
+                    slideInVertically(
+                        initialOffsetY = { it / 2 },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) + fadeIn() togetherWith ExitTransition.None
+                },
+                popTransitionSpec = {
+                    EnterTransition.None togetherWith fadeOut()
+                },
+                predictivePopTransitionSpec = {
+                    EnterTransition.None togetherWith fadeOut()
                 }
-                entry<MainNavRoute.Browse> {
-                    BrowseScreenNavigator(
-                        browseScreenBackStack = browseScreenBackStack,
-                        currentUserData = currentUser,
-                        onEpisodeNavigate = { playerNavigate ->
-                            appNavOptions.navigateToPlayer(playerNavigate)
-                        },
-                        onChapterScreen = { isChapterScreen = it }
-                    )
-                }
-                entry<MainNavRoute.More> {
-                    MoreScreenNavigator(
-                        moreScreenBackStack = moreScreenBackStack,
-                        currentUser = currentUser
-                    )
-                }
-            },
-            transitionSpec = {
-                slideInVertically(
-                    initialOffsetY = { it / 2 },
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioNoBouncy,
-                        stiffness = Spring.StiffnessMediumLow
-                    )
-                ) + fadeIn() togetherWith ExitTransition.None
-            },
-            popTransitionSpec = {
-                EnterTransition.None togetherWith fadeOut()
-            },
-            predictivePopTransitionSpec = {
-                EnterTransition.None togetherWith fadeOut()
-            }
-        )
+            )
+        }
     }
 }
 

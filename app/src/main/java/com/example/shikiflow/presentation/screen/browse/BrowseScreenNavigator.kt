@@ -11,14 +11,11 @@ import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
-import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 
 @Composable
 fun BrowseScreenNavigator(
     browseScreenBackStack: NavBackStack<NavKey>,
-    currentUserData: User?,
-    onEpisodeNavigate: (PlayerNavigate) -> Unit,
-    onChapterScreen: (Boolean) -> Unit
+    currentUserData: User?
 ) {
     //val browseBackstack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val browseNavOptions = object: BrowseNavOptions {
@@ -54,9 +51,7 @@ fun BrowseScreenNavigator(
                     currentUserData = currentUserData,
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    source = "browse",
-                    onEpisodeNavigate = onEpisodeNavigate,
-                    onChapterScreen = onChapterScreen
+                    source = "browse"
                 )
             }
         }, entryDecorators = listOf(

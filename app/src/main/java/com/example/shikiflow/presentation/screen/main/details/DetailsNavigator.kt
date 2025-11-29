@@ -18,7 +18,6 @@ import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.studio.StudioScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavigator
-import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
@@ -34,8 +33,6 @@ fun DetailsNavigator(
     mediaId: String,
     mediaType: MediaType,
     source: String,
-    onEpisodeNavigate: (PlayerNavigate) -> Unit,
-    onChapterScreen: (Boolean) -> Unit
 ) {
     val detailsBackstack = rememberNavBackStack(when(mediaType) {
         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)
@@ -158,7 +155,6 @@ fun DetailsNavigator(
                     title = route.title,
                     completedChapters = route.completedChapters,
                     onNavigateBack = { options.navigateBack() },
-                    onChapterScreen = onChapterScreen,
                     source = source
                 )
             }
@@ -183,7 +179,6 @@ fun DetailsNavigator(
                     shikimoriId = route.shikimoriId,
                     completedEpisodes = route.completedEpisodes,
                     onNavigateBack = { options.navigateBack() },
-                    onEpisodeNavigate = onEpisodeNavigate,
                     source = source
                 )
             }

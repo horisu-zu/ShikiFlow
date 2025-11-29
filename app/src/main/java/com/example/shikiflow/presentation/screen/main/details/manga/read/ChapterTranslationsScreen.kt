@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,9 +46,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
-import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaDexChapterMetadata
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
+import com.example.shikiflow.presentation.screen.LocalBottomBarController
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.IconResource
