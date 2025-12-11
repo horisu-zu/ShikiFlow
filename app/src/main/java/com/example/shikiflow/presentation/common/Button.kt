@@ -38,7 +38,7 @@ fun Button(
             containerColor = if (enabled) MaterialTheme.colorScheme.primary.copy(
                 alpha = 0.75f
             ) else Color.Transparent,
-            contentColor = if (enabled) MaterialTheme.colorScheme.onSurface
+            contentColor = if (enabled) Color.White
                 else MaterialTheme.colorScheme.onSurfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
         ),

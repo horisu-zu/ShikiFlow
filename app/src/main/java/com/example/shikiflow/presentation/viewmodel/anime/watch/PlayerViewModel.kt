@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
+import com.example.shikiflow.data.response.TimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -19,8 +21,19 @@ class PlayerViewModel @Inject constructor() : ViewModel() {
 
     private var exoPlayer: ExoPlayer? = null
 
-    fun initPlayer(player: ExoPlayer) {
+    fun initPlayer(
+        player: ExoPlayer,
+        //opTimeCode: TimeRange?,
+        //edTimeCode: TimeRange?
+    ) {
         this.exoPlayer = player
+        /*_playerState.update { state ->
+            state.copy(
+                opTimeCode = opTimeCode,
+                edTimeCode = edTimeCode
+            )
+        }*/
+
         setupPlayerListeners()
         startPositionUpdates()
     }
@@ -35,10 +48,12 @@ class PlayerViewModel @Inject constructor() : ViewModel() {
                 val isBuffering = playbackState == Player.STATE_BUFFERING
                 val duration = exoPlayer?.duration?.coerceAtLeast(0L) ?: 0L
 
-                _playerState.value = _playerState.value.copy(
-                    isBuffering = isBuffering,
-                    duration = duration
-                )
+                _playerState.update { state ->
+                    state.copy(
+                        isBuffering = isBuffering,
+                        duration = duration
+                    )
+                }
             }
         }
         exoPlayer?.addListener(listener)
@@ -48,9 +63,11 @@ class PlayerViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             while (true) {
                 exoPlayer?.let { player ->
-                    _playerState.value = _playerState.value.copy(
-                        currentPosition = player.currentPosition
-                    )
+                    _playerState.update { state ->
+                        state.copy(
+                            currentPosition = player.currentPosition
+                        )
+                    }
                 }
                 delay(500L)
             }
@@ -93,5 +110,7 @@ data class PlayerState(
     val isPlaying: Boolean = false,
     val isBuffering: Boolean = true,
     val duration: Long = 0L,
-    val currentPosition: Long = 0L
+    val currentPosition: Long = 0L,
+    var opTimeCode: TimeRange? = null,
+    var edTimeCode: TimeRange? = null
 )

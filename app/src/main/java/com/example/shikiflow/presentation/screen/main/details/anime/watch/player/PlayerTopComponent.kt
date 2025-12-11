@@ -38,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.kodik.KodikLink
 
 @Composable
 fun PlayerTopComponent(
@@ -47,7 +46,7 @@ fun PlayerTopComponent(
     episodesCount: Int,
     currentQuality: String,
     translationGroup: String,
-    qualityData: KodikLink?,
+    qualityData: List<String>?,
     onNavigateBack: () -> Unit,
     onQualityChange: (String) -> Unit,
     onEpisodeChange: (Int) -> Unit,
@@ -90,8 +89,6 @@ fun PlayerTopComponent(
             )
         }
         qualityData?.let {
-            val qualities = qualityData.qualityLink.entries.toList()
-
             if(episodesCount > 1) {
                 PlayerDropdown(
                     label = stringResource(R.string.media_item_episode, episodeNum),
@@ -106,9 +103,9 @@ fun PlayerTopComponent(
             }
             PlayerDropdown(
                 label = "${currentQuality}P",
-                values = qualities.map { "${it.key}P" },
+                values = qualityData.map { "${it}P" },
                 onValueChange = { index ->
-                    onQualityChange(qualities[index].key)
+                    onQualityChange(qualityData[index])
                 },
                 onExpand = onExpand
             )

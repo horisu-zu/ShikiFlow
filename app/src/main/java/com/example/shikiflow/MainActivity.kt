@@ -12,6 +12,7 @@ import androidx.activity.viewModels
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.example.shikiflow.presentation.navigation.AppNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 import com.example.shikiflow.presentation.viewmodel.ThemeViewModel
@@ -25,9 +26,10 @@ class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
         enableEdgeToEdge()
+        val splashScreen = installSplashScreen()
+
+        super.onCreate(savedInstanceState)
 
         setContent {
             val (darkTheme, oledTheme) = observeTheme()
@@ -39,7 +41,12 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 oledTheme = oledTheme
             ) {
-                AppNavigator(onFinishActivity = { this.finish() })
+                AppNavigator(
+                    onFinishActivity = { this.finish() },
+                    onSplashNavigate = {
+                        splashScreen.setKeepOnScreenCondition { it }
+                    }
+                )
             }
         }
 

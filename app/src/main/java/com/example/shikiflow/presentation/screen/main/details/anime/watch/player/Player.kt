@@ -15,11 +15,13 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +40,8 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.example.shikiflow.domain.model.kodik.KodikLink
+import com.example.shikiflow.data.response.TimeRange.Companion.isWithinRange
+import com.example.shikiflow.domain.model.kodik.KodikEpisode
 import com.example.shikiflow.presentation.viewmodel.anime.watch.PlayerViewModel
 import com.example.shikiflow.utils.systemBarsVisibility
 import kotlinx.coroutines.delay
@@ -52,7 +55,7 @@ fun Player(
     translationGroup: String,
     currentEpisode: Int,
     episodesCount: Int,
-    qualityData: KodikLink?,
+    episodeData: KodikEpisode?,
     context: Context,
     isLoadingEpisode: Boolean,
     onSeekToEpisode: (Int) -> Unit,
@@ -68,6 +71,12 @@ fun Player(
 
     val playerState by playerViewModel.playerState.collectAsStateWithLifecycle()
     val isLoading = playerState.isBuffering || isLoadingEpisode
+
+    val shouldShowSkipOp by remember(playerState.currentPosition) {
+        derivedStateOf {
+            episodeData?.opTimeCode?.isWithinRange(playerState.currentPosition) ?: false
+        }
+    }
 
     LaunchedEffect(exoPlayer) {
         playerViewModel.initPlayer(exoPlayer)
@@ -143,7 +152,7 @@ fun Player(
                 episodesCount = episodesCount,
                 currentQuality = currentQuality,
                 translationGroup = translationGroup,
-                qualityData = qualityData,
+                qualityData = episodeData?.qualityLink?.keys?.toList(),
                 onNavigateBack = onNavigateBack,
                 onQualityChange = onQualityChange,
                 onEpisodeChange = { episodeNum ->
@@ -192,14 +201,21 @@ fun Player(
             PlayerBottomComponent(
                 duration = playerState.duration,
                 currentProgress = playerState.currentPosition,
+                shouldShowSkipOp = shouldShowSkipOp,
                 isFit = isFit,
+                onSkipOp = {
+                    episodeData?.opTimeCode?.let { timeRange ->
+                        playerViewModel.seekTo(timeRange.endTime)
+                    }
+                },
                 onSeek = { position ->
                     playerViewModel.seekTo(position)
                 },
                 onSkip = {
                     playerViewModel.seekForward(87500L)
                 },
-                onResize = { isFit = !isFit }
+                onResize = { isFit = !isFit },
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

@@ -75,7 +75,7 @@ fun EpisodeScreen(
             translationGroup = playerNavigate.translationGroup,
             currentEpisode = playerNavigate.serialNum,
             episodesCount = playerNavigate.episodesCount,
-            qualityData = episodeState.data,
+            episodeData = episodeState.data,
             context = context,
             isLoadingEpisode = isLoadingEpisodeData,
             onSeekToEpisode = { episodeNum ->

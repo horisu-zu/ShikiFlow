@@ -10,7 +10,9 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -23,10 +25,21 @@ import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 @Composable
 fun AppNavigator(
     onFinishActivity: () -> Unit,
+    onSplashNavigate: (Boolean) -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
     val appBackstack = rememberNavBackStack(AppNavRoute.Splash)
     val authState by viewModel.authState.collectAsState()
+
+    val isOnSplash by remember(authState) {
+        derivedStateOf {
+            authState is AuthState.Loading
+        }
+    }
+
+    LaunchedEffect(isOnSplash) {
+        onSplashNavigate(isOnSplash)
+    }
 
     val options = object : AppNavOptions {
         override fun navigateToAuth() {
@@ -60,9 +73,7 @@ fun AppNavigator(
         backStack = appBackstack,
         onBack = { if(appBackstack.size > 1) appBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<AppNavRoute.Splash> {
-                /**/
-            }
+            entry<AppNavRoute.Splash> { /**/ }
             entry<AppNavRoute.Auth> {
                 AuthScreen()
             }

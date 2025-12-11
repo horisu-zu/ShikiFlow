@@ -12,7 +12,7 @@ import androidx.media3.datasource.DefaultHttpDataSource
 import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import com.example.shikiflow.domain.model.kodik.KodikLink
+import com.example.shikiflow.domain.model.kodik.KodikEpisode
 import com.example.shikiflow.domain.usecase.GetEpisodesUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -28,7 +28,7 @@ class AnimeEpisodeViewModel @Inject constructor(
     private val getEpisodesUseCase: GetEpisodesUseCase
 ) : ViewModel() {
 
-    private val _episodeState = MutableStateFlow<Resource<KodikLink>>(Resource.Loading())
+    private val _episodeState = MutableStateFlow<Resource<KodikEpisode>>(Resource.Loading())
     val episodeState = _episodeState.asStateFlow()
 
     var currentQuality by mutableStateOf<String>("")

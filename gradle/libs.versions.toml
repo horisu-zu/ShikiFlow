@@ -1,7 +1,7 @@
 [versions]
 agp = "8.13.0"
 apollo = "4.3.3"
-material3 = "1.5.0-alpha09"
+material3 = "1.5.0-alpha10"
 material-icons = "1.7.8"
 material3-adaptive = "1.2.0"
 material3-adaptive-navigation-suite = "1.4.0"
@@ -18,9 +18,9 @@ kotlinxSerializationJsonVersion = "1.9.0"
 kotlinxCoroutines = "1.10.2"
 ksoup = "0.2.5"
 lifecycleRuntimeKtx = "2.10.0"
-activityCompose = "1.12.0"
-compose = "1.9.5"
-composeBom = "2025.11.01"
+activityCompose = "1.12.1"
+compose = "1.10.0"
+composeBom = "2025.12.00"
 media3Exoplayer = "1.8.0"
 pagingCompose = "3.3.6"
 okhttp = "5.3.2"
@@ -33,6 +33,7 @@ navigation3 = "1.0.0"
 lifecycleViewmodelNavigation3Android = "2.10.0"
 pagerIndicator = "0.0.8"
 vico = "2.3.6"
+splashScreen = "1.2.0"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -81,6 +82,7 @@ apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.r
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 zoomable = { group = "net.engawapg.lib", name = "zoomable", version.ref = "zoomable" }
 androidx-lifecycle-viewmodel-navigation3-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3-android", version.ref = "lifecycleViewmodelNavigation3Android" }
+androidx-core-splash-screen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashScreen" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
