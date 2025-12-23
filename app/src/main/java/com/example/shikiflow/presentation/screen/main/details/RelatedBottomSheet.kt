@@ -30,41 +30,38 @@ import com.example.shikiflow.presentation.screen.main.details.anime.RelatedItem
 fun RelatedBottomSheet(
     relatedItems: List<RelatedInfo>,
     onItemClick: (String, MediaType) -> Unit,
-    showBottomSheet: Boolean,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
 
-    if(showBottomSheet) {
-        ModalBottomSheet(
-            onDismissRequest = onDismiss,
-            sheetState = sheetState,
-            modifier = Modifier.heightIn(min = 480.dp)
-        ) {
-            (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
-                LaunchedEffect(Unit) {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        window.isNavigationBarContrastEnforced = false
-                    }
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        modifier = Modifier.heightIn(min = 480.dp)
+    ) {
+        (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.isNavigationBarContrastEnforced = false
                 }
             }
-            Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            ) {
-                Text(
-                    text = stringResource(R.string.details_related),
-                    style = MaterialTheme.typography.titleMedium,
+        }
+        Column(
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = stringResource(R.string.details_related),
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(horizontal = 12.dp)
+            )
+            HorizontalDivider()
+            relatedItems.forEach { relatedItem ->
+                RelatedItem(
+                    relatedInfo = relatedItem,
+                    onItemClick = onItemClick,
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )
-                HorizontalDivider()
-                relatedItems.forEach { relatedItem ->
-                    RelatedItem(
-                        relatedInfo = relatedItem,
-                        onItemClick = onItemClick,
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    )
-                }
             }
         }
     }

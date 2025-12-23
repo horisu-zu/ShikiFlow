@@ -1,10 +1,12 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -78,18 +80,18 @@ fun AnimeDetailsScreen(
                 val horizontalPadding = 12.dp
 
                 SharedTransitionLayout {
-                    AnimatedVisibility(
-                        visible = selectedScreenshotIndex != null,
-                        enter = fadeIn(),
-                        exit = fadeOut(),
-                        modifier = Modifier.zIndex(1f)
-                    ) {
+                    AnimatedContent(
+                        targetState = selectedScreenshotIndex,
+                        transitionSpec = { fadeIn() togetherWith fadeOut() using SizeTransform(clip = false) },
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize().zIndex(1f)
+                    ) { selectedIndex ->
                         animeDetails.data?.let { details ->
-                            selectedScreenshotIndex?.let { index ->
+                            selectedIndex?.let { index ->
                                 FullScreenImageDialog(
                                     imageUrls = details.screenshots.map { it.originalUrl },
                                     initialIndex = index,
-                                    visibilityScope = this@AnimatedVisibility,
+                                    visibilityScope = this@AnimatedContent,
                                     onDismiss = { selectedScreenshotIndex = null }
                                 )
                             }
@@ -142,10 +144,10 @@ fun AnimeDetailsScreen(
                                         navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId)
                                     },
                                     onSimilarClick = { animeId, title ->
-                                        navOptions.navigateToSimilarPage(id, title, MediaType.ANIME)
+                                        navOptions.navigateToSimilarPage(animeId, title, MediaType.ANIME)
                                     },
                                     onExternalLinksClick = { animeId ->
-                                        navOptions.navigateToLinksPage(id, MediaType.ANIME)
+                                        navOptions.navigateToLinksPage(animeId, MediaType.ANIME)
                                     },
                                     onScreenshotClick = { index ->
                                         selectedScreenshotIndex = index

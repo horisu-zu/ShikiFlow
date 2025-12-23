@@ -22,8 +22,8 @@ import kotlin.time.Instant
 
 @Composable
 fun CurrentVersionItem(
-    currentRelease: GithubRelease,
-    modifier: Modifier
+    currentVersion: String,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -44,7 +44,7 @@ fun CurrentVersionItem(
             )
         )
         Text(
-            text = currentRelease.tagName,
+            text = "v$currentVersion",
             style = MaterialTheme.typography.labelMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
             )

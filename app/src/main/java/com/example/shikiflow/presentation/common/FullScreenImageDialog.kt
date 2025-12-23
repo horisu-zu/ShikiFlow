@@ -5,19 +5,14 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -26,7 +21,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import kotlinx.coroutines.delay
 import mx.platacard.pagerindicator.PagerIndicatorOrientation
 import mx.platacard.pagerindicator.PagerWormIndicator
 import net.engawapg.lib.zoomable.rememberZoomState
@@ -42,15 +36,6 @@ fun SharedTransitionScope.FullScreenImageDialog(
     onDismiss: () -> Unit,
     imageType: ImageType = ImageType.Screenshot(),
 ) {
-    var isInitCompleted by remember { mutableStateOf(false) }
-
-    LaunchedEffect(visibilityScope.transition.isRunning) {
-        if(!visibilityScope.transition.isRunning) {
-            delay(100)
-            isInitCompleted = true
-        }
-    }
-
     BackHandler {
         onDismiss()
     }
@@ -62,22 +47,22 @@ fun SharedTransitionScope.FullScreenImageDialog(
 
     Box(modifier = modifier.background(Color.Black.copy(alpha = 0.7f))) {
         HorizontalPager(state = pagerState) { pageIndex ->
-            BaseImage(
-                model = imageUrls[pageIndex],
-                contentScale = ContentScale.Fit,
-                modifier = Modifier.fillMaxSize()
-                    .zoomable(rememberZoomState())
-                    .clickable { onDismiss() }
-                    .then(
-                        if(!isInitCompleted) {
-                            Modifier.sharedElement(
-                                sharedContentState = rememberSharedContentState(key = imageUrls[pageIndex]),
-                                animatedVisibilityScope = visibilityScope
-                            )
-                        } else Modifier
-                    ),
-                imageType = imageType
-            )
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                BaseImage(
+                    model = imageUrls[pageIndex],
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxWidth(0.8f)
+                        .zoomable(rememberZoomState())
+                        .sharedElement(
+                            sharedContentState = rememberSharedContentState(key = imageUrls[pageIndex]),
+                            animatedVisibilityScope = visibilityScope
+                        ),
+                    imageType = imageType
+                )
+            }
         }
         if (imageUrls.size > 1) {
             Box(

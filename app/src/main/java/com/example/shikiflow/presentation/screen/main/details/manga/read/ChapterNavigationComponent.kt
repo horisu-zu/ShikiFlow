@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -69,8 +71,7 @@ fun ChapterNavigationComponent(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous Page",
-                modifier = Modifier.size(24.dp)
+                contentDescription = "Previous Page"
             )
         }
         BasicTextField(
@@ -80,13 +81,16 @@ fun ChapterNavigationComponent(
                     isEditing = true
                     pageInput = currentPage.toString()
                 }
-                pageInput = newValue.filter { it.isDigit() }
+                pageInput = newValue
             },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
             ),
             singleLine = true,
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Number
+            ),
             modifier = Modifier.width(32.dp).onFocusChanged { focusState ->
                 if (focusState.isFocused) {
                     onInteractionStart()
@@ -98,7 +102,7 @@ fun ChapterNavigationComponent(
                     onInteractionEnd()
                     if (isEditing) {
                         pageInput.toIntOrNull()?.let { targetPage ->
-                            if (targetPage in 1..pageCount) {
+                            targetPage.coerceIn(1..pageCount).let {
                                 if(targetPage != currentPage) {
                                     onNavigateClick(targetPage)
                                 }
@@ -107,7 +111,8 @@ fun ChapterNavigationComponent(
                         isEditing = false
                     }
                 }
-            }, decorationBox = { innerTextField ->
+            },
+            decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.fillMaxSize()
                         .padding(vertical = 8.dp)
@@ -128,8 +133,7 @@ fun ChapterNavigationComponent(
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                contentDescription = "Next Page",
-                modifier = Modifier.size(24.dp)
+                contentDescription = "Next Page"
             )
         }
     }

@@ -236,7 +236,7 @@ private fun StatsGraph(
                             rememberLineComponent(
                                 fill = fill(color),
                                 thickness = 24.dp,
-                                shape = CorneredShape.rounded(topLeftDp = 4f, topRightDp = 4f)
+                                shape = CorneredShape.rounded(topLeftPercent = 20, topRightPercent = 20)
                             )
                         }
                     )

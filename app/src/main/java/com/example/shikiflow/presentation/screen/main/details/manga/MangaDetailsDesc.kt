@@ -149,12 +149,13 @@ fun MangaDetailsDesc(
         }
     }
 
-    RelatedBottomSheet(
-        relatedItems = mangaDetails.related?.map { RelatedMapper.fromMangaRelated(it) } ?: emptyList(),
-        showBottomSheet = showRelatedBottomSheet,
-        onItemClick = onItemClick,
-        onDismiss = { showRelatedBottomSheet = false }
-    )
+    if(showRelatedBottomSheet) {
+        RelatedBottomSheet(
+            relatedItems = mangaDetails.related?.map { RelatedMapper.fromMangaRelated(it) } ?: emptyList(),
+            onItemClick = onItemClick,
+            onDismiss = { showRelatedBottomSheet = false }
+        )
+    }
 }
 
 @Composable

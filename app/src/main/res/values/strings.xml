@@ -297,6 +297,9 @@
     <string name="track_average_score">Average Score — %1$s</string>
     <string name="player_skip_opening_label">Skip Opening</string>
 
+    <string name="similar_media_app_bar_label">Similar</string>
+    <string name="similar_media_error">Error Loading Similar Media Data</string>
+
     <plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

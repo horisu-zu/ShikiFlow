@@ -54,8 +54,7 @@ fun AboutAppScreen(
             }
 
             CurrentVersionItem(
-                currentRelease = currentVersion,
-                modifier = Modifier
+                currentVersion = currentVersion.tagName
             )
             CheckUpdateSection(
                 releaseState = latestRelease,

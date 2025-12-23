@@ -219,25 +219,25 @@ private fun BrowseGridComponent(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         contentPadding = PaddingValues(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 8.dp)
     ) {
-        item(span = { GridItemSpan(3) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             NavigationSection(
                 onNavigateSideScreen = { sideScreen -> onSideScreenNavigate(sideScreen) }
             )
         }
 
-        item(span = { GridItemSpan(3) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             OngoingTitleComponent(onSettingClick = onSettingClick)
         }
 
         if(browseState.loadState.refresh is LoadState.Loading) {
-            item(span = { GridItemSpan(3) }) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
                     modifier = Modifier.fillMaxSize().heightIn(240.dp),
                     contentAlignment = Alignment.Center
                 ) { CircularProgressIndicator() }
             }
         } else if(browseState.loadState.refresh is LoadState.Error) {
-            item(span = { GridItemSpan(3) }) {
+            item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
                     modifier = Modifier.fillMaxSize().heightIn(240.dp),
                     contentAlignment = Alignment.Center
@@ -263,7 +263,7 @@ private fun BrowseGridComponent(
             }
             browseState.apply {
                 if(loadState.append is LoadState.Loading) {
-                    item(span = { GridItemSpan(3) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -271,7 +271,7 @@ private fun BrowseGridComponent(
                     }
                 }
                 if(browseState.loadState.append is LoadState.Error) {
-                    item(span = { GridItemSpan(3) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         ErrorItem(
                             message = stringResource(R.string.b_mss_error),
                             showFace = false,

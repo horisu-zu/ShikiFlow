@@ -22,17 +22,9 @@ class PlayerViewModel @Inject constructor() : ViewModel() {
     private var exoPlayer: ExoPlayer? = null
 
     fun initPlayer(
-        player: ExoPlayer,
-        //opTimeCode: TimeRange?,
-        //edTimeCode: TimeRange?
+        player: ExoPlayer
     ) {
         this.exoPlayer = player
-        /*_playerState.update { state ->
-            state.copy(
-                opTimeCode = opTimeCode,
-                edTimeCode = edTimeCode
-            )
-        }*/
 
         setupPlayerListeners()
         startPositionUpdates()

@@ -158,6 +158,7 @@ dependencies {
 
     //Material3 Adaptive
     implementation(libs.androidx.material3.adaptive)
+    implementation(libs.androidx.material3.adaptive.navigation)
     implementation(libs.androidx.material3.navigation.suite)
 
     //Vico (Chart Library)

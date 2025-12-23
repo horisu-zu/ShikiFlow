@@ -32,7 +32,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -159,7 +158,7 @@ fun ChapterScreen(
                             ChapterUIMode.SCROLL -> {
                                 ChapterScrollModeComponent(
                                     chapterPageUrls = pageUrls,
-                                    initialPage = chapterPage,
+                                    chapterPage = chapterPage,
                                     onPageChange = { pageNumber -> chapterPage = pageNumber },
                                     onScrollDetected = { chapterNavigationViewModel.onScrollDetected() },
                                     modifier = Modifier
@@ -221,34 +220,40 @@ fun ChapterScreen(
 @Composable
 private fun ChapterScrollModeComponent(
     chapterPageUrls: List<String>,
-    initialPage: Int,
+    chapterPage: Int,
     onPageChange: (Int) -> Unit,
     onScrollDetected: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = initialPage - 1
+        initialFirstVisibleItemIndex = chapterPage - 1
     )
 
-    val currentPage by remember {
-        derivedStateOf {
-            lazyListState.firstVisibleItemIndex + 1
+    LaunchedEffect(lazyListState) {
+        snapshotFlow { lazyListState.firstVisibleItemIndex }
+            .distinctUntilChanged()
+            .collect { index ->
+                onPageChange(index + 1)
+            }
+    }
+
+    LaunchedEffect(lazyListState.isScrollInProgress) {
+        if (lazyListState.isScrollInProgress) {
+            onScrollDetected()
         }
     }
 
-    LaunchedEffect(currentPage) {
-        onPageChange(currentPage)
-    }
+    LaunchedEffect(chapterPage) {
+        val pageIndex = chapterPage - 1
 
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
-            .distinctUntilChanged()
-            .collect { onScrollDetected() }
+        if(lazyListState.firstVisibleItemIndex != pageIndex) {
+            lazyListState.scrollToItem(index = pageIndex)
+        }
     }
 
     LazyColumn(
         state = lazyListState,
-        modifier = modifier.zoomable(rememberZoomState()), //Well, it's easier this way I guess
+        modifier = modifier.zoomable(rememberZoomState()),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         contentPadding = PaddingValues(vertical = 8.dp)
     ) {

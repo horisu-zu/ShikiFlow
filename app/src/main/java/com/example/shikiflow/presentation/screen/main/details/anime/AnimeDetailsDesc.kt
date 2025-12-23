@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -41,7 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.graphql.AnimeDetailsQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.RelatedInfo
@@ -107,7 +105,7 @@ fun AnimeDetailsDesc(
             }
         }
 
-        animeDetails.characterRoles?.let { characterRoles ->
+        if(!animeDetails.characterRoles.isNullOrEmpty()) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -135,7 +133,7 @@ fun AnimeDetailsDesc(
             }
         }
 
-        animeDetails.related?.let {
+        if(!animeDetails.related.isNullOrEmpty()) {
             RelatedSection(
                 relatedItems = animeDetails.related.map { RelatedMapper.fromAnimeRelated(it) },
                 onArrowClick = { showRelatedBottomSheet = true },
@@ -166,12 +164,13 @@ fun AnimeDetailsDesc(
         )
     }
 
-    RelatedBottomSheet(
-        relatedItems = animeDetails.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
-        showBottomSheet = showRelatedBottomSheet,
-        onItemClick = onItemClick,
-        onDismiss = { showRelatedBottomSheet = false }
-    )
+    if(showRelatedBottomSheet) {
+        RelatedBottomSheet(
+            relatedItems = animeDetails.related?.map { RelatedMapper.fromAnimeRelated(it) } ?: emptyList(),
+            onItemClick = onItemClick,
+            onDismiss = { showRelatedBottomSheet = false }
+        )
+    }
 }
 
 @Composable

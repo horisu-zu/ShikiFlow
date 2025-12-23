@@ -89,7 +89,7 @@ fun MainSideScreen(
             }
             browseData.apply {
                 if(loadState.append is LoadState.Loading) {
-                    item(span = { GridItemSpan(3) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -97,7 +97,7 @@ fun MainSideScreen(
                     }
                 }
                 if(loadState.append is LoadState.Error) {
-                    item(span = { GridItemSpan(3) }) {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         ErrorItem(
                             message = stringResource(R.string.b_mss_error),
                             showFace = false,

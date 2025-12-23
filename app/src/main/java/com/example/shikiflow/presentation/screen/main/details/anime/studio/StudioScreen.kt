@@ -160,7 +160,7 @@ fun StudioScreen(
                 }
                 studioAnimeData.apply {
                     if(loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(3) }) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
