@@ -1,12 +1,8 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -80,21 +76,19 @@ fun AnimeDetailsScreen(
                 val horizontalPadding = 12.dp
 
                 SharedTransitionLayout {
-                    AnimatedContent(
-                        targetState = selectedScreenshotIndex,
-                        transitionSpec = { fadeIn() togetherWith fadeOut() using SizeTransform(clip = false) },
-                        contentAlignment = Alignment.Center,
+                    AnimatedVisibility(
+                        visible = selectedScreenshotIndex != null,
                         modifier = Modifier.fillMaxSize().zIndex(1f)
-                    ) { selectedIndex ->
+                    ) {
                         animeDetails.data?.let { details ->
-                            selectedIndex?.let { index ->
-                                FullScreenImageDialog(
-                                    imageUrls = details.screenshots.map { it.originalUrl },
-                                    initialIndex = index,
-                                    visibilityScope = this@AnimatedContent,
-                                    onDismiss = { selectedScreenshotIndex = null }
-                                )
-                            }
+                            FullScreenImageDialog(
+                                imageUrls = details.screenshots.map { it.originalUrl },
+                                initialIndex = selectedScreenshotIndex ?: 0,
+                                visibilityScope = this@AnimatedVisibility,
+                                onImageChange = { index ->
+                                    selectedScreenshotIndex = index
+                                }
+                            )
                         }
                     }
                     PullToRefreshBox(

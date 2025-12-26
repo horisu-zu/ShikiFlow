@@ -13,6 +13,7 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,11 +34,11 @@ fun SharedTransitionScope.FullScreenImageDialog(
     initialIndex: Int,
     visibilityScope: AnimatedVisibilityScope,
     modifier: Modifier = Modifier,
-    onDismiss: () -> Unit,
+    onImageChange: (Int?) -> Unit,
     imageType: ImageType = ImageType.Screenshot(),
 ) {
     BackHandler {
-        onDismiss()
+        onImageChange(null)
     }
 
     val pagerState = rememberPagerState(
@@ -45,8 +46,14 @@ fun SharedTransitionScope.FullScreenImageDialog(
         pageCount = { imageUrls.size }
     )
 
+    LaunchedEffect(pagerState.currentPage) {
+        onImageChange(pagerState.currentPage)
+    }
+
     Box(modifier = modifier.background(Color.Black.copy(alpha = 0.7f))) {
         HorizontalPager(state = pagerState) { pageIndex ->
+            val isSelected = initialIndex == pageIndex
+
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -56,9 +63,13 @@ fun SharedTransitionScope.FullScreenImageDialog(
                     contentScale = ContentScale.Fit,
                     modifier = Modifier.fillMaxWidth(0.8f)
                         .zoomable(rememberZoomState())
-                        .sharedElement(
-                            sharedContentState = rememberSharedContentState(key = imageUrls[pageIndex]),
-                            animatedVisibilityScope = visibilityScope
+                        .then(
+                            if(isSelected && !pagerState.isScrollInProgress) {
+                                Modifier.sharedElement(
+                                    sharedContentState = rememberSharedContentState(key = "screenshot-$pageIndex"),
+                                    animatedVisibilityScope = visibilityScope
+                                )
+                            } else Modifier
                         ),
                     imageType = imageType
                 )
@@ -67,7 +78,7 @@ fun SharedTransitionScope.FullScreenImageDialog(
         if (imageUrls.size > 1) {
             Box(
                 modifier = Modifier.align(Alignment.BottomCenter)
-                    .padding(all = 32.dp)
+                    .padding(all = 16.dp)
                     .clip(CircleShape)
                     .background(Color.Black.copy(alpha = 0.85f))
                     .padding(horizontal = 8.dp, vertical = 4.dp)

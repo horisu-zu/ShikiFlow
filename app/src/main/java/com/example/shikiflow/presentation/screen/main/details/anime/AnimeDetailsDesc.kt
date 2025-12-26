@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details.anime
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -87,7 +88,8 @@ fun AnimeDetailsDesc(
                 brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
                 onEntityClick = { entityType, id ->
                     onEntityClick(entityType, id)
-                }, onLinkClick = onLinkClick
+                },
+                onLinkClick = onLinkClick
             )
         }
 
@@ -341,8 +343,8 @@ private fun ScreenshotSection(
             itemsIndexed(screenshots) { index, screenshot ->
                 AnimatedVisibility(
                     visible = index != selectedIndex,
-                    enter = fadeIn(),
-                    exit = fadeOut(),
+                    enter = fadeIn(spring(stiffness = 800f)),
+                    exit = fadeOut(spring(stiffness = 800f)),
                     modifier = Modifier.animateItem()
                 ) {
                     with(sharedTransitionScope) {
@@ -351,7 +353,7 @@ private fun ScreenshotSection(
                             modifier = Modifier
                                 .clickable { onScreenshotClick(index) }
                                 .sharedElement(
-                                    sharedContentState = rememberSharedContentState(key = screenshot.originalUrl),
+                                    sharedContentState = rememberSharedContentState(key = "screenshot-$index"),
                                     animatedVisibilityScope = this@AnimatedVisibility
                                 ),
                             imageType = ImageType.Screenshot()
