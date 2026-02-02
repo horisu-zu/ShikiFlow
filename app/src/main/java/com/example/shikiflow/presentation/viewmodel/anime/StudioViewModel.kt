@@ -1,17 +1,13 @@
 package com.example.shikiflow.presentation.viewmodel.anime
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.mapper.BrowseOptions
-import com.example.shikiflow.domain.repository.AnimeRepository
-import com.example.shikiflow.domain.repository.MangaRepository
+import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -27,18 +23,20 @@ import kotlin.collections.set
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class StudioViewModel @Inject constructor(
-    private val animeRepository: AnimeRepository,
-    private val mangaRepository: MangaRepository
+    private val mediaRepository: MediaRepository
 ): ViewModel() {
 
     private val _titleQuery = MutableStateFlow("")
     val titleQuery = _titleQuery.asStateFlow()
 
+    private var onUserList = mutableStateOf<Boolean?>(null)
+
     private var _cachedTitle: String? = null
-    private var _studioCache = mutableMapOf<String, Flow<PagingData<Browse>>>()
+    private var _studioCache = mutableMapOf<Int, Flow<PagingData<Browse>>>()
 
     fun getStudioAnime(
-        studioId: String
+        studioId: Int,
+        orderOption: OrderOption
     ): Flow<PagingData<Browse>> {
         val pagerFlow = {
             _titleQuery
@@ -46,25 +44,12 @@ class StudioViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .flatMapLatest { title ->
                     _cachedTitle = title
-                    Pager(
-                        config = PagingConfig(
-                            pageSize = 30,
-                            enablePlaceholders = true,
-                            prefetchDistance = 9,
-                            initialLoadSize = 30
-                        ),
-                        pagingSourceFactory = {
-                            BrowsePagingSource(
-                                animeRepository = animeRepository,
-                                mangaRepository = mangaRepository,
-                                type = BrowseType.AnimeBrowseType.SEARCH,
-                                options = BrowseOptions(
-                                    studio = studioId,
-                                    name = title
-                                ),
-                            )
-                        }
-                    ).flow
+                    mediaRepository.getStudioMedia(
+                        studioId,
+                        search = title,
+                        order = orderOption,
+                        onList = onUserList.value
+                    )
                 }.cachedIn(viewModelScope)
         }
 
@@ -74,6 +59,10 @@ class StudioViewModel @Inject constructor(
         } else {
             _studioCache.getValue(studioId)
         }
+    }
+
+    fun onUserListSearchChange(value: Boolean) {
+        onUserList.value = value
     }
 
     fun updateTitleQuery(newQuery: String) {

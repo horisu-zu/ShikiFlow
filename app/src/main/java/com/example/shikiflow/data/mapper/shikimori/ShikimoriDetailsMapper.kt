@@ -1,0 +1,145 @@
+package com.example.shikiflow.data.mapper.shikimori
+
+import com.example.graphql.shikimori.AnimeBrowseQuery
+import com.example.graphql.shikimori.AnimeDetailsQuery
+import com.example.graphql.shikimori.MangaBrowseQuery
+import com.example.graphql.shikimori.MangaDetailsQuery
+import com.example.graphql.shikimori.type.AnimeKindEnum
+import com.example.graphql.shikimori.type.MangaKindEnum
+import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.data.datasource.dto.ShikiAnime
+import com.example.shikiflow.data.datasource.dto.ShikiManga
+import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaOriginMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.RatingMapper.toDomain
+import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
+import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaOrigin
+import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.track.MediaFormat
+import com.example.shikiflow.domain.model.tracks.MediaType
+import kotlin.time.Instant
+
+object ShikimoriDetailsMapper {
+
+    fun AnimeDetailsQuery.Anime.toDomain(): MediaDetails {
+        return MediaDetails(
+            id = id.toInt(),
+            malId = id.toInt(),
+            mediaType = MediaType.ANIME,
+            title = name,
+            descriptionHtml = descriptionHtml ?: "",
+            native = japanese ?: "",
+            synonyms = synonyms,
+            coverImageUrl = poster?.originalUrl ?: "",
+            score = score?.toFloat() ?: 0.0f,
+            totalCount = episodes,
+            currentProgress = episodesAired,
+            volumes = null,
+            format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
+            status = status?.toDomain() ?: MediaStatus.UNKNOWN,
+            mediaAgeRating = rating?.toDomain(),
+            genres = genres?.map { it.name } ?: emptyList(),
+            characters = characterRoles?.map { it.character.characterShort.toDomain() }
+                ?: emptyList(),
+            airedOn = airedOn?.dateShort?.toDomain(),
+            releasedOn = releasedOn?.dateShort?.toDomain(),
+            nextEpisodeAt = nextEpisodeAt?.let { Instant.parse(it.toString()) },
+            origin = origin?.toDomain() ?: MediaOrigin.UNKNOWN,
+            screenshots = screenshots.map { it.originalUrl },
+            userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.ANIME),
+            studios = studios.map { it.toDomain() },
+            durationMins = duration,
+            relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
+            scoreStats = scoresStats?.associate { it.score to it.count } ?: emptyMap(),
+            statusesStats = statusesStats?.associate { it.status.toDomain() to it.count }
+                ?: emptyMap(),
+            threadId = topic?.id?.toInt()
+        )
+    }
+
+    fun MangaDetailsQuery.Manga.toDomain(): MediaDetails {
+        return MediaDetails(
+            id = id.toInt(),
+            malId = id.toInt(),
+            mediaType = MediaType.MANGA,
+            title = name,
+            descriptionHtml = descriptionHtml ?: "",
+            native = japanese ?: "",
+            synonyms = synonyms,
+            coverImageUrl = poster?.originalUrl ?: "",
+            score = score?.toFloat() ?: 0.0f,
+            totalCount = chapters,
+            volumes = volumes,
+            format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
+            status = status?.toDomain() ?: MediaStatus.UNKNOWN,
+            genres = genres?.map { it.name } ?: emptyList(),
+            characters = characterRoles?.map { it.character.characterShort.toDomain() }
+                ?: emptyList(),
+            airedOn = airedOn?.dateShort?.toDomain(),
+            releasedOn = releasedOn?.dateShort?.toDomain(),
+            userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.MANGA),
+            relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
+            scoreStats = scoresStats?.associate { it.score to it.count } ?: emptyMap(),
+            statusesStats = statusesStats?.associate { it.status.toDomain() to it.count }
+                ?: emptyMap(),
+            threadId = topic?.id?.toInt()
+        )
+    }
+
+    fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
+        return Browse.Anime(
+            id = this.id.toInt(),
+            title = this.name,
+            posterUrl = this.poster?.posterShort?.mainUrl,
+            score = this.score?.toFloat(),
+            mediaFormat = this.kind?.toDomain() ?: MediaFormat.UNKNOWN,
+            nextEpisodeAt = this.nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
+            userRateStatus = this.userRate?.animeUserRate?.status?.toDomain(),
+            episodesAired = this.episodesAired,
+            episodes = this.episodes,
+            studios = this.studios.map { it.name },
+            genres = this.genres?.map { it.name } ?: emptyList()
+        )
+    }
+
+    fun MangaBrowseQuery.Manga.toBrowseManga(): Browse.Manga {
+        return Browse.Manga(
+            id = this.id.toInt(),
+            title = name,
+            posterUrl = this.poster?.posterShort?.originalUrl,
+            score = this.score?.toFloat(),
+            mediaType = MediaType.MANGA,
+            mediaFormat = this.kind?.toDomain() ?: MediaFormat.UNKNOWN,
+        )
+    }
+
+    fun ShikiManga.toBrowseManga(): Browse.Manga {
+        return Browse.Manga(
+            id = this.id ?: 0,
+            title = this.name ?: "Unknown",
+            posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
+            score = this.score?.toFloat(),
+            mediaFormat = MangaKindEnum.valueOf(this.kind ?: "UNKNOWN__").toDomain(),
+        )
+    }
+
+    fun ShikiAnime.toBrowseAnime(): Browse.Anime {
+        return Browse.Anime(
+            id = this.id ?: 0,
+            title = this.name ?: "Unknown",
+            posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
+            score = this.score?.toFloat(),
+            mediaFormat = AnimeKindEnum.valueOf(this.kind ?: "UNKNOWN__").toDomain(),
+            episodesAired = this.episodesAired ?: 0,
+            episodes = this.episodes ?: 0
+        )
+    }
+}

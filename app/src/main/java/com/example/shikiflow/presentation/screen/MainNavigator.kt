@@ -68,7 +68,8 @@ fun MainNavigator(
     val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
-    val currentUser by userViewModel.userFlow.collectAsState()
+    val currentUser by userViewModel.userFlow.collectAsState(initial = null)
+    val authType by userViewModel.authTypeFlow.collectAsState()
 
     val isKeyboardVisible = WindowInsets.isImeVisible && LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     var isBottomBarVisible by remember { mutableStateOf(true) }
@@ -147,13 +148,15 @@ fun MainNavigator(
                     entry<MainNavRoute.Home> {
                         MainScreenNavigator(
                             mainScreenBackStack = mainScreenBackStack,
-                            currentUserData = currentUser
+                            currentUserData = currentUser,
+                            authType = authType
                         )
                     }
                     entry<MainNavRoute.Browse> {
                         BrowseScreenNavigator(
                             browseScreenBackStack = browseScreenBackStack,
-                            currentUserData = currentUser
+                            currentUserData = currentUser,
+                            authType = authType
                         )
                     }
                     entry<MainNavRoute.More> {

@@ -1,0 +1,40 @@
+query MediaThreads(
+    $mediaId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $sort: ThreadSort!
+) {
+    Page(page: $page, perPage: $perPage) {
+        threads(mediaCategoryId: $mediaId, sort: [$sort]) {
+            ...ALThread
+        }
+    }
+}
+
+# Okay, so this is a bit weird. Kudos to AnyHyou dev for figuring this bug.
+# ThreadComments as the title of the query causes query to always return null for childComments.
+# But turns out, there is one more thing that causes this weird behavior.
+# If I have any fragments (like I tend to use in other queries), it does the same thing.
+query TopicComments(
+    $threadId: Int!,
+    $page: Int!,
+    $perPage: Int!
+) {
+    Page(page: $page, perPage: $perPage) {
+        threadComments(threadId: $threadId) {
+            id
+            user {
+                id
+                name
+                avatar {
+                    large
+                    medium
+                }
+            }
+            comment(asHtml: true)
+            createdAt
+            childComments
+            likeCount
+        }
+    }
+}

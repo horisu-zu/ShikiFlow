@@ -1,135 +1,93 @@
 package com.example.shikiflow.domain.model.tracks
 
-import com.example.graphql.AnimeDetailsQuery
-import com.example.graphql.MangaDetailsQuery
-import com.example.graphql.type.AnimeStatusEnum
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-enum class MediaType { ANIME, MANGA }
+enum class MediaType(val displayValue: Int) {
+    ANIME(R.string.browse_search_media_anime),
+    MANGA(R.string.browse_search_media_manga);
+}
 
 data class UserRateData(
-    val id: String? = null,
+    val id: Int? = null,
     val mediaType: MediaType,
-    val status: UserRateStatusEnum,
+    val status: UserRateStatus,
     val progress: Int,
+    val progressVolumes: Int,
     val rewatches: Int,
     val score: Int,
-    val mediaId: String,
+    val mediaId: Int,
     val title: String,
     val posterUrl: String?,
     val createDate: Instant,
     val updateDate: Instant,
-    val totalEpisodes: Int?,
-    val totalChapters: Int?
+    val totalCount: Int,
+    val volumesCount: Int
 ) {
     companion object {
+        fun MediaDetails.toUiModel(): UserRateData {
+            return userRate?.let { userRate ->
+                UserRateData(
+                    id = userRate.rateId,
+                    mediaType = mediaType,
+                    status = userRate.rateStatus,
+                    progress = userRate.progress,
+                    progressVolumes = userRate.progressVolumes,
+                    rewatches = userRate.repeat,
+                    score = userRate.score,
+                    mediaId = id,
+                    title = title,
+                    posterUrl = coverImageUrl,
+                    createDate = userRate.createdAt,
+                    updateDate = userRate.updatedAt,
+                    totalCount = (if(status == MediaStatus.RELEASED) totalCount else currentProgress) ?: Int.MAX_VALUE,
+                    volumesCount = if(status == MediaStatus.RELEASED) volumes ?: 0 else Int.MAX_VALUE
+                )
+            } ?: createEmpty(
+                mediaId = id,
+                mediaTitle = title,
+                mediaPosterUrl = coverImageUrl,
+                mediaType = mediaType,
+                totalCount = (if(status == MediaStatus.RELEASED) totalCount else currentProgress) ?: Int.MAX_VALUE,
+                volumesCount = if(status == MediaStatus.RELEASED) volumes ?: 0 else Int.MAX_VALUE
+            )
+        }
+
         fun createEmpty(
-            mediaId: String,
+            mediaId: Int,
             mediaTitle: String,
-            mediaPosterUrl: String?,
+            mediaPosterUrl: String,
+            totalCount: Int,
+            volumesCount: Int,
             mediaType: MediaType
         ) = UserRateData(
-            id = null,
             mediaType = mediaType,
-            status = UserRateStatusEnum.UNKNOWN__,
+            status = UserRateStatus.UNKNOWN,
+            totalCount = totalCount,
+            volumesCount = volumesCount,
             progress = 0,
+            progressVolumes = 0,
             rewatches = 0,
             score = 0,
             mediaId = mediaId,
             title = mediaTitle,
             posterUrl = mediaPosterUrl,
             createDate = Clock.System.now(),
-            updateDate = Clock.System.now(),
-            totalEpisodes = null,
-            totalChapters = null
+            updateDate = Clock.System.now()
         )
     }
 }
 
-/*fun AnimeTracksQuery.UserRate.toUiModel() = UserRateData(
-    id = animeUserRateWithModel.id,
-    mediaType = MediaType.ANIME,
-    status = animeUserRateWithModel.status.rawValue,
-    progress = animeUserRateWithModel.episodes,
-    rewatches = animeUserRateWithModel.rewatches,
-    score = animeUserRateWithModel.score,
-    mediaId = animeUserRateWithModel.anime?.animeShort?.id.toString(),
-    title = animeUserRateWithModel.anime?.animeShort?.name.toString(),
-    posterUrl = animeUserRateWithModel.anime?.animeShort?.poster?.posterShort?.previewUrl,
-    createDate = Instant.parse(animeUserRateWithModel.createdAt.toString()),
-    updateDate = Instant.parse(animeUserRateWithModel.updatedAt.toString()),
-    totalEpisodes = animeUserRateWithModel.anime?.animeShort?.episodesAired,
-    totalChapters = null
+data class SaveUserRate(
+    val rateId: Int? = null,
+    val mediaId: Int,
+    val userStatus: UserRateStatus,
+    val score: Int = 0,
+    val progress: Int = 0,
+    val progressVolumes: Int? = null,
+    val repeat: Int = 0
 )
-
-fun MangaTracksQuery.UserRate.toUiModel() = UserRateData(
-    id = mangaUserRateWithModel.id,
-    mediaType = MediaType.MANGA,
-    status = mangaUserRateWithModel.status.rawValue,
-    progress = mangaUserRateWithModel.chapters,
-    rewatches = mangaUserRateWithModel.rewatches,
-    score = mangaUserRateWithModel.score,
-    mediaId = mangaUserRateWithModel.manga?.mangaShort?.id.toString(),
-    title = mangaUserRateWithModel.manga?.mangaShort?.name.toString(),
-    posterUrl = mangaUserRateWithModel.manga?.mangaShort?.poster?.posterShort?.previewUrl,
-    createDate = Instant.parse(mangaUserRateWithModel.createdAt.toString()),
-    updateDate = Instant.parse(mangaUserRateWithModel.updatedAt.toString()),
-    totalEpisodes = null,
-    totalChapters = mangaUserRateWithModel.manga?.mangaShort?.chapters
-)*/
-
-fun AnimeDetailsQuery.Anime.toUiModel(): UserRateData {
-    return if(this.userRate != null) {
-        UserRateData(
-            id = userRate.id,
-            mediaType = MediaType.ANIME,
-            status = userRate.status,
-            progress = userRate.episodes,
-            rewatches = userRate.rewatches,
-            score = userRate.score,
-            mediaId = id,
-            title = name,
-            posterUrl = poster?.originalUrl,
-            createDate = Instant.parse(userRate.createdAt.toString()),
-            updateDate = Instant.parse(userRate.updatedAt.toString()),
-            totalEpisodes = if(status == AnimeStatusEnum.released) episodes else episodesAired,
-            totalChapters = null
-        )
-    } else {
-        UserRateData.createEmpty(
-            mediaId = id,
-            mediaTitle = name,
-            mediaPosterUrl = poster?.originalUrl ?: "",
-            mediaType = MediaType.ANIME
-        )
-    }
-}
-
-fun MangaDetailsQuery.Manga.toUiModel(): UserRateData {
-    return if(userRate != null) {
-        UserRateData(
-            id = userRate.id,
-            mediaType = MediaType.MANGA,
-            status = userRate.status,
-            progress = userRate.chapters,
-            rewatches = userRate.rewatches,
-            score = userRate.score,
-            mediaId = id,
-            title = name,
-            posterUrl = poster?.posterShort?.previewUrl,
-            createDate = Instant.parse(userRate.createdAt.toString()),
-            updateDate = Instant.parse(userRate.updatedAt.toString()),
-            totalEpisodes = null,
-            totalChapters = chapters
-        )
-    } else {
-        UserRateData.createEmpty(
-            mediaId = id,
-            mediaTitle = name,
-            mediaPosterUrl = poster?.posterShort?.originalUrl ?: "",
-            mediaType = MediaType.MANGA
-        )
-    }
-}

@@ -16,7 +16,7 @@ import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity
         MangaTrackEntity::class, MangaShortEntity::class,
         //VersionEntity::class, AssetsEntity::class
         ],
-    version = 2,
+    version = 1,
     exportSchema = false
 )
 @TypeConverters(InstantConverter::class)

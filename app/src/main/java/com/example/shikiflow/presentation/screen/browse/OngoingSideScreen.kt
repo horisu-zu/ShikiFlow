@@ -32,7 +32,7 @@ import com.example.shikiflow.utils.Resource
 
 @Composable
 fun OngoingSideScreen(
-    onNavigate: (String) -> Unit,
+    onNavigate: (Int) -> Unit,
     onScrollStateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()

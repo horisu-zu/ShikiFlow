@@ -1,0 +1,137 @@
+query MediaDetails(
+    $type: MediaType!,
+    $id: Int!
+) {
+    Media(id: $id, type: $type) {
+        id,
+        idMal,
+        type
+        title {
+            english
+            romaji
+            native
+        }
+        synonyms
+        coverImage {
+            extraLarge
+            large
+            medium
+        }
+        description(asHtml: true)
+        format
+        status
+        genres
+        source
+        characters(sort: [RELEVANCE, ROLE]) {
+            nodes {
+                ...ALCharacterShort
+            }
+        }
+        mediaListEntry {
+            ...ALRateEntry
+        }
+        relations {
+            edges {
+                ...ALRelatedMediaShort
+            }
+        }
+        stats {
+            ...ALMediaStats
+        }
+        season
+        episodes
+        chapters
+        volumes
+        meanScore
+        averageScore
+        duration
+        nextAiringEpisode {
+            ...ALAiringEpisodeShort
+        }
+        startDate {
+            ...Date
+        }
+        endDate {
+            ...Date
+        }
+        studios(isMain: true) {
+            nodes {
+                ...ALStudioShort
+            }
+        }
+    }
+}
+
+query MediaBrowse(
+    $page: Int!,
+    $perPage: Int!,
+    $search: String,
+    $status: MediaStatus,
+    $sort: MediaSort!,
+    $mediaType: MediaType!,
+    $format: MediaFormat
+    $score: Int,
+    $genre: String,
+    $season: MediaSeason
+    $seasonYear: Int
+) {
+    Page(page: $page, perPage: $perPage) {
+        media(
+            search: $search,
+            status: $status,
+            sort: [$sort],
+            type: $mediaType,
+            format: $format,
+            averageScore_greater: $score,
+            genre: $genre,
+            season: $season,
+            seasonYear: $seasonYear
+        ) {
+            ...MediaBrowse
+        }
+    }
+}
+
+query StudioBrowse(
+    $studioId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $sort: MediaSort,
+    $onList: Boolean
+) {
+    Studio(id: $studioId) {
+        media(page: $page, perPage: $perPage, sort: [$sort], onList: $onList, isMain: true) {
+            nodes {
+                ...MediaBrowse
+            }
+        }
+    }
+}
+
+query MediaRecommendations(
+    $mediaId: Int!,
+    $page: Int!,
+    $perPage: Int!
+) {
+    Media(id: $mediaId) {
+        recommendations(page: $page, perPage: $perPage) {
+            nodes {
+                mediaRecommendation {
+                    ...MediaBrowse
+                }
+            }
+        }
+    }
+}
+
+query MediaExternalLinks(
+    $mediaId: Int!
+) {
+    Media(id: $mediaId) {
+        externalLinks {
+            icon
+            site
+            url
+        }
+    }
+}

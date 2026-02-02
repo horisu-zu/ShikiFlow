@@ -1,8 +1,11 @@
 package com.example.shikiflow.presentation.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.AuthRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,10 +18,14 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val tokenRepository: TokenRepository,
+    private val settingsRepository: SettingsRepository,
     private val authRepository: AuthRepository
 ): ViewModel() {
 
-    val authState: StateFlow<AuthState> = tokenRepository.tokensFlow
+    var _authType = mutableStateOf<AuthType?>(null)
+        private set
+
+    val authState: StateFlow<AuthState> = tokenRepository.authCredentials
         .map { tokens ->
             when(tokens.accessToken) {
                 null -> AuthState.Initial
@@ -27,15 +34,21 @@ class AuthViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = AuthState.Loading
         )
 
-    fun getAuthorizationUrl() = authRepository.getAuthorizationUrl()
+    fun getAuthorizationUrl(authType: AuthType): String {
+        _authType.value = authType
+        return authRepository.getAuthorizationUrl(authType)
+    }
 
     fun handleAuthCode(code: String) {
         viewModelScope.launch {
-            authRepository.handleAuthCode(code)
+            _authType.value?.let { type ->
+                authRepository.handleAuthCode(code, type)
+                settingsRepository.saveAuthType(type)
+            }
         }
     }
 }

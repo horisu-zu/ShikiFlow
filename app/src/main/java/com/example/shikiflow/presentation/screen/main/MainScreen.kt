@@ -67,6 +67,7 @@ fun MainScreen(
                 Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                     if(isSearchActive) {
                         SearchPage(
+                            userId = currentUser?.id,
                             searchQuery = searchQuery,
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
                             onAnimeClick = { animeId ->
@@ -75,6 +76,7 @@ fun MainScreen(
                         )
                     } else {
                         MainPage(
+                            userId = currentUser?.id,
                             mediaType = when(trackMode) {
                                 MainTrackMode.ANIME -> MediaType.ANIME
                                 MainTrackMode.MANGA -> MediaType.MANGA

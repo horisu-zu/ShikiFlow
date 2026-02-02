@@ -63,9 +63,15 @@ android {
     }
     apollo {
         service("shikimori-api") {
-            packageName.set("com.example.graphql")
-            schemaFile.set(file("src/main/graphql/schema.graphql"))
-            srcDir("src/main/graphql/sources")
+            packageName.set("com.example.graphql.shikimori")
+            schemaFile.set(file("src/main/graphql/shikimori/schema.graphql"))
+            srcDir("src/main/graphql/shikimori/sources")
+            generateKotlinModels.set(true)
+        }
+        service("anilist-api") {
+            packageName.set("com.example.graphql.anilist")
+            schemaFile.set(file("src/main/graphql/anilist/schema.graphql"))
+            srcDir("src/main/graphql/anilist/sources")
             generateKotlinModels.set(true)
         }
     }
@@ -104,6 +110,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
     implementation(libs.jetbrains.kotlinx.serialization.json)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.retrofit)

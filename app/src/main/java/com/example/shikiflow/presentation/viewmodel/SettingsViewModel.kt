@@ -116,6 +116,7 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
+            settingsRepository.clearUserData()
         }
     }
 }

@@ -6,29 +6,30 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.example.graphql.type.SortOrderEnum
-import com.example.graphql.type.UserRateOrderFieldEnum
-import com.example.graphql.type.UserRateOrderInputType
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.datasource.MediaTracksDataSource
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.dao.MangaTracksDao
-import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity.Companion.toEntity
+import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackDto
-import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity.Companion.toEntity
-import com.example.shikiflow.domain.repository.MangaTracksRepository
+import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity.Companion.toDto
+import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.track.UserRateOrder
+import com.example.shikiflow.domain.model.track.UserRateOrderType
 import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class MangaTracksMediator(
-    private val mangaTracksRepository: MangaTracksRepository,
+    private val mediaTracksDataSource: MediaTracksDataSource,
     private val appRoomDatabase: AppRoomDatabase,
-    private val mangaTracksDao: MangaTracksDao,
-    private val userRateStatus: UserRateStatusEnum
+    private val userRateStatus: UserRateStatus,
+    private val userId: String?
 ): RemoteMediator<Int, MangaTrackDto>() {
 
+    private val mangaTracksDao = appRoomDatabase.mangaTracksDao()
+
     companion object {
-        private val loadedPagesMap = mutableMapOf<UserRateStatusEnum, Int>()
+        private val loadedPagesMap = mutableMapOf<UserRateStatus, Int>()
     }
 
     override suspend fun load(
@@ -57,30 +58,29 @@ class MangaTracksMediator(
             }
 
             Log.d("MangaTracksMediator", "Attempting to load tracks for status: $userRateStatus")
-            val response = mangaTracksRepository.getMangaTracks(
+            val response = mediaTracksDataSource.getMangaTracks(
                 page = page,
                 limit = state.config.pageSize,
+                userId = userId,
                 status = userRateStatus,
-                order = UserRateOrderInputType(
-                    field = UserRateOrderFieldEnum.updated_at,
-                    order = SortOrderEnum.desc
+                order = UserRateOrder(
+                    type = UserRateOrderType.UPDATED_AT,
+                    sort = SortDirection.DESCENDING
                 )
             )
 
             return response.fold(
                 onSuccess = { data ->
-                    val tracks = data.map { it.mangaUserRateWithModel.toEntity() }
-                    val mangaItems = data
-                        .mapNotNull { it.mangaUserRateWithModel.manga?.mangaShort }
-                        .map { it.toEntity() }
+                    val tracks = data.map { it.track.toDto() }
+                    val mangaItems = data.map { it.manga.toDto() }
 
                     appRoomDatabase.withTransaction {
                         if (loadType == LoadType.REFRESH) {
                             mangaTracksDao.clearTracks(userRateStatus.name)
                             mangaTracksDao.clearMangaItems(userRateStatus.name)
                         }
-                        appRoomDatabase.mangaTracksDao().insertTracks(tracks)
-                        appRoomDatabase.mangaTracksDao().insertMangaItems(mangaItems)
+                        mangaTracksDao.insertTracks(tracks)
+                        mangaTracksDao.insertMangaItems(mangaItems)
                     }
 
                     val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize

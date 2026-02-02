@@ -23,7 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,31 +34,32 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.anime.MyListString
-import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
+import com.example.shikiflow.domain.model.mapper.UserRateMapper
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
 
 @Composable
 fun SearchPage(
+    userId: String?,
     searchQuery: String,
     isAtTop: Boolean,
     tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel(),
-    onAnimeClick: (String) -> Unit
+    onAnimeClick: (Int) -> Unit
 ) {
-    val chips = listOf(R.string.media_user_status_all) +
-        UserRateStatusConstants.getStatusChips(MediaType.ANIME)
+    val chips = listOf(null) + UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
 
-    var selectedTabSearch by remember { mutableIntStateOf(0) }
+    var selectedTabSearch by rememberSaveable { mutableIntStateOf(0) }
     val selectedStatus = when (selectedTabSearch) {
-        in 1..chips.size -> MyListString.entries[selectedTabSearch - 1]
+        in 1..UserRateStatus.entries.size -> UserRateStatus.entries[selectedTabSearch - 1]
         else -> null
     }
 
     val trackItems = tracksViewModel.getPaginatedTracks(
+        userId = userId,
         title = searchQuery,
-        userStatus = selectedStatus
+        userRateStatus = selectedStatus
     ).collectAsLazyPagingItems()
 
     Column {
@@ -72,12 +73,16 @@ fun SearchPage(
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(chips) { tab ->
+            items(chips) { rateStatus ->
+                val userRateStatus = rateStatus?.let {
+                    UserRateMapper.mapUserRateStatus(rateStatus, MediaType.ANIME)
+                } ?: R.string.media_user_status_all
+
                 FilterChip(
-                    selected = chips[selectedTabSearch] == tab,
-                    onClick = { selectedTabSearch = chips.indexOf(tab) },
-                    label = { Text(stringResource(id = tab)) },
-                    leadingIcon = if (chips[selectedTabSearch] == tab) {
+                    selected = chips[selectedTabSearch] == rateStatus,
+                    onClick = { selectedTabSearch = chips.indexOf(rateStatus) },
+                    label = { Text(stringResource(id = userRateStatus)) },
+                    leadingIcon = if (chips[selectedTabSearch] == rateStatus) {
                         {
                             Icon(
                                 imageVector = Icons.Filled.Done,
@@ -118,7 +123,7 @@ fun SearchPage(
             } else {
                 items(
                     count = trackItems.itemCount,
-                    key = trackItems.itemKey { it.id }
+                    key = trackItems.itemKey { it.anime.id }
                 ) { index ->
                     val item = trackItems[index] ?: return@items
                     SearchAnimeTrackItem(

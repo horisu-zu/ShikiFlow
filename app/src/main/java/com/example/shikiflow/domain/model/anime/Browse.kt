@@ -1,15 +1,11 @@
 package com.example.shikiflow.domain.model.anime
 
-import com.example.graphql.AnimeBrowseQuery
-import com.example.graphql.MangaBrowseQuery
-import com.example.graphql.type.AnimeKindEnum
-import com.example.graphql.type.MangaKindEnum
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper
+import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
-
 import kotlin.time.Instant
 
 @Serializable
@@ -18,81 +14,56 @@ sealed interface BrowseType {
 
     enum class AnimeBrowseType(override val displayValueRes: Int): BrowseType {
         ONGOING(R.string.browse_type_anime_ongoing),
-        SEARCH(R.string.browse_type_search),
         ANIME_TOP(R.string.browse_type_anime_top)
     }
 
     enum class MangaBrowseType(override val displayValueRes: Int): BrowseType {
-        SEARCH(R.string.browse_type_search),
         MANGA_TOP(R.string.browse_type_manga_top)
+    }
+
+    companion object {
+        fun BrowseType.getBrowseOptions(): BrowseOptions {
+            return when(this) {
+                is AnimeBrowseType -> BrowseOptions(mediaType = MediaType.ANIME)
+                is MangaBrowseType -> BrowseOptions(mediaType = MediaType.MANGA)
+            }
+        }
     }
 }
 
 sealed interface Browse {
-    val id: String
+    val id: Int
     val title: String
     val posterUrl: String?
-    val score: Double
-    val kindResId: Int
+    val score: Float?
     val nextEpisodeAt: Instant?
     val mediaType: MediaType
+    val mediaFormat: MediaFormat?
 
     data class Anime(
-        override val id: String,
+        override val id: Int,
         override val title: String,
         override val posterUrl: String?,
-        override val score: Double,
+        override val score: Float?,
         override val nextEpisodeAt: Instant? = null,
         override val mediaType: MediaType = MediaType.ANIME,
-        val animeKind: AnimeKindEnum,
-        val userRateStatus: UserRateStatusEnum? = null,
-        val episodesAired: Int,
-        val episodes: Int,
+        override val mediaFormat: MediaFormat,
+        val userRateStatus: UserRateStatus? = null,
+        val episodesAired: Int?,
+        val episodes: Int?,
         val studios: List<String> = emptyList(),
         val genres: List<String> = emptyList()
-    ): Browse {
-        override val kindResId: Int get() = UserRateMapper.mapAnimeKind(animeKind)
-    }
+    ): Browse
 
     data class Manga(
-        override val id: String,
+        override val id: Int,
         override val title: String,
         override val posterUrl: String?,
-        override val score: Double,
+        override val score: Float?,
         override val nextEpisodeAt: Instant? = null,
         override val mediaType: MediaType = MediaType.MANGA,
-        val mangaKind: MangaKindEnum
-    ): Browse {
-        override val kindResId: Int get() = UserRateMapper.mapMangaKind(mangaKind)
-    }
-}
-
-
-fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
-    return Browse.Anime(
-        id = this.id,
-        title = this.name,
-        posterUrl = this.poster?.posterShort?.mainUrl,
-        score = this.score ?: 0.0,
-        animeKind = this.kind ?: AnimeKindEnum.UNKNOWN__,
-        nextEpisodeAt = this.nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
-        userRateStatus = this.userRate?.animeUserRate?.status,
-        episodesAired = this.episodesAired,
-        episodes = this.episodes,
-        studios = this.studios.map { it.name },
-        genres = this.genres?.map { it.name } ?: emptyList()
-    )
-}
-
-
-fun MangaBrowseQuery.Manga.toBrowseManga(): Browse.Manga {
-    return Browse.Manga(
-        id = this.id,
-        title = this.name,
-        posterUrl = this.poster?.posterShort?.mainUrl,
-        score = this.score ?: 0.0,
-        mangaKind = this.kind ?: MangaKindEnum.UNKNOWN__
-    )
+        override val mediaFormat: MediaFormat,
+    ): Browse
 }
 
 /*sealed class BrowseScreens(val route: String) {

@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -22,10 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.mapper.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
@@ -33,7 +30,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
 @Composable
 fun MainSideScreen(
     browseType: BrowseType,
-    onMediaNavigate: (String, MediaType) -> Unit,
+    onMediaNavigate: (Int, MediaType) -> Unit,
     onScrollStateChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     browseViewModel: BrowseViewModel = hiltViewModel()

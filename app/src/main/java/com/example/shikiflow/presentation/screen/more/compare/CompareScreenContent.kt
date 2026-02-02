@@ -32,13 +32,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.userrate.ComparisonType
-import com.example.shikiflow.domain.model.userrate.ShortUserRateData
+import com.example.shikiflow.domain.model.user.ComparisonType
+import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -255,8 +255,8 @@ private fun ComparisonItem(
             if(comparisonType != ComparisonType.TARGET_USER_ONLY) {
                 Text(
                     text = if(
-                        currentUserScore?.status == UserRateStatusEnum.completed ||
-                        currentUserScore?.status == UserRateStatusEnum.watching
+                        currentUserScore?.status == UserRateStatus.COMPLETED ||
+                        currentUserScore?.status == UserRateStatus.WATCHING
                     ) {
                         when(currentUserScore.userScore) {
                             0 -> { "-" }
@@ -264,8 +264,8 @@ private fun ComparisonItem(
                         }
                     } else {
                         stringResource(
-                            id = UserRateMapper.simpleMapUserRateStatusToString(
-                                status = currentUserScore?.status ?: UserRateStatusEnum.planned,
+                            id = UserRateMapper.mapUserRateStatus(
+                                status = currentUserScore?.status ?: UserRateStatus.PLANNED,
                                 mediaType = mediaType
                             )
                         )
@@ -285,8 +285,8 @@ private fun ComparisonItem(
             if(comparisonType != ComparisonType.CURRENT_USER_ONLY) {
                 Text(
                     text = if(
-                        targetUserScore?.status == UserRateStatusEnum.completed ||
-                        targetUserScore?.status == UserRateStatusEnum.watching
+                        targetUserScore?.status == UserRateStatus.COMPLETED ||
+                        targetUserScore?.status == UserRateStatus.WATCHING
                     ) {
                         when(targetUserScore.userScore) {
                             0 -> { "-" }
@@ -294,8 +294,8 @@ private fun ComparisonItem(
                         }
                     } else {
                         stringResource(
-                            id = UserRateMapper.simpleMapUserRateStatusToString(
-                                status = targetUserScore?.status ?: UserRateStatusEnum.planned,
+                            id = UserRateMapper.mapUserRateStatus(
+                                status = targetUserScore?.status ?: UserRateStatus.PLANNED,
                                 mediaType = mediaType
                             )
                         )

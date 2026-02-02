@@ -1,7 +1,7 @@
 package com.example.shikiflow.di.interceptor
 
 import android.util.Log
-import com.example.shikiflow.data.remote.ShikimoriAuthApi
+import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
 import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -14,19 +14,19 @@ import javax.inject.Inject
 
 class TokenAuthenticator @Inject constructor(
     private val tokenRepository: TokenRepository,
-    private val authApi: ShikimoriAuthApi
+    private val shikiAuthApi: ShikimoriAuthApi
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
 
         val refreshToken = runBlocking {
-            tokenRepository.tokensFlow.firstOrNull()?.refreshToken
+            tokenRepository.authCredentials.firstOrNull()?.refreshToken
         }
 
         return try {
             runBlocking(Dispatchers.IO) {
                 val tokenResponse = refreshToken?.let {
                     Log.d("TokenAuthenticator", "Refresh Token: $refreshToken")
-                    authApi.refreshToken(refreshToken = it).body()
+                    shikiAuthApi.refreshToken(refreshToken = it).body()
                 }
                 tokenResponse?.let {
                     tokenRepository.saveTokens(it)

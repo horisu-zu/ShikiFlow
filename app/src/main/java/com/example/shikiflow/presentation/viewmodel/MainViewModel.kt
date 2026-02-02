@@ -42,11 +42,9 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            viewModelScope.launch {
-                _currentTrackMode.value = settingsRepository.settingsFlow
-                    .map { it.trackMode }
-                    .first()
-            }
+            _currentTrackMode.value = settingsRepository.settingsFlow
+                .map { it.trackMode }
+                .first()
         }
     }
 

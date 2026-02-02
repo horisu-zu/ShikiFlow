@@ -1,62 +1,42 @@
 package com.example.shikiflow.domain.repository
 
-import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
-import com.example.shikiflow.domain.model.tracks.TargetType
-import com.example.shikiflow.domain.model.user.UserHistoryResponse
-import com.example.shikiflow.domain.model.tracks.UserRate
-import com.example.shikiflow.domain.model.tracks.UserRateRequest
-import com.example.shikiflow.domain.model.tracks.UserRateResponse
+import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.user.UserFavoritesResponse
-import com.example.shikiflow.domain.model.userrate.ShortUserRate
+import com.example.shikiflow.domain.model.user.UserFavorite
+import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     suspend fun fetchCurrentUser(): User?
-    suspend fun getUserHistory(
-        userId: Long,
-        page: Int? = null,
-        limit: Int? = null,
-        targetId: Long? = null,
-        targetType: TargetType? = null
-    ): Result<List<UserHistoryResponse>>
 
-    suspend fun getUserAnimeRates(
-        userId: Long,
-        page: Int? = null,
-        limit: Int? = 2000,
-        status: String? = null,
-        censored: Boolean? = true
-    ): List<ShortUserRate.ShortAnimeRate>
+    fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>>
 
-    suspend fun getUserMangaRates(
-        userId: Long,
-        page: Int? = null,
-        limit: Int? = 2000,
-        status: String? = null,
-        censored: Boolean? = true
-    ): List<ShortUserRate.ShortMangaRate>
+    suspend fun getUserRates(userId: Int): UserRateStats
 
-    suspend fun getUserRates(
-        userId: Long,
-        page: Int? = null,
-        limit: Int? = null,
-        status: String? = null,
-        targetType: String? = null,
-        censored: Boolean? = true
-    ): List<UserRate>
+    suspend fun getFavoriteCategories(userId: Int): List<FavoriteCategory>
+    fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
 
-    suspend fun getUsersByNickname(
-        page: Int,
-        limit: Int,
+    suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>
+
+    fun getUsers(
         nickname: String
-    ): Result<List<User>>
+    ): Flow<PagingData<User>>
 
-    suspend fun updateUserRate(
-        id: Long,
-        request: UserRateRequest
-    ): UserRateResponse
-
-    suspend fun createUserRate(createRequest: CreateUserRateRequest): UserRateResponse
-
-    suspend fun getUserFavorites(userId: Long): UserFavoritesResponse
+    suspend fun saveUserRate(
+        userId: Int? = null,
+        entryId: Int? = null,
+        mediaType: MediaType,
+        mediaId: Int,
+        status: UserRateStatus,
+        progress: Int? = null,
+        progressVolumes: Int? = null,
+        repeat: Int? = null,
+        score: Int? = null
+    ): UserMediaRate
 }

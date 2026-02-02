@@ -35,12 +35,12 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
-import com.example.graphql.type.AnimeStatusEnum
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.common.RateUpdateState
+import com.example.shikiflow.data.mapper.MediaTracksMapper.toUserRateData
+import com.example.shikiflow.domain.model.tracks.RateUpdateState
+import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack.Companion.toUserRateData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
@@ -52,19 +52,19 @@ import com.example.shikiflow.utils.AppUiMode
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeTracksPage(
-    userStatus: UserRateStatusEnum,
+    userStatus: UserRateStatus,
+    userId: String,
     isAppBarVisible: Boolean,
-    onAnimeClick: (String) -> Unit,
+    onAnimeClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     tracksViewModel: AnimeTracksViewModel = hiltViewModel(),
 ) {
-    val animeTrackItems = tracksViewModel.getAnimeTracks(userStatus).collectAsLazyPagingItems()
+    val animeTrackItems = tracksViewModel.getAnimeTracks(userStatus, userId).collectAsLazyPagingItems()
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
     val rateUpdateState by tracksViewModel.rateUpdateState
 
     var isRefreshing by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
-    var rateBottomSheet by remember { mutableStateOf(false) }
 
     PullToRefreshCustomBox(
         isRefreshing = isRefreshing,
@@ -98,7 +98,6 @@ fun AnimeTracksPage(
                         trackItems = animeTrackItems,
                         onAnimeClick = onAnimeClick,
                         onLongClick = { item ->
-                            rateBottomSheet = true
                             selectedItem = item
                         }, modifier = modifier
                     )
@@ -108,34 +107,25 @@ fun AnimeTracksPage(
                         trackItems = animeTrackItems,
                         onAnimeClick = onAnimeClick,
                         onLongClick = { item ->
-                            rateBottomSheet = true
                             selectedItem = item
                         }, modifier = modifier
                     )
                 }
             }
 
-            if (rateBottomSheet) {
-                selectedItem?.let {
-                    UserRateBottomSheet(
-                        userRate = it.toUserRateData(),
-                        rateUpdateState = rateUpdateState,
-                        onDismiss = {
-                            if (rateUpdateState != RateUpdateState.LOADING) {
-                                rateBottomSheet = false
-                            }
-                        },
-                        onSave = { id, rateStatus, score, episodes, rewatches ->
-                            tracksViewModel.updateUserRate(
-                                id = id,
-                                status = rateStatus,
-                                score = score,
-                                progress = episodes,
-                                rewatches = rewatches
-                            )
+            selectedItem?.let {
+                UserRateBottomSheet(
+                    userRate = it.toUserRateData(),
+                    rateUpdateState = rateUpdateState,
+                    onDismiss = {
+                        if (rateUpdateState != RateUpdateState.LOADING) {
+                            selectedItem = null
                         }
-                    )
-                }
+                    },
+                    onSave = { saveUserRate ->
+                        tracksViewModel.saveUserRate(saveUserRate)
+                    }
+                )
             }
         }
     }
@@ -144,7 +134,7 @@ fun AnimeTracksPage(
 @Composable
 private fun AnimeTracksListComponent(
     trackItems: LazyPagingItems<AnimeTrack>,
-    onAnimeClick: (String) -> Unit,
+    onAnimeClick: (Int) -> Unit,
     onLongClick: (AnimeTrack) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -162,7 +152,8 @@ private fun AnimeTracksListComponent(
             AnimeTrackItem(
                 userRate = item,
                 onClick = onAnimeClick,
-                onLongClick = { onLongClick(item) }
+                onLongClick = { onLongClick(item) },
+                modifier = Modifier.animateItem()
             )
         }
         trackItems.apply {
@@ -191,7 +182,7 @@ private fun AnimeTracksListComponent(
 @Composable
 private fun AnimeTracksGridComponent(
     trackItems: LazyPagingItems<AnimeTrack>,
-    onAnimeClick: (String) -> Unit,
+    onAnimeClick: (Int) -> Unit,
     onLongClick: (AnimeTrack) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -213,7 +204,8 @@ private fun AnimeTracksGridComponent(
                     .combinedClickable(
                         onClick = { onAnimeClick(trackItem.anime.id) },
                         onLongClick = { onLongClick(trackItem) }
-                    ),
+                    )
+                    .animateItem(),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 BaseImage(
@@ -235,7 +227,7 @@ private fun AnimeTracksGridComponent(
                 )
                 Text(
                     text = buildString {
-                        if(trackItem.anime.status == AnimeStatusEnum.ongoing)
+                        if(trackItem.anime.status == MediaStatus.ONGOING)
                             append("${trackItem.track.episodes} / ${trackItem.anime.episodesAired}")
                         else append(trackItem.track.episodes)
                         append(" of ${trackItem.anime.episodes.takeIf { it > 0 } ?: "?"} ep.")

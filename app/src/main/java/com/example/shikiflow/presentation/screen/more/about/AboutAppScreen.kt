@@ -77,7 +77,13 @@ fun AboutAppScreen(
                         icon = IconResource.Drawable(R.drawable.shiki_logo),
                         title = stringResource(R.string.about_app_shikimori_label),
                         subtitle = stringResource(R.string.about_app_shikimori_desc),
-                        onClick = { WebIntent.openUrlCustomTab(context, BuildConfig.BASE_URL) }
+                        onClick = { WebIntent.openUrlCustomTab(context, BuildConfig.SHIKI_BASE_URL) }
+                    ),
+                    SectionItem.General(
+                        icon = IconResource.Drawable(R.drawable.anilist_logo),
+                        title = stringResource(R.string.about_app_anilist_label),
+                        subtitle = stringResource(R.string.about_app_anilist_desc),
+                        onClick = { WebIntent.openUrlCustomTab(context, BuildConfig.ANILIST_BASE_URL) }
                     ),
                     SectionItem.General(
                         icon = IconResource.Drawable(R.drawable.ic_mangadex_v2),

@@ -11,27 +11,28 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
-import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
+    userId: String?,
     mediaType: MediaType,
     isAtTop: Boolean,
     isAppBarVisible: Boolean,
-    onMediaClick: (String, MediaType) -> Unit
+    onMediaClick: (Int, MediaType) -> Unit
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val tabs = UserRateStatusConstants.getStatusChips(mediaType)
+    val tabs = UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
     val pagerState = rememberPagerState { tabs.size }
 
     Column {
         MainTabRow(
-            tabs = tabs.map { stringResource(id = it) },
+            tabs = tabs,
+            mediaType = mediaType,
             selectedTab = pagerState.currentPage,
             onTabSelected = {
                 coroutineScope.launch {
@@ -43,35 +44,39 @@ fun MainPage(
                         )
                     )
                 }
-            }, isAtTop = isAtTop
+            },
+            isAtTop = isAtTop
         )
-        HorizontalPager(
-            state = pagerState,
-            modifier = Modifier.fillMaxSize(),
-        ) { page ->
-            val status = UserRateMapper.mapStringResToStatus(tabs[page])
+        userId?.let {
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier.fillMaxSize(),
+            ) { page ->
+                AnimatedContent(
+                    targetState = mediaType
+                ) { type ->
+                    when (type) {
+                        MediaType.ANIME -> {
+                            AnimeTracksPage(
+                                userStatus = UserRateStatus.entries[page],
+                                userId = userId,
+                                isAppBarVisible = isAppBarVisible,
+                                onAnimeClick = { animeId ->
+                                    onMediaClick(animeId, mediaType)
+                                }
+                            )
+                        }
 
-            AnimatedContent(
-                targetState = mediaType
-            ) { type ->
-                when(type) {
-                    MediaType.ANIME -> {
-                        AnimeTracksPage(
-                            userStatus = status,
-                            isAppBarVisible = isAppBarVisible,
-                            onAnimeClick = { animeId ->
-                                onMediaClick(animeId, mediaType)
-                            }
-                        )
-                    }
-                    MediaType.MANGA -> {
-                        MangaTracksPage(
-                            userStatus = status,
-                            isAppBarVisible = isAppBarVisible,
-                            onMangaClick = { mangaId ->
-                                onMediaClick(mangaId, mediaType)
-                            }
-                        )
+                        MediaType.MANGA -> {
+                            MangaTracksPage(
+                                userStatus = UserRateStatus.entries[page],
+                                userId = userId,
+                                isAppBarVisible = isAppBarVisible,
+                                onMangaClick = { mangaId ->
+                                    onMediaClick(mangaId, mediaType)
+                                }
+                            )
+                        }
                     }
                 }
             }

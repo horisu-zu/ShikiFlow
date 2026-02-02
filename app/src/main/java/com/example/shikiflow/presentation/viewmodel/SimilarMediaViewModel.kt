@@ -2,53 +2,28 @@ package com.example.shikiflow.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.toBrowseAnime
-import com.example.shikiflow.domain.model.anime.toBrowseManga
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.repository.AnimeRepository
-import com.example.shikiflow.domain.repository.MangaRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.domain.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
 class SimilarMediaViewModel @Inject constructor(
-    private val animeRepository: AnimeRepository,
-    private val mangaRepository: MangaRepository
+    private val mediaRepository: MediaRepository
 ): ViewModel() {
 
-    private val _lastMediaId = MutableStateFlow<String?>(null)
-    private val _similarMedia = MutableStateFlow<Resource<List<Browse>>>(Resource.Loading())
-    val similarMedia = _similarMedia.asStateFlow()
+    private val _pagingRecommendationMap = mutableMapOf<Int, Flow<PagingData<Browse>>>()
 
     fun getSimilarMedia(
-        mediaId: String,
+        mediaId: Int,
         mediaType: MediaType
-    ) {
-        viewModelScope.launch {
-            if(mediaId == _lastMediaId.value) {
-                return@launch
-            }
-            _similarMedia.value = Resource.Loading()
-            when (mediaType) {
-                MediaType.ANIME -> {
-                    val response = animeRepository.getSimilarAnime(mediaId).map { result ->
-                        result.toBrowseAnime()
-                    }
-                    _similarMedia.value = Resource.Success(response)
-                }
-                MediaType.MANGA -> {
-                    val response = mangaRepository.getSimilarManga(mediaId).map { result ->
-                        result.toBrowseManga()
-                    }
-                    _similarMedia.value = Resource.Success(response)
-                }
-            }
-            _lastMediaId.value = mediaId
+    ): Flow<PagingData<Browse>> {
+        return _pagingRecommendationMap.getOrPut(mediaId) {
+            mediaRepository.getSimilarMedia(mediaType, mediaId).cachedIn(viewModelScope)
         }
     }
 }

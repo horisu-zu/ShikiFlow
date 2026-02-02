@@ -1,6 +1,6 @@
 package com.example.shikiflow.di.module
 
-import com.example.shikiflow.domain.model.common.InstantSerializer
+import com.example.shikiflow.data.datasource.dto.InstantSerializer
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,6 +19,7 @@ object SerializationModule {
         ignoreUnknownKeys = true
         coerceInputValues = true
         explicitNulls = false
+        encodeDefaults = true
         serializersModule = kotlinx.serialization.modules.SerializersModule {
             contextual(Instant::class, InstantSerializer)
         }

@@ -1,5 +1,6 @@
 package com.example.shikiflow.utils
 
+import android.content.res.Resources
 import android.util.Log
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
@@ -9,15 +10,13 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withStyle
-import com.example.graphql.type.AnimeRatingEnum
-import com.example.graphql.type.MangaKindEnum
-import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentType
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
-import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserRate
+import com.example.shikiflow.domain.model.comment.DescriptionElement
+import com.example.shikiflow.domain.model.comment.EntityData
+import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.track.MediaFormat
 import com.fleeksoft.ksoup.Ksoup
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
@@ -35,32 +34,30 @@ import kotlin.time.Instant
 
 object Converter {
     fun formatInstant(
-        instant: Instant?,
+        instant: Instant,
         includeTime: Boolean = false,
         includeDayOfWeek: Boolean = false
     ): String {
-        return instant?.let { instant ->
-            val date = Date(instant.toEpochMilliseconds())
-            val currentYear = Clock.System.now()
-                .toLocalDateTime(TimeZone.currentSystemDefault()).year
-            val instantYear = instant
-                .toLocalDateTime(TimeZone.currentSystemDefault()).year
+        val date = Date(instant.toEpochMilliseconds())
+        val currentYear = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault()).year
+        val instantYear = instant
+            .toLocalDateTime(TimeZone.currentSystemDefault()).year
 
-            val pattern = buildString {
-                if(includeDayOfWeek) {
-                    append("EEE, ")
-                }
-                append("dd MMM")
-                if (instantYear != currentYear) {
-                    append(" yyyy")
-                }
-                if (includeTime && instantYear == currentYear) {
-                    append(", HH:mm")
-                }
+        val pattern = buildString {
+            if(includeDayOfWeek) {
+                append("EEE, ")
             }
+            append("dd MMM")
+            if (instantYear != currentYear) {
+                append(" yyyy")
+            }
+            if (includeTime && instantYear == currentYear) {
+                append(", HH:mm")
+            }
+        }
 
-            SimpleDateFormat(pattern, Locale.getDefault()).format(date)
-        } ?: "Not available"
+        return SimpleDateFormat(pattern, Locale.getDefault()).format(date)
     }
 
     fun formatDate(
@@ -88,43 +85,33 @@ object Converter {
         }
     }
 
-    /*fun convertInstantToString(context: Context, lastSeenInstant: Instant?): String {
+    fun convertInstantToString(resources: Resources, instant: Instant): String {
         val currentTimeInstant = Clock.System.now()
-        val duration = currentTimeInstant - lastSeenInstant!!
+        val duration = currentTimeInstant - instant
         val diffMillis = duration.inWholeMilliseconds
 
         return when {
-            diffMillis < 60000 -> {
-                context.getString(R.string.status_now)
-            }
-
             diffMillis < 3600000 -> {
                 val minutes = duration.inWholeMinutes
                 if (minutes == 1L) {
-                    context.getString(R.string.status_minute_ago, minutes)
+                    resources.getString(R.string.status_minute_ago, minutes)
                 } else {
-                    context.getString(R.string.status_minutes_ago, minutes)
+                    resources.getString(R.string.status_minutes_ago, minutes)
                 }
             }
-
             diffMillis < 86400000 -> {
-                val hours = duration.inWholeHours
-                when (hours) {
-                    1L -> context.getString(R.string.status_hour_ago, hours)
-                    in 2..4 -> context.getString(R.string.status_hours_ago, hours)
-                    else -> context.getString(R.string.status_hours_ago_v2, hours)
+                when (val hours = duration.inWholeHours) {
+                    1L -> resources.getString(R.string.status_hour_ago, hours)
+                    else -> resources.getString(R.string.status_hours_ago, hours)
                 }
             }
-
             else -> {
-                val date = Date(lastSeenInstant.toEpochMilliseconds())
+                val date = Date(instant.toEpochMilliseconds())
                 val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                val formattedDate = formatter.format(date)
-
-                context.getString(R.string.status_days, formattedDate)
+                formatter.format(date)
             }
         }
-    }*/
+    }
 
     fun formatFileSize(size: Double): String {
         return when {
@@ -150,34 +137,9 @@ object Converter {
         }
     }
 
-    fun MangaKindEnum.isManga(): Boolean {
-        return this in setOf(MangaKindEnum.manga, MangaKindEnum.manhwa,
-            MangaKindEnum.manhua, MangaKindEnum.one_shot, MangaKindEnum.doujin)
-    }
-
-    fun convertRatingToString(rating: AnimeRatingEnum): Int {
-        return when(rating) {
-            AnimeRatingEnum.none -> R.string.rating_none
-            AnimeRatingEnum.g -> R.string.rating_g
-            AnimeRatingEnum.pg -> R.string.rating_pg
-            AnimeRatingEnum.pg_13 -> R.string.rating_pg_13
-            AnimeRatingEnum.r -> R.string.rating_r_17
-            AnimeRatingEnum.r_plus -> R.string.rating_r_plus
-            AnimeRatingEnum.rx -> R.string.rating_rx
-            else -> R.string.common_unknown
-        }
-    }
-
-    fun List<UserRate?>.groupAndSortByStatus(
-        contentType: MediaType
-    ): Map<Int, Int> {
-        val order = UserRateStatusEnum.knownEntries
-
-        return this
-            .groupBy { it?.status ?: UserRateStatusEnum.UNKNOWN__ }
-            .mapValues { it.value.size }
-            .toSortedMap(compareBy { order.indexOf(it) })
-            .mapKeys { simpleMapUserRateStatusToString(it.key, contentType) }
+    fun MediaFormat.isManga(): Boolean {
+        return this in setOf(MediaFormat.MANGA, MediaFormat.MANHWA,
+            MediaFormat.MANHUA, MediaFormat.ONE_SHOT, MediaFormat.DOUJIN)
     }
 
     fun String.toAbbreviation(maxLetters: Int = 2): String {
@@ -198,6 +160,12 @@ object Converter {
             }
             else -> words.take(maxLetters).map { it.first().uppercaseChar() }.joinToString("")
         }
+    }
+
+    fun String.isHTMLStringBlank(): Boolean {
+        val text = Ksoup.parse(this).text()
+
+        return text.isBlank()
     }
 
     fun parseChapterNumber(chapterNumber: String): Float {
@@ -286,33 +254,10 @@ object Converter {
         }
     }*/
 
-    sealed class DescriptionElement {
-        data class Text(val annotatedString: AnnotatedString) : DescriptionElement()
-        data class Spoiler(val label: String, val content: List<DescriptionElement>) : DescriptionElement()
-        data class Image(val imageUrl: String, val aspectRatio: Float) : DescriptionElement()
-        data class Video(val videoUrl: String, val thumbnailUrl: String) : DescriptionElement()
-        data class Quote(
-            val senderAvatarUrl: String?,
-            val senderNickname: String?,
-            val content: String
-        ) : DescriptionElement()
-    }
-
-    enum class EntityType {
-        CHARACTER,
-        PERSON,
-        ANIME,
-        MANGA,
-        RANOBE,
-        COMMENT
-    }
-
-    data class EntityData(
-        val id: String,
-        val type: EntityType
-    )
-
-    fun parseDescriptionHtml(html: String, linkColor: Color = Color.Blue): List<DescriptionElement> {
+    fun parseDescriptionHtml(
+        html: String,
+        linkColor: Color = Color.Blue
+    ): List<DescriptionElement> {
         if (html.isBlank()) {
             return emptyList()
         }
@@ -464,9 +409,21 @@ object Converter {
         linkColor: Color
     ) {
         element.childNodes().forEach { node ->
+            Log.d("Converter", "Node: $node")
             when (node) {
                 is TextNode -> {
-                    builder.append(node.text())
+                    val originalText = node.text()
+                    val text = originalText.replace("\n", " ")
+
+                    if (text.isNotBlank()) {
+                        val currentText = builder.toAnnotatedString().text
+                        val textToAppend = if (currentText.isEmpty() || currentText.endsWith("\n")) {
+                            text.trimStart()
+                        } else {
+                            text
+                        }
+                        builder.append(textToAppend)
+                    }
                 }
                 is Element -> {
                     if ((node.tagName() == "div" && (node.hasClass("b-spoiler")
@@ -474,11 +431,23 @@ object Converter {
                                 || node.hasClass("b-replies")
                                 || node.hasClass("b-video") || node.hasClass("b-quote"))
                                 || node.tagName() == "a" && node.hasClass("b-image")
-                            )
-                        ) { return@forEach }
+                                )
+                    ) { return@forEach }
+
+                    if (node.tagName() == "p") {
+                        val currentText = builder.toAnnotatedString().text
+                        if (currentText.isNotEmpty() && !currentText.endsWith("\n")) {
+                            builder.append("\n")
+                        }
+                        processInlineContent(node, builder, linkColor)
+                        return@forEach
+                    }
 
                     if (node.tagName().lowercase() == "br") {
-                        builder.append("\n")
+                        val currentText = builder.toAnnotatedString().text
+                        if (!currentText.endsWith("\n\n")) {
+                            builder.append("\n")
+                        }
                         return@forEach
                     }
 
@@ -499,7 +468,7 @@ object Converter {
                             node.attr("href").substringAfter("/comments/")
                         }
                         node.tagName() == "a" -> node.attr("href").takeIf { it.startsWith("http") }
-                            ?: "${BuildConfig.BASE_URL}/${node.attr("href")}"
+                            ?: "${BuildConfig.SHIKI_BASE_URL}/${node.attr("href")}"
                         else -> null
                     }
 

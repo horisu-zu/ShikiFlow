@@ -19,11 +19,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.graphql.type.AnimeStatusEnum
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.determineSeason
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeKind
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapAnimeStatus
+import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
@@ -34,7 +32,7 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 fun AnimeTrackItem(
     userRate: AnimeTrack,
     modifier: Modifier = Modifier,
-    onClick: (String) -> Unit,
+    onClick: (Int) -> Unit,
     onLongClick: () -> Unit
 ) {
     Row(
@@ -68,9 +66,13 @@ fun AnimeTrackItem(
 
             Text(
                 text = buildString {
-                    append(stringResource(id = mapAnimeStatus(userRate.anime.status)))
-                    append(" • ")
-                    append(stringResource(id = mapAnimeKind(userRate.anime.kind)))
+                    userRate.anime.status?.let { mediaStatus ->
+                        append(stringResource(id = mediaStatus.displayValue))
+                    }
+                    userRate.anime.kind?.displayValue?.let { formatRes ->
+                        append(" • ")
+                        append(stringResource(id = formatRes))
+                    }
                     append(" • ")
                     append(
                         stringResource(
@@ -78,14 +80,14 @@ fun AnimeTrackItem(
                             userRate.anime.episodes.takeIf { it > 0 } ?: "?"
                         )
                     )
-                    if (userRate.anime.status != AnimeStatusEnum.anons) {
+                    userRate.anime.score?.takeIf { it != 0.0f }?.let { score ->
                         append(" • ")
-                        append("${userRate.anime.score} ★")
+                        append("$score ★")
                     }
                 }, style = MaterialTheme.typography.labelMedium
             )
 
-            if (userRate.anime.status != AnimeStatusEnum.anons) {
+            if (userRate.anime.status != MediaStatus.ANNOUNCED) {
                 ProgressBar(
                     progress = userRate.anime.let { animeShort ->
                         val totalEpisodes = when {
@@ -114,7 +116,7 @@ fun AnimeTrackItem(
             } else {
                 userRate.anime.airedOn?.let { date ->
                     StatusCard(
-                        text = determineSeason(userRate.anime.airedOn)?.let { seasonRes ->
+                        text = determineSeason(date)?.let { seasonRes ->
                             stringResource(id = seasonRes) + " ${date.year}"
                         } ?: date.year.toString()
                     )

@@ -1,126 +1,86 @@
 package com.example.shikiflow.data.repository
 
-import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.Optional
-import com.example.graphql.CurrentUserQuery
-import com.example.graphql.UsersQuery
-import com.example.shikiflow.data.remote.UserApi
-import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
-import com.example.shikiflow.domain.model.tracks.TargetType
-import com.example.shikiflow.domain.model.tracks.UserRate
-import com.example.shikiflow.domain.model.tracks.UserRateRequest
-import com.example.shikiflow.domain.model.tracks.UserRateResponse
+import androidx.paging.PagingData
+import com.example.shikiflow.data.datasource.UserDataSource
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.user.User.Companion.toDomain
-import com.example.shikiflow.domain.model.user.UserFavoritesResponse
-import com.example.shikiflow.domain.model.user.UserHistoryResponse
-import com.example.shikiflow.domain.model.userrate.ShortUserRate
+import com.example.shikiflow.domain.model.user.UserFavorite
+import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class UserRepositoryImpl @Inject constructor(
-    private val apolloClient: ApolloClient,
-    private val userApi: UserApi
+    private val shikimoriUserDataSource: UserDataSource,
+    private val anilistUserDataSource: UserDataSource,
+    private val settingsRepository: SettingsRepository
 ): UserRepository {
 
-    override suspend fun fetchCurrentUser(): User? {
-        val response = apolloClient.query(CurrentUserQuery()).execute()
+    private fun getSource(): UserDataSource {
+        val authType = settingsRepository.authTypeFlow.value
 
-        return response.data?.currentUser?.toDomain()
-    }
-
-    override suspend fun getUserHistory(
-        userId: Long,
-        page: Int?,
-        limit: Int?,
-        targetId: Long?,
-        targetType: TargetType?
-    ): Result<List<UserHistoryResponse>> = runCatching {
-        userApi.getUserHistory(
-            userId = userId,
-            page = page,
-            limit = limit,
-            targetId = targetId,
-            targetType = targetType?.name
-        )
-    }
-
-    override suspend fun getUserAnimeRates(
-        userId: Long,
-        page: Int?,
-        limit: Int?,
-        status: String?,
-        censored: Boolean?
-    ): List<ShortUserRate.ShortAnimeRate> = userApi.getUserAnimeRates(
-        userId = userId,
-        page = page,
-        limit = limit,
-        status = status,
-        censored = censored
-    )
-
-    override suspend fun getUserMangaRates(
-        userId: Long,
-        page: Int?,
-        limit: Int?,
-        status: String?,
-        censored: Boolean?
-    ): List<ShortUserRate.ShortMangaRate> = userApi.getUserMangaRates(
-        userId = userId,
-        page = page,
-        limit = limit,
-        status = status,
-        censored = censored
-    )
-
-    override suspend fun getUserRates(
-        userId: Long,
-        page: Int?,
-        limit: Int?,
-        status: String?,
-        targetType: String?,
-        censored: Boolean?
-    ): List<UserRate> = userApi.getUserRates(
-        userId = userId,
-        page = page,
-        limit = limit,
-        status = status,
-        targetType = targetType,
-        censored = censored
-    )
-
-    override suspend fun getUsersByNickname(
-        page: Int,
-        limit: Int,
-        nickname: String
-    ): Result<List<User>> {
-        val query = UsersQuery(
-            page = Optional.present(page),
-            limit = Optional.present(limit),
-            search = Optional.present(nickname)
-        )
-
-        return try {
-            val response = apolloClient.query(query).execute()
-
-            response.data?.let { users ->
-                Result.success(users.users.map { it.toDomain() })
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+        return when(authType) {
+            AuthType.SHIKIMORI -> shikimoriUserDataSource
+            AuthType.ANILIST -> anilistUserDataSource
         }
     }
 
-    override suspend fun updateUserRate(
-        id: Long,
-        request: UserRateRequest
-    ): UserRateResponse = userApi.updateUserRate(
-        id = id,
-        request = request
+    override suspend fun fetchCurrentUser(): User? {
+        return getSource().fetchCurrentUser()
+    }
+
+    override fun getUserHistory(
+        userId: Int,
+    ): Flow<PagingData<UserHistory>> = getSource().getUserHistory(userId)
+
+    override suspend fun getUserRates(
+        userId: Int
+    ): UserRateStats = getSource().getUserRates(userId)
+
+    override suspend fun getFavoriteCategories(userId: Int): List<FavoriteCategory> {
+        return getSource().getFavoriteCategories(userId)
+    }
+
+    override fun getUserFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<PagingData<UserFavorite>> = getSource().getUserFavorites(userId, favoriteCategory)
+
+    override suspend fun getMediaRates(
+        userId: Int,
+        mediaType: MediaType
+    ): List<ShortUserMediaRate> = getSource().getMediaRates(userId, mediaType)
+
+    override fun getUsers(nickname: String): Flow<PagingData<User>> = getSource().getUsers(nickname)
+
+    override suspend fun saveUserRate(
+        userId: Int?,
+        entryId: Int?,
+        mediaType: MediaType,
+        mediaId: Int,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?
+    ): UserMediaRate = getSource().saveUserRate(
+        userId = userId,
+        entryId = entryId,
+        mediaType = mediaType,
+        mediaId = mediaId,
+        status = status,
+        progress = progress,
+        progressVolumes = progressVolumes,
+        repeat = repeat,
+        score = score
     )
-
-    override suspend fun createUserRate(createRequest: CreateUserRateRequest): UserRateResponse =
-        userApi.createUserRate(createRequest)
-
-    override suspend fun getUserFavorites(userId: Long): UserFavoritesResponse = userApi.getUserFavorites(userId)
 }

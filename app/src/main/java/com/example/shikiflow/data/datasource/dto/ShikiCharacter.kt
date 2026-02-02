@@ -1,0 +1,25 @@
+package com.example.shikiflow.data.datasource.dto
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ShikiCharacter(
+    val id: Int,
+    val name: String,
+    val russian: String?,
+    @Serializable(with = ShikiImageSerializer::class)
+    val image: ShikiImage,
+    @SerialName("altname") val altName: String?,
+    val japanese: String?,
+    val description: String?,
+    @SerialName("description_html") val descriptionHtml: String?,
+    @SerialName("description_source") val descriptionSource: String?,
+    val favoured: Boolean?,
+    @SerialName("thread_id") val threadId: Int?,
+    @SerialName("topic_id") val topicId: Int?,
+    @SerialName("updated_at") val updatedAt: String?,
+    val seyu: List<ShikiSeyu>?,
+    val animes: List<ShikiAnime>?,
+    val mangas: List<ShikiManga>?
+)

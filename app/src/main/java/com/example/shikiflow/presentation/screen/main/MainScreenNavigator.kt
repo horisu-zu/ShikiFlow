@@ -7,6 +7,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
@@ -16,10 +17,11 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 @Composable
 fun MainScreenNavigator(
     mainScreenBackStack: NavBackStack<NavKey>,
-    currentUserData: User?
+    currentUserData: User?,
+    authType: AuthType
 ) {
     val options = object : MainScreenNavOptions {
-        override fun navigateToDetails(mediaId: String, mediaType: MediaType) {
+        override fun navigateToDetails(mediaId: Int, mediaType: MediaType) {
             mainScreenBackStack.add(MainScreenNavRoute.Details(mediaId, mediaType))
         }
 
@@ -41,6 +43,7 @@ fun MainScreenNavigator(
             entry<MainScreenNavRoute.Details> { route ->
                 DetailsNavigator(
                     currentUserData = currentUserData,
+                    authType = authType,
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
                     source = "main"

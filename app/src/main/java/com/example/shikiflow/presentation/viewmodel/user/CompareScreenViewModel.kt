@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.userrate.ComparisonType
-import com.example.shikiflow.domain.model.userrate.MediaComparison
+import com.example.shikiflow.domain.model.user.ComparisonType
+import com.example.shikiflow.domain.model.user.MediaComparison
 import com.example.shikiflow.domain.usecase.GroupUserRatesUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

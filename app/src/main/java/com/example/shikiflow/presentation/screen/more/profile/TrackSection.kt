@@ -22,14 +22,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserRate
+import com.example.shikiflow.domain.model.user.MediaTypeStats
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun TrackSection(
     isCurrentUser: Boolean,
-    userRateData: Map<MediaType, List<UserRate>>,
+    userRateData: Map<MediaType, MediaTypeStats>,
     onCompareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -83,8 +83,8 @@ fun TrackSection(
                     MediaType.ANIME -> stringResource(R.string.main_track_mode_anime)
                     MediaType.MANGA -> stringResource(R.string.main_track_mode_manga)
                 },
-                userRatesList = ratesList,
-                itemsCount = ratesList.size
+                ratesList = ratesList,
+                itemsCount = ratesList.count
             )
         }
     }

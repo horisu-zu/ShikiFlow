@@ -2,12 +2,9 @@ package com.example.shikiflow.domain.usecase
 
 import android.util.Log
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.userrate.ComparisonType
-import com.example.shikiflow.domain.model.userrate.MediaComparison
-import com.example.shikiflow.domain.model.userrate.ShortUserRate.Companion.getImageUrl
-import com.example.shikiflow.domain.model.userrate.ShortUserRate.Companion.getMediaId
-import com.example.shikiflow.domain.model.userrate.ShortUserRate.Companion.getMediaTitle
-import com.example.shikiflow.domain.model.userrate.ShortUserRateData
+import com.example.shikiflow.domain.model.user.ComparisonType
+import com.example.shikiflow.domain.model.user.MediaComparison
+import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.async
@@ -26,17 +23,11 @@ class GroupUserRatesUseCase @Inject constructor(
         try {
             val (currentUserRates, targetUserRates) = coroutineScope {
                 val currentUser = async {
-                    when(mediaType) {
-                        MediaType.ANIME -> userRepository.getUserAnimeRates(currentUserId.toLong())
-                        MediaType.MANGA -> userRepository.getUserMangaRates(currentUserId.toLong())
-                    }
+                    userRepository.getMediaRates(currentUserId.toInt(), mediaType)
                 }
 
                 val targetUser = async {
-                    when(mediaType) {
-                        MediaType.ANIME -> userRepository.getUserAnimeRates(targetUserId.toLong())
-                        MediaType.MANGA -> userRepository.getUserMangaRates(targetUserId.toLong())
-                    }
+                    userRepository.getMediaRates(targetUserId.toInt(), mediaType)
                 }
 
                 Pair(currentUser.await(), targetUser.await())
@@ -44,8 +35,8 @@ class GroupUserRatesUseCase @Inject constructor(
 
             Log.d("GroupUserRatesUseCase", "Current User Rates Size: ${currentUserRates.size}")
             Log.d("GroupUserRatesUseCase", "Target User Rates Size: ${targetUserRates.size}")
-            val currentRatesMap = currentUserRates.associateBy { it.getMediaId() }
-            val targetRatesMap = targetUserRates.associateBy { it.getMediaId() }
+            val currentRatesMap = currentUserRates.associateBy { it.id }
+            val targetRatesMap = targetUserRates.associateBy { it.id }
 
             val allMediaIds = (currentRatesMap.keys + targetRatesMap.keys).distinct()
 
@@ -55,8 +46,8 @@ class GroupUserRatesUseCase @Inject constructor(
 
                 MediaComparison(
                     mediaId = mediaId.toString(),
-                    mediaTitle = (currentUserRate ?: targetUserRate)?.getMediaTitle() ?: "Unknown Title",
-                    mediaImage = (currentUserRate ?: targetUserRate)?.getImageUrl(),
+                    mediaTitle = (currentUserRate ?: targetUserRate)?.title ?: "Unknown Title",
+                    mediaImage = (currentUserRate ?: targetUserRate)?.imageUrl,
                     currentUserScore = currentUserRate?.let { userRate ->
                         ShortUserRateData(
                             userScore = userRate.score,
@@ -68,8 +59,7 @@ class GroupUserRatesUseCase @Inject constructor(
                             userScore = userRate.score,
                             status = userRate.status
                         )
-                    },
-                    //comparisonType = comparisonType,
+                    }
                 )
             }
 

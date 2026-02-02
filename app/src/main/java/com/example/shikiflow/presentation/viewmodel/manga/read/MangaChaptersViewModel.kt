@@ -29,14 +29,14 @@ class MangaChaptersViewModel @Inject constructor(
             _mangaChapters.value = result
             when (result) {
                 is Resource.Loading -> {
-                    Log.d("MangaReadViewModel", "Aggregation in progress...")
+                    Log.d("MangaChaptersViewModel", "Aggregation in progress...")
                 }
                 is Resource.Success -> {
                     currentId = mangaDexId
-                    Log.d("MangaReadViewModel", "Aggregation successful: ${result.data}")
+                    Log.d("MangaChaptersViewModel", "Aggregation successful: ${result.data}")
                 }
                 is Resource.Error -> {
-                    Log.e("MangaReadViewModel", "Aggregation failed: ${result.message}")
+                    Log.e("MangaChaptersViewModel", "Aggregation failed: ${result.message}")
                 }
             }
         }.launchIn(viewModelScope)

@@ -1,7 +1,7 @@
 package com.example.shikiflow.data.local.entity
 
-import com.example.graphql.fragment.AnimeShort
-import com.example.graphql.fragment.MangaShort
+import com.example.graphql.shikimori.fragment.DateShort
+import com.example.shikiflow.domain.model.track.Date
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
@@ -14,7 +14,7 @@ data class ReleaseDateEntity(
     val date: Instant?
 ) {
     companion object {
-        fun AnimeShort.AiredOn.toEntity(): ReleaseDateEntity {
+        fun DateShort.toEntity(): ReleaseDateEntity {
             return ReleaseDateEntity(
                 year = this.year,
                 month = this.month,
@@ -24,33 +24,21 @@ data class ReleaseDateEntity(
             )
         }
 
-        fun AnimeShort.ReleasedOn.toEntity(): ReleaseDateEntity {
-            return ReleaseDateEntity(
+        fun ReleaseDateEntity.toDomain(): Date {
+            return Date(
                 year = this.year,
                 month = this.month,
                 day = this.day,
-                date = this.date?.let { LocalDate.parse(it.toString())
-                    .atStartOfDayIn(TimeZone.currentSystemDefault()) }
+                date = this.date
             )
         }
 
-        fun MangaShort.AiredOn.toEntity(): ReleaseDateEntity {
+        fun Date.toDto(): ReleaseDateEntity {
             return ReleaseDateEntity(
                 year = this.year,
                 month = this.month,
                 day = this.day,
-                date = this.date?.let { LocalDate.parse(it.toString())
-                    .atStartOfDayIn(TimeZone.currentSystemDefault()) }
-            )
-        }
-
-        fun MangaShort.ReleasedOn.toEntity(): ReleaseDateEntity {
-            return ReleaseDateEntity(
-                year = this.year,
-                month = this.month,
-                day = this.day,
-                date = this.date?.let { LocalDate.parse(it.toString())
-                    .atStartOfDayIn(TimeZone.currentSystemDefault()) }
+                date = this.date
             )
         }
     }

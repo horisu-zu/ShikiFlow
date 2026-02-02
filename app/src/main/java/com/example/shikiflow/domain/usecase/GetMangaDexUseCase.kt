@@ -15,38 +15,40 @@ import javax.inject.Inject
 class GetMangaDexUseCase @Inject constructor(
     private val mangaDexRepository: MangaDexRepository
 ) {
-    suspend operator fun invoke(title: String, malId: String): Resource<List<String>> {
-        return try {
-            val result = mangaDexRepository.getMangaList(title)
-            val mangaDexItems = result.data.filter { item ->
-                //val enTitle = item.attributes.title.en
+     operator fun invoke(title: String, nativeTitle: String?, malId: Int): Flow<Resource<List<String>>> = flow {
+         try {
+             emit(Resource.Loading())
 
-                //Look, I know how wacky this is, but in some cases, MangaDex doesn't have the
-                //same title, let it be en, ja or ja-ro, as in MyAnimeList.
-                //I tested and looks like this one works in 100% of cases
-                //(ofc I'm not sure if it really does)
-                //val matchesTitle = !enTitle.contains("colored", ignoreCase = true)
-                item.attributes.links?.mal == malId
+             val results = coroutineScope {
+                 val nativeResult = nativeTitle?.let { async { mangaDexRepository.getMangaList(title = nativeTitle) } }
+                 val titleResult = async { mangaDexRepository.getMangaList(title = title) }
+
+                Pair(nativeResult?.await(), titleResult.await())
+            }
+
+            val result = buildList {
+                results.first?.data?.let { addAll(it) }
+                results.second.data.let { addAll(it) }
+            }.distinctBy { it.id }
+
+            val mangaDexItems = result.filter { item ->
+                item.attributes.links?.mal == malId.toString()
             }.map { it.id }
 
             when {
-                result.data.isEmpty() -> {
-                    Log.d("GetMangaDexUseCase", "No manga found with title: $title or MAL ID: $malId")
-                    Resource.Error("No manga found with the title: $title")
-                }
-                mangaDexItems.isNotEmpty() -> {
-                    Log.d("GetMangaDexUseCase", "Items: $mangaDexItems")
-                    Resource.Success(mangaDexItems)
+                mangaDexItems.isEmpty() -> {
+                    Log.d("GetMangaDexUseCase", "No manga found with the title $title and MAL ID: $malId")
+                    emit(Resource.Error("No manga found with the title: $title"))
                 }
                 else -> {
-                    Log.d("GetMangaDexUseCase", "No manga found with MAL ID: $malId")
-                    Resource.Error("No manga found with MAL ID: $malId")
+                    Log.d("GetMangaDexUseCase", "Items: $mangaDexItems")
+                    emit(Resource.Success(mangaDexItems))
                 }
             }
         } catch (e: HttpException) {
-            Resource.Error(e.localizedMessage ?: "Network error: ${e.message}")
+            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            Resource.Error("An unexpected error occurred: ${e.message}")
+             emit(Resource.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 

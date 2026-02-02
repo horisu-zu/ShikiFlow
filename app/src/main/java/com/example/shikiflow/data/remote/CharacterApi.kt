@@ -1,6 +1,6 @@
 package com.example.shikiflow.data.remote
 
-import com.example.shikiflow.domain.model.character.ShikiCharacter
+import com.example.shikiflow.data.datasource.dto.ShikiCharacter
 import retrofit2.http.GET
 import retrofit2.http.Path
 

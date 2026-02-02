@@ -10,15 +10,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.Density
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -47,21 +42,15 @@ fun StarScore(
         Row(
             modifier = Modifier.clipToBounds()
         ) {
-            val fullStars = scaledScore.toInt()
-            val partialFill = scaledScore - fullStars
+            repeat(maxScore) { index ->
+                val starFill = when {
+                    index < scaledScore.toInt() -> 1f
+                    index < scaledScore -> scaledScore - index
+                    else -> 0f
+                }
 
-            repeat(fullStars) {
-                Icon(
-                    imageVector = Icons.Default.Star,
-                    contentDescription = null,
-                    modifier = Modifier.size(starSize),
-                    tint = starColor
-                )
-            }
-
-            if (partialFill > 0) {
-                PartialStar(
-                    fraction = partialFill,
+                StarIcon(
+                    fraction = starFill,
                     starSize = starSize,
                     filledColor = starColor,
                     emptyColor = emptyStarColor
@@ -72,7 +61,7 @@ fun StarScore(
 }
 
 @Composable
-private fun PartialStar(
+private fun StarIcon(
     fraction: Float,
     starSize: Dp,
     filledColor: Color,
@@ -86,38 +75,19 @@ private fun PartialStar(
             tint = emptyColor
         )
 
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .graphicsLayer {
-                    clip = true
-                    shape = FractionalClipShape(fraction)
-                }
-        ) {
+        if (fraction > 0f) {
             Icon(
                 imageVector = Icons.Default.Star,
                 contentDescription = null,
-                modifier = Modifier.matchParentSize(),
+                modifier = Modifier
+                    .matchParentSize()
+                    .drawWithContent {
+                        clipRect(right = size.width * fraction) {
+                            this@drawWithContent.drawContent()
+                        }
+                    },
                 tint = filledColor
             )
         }
-    }
-}
-
-
-private class FractionalClipShape(private val fraction: Float) : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
-        return Outline.Rectangle(
-            rect = Rect(
-                left = 0f,
-                top = 0f,
-                right = size.width * fraction,
-                bottom = size.height
-            )
-        )
     }
 }

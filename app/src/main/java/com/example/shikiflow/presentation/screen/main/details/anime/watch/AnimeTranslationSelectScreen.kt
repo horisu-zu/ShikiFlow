@@ -65,7 +65,7 @@ import com.example.shikiflow.utils.Resource
 @Composable
 fun AnimeTranslationSelectScreen(
     title: String,
-    shikimoriId: String,
+    shikimoriId: Int,
     navOptions: AnimeWatchNavOptions,
     onNavigateBack: () -> Unit,
     animeTranslationsViewModel: AnimeTranslationsViewModel = hiltViewModel()

@@ -1,34 +1,33 @@
 package com.example.shikiflow.domain.usecase
 
-import coil3.network.HttpException
-import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.repository.AnimeRepository
-import com.example.shikiflow.domain.repository.MangaRepository
+import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.utils.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class GetExternalLinksUseCase @Inject  constructor(
-    private val animeRepository: AnimeRepository,
-    private val mangaRepository: MangaRepository
+    private val mediaRepository: MediaRepository
 ) {
     operator fun invoke(
-        id: String,
+        id: Int,
         mediaType: MediaType
-    ): Flow<Resource<List<ExternalLink>>> = flow {
-        try {
-            emit(Resource.Loading())
-            val links = when (mediaType) {
-                MediaType.ANIME -> animeRepository.getExternalLinks(id)
-                MediaType.MANGA -> mangaRepository.getExternalLinks(id)
+    ): Flow<Resource<List<ExternalLinkData>>> = flow {
+        emit(Resource.Loading())
+
+        val result = mediaRepository.getExternalLinks(mediaType, id)
+
+        result.fold(
+            onSuccess = { links ->
+                emit(Resource.Success(links))
+            },
+            onFailure = { exception ->
+                emit(Resource.Error(
+                    exception.localizedMessage ?: "Network error: ${exception.message}")
+                )
             }
-            emit(Resource.Success(links))
-        } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
-        } catch (e: Exception) {
-            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
-        }
+        )
     }
 }

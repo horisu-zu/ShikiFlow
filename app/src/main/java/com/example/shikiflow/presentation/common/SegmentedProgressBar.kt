@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.common
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,17 +21,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapUserRateStatus
+import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.StatusColor
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun SegmentedProgressBar(
-    groupedData: Map<String, Int>,
+    mediaType: MediaType,
+    groupedData: Map<UserRateStatus, Int>,
     totalCount: Int,
     modifier: Modifier = Modifier,
     rowHeight: Dp = 12.dp,
@@ -48,6 +54,7 @@ fun SegmentedProgressBar(
                 .clip(rowShape),
             horizontalArrangement = Arrangement.spacedBy(rowHeight / 4)
         ) {
+            Log.d("SegmentedProgressBar", "Grouped Data: $groupedData")
             groupedData.forEach { (status, count) ->
                 val progress = count.toFloat() / totalCount
                 Box(
@@ -55,7 +62,7 @@ fun SegmentedProgressBar(
                         .weight(progress)
                         .fillMaxHeight()
                         .background(
-                            color = StatusColor.getStatusBrightColor(status)
+                            color = StatusColor.getAnimeStatusColor(status)
                         )
                 )
             }
@@ -68,11 +75,11 @@ fun SegmentedProgressBar(
         ) {
             groupedData.forEach { (status, count) ->
                 SegmentedDataItem(
-                    status = status,
+                    status = stringResource(id = mapUserRateStatus(status, mediaType)),
                     count = count,
                     shape = itemShape,
                     size = itemSize,
-                    color = StatusColor.getStatusBrightColor(status)
+                    color = StatusColor.getAnimeStatusColor(status)
                 )
             }
         }

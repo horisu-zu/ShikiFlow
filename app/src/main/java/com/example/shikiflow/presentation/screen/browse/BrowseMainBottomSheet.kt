@@ -15,7 +15,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -31,7 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
-import com.example.shikiflow.utils.BrowseOngoingOrder
+import com.example.shikiflow.domain.model.track.BrowseOrder
+import com.example.shikiflow.domain.model.track.OrderOption
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.launch
@@ -40,10 +40,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun BrowseMainBottomSheet(
     currentBrowseMode: BrowseUiMode,
-    currentOngoingMode: BrowseOngoingOrder,
+    ongoingOrder: List<BrowseOrder>,
+    currentOngoingMode: OrderOption,
     onDismiss: () -> Unit,
     onModeSelect: (BrowseUiMode) -> Unit,
-    onOrderSelect: (BrowseOngoingOrder) -> Unit
+    onOrderSelect: (BrowseOrder) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -114,7 +115,7 @@ fun BrowseMainBottomSheet(
                     .padding(horizontal = 4.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                BrowseOngoingOrder.entries.forEach { option ->
+                ongoingOrder.forEach { option ->
                     Row(
                         modifier = Modifier.fillMaxWidth()
                             .clip(RoundedCornerShape(12.dp))

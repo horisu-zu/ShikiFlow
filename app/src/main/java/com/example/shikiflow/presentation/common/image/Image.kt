@@ -54,7 +54,7 @@ fun BaseImage(
     imageType: ImageType = ImageType.Poster(),
     error: @Composable () -> Unit = {
         BaseImage(
-            model = BuildConfig.MISSING_URL,
+            model = BuildConfig.SHIKI_MISSING_IMAGE_URL,
             modifier = modifier
         )
     }
@@ -174,9 +174,7 @@ fun RoundedImage(
 ) {
     BaseImage(
         model = model,
-        modifier = modifier
-            .aspectRatio(1f)
-            .clip(clip),
+        modifier = modifier.clip(clip),
         contentScale = contentScale,
         contentDescription = contentDescription
     )

@@ -69,7 +69,7 @@ private class GraphState(
 
 @Composable
 fun Graph(
-    data: Map<String, Float>,
+    data: Map<String, Int>,
     modifier: Modifier = Modifier,
     height: Dp = 240.dp,
     gridType: GraphGridType = GraphGridType.BOTH,
@@ -130,7 +130,7 @@ fun Graph(
 
 @Composable
 private fun GraphCanvas(
-    data: Map<String, Float>,
+    data: Map<String, Int>,
     dimensions: GraphDimensions,
     style: GraphStyle.Bar,
     axisStyle: GraphStyle.Axis,
@@ -147,7 +147,7 @@ private fun GraphCanvas(
     ) {
         if (data.isEmpty()) return@Canvas
 
-        val maxValue = data.values.maxOrNull() ?: 0f
+        val maxValue = data.values.maxOrNull() ?: 0
         val roundedMaxValue = calculateRoundedMaxValue(maxValue)
 
         drawAxes(
@@ -179,10 +179,10 @@ private fun GraphCanvas(
     }
 }
 
-private fun calculateRoundedMaxValue(value: Float): Float = when {
-    value > 1000 -> ceil(value / 100) * 100
-    value > 100 -> ceil(value / 10) * 10
-    else -> ceil(value)
+private fun calculateRoundedMaxValue(value: Int): Float = when {
+    value > 1000 -> (ceil(value / 100f) * 100)
+    value > 100 -> (ceil(value / 10f) * 10)
+    else -> ceil(value.toFloat())
 }
 
 private fun calculateBarSizes(
@@ -261,7 +261,7 @@ private fun DrawScope.drawGrid(
 }
 
 private fun DrawScope.drawBars(
-    data: Map<String, Float>,
+    data: Map<String, Int>,
     dimensions: GraphDimensions,
     style: GraphStyle.Bar,
     maxValue: Float,
@@ -287,7 +287,7 @@ private fun DrawScope.drawBars(
 }
 
 private fun DrawScope.drawLabels(
-    data: Map<String, Float>,
+    data: Map<String, Int>,
     dimensions: GraphDimensions,
     textStyle: GraphStyle.Text
 ) {

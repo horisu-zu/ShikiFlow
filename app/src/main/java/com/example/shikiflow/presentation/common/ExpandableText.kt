@@ -53,19 +53,19 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.comment.DescriptionElement
+import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.image.shimmerEffect
-import com.example.shikiflow.utils.Converter.DescriptionElement
-import com.example.shikiflow.utils.Converter.EntityType
 import com.example.shikiflow.utils.Converter.parseDescriptionHtml
 
 @Composable
 fun ExpandableText(
     descriptionHtml: String,
     modifier: Modifier = Modifier,
-    onEntityClick: (EntityType, String) -> Unit,
+    onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
     linkColor: Color = MaterialTheme.colorScheme.primary,
     collapsedMaxLines: Int = 8,
@@ -88,11 +88,11 @@ fun ExpandableText(
 }
 
 @Composable
-private fun DescriptionElementsList(
+fun DescriptionElementsList(
     elements: List<DescriptionElement>,
     style: TextStyle,
     brushColor: Color,
-    onEntityClick: (EntityType, String) -> Unit,
+    onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = Int.MAX_VALUE
@@ -158,7 +158,7 @@ private fun DescriptionElementsList(
 private fun AnnotatedText(
     text: AnnotatedString,
     style: TextStyle,
-    onEntityClick: (EntityType, String) -> Unit,
+    onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = Int.MAX_VALUE,
@@ -201,7 +201,7 @@ private fun AnnotatedText(
                                                 "Formatted Text",
                                                 "Clicked on entity: ${annotation.item}"
                                             )
-                                            onEntityClick(entityType, annotation.item)
+                                            onEntityClick(entityType, annotation.item.toInt())
                                         }
                                 }
 
@@ -269,7 +269,7 @@ private fun SpoilerElement(
     brushColor: Color,
     content: List<DescriptionElement>,
     style: TextStyle,
-    onEntityClick: (EntityType, String) -> Unit,
+    onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }

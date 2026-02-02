@@ -27,7 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,12 +35,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.example.graphql.type.UserRateStatusEnum
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.ScoreFormat.Companion.detectFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserRate
+import com.example.shikiflow.domain.model.user.MediaTypeStats
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
-import com.example.shikiflow.utils.Converter.groupAndSortByStatus
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -51,6 +50,7 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesian
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.vicoTheme
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -59,25 +59,21 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
-import kotlin.collections.mapValues
 
 @Composable
 fun TrackItem(
     mediaType: MediaType,
     type: String,
     iconResource: IconResource,
-    userRatesList: List<UserRate>,
+    ratesList: MediaTypeStats,
     itemsCount: Int,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val groupedData = remember(userRatesList) {
-        userRatesList.groupAndSortByStatus(mediaType)
-    }
-    val shouldShowExpand = remember(userRatesList) {
-        userRatesList
-            .filter { it.status == UserRateStatusEnum.completed }
-            .sumOf { it.score } > 50
+    var isExpanded by retain { mutableStateOf(false) }
+    val shouldShowExpand = remember(ratesList) {
+        ratesList.scoreStats
+            .map { (score, count) -> score * count }
+            .sum() > 50
     }
 
     Column(
@@ -93,24 +89,16 @@ fun TrackItem(
         )
 
         SegmentedProgressBar(
-            groupedData = groupedData.mapKeys { (rateResId, _) ->
-                stringResource(rateResId)
-            },
+            mediaType = mediaType,
+            groupedData = ratesList.statusesStats,
             totalCount = itemsCount,
             modifier = Modifier.padding(top = 8.dp)
         )
 
         AnimatedVisibility(visible = isExpanded) {
-            val completedStatsMap = remember(userRatesList) {
-                userRatesList
-                    .filter { it.status == UserRateStatusEnum.completed && it.score > 0 }
-                    .groupBy { it.score }
-                    .mapValues { (score, userRates) -> userRates.size }
-            }
-
             StatsGraph(
-                completedStats = completedStatsMap,
-                modifier = Modifier
+                scoreStats = ratesList.scoreStats.filter { it.value > 0 },
+                modifier = Modifier.fillMaxWidth()
                     .height(240.dp)
                     .padding(top = 8.dp)
             )
@@ -192,21 +180,22 @@ private fun TypeItem(
 
 @Composable
 private fun StatsGraph(
-    completedStats: Map<Int, Int>,
+    scoreStats: Map<Int, Int>,
     modifier: Modifier = Modifier
 ) {
+    val scoreFormat = detectFormat(scoreStats)
     val modelProducer = remember { CartesianChartModelProducer() }
-    val averageScore = remember(completedStats) {
-        completedStats.entries
+    val averageScore = remember(scoreStats) {
+        scoreStats.entries
             .sumOf { (score, count) ->
                 score * count
-            } / completedStats.values.sum().toDouble()
+            } / scoreStats.values.sum().toDouble()
     }
 
-    LaunchedEffect(completedStats) {
-        val xAxis = (1..10).toList()
+    LaunchedEffect(scoreStats) {
+        val xAxis = (scoreFormat.minVal..scoreFormat.maxVal step scoreFormat.step).toList()
         val yAxis = xAxis.map { score ->
-            completedStats[score]?.toDouble() ?: 0.0
+            scoreStats[score] ?: 0
         }
 
         modelProducer.runTransaction {
@@ -218,10 +207,9 @@ private fun StatsGraph(
 
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 8.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         Text(
@@ -239,17 +227,23 @@ private fun StatsGraph(
                                 shape = CorneredShape.rounded(topLeftPercent = 20, topRightPercent = 20)
                             )
                         }
+                    ),
+                    dataLabel = rememberTextComponent(
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 ),
                 startAxis = VerticalAxis.rememberStart(
-                    label = rememberAxisLabelComponent(
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    label = null,
+                    tickLength = 0.dp,
+                    line = null,
+                    guideline = null
                 ),
                 bottomAxis = HorizontalAxis.rememberBottom(
                     label = rememberAxisLabelComponent(
                         color = MaterialTheme.colorScheme.onBackground
-                    )
+                    ),
+                    tickLength = 0.dp,
+                    guideline = null
                 )
             ),
             scrollState = rememberVicoScrollState(scrollEnabled = false),

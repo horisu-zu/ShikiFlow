@@ -10,13 +10,18 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.mapper.UserRateMapper
+import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
 
 @Composable
 fun MainTabRow(
-    tabs: List<String>,
+    tabs: List<UserRateStatus>,
+    mediaType: MediaType,
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
     isAtTop: Boolean,
@@ -35,13 +40,15 @@ fun MainTabRow(
         },
         divider = { if(!isAtTop) HorizontalDivider() }
     ) {
-        tabs.forEachIndexed { index, title ->
+        tabs.forEachIndexed { index, status ->
+            val rateStatus = UserRateMapper.mapUserRateStatus(status, mediaType)
+
             Tab(
                 selected = selectedTab == index,
                 onClick = { onTabSelected(index) },
                 text = {
                     Text(
-                        text = title,
+                        text = stringResource(rateStatus),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )

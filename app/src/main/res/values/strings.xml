@@ -1,25 +1,28 @@
 <resources>
     <string name="app_name">ShikiFlow</string>
 
-    <string name="auth_sign_in">Sign In</string>
-    <string name="auth_features_shiki_integration_label">Shikimori Integration</string>
-    <string name="auth_features_shiki_integration_desc">"Connect your Shikimori account to search, track, and manage your anime and manga with ease."</string>
-    <string name="auth_features_personalize_label">Personalized Favorites</string>
-    <string name="auth_features_personalize_desc">Save and organize your favorite anime and manga to revisit them anytime.</string>
+    <string name="auth_shiki_sign_in">Sign In via Shikimori</string>
+    <string name="auth_anilist_sign_in">Sign in via AniList</string>
+    <string name="auth_features_shiki_integration_label">Shikimori and AniList Integration</string>
+    <string name="auth_features_shiki_integration_desc">
+        Connect your existing Shikimori or AniList account to search, track, and manage your anime and manga
+    </string>
     <string name="auth_features_mangadex_integration_label">MangaDex Integration</string>
     <string name="auth_features_mangadex_integration_desc">
-        Access a vast manga library with multilingual support and tracking across your reading list.
+        Access a vast manga library with multilingual support and tracking across your reading list
+    </string>
+    <string name="auth_features_customization_label">App Customization</string>
+    <string name="auth_features_customization_desc">
+        Customize the app’s appearance and behavior to match how you watch, read, and browse
     </string>
 
     <string name="online_status">Online — %1s</string>
-    <!--<string name="status_online">Online</string>
-    <string name="status_now">Last seen — just now</string>
-    <string name="status_minute_ago">Last seen — %1$d minute ago</string>
-    <string name="status_minutes_ago">Last seen — %1$d minutes ago</string>
-    <string name="status_hour_ago">Last seen — %1$d hour ago</string>
-    <string name="status_hours_ago">Last seen — %1$d hours ago</string>
-    <string name="status_hours_ago_v2">Last seen — %1$d hours ago</string>
-    <string name="status_days">Last seen on — %1$s</string>-->
+    <string name="status_online">Online</string>
+    <string name="status_minute_ago">%1$d minute ago</string>
+    <string name="status_minutes_ago">%1$d minutes ago</string>
+    <string name="status_hour_ago">%1$d hour ago</string>
+    <string name="status_hours_ago">%1$d hours ago</string>
+    <string name="status_days">%1$s days ago</string>
 
     <string name="mtp_loading_error">Error loading tracked manga</string>
     <string name="atp_loading_error">Error Loading Anime Tracks</string>
@@ -69,13 +72,17 @@
     <string name="ongoing_browse_mode_popularity">Popularity</string>
     <string name="ongoing_browse_mode_aired_on">Aired On</string>
     <string name="ongoing_browse_mode_ranked_shiki">Ranked Shiki</string>
+    <string name="ongoing_browse_mode_score">Score</string>
+    <string name="ongoing_browse_mode_trending">Trending</string>
+
     <string name="browse_search_label_media">Media</string>
     <string name="browse_search_media_anime">Anime</string>
     <string name="browse_search_media_manga">Manga</string>
     <string name="browse_search_label_kind">Kind</string>
     <string name="browse_search_label_status">Status</string>
-    <string name="browse_search_label_in_my_list">In my list</string>
+    <!--<string name="browse_search_label_in_my_list">In my list</string>-->
     <string name="browse_search_label_sort_by">Sort by</string>
+    <string name="browse_search_label_age_rating">Age Rating</string>
 
     <string name="chapter_ui_mode_page">Page</string>
     <string name="chapter_ui_mode_scroll">Scroll</string>
@@ -100,11 +107,13 @@
     <string name="browse_ui_mode_grid">Grid</string>
 
     <string name="about_app_github_label">Github</string>
-    <string name="about_app_github_desc">Link to Repository</string>
+    <string name="about_app_github_desc">Project Repository</string>
     <string name="about_app_shikimori_label">Shikimori</string>
     <string name="about_app_shikimori_desc">Encyclopedia of Anime and Manga</string>
+    <string name="about_app_anilist_label">AniList</string>
+    <string name="about_app_anilist_desc">Anime and Manga Tracking Platform</string>
     <string name="about_app_mangadex_label">MangaDex</string>
-    <string name="about_app_mangadex_desc">Online Platform for reading Manga</string>
+    <string name="about_app_mangadex_desc">Online Manga Reading Platform</string>
     <string name="version_from">from: %1$s</string>
     <string name="update_available">Update Available</string>
     <string name="update_version">"Version: "</string>
@@ -121,7 +130,7 @@
     <string name="profile_screen_favorites">Favorites</string>
     <string name="more_screen_profile">My Profile</string>
     <string name="more_screen_clubs">Clubs</string>
-    <string name="more_screen_history">History</string>
+    <string name="more_screen_history">Activity History</string>
     <string name="more_screen_settings">Settings</string>
     <string name="more_screen_about_app">About App</string>
     <string name="more_search_users">Search Users…</string>
@@ -130,7 +139,7 @@
     <string name="translation_updated_at">Updated %1$s</string>
     <string name="episodes">%1s ep.</string>
     <string name="episodes_watched">Episodes: %1s</string>
-    <string name="ongoing_episodes">%1s of %2s ep.</string>
+    <string name="ongoing_episodes">%1$s of %2$s ep.</string>
     <string name="translation_filter_all">All</string>
     <string name="translation_filter_voice">Voice</string>
     <string name="translation_filter_subtitles">Subtitles</string>
@@ -149,8 +158,8 @@
     <string name="details_info_released_on">Released on</string>
     <string name="details_info_title_romaji">Romaji</string>
     <string name="details_info_title_japanese">Japanese</string>
-    <string name="details_info_title_synonyms">Synonyms</string>
-    <string name="details_info_similar">Similar</string>
+    <string name="details_info_title_synonyms">Alternative Titles</string>
+    <string name="details_info_recommendations">Recommendations</string>
     <string name="details_info_links">Links</string>
     <string name="details_info_score_stats">Score stats ∙ %1$s ★</string>
     <string name="details_info_statuses_stats">Statuses stats</string>
@@ -179,8 +188,8 @@
 
     <string name="browse_type_anime_ongoing">Ongoing</string>
     <string name="browse_type_search">Search</string>
-    <string name="browse_type_anime_top">Anime Top</string>
-    <string name="browse_type_manga_top">Manga Top</string>
+    <string name="browse_type_anime_top">Top Anime</string>
+    <string name="browse_type_manga_top">Top Manga</string>
     <string name="bottom_navigator_main">Main</string>
     <string name="bottom_navigator_browse">Browse</string>
     <string name="bottom_navigator_more">More</string>
@@ -189,10 +198,14 @@
     <string name="chapter_title">Ch. %1$s — %2$s</string>
 
     <string name="character_title">Character</string>
-    <string name="person_title">Person</string>
+    <string name="staff_title">Staff</string>
     <string name="works_title">Works</string>
     <string name="person_stats_expand">Stats</string>
     <string name="details_comments_count">— %1s total</string>
+
+    <string name="thread_item_user_replied">" replied "</string>
+    <string name="comment_offtopic">Off Topic</string>
+    <string name="comment_tree_show_more">Show more</string>
 
     <string name="media_user_status_all">All</string>
     <string name="media_user_status_anime_watching">Watching</string>
@@ -201,17 +214,21 @@
     <string name="media_user_status_manga_rereading">Rereading</string>
     <string name="media_user_status_planned">Planned</string>
     <string name="media_user_status_completed">Completed</string>
-    <string name="media_user_status_on_hold">On Hold</string>
+    <string name="media_user_status_paused">Paused</string>
     <string name="media_user_status_unknown">Add to List</string>
     <string name="media_user_status_dropped">Dropped</string>
+
     <string name="progress_suffix">" ∙ %1$d/%2$d"</string>
     <string name="score_suffix">" ∙ %1$s ★"</string>
+
+    <string name="media_user_progress">%1$d/%2$d</string>
+    <string name="media_score">%1$s ★</string>
 
     <string name="media_status_announced">Announced</string>
     <string name="media_status_ongoing">Ongoing</string>
     <string name="media_status_released">Released</string>
-    <string name="media_status_manga_discontinued">Discontinued\n</string>
-    <string name="media_status_manga_paused">Paused</string>
+    <string name="media_status_manga_cancelled">Cancelled</string>
+    <string name="media_status_manga_hiatus">Hiatus</string>
 
     <string name="anime_kind_tv">TV</string>
     <string name="anime_kind_ona">ONA</string>
@@ -222,10 +239,11 @@
     <string name="anime_kind_music">Music</string>
     <string name="anime_kind_special">Special</string>
     <string name="anime_kind_tv_special">TV Special</string>
+    <string name="anime_kind_tv_short">TV Short</string>
     <string name="manga_kind_manga">Manga</string>
     <string name="manga_kind_manhwa">Manhwa</string>
     <string name="manga_kind_manhua">Manhua</string>
-    <string name="manga_kind_ranobe">Ranobe</string>
+    <string name="manga_kind_light_novel">Light Novel</string>
     <string name="manga_kind_novel">Novel</string>
     <string name="manga_kind_one_shot">One Shot</string>
     <string name="manga_kind_doujin">Doujin</string>
@@ -236,12 +254,14 @@
     <string name="relation_kind_character">Character</string>
     <string name="relation_kind_full_story">Full Story</string>
     <string name="relation_kind_other">Other</string>
-    <string name="relation_kind_parent_story">Parent Story</string>
     <string name="relation_kind_prequel">Prequel</string>
     <string name="relation_kind_sequel">Sequel</string>
     <string name="relation_kind_side_story">Side Story</string>
     <string name="relation_kind_spin_off">Spin Off</string>
     <string name="relation_kind_summary">Summary</string>
+    <string name="relation_kind_source">Source</string>
+    <string name="relation_kind_contains">Contains</string>
+    <string name="relation_kind_compilation">Compilation</string>
 
     <string name="season_spring">Spring</string>
     <string name="season_summer">"Summer"</string>
@@ -286,7 +306,6 @@
 
     <string name="translation_chapter_label">Chapter %1$s — %2$s</string>
 
-    <string name="favorite_prefix">Favorite</string>
     <string name="shiki_person_type_seyu">Seyu</string>
     <string name="shiki_person_type_mangaka">Mangakas</string>
     <string name="shiki_person_type_producer">Producers</string>
@@ -297,11 +316,31 @@
     <string name="track_average_score">Average Score — %1$s</string>
     <string name="player_skip_opening_label">Skip Opening</string>
 
-    <string name="similar_media_app_bar_label">Similar</string>
-    <string name="similar_media_error">Error Loading Similar Media Data</string>
+    <string name="similar_media_app_bar_label">Similar / Recommendations</string>
+    <string name="similar_media_error">Error Loading Media Recommendations Data</string>
 
-    <plurals name="author_plural_form">
+    <string name="profile_favorites">Favorites</string>
+    <string name="favorite_staff">Staff</string>
+    <string name="favorite_studios">Studios</string>
+
+    <string name="external_links_label">External Links</string>
+    <string name="browse_order_title">Title</string>
+    <string name="browse_order_favorites">Favorites</string>
+    <string name="browse_order_date_added">Date Added</string>
+    <string name="browse_order_release_date">Release Date</string>
+    <string name="browse_order_status">Status</string>
+    <string name="browse_order_updated_at">Updated At</string>
+    <string name="browse_order_episodes_count">Episodes Count</string>
+    <string name="character_role_main">Main</string>
+    <string name="character_role_supporting">Supporting</string>
+    <string name="character_role_background">Background</string>
+    <string name="media_character_voice_actor">Voice Actor</string>
+
+    <string name="staff_label">Staff</string>
+    <string name="details_volumes">Volumes</string>
+    <string name="details_info_threads">Threads</string>
+    <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>
-    </plurals>
+    </plurals>-->
 </resources>

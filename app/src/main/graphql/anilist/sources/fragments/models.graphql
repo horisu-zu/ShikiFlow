@@ -1,0 +1,331 @@
+fragment MediaListShort on MediaList {
+    id
+    status
+    progress
+    progressVolumes
+    repeat
+    ...Score
+    createdAt
+    updatedAt
+    media {
+        ...MediaShort
+    }
+}
+
+fragment MediaShort on Media {
+    id
+    title {
+        english
+        romaji
+        native
+    }
+    type
+    format
+    averageScore
+    status
+    episodes
+    chapters
+    volumes
+    nextAiringEpisode {
+        airingAt
+        episode
+    }
+    duration
+    startDate { ...Date }
+    endDate { ...Date }
+    studios(isMain: true) {
+        nodes {
+            id
+            name
+        }
+    }
+    genres
+    coverImage { ...MediaCoverShort }
+}
+
+fragment MediaBrowse on Media {
+    id
+    title {
+        romaji
+    }
+    coverImage {
+        extraLarge
+    }
+    averageScore
+    type
+    format
+    status
+    season
+    seasonYear
+    episodes
+    chapters
+    nextAiringEpisode {
+        airingAt
+        episode
+    }
+    mediaListEntry {
+        id
+        status
+        progress
+        repeat
+        score
+    }
+    studios(isMain: true) {
+        nodes {
+            ...ALStudioShort
+        }
+    }
+    genres
+}
+
+fragment ALMediaBrowseShort on Media {
+    id
+    type
+    title {
+        romaji
+    }
+    coverImage {
+        large
+    }
+    mediaListEntry {
+        id
+        status
+    }
+}
+
+fragment MediaCoverShort on MediaCoverImage {
+    extraLarge
+    large
+    medium
+}
+
+fragment Date on FuzzyDate {
+    year
+    month
+    day
+}
+
+fragment Score on MediaList {
+    score(format: POINT_10_DECIMAL)
+}
+
+fragment ALUserShort on User {
+    id
+    name
+    avatar {
+        large
+        medium
+    }
+}
+
+fragment ALUserActivity on ListActivity {
+    id
+    media {
+        id
+        title {
+            romaji
+        }
+        coverImage {
+            extraLarge
+            large
+            medium
+        }
+    }
+    type
+    status
+    progress
+    createdAt
+}
+
+fragment ALRateEntry on MediaList {
+    id
+    mediaId
+    status
+    progress
+    progressVolumes
+    repeat
+    ...Score
+    notes
+    createdAt
+    updatedAt
+}
+
+fragment ALUserListStats on UserStatistics {
+    count
+    meanScore
+    scores {
+        score
+        count
+    }
+    statuses {
+        status
+        count
+    }
+}
+
+fragment ALFavoriteMediaShort on Media {
+    id
+    title {
+        romaji
+        #english
+        #native
+    }
+    coverImage {
+        extraLarge
+    }
+}
+
+fragment ALFavoriteCharacterShort on Character {
+    id
+    name {
+        full
+    }
+    image {
+        large
+    }
+}
+
+fragment ALFavoriteStaffShort on Staff {
+    id
+    name {
+        full
+    }
+    image {
+        large
+    }
+}
+
+fragment ALFavoriteStudioShort on Studio {
+    id
+    name
+}
+
+fragment ALPageInfoShort on PageInfo {
+    total
+}
+
+fragment ALRateEntryShort on MediaList {
+    mediaId
+    ...Score
+    status
+    progress
+    media {
+        title {
+            romaji
+        }
+        coverImage {
+            large
+        }
+    }
+}
+
+fragment ALMediaStats on MediaStats {
+    scoreDistribution {
+        score
+        amount
+    }
+    statusDistribution {
+        status
+        amount
+    }
+}
+
+fragment ALAiringEpisodeShort on AiringSchedule {
+    airingAt
+    episode
+}
+
+fragment ALStudioShort on Studio {
+    id
+    name
+}
+
+fragment ALRelatedMediaShort on MediaEdge {
+    node {
+        id
+        type
+        title {
+            romaji
+        }
+        coverImage {
+            large
+        }
+        format
+    }
+    relationType(version: 2)
+}
+
+fragment ALCharacterShort on Character {
+    id
+    name {
+        full
+    }
+    image {
+        large
+    }
+}
+
+fragment ALStaffShort on Staff {
+    id
+    name {
+        full
+    }
+    image {
+        large
+    }
+}
+
+fragment ALMediaStaffRoles on MediaConnection {
+    pageInfo {
+        hasNextPage
+    }
+    edges {
+        staffRole
+        node {
+            ...ALMediaBrowseShort
+        }
+    }
+}
+
+fragment ALThread on Thread {
+    id
+    title
+    body(asHtml: true)
+    categories {
+        id
+        name
+    }
+    viewCount
+    replyCount
+    replyUser {
+        ...ALUserShort
+    }
+    repliedAt
+    user {
+        ...ALUserShort
+    }
+    createdAt
+}
+
+fragment ALThreadHeader on Thread {
+    id
+    title
+    user {
+        ...ALUserShort
+    }
+    body(asHtml: true)
+    createdAt
+    viewCount
+    replyCount
+}
+
+fragment ALThreadComment on ThreadComment {
+    id
+    user {
+        ...ALUserShort
+    }
+    comment(asHtml: true)
+    createdAt
+    childComments
+    likeCount
+}

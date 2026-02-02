@@ -8,3 +8,4 @@
 /src/main/java/com/example/shikiflow/data/mapper/KodikMapper.kt
 /src/main/java/com/example/shikiflow/data/parser/
 /src/main/java/com/example/shikiflow/domain/usecase/GetEpisodesUseCase.kt
+/src/main/graphql/anilist/schema.graphql

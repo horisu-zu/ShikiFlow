@@ -13,5 +13,5 @@ sealed interface BrowseNavRoute: NavKey {
     data class SideScreen(val browseType: BrowseType): BrowseNavRoute
 
     @Serializable
-    data class Details(val mediaId: String, val mediaType: MediaType) : BrowseNavRoute
+    data class Details(val mediaId: Int, val mediaType: MediaType) : BrowseNavRoute
 }

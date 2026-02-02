@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.viewmodel.user
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,20 +18,22 @@ class UserViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userFlow = settingsRepository.userFlow
+    val authTypeFlow = settingsRepository.authTypeFlow
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Eagerly,
-            initialValue = null
+            initialValue = AuthType.SHIKIMORI
         )
 
     fun fetchCurrentUser() {
         viewModelScope.launch {
-            val currentData = userFlow.value
-            val result = userRepository.fetchCurrentUser()
+            userFlow.collect { localUserData ->
+                val result = userRepository.fetchCurrentUser()
 
-            result?.let { currentUser ->
-                if(currentUser.id != currentData?.id) {
-                    settingsRepository.saveUserData(currentUser)
+                result?.let { currentUser ->
+                    if(currentUser != localUserData) {
+                        settingsRepository.saveUserData(currentUser)
+                    }
                 }
             }
         }

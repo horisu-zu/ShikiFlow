@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.shikiflow.domain.model.auth.AuthCredentials
 import com.example.shikiflow.domain.model.auth.TokenResponse
 import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.flow.Flow
@@ -22,9 +23,9 @@ class TokenRepositoryImpl @Inject constructor(
         private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     }
 
-    override val tokensFlow: Flow<TokenResponse> = context.dataStore.data
+    override val authCredentials: Flow<AuthCredentials> = context.dataStore.data
         .map { preferences ->
-            TokenResponse(
+            AuthCredentials(
                 accessToken = preferences[ACCESS_TOKEN_KEY],
                 refreshToken = preferences[REFRESH_TOKEN_KEY]
             )

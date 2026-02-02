@@ -16,13 +16,15 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.BrowseSearchViewModel
 
 @Composable
 fun BrowseScreen(
+    authType: AuthType,
     browseNavOptions: BrowseNavOptions,
-    browseViewModel: BrowseViewModel = hiltViewModel()
+    browseViewModel: BrowseSearchViewModel = hiltViewModel()
 ) {
     val searchQuery by browseViewModel.searchQuery.collectAsStateWithLifecycle()
     val screenState by browseViewModel.screenState.collectAsStateWithLifecycle()
@@ -46,6 +48,7 @@ fun BrowseScreen(
         Crossfade(screenState.isSearchActive) { isSearchActive ->
             if (isSearchActive) {
                 BrowseSearchPage(
+                    authType = authType,
                     query = searchQuery,
                     modifier = Modifier.padding(
                         top = innerPadding.calculateTopPadding(),
@@ -58,6 +61,7 @@ fun BrowseScreen(
                 )
             } else {
                 BrowseMainPage(
+                    authType = authType,
                     onNavigate = { id, mediaType ->
                         browseNavOptions.navigateToDetails(id, MediaType.ANIME)
                     },

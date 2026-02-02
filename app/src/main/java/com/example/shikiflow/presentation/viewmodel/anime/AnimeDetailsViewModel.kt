@@ -4,16 +4,14 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.graphql.AnimeDetailsQuery
-import com.example.shikiflow.domain.model.common.RateUpdateState
-import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
-import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack.Companion.toEntity
-import com.example.shikiflow.domain.model.tracks.CreateUserRateRequest
-import com.example.shikiflow.domain.model.tracks.TargetType
-import com.example.shikiflow.domain.model.tracks.UserRateRequest
-import com.example.shikiflow.domain.model.tracks.UserRateResponse.Companion.toAnimeUserRate
-import com.example.shikiflow.domain.repository.AnimeRepository
-import com.example.shikiflow.domain.repository.AnimeTracksRepository
+import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toAnimeEntity
+import com.example.shikiflow.domain.model.tracks.RateUpdateState
+import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.track.anime.AnimeShortData
+import com.example.shikiflow.domain.model.tracks.SaveUserRate
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,23 +23,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AnimeDetailsViewModel @Inject constructor(
-    private val animeRepository: AnimeRepository,
+    private val mediaRepository: MediaRepository,
     private val userRepository: UserRepository,
-    private val animeTracksRepository: AnimeTracksRepository
+    private val mediaTracksRepository: MediaTracksRepository
 ) : ViewModel() {
 
-    private var currentId: String? = null
+    private var currentId: Int? = null
 
-    private val _animeDetails = MutableStateFlow<Resource<AnimeDetailsQuery.Anime>>(Resource.Loading())
+    private val _animeDetails = MutableStateFlow<Resource<MediaDetails>>(Resource.Loading())
     val animeDetails = _animeDetails.asStateFlow()
 
-    var rateUpdateState = mutableStateOf<RateUpdateState>(RateUpdateState.INITIAL)
+    var rateUpdateState = mutableStateOf(RateUpdateState.INITIAL)
         private set
 
     var isRefreshing = mutableStateOf(false)
         private set
 
-    fun getAnimeDetails(id: String, isRefresh: Boolean = false) {
+    fun getAnimeDetails(id: Int, isRefresh: Boolean = false) {
         viewModelScope.launch {
             if (!isRefresh && currentId != id) {
                 _animeDetails.value = Resource.Loading()
@@ -51,82 +49,52 @@ class AnimeDetailsViewModel @Inject constructor(
                 isRefreshing.value = true
             }
 
-            try {
-                val result = animeRepository.getAnimeDetails(id)
+            val result = mediaRepository.getMediaDetails(id, mediaType = MediaType.ANIME)
 
-                result?.let { animeDetails ->
-                    _animeDetails.value = Resource.Success(animeDetails)
+            result.fold(
+                onSuccess = { mediaDetails ->
+                    _animeDetails.value = Resource.Success(mediaDetails)
                     currentId = id
-                    if(isRefreshing.value) { isRefreshing.value = false }
+                },
+                onFailure = { exception ->
+                    _animeDetails.value = Resource.Error(exception.message ?: "Unknown error")
                 }
-            } catch (e: Exception) {
-                _animeDetails.value = Resource.Error(e.message ?: "Unknown error")
-            }
+            )
         }
     }
 
-    fun updateUserRate(
-        id: Long,
-        status: Int,
-        score: Int,
-        progress: Int,
-        rewatches: Int
+    fun saveUserRate(
+        userId: Int,
+        saveUserRate: SaveUserRate,
+        animeShortData: AnimeShortData? = null
     ) {
         viewModelScope.launch {
             try {
                 rateUpdateState.value = RateUpdateState.LOADING
 
-                val request = UserRateRequest(
-                    status = UserRateStatusConstants.convertToApiStatus(status),
-                    score = score,
-                    episodes = progress,
-                    rewatches = rewatches
+                val result = userRepository.saveUserRate(
+                    userId = userId,
+                    entryId = saveUserRate.rateId,
+                    mediaId = saveUserRate.mediaId,
+                    score = saveUserRate.score,
+                    progress = saveUserRate.progress,
+                    repeat = saveUserRate.repeat,
+                    status = saveUserRate.userStatus,
+                    mediaType = MediaType.ANIME
                 )
 
-                val result = userRepository.updateUserRate(id, request)
-
-                animeTracksRepository.updateAnimeTrack(result.toEntity())
+                mediaTracksRepository.updateAnimeTrack(
+                    animeTrack = result.toAnimeEntity(),
+                    animeShortData = if(saveUserRate.rateId != null ) null else animeShortData
+                )
 
                 _animeDetails.update { resource ->
-                    if(resource is Resource.Success) {
-                        Resource.Success(resource.data?.copy(userRate = result.toAnimeUserRate()))
+                    if (resource is Resource.Success) {
+                        Resource.Success(resource.data?.copy(userRate = result))
                     } else { resource }
                 }
             } catch (e: Exception) {
-                Log.e("AnimeDetailsViewModel", "Error updating user rate", e)
-            } finally {
-                rateUpdateState.value = RateUpdateState.FINISHED
-            }
-        }
-    }
-
-    fun createUserRate(
-        userId: String,
-        targetId: String,
-        status: Int
-    ) {
-        viewModelScope.launch {
-            try {
-                rateUpdateState.value = RateUpdateState.LOADING
-
-                val request = CreateUserRateRequest(
-                    userId = userId.toLong(),
-                    targetId = targetId.toLong(),
-                    status = UserRateStatusConstants.convertToApiStatus(status),
-                    targetType = TargetType.ANIME
-                )
-
-                val result = userRepository.createUserRate(request)
-
-                animeTracksRepository.updateAnimeTrack(result.toEntity())
-
-                _animeDetails.update { resource ->
-                    if(resource is Resource.Success) {
-                        Resource.Success(resource.data?.copy(userRate = result.toAnimeUserRate()))
-                    } else { resource }
-                }
-            } catch (e: Exception) {
-                Log.e("AnimeDetailsViewModel", "Error creating user rate: ${e.message}")
+                Log.e("AnimeDetailsViewModel", "Error saving user rate: ${e.message}")
             } finally {
                 rateUpdateState.value = RateUpdateState.FINISHED
             }

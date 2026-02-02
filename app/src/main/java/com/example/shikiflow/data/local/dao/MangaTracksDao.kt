@@ -7,6 +7,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackDto
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity
@@ -19,11 +20,17 @@ interface MangaTracksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMangaItems(animeItems: List<MangaShortEntity>)
 
-    @Insert
-    suspend fun insert(track: MangaTrackEntity)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTrack(track: MangaTrackEntity)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertShortEntity(shortEntity: MangaShortEntity)
 
     @Delete
     fun deleteTrack(track: MangaTrackEntity)
+
+    @Update
+    fun updateTrack(track: MangaTrackEntity)
 
     @Query("DELETE FROM manga_track WHERE status = :status")
     fun clearTracks(status: String)

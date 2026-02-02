@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,7 @@ class ChapterNavigationViewModel @Inject constructor(): ViewModel() {
     private val _isNavigationVisible = MutableStateFlow(false)
     val isNavigationVisible = _isNavigationVisible.asStateFlow()
 
-    private val _isUserInteracting = MutableStateFlow(false)
+    private var _isUserInteracting = mutableStateOf(false)
 
     private var hideJob: Job? = null
     private val hideDelayMs = 2000L

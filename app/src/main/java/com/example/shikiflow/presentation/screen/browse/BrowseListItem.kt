@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,27 +26,29 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.StatusColor
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun BrowseListItem(
     browseItem: Browse.Anime,
-    onItemClick: (String, MediaType) -> Unit,
+    onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val roundedCornerShape = 12.dp
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(roundedCornerShape))
             .clickable { onItemClick(browseItem.id, browseItem.mediaType) },
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.Top
@@ -57,24 +61,22 @@ fun BrowseListItem(
                 contentScale = ContentScale.Crop,
                 imageType = ImageType.Poster()
             )
-            browseItem.userRateStatus ?.let {
+            browseItem.userRateStatus ?.let { userRateStatus ->
+                val iconSize = 20.dp
+                val iconPadding = roundedCornerShape * 0.293f
+                val boxSize = (iconSize + iconPadding) * 2
+
                 Box(
-                    modifier = Modifier
-                        .padding(4.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(StatusColor.getStatusBrightColor(browseItem.userRateStatus.name))
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                    modifier = Modifier.size(boxSize)
+                        .align(Alignment.BottomEnd)
+                        .clip(RoundedCornerShape(bottomEnd = roundedCornerShape))
+                        .clip(CutCornerShape(topStartPercent = 100))
+                        .background(StatusColor.getAnimeStatusColor(userRateStatus)),
                 ) {
-                    Text(
-                        text = stringResource(id = simpleMapUserRateStatusToString(
-                            browseItem.userRateStatus,
-                            mediaType = browseItem.mediaType
-                        )),
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = MaterialTheme.colorScheme.scrim,
-                            fontSize = 9.sp
-                        )
+                    userRateStatus.icon(mediaType = browseItem.mediaType).toIcon(
+                        modifier = Modifier.align(Alignment.BottomEnd)
+                            .padding(all = iconPadding)
+                            .size(iconSize)
                     )
                 }
             }
@@ -109,12 +111,14 @@ fun BrowseListItem(
                 )
             }
             Text(
-                text = buildString {
-                    append(stringResource(id = browseItem.kindResId))
-                    append(" • ")
-                    append("${browseItem.episodesAired} / ${browseItem.episodes.takeIf { it != 0 } ?: "?"}" )
-                    append(stringResource(id = R.string.score_suffix, browseItem.score))
-                }, style = MaterialTheme.typography.labelSmall
+                text = listOfNotNull(
+                    stringResource(id = browseItem.mediaFormat.displayValue),
+                    "${browseItem.episodesAired} / ${browseItem.episodes.takeIf { it != 0 } ?: "?"}",
+                    browseItem.score?.let { score ->
+                        stringResource(id = R.string.media_score, score)
+                    }
+                ).joinToString(" • "),
+                style = MaterialTheme.typography.labelSmall
             )
             if(browseItem.genres.isNotEmpty()) {
                 FlowRow(

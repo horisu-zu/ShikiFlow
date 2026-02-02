@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.common
 
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -56,12 +57,13 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.common.RateUpdateState
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
+import com.example.shikiflow.domain.model.tracks.RateUpdateState
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapUserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
-import com.example.shikiflow.domain.model.mapper.UserRateStatusConstants
-import com.example.shikiflow.domain.model.tracks.RateStatus
+import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.SaveUserRate
+import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -75,21 +77,23 @@ fun UserRateBottomSheet(
     userRate: UserRateData,
     rateUpdateState: RateUpdateState,
     onDismiss: () -> Unit,
-    onSave: (Long, Int, Int, Int, Int) -> Unit,
-    modifier: Modifier = Modifier,
-    onCreateRate: (String, Int) -> Unit = { _, _ -> }
+    onSave: (SaveUserRate) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(
+        skipPartiallyExpanded = true
+    )
     val scope = rememberCoroutineScope()
 
-    val chips = UserRateStatusConstants.getStatusChips(userRate.mediaType)
+    val chips = UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
     val initialStatusIndex = chips.indexOfFirst { chip ->
-        chip == simpleMapUserRateStatusToString(userRate.status, userRate.mediaType)
+        chip == userRate.status
     }
 
     var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
     var selectedScore by remember { mutableIntStateOf(userRate.score) }
     var progress by remember { mutableIntStateOf(userRate.progress) }
+    var progressVolumes by remember { mutableIntStateOf(userRate.progressVolumes) }
     var rewatches by remember { mutableIntStateOf(userRate.rewatches) }
 
     LaunchedEffect(rateUpdateState) {
@@ -119,41 +123,55 @@ fun UserRateBottomSheet(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
             SheetHeader(
-                posterUrl = userRate.posterUrl ?: "",
+                posterUrl = userRate.posterUrl,
                 title = userRate.title,
                 onDismiss = onDismiss
             )
 
             StatusChips(
-                chips = chips.map { resId -> stringResource(id = resId) },
+                chips = chips,
+                mediaType = userRate.mediaType,
                 selectedStatus = selectedStatus,
                 onStatusSelected = { selectedStatus = it },
                 horizontalPadding = horizontalPadding
             )
 
+            AnimatedVisibility(
+                visible = selectedStatus != -1
+            ) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ScoreSelector(
+                        score = selectedScore,
+                        onScoreChange = { selectedScore = it }
+                    )
+                    ProgressColumn(
+                        userRate = userRate.copy(
+                            progress = progress,
+                            progressVolumes = progressVolumes,
+                            rewatches = rewatches
+                        ),
+                        onProgressChange = { progress = it },
+                        onVolumesProgressChange = { progressVolumes = it },
+                        onRewatchesChange = { rewatches = it }
+                    )
+                }
+            }
             if(userRate.id != null) {
-                ScoreSelector(
-                    score = selectedScore,
-                    onScoreChange = { selectedScore = it }
-                )
-
-                ProgressColumn(
-                    userRate = userRate.copy(
-                        progress = progress,
-                        rewatches = rewatches
-                    ),
-                    onProgressChange = { newProgress -> progress = newProgress },
-                    onRewatchesChange = { newRewatches -> rewatches = newRewatches }
-                )
-
                 ChangeRow(
                     onSave = {
                         onSave(
-                            userRate.id.toLong(),
-                            selectedStatus,
-                            selectedScore,
-                            progress,
-                            rewatches
+                            SaveUserRate(
+                                rateId = userRate.id,
+                                mediaId = userRate.mediaId,
+                                userStatus = UserRateStatus.entries[selectedStatus],
+                                score = selectedScore,
+                                progress  = progress,
+                                progressVolumes = progressVolumes,
+                                repeat = rewatches
+                            )
                         )
                     },
                     createDate = userRate.createDate,
@@ -167,7 +185,18 @@ fun UserRateBottomSheet(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp)),
                     label = stringResource(R.string.user_rate_add_to_list),
-                    onClick = { onCreateRate(userRate.mediaId, selectedStatus) },
+                    onClick = {
+                        onSave(
+                            SaveUserRate(
+                                mediaId = userRate.mediaId,
+                                userStatus = UserRateStatus.entries[selectedStatus],
+                                score = selectedScore,
+                                progress  = progress,
+                                progressVolumes = progressVolumes,
+                                repeat = rewatches
+                            )
+                        )
+                    },
                     enabled = selectedStatus != -1
                 )
             }
@@ -177,7 +206,7 @@ fun UserRateBottomSheet(
 
 @Composable
 private fun SheetHeader(
-    posterUrl: String,
+    posterUrl: String?,
     title: String,
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -221,34 +250,37 @@ private fun SheetHeader(
 
 @Composable
 private fun StatusChips(
-    chips: List<String>,
+    chips: List<UserRateStatus>,
+    mediaType: MediaType,
     selectedStatus: Int,
     onStatusSelected: (Int) -> Unit,
     horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
-    val statusMap = RateStatus.entries.associateBy {
-        it.name.lowercase().replace("_", " ")
-    }
-
     LazyRow(
         modifier = modifier.ignoreHorizontalParentPadding(horizontalPadding),
         contentPadding = PaddingValues(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(chips) { tab ->
+        items(chips) { userRateStatus ->
+            val rateStatus = mapUserRateStatus(userRateStatus, mediaType)
+
             FilterChip(
-                selected = selectedStatus != -1 && chips.getOrNull(selectedStatus) == tab,
+                selected = selectedStatus != -1 && chips.getOrNull(selectedStatus) == userRateStatus,
                 onClick = {
-                    val newIndex = chips.indexOf(tab)
+                    val newIndex = chips.indexOf(userRateStatus)
                     onStatusSelected(if (selectedStatus == newIndex) -1 else newIndex)
                 },
-                label = { Text(tab) },
+                label = {
+                    Text(
+                        text = stringResource(rateStatus)
+                    )
+                },
                 colors = FilterChipDefaults.filterChipColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 leadingIcon = {
-                    statusMap[tab.lowercase()]?.icon?.toIcon(
+                    userRateStatus.icon(mediaType).toIcon(
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(FilterChipDefaults.IconSize)
                     )
@@ -289,11 +321,11 @@ private fun ScoreSelector(
 private fun ProgressColumn(
     userRate: UserRateData,
     onProgressChange: (Int) -> Unit,
+    onVolumesProgressChange: (Int) -> Unit,
     onRewatchesChange: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val isAnime = userRate.mediaType == MediaType.ANIME
-    val totalCount = if (isAnime) userRate.totalEpisodes else userRate.totalChapters
     val progressTitle = if (isAnime) stringResource(id = R.string.details_short_info_episodes)
         else stringResource(id = R.string.details_short_info_manga_chapters)
     val rewatchTitle = if (isAnime) stringResource(R.string.rewatches)
@@ -303,14 +335,22 @@ private fun ProgressColumn(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
-        totalCount?.let {
+        ProgressCard(
+            title = progressTitle,
+            count = userRate.progress,
+            onIncrement = { onProgressChange(userRate.progress + 1) },
+            onDecrement = { onProgressChange(userRate.progress - 1) },
+            canIncrement = userRate.progress < userRate.totalCount,
+            canDecrement = userRate.progress > 0
+        )
+        if(!isAnime) {
             ProgressCard(
-                title = progressTitle,
-                count = userRate.progress,
-                onIncrement = { onProgressChange(userRate.progress + 1) },
-                onDecrement = { onProgressChange(userRate.progress - 1) },
-                canIncrement = userRate.progress < totalCount,
-                canDecrement = userRate.progress > 0
+                title = stringResource(R.string.details_volumes),
+                count = userRate.progressVolumes,
+                onIncrement = { onVolumesProgressChange(userRate.progressVolumes + 1) },
+                onDecrement = { onVolumesProgressChange(userRate.progressVolumes - 1) },
+                canIncrement = userRate.progressVolumes < userRate.volumesCount,
+                canDecrement = userRate.progressVolumes > 0
             )
         }
         ProgressCard(

@@ -1,13 +1,19 @@
 package com.example.shikiflow.domain.model.tracks
 
-import com.example.graphql.type.UserRateStatusEnum
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import com.example.shikiflow.domain.model.track.UserRateStatus
 
-@Serializable
 data class UserRate(
-    val id: Long,
-    val status: UserRateStatusEnum,
+    val id: Int,
+    val status: UserRateStatus,
     val score: Int,
-    @SerialName("target_type") val targetType: TargetType
+    val mediaType: MediaType
+)
+
+data class ShortUserMediaRate(
+    val id: Int,
+    val title: String,
+    val imageUrl: String,
+    val score: Int,
+    val status: UserRateStatus,
+    val progress: Int
 )

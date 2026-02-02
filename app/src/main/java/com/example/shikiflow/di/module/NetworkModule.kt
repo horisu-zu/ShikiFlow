@@ -1,15 +1,10 @@
 package com.example.shikiflow.di.module
 
-import android.content.Context
-import coil3.ImageLoader
-import coil3.memory.MemoryCache
-import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.network.okHttpClient
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.di.annotations.GithubOkHttpClient
 import com.example.shikiflow.di.annotations.GithubRetrofit
-import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MainRetrofit
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
@@ -20,9 +15,13 @@ import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.MangaDexApi
 import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.data.remote.UserApi
+import com.example.shikiflow.di.annotations.AnilistApollo
+import com.example.shikiflow.di.annotations.AnilistOkHttpClient
 import com.example.shikiflow.di.annotations.KodikOkHttpClient
 import com.example.shikiflow.di.annotations.KodikRetrofit
+import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MangaDexRetrofit
+import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.KodikInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
@@ -35,7 +34,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import retrofit2.create
 import javax.inject.Singleton
@@ -54,6 +53,22 @@ class NetworkModule {
         return OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor(tokenRepository))
             .authenticator(tokenAuthenticator)
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @AnilistOkHttpClient
+    fun provideAnilistOkHttpClient(
+        tokenRepository: TokenRepository
+    ): OkHttpClient {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        return OkHttpClient.Builder()
+            .addInterceptor(AuthInterceptor(tokenRepository))
+            .addInterceptor(logging)
             .build()
     }
 
@@ -90,7 +105,7 @@ class NetworkModule {
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BuildConfig.SHIKI_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
@@ -140,36 +155,25 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideApolloClient(
+    @ShikimoriApollo
+    fun provideShikimoriApolloClient(
         @MainOkHttpClient okHttpClient: OkHttpClient
     ): ApolloClient {
         return ApolloClient.Builder()
-            .serverUrl("${BuildConfig.BASE_URL}/api/graphql")
+            .serverUrl("${BuildConfig.SHIKI_BASE_URL}/api/graphql")
             .okHttpClient(okHttpClient)
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideImageLoader(
-        @ApplicationContext context: Context,
-        @MainOkHttpClient okHttpClient: OkHttpClient
-    ): ImageLoader {
-        return ImageLoader.Builder(context)
-            .memoryCache {
-                MemoryCache.Builder()
-                    .maxSizePercent(context, 0.25)
-                    .build()
-            }
-            .components {
-                add(
-                    OkHttpNetworkFetcherFactory(
-                        callFactory = {
-                            okHttpClient
-                        }
-                    )
-                )
-            }
+    @AnilistApollo
+    fun provideAnilistApolloClient(
+        @AnilistOkHttpClient okHttpClient: OkHttpClient
+    ): ApolloClient {
+        return ApolloClient.Builder()
+            .serverUrl(BuildConfig.ANILIST_GRAPHQL_URL)
+            .okHttpClient(okHttpClient)
             .build()
     }
 

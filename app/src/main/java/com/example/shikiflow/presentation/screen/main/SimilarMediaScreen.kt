@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -35,26 +35,26 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.viewmodel.SimilarMediaViewModel
-import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SimilarMediaScreen(
     mediaTitle: String,
-    mediaId: String,
+    mediaId: Int,
     mediaType: MediaType,
     navOptions: MediaNavOptions,
     similarMediaViewModel: SimilarMediaViewModel = hiltViewModel()
 ) {
     val lazyGridState = rememberLazyGridState()
-    val similarMediaState by similarMediaViewModel.similarMedia.collectAsStateWithLifecycle()
+    val similarMediaState = similarMediaViewModel.getSimilarMedia(mediaId, mediaType).collectAsLazyPagingItems()
 
     val horizontalPadding = 12.dp
     val isAtTop by remember {
@@ -62,10 +62,6 @@ fun SimilarMediaScreen(
             lazyGridState.firstVisibleItemIndex == 0 &&
             lazyGridState.firstVisibleItemScrollOffset == 0
         }
-    }
-
-    LaunchedEffect(mediaId) {
-        similarMediaViewModel.getSimilarMedia(mediaId, mediaType)
     }
 
     Scaffold(
@@ -107,19 +103,20 @@ fun SimilarMediaScreen(
             }
         }
     ) { innerPadding ->
-        if(similarMediaState is Resource.Loading) {
+        if(similarMediaState.loadState.refresh is LoadState.Loading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-        } else if(similarMediaState is Resource.Error) {
+        } else if(similarMediaState.loadState.refresh is LoadState.Error) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(R.string.similar_media_error),
-                    buttonLabel = stringResource(R.string.common_error)
+                    message = (similarMediaState.loadState.refresh as LoadState.Error)
+                        .error.message?: stringResource(R.string.similar_media_error),
+                    buttonLabel = stringResource(R.string.common_retry)
                 )
             }
         } else {
@@ -132,17 +129,18 @@ fun SimilarMediaScreen(
                         top = innerPadding.calculateTopPadding(),
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                    )
-                    .padding(horizontal = horizontalPadding),
+                    ),
+                contentPadding = PaddingValues(horizontal = horizontalPadding),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                similarMediaState.data?.let { mediaList ->
-                    items(mediaList.size) { index ->
-                        val browseItem = mediaList[index]
-
+                items(
+                    count = similarMediaState.itemCount,
+                    key = { index -> similarMediaState[index]?.id ?: index }
+                ) { index ->
+                    similarMediaState[index]?.let { mediaRecommendation ->
                         BrowseGridItem(
-                            browseItem = browseItem,
+                            browseItem = mediaRecommendation,
                             onItemClick = { id, mediaType ->
                                 when(mediaType) {
                                     MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)

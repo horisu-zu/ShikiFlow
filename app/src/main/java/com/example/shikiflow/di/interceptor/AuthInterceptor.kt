@@ -19,7 +19,7 @@ class AuthInterceptor @Inject constructor(
         Log.d("AuthInterceptor", "Original request URL: ${original.url}")
 
         val token = runBlocking {
-            tokenRepository.tokensFlow.map { it.accessToken }.firstOrNull()
+            tokenRepository.authCredentials.map { it.accessToken }.firstOrNull()
         }
         Log.d("AuthInterceptor", "Token retrieved: $token")
 

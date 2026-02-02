@@ -1,9 +1,9 @@
 package com.example.shikiflow.domain.repository
 
-import com.example.shikiflow.domain.model.auth.TokenResponse
+import com.example.shikiflow.domain.model.auth.AuthType
 
 interface AuthRepository {
-    fun getAuthorizationUrl(): String
-    suspend fun handleAuthCode(code: String): Result<TokenResponse>
+    fun getAuthorizationUrl(authType: AuthType): String
+    suspend fun handleAuthCode(code: String, authType: AuthType)
     suspend fun logout()
 }

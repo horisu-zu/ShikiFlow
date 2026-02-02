@@ -1,0 +1,195 @@
+query CurrentUser {
+    Viewer {
+        ...ALUserShort
+    }
+}
+
+query Users(
+    $page: Int,
+    $limit: Int,
+    $search: String
+) {
+    Page(page: $page, perPage: $limit) {
+        users(search: $search) {
+            ...ALUserShort
+        }
+    }
+}
+
+query UserActivities(
+    $page: Int,
+    $limit: Int,
+    $userId: Int
+) {
+    Page(page: $page, perPage: $limit) {
+        activities(userId: $userId, sort: [ID_DESC]) {
+            ...on ListActivity {
+                ...ALUserActivity
+            }
+        }
+    }
+}
+
+query UserRates(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        statistics {
+            anime {
+                ...ALUserListStats
+            }
+            manga {
+                ...ALUserListStats
+            }
+        }
+    }
+}
+
+query UserFavoriteCategories(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        favourites {
+            anime {
+                pageInfo {
+                    ...ALPageInfoShort
+                }
+            }
+            manga {
+                pageInfo {
+                    ...ALPageInfoShort
+                }
+            }
+            characters {
+                pageInfo {
+                    ...ALPageInfoShort
+                }
+            }
+            staff {
+                pageInfo {
+                    ...ALPageInfoShort
+                }
+            }
+            studios {
+                pageInfo {
+                    ...ALPageInfoShort
+                }
+            }
+        }
+    }
+}
+
+query UserFavoriteAnime(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    User(id: $userId) {
+        favourites {
+            anime(page: $page, perPage: $limit) {
+                nodes {
+                    ...ALFavoriteMediaShort
+                }
+            }
+        }
+    }
+}
+
+query UserFavoriteManga(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    User(id: $userId) {
+        favourites {
+            manga(page: $page, perPage: $limit) {
+                nodes {
+                    ...ALFavoriteMediaShort
+                }
+            }
+        }
+    }
+}
+
+query UserFavoriteCharacters(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    User(id: $userId) {
+        favourites {
+            characters(page: $page, perPage: $limit) {
+                nodes {
+                    ...ALFavoriteCharacterShort
+                }
+            }
+        }
+    }
+}
+
+query UserFavoriteStaff(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    User(id: $userId) {
+        favourites {
+            staff(page: $page, perPage: $limit) {
+                nodes {
+                    ...ALFavoriteStaffShort
+                }
+            }
+        }
+    }
+}
+
+query UserFavoriteStudios(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    User(id: $userId) {
+        favourites {
+            studios(page: $page, perPage: $limit) {
+                nodes {
+                    ...ALFavoriteStudioShort
+                }
+            }
+        }
+    }
+}
+
+query ShortUserRate(
+    $userId: Int!,
+    $mediaType: MediaType!
+) {
+    MediaListCollection(userId: $userId, type: $mediaType) {
+        lists {
+            entries {
+                ...ALRateEntryShort
+            }
+        }
+    }
+}
+
+mutation SaveUserRate(
+    $rateEntryId: Int,
+    $mediaId: Int!,
+    $mediaStatus: MediaListStatus!,
+    $progress: Int,
+    $progressVolumes: Int,
+    $repeat: Int,
+    $scoreRaw: Int
+) {
+    SaveMediaListEntry(
+        id: $rateEntryId,
+        mediaId: $mediaId,
+        status: $mediaStatus,
+        progress: $progress,
+        progressVolumes: $progressVolumes,
+        repeat: $repeat,
+        scoreRaw: $scoreRaw
+    ) {
+        ...ALRateEntry
+    }
+}

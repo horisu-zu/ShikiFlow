@@ -6,29 +6,30 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.example.graphql.type.SortOrderEnum
-import com.example.graphql.type.UserRateOrderFieldEnum
-import com.example.graphql.type.UserRateOrderInputType
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.data.datasource.MediaTracksDataSource
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.dao.AnimeTracksDao
-import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Companion.toEntity
+import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackDto
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toEntity
-import com.example.shikiflow.domain.repository.AnimeTracksRepository
+import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toDto
+import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.track.UserRateOrder
+import com.example.shikiflow.domain.model.track.UserRateOrderType
 import retrofit2.HttpException
 import java.io.IOException
 
 @OptIn(ExperimentalPagingApi::class)
 class AnimeTracksMediator(
-    private val animeTracksRepository: AnimeTracksRepository,
+    private val mediaTracksDataSource: MediaTracksDataSource,
     private val appRoomDatabase: AppRoomDatabase,
-    private val animeTracksDao: AnimeTracksDao,
-    private val userRateStatus: UserRateStatusEnum
+    private val userRateStatus: UserRateStatus,
+    private val userId: String? = null
 ): RemoteMediator<Int, AnimeTrackDto>() {
 
+    private val animeTracksDao = appRoomDatabase.animeTracksDao()
+
     companion object {
-        private val loadedPagesMap = mutableMapOf<UserRateStatusEnum, Int>()
+        private val loadedPagesMap = mutableMapOf<UserRateStatus, Int>()
     }
 
     override suspend fun load(
@@ -36,9 +37,6 @@ class AnimeTracksMediator(
         state: PagingState<Int, AnimeTrackDto>
     ): MediatorResult {
         return try {
-            // I'm using custom page map cuz of the way the API works. It's indexed starting with 1
-            // and not 0, which works... a bit weird (I tried to fix it for 3 hours) with Paging3
-            // Of course I'm not sure about this conclusion
             val page = when(loadType) {
                 LoadType.REFRESH -> {
                     loadedPagesMap[userRateStatus] = 1
@@ -59,32 +57,33 @@ class AnimeTracksMediator(
                 }
             }
 
-            val response = animeTracksRepository.getAnimeTracks(
+            val response = mediaTracksDataSource.getAnimeTracks(
                 page = page,
                 limit = state.config.pageSize,
                 status = userRateStatus,
-                order = UserRateOrderInputType(
-                    field = UserRateOrderFieldEnum.updated_at,
-                    order = SortOrderEnum.desc
+                userId = userId,
+                order = UserRateOrder(
+                    type = UserRateOrderType.UPDATED_AT,
+                    sort = SortDirection.DESCENDING
                 )
             )
 
             return response.fold(
                 onSuccess = { data ->
                     val tracks = data.map { userRate ->
-                        userRate.animeUserRateWithModel.toEntity()
+                        userRate.track.toDto()
                     }
-                    val animeItems = data
-                        .mapNotNull { it.animeUserRateWithModel.anime?.animeShort }
-                        .map { it.toEntity() }
+                    val animeItems = data.map { userRate ->
+                        userRate.anime.toDto()
+                    }
 
                     appRoomDatabase.withTransaction {
                         if (loadType == LoadType.REFRESH) {
-                            animeTracksDao.clearTracks(userRateStatus.name)
-                            animeTracksDao.clearAnimeItems(userRateStatus.name)
+                            animeTracksDao.clearTracksByStatus(userRateStatus.name)
+                            animeTracksDao.clearAnimeItemsByStatus(userRateStatus.name)
                         }
-                        appRoomDatabase.animeTracksDao().insertTracks(tracks)
-                        appRoomDatabase.animeTracksDao().insertAnimeItems(animeItems)
+                        animeTracksDao.insertTracks(tracks)
+                        animeTracksDao.insertAnimeItems(animeItems)
                     }
 
                     val endOfPaginationReached = data.isEmpty() || data.size < state.config.pageSize

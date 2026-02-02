@@ -20,19 +20,19 @@ class AnimeTranslationsViewModel @Inject constructor(
     private val getAnimeTranslationsUseCase: GetAnimeTranslationsUseCase
 ): ViewModel() {
 
-    private var currentId: String? = null
+    private var currentId: Int? = null
     private val _translations = MutableStateFlow<Resource<Map<TranslationFilter, List<KodikAnime>>>>(Resource.Loading())
     val translations = _translations.asStateFlow()
 
     var isRefreshing = mutableStateOf(false)
         private set
 
-    fun getAnimeTranslations(id: String, isRefresh: Boolean = false) {
+    fun getAnimeTranslations(id: Int, isRefresh: Boolean = false) {
         if(currentId == id && !isRefresh) {
             return
         } else if(isRefresh) { isRefreshing.value = true }
 
-        getAnimeTranslationsUseCase(id).onEach { result ->
+        getAnimeTranslationsUseCase(id.toString()).onEach { result ->
             _translations.value = result
             when(result) {
                 is Resource.Loading -> {

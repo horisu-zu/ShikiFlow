@@ -4,8 +4,10 @@ import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.user.UserRateExpanded
-import com.example.shikiflow.domain.usecase.GetUserProfileUseCase
+import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.domain.usecase.GetUserRatesUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,13 +17,14 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserRateViewModel @Inject constructor(
-    private val getUserProfileUseCase: GetUserProfileUseCase
+    private val userRepository: UserRepository,
+    private val getUserRatesUseCase: GetUserRatesUseCase
 ) : ViewModel() {
 
     private var _userId: String? = null
 
-    private val _userRateData = MutableStateFlow<Resource<UserRateExpanded>>(Resource.Loading())
-    val userRateData = _userRateData.asStateFlow()
+    private val _userRateStats = MutableStateFlow<Resource<ProfileStats>>(Resource.Loading())
+    val userRateStats = _userRateStats.asStateFlow()
 
     var isRefreshing = mutableStateOf(false)
         private set
@@ -34,14 +37,14 @@ class UserRateViewModel @Inject constructor(
             if (!isRefresh && _userId == userId) {
                 return@launch
             } else if(!isRefresh) {
-                _userRateData.value = Resource.Loading()
+                _userRateStats.value = Resource.Loading()
             } else {
                 isRefreshing.value = true
             }
 
-            _userRateData.value = getUserProfileUseCase(userId.toLong())
+            _userRateStats.value = getUserRatesUseCase(userId.toLong())
 
-            when(val result = _userRateData.value) {
+            when(val result = _userRateStats.value) {
                 is Resource.Loading -> { /**/ }
                 is Resource.Success -> {
                     _userId = userId
@@ -176,3 +179,8 @@ class UserRateViewModel @Inject constructor(
         }
     }*/
 }
+
+data class ProfileStats(
+    val userMediaStats: UserRateStats,
+    val favoriteCategories: List<FavoriteCategory>
+)

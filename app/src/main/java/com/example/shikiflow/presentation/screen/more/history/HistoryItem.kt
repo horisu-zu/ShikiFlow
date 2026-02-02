@@ -14,15 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.domain.model.user.UserHistoryResponse
+import com.example.shikiflow.domain.model.user.UserHistory
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.Converter
-import kotlin.time.Instant
 
 @Composable
 fun HistoryItem(
-    historyItem: UserHistoryResponse?,
+    historyItem: UserHistory,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -32,30 +30,27 @@ fun HistoryItem(
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
         BaseImage(
-            model = "${BuildConfig.BASE_URL}${historyItem?.target?.image?.original}",
+            model = historyItem.coverImage,
             contentDescription = "Poster",
             modifier = Modifier.width(96.dp)
         )
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
-                text = historyItem?.target?.name ?: "Huh!",
+                text = historyItem.title,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = historyItem?.description?.replace("<b>", "")
-                    ?.replace("</b>", "") ?: "Huh!",
+                text = historyItem.description,
                 style = MaterialTheme.typography.bodySmall,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
             )
-            historyItem?.createdAt?.let { createdAt ->
-                Text(
-                    text = Converter.formatInstant(Instant.parse(createdAt)),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                )
-            }
+            Text(
+                text = Converter.formatInstant(historyItem.createdAt, includeTime = true),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+            )
         }
     }
 }

@@ -16,7 +16,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.watch.player
 @Composable
 fun AnimeWatchNavigator(
     title: String,
-    shikimoriId: String,
+    shikimoriId: Int,
     completedEpisodes: Int,
     onNavigateBack: () -> Unit,
     source: String

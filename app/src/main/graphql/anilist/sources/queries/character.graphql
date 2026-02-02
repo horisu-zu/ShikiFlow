@@ -1,0 +1,86 @@
+query Characters(
+    $mediaId: Int!,
+    $page: Int!,
+    $perPage: Int!
+) {
+    Media(id: $mediaId) {
+        characters(page: $page, perPage: $perPage, sort: [RELEVANCE,ROLE]) {
+            edges {
+                node {
+                    ...ALCharacterShort
+                }
+                role
+                voiceActors(language: JAPANESE) {
+                    ...ALStaffShort
+                }
+            }
+        }
+    }
+}
+
+query CharacterDetails(
+    $id: Int!
+) {
+    Character(id: $id) {
+        id
+        name {
+            full
+            native
+            alternativeSpoiler
+        }
+        image {
+            large
+        }
+        anime: media(sort: [POPULARITY_DESC], type: ANIME) {
+            edges {
+                characterRole
+                node {
+                    ...ALMediaBrowseShort
+                }
+            }
+        }
+        manga: media(sort: [POPULARITY_DESC], type: MANGA) {
+            edges {
+                characterRole
+                node {
+                    ...ALMediaBrowseShort
+                }
+            }
+        }
+        description(asHtml: true)
+    }
+}
+
+query StaffDetails(
+    $staffId: Int!
+) {
+    Staff(id: $staffId) {
+        id
+        name {
+            full
+            native
+        }
+        image {
+            large
+        }
+        primaryOccupations
+        dateOfBirth {
+            ...Date
+        }
+        description
+        characters(sort: [FAVOURITES_DESC]) {
+            pageInfo {
+                hasNextPage
+            }
+            nodes {
+                ...ALCharacterShort
+            }
+        }
+        animeStaffRoles: staffMedia(sort: [POPULARITY_DESC], type: ANIME) {
+            ...ALMediaStaffRoles
+        }
+        mangaStaffRoles: staffMedia(sort: [POPULARITY_DESC], type: MANGA) {
+            ...ALMediaStaffRoles
+        }
+    }
+}

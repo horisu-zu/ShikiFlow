@@ -2,14 +2,14 @@ package com.example.shikiflow.data.local.entity.mangatrack
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.graphql.fragment.MangaUserRateWithModel
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.track.manga.MangaUserTrack
 import kotlin.time.Instant
 
 @Entity(tableName = "manga_track")
 data class MangaTrackEntity(
-    @PrimaryKey val id: String,
-    val status: UserRateStatusEnum,
+    val id: Int,
+    val status: UserRateStatus,
     val chapters: Int,
     val volumes: Int,
     val rewatches: Int,
@@ -17,10 +17,10 @@ data class MangaTrackEntity(
     val text: String?,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val mangaId: String
+    @PrimaryKey val mangaId: Int
 ) {
     companion object {
-        fun MangaUserRateWithModel.toEntity(): MangaTrackEntity {
+        fun MangaUserTrack.toDto(): MangaTrackEntity {
             return MangaTrackEntity(
                 id = this.id,
                 status = this.status,
@@ -29,9 +29,24 @@ data class MangaTrackEntity(
                 rewatches = this.rewatches,
                 score = this.score,
                 text = this.text,
-                createdAt = Instant.parse(this.createdAt.toString()),
-                updatedAt = Instant.parse(this.updatedAt.toString()),
-                mangaId = this.manga?.mangaShort?.id.toString()
+                createdAt = this.createdAt,
+                updatedAt = this.updatedAt,
+                mangaId = this.mangaId
+            )
+        }
+
+        fun MangaTrackEntity.toDomain(): MangaUserTrack {
+            return MangaUserTrack(
+                id = this.id,
+                status = this.status,
+                chapters = this.chapters,
+                volumes = this.volumes,
+                rewatches = this.rewatches,
+                score = this.score,
+                text = this.text,
+                createdAt = this.createdAt,
+                updatedAt = this.updatedAt,
+                mangaId = this.mangaId
             )
         }
     }

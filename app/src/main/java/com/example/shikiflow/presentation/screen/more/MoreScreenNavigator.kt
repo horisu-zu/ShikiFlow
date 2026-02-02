@@ -15,11 +15,13 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
+import com.example.shikiflow.presentation.screen.more.profile.statistics.FavoritesScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
@@ -47,6 +49,10 @@ fun MoreScreenNavigator(
             moreScreenBackStack.add(MoreNavRoute.CompareScreen(targetUser))
         }
 
+        override fun navigateToFavorites(userId: String, userFavorites: List<FavoriteCategory>) {
+            moreScreenBackStack.add(MoreNavRoute.FavoritesScreen(userId, userFavorites))
+        }
+
         override fun navigateBack() {
             moreScreenBackStack.removeLastOrNull()
         }
@@ -56,58 +62,62 @@ fun MoreScreenNavigator(
         backStack = moreScreenBackStack,
         onBack = { moreScreenBackStack.removeLastOrNull() },
         entryProvider = entryProvider {
-            currentUser?.let {
-                entry<MoreNavRoute.MoreScreen> {
-                    MoreScreen(
-                        moreNavOptions = moreNavOptions,
-                        currentUser = currentUser
+            entry<MoreNavRoute.MoreScreen> {
+                MoreScreen(
+                    moreNavOptions = moreNavOptions,
+                    currentUser = currentUser
+                )
+            }
+            entry<MoreNavRoute.ProfileScreen> { route ->
+                ProfileScreen(
+                    currentUserId = currentUser?.id,
+                    userData = route.user,
+                    moreNavOptions = moreNavOptions
+                )
+            }
+            entry<MoreNavRoute.HistoryScreen> {
+                HistoryScreen(
+                    currentUserId = currentUser?.id,
+                    moreNavOptions = moreNavOptions,
+                )
+            }
+            entry<MoreNavRoute.SettingsScreen> {
+                SettingsScreen(
+                    userData = currentUser
+                )
+            }
+            entry<MoreNavRoute.CompareScreen>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { it },
+                        animationSpec = tween(300)
+                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                } + NavDisplay.popTransitionSpec {
+                    EnterTransition.None togetherWith slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(300)
+                    )
+                } + NavDisplay.predictivePopTransitionSpec {
+                    EnterTransition.None togetherWith slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = tween(300)
                     )
                 }
-                entry<MoreNavRoute.ProfileScreen> { route ->
-                    ProfileScreen(
-                        currentUserId = currentUser.id,
-                        userData = route.user,
-                        moreNavOptions = moreNavOptions
-                    )
-                }
-                entry<MoreNavRoute.HistoryScreen> {
-                    HistoryScreen(
-                        currentUserId = currentUser.id,
-                        moreNavOptions = moreNavOptions,
-                    )
-                }
-                entry<MoreNavRoute.SettingsScreen> {
-                    SettingsScreen(
-                        userData = currentUser
-                    )
-                }
-                entry<MoreNavRoute.CompareScreen>(
-                    metadata = NavDisplay.transitionSpec {
-                        slideInHorizontally(
-                            initialOffsetX = { it },
-                            animationSpec = tween(300)
-                        ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                    } + NavDisplay.popTransitionSpec {
-                        EnterTransition.None togetherWith slideOutHorizontally(
-                            targetOffsetX = { it },
-                            animationSpec = tween(300)
-                        )
-                    } + NavDisplay.predictivePopTransitionSpec {
-                        EnterTransition.None togetherWith slideOutHorizontally(
-                            targetOffsetX = { it },
-                            animationSpec = tween(300)
-                        )
-                    }
-                ) { route ->
-                    CompareScreen(
-                        currentUser = currentUser,
-                        targetUser = route.targetUser,
-                        moreNavOptions = moreNavOptions
-                    )
-                }
-                entry<MoreNavRoute.AboutAppScreen> {
-                    AboutAppScreen()
-                }
+            ) { route ->
+                CompareScreen(
+                    currentUser = currentUser,
+                    targetUser = route.targetUser,
+                    moreNavOptions = moreNavOptions
+                )
+            }
+            entry<MoreNavRoute.FavoritesScreen> { route ->
+                FavoritesScreen(
+                    userId = route.userId,
+                    favoriteCategories = route.userFavorites
+                )
+            }
+            entry<MoreNavRoute.AboutAppScreen> {
+                AboutAppScreen()
             }
         },
         transitionSpec = {

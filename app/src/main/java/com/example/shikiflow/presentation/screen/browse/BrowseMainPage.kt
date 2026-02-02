@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -24,10 +24,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,6 +45,8 @@ import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.track.BrowseOrder
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
@@ -48,7 +55,8 @@ import com.example.shikiflow.utils.BrowseUiMode
 
 @Composable
 fun BrowseMainPage(
-    onNavigate: (String, MediaType) -> Unit,
+    authType: AuthType,
+    onNavigate: (Int, MediaType) -> Unit,
     onSideScreenNavigate: (BrowseType) -> Unit,
     modifier: Modifier = Modifier,
     onIsAtTopChange: (Boolean) -> Unit,
@@ -89,6 +97,10 @@ fun BrowseMainPage(
     if(showBottomSheet.value) {
         BrowseMainBottomSheet(
             currentBrowseMode = browseUiSettings.browseUiMode,
+            ongoingOrder = when(authType) {
+                AuthType.ANILIST -> BrowseOrder.Anilist.getOngoingOrderOptions()
+                AuthType.SHIKIMORI -> BrowseOrder.Shikimori.getOngoingOrderOptions()
+            },
             currentOngoingMode = browseUiSettings.browseOngoingOrder,
             onDismiss = { showBottomSheet.value = false },
             onModeSelect = { newMode ->
@@ -105,7 +117,7 @@ fun BrowseMainPage(
 private fun BrowseListComponent(
     browseState: LazyPagingItems<Browse>,
     onSideScreenNavigate: (BrowseType) -> Unit,
-    onNavigate: (String, MediaType) -> Unit,
+    onNavigate: (Int, MediaType) -> Unit,
     onSettingClick: () -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -194,7 +206,7 @@ private fun BrowseListComponent(
 private fun BrowseGridComponent(
     browseState: LazyPagingItems<Browse>,
     onSideScreenNavigate: (BrowseType) -> Unit,
-    onNavigate: (String, MediaType) -> Unit,
+    onNavigate: (Int, MediaType) -> Unit,
     onSettingClick: () -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -204,6 +216,17 @@ private fun BrowseGridComponent(
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex == 0 &&
             lazyGridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    val localWindowInfo = LocalWindowInfo.current
+    val density = LocalDensity.current
+    var headerHeightPx by remember { mutableIntStateOf(0) }
+    val componentHeight by remember {
+        derivedStateOf {
+            with(density) {
+                localWindowInfo.containerDpSize.height - headerHeightPx.toDp()
+            }
         }
     }
 
@@ -221,25 +244,33 @@ private fun BrowseGridComponent(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             NavigationSection(
-                onNavigateSideScreen = { sideScreen -> onSideScreenNavigate(sideScreen) }
+                onNavigateSideScreen = { sideScreen -> onSideScreenNavigate(sideScreen) },
+                modifier = Modifier.onSizeChanged { size ->
+                    headerHeightPx += size.height
+                }
             )
         }
 
         item(span = { GridItemSpan(maxLineSpan) }) {
-            OngoingTitleComponent(onSettingClick = onSettingClick)
+            OngoingTitleComponent(
+                onSettingClick = onSettingClick,
+                modifier = Modifier.onSizeChanged { size ->
+                    headerHeightPx += size.height
+                }
+            )
         }
 
         if(browseState.loadState.refresh is LoadState.Loading) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
-                    modifier = Modifier.fillMaxSize().heightIn(240.dp),
+                    modifier = Modifier.height(componentHeight),
                     contentAlignment = Alignment.Center
                 ) { CircularProgressIndicator() }
             }
         } else if(browseState.loadState.refresh is LoadState.Error) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Box(
-                    modifier = Modifier.fillMaxSize().heightIn(240.dp),
+                    modifier = Modifier.height(componentHeight),
                     contentAlignment = Alignment.Center
                 ) {
                     ErrorItem(

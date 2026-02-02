@@ -33,24 +33,23 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.mapper.BrowseOptions
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.BrowseSearchViewModel
 
 @Composable
 fun BrowseSearchPage(
+    authType: AuthType,
     query: String,
-    onMediaNavigate: (String, MediaType) -> Unit,
+    onMediaNavigate: (Int, MediaType) -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    browseViewModel: BrowseViewModel = hiltViewModel()
+    browseViewModel: BrowseSearchViewModel = hiltViewModel()
 ) {
     val lazyGridState = rememberLazyGridState()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var currentType by rememberSaveable { mutableStateOf<BrowseType>(BrowseType.AnimeBrowseType.SEARCH) }
-    var searchOptions by remember { mutableStateOf(BrowseOptions()) }
+    var searchOptions by browseViewModel.searchOptions
     val isAtTop by remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex == 0 &&
@@ -58,9 +57,8 @@ fun BrowseSearchPage(
         }
     }
 
-    val browseSearchData = remember(query, currentType, searchOptions) {
-        browseViewModel.paginatedBrowse(
-            type = currentType,
+    val browseSearchData = remember(query, searchOptions) {
+        browseViewModel.paginatedBrowseSearch(
             options = searchOptions.copy(name = query)
         )
     }.collectAsLazyPagingItems()
@@ -139,10 +137,12 @@ fun BrowseSearchPage(
 
     if (showBottomSheet) {
         SearchBottomSheet(
-            currentType = currentType,
+            authType = authType,
             searchOptions = searchOptions,
-            onOptionsChanged = { newOptions -> searchOptions = newOptions },
-            onTypeChanged = { newType -> currentType = newType },
+            onOptionsChanged = { newOptions -> browseViewModel.updateSearchOptions(newOptions) },
+            onTypeChanged = { newType ->
+                browseViewModel.clearSearchOptions(newType)
+            },
             onDismiss = { showBottomSheet = false }
         )
     }

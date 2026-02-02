@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.common
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.utils.IconResource
@@ -26,7 +27,9 @@ import com.example.shikiflow.utils.toIcon
 @Composable
 fun Button(
     modifier: Modifier = Modifier,
+    icon: IconResource? = null,
     label: String = "Confirm operation",
+    containerColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
     onClick: () -> Unit,
     enabled: Boolean = true
 ) {
@@ -35,9 +38,7 @@ fun Button(
         enabled = enabled,
         modifier = modifier,
         colors = ButtonDefaults.buttonColors(
-            containerColor = if (enabled) MaterialTheme.colorScheme.primary.copy(
-                alpha = 0.75f
-            ) else Color.Transparent,
+            containerColor = if (enabled) containerColor else Color.Transparent,
             contentColor = if (enabled) Color.White
                 else MaterialTheme.colorScheme.onSurfaceVariant,
             disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant
@@ -46,9 +47,16 @@ fun Button(
             BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
         shape = RoundedCornerShape(8.dp)
     ) {
+        icon?.let {
+            icon.toIcon(
+                modifier = Modifier.size(24.dp)
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+        }
         Text(
             text = label,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
         )
     }
 }

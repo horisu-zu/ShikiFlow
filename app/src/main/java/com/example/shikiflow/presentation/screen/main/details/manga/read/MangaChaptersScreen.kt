@@ -60,7 +60,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Resource
-import com.example.shikiflow.utils.SortDirection
+import com.example.shikiflow.domain.model.common.SortDirection
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

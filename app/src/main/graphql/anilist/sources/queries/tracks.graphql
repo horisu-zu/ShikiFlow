@@ -1,0 +1,48 @@
+query MediaListTracksQuery(
+    $page: Int = 0,
+    $limit: Int = 10,
+    $type: MediaType,
+    $userId: Int,
+    $status: MediaListStatus,
+    $order: [MediaListSort] = [UPDATED_TIME_DESC],
+    $idsIn: [Int]
+) {
+    Page(page: $page, perPage: $limit) {
+        mediaList(
+            type: $type,
+            userId: $userId,
+            status: $status,
+            sort: $order,
+            mediaId_in: $idsIn
+        ) {
+            ...MediaListShort
+        }
+    }
+}
+
+query MediaListIDsQuery(
+    $page: Int = 0,
+    $limit: Int = 15,
+    $type: MediaType,
+    $search: String,
+    $order: [MediaSort] = [SCORE_DESC]
+) {
+    Page(page: $page, perPage: $limit) {
+        pageInfo {
+            total
+            perPage
+            currentPage
+            lastPage
+        }
+        media(search: $search, type: $type, onList: true, sort: $order) {
+            id
+            title {
+                romaji
+                english
+            }
+            mediaListEntry {
+                id
+            }
+        }
+    }
+}

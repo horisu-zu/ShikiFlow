@@ -1,0 +1,181 @@
+fragment AnimeShort on Anime {
+    id
+    name
+    japanese
+    kind
+    score
+    status
+    episodes
+    episodesAired
+    nextEpisodeAt
+    duration
+    airedOn { ...DateShort }
+    releasedOn { ...DateShort }
+    genres { id name kind }
+    studios { id name imageUrl }
+    poster { ...PosterShort }
+    url
+}
+
+fragment MangaShort on Manga {
+    id
+    name
+    japanese
+    kind
+    score
+    status
+    chapters
+    volumes
+    airedOn { ...DateShort }
+    releasedOn { ...DateShort }
+    poster { ...PosterShort}
+    url
+}
+
+fragment CharacterShort on Character {
+    id
+    name
+    japanese
+    poster { ...PosterShort }
+    url
+}
+
+fragment PersonShort on Person {
+    id
+    name
+    japanese
+    poster { ...PosterShort }
+    url
+}
+
+fragment AnimeUserRate on UserRate {
+    id
+    status
+    episodes
+    rewatches
+    score
+    text
+    createdAt
+    updatedAt
+    anime {
+        id
+    }
+}
+
+fragment AnimeUserRateWithModel on UserRate {
+    id
+    status
+    episodes
+    rewatches
+    score
+    text
+    createdAt
+    updatedAt
+    anime {
+        ...AnimeShort
+    }
+}
+
+fragment MangaUserRate on UserRate {
+    id
+    status
+    chapters
+    volumes
+    score
+    text
+    createdAt
+    updatedAt
+    rewatches
+    manga {
+        id
+    }
+}
+
+fragment MangaUserRateWithModel on UserRate {
+    id
+    status
+    chapters
+    volumes
+    score
+    text
+    createdAt
+    updatedAt
+    rewatches
+    manga {
+        ...MangaShort
+    }
+}
+
+fragment PosterShort on Poster {
+    originalUrl mainUrl previewUrl
+}
+
+fragment DateShort on IncompleteDate {
+    year month day date
+}
+
+fragment UserShort on User {
+    id
+    avatarUrl
+    nickname
+    url
+    lastOnlineAt
+}
+
+fragment StudioShort on Studio {
+    id
+    name
+    imageUrl
+}
+
+fragment GenreShort on Genre {
+    id
+    name
+    kind
+}
+
+fragment RelatedMediaShort on Related {
+    id
+    anime {
+       ...RelatedAnimeShort
+    }
+    manga {
+        ...RelatedMangaShort
+    }
+    relationKind
+}
+
+fragment RelatedAnimeShort on Anime {
+    id
+    name
+    poster { mainUrl }
+    kind
+}
+
+fragment RelatedMangaShort on Manga {
+    id
+    name
+    poster { mainUrl }
+    kind
+}
+
+fragment UserRateShort on UserRate {
+    id
+    text
+    status
+    episodes
+    chapters
+    volumes
+    rewatches
+    score
+    createdAt
+    updatedAt
+}
+
+fragment ShikiCharacterRole on CharacterRole {
+    id
+    rolesEn
+    character {
+        ...CharacterShort
+    }
+}

@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CompareScreen(
-    currentUser: User,
+    currentUser: User?,
     targetUser: User,
     moreNavOptions: MoreNavOptions,
     compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
@@ -103,12 +103,14 @@ fun CompareScreen(
                 state = pagerState,
                 modifier = Modifier.weight(1f)
             ) { page ->
-                CompareScreenContent(
-                    mediaType = tabs.map { it.key }[page],
-                    currentUser = currentUser,
-                    targetUser = targetUser,
-                    compareScreenViewModel = compareScreenViewModel
-                )
+                currentUser?.let {
+                    CompareScreenContent(
+                        mediaType = tabs.map { it.key }[page],
+                        currentUser = currentUser,
+                        targetUser = targetUser,
+                        compareScreenViewModel = compareScreenViewModel
+                    )
+                }
             }
         }
     }

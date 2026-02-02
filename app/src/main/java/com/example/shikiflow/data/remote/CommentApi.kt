@@ -1,6 +1,6 @@
 package com.example.shikiflow.data.remote
 
-import com.example.shikiflow.domain.model.comment.CommentItem
+import com.example.shikiflow.data.datasource.dto.comment.ShikimoriCommentItem
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -14,10 +14,10 @@ interface CommentApi {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 30,
         @Query("desc") sort: Int = 1, // 1 for descending, 0 for ascending
-    ): List<CommentItem>
+    ): List<ShikimoriCommentItem>
 
     @GET("/api/comments/{id}")
     suspend fun getCommentById(
         @Path("id") commentId: String
-    ): CommentItem
+    ): ShikimoriCommentItem
 }

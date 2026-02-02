@@ -28,12 +28,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.shikiflow.domain.model.common.ExternalLink
+import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.ExternalLinksViewModel
 import com.example.shikiflow.utils.Resource
@@ -42,7 +45,7 @@ import com.example.shikiflow.utils.WebIntent.openUrlCustomTab
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ExternalLinksScreen(
-    mediaId: String,
+    mediaId: Int,
     mediaType: MediaType,
     navOptions: MediaNavOptions,
     externalLinksViewModel: ExternalLinksViewModel = hiltViewModel()
@@ -59,7 +62,7 @@ fun ExternalLinksScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "External Links",
+                        text = stringResource(R.string.external_links_label),
                         style = MaterialTheme.typography.bodyLarge
                     )
                 },
@@ -80,23 +83,32 @@ fun ExternalLinksScreen(
         }
     ) { innerPadding ->
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(
-                top = innerPadding.calculateTopPadding(),
-                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-            ).padding(horizontal = 12.dp).clip(RoundedCornerShape(12.dp)),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(
+                    top = innerPadding.calculateTopPadding(),
+                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                )
+                .padding(horizontal = 12.dp)
+                .clip(RoundedCornerShape(12.dp)),
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
             when(val links = externalLinks.value) {
                 is Resource.Error -> {
                     item {
                         Box(
-                            modifier = Modifier.fillParentMaxSize().padding(horizontal = 24.dp),
+                            modifier = Modifier
+                                .fillParentMaxSize()
+                                .padding(horizontal = 24.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text(
-                                text = "Error: ${links.message}",
-                                style = MaterialTheme.typography.bodyLarge
+                            ErrorItem(
+                                message = links.message ?: stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = {
+                                    externalLinksViewModel.getExternalLinks(mediaId, mediaType)
+                                }
                             )
                         }
                     }
@@ -128,20 +140,20 @@ fun ExternalLinksScreen(
 
 @Composable
 private fun LinkItem(
-    link: ExternalLink,
+    link: ExternalLinkData,
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(4.dp))
             .clickable { onLinkClick(link.url) }
             .padding(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Text(
-            text = link.kind.replace("_", " ").split(" ")
-                .joinToString(" ") { it.replaceFirstChar { it.uppercaseChar() } },
+            text = link.siteName,
             style = MaterialTheme.typography.bodyLarge
         )
         Text(

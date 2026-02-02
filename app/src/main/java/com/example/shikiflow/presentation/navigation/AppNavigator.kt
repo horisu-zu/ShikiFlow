@@ -14,8 +14,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
@@ -75,7 +77,11 @@ fun AppNavigator(
         entryProvider = entryProvider {
             entry<AppNavRoute.Splash> { /**/ }
             entry<AppNavRoute.Auth> {
-                AuthScreen()
+                AuthScreen(
+                    onAuth = { authType ->
+                        viewModel.getAuthorizationUrl(authType)
+                    }
+                )
             }
             entry<AppNavRoute.Main> {
                 MainNavigator(
@@ -92,6 +98,10 @@ fun AppNavigator(
         },
         predictivePopTransitionSpec = {
             EnterTransition.None togetherWith fadeOut(targetAlpha = 0.5f)
-        }
+        },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        )
     )
 }

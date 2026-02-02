@@ -1,44 +1,43 @@
 package com.example.shikiflow.di.module
 
 import android.content.Context
-import com.apollographql.apollo.ApolloClient
+import com.example.shikiflow.data.datasource.CharactersDataSource
+import com.example.shikiflow.data.datasource.CommentsDataSource
+import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.shikiflow.data.datasource.MediaTracksDataSource
+import com.example.shikiflow.data.datasource.StaffDataSource
+import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.dao.AnimeTracksDao
-import com.example.shikiflow.data.local.dao.MangaTracksDao
-import com.example.shikiflow.data.remote.AnimeApi
-import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.data.remote.GithubApi
 import com.example.shikiflow.data.remote.KodikApi
-import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.MangaDexApi
 import com.example.shikiflow.data.remote.PersonApi
-import com.example.shikiflow.data.remote.ShikimoriAuthApi
-import com.example.shikiflow.data.remote.UserApi
-import com.example.shikiflow.data.repository.AnimeRepositoryImpl
-import com.example.shikiflow.data.repository.AnimeTracksRepositoryImpl
+import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
+import com.example.shikiflow.data.remote.auth.AnilistAuthApi
 import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
 import com.example.shikiflow.data.repository.GithubRepositoryImpl
 import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
-import com.example.shikiflow.data.repository.MangaRepositoryImpl
-import com.example.shikiflow.data.repository.MangaTracksRepositoryImpl
+import com.example.shikiflow.data.repository.MediaRepositoryImpl
+import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
 import com.example.shikiflow.data.repository.PersonRepositoryImpl
 import com.example.shikiflow.data.repository.TokenRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
-import com.example.shikiflow.domain.repository.AnimeRepository
-import com.example.shikiflow.domain.repository.AnimeTracksRepository
+import com.example.shikiflow.di.annotations.AniList
+import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.GithubRepository
 import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.domain.repository.MangaRepository
-import com.example.shikiflow.domain.repository.MangaTracksRepository
+import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.PersonRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.Module
@@ -55,9 +54,11 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideAuthRepository(
-        authApi: ShikimoriAuthApi,
-        tokenRepository: TokenRepository
-    ): AuthRepository = AuthRepositoryImpl(authApi, tokenRepository)
+        shikiAuthApi: ShikimoriAuthApi,
+        anilistAuthApi: AnilistAuthApi,
+        tokenRepository: TokenRepository,
+        appRoomDatabase: AppRoomDatabase
+    ): AuthRepository = AuthRepositoryImpl(shikiAuthApi, anilistAuthApi, tokenRepository, appRoomDatabase)
 
     @Provides
     @Singleton
@@ -67,34 +68,20 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideAnimeTracksRepository(
-        apolloClient: ApolloClient,
-        appRoomDatabase: AppRoomDatabase,
-        animeTracksDao: AnimeTracksDao
-    ): AnimeTracksRepository = AnimeTracksRepositoryImpl(apolloClient, appRoomDatabase, animeTracksDao)
-
-
-    @Provides
-    @Singleton
-    fun provideMangaTracksRepository(
-        apolloClient: ApolloClient,
-        appRoomDatabase: AppRoomDatabase,
-        mangaTracksDao: MangaTracksDao
-    ): MangaTracksRepository = MangaTracksRepositoryImpl(apolloClient, appRoomDatabase, mangaTracksDao)
+    fun provideMediaTracksRepository(
+        @Shikimori shikimoriTracksDataSource: MediaTracksDataSource,
+        @AniList anilistTracksDataSource: MediaTracksDataSource,
+        settingsRepository: SettingsRepository,
+        appRoomDatabase: AppRoomDatabase
+    ): MediaTracksRepository = MediaTracksRepositoryImpl(shikimoriTracksDataSource, anilistTracksDataSource, settingsRepository, appRoomDatabase)
 
     @Provides
     @Singleton
-    fun provideAnimeRepository(
-        apolloClient: ApolloClient,
-        animeApi: AnimeApi
-    ): AnimeRepository = AnimeRepositoryImpl(apolloClient, animeApi)
-
-    @Provides
-    @Singleton
-    fun provideMangaRepository(
-        apolloClient: ApolloClient,
-        mangaApi: MangaApi
-    ): MangaRepository = MangaRepositoryImpl(apolloClient, mangaApi)
+    fun provideMediaDetailsRepository(
+        @Shikimori shikimoriDataSource: MediaDetailsDataSource,
+        @AniList anilistDataSource: MediaDetailsDataSource,
+        settingsRepository: SettingsRepository,
+    ): MediaRepository = MediaRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
 
     @Provides
     @Singleton
@@ -105,27 +92,34 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideUserRepository(
-        apolloClient: ApolloClient,
-        userApi: UserApi
-    ): UserRepository = UserRepositoryImpl(apolloClient, userApi)
+        @Shikimori shikimoriUserDataSource: UserDataSource,
+        @AniList anilistUserDataSource: UserDataSource,
+        settingsRepository: SettingsRepository
+    ): UserRepository = UserRepositoryImpl(shikimoriUserDataSource, anilistUserDataSource, settingsRepository)
 
     @Provides
     @Singleton
     fun provideCharacterRepository(
-        characterApi: CharacterApi
-    ): CharacterRepository = CharacterRepositoryImpl(characterApi)
+        @Shikimori shikimoriDataSource: CharactersDataSource,
+        @AniList anilistDataSource: CharactersDataSource,
+        settingsRepository: SettingsRepository
+    ): CharacterRepository = CharacterRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository)
 
     @Provides
     @Singleton
     fun providePersonRepository(
-        personApi: PersonApi
-    ): PersonRepository = PersonRepositoryImpl(personApi)
+        @Shikimori shikimoriDataSource: StaffDataSource,
+        @AniList anilistDataSource: StaffDataSource,
+        settingsRepository: SettingsRepository
+    ): PersonRepository = PersonRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
 
     @Provides
     @Singleton
     fun provideCommentRepository(
-        commentApi: CommentApi
-    ): CommentRepository = CommentRepositoryImpl(commentApi)
+        @Shikimori shikimoriDataSource: CommentsDataSource,
+        @AniList anilistDataSource: CommentsDataSource,
+        settingsRepository: SettingsRepository
+    ): CommentRepository = CommentRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository)
 
     @Provides
     @Singleton

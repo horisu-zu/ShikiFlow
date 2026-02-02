@@ -42,7 +42,7 @@ class MainActivity : ComponentActivity() {
                 oledTheme = oledTheme
             ) {
                 AppNavigator(
-                    onFinishActivity = { this.finish() },
+                    onFinishActivity = { this.moveTaskToBack(true) },
                     onSplashNavigate = {
                         splashScreen.setKeepOnScreenCondition { it }
                     }
@@ -76,12 +76,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        Log.d("NewIntent", "onNewIntent called with intent: $intent")
-        handleIntent(intent)
-    }
 
-    private fun handleIntent(intent: Intent?) {
-        val uri = intent?.data
+        val uri = intent.data
         uri?.let {
             val authCode = uri.getQueryParameter("code")
             authCode?.let {

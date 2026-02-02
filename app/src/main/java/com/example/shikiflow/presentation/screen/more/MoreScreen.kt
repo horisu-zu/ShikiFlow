@@ -53,7 +53,7 @@ import com.example.shikiflow.utils.IconResource
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoreScreen(
-    currentUser: User,
+    currentUser: User?,
     moreNavOptions: MoreNavOptions,
     moreScreenViewModel: MoreScreenViewModel = hiltViewModel()
 ) {
@@ -121,7 +121,7 @@ fun MoreScreen(
 
 @Composable
 private fun MoreMainContent(
-    currentUser: User,
+    currentUser: User?,
     moreNavOptions: MoreNavOptions,
     modifier: Modifier = Modifier
 ) {
@@ -130,13 +130,15 @@ private fun MoreMainContent(
         verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.Top)
     ) {
         Section(
-            items = listOf(
-                SectionItem.Expanded(
-                    avatar = currentUser.avatarUrl,
-                    title = currentUser.nickname,
-                    subtitle = stringResource(R.string.more_screen_profile),
-                    onClick = { moreNavOptions.navigateToProfile(currentUser) }
-                ),
+            items = listOfNotNull(
+                currentUser?.let {
+                    SectionItem.Expanded(
+                        avatar = currentUser.avatarUrl,
+                        title = currentUser.nickname,
+                        subtitle = stringResource(R.string.more_screen_profile),
+                        onClick = { moreNavOptions.navigateToProfile(currentUser) }
+                    )
+                },
                 SectionItem.General(
                     icon = IconResource.Drawable(R.drawable.ic_history),
                     title = stringResource(R.string.more_screen_history),
@@ -224,7 +226,7 @@ private fun UserItem(
     ) {
         RoundedImage(
             model = user.avatarUrl,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(36.dp),
         )
         Column(
             verticalArrangement = Arrangement.SpaceBetween
@@ -235,16 +237,18 @@ private fun UserItem(
                     fontWeight = FontWeight.SemiBold
                 )
             )
-            Text(
-                text = stringResource(R.string.online_status, Converter.formatInstant(
-                    instant = user.lastOnlineAt,
-                    includeTime = true
-                )),
-                style = MaterialTheme.typography.bodySmall.copy(
-                    fontWeight = FontWeight.Normal,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+            user.lastOnlineAt?.let { onlineInstant ->
+                Text(
+                    text = stringResource(R.string.online_status, Converter.formatInstant(
+                        instant = onlineInstant,
+                        includeTime = true
+                    )),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.85f)
+                    )
                 )
-            )
+            }
         }
     }
 }

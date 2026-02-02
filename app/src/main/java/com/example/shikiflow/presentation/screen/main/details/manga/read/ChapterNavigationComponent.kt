@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -24,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -45,8 +45,8 @@ fun ChapterNavigationComponent(
     pageCount: Int,
     onNavigateClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onInteractionStart: () -> Unit = {},
-    onInteractionEnd: () -> Unit = {}
+    onInteractionStart: () -> Unit,
+    onInteractionEnd: () -> Unit
 ) {
     var pageInput by remember { mutableStateOf("") }
     var isEditing by remember { mutableStateOf(false) }
@@ -63,11 +63,12 @@ fun ChapterNavigationComponent(
 
     HorizontalFloatingToolbar(
         expanded = true,
-        modifier = modifier.height(IntrinsicSize.Min)
+        shape = RoundedCornerShape(size = 24.dp),
+        modifier = modifier.heightIn(max = 56.dp)
     ) {
         IconButton(
             onClick = { onNavigateClick(currentPage - 1) },
-            enabled = currentPage > 1,
+            enabled = currentPage > 1
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -91,31 +92,29 @@ fun ChapterNavigationComponent(
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
-            modifier = Modifier.width(32.dp).onFocusChanged { focusState ->
-                if (focusState.isFocused) {
-                    onInteractionStart()
-                    if (!isEditing) {
-                        isEditing = true
-                        pageInput = currentPage.toString()
-                    }
-                } else {
-                    onInteractionEnd()
-                    if (isEditing) {
-                        pageInput.toIntOrNull()?.let { targetPage ->
-                            targetPage.coerceIn(1..pageCount).let {
-                                if(targetPage != currentPage) {
-                                    onNavigateClick(targetPage)
+            modifier = Modifier.width(32.dp)
+                .onFocusChanged { focusState ->
+                    if (focusState.isFocused) {
+                        onInteractionStart()
+                        if (!isEditing) {
+                            isEditing = true
+                            pageInput = currentPage.toString()
+                        }
+                    } else {
+                        onInteractionEnd()
+                        if (isEditing) {
+                            pageInput.toInt().coerceIn(1..pageCount).let { value ->
+                                if (value != currentPage) {
+                                    onNavigateClick(value)
                                 }
+                                isEditing = false
                             }
                         }
-                        isEditing = false
                     }
-                }
-            },
+                },
             decorationBox = { innerTextField ->
                 Box(
                     modifier = Modifier.fillMaxSize()
-                        .padding(vertical = 8.dp)
                         .clip(RoundedCornerShape(6.dp))
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
                     contentAlignment = Alignment.Center
@@ -129,7 +128,7 @@ fun ChapterNavigationComponent(
         )
         IconButton(
             onClick = { onNavigateClick(currentPage + 1) },
-            enabled = currentPage < pageCount,
+            enabled = currentPage < pageCount
         ) {
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

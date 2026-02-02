@@ -1,38 +1,51 @@
 package com.example.shikiflow.presentation.screen.main.details
 
 import androidx.navigation3.runtime.NavKey
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
 import kotlinx.serialization.Serializable
 
 sealed interface DetailsNavRoute : NavKey {
     @Serializable
-    data class AnimeDetails(val id: String) : DetailsNavRoute
+    data class AnimeDetails(val id: Int, val authType: AuthType) : DetailsNavRoute
 
     @Serializable
-    data class MangaDetails(val id: String) : DetailsNavRoute
+    data class MangaDetails(val id: Int, val authType: AuthType) : DetailsNavRoute
 
     @Serializable
-    data class CharacterDetails(val characterId: String) : DetailsNavRoute
+    data class CharacterDetails(val characterId: Int) : DetailsNavRoute
 
     @Serializable
-    data class SimilarPage(val id: String, val title: String, val mediaType: MediaType) : DetailsNavRoute
+    data class MediaCharacters(val mediaId: Int, val mediaTitle: String, val mediaType: MediaType) : DetailsNavRoute
 
     @Serializable
-    data class ExternalLinks(val mediaId: String, val mediaType: MediaType) : DetailsNavRoute
+    data class SimilarPage(val id: Int, val title: String, val mediaType: MediaType) : DetailsNavRoute
+
+    @Serializable
+    data class ExternalLinks(val mediaId: Int, val mediaType: MediaType) : DetailsNavRoute
 
     @Serializable
     data class MangaRead(val mangaDexIds: List<String>, val title: String, val completedChapters: Int) : DetailsNavRoute
 
     @Serializable
-    data class Comments(val screenMode: CommentsScreenMode, val id: String) : DetailsNavRoute
+    data class Threads(val mediaId: Int): DetailsNavRoute
+
+    @Serializable
+    data class Comments(
+        val screenMode: CommentsScreenMode,
+        val authType: AuthType,
+        val id: Int,
+        val threadHeader: Thread?
+    ) : DetailsNavRoute
     
     @Serializable
-    data class Person(val personId: String) : DetailsNavRoute
+    data class Staff(val staffId: Int) : DetailsNavRoute
 
     @Serializable
-    data class AnimeWatch(val title: String, val shikimoriId: String, val completedEpisodes: Int) : DetailsNavRoute
+    data class AnimeWatch(val title: String, val shikimoriId: Int, val completedEpisodes: Int) : DetailsNavRoute
 
     @Serializable
-    data class Studio(val id: String, val studioName: String) : DetailsNavRoute
+    data class Studio(val id: Int, val studioName: String, val authType: AuthType) : DetailsNavRoute
 }

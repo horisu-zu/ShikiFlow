@@ -20,5 +20,5 @@ sealed interface MainScreenNavRoute : NavKey {
     data object MainTracks : MainScreenNavRoute
 
     @Serializable
-    data class Details(val mediaId: String, val mediaType: MediaType) : MainScreenNavRoute
+    data class Details(val mediaId: Int, val mediaType: MediaType) : MainScreenNavRoute
 }

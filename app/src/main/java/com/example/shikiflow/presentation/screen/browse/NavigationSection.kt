@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.BrowseType
@@ -28,13 +29,13 @@ fun NavigationSection(
         ) {
             NavigationCard(
                 icon = IconResource.Drawable(R.drawable.ic_anime) ,
-                title = "Anime's Top",
+                title = stringResource(R.string.browse_type_anime_top),
                 onClick = { onNavigateSideScreen(BrowseType.AnimeBrowseType.ANIME_TOP) },
                 modifier = Modifier.weight(1f),
             )
             NavigationCard(
                 icon = IconResource.Drawable(R.drawable.ic_manga) ,
-                title = "Manga's Top",
+                title = stringResource(R.string.browse_type_manga_top),
                 onClick = { onNavigateSideScreen(BrowseType.MangaBrowseType.MANGA_TOP) },
                 modifier = Modifier.weight(1f),
             )

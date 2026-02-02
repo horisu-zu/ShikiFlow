@@ -19,7 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -38,10 +38,10 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    userData: User,
+    userData: User?,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
     val themeSettings by settingsViewModel.themeSettings.collectAsStateWithLifecycle()
@@ -81,13 +81,15 @@ fun SettingsScreen(
         ) {
             SettingsSection(
                 title = stringResource(R.string.settings_account_section_title),
-                items = listOf(
-                    SectionItem.Image(
-                        title = userData.nickname,
-                        displayValue = stringResource(R.string.settings_sign_out),
-                        imageUrl = userData.avatarUrl,
-                        onClick = { settingsViewModel.logout() }
-                    )
+                items = listOfNotNull(
+                    userData?.let {
+                        SectionItem.Image(
+                            title = userData.nickname,
+                            displayValue = stringResource(R.string.settings_sign_out),
+                            imageUrl = userData.avatarUrl,
+                            onClick = { settingsViewModel.logout() }
+                        )
+                    }
                 )
             )
             SettingsSection(
@@ -121,9 +123,9 @@ fun SettingsScreen(
                         displayValue = stringResource(settings.trackMode.displayValue),
                         onClick = {
                             bottomSheetConfig.value = BottomSheetConfig(
-                                title = context.getString(R.string.settings_track_mode_select),
-                                options = MainTrackMode.entries.map { context.getString(it.displayValue) },
-                                currentValue = context.getString(settings.trackMode.displayValue),
+                                title = resources.getString(R.string.settings_track_mode_select),
+                                options = MainTrackMode.entries.map { resources.getString(it.displayValue) },
+                                currentValue = resources.getString(settings.trackMode.displayValue),
                                 onOptionClick = { selectedIndex ->
                                     settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -135,12 +137,12 @@ fun SettingsScreen(
                     ),
                     SectionItem.Default(
                         title = stringResource(R.string.settings_app_ui_mode),
-                        displayValue = context.getString(settings.appUiMode.displayValue),
+                        displayValue = stringResource(settings.appUiMode.displayValue),
                         onClick = {
                             bottomSheetConfig.value = BottomSheetConfig(
-                                title = context.getString(R.string.settings_app_mode_select),
-                                options = AppUiMode.entries.map { context.getString(it.displayValue) },
-                                currentValue = context.getString(settings.appUiMode.displayValue),
+                                title = resources.getString(R.string.settings_app_mode_select),
+                                options = AppUiMode.entries.map { resources.getString(it.displayValue) },
+                                currentValue = resources.getString(settings.appUiMode.displayValue),
                                 onOptionClick = { selectedIndex ->
                                     settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -158,7 +160,7 @@ fun SettingsScreen(
                     SectionItem.Default(
                         title = stringResource(R.string.settings_clear_cache),
                         displayValue = stringResource(R.string.settings_cache_size, cacheSize),
-                        onClick = { if(cacheSize != context.getString(R.string.cache_size_zero_bytes)) openCacheDialog.value = true }
+                        onClick = { if(cacheSize != resources.getString(R.string.cache_size_zero_bytes)) openCacheDialog.value = true }
                     )
                 )
             )

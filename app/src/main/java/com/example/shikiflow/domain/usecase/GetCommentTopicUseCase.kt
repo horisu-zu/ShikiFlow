@@ -2,7 +2,7 @@ package com.example.shikiflow.domain.usecase
 
 import android.util.Log
 import coil3.network.HttpException
-import com.example.shikiflow.domain.model.comment.CommentItem
+import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.utils.Converter
@@ -18,17 +18,17 @@ class GetCommentTopicUseCase @Inject constructor(
     private val commentRepository: CommentRepository
 ) {
     operator fun invoke(
-        commentId: String
-    ): Flow<Resource<Map<CommentType, List<CommentItem>>>> = flow {
+        commentId: Int
+    ): Flow<Resource<Map<CommentType, List<Comment>>>> = flow {
         try {
             emit(Resource.Loading())
 
             val originalResponse = commentRepository.getCommentById(commentId)
-            val result = mutableMapOf<CommentType, List<CommentItem>>(
+            val result = mutableMapOf(
                 CommentType.OP to listOf(originalResponse)
             )
 
-            val convertedResponse = Converter.parseDescriptionHtml(originalResponse.htmlBody)
+            val convertedResponse = Converter.parseDescriptionHtml(originalResponse.commentBody)
 
             val replyIds = Converter.getCommentStringAnnotations(convertedResponse)
             Log.d("GetCommentUseCase", "Replies: $replyIds")
@@ -37,7 +37,7 @@ class GetCommentTopicUseCase @Inject constructor(
                 val repliedToIds = replyIds[CommentType.REPLIED_TO] ?: emptyList()
                 if (repliedToIds.isNotEmpty()) {
                     val repliedToComments = repliedToIds.map { commentId ->
-                        async { commentRepository.getCommentById(commentId) }
+                        async { commentRepository.getCommentById(commentId.toInt()) }
                     }.awaitAll()
 
                     result[CommentType.REPLIED_TO] = repliedToComments
@@ -47,7 +47,7 @@ class GetCommentTopicUseCase @Inject constructor(
                 val repliesIds = replyIds[CommentType.REPLIES] ?: emptyList()
                 if (repliesIds.isNotEmpty()) {
                     val repliesComments = repliesIds.map { commentId ->
-                        async { commentRepository.getCommentById(commentId) }
+                        async { commentRepository.getCommentById(commentId.toInt()) }
                     }.awaitAll()
 
                     result[CommentType.REPLIES] = repliesComments

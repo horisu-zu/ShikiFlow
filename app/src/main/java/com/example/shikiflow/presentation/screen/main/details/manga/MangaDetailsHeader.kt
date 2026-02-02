@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,15 +32,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.graphql.MangaDetailsQuery
-import com.example.graphql.type.MangaStatusEnum
-import com.example.graphql.type.UserRateStatusEnum
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapMangaKind
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapMangaStatus
+import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.RateStatus
+import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.GradientImage
@@ -50,18 +47,14 @@ import com.example.shikiflow.presentation.screen.main.details.anime.ScoreItem
 import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoItem
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.Converter.isManga
-import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.StatusColor
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.atStartOfDayIn
 
 @Composable
 fun MangaDetailsHeader(
-    mangaDetails: MangaDetailsQuery.Manga,
+    mangaDetails: MediaDetails,
     mangaDexResource: Resource<List<String>>,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
@@ -73,12 +66,12 @@ fun MangaDetailsHeader(
 
     Box(modifier = modifier.fillMaxWidth()) {
         GradientImage(
-            model = mangaDetails.poster?.posterShort?.originalUrl,
+            model = mangaDetails.coverImageUrl,
             gradientFraction = 0.8f,
             imageType = ImageType.Poster(
                 defaultClip = RoundedCornerShape(0.dp),
                 defaultAspectRatio = if(orientation == Configuration.ORIENTATION_PORTRAIT)
-                    2f / 2.85f else 1.5f
+                    2f / 2.85f else 1.75f
             ),
             modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
         )
@@ -88,19 +81,21 @@ fun MangaDetailsHeader(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             BaseImage(
-                model = mangaDetails.poster?.posterShort?.originalUrl,
+                model = mangaDetails.coverImageUrl,
                 imageType = ImageType.Poster(
                     defaultWidth = 216.dp
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )
 
-            if (mangaDetails.status != MangaStatusEnum.anons) {
-                ScoreItem(score = mangaDetails.score?.toFloat() ?: 0f)
+            if (mangaDetails.status != MediaStatus.ANNOUNCED && mangaDetails.score != null
+                && mangaDetails.score != 0.0f
+            ) {
+                ScoreItem(score = mangaDetails.score)
             }
 
             Text(
-                text = mangaDetails.name,
+                text = mangaDetails.title,
                 style = MaterialTheme.typography.headlineSmall
             )
 
@@ -108,41 +103,39 @@ fun MangaDetailsHeader(
                 ShortInfoItem(
                     infoType = stringResource(R.string.details_short_info_manga_type),
                     infoItem = buildString {
-                        append(stringResource(mapMangaKind(mangaDetails.kind)))
+                        append(stringResource(mangaDetails.format.displayValue))
                         append(" ∙ ")
-                        append(stringResource(id = mapMangaStatus(mangaDetails.status)))
+                        append(stringResource(id = mangaDetails.status.displayValue))
                     }
                 )
-                if (mangaDetails.status != MangaStatusEnum.ongoing && mangaDetails.status != MangaStatusEnum.anons) {
-                    mangaDetails.releasedOn?.date?.let {
+                if (mangaDetails.status != MediaStatus.ONGOING && mangaDetails.status != MediaStatus.ANNOUNCED) {
+                    mangaDetails.releasedOn?.date?.let { releaseDate ->
                         ShortInfoItem(
                             infoType = stringResource(R.string.details_short_info_manga_published),
                             infoItem = formatInstant(
-                                LocalDate.parse(mangaDetails.releasedOn.date.toString())
-                                    .atStartOfDayIn(TimeZone.currentSystemDefault()),
+                                instant = releaseDate,
                                 includeTime = false
                             )
                         )
                     }
-                    if(mangaDetails.volumes != 0) {
+                    if(mangaDetails.volumes != null) {
                         ShortInfoItem(
                             infoType = stringResource(R.string.details_short_info_manga_volumes),
                             infoItem = stringResource(R.string.volumes, mangaDetails.volumes)
                         )
                     }
-                    if(mangaDetails.chapters != 0) {
+                    if(mangaDetails.totalCount != null) {
                         ShortInfoItem(
                             infoType = stringResource(R.string.details_short_info_manga_chapters),
-                            infoItem = stringResource(R.string.chapters, mangaDetails.chapters)
+                            infoItem = stringResource(R.string.chapters, mangaDetails.totalCount)
                         )
                     }
                 } else {
-                    mangaDetails.airedOn?.date?.let {
+                    mangaDetails.airedOn?.date?.let { startingDate ->
                         ShortInfoItem(
                             infoType = stringResource(R.string.details_short_info_manga_started),
                             infoItem = formatInstant(
-                                LocalDate.parse(it.toString())
-                                    .atStartOfDayIn(TimeZone.currentSystemDefault()),
+                                instant = startingDate,
                                 includeTime = false
                             )
                         )
@@ -151,14 +144,14 @@ fun MangaDetailsHeader(
             }
 
             MangaUserRateItem(
-                userRate = mangaDetails.userRate?.status,
-                allChapters = mangaDetails.chapters,
-                readChapters = mangaDetails.userRate?.chapters ?: 0,
+                userRateStatus = mangaDetails.userRate?.rateStatus,
+                allChapters = mangaDetails.totalCount ?: 0,
+                readChapters = mangaDetails.userRate?.progress ?: 0,
                 score = mangaDetails.userRate?.score ?: 0,
-                isManga = mangaDetails.kind?.isManga() ?: false,
+                isManga = mangaDetails.format.isManga(),
                 mangaDexResource = mangaDexResource,
                 onStatusClick = { onStatusClick() },
-                onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails.name) },
+                onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails.title) },
                 onMangaDexRefreshClick = onMangaDexRefreshClick
             )
 
@@ -169,8 +162,8 @@ fun MangaDetailsHeader(
                 contentPadding = PaddingValues(horizontal = horizontalPadding),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(mangaDetails.genres ?: emptyList()) { genreItem ->
-                    CardItem(genreItem.name)
+                items(mangaDetails.genres) { genreItem ->
+                    CardItem(genreItem)
                 }
             }
         }
@@ -179,7 +172,7 @@ fun MangaDetailsHeader(
 
 @Composable
 fun MangaUserRateItem(
-    userRate: UserRateStatusEnum?,
+    userRateStatus: UserRateStatus?,
     allChapters: Int,
     readChapters: Int,
     score: Int,
@@ -203,7 +196,7 @@ fun MangaUserRateItem(
                 .border(
                     width = 1.dp,
                     color = StatusColor.getAnimeStatusColor(
-                        userRate ?: UserRateStatusEnum.UNKNOWN__
+                        userRateStatus ?: UserRateStatus.UNKNOWN
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
@@ -212,17 +205,15 @@ fun MangaUserRateItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val color = StatusColor.getAnimeStatusColor(userRate ?: UserRateStatusEnum.UNKNOWN__)
-            val icon = RateStatus.fromStatus(userRate ?: UserRateStatusEnum.UNKNOWN__)?.icon
-                ?: IconResource.Vector(Icons.Outlined.Clear)
+            val color = StatusColor.getAnimeStatusColor(userRateStatus ?: UserRateStatus.UNKNOWN)
 
-            icon.toIcon(
+            userRateStatus.icon(MediaType.MANGA).toIcon(
                 modifier = Modifier.size(24.dp),
                 tint = color
             )
             Text(
                 text = UserRateMapper.mapUserRateStatusToString(
-                    status = userRate ?: UserRateStatusEnum.UNKNOWN__,
+                    status = userRateStatus ?: UserRateStatus.UNKNOWN,
                     allEpisodes = allChapters,
                     watchedEpisodes = readChapters,
                     score = score,

@@ -21,15 +21,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.common.RelatedInfo
+import com.example.shikiflow.domain.model.media_details.RelatedMedia
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.screen.main.details.anime.RelatedItem
+import com.example.shikiflow.presentation.screen.main.details.common.RelatedItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RelatedBottomSheet(
-    relatedItems: List<RelatedInfo>,
-    onItemClick: (String, MediaType) -> Unit,
+    relatedItems: List<RelatedMedia>,
+    onItemClick: (Int, MediaType) -> Unit,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
@@ -58,7 +58,7 @@ fun RelatedBottomSheet(
             HorizontalDivider()
             relatedItems.forEach { relatedItem ->
                 RelatedItem(
-                    relatedInfo = relatedItem,
+                    relatedMedia = relatedItem,
                     onItemClick = onItemClick,
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )

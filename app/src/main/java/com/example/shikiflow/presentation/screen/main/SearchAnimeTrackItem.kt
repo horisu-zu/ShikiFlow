@@ -18,35 +18,35 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.graphql.AnimeBrowseQuery
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.isWatched
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.simpleMapUserRateStatusToString
+import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapUserRateStatus
+import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.StatusColor
 
 @Composable
 fun SearchAnimeTrackItem(
-    animeItem: AnimeBrowseQuery.Anime,
-    onItemClick: (String) -> Unit
+    animeItem: AnimeTrack,
+    onItemClick: (Int) -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 12.dp, end = 24.dp)
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onItemClick(animeItem.id) },
+            .clickable { onItemClick(animeItem.anime.id) },
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
         BaseImage(
-            model = animeItem.poster?.posterShort?.originalUrl,
+            model = animeItem.anime.poster?.originalUrl,
             contentDescription = "Poster",
             modifier = Modifier.width(96.dp)
         )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(
-                text = animeItem.name,
+                text = animeItem.anime.name,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold,
                 //fontSize = 10.sp,
@@ -54,23 +54,23 @@ fun SearchAnimeTrackItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            animeItem.userRate?.let {
+            animeItem.let {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     StatusCard(
                         text = stringResource(
-                            id = simpleMapUserRateStatusToString(
-                                status = animeItem.userRate.animeUserRate.status
+                            id = mapUserRateStatus(
+                                status = animeItem.track.status
                             )
                         ) ,
-                        containerColor = animeItem.userRate.animeUserRate.status.let {
+                        containerColor = animeItem.track.status.let {
                             StatusColor.getAnimeStatusColor(it)
                         }
                     )
-                    if(isWatched(animeItem.userRate.animeUserRate.status)) {
+                    if(isWatched(animeItem.track.status)) {
                         StatusCard(
                             text = stringResource(
                                 id = R.string.episodes_watched,
-                                animeItem.userRate.animeUserRate.episodes
+                                animeItem.track.episodes
                             )
                         )
                     }

@@ -1,0 +1,16 @@
+query CurrentUser {
+    currentUser {
+        ...UserShort
+    }
+}
+
+query Users(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $ids: [ID!],
+    $search: String
+) {
+    users(page: $page, limit: $limit, ids: $ids, search: $search) {
+        ...UserShort
+    }
+}

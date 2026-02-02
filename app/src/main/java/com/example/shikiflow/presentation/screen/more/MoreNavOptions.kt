@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more
 
+import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainNavOptions
 
@@ -9,4 +10,5 @@ interface MoreNavOptions: MainNavOptions {
     fun navigateToSettings()
     fun navigateToAbout()
     fun navigateToCompare(targetUser: User)
+    fun navigateToFavorites(userId: String, userFavorites: List<FavoriteCategory>)
 }

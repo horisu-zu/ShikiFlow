@@ -44,12 +44,13 @@ import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
-    currentUserId: String,
+    currentUserId: String?,
     moreNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
-    val currentUserId = currentUserId.toLong()
-    val historyData = userHistoryViewModel.loadPaginatedHistory(currentUserId).collectAsLazyPagingItems()
+    val historyData = userHistoryViewModel.loadPaginatedHistory(
+        userId = currentUserId?.toInt() ?: 0
+    ).collectAsLazyPagingItems()
 
     val lazyListState = rememberLazyListState()
     val isRefreshing by remember {
@@ -106,18 +107,12 @@ fun HistoryScreen(
                 contentPadding = PaddingValues(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                if(historyData.loadState.refresh is LoadState.Error) {
+                if(historyData.loadState.refresh is LoadState.Loading) {
                     item {
                         Box(
                             modifier = Modifier.fillParentMaxSize(),
                             contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = stringResource(R.string.common_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { historyData.refresh() }
-                            )
-                        }
+                        ) { CircularProgressIndicator() }
                     }
                 } else if(historyData.loadState.append is LoadState.Error) {
                     item {
@@ -134,16 +129,25 @@ fun HistoryScreen(
                     }
                 } else {
                     items(historyData.itemCount) { index ->
-                        HistoryItem(historyData[index])
+                        historyData[index]?.let { historyItem ->
+                            HistoryItem(historyItem)
+                        }
                     }
                     historyData.apply {
                         when {
-                            loadState.refresh is LoadState.Loading -> {
+                            loadState.append is LoadState.Error -> {
                                 item {
                                     Box(
-                                        modifier = Modifier.fillParentMaxSize(),
+                                        modifier = Modifier.fillMaxWidth()
+                                            .padding(vertical = 8.dp),
                                         contentAlignment = Alignment.Center
-                                    ) { CircularProgressIndicator() }
+                                    ) {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { historyData.refresh() }
+                                        )
+                                    }
                                 }
                             }
                             loadState.append is LoadState.Loading -> {

@@ -8,6 +8,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
@@ -15,7 +16,8 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 @Composable
 fun BrowseScreenNavigator(
     browseScreenBackStack: NavBackStack<NavKey>,
-    currentUserData: User?
+    currentUserData: User?,
+    authType: AuthType
 ) {
     //val browseBackstack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val browseNavOptions = object: BrowseNavOptions {
@@ -23,7 +25,7 @@ fun BrowseScreenNavigator(
             browseScreenBackStack.add(BrowseNavRoute.SideScreen(browseType))
         }
 
-        override fun navigateToDetails(mediaId: String, mediaType: MediaType) {
+        override fun navigateToDetails(mediaId: Int, mediaType: MediaType) {
             browseScreenBackStack.add(BrowseNavRoute.Details(mediaId, mediaType))
         }
 
@@ -36,6 +38,7 @@ fun BrowseScreenNavigator(
         entryProvider = entryProvider {
             entry<BrowseNavRoute.BrowseScreen> {
                 BrowseScreen(
+                    authType = authType,
                     browseNavOptions = browseNavOptions
                 )
             }
@@ -49,6 +52,7 @@ fun BrowseScreenNavigator(
             entry<BrowseNavRoute.Details> { route ->
                 DetailsNavigator(
                     currentUserData = currentUserData,
+                    authType = authType,
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
                     source = "browse"

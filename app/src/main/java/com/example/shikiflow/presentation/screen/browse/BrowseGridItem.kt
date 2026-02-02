@@ -14,7 +14,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -24,7 +23,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 @Composable
 fun BrowseGridItem(
     browseItem: Browse,
-    onItemClick: (String, MediaType) -> Unit,
+    onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val mutableInteractionSource = remember { MutableInteractionSource() }
@@ -55,13 +54,15 @@ fun BrowseGridItem(
         )
 
         Text(
-            text = buildString {
-                append(stringResource(id = browseItem.kindResId))
-                append(stringResource(id = R.string.score_suffix, browseItem.score))
-            },
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = 10.sp
-            )
+            text = listOfNotNull(
+                browseItem.mediaFormat?.displayValue?.let { formatRes ->
+                    stringResource(id = formatRes)
+                },
+                browseItem.score?.let { score ->
+                    stringResource(id = R.string.media_score, score)
+                }
+            ).joinToString(" • "),
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }

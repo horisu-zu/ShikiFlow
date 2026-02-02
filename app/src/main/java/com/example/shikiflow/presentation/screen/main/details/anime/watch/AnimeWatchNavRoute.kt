@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 sealed interface AnimeWatchNavRoute : NavKey {
     @Serializable
-    data class TranslationSelect(val shikimoriId: String) : AnimeWatchNavRoute
+    data class TranslationSelect(val shikimoriId: Int) : AnimeWatchNavRoute
 
     @Serializable
     data class EpisodeSelection(

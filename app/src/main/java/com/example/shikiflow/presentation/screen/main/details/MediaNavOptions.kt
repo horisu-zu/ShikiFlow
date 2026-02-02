@@ -1,20 +1,35 @@
 package com.example.shikiflow.presentation.screen.main.details
 
+import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainNavOptions
-import com.example.shikiflow.presentation.screen.main.details.common.CommentsScreenMode
-import com.example.shikiflow.utils.Converter
 
 interface MediaNavOptions: MainNavOptions {
-    fun navigateToCharacterDetails(characterId: String)
-    fun navigateToAnimeDetails(animeId: String)
-    fun navigateToMangaDetails(mangaId: String)
-    fun navigateToSimilarPage(id: String, title: String, mediaType: MediaType)
-    fun navigateToLinksPage(id: String, mediaType: MediaType)
+    fun navigateToCharacterDetails(characterId: Int)
+
+    fun navigateToMediaCharacters(mediaId: Int, mediaTitle: String, mediaType: MediaType)
+
+    fun navigateToAnimeDetails(animeId: Int)
+
+    fun navigateToMangaDetails(mangaId: Int)
+
+    fun navigateToSimilarPage(id: Int, title: String, mediaType: MediaType)
+
+    fun navigateToLinksPage(id: Int, mediaType: MediaType)
+
     fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int)
-    fun navigateToComments(screenMode: CommentsScreenMode, id: String)
-    fun navigateToAnimeWatch(title: String, shikimoriId: String, completedEpisodes: Int)
-    fun navigateByEntity(entityType: Converter.EntityType, id: String)
-    fun navigateToPerson(personId: String)
-    fun navigateToStudio(id: String, studioName: String)
+
+    fun navigateToThreads(mediaId: Int)
+
+    fun navigateToComments(screenMode: CommentsScreenMode, id: Int, threadHeader: Thread? = null)
+
+    fun navigateToAnimeWatch(title: String, shikimoriId: Int, completedEpisodes: Int)
+
+    fun navigateByEntity(entityType: EntityType, id: Int)
+
+    fun navigateToStaff(personId: Int)
+
+    fun navigateToStudio(id: Int, studioName: String)
 }

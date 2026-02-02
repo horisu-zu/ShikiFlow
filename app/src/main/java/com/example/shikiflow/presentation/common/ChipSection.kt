@@ -21,13 +21,13 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ChipSection(
+fun <T> ChipSection(
     label: String,
-    items: List<String>,
-    selectedItems: List<String>,
-    onItemSelected: (String) -> Unit,
-    modifier: Modifier = Modifier,
-    required: Boolean = false
+    items: List<T>,
+    selectedItem: T?,
+    onItemSelected: (T) -> Unit,
+    itemLabel: @Composable (T) -> String,
+    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -44,22 +44,18 @@ fun ChipSection(
         ) {
             items.forEach { item ->
                 FilterChip(
-                    selected = selectedItems.contains(item),
-                    onClick = {
-                        if (!(required && selectedItems.contains(item))) {
-                            onItemSelected(item)
-                        }
-                    },
-                    label = { Text(item) },
+                    selected = selectedItem == item,
+                    onClick = { onItemSelected(item) },
+                    label = { Text(itemLabel(item)) },
                     leadingIcon = {
-                        if(selectedItems.contains(item)) {
+                        if(selectedItem == item) {
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = null
                             )
                         }
                     },
-                    modifier = modifier.height(32.dp)
+                    modifier = Modifier.height(32.dp)
                 )
             }
         }

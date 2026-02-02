@@ -1,9 +1,11 @@
 package com.example.shikiflow.di.module
 
 import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.data.remote.auth.AnilistAuthApi
 import com.example.shikiflow.di.annotations.AuthOkHttpClient
-import com.example.shikiflow.di.annotations.AuthRetrofit
-import com.example.shikiflow.data.remote.ShikimoriAuthApi
+import com.example.shikiflow.di.annotations.ShikiAuthRetrofit
+import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
+import com.example.shikiflow.di.annotations.AnilistAuthRetrofit
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,13 +39,13 @@ class AuthNetworkModule {
 
     @Provides
     @Singleton
-    @AuthRetrofit
-    fun provideAuthRetrofit(
+    @ShikiAuthRetrofit
+    fun provideShikiAuthRetrofit(
         @AuthOkHttpClient okHttpClient: OkHttpClient,
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(BuildConfig.BASE_URL)
+            .baseUrl(BuildConfig.SHIKI_BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
@@ -51,6 +53,25 @@ class AuthNetworkModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(@AuthRetrofit retrofit: Retrofit): ShikimoriAuthApi =
+    @AnilistAuthRetrofit
+    fun provideAnilistAuthRetrofit(
+        @AuthOkHttpClient okHttpClient: OkHttpClient,
+        json: Json
+    ): Retrofit {
+        return Retrofit.Builder()
+            .baseUrl(BuildConfig.ANILIST_BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideShikiAuthApi(@ShikiAuthRetrofit retrofit: Retrofit): ShikimoriAuthApi =
+        retrofit.create()
+
+    @Provides
+    @Singleton
+    fun provideAnilistAuthApi(@AnilistAuthRetrofit retrofit: Retrofit): AnilistAuthApi =
         retrofit.create()
 }
