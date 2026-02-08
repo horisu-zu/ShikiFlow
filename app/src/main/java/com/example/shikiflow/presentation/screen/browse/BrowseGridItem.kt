@@ -10,15 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.ImageType
 
 @Composable
 fun BrowseGridItem(
@@ -37,12 +34,12 @@ fun BrowseGridItem(
                 onClick = { onItemClick(browseItem.id, browseItem.mediaType) }
             )
     ) {
-        BaseImage(
-            model = browseItem.posterUrl,
-            contentScale = ContentScale.Crop,
-            imageType = ImageType.Poster(
-                defaultWidth = Int.MAX_VALUE.dp,
-            )
+        BrowseCoverItem(
+            posterUrl = browseItem.posterUrl,
+            mediaType = browseItem.mediaType,
+            userRateStatus = browseItem.userRateStatus,
+            coverWidth = Int.MAX_VALUE.dp,
+            cornerShape = 12.dp
         )
 
         Text(

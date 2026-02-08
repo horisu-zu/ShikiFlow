@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -43,8 +43,9 @@ fun ScreenshotSection(
             text = stringResource(R.string.anime_details_screenshots),
             style = MaterialTheme.typography.titleMedium
         )
-        LazyRow(
-            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+        SnapFlingLazyRow(
+            modifier = Modifier
+                .ignoreHorizontalParentPadding(horizontalPadding)
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(horizontal = horizontalPadding)

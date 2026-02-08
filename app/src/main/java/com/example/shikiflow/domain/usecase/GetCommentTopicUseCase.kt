@@ -2,11 +2,14 @@ package com.example.shikiflow.domain.usecase
 
 import android.util.Log
 import coil3.network.HttpException
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.parser.HTMLParser.getCommentStringAnnotations
+import com.example.shikiflow.utils.parser.HTMLParser.parseDescriptionHtml
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -28,9 +31,9 @@ class GetCommentTopicUseCase @Inject constructor(
                 CommentType.OP to listOf(originalResponse)
             )
 
-            val convertedResponse = Converter.parseDescriptionHtml(originalResponse.commentBody)
+            val convertedResponse = parseDescriptionHtml(originalResponse.commentBody, authType = AuthType.SHIKIMORI)
 
-            val replyIds = Converter.getCommentStringAnnotations(convertedResponse)
+            val replyIds = getCommentStringAnnotations(convertedResponse)
             Log.d("GetCommentUseCase", "Replies: $replyIds")
 
             coroutineScope {

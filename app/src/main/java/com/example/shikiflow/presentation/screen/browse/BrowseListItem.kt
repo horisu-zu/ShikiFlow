@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,9 +24,11 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.CardItem
@@ -53,34 +54,13 @@ fun BrowseListItem(
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.Top
     ) {
-        Box(
-            contentAlignment = Alignment.TopStart
-        ) {
-            BaseImage(
-                model = browseItem.posterUrl,
-                contentScale = ContentScale.Crop,
-                imageType = ImageType.Poster()
-            )
-            browseItem.userRateStatus ?.let { userRateStatus ->
-                val iconSize = 20.dp
-                val iconPadding = roundedCornerShape * 0.293f
-                val boxSize = (iconSize + iconPadding) * 2
-
-                Box(
-                    modifier = Modifier.size(boxSize)
-                        .align(Alignment.BottomEnd)
-                        .clip(RoundedCornerShape(bottomEnd = roundedCornerShape))
-                        .clip(CutCornerShape(topStartPercent = 100))
-                        .background(StatusColor.getAnimeStatusColor(userRateStatus)),
-                ) {
-                    userRateStatus.icon(mediaType = browseItem.mediaType).toIcon(
-                        modifier = Modifier.align(Alignment.BottomEnd)
-                            .padding(all = iconPadding)
-                            .size(iconSize)
-                    )
-                }
-            }
-        }
+        BrowseCoverItem(
+            posterUrl = browseItem.posterUrl,
+            mediaType = browseItem.mediaType,
+            userRateStatus = browseItem.userRateStatus,
+            coverWidth = 96.dp,
+            cornerShape = roundedCornerShape
+        )
         Column(
             verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
@@ -134,20 +114,62 @@ fun BrowseListItem(
                     }
                 }
             }
-            browseItem.nextEpisodeAt?.let { date ->
+            browseItem.nextEpisodeAt?.let { instant ->
                 Text(
                     text = buildAnnotatedString {
-                        append(stringResource(R.string.next_episode_at))
+                        append(stringResource(R.string.next_episode))
                         withStyle(
                             style = SpanStyle(
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer
                             )
                         ) {
-                            append(Converter.formatInstant(date, includeDayOfWeek = true))
+                            append(Converter.formatInstant(instant, includeDayOfWeek = true))
                         }
                     },
                     style = MaterialTheme.typography.labelMedium
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun BrowseCoverItem(
+    posterUrl: String?,
+    mediaType: MediaType,
+    userRateStatus: UserRateStatus?,
+    coverWidth: Dp,
+    cornerShape: Dp,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier) {
+        BaseImage(
+            model = posterUrl,
+            contentScale = ContentScale.Crop,
+            imageType = ImageType.Poster(
+                defaultWidth = coverWidth,
+                defaultClip = RoundedCornerShape(cornerShape)
+            )
+        )
+        userRateStatus ?.let {
+            Box(
+                modifier = Modifier.align(Alignment.BottomEnd)
+                    .clip(
+                        shape = RoundedCornerShape(
+                            bottomEnd = cornerShape,
+                            bottomStart = 0.dp,
+                            topEnd = 0.dp,
+                            topStart = 18.dp
+                        )
+                    )
+                    .background(StatusColor.getDullStatusColor(userRateStatus)),
+                contentAlignment = Alignment.Center
+            ) {
+                userRateStatus.icon(mediaType).toIcon(
+                    modifier = Modifier
+                        .padding(all = 6.dp)
+                        .size(24.dp)
                 )
             }
         }

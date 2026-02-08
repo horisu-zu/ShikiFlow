@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
@@ -55,6 +56,7 @@ import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 @Composable
 fun CharacterDetailsScreen(
     characterId: Int,
+    authType: AuthType,
     navOptions: MediaNavOptions,
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
@@ -140,12 +142,14 @@ fun CharacterDetailsScreen(
                         characterDetails.description?.let { description ->
                             item {
                                 ExpandableText(
-                                    descriptionHtml = description,
+                                    htmlText = description,
+                                    authType = authType,
                                     style = MaterialTheme.typography.bodySmall,
                                     collapsedMaxLines = 3,
                                     onEntityClick = { entityType, id ->
                                         navOptions.navigateByEntity(entityType, id)
-                                    }, onLinkClick = { url ->
+                                    },
+                                    onLinkClick = { url ->
                                         WebIntent.openUrlCustomTab(context, url)
                                     }
                                 )

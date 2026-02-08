@@ -168,7 +168,7 @@ private fun ThreadItem(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             threadData.title?.let { threadTitle ->
                 Text(
@@ -242,7 +242,9 @@ private fun ThreadStatsItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 6.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
     ) {
         TextWithIcon(

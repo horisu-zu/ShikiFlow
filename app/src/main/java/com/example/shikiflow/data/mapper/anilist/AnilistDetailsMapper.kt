@@ -90,7 +90,8 @@ object AnilistDetailsMapper {
                         Instant.fromEpochSeconds(it.airingAt.toLong())
                     },
                     mediaType = mediaType,
-                    mediaFormat = format?.toDomain() ?: MediaFormat.UNKNOWN
+                    mediaFormat = format?.toDomain() ?: MediaFormat.UNKNOWN,
+                    userRateStatus = mediaListEntry?.status?.toDomain()
                 )
             }
         }

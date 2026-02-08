@@ -169,7 +169,7 @@ dependencies {
     implementation(libs.androidx.material3.navigation.suite)
 
     //Vico (Chart Library)
-    implementation(libs.vico.compose.m3)
+    //implementation(libs.vico.compose.m3)
 
     //Splash Screen
     implementation(libs.androidx.core.splash.screen)

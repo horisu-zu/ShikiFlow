@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -9,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -42,6 +42,7 @@ import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiModel
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
@@ -90,10 +91,11 @@ fun AnimeDetailsContent(
                 }
             )
         }
-        item {
-            if(animeDetails.descriptionHtml?.isHTMLStringBlank() != true) {
+        if(animeDetails.descriptionHtml?.isHTMLStringBlank() != true) {
+            item {
                 ExpandableText(
-                    descriptionHtml = animeDetails.descriptionHtml ?: "",
+                    htmlText = animeDetails.descriptionHtml ?: "",
+                    authType = currentAuthType,
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodySmall,
                     linkColor = MaterialTheme.colorScheme.primary,
@@ -108,10 +110,11 @@ fun AnimeDetailsContent(
             }
         }
         item {
-            LazyRow(
-                modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding).fillMaxWidth(),
+            SnapFlingLazyRow(
+                snapPosition = SnapPosition.Start,
                 contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding).fillMaxWidth()
             ) {
                 items(animeDetails.genres) { genreItem ->
                     CardItem(
@@ -150,8 +153,10 @@ fun AnimeDetailsContent(
                             )
                         }
                     }
-                    LazyRow(
-                        modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                    SnapFlingLazyRow(
+                        snapPosition = SnapPosition.Start,
+                        modifier = Modifier
+                            .ignoreHorizontalParentPadding(horizontalPadding)
                             .fillMaxWidth(),
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -223,7 +228,8 @@ fun AnimeDetailsContent(
             HorizontalDivider()
         }
         item {
-            AnimeDetailsStatsComponent(
+            MediaStatsComponent(
+                mediaType = animeDetails.mediaType,
                 isAnnounced = animeDetails.status == MediaStatus.ANNOUNCED,
                 titleScore = animeDetails.score,
                 scoreStats = animeDetails.scoreStats,

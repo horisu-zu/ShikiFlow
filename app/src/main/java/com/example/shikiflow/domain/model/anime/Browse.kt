@@ -39,6 +39,7 @@ sealed interface Browse {
     val nextEpisodeAt: Instant?
     val mediaType: MediaType
     val mediaFormat: MediaFormat?
+    val userRateStatus: UserRateStatus?
 
     data class Anime(
         override val id: Int,
@@ -48,11 +49,12 @@ sealed interface Browse {
         override val nextEpisodeAt: Instant? = null,
         override val mediaType: MediaType = MediaType.ANIME,
         override val mediaFormat: MediaFormat,
-        val userRateStatus: UserRateStatus? = null,
+        override val userRateStatus: UserRateStatus?,
         val episodesAired: Int?,
         val episodes: Int?,
         val studios: List<String> = emptyList(),
-        val genres: List<String> = emptyList()
+        val genres: List<String> = emptyList(),
+
     ): Browse
 
     data class Manga(
@@ -63,6 +65,7 @@ sealed interface Browse {
         override val nextEpisodeAt: Instant? = null,
         override val mediaType: MediaType = MediaType.MANGA,
         override val mediaFormat: MediaFormat,
+        override val userRateStatus: UserRateStatus?
     ): Browse
 }
 

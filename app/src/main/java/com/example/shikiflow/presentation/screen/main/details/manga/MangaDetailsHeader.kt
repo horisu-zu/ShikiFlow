@@ -195,7 +195,7 @@ fun MangaUserRateItem(
                 .background(MaterialTheme.colorScheme.background)
                 .border(
                     width = 1.dp,
-                    color = StatusColor.getAnimeStatusColor(
+                    color = StatusColor.getStatusColor(
                         userRateStatus ?: UserRateStatus.UNKNOWN
                     ),
                     shape = RoundedCornerShape(12.dp)
@@ -205,7 +205,7 @@ fun MangaUserRateItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val color = StatusColor.getAnimeStatusColor(userRateStatus ?: UserRateStatus.UNKNOWN)
+            val color = StatusColor.getStatusColor(userRateStatus ?: UserRateStatus.UNKNOWN)
 
             userRateStatus.icon(MediaType.MANGA).toIcon(
                 modifier = Modifier.size(24.dp),

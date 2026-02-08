@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserRateStats
-import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.domain.usecase.GetUserRatesUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,7 +16,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserRateViewModel @Inject constructor(
-    private val userRepository: UserRepository,
     private val getUserRatesUseCase: GetUserRatesUseCase
 ) : ViewModel() {
 

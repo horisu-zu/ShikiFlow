@@ -1,9 +1,7 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +10,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,7 +20,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,29 +32,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.common.ScoreFormat.Companion.detectFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.presentation.common.BarsChartMode
 import com.example.shikiflow.presentation.common.SegmentedProgressBar
+import com.example.shikiflow.presentation.common.VerticalBarsChart
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
-import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisLabelComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
-import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
-import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.fill
-import com.patrykandpatrick.vico.compose.common.vicoTheme
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
-import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 
 @Composable
 fun TrackItem(
@@ -96,12 +76,45 @@ fun TrackItem(
         )
 
         AnimatedVisibility(visible = isExpanded) {
-            StatsGraph(
+            val isScrollable = ratesList.scoreStats.keys.size > 10
+            val averageScore = remember(ratesList.scoreStats) {
+                ratesList.scoreStats.entries
+                    .sumOf { (score, count) ->
+                        score * count
+                    } / ratesList.scoreStats.values.sum().toDouble()
+            }
+
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+            ) {
+                Text(
+                    text = buildString {
+                        append(stringResource(R.string.details_info_score_stats))
+                        append(" ∙ ")
+                        append("%.2f".format(averageScore))
+                        append("★")
+                    },
+                    style = MaterialTheme.typography.titleMedium
+                )
+                VerticalBarsChart(
+                    barData = ratesList.scoreStats
+                        .mapKeys { it.key.toString() }
+                        .filter { it.value > 0 },
+                    chartMode = if(isScrollable) BarsChartMode.Scrollable(barWidth = 32.dp, barSpacing = 8.dp)
+                        else BarsChartMode.FillWidth(),
+                    maxBarHeight = 156.dp
+                )
+            }
+            /*StatsGraph(
                 scoreStats = ratesList.scoreStats.filter { it.value > 0 },
                 modifier = Modifier.fillMaxWidth()
                     .height(240.dp)
                     .padding(top = 8.dp)
-            )
+            )*/
         }
     }
 }
@@ -178,6 +191,7 @@ private fun TypeItem(
     }
 }
 
+/*
 @Composable
 private fun StatsGraph(
     scoreStats: Map<Int, Int>,
@@ -255,4 +269,4 @@ private fun StatsGraph(
             modifier = Modifier.fillMaxWidth()
         )
     }
-}
+}*/

@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,20 +26,24 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
+import kotlin.time.Instant
 
 @Composable
 fun CommentItem(
@@ -83,30 +89,14 @@ private fun ShikimoriCommentItem(
         Row(
             modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            RoundedImage(
-                model = commentData.sender?.avatarUrl,
-                modifier = Modifier.size(24.dp),
-            )
-
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold)) {
-                        append(commentData.sender?.nickname)
-                    }
-                    append(" · ")
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    ) {
-                        append(formatInstant(commentData.dateTime, includeTime = true))
-                    }
-                }
-            )
-
+            commentData.sender?.let { commentSender ->
+                CommentUserItem(
+                    userData = commentSender,
+                    commentInstant = commentData.dateTime
+                )
+            }
             if(commentData.isOfftopic) {
                 Spacer(modifier = Modifier.weight(1f))
                 Box(
@@ -124,7 +114,8 @@ private fun ShikimoriCommentItem(
             }
         }
         ExpandableText(
-            descriptionHtml = commentData.commentBody,
+            htmlText = commentData.commentBody,
+            authType = AuthType.SHIKIMORI,
             style = MaterialTheme.typography.bodySmall,
             onEntityClick = { type, id -> onEntityClick(type, id) },
             onLinkClick = onLinkClick,
@@ -205,32 +196,43 @@ private fun AnilistCommentItem(
         Row(
             modifier = Modifier,
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            RoundedImage(
-                model = commentData.sender?.avatarUrl,
-                modifier = Modifier.size(24.dp),
-            )
+            commentData.sender?.let { commentSender ->
+                CommentUserItem(
+                    userData = commentSender,
+                    commentInstant = commentData.dateTime,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold)) {
-                        append(commentData.sender?.nickname)
-                    }
-                    append(" · ")
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+            if(commentData.likesCount > 0) { //Could be temporary if I decide to integrate a request
+                Row(
+                    modifier = Modifier.clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.6f))
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = commentData.likesCount.toString(),
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onError,
+                            fontWeight = FontWeight.Medium
                         )
-                    ) {
-                        append(formatInstant(commentData.dateTime, includeTime = true))
-                    }
+                    )
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Likes Count",
+                        tint = MaterialTheme.colorScheme.onError,
+                        modifier = Modifier.size(16.dp)
+                    )
                 }
-            )
+            }
         }
         ExpandableText(
-            descriptionHtml = commentData.commentBody,
+            htmlText = commentData.commentBody,
+            authType = AuthType.ANILIST,
             style = MaterialTheme.typography.bodySmall,
             onEntityClick = { type, id -> onEntityClick(type, id) },
             onLinkClick = onLinkClick,
@@ -266,40 +268,62 @@ fun ThreadHeaderItem(
                 )
             }
         }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RoundedImage(
-                model = threadHeader.createdBy?.avatarUrl,
-                modifier = Modifier.size(24.dp),
-            )
-            Text(
-                text = buildAnnotatedString {
-                    withStyle(style = SpanStyle(fontSize = 14.sp, fontWeight = FontWeight.SemiBold)) {
-                        append(threadHeader.createdBy?.nickname)
-                    }
-                    append(" · ")
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                        )
-                    ) {
-                        append(formatInstant(threadHeader.createdAt, includeTime = true))
-                    }
-                }
+        threadHeader.createdBy?.let { threadAuthor ->
+            CommentUserItem(
+                userData = threadAuthor,
+                commentInstant = threadHeader.createdAt
             )
         }
         threadHeader.body?.let { headerBody ->
             ExpandableText(
-                descriptionHtml = headerBody,
+                htmlText = headerBody,
+                authType = AuthType.ANILIST,
                 style = MaterialTheme.typography.bodySmall,
                 onEntityClick = { type, id -> onEntityClick(type, id) },
                 onLinkClick = onLinkClick,
                 collapsedMaxLines = Int.MAX_VALUE
             )
         }
+    }
+}
+
+@Composable
+private fun CommentUserItem(
+    userData: User,
+    commentInstant: Instant,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RoundedImage(
+            model = userData.avatarUrl,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            text = buildAnnotatedString {
+                withStyle(
+                    style = SpanStyle(
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                ) {
+                    append(userData.nickname)
+                }
+                append(" · ")
+                withStyle(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    )
+                ) {
+                    append(formatInstant(commentInstant, includeTime = true))
+                }
+            },
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

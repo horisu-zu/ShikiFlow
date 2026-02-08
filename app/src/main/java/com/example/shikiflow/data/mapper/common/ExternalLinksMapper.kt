@@ -7,8 +7,8 @@ import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 object ExternalLinksMapper {
     fun ExternalLink.toDomain(): ExternalLinkData {
         return ExternalLinkData(
-            icon = kind,
-            siteName = source,
+            icon = null,
+            siteName = kind,
             url = url
         )
     }

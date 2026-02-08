@@ -63,7 +63,7 @@ fun SearchAnimeTrackItem(
                             )
                         ) ,
                         containerColor = animeItem.track.status.let {
-                            StatusColor.getAnimeStatusColor(it)
+                            StatusColor.getStatusColor(it)
                         }
                     )
                     if(isWatched(animeItem.track.status)) {

@@ -59,6 +59,7 @@ fun MangaDetailsScreen(
                     mangaDetails.data?.let { mangaDetails ->
                         MangaDetailsContent(
                             userId = userId?.toInt() ?: 0,
+                            authType = authType,
                             mangaDetails = mangaDetails,
                             mangaDexResource = mangaDexIds,
                             rateUpdateState = rateUpdateState,

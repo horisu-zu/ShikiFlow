@@ -177,6 +177,7 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
+                    authType = authType,
                     navOptions = options,
                     characterDetailsViewModel = hiltViewModel(key = source)
                 )

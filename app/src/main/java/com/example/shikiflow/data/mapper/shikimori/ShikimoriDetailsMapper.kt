@@ -58,7 +58,9 @@ object ShikimoriDetailsMapper {
             studios = studios.map { it.toDomain() },
             durationMins = duration,
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
-            scoreStats = scoresStats?.associate { it.score to it.count } ?: emptyMap(),
+            scoreStats = scoresStats?.associate {
+                it.score to it.count
+            }?.toSortedMap() ?: emptyMap(),
             statusesStats = statusesStats?.associate { it.status.toDomain() to it.count }
                 ?: emptyMap(),
             threadId = topic?.id?.toInt()
@@ -87,7 +89,9 @@ object ShikimoriDetailsMapper {
             releasedOn = releasedOn?.dateShort?.toDomain(),
             userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.MANGA),
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
-            scoreStats = scoresStats?.associate { it.score to it.count } ?: emptyMap(),
+            scoreStats = scoresStats?.associate {
+                it.score to it.count
+            }?.toSortedMap() ?: emptyMap(),
             statusesStats = statusesStats?.associate { it.status.toDomain() to it.count }
                 ?: emptyMap(),
             threadId = topic?.id?.toInt()
@@ -118,6 +122,7 @@ object ShikimoriDetailsMapper {
             score = this.score?.toFloat(),
             mediaType = MediaType.MANGA,
             mediaFormat = this.kind?.toDomain() ?: MediaFormat.UNKNOWN,
+            userRateStatus = this.userRate?.mangaUserRate?.status?.toDomain()
         )
     }
 
@@ -128,6 +133,7 @@ object ShikimoriDetailsMapper {
             posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
             score = this.score?.toFloat(),
             mediaFormat = MangaKindEnum.valueOf(this.kind ?: "UNKNOWN__").toDomain(),
+            userRateStatus = null
         )
     }
 
@@ -139,7 +145,8 @@ object ShikimoriDetailsMapper {
             score = this.score?.toFloat(),
             mediaFormat = AnimeKindEnum.valueOf(this.kind ?: "UNKNOWN__").toDomain(),
             episodesAired = this.episodesAired ?: 0,
-            episodes = this.episodes ?: 0
+            episodes = this.episodes ?: 0,
+            userRateStatus = null
         )
     }
 }

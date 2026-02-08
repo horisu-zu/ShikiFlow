@@ -167,7 +167,7 @@ fun MangaChaptersScreen(
                     ), contentPadding = PaddingValues(horizontal = 8.dp, vertical = 6.dp),
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    val startsFromZero = sortedChapters.firstOrNull()?.toFloat() == 0f
+                    //val startsFromZero = sortedChapters.firstOrNull()?.toFloat() == 0f
 
                     items(sortedChapters) { chapterNumber ->
                         val chapterNum = Converter.parseChapterNumber(chapterNumber)
@@ -184,9 +184,9 @@ fun MangaChaptersScreen(
                                 )
                             },
                             mediaType = MediaType.MANGA,
-                            isCompleted = if(startsFromZero) {
+                            isCompleted = /*if(startsFromZero) {
                                 chapterNum < completedChapters
-                            } else chapterNum <= completedChapters
+                            } else*/ chapterNum <= completedChapters
                         )
                     }
                 }
