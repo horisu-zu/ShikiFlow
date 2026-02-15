@@ -6,14 +6,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.navigation.BackNavigationBehavior
-import androidx.compose.material3.adaptive.navigation3.ListDetailSceneStrategy
-import androidx.compose.material3.adaptive.navigation3.rememberListDetailSceneStrategy
 import androidx.compose.runtime.Composable
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -37,7 +32,6 @@ import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetails
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MangaReadNavigator
 import com.example.shikiflow.presentation.screen.main.details.staff.StaffScreen
 
-@OptIn(ExperimentalMaterial3AdaptiveApi::class)
 @Composable
 fun DetailsNavigator(
     currentUserData: User?,
@@ -46,29 +40,15 @@ fun DetailsNavigator(
     mediaType: MediaType,
     source: String,
 ) {
-    val twoPaneSceneStrategy = rememberListDetailSceneStrategy<NavKey>(
-        backNavigationBehavior = BackNavigationBehavior.PopUntilContentChange
-    )
-    //val sceneStrategy = rememberTwoPaneSceneStrategy<NavKey>()
     val detailsBackstack = rememberNavBackStack(when(mediaType) {
         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId, authType)
         MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId, authType)
     })
 
     val options = object : MediaNavOptions {
-        //Added this function to prevent details pane appearing after returning from other screens
-        fun twoPaneNavigate(detailsNavRoute: DetailsNavRoute) {
-            val index = detailsBackstack.indexOfLast { it !is DetailsNavRoute.SimilarPage && it !is DetailsNavRoute.ExternalLinks }
-
-            repeat(detailsBackstack.size - index - 1) {
-                detailsBackstack.removeAt(detailsBackstack.lastIndex)
-            }
-
-            detailsBackstack.add(detailsNavRoute)
-        }
-
+        //Removed two pane scene strategy due to the changes in the Material Adaptive API
         override fun navigateToCharacterDetails(characterId: Int) {
-            twoPaneNavigate(DetailsNavRoute.CharacterDetails(characterId))
+            detailsBackstack.add(DetailsNavRoute.CharacterDetails(characterId))
         }
 
         override fun navigateToMediaCharacters(
@@ -76,31 +56,31 @@ fun DetailsNavigator(
             mediaTitle: String,
             mediaType: MediaType
         ) {
-            twoPaneNavigate(DetailsNavRoute.MediaCharacters(mediaId, mediaTitle, mediaType))
+            detailsBackstack.add(DetailsNavRoute.MediaCharacters(mediaId, mediaTitle, mediaType))
         }
 
         override fun navigateToAnimeDetails(animeId: Int) {
-            twoPaneNavigate(DetailsNavRoute.AnimeDetails(animeId, authType))
+            detailsBackstack.add(DetailsNavRoute.AnimeDetails(animeId, authType))
         }
 
         override fun navigateToMangaDetails(mangaId: Int) {
-            twoPaneNavigate(DetailsNavRoute.MangaDetails(mangaId, authType))
+            detailsBackstack.add(DetailsNavRoute.MangaDetails(mangaId, authType))
         }
 
         override fun navigateToSimilarPage(id: Int, title: String, mediaType: MediaType) {
-            twoPaneNavigate(DetailsNavRoute.SimilarPage(id, title, mediaType))
+            detailsBackstack.add(DetailsNavRoute.SimilarPage(id, title, mediaType))
         }
 
         override fun navigateToLinksPage(id: Int, mediaType: MediaType) {
-            twoPaneNavigate(DetailsNavRoute.ExternalLinks(mediaId, mediaType))
+            detailsBackstack.add(DetailsNavRoute.ExternalLinks(mediaId, mediaType))
         }
 
         override fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int) {
-            twoPaneNavigate(DetailsNavRoute.MangaRead(mangaDexIds, title, completedChapters))
+            detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexIds, title, completedChapters))
         }
 
         override fun navigateToThreads(mediaId: Int) {
-            twoPaneNavigate(DetailsNavRoute.Threads(mediaId))
+            detailsBackstack.add(DetailsNavRoute.Threads(mediaId))
         }
 
         override fun navigateToComments(
@@ -108,19 +88,19 @@ fun DetailsNavigator(
             id: Int,
             threadHeader: Thread?
         ) {
-            twoPaneNavigate(DetailsNavRoute.Comments(screenMode, authType, id, threadHeader))
+            detailsBackstack.add(DetailsNavRoute.Comments(screenMode, authType, id, threadHeader))
         }
 
         override fun navigateToStaff(personId: Int) {
-            twoPaneNavigate(DetailsNavRoute.Staff(personId))
+            detailsBackstack.add(DetailsNavRoute.Staff(personId))
         }
 
         override fun navigateToAnimeWatch(title: String, shikimoriId: Int, completedEpisodes: Int) {
-            twoPaneNavigate(DetailsNavRoute.AnimeWatch(title, shikimoriId, completedEpisodes))
+            detailsBackstack.add(DetailsNavRoute.AnimeWatch(title, shikimoriId, completedEpisodes))
         }
 
         override fun navigateToStudio(id: Int, studioName: String) {
-            twoPaneNavigate(DetailsNavRoute.Studio(id, studioName, authType))
+            detailsBackstack.add(DetailsNavRoute.Studio(id, studioName, authType))
         }
 
         override fun navigateByEntity(entityType: EntityType, id: Int) {
@@ -150,11 +130,8 @@ fun DetailsNavigator(
 
     NavDisplay(
         backStack = detailsBackstack,
-        sceneStrategy = twoPaneSceneStrategy,
         entryProvider = entryProvider {
-            entry<DetailsNavRoute.AnimeDetails>(
-                metadata = ListDetailSceneStrategy.listPane()
-            ) { route ->
+            entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
                     id = route.id,
                     authType = route.authType,
@@ -163,9 +140,7 @@ fun DetailsNavigator(
                     animeDetailsViewModel = hiltViewModel(key = source)
                 )
             }
-            entry<DetailsNavRoute.MangaDetails>(
-                metadata = ListDetailSceneStrategy.listPane()
-            ) { route ->
+            entry<DetailsNavRoute.MangaDetails> { route ->
                 MangaDetailsScreen(
                     id = route.id,
                     authType = route.authType,
@@ -182,9 +157,7 @@ fun DetailsNavigator(
                     characterDetailsViewModel = hiltViewModel(key = source)
                 )
             }
-            entry<DetailsNavRoute.SimilarPage>(
-                metadata = ListDetailSceneStrategy.detailPane()
-            ) { route ->
+            entry<DetailsNavRoute.SimilarPage> { route ->
                 SimilarMediaScreen(
                     mediaTitle = route.title,
                     mediaId = route.id,
@@ -193,9 +166,7 @@ fun DetailsNavigator(
                     similarMediaViewModel = hiltViewModel(key = source)
                 )
             }
-            entry<DetailsNavRoute.ExternalLinks>(
-                metadata = ListDetailSceneStrategy.detailPane()
-            ) { route ->
+            entry<DetailsNavRoute.ExternalLinks> { route ->
                 ExternalLinksScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,

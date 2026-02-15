@@ -37,11 +37,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
-import coil3.imageLoader
-import coil3.memory.MemoryCache
 import coil3.request.ImageRequest
 import coil3.request.allowHardware
 import coil3.request.crossfade
+import coil3.size.Size
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 
@@ -189,12 +188,12 @@ fun ChapterItem(
 ) {
     val context = LocalContext.current
     var retryKey by remember { mutableIntStateOf(0) }
-    val imageLoader = context.imageLoader
 
     key(retryKey) {
         val imageRequest = remember(pageUrl) {
             ImageRequest.Builder(context)
                 .data(pageUrl)
+                .size(Size.ORIGINAL)
                 .allowHardware(false)
                 .memoryCacheKey(pageUrl)
                 .crossfade(true)
@@ -205,7 +204,6 @@ fun ChapterItem(
             model = imageRequest,
             contentDescription = pageUrl,
             contentScale = contentScale,
-            imageLoader = imageLoader,
             modifier = modifier.fillMaxWidth(),
             loading = {
                 Box(
@@ -240,7 +238,6 @@ fun ChapterItem(
                     )
                     Button(
                         onClick = {
-                            imageLoader.memoryCache?.remove(MemoryCache.Key(pageUrl))
                             retryKey++
                         },
                         modifier = Modifier

@@ -11,5 +11,17 @@ enum class EntityType {
     ANIME,
     MANGA,
     RANOBE,
-    COMMENT
+    COMMENT;
+
+    companion object {
+        fun String.getAnilistEntityType(): EntityType? {
+            return when(this) {
+                "anime" -> ANIME
+                "manga" -> MANGA
+                "character" -> CHARACTER
+                "staff" -> PERSON
+                else -> null
+            }
+        }
+    }
 }

@@ -2,7 +2,9 @@ package com.example.shikiflow.data.repository
 
 import android.content.Context
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.repository.CacheRepository
+import com.example.shikiflow.utils.Converter.formatFileSize
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -13,10 +15,11 @@ class CacheRepositoryImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ): CacheRepository {
 
-    override suspend fun getCacheSize(): String {
+    override suspend fun getCacheSize(): FileSize {
         return withContext(Dispatchers.IO) {
-            val cacheSize = calculateDirSize(context.cacheDir)
-            formatSize(cacheSize)
+            val imageCacheDir = File(context.cacheDir, "image_cache")
+            val cacheSize = calculateDirSize(imageCacheDir)
+            formatFileSize(cacheSize.toDouble())
         }
     }
 
@@ -49,14 +52,5 @@ class CacheRepositoryImpl @Inject constructor(
             }
         }
         return dir.delete()
-    }
-
-    private fun formatSize(size: Long): String {
-        return when {
-            size < 1024 -> context.getString(R.string.cache_size_bytes, size)
-            size < 1024 * 1024 -> context.getString(R.string.cache_size_kbytes).format(size.toDouble() / 1024)
-            size < 1024 * 1024 * 1024 -> context.getString(R.string.cache_size_mbytes).format(size.toDouble() / (1024 * 1024))
-            else -> context.getString(R.string.cache_size_gbytes).format(size.toDouble() / (1024 * 1024 * 1024))
-        }
     }
 }

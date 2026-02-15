@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
@@ -49,7 +50,7 @@ class SettingsViewModel @Inject constructor(
             initialValue = MangaChapterSettings()
         )
 
-    private val _cacheSize = MutableStateFlow<String>("")
+    private val _cacheSize = MutableStateFlow<FileSize?>(null)
     val cacheSize = _cacheSize.asStateFlow()
 
     init {

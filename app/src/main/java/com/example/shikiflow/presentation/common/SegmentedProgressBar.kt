@@ -74,7 +74,8 @@ fun SegmentedProgressBar(
 ) {
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+        verticalArrangement = Arrangement.SpaceBetween
+        //verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
     ) {
         when(barType) {
             is SegmentedProgressBarType.Row -> {
@@ -87,7 +88,9 @@ fun SegmentedProgressBar(
                 )
 
                 FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
@@ -125,7 +128,9 @@ fun SegmentedProgressBar(
                     totalCount = totalCount,
                     barHeight = barType.barHeight,
                     barShape = barType.barShape,
-                    modifier = Modifier.ignoreHorizontalParentPadding(barType.horizontalPadding)
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(barType.horizontalPadding)
+                        .padding(top = 12.dp)
                 )
             }
         }
@@ -211,7 +216,7 @@ private fun SegmentedDataColumnItem(
             modifier = Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(
-                    color = StatusColor.getStatusColor(status).copy(alpha = 0.35f)
+                    color = StatusColor.getStatusColor(status).copy(alpha = 0.3f)
                 )
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center

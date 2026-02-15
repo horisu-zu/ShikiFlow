@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -44,6 +43,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
@@ -157,8 +157,9 @@ fun CharacterDetailsScreen(
                         }
                         if(!characterDetails.voiceActors.isEmpty()) {
                             item {
-                                LazyRow(
-                                    modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                                SnapFlingLazyRow(
+                                    modifier = Modifier
+                                        .ignoreHorizontalParentPadding(horizontalPadding)
                                         .fillMaxWidth(),
                                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)

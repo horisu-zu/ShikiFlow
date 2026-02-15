@@ -13,7 +13,7 @@
     </string>
     <string name="auth_features_customization_label">App Customization</string>
     <string name="auth_features_customization_desc">
-        Customize the app’s appearance and behavior to match how you watch, read, and browse
+        Customize the app’s appearance to match how you watch, read, and browse
     </string>
 
     <string name="online_status">Online — %1s</string>
@@ -33,6 +33,7 @@
 
     <string name="details_error">Error Loading %1s Details</string>
 
+    <string name="error_image">Error Loading Image</string>
     <string name="common_error">Error Loading Data</string>
     <string name="common_retry">Retry</string>
     <string name="common_unknown">Unknown</string>
@@ -51,7 +52,7 @@
     <string name="settings_oled_desc">Enable OLED mode for darker backgrounds</string>
 
     <string name="settings_cache_confirmation">Are you sure you want to clear the image cache?</string>
-    <string name="settings_cache_size">Cache Size: %1$s</string>
+    <string name="settings_cache_size">Cache Size</string>
     <string name="settings_cache_button_label">Clear</string>
 
     <string name="settings_account_section_title">Account</string>
@@ -123,7 +124,7 @@
     <string name="release_notes_current_version">Current Version: %1$s</string>
     <string name="release_notes_latest_version">Latest Version: %1$s</string>
     <string name="release_notes_release_date">Release Date: %1$s</string>
-    <string name="release_notes_update_size">Size: %1$s</string>
+    <string name="release_notes_update_size">Size</string>
 
     <string name="profile_screen_missing_nickname">NoNickname!</string>
     <string name="profile_screen_track_lists_label">Lists</string>
@@ -337,8 +338,12 @@
     <string name="media_character_voice_actor">Voice Actor</string>
 
     <string name="staff_label">Staff</string>
+
     <string name="details_volumes">Volumes</string>
     <string name="details_info_threads">Threads</string>
+
+    <string name="spoiler_label">Spoiler</string>
+    <string name="error_imgur_image">Open Imgur Image</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

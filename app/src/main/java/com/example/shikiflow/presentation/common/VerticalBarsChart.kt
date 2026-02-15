@@ -85,7 +85,7 @@ fun ScrollableVerticalBarsChart(
     horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
-    val maxValue = remember(barData) { barData.values.max() }
+    val maxValue = remember(barData) { barData.values.maxOrNull() ?: 0 }
     val autoSize = TextAutoSize.StepBased(
         minFontSize = 10.sp,
         maxFontSize = 14.sp,
@@ -150,7 +150,7 @@ private fun FixedWidthVerticalBarsChart(
     maxBarHeight: Dp,
     modifier: Modifier = Modifier
 ) {
-    val maxValue = remember(barData) { barData.values.max() }
+    val maxValue = remember(barData) { barData.values.maxOrNull() ?: 0 }
     val autoSize = TextAutoSize.StepBased(
         minFontSize = 10.sp,
         maxFontSize = 14.sp,

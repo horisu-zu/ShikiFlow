@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -94,11 +93,11 @@ private fun ShikimoriCommentItem(
             commentData.sender?.let { commentSender ->
                 CommentUserItem(
                     userData = commentSender,
-                    commentInstant = commentData.dateTime
+                    commentInstant = commentData.dateTime,
+                    modifier = Modifier.weight(1f)
                 )
             }
             if(commentData.isOfftopic) {
-                Spacer(modifier = Modifier.weight(1f))
                 Box(
                     modifier = Modifier
                         .clip(CircleShape)
@@ -160,23 +159,25 @@ private fun AnilistCommentTree(
                 )
             }
         } else {
-            Box(
-                modifier = Modifier.clip(CircleShape)
-                    .clickable { onEntityClick(EntityType.COMMENT,commentData.id) }
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                TextWithIcon(
-                    text = stringResource(R.string.comment_tree_show_more),
-                    iconResources = listOf(
-                        IconResource.Vector(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight)
-                    ),
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        color = MaterialTheme.colorScheme.primary
-                    ),
-                    placeIconAtTheBeginning = false
-                )
+            if(commentData.childComments.isNotEmpty()) {
+                Box(
+                    modifier = Modifier.clip(CircleShape)
+                        .clickable { onEntityClick(EntityType.COMMENT,commentData.id) }
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    TextWithIcon(
+                        text = stringResource(R.string.comment_tree_show_more),
+                        iconResources = listOf(
+                            IconResource.Vector(imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight)
+                        ),
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = MaterialTheme.colorScheme.primary
+                        ),
+                        placeIconAtTheBeginning = false
+                    )
+                }
             }
         }
     }
@@ -207,9 +208,10 @@ private fun AnilistCommentItem(
             }
 
             if(commentData.likesCount > 0) { //Could be temporary if I decide to integrate a request
+                //Plan to add isLiked field and different coloring depending on its value
                 Row(
                     modifier = Modifier.clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.error.copy(alpha = 0.6f))
+                        //.background(MaterialTheme.colorScheme.error.copy(alpha = 0.6f))
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
@@ -217,14 +219,14 @@ private fun AnilistCommentItem(
                     Text(
                         text = commentData.likesCount.toString(),
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = MaterialTheme.colorScheme.onError,
+                            color = MaterialTheme.colorScheme.error,
                             fontWeight = FontWeight.Medium
                         )
                     )
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Likes Count",
-                        tint = MaterialTheme.colorScheme.onError,
+                        tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -253,7 +255,7 @@ fun ThreadHeaderItem(
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(all = 12.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         threadHeader.title?.let { threadTitle ->
             Box(

@@ -11,11 +11,13 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -26,8 +28,11 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,8 +44,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextLayoutResult
@@ -53,17 +58,21 @@ import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.DescriptionElement
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.image.shimmerEffect
-import com.example.shikiflow.utils.Converter.parseDescriptionHtml
+import com.example.shikiflow.utils.parser.AnilistDialect
+import com.example.shikiflow.utils.parser.HTMLParser
+import com.example.shikiflow.utils.parser.ShikimoriDialect
 
 @Composable
 fun ExpandableText(
-    descriptionHtml: String,
+    htmlText: String,
+    authType: AuthType,
     modifier: Modifier = Modifier,
     onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
@@ -72,19 +81,29 @@ fun ExpandableText(
     style: TextStyle = TextStyle.Default,
     brushColor: Color = MaterialTheme.colorScheme.background.copy(0.8f)
 ) {
-    val elements = remember(descriptionHtml) {
-        parseDescriptionHtml(descriptionHtml, linkColor)
+    val parser = remember(authType) {
+        HTMLParser(
+            strategy = when(authType) {
+                AuthType.SHIKIMORI -> ShikimoriDialect()
+                AuthType.ANILIST -> AnilistDialect()
+            }
+        )
+    }
+    val elements = remember(htmlText) {
+        parser.parseHtmlString(htmlText, linkColor)
     }
 
-    DescriptionElementsList(
-        modifier = modifier,
-        elements = elements,
-        collapsedMaxLines = collapsedMaxLines,
-        style = style,
-        brushColor = brushColor,
-        onEntityClick = onEntityClick,
-        onLinkClick = onLinkClick
-    )
+    elements?.let { descriptionElements ->
+        DescriptionElementsList(
+            modifier = modifier,
+            elements = descriptionElements,
+            collapsedMaxLines = collapsedMaxLines,
+            style = style,
+            brushColor = brushColor,
+            onEntityClick = onEntityClick,
+            onLinkClick = onLinkClick
+        )
+    }
 }
 
 @Composable
@@ -167,105 +186,115 @@ private fun AnnotatedText(
     brushColor: Color = MaterialTheme.colorScheme.primary
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
+    var containerWidth by remember { mutableIntStateOf(0) }
     val textMeasurer = rememberTextMeasurer()
-    val density = LocalDensity.current
 
-    BoxWithConstraints {
-        val maxWidthPx = with(density) { maxWidth.roundToPx() }
-        val fullLineCount = remember(text, style) {
+    val fullLineCount by remember(text, style, containerWidth) {
+        derivedStateOf {
             textMeasurer.measure(
                 text = text,
                 style = style,
-                constraints = Constraints(maxWidth = maxWidthPx)
+                constraints = Constraints(maxWidth = containerWidth)
             ).lineCount
         }
+    }
 
-        val shouldShowButton = fullLineCount > collapsedMaxLines
+    val shouldShowButton = fullLineCount > collapsedMaxLines
 
-        Column(
-            modifier = modifier,
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
-        ) {
-            Text(
-                text = text,
-                style = style.copy(lineHeight = style.lineHeight * 1.2),
-                modifier = Modifier
-                    .pointerInput(Unit) {
-                        detectTapGestures { offset ->
-                            layoutResult.value?.let { result ->
-                                val position = result.getOffsetForPosition(offset)
-                                for (entityType in EntityType.entries) {
-                                    text.getStringAnnotations(entityType.name, position, position)
-                                        .firstOrNull()?.let { annotation ->
-                                            Log.d(
-                                                "Formatted Text",
-                                                "Clicked on entity: ${annotation.item}"
-                                            )
-                                            onEntityClick(entityType, annotation.item.toInt())
-                                        }
-                                }
+    Column(
+        modifier = modifier.onSizeChanged { size ->
+            containerWidth = size.width
+        },
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Text(
+            text = text,
+            style = style.copy(lineHeight = style.lineHeight * 1.2),
+            modifier = Modifier
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
+                        layoutResult.value?.let { result ->
+                            val position = result.getOffsetForPosition(offset)
+                            Log.d("FormattedText", "Clicked on position: $position")
+                            for (entityType in EntityType.entries) {
+                                val allAnnotations =
+                                    text.getStringAnnotations(entityType.name, 0, text.length)
+                                Log.d(
+                                    "FormattedText",
+                                    "All ${entityType.name} annotations: ${allAnnotations.map { "${it.start}-${it.end}: ${it.item}" }}"
+                                )
+                            }
 
-                                text.getStringAnnotations("URL_LINK", position, position)
+                            for (entityType in EntityType.entries) {
+                                text.getStringAnnotations(entityType.name, position, position)
                                     .firstOrNull()?.let { annotation ->
-                                        try {
-                                            Log.d(
-                                                "Formatted Text",
-                                                "Clicked on URL: ${annotation.item}"
-                                            )
-                                            onLinkClick(annotation.item)
-                                        } catch (e: Exception) {
-                                            Log.e(
-                                                "Formatted Text",
-                                                "Error opening URL: ${annotation.item}",
-                                                e
-                                            )
-                                        }
+                                        Log.d(
+                                            "Formatted Text",
+                                            "Clicked on entity: ${annotation.item}"
+                                        )
+                                        onEntityClick(entityType, annotation.item.toInt())
                                     }
                             }
+                            text.getStringAnnotations("URL_LINK", position, position)
+                                .firstOrNull()?.let { annotation ->
+                                    try {
+                                        Log.d(
+                                            "Formatted Text",
+                                            "Clicked on URL: ${annotation.item}"
+                                        )
+                                        onLinkClick(annotation.item)
+                                    } catch (e: Exception) {
+                                        Log.e(
+                                            "Formatted Text",
+                                            "Error opening URL: ${annotation.item}",
+                                            e
+                                        )
+                                    }
+                                }
                         }
                     }
-                    .drawWithContent {
-                        drawContent()
-                        if (!isExpanded && shouldShowButton) {
-                            drawRect(
-                                brush = Brush.verticalGradient(
-                                    colors = listOf(Color.Transparent, brushColor)
-                                )
-                            )
-                        }
-                    }
-                    .animateContentSize(
-                        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
-                    ),
-                maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
-                onTextLayout = { result ->
-                    layoutResult.value = result
                 }
-            )
-            if (shouldShowButton) {
-                Text(
-                    text = stringResource(
-                        id = if(isExpanded) R.string.expandable_text_collapse
-                            else R.string.expandable_text_expand
-                    ),
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = null
-                        ) { onExpandToggle() }
-                )
+                .drawWithContent {
+                    drawContent()
+                    if (!isExpanded && shouldShowButton) {
+                        drawRect(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, brushColor)
+                            )
+                        )
+                    }
+                }
+                .animateContentSize(
+                    animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
+                ),
+            maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines,
+            onTextLayout = { result ->
+                layoutResult.value = result
             }
+        )
+        if (shouldShowButton) {
+            Text(
+                text = stringResource(
+                    id = if(isExpanded) R.string.expandable_text_collapse
+                        else R.string.expandable_text_expand
+                ),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontWeight = FontWeight.SemiBold
+                ),
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { onExpandToggle() }
+            )
         }
     }
 }
 
 @Composable
 private fun SpoilerElement(
-    label: String,
+    label: String?,
     brushColor: Color,
     content: List<DescriptionElement>,
     style: TextStyle,
@@ -289,7 +318,7 @@ private fun SpoilerElement(
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Text(
-            text = label,
+            text = label ?: stringResource(R.string.spoiler_label),
             style = MaterialTheme.typography.labelMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.clickable(
@@ -324,15 +353,45 @@ private fun ImageItem(
             .build(),
         loading = {
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .aspectRatio(imageData.aspectRatio)
                     .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface)
                     .shimmerEffect()
             )
         },
-        modifier = modifier.fillMaxWidth()
+        error = { errorState ->
+            Log.d("ImageItem", "Error Loading Image", errorState.result.throwable)
+            val isImgur = imageData.imageUrl?.contains("imgur.com") == true
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(imageData.aspectRatio)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .clickable {
+                        imageData.imageUrl?.let { imageUrl ->
+                            onLinkClick(imageUrl)
+                        }
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = if(isImgur) stringResource(R.string.error_imgur_image)
+                        else stringResource(R.string.error_image)
+                )
+            }
+        },
+        modifier = modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
-            .clickable { onLinkClick(imageData.imageUrl) },
+            .clickable {
+                imageData.imageUrl?.let { imageUrl ->
+                    onLinkClick(imageUrl)
+                }
+            },
         contentScale = ContentScale.Crop,
         contentDescription = imageData.imageUrl
     )
@@ -341,44 +400,53 @@ private fun ImageItem(
 @Composable
 private fun QuoteItem(
     quoteElement: DescriptionElement.Quote,
-    style: TextStyle
+    style: TextStyle,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
+    Row(
+        modifier = modifier.height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.75f))
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
-        horizontalAlignment = Alignment.Start
+            .background(MaterialTheme.colorScheme.surface)
     ) {
-        quoteElement.senderNickname?.let { nickname ->
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RoundedImage(
-                    model = quoteElement.senderAvatarUrl,
-                    modifier = Modifier.size(24.dp),
-                    clip = RoundedCornerShape(8.dp)
-                )
-                Text(
-                    text = nickname,
-                    style = style
-                )
-            }
-        }
-        Text(
-            text = quoteElement.content,
-            style = style
+        VerticalDivider(
+            modifier = Modifier.fillMaxHeight(),
+            thickness = 4.dp,
+            color = MaterialTheme.colorScheme.onBackground
         )
+        Column(
+            modifier = Modifier.weight(1f)
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start
+        ) {
+            quoteElement.senderNickname?.let { nickname ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RoundedImage(
+                        model = quoteElement.senderAvatarUrl,
+                        modifier = Modifier.size(24.dp),
+                        clip = RoundedCornerShape(8.dp)
+                    )
+                    Text(
+                        text = nickname,
+                        style = style
+                    )
+                }
+            }
+            Text(
+                text = quoteElement.content,
+                style = style
+            )
+        }
     }
 }
 
 @Composable
 private fun VideoItem(
-    thumbnailUrl: String,
+    thumbnailUrl: String?,
     onVideoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -59,7 +59,7 @@ fun CommentsScreen(
             start = 12.dp,
             end = 12.dp,
             top = paddingValues.calculateTopPadding(),
-            bottom = 6.dp
+            bottom = 12.dp
         )
 
         when(screenMode) {
@@ -71,7 +71,7 @@ fun CommentsScreen(
                     context = context,
                     modifier = Modifier.padding(
                         start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
                     ),
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->

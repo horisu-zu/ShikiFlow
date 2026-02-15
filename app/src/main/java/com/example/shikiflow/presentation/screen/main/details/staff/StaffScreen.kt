@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -64,6 +63,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterMediaSection
@@ -163,8 +163,9 @@ fun StaffScreen(
                         }
                         details.staffCharacterRoles?.let { characterRoles ->
                             item {
-                                LazyRow(
-                                    modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+                                SnapFlingLazyRow(
+                                    modifier = Modifier
+                                        .ignoreHorizontalParentPadding(horizontalPadding)
                                         .fillMaxWidth(),
                                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -328,41 +329,39 @@ private fun StaffTitleSection(
             )
         }
 
-        staffRoles.let {
-            AnimatedVisibility(
-                visible = isExpanded,
-                enter = expandHorizontally(
-                    expandFrom = Alignment.Start,
-                    animationSpec = spring(
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ),
-                exit = shrinkHorizontally(
-                    shrinkTowards = Alignment.Start,
-                    animationSpec = spring(
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ),
-                modifier = Modifier.fillMaxHeight()
-                    .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                    .background(MaterialTheme.colorScheme.surface)
+        AnimatedVisibility(
+            visible = isExpanded,
+            enter = expandHorizontally(
+                expandFrom = Alignment.Start,
+                animationSpec = spring(
+                    stiffness = Spring.StiffnessMedium
+                )
+            ),
+            exit = shrinkHorizontally(
+                shrinkTowards = Alignment.Start,
+                animationSpec = spring(
+                    stiffness = Spring.StiffnessMedium
+                )
+            ),
+            modifier = Modifier.fillMaxHeight()
+                .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
+                .background(MaterialTheme.colorScheme.surface)
+        ) {
+            Column(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
             ) {
-                Column(
-                    modifier = modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
-                ) {
-                    staffRoles.forEach { role ->
-                        Text(
-                            text = buildString {
-                                append(role.key)
-                                role.value?.let { rolesCount ->
-                                    append(": $rolesCount")
-                                }
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.padding(horizontal = 4.dp)
-                        )
-                    }
+                staffRoles.forEach { role ->
+                    Text(
+                        text = buildString {
+                            append(role.key)
+                            role.value?.let { rolesCount ->
+                                append(": $rolesCount")
+                            }
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.padding(horizontal = 4.dp)
+                    )
                 }
             }
         }

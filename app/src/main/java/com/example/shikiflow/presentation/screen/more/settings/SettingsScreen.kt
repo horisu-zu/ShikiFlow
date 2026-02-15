@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.screen.main.MainTrackMode
@@ -159,8 +160,24 @@ fun SettingsScreen(
                 items = listOf(
                     SectionItem.Default(
                         title = stringResource(R.string.settings_clear_cache),
-                        displayValue = stringResource(R.string.settings_cache_size, cacheSize),
-                        onClick = { if(cacheSize != resources.getString(R.string.cache_size_zero_bytes)) openCacheDialog.value = true }
+                        displayValue = buildString {
+                            cacheSize?.let { size ->
+                                append(stringResource(R.string.settings_cache_size))
+                                append(": ")
+                                append(
+                                    when(size.unit) {
+                                        FileSize.SizeUnit.B -> stringResource(R.string.cache_size_bytes, size.value.toLong())
+                                        FileSize.SizeUnit.KB -> stringResource(R.string.cache_size_kbytes, size.value)
+                                        FileSize.SizeUnit.MB -> stringResource(R.string.cache_size_mbytes, size.value)
+                                        FileSize.SizeUnit.GB -> stringResource(R.string.cache_size_gbytes, size.value)
+                                    }
+                                )
+                            }
+                        },
+                        onClick = {
+                            if(cacheSize != FileSize(value = 0.0, unit = FileSize.SizeUnit.B))
+                                openCacheDialog.value = true
+                        }
                     )
                 )
             )

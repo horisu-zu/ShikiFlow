@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.character.MediaRole
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -38,7 +38,7 @@ fun CharacterMediaSection(
             text = sectionTitle,
             style = MaterialTheme.typography.titleMedium
         )
-        LazyRow(
+        SnapFlingLazyRow(
             modifier = Modifier.height(210.dp)
                 .ignoreHorizontalParentPadding(horizontalPadding)
                 .fillMaxWidth(),

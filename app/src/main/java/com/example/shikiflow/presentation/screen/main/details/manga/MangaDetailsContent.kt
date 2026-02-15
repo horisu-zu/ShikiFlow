@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
@@ -44,6 +45,7 @@ import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.anime.MediaStatsComponent
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -159,15 +161,6 @@ fun MangaDetailsContent(
                 }
             }
         }
-        item {
-            MediaStatsComponent(
-                mediaType = mangaDetails.mediaType,
-                isAnnounced = mangaDetails.status == MediaStatus.ANNOUNCED,
-                titleScore = mangaDetails.score,
-                scoreStats = mangaDetails.scoreStats,
-                statusesStats = mangaDetails.statusesStats
-            )
-        }
         if(mangaDetails.relatedMedia.isNotEmpty()) {
             item {
                 RelatedSection(
@@ -178,6 +171,35 @@ fun MangaDetailsContent(
                         } else mediaNavOptions.navigateToMangaDetails(id)
                     },
                     onArrowClick = { showRelatedBottomSheet = true }
+                )
+            }
+        }
+        item {
+            MediaStatsComponent(
+                mediaType = mangaDetails.mediaType,
+                isAnnounced = mangaDetails.status == MediaStatus.ANNOUNCED,
+                titleScore = mangaDetails.score,
+                scoreStats = mangaDetails.scoreStats,
+                statusesStats = mangaDetails.statusesStats
+            )
+        }
+        mangaDetails.threadId?.let { threadId ->
+            item {
+                CommentSection(
+                    topicId = threadId,
+                    onEntityClick = { entityType, id ->
+                        mediaNavOptions.navigateByEntity(entityType, id)
+                    },
+                    onLinkClick = { url ->
+                        WebIntent.openUrlCustomTab(context, url)
+                    },
+                    onTopicNavigate = { topicId ->
+                        mediaNavOptions.navigateToComments(
+                            screenMode = CommentsScreenMode.TOPIC,
+                            id = topicId
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

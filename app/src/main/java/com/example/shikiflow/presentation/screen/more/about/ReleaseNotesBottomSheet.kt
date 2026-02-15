@@ -30,8 +30,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.utils.Converter
+import com.example.shikiflow.utils.Converter.formatFileSize
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,11 +66,15 @@ fun ReleaseNotesBottomSheet(
                     .padding(horizontal = 16.dp, vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
             ) {
+                val latestSize = release.assets.firstOrNull()?.let { asset ->
+                    formatFileSize(asset.size.toDouble())
+                } ?: FileSize(value = 0.0, unit = FileSize.SizeUnit.B)
+
                 ReleaseNotesHeader(
                     currentVersion = currentVersion,
                     latestVersion = release.tagName,
                     releaseDate = release.publishedAt,
-                    latestSize = release.assets.firstOrNull()?.size ?: 0L
+                    latestSize = latestSize
                 )
                 if(!release.body.isNullOrBlank()) {
                     Column(
@@ -125,7 +131,7 @@ private fun ReleaseNotesHeader(
     currentVersion: String,
     latestVersion: String,
     releaseDate: Instant,
-    latestSize: Long,
+    latestSize: FileSize,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -148,10 +154,18 @@ private fun ReleaseNotesHeader(
             style = MaterialTheme.typography.labelMedium
         )
         Text(
-            text = stringResource(
-                R.string.release_notes_update_size,
-                Converter.formatFileSize(latestSize.toDouble())
-            ),
+            text = buildString {
+                append(stringResource(R.string.release_notes_update_size))
+                append(": ")
+                append(
+                    when(latestSize.unit) {
+                        FileSize.SizeUnit.B -> stringResource(R.string.cache_size_bytes, latestSize.value.toLong())
+                        FileSize.SizeUnit.KB -> stringResource(R.string.cache_size_kbytes, latestSize.value)
+                        FileSize.SizeUnit.MB -> stringResource(R.string.cache_size_mbytes, latestSize.value)
+                        FileSize.SizeUnit.GB -> stringResource(R.string.cache_size_gbytes, latestSize.value)
+                    }
+                )
+            },
             style = MaterialTheme.typography.labelMedium
         )
     }
