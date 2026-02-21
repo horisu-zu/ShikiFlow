@@ -30,12 +30,8 @@ import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
-import com.example.shikiflow.domain.model.media_details.MediaAgeRating
 import com.example.shikiflow.domain.model.media_details.MediaDetails
-import com.example.shikiflow.domain.model.media_details.MediaSeason
-import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.search.BrowseOptions
-import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.OrderOption
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.coroutines.flow.Flow
@@ -92,7 +88,7 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
         }
     }
 
-    override fun browseMedia(
+    override fun paginatedBrowseMedia(
         browseType: BrowseType?,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>> {
@@ -113,33 +109,25 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
         ).flow
     }
 
-    override suspend fun paginatedMedia(
+    override suspend fun browseMedia(
         page: Int,
         limit: Int,
-        mediaType: MediaType,
-        search: String?,
-        status: MediaStatus?,
-        order: OrderOption?,
-        format: MediaFormat?,
-        season: MediaSeason?,
-        score: Int?,
-        genre: String?,
-        rating: MediaAgeRating?
+        browseOptions: BrowseOptions
     ): Result<List<Browse>> {
         return try {
-            val result = when(mediaType) {
+            val result = when(browseOptions.mediaType) {
                 MediaType.ANIME -> {
                     val query = AnimeBrowseQuery(
                         page = Optional.presentIfNotNull(page),
                         limit = Optional.presentIfNotNull(limit),
-                        search = Optional.presentIfNotNull(search),
-                        order = Optional.presentIfNotNull(order?.toShikimoriBrowseOrder()),
-                        kind = Optional.presentIfNotNull(format?.toShikiAnimeKind()?.name),
-                        status = Optional.presentIfNotNull(status?.toShikimoriAnimeStatus()?.name),
-                        season = Optional.presentIfNotNull(season?.toShikiSeason()),
-                        score = Optional.presentIfNotNull(score),
-                        genre = Optional.presentIfNotNull(genre),
-                        rating = Optional.presentIfNotNull(rating?.toShikiRating()?.name)
+                        search = Optional.presentIfNotNull(browseOptions.name),
+                        order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
+                        kind = Optional.presentIfNotNull(browseOptions.format?.toShikiAnimeKind()?.name),
+                        status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriAnimeStatus()?.name),
+                        season = Optional.presentIfNotNull(browseOptions.season?.toShikiSeason()),
+                        score = Optional.presentIfNotNull(browseOptions.score),
+                        genre = Optional.presentIfNotNull(browseOptions.genre),
+                        rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name)
                     )
 
                     val response = apolloClient.query(query).execute()
@@ -157,12 +145,12 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
                     val query = MangaBrowseQuery(
                         page = Optional.presentIfNotNull(page),
                         limit = Optional.presentIfNotNull(limit),
-                        search = Optional.presentIfNotNull(search),
-                        order = Optional.presentIfNotNull(order?.toShikimoriBrowseOrder()),
-                        kind = Optional.presentIfNotNull(format?.toShikiMangaKind()?.name),
-                        status = Optional.presentIfNotNull(status?.toShikimoriMangaStatus()?.name),
-                        genre = Optional.presentIfNotNull(genre),
-                        score = Optional.presentIfNotNull(score),
+                        search = Optional.presentIfNotNull(browseOptions.name),
+                        order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
+                        kind = Optional.presentIfNotNull(browseOptions.format?.toShikiMangaKind()?.name),
+                        status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriMangaStatus()?.name),
+                        genre = Optional.presentIfNotNull(browseOptions.genre),
+                        score = Optional.presentIfNotNull(browseOptions.score),
                     )
 
                     val response = apolloClient.query(query).execute()

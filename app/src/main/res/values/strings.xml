@@ -5,7 +5,7 @@
     <string name="auth_anilist_sign_in">Sign in via AniList</string>
     <string name="auth_features_shiki_integration_label">Shikimori and AniList Integration</string>
     <string name="auth_features_shiki_integration_desc">
-        Connect your existing account to search, track, and manage your anime and manga
+        Connect your existing account to search, track, and manage anime and manga
     </string>
     <string name="auth_features_mangadex_integration_label">MangaDex Integration</string>
     <string name="auth_features_mangadex_integration_desc">
@@ -13,7 +13,7 @@
     </string>
     <string name="auth_features_customization_label">App Customization</string>
     <string name="auth_features_customization_desc">
-        Customize the app’s appearance to match how you watch, read, and browse
+        Customize the app\'s appearance and reading preferences
     </string>
 
     <string name="online_status">Online — %1s</string>
@@ -206,7 +206,7 @@
 
     <string name="thread_item_user_replied">" replied "</string>
     <string name="comment_offtopic">Off Topic</string>
-    <string name="comment_tree_show_more">Show more</string>
+    <string name="comment_tree_show_more">View more</string>
 
     <string name="media_user_status_all">All</string>
     <string name="media_user_status_anime_watching">Watching</string>

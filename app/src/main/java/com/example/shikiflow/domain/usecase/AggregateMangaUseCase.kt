@@ -14,17 +14,37 @@ class AggregateMangaUseCase @Inject constructor(
         try {
             emit(Resource.Loading())
             val mangaResponse = mangaDexRepository.aggregateManga(mangaDexId)
+            /*val responseMap = mangaResponse.volumes.entries
+                .sortedBy { (volume, _) ->
+                    volume.toFloatOrNull() ?: 0f
+                }
+                .associateTo(LinkedHashMap()) { (key, volume) ->
+                    val chaptersList = volume.chapters.values
+                        .sortedBy { (chapterKey, _) ->
+                            chapterKey.split("_", "-").first().toFloatOrNull() ?: 0f
+                        }
+                        .flatMap { chapter ->
+                            listOf(chapter.id) + chapter.others
+                        }
+
+                    key to chaptersList
+                }*/
+
             val chaptersMap = mangaResponse.volumes.values
-                .flatMap { it.chapters.values }
-                .groupBy { it.chapter }
-                .mapValues { (_ , chapters) ->
-                    chapters.flatMap { chapter ->
-                        listOf(chapter.id) + chapter.others
+                .flatMap { volume ->
+                    volume.chapters.values
+                }
+                .groupBy { volume ->
+                    volume.chapter
+                }
+                .mapValues { (key, chapters) ->
+                    chapters.flatMap { chapter -> listOf(chapter.id) + chapter.others }
+                }
+                .toSortedMap(
+                    comparator = compareBy {
+                        it.split("-", "–").first().toFloatOrNull() ?: 0f
                     }
-                }.toList()
-                .sortedBy { (chapterKey, _) ->
-                    chapterKey.split("-", "–").first().toFloatOrNull() ?: 0f
-                }.toMap(LinkedHashMap())
+                )
 
             emit(Resource.Success(chaptersMap))
         } catch (e: HttpException) {

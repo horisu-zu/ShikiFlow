@@ -2,7 +2,6 @@ package com.example.shikiflow.domain.usecase
 
 import android.util.Log
 import coil3.network.HttpException
-import com.example.graphql.shikimori.type.AnimeStatusEnum
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.search.BrowseOptions
@@ -19,7 +18,7 @@ import javax.inject.Inject
 class GetOngoingsCalendarUseCase @Inject constructor(
     private val mediaRepository: MediaRepository
 ) {
-    operator fun invoke(limit: Int = 45): Flow<Resource<Map<String, List<Browse>>>> = flow {
+    operator fun invoke(limit: Int = 25): Flow<Resource<Map<String, List<Browse>>>> = flow {
         var currentSize = limit
         var currentPage = 1
         val ongoings = mutableListOf<Browse>()
@@ -27,8 +26,10 @@ class GetOngoingsCalendarUseCase @Inject constructor(
         try {
             emit(Resource.Loading())
 
-            /*while(currentSize == limit) {
+            while(currentSize == limit) {
                 mediaRepository.browseMedia(
+                    page = currentPage,
+                    size = currentSize,
                     browseOptions = BrowseOptions(
                         mediaType = MediaType.ANIME,
                         status = MediaStatus.ONGOING,
@@ -43,7 +44,7 @@ class GetOngoingsCalendarUseCase @Inject constructor(
                     emit(Resource.Error(result.localizedMessage ?: "Error: ${result.message}"))
                     return@onFailure
                 }
-            }*/
+            }
 
             val mappedOngoings = ongoings.filter { it.nextEpisodeAt != null }
                 .groupBy { item -> item.nextEpisodeAt!!

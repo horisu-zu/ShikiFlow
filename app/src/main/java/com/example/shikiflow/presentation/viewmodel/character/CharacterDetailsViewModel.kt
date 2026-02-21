@@ -16,13 +16,12 @@ class CharacterDetailsViewModel @Inject constructor(
     private val characterRepository: CharacterRepository
 ): ViewModel() {
 
-    private var _currentId: Int? = null
     private val _characterDetails = MutableStateFlow<Resource<MediaCharacter>>(Resource.Loading())
     val characterDetails = _characterDetails.asStateFlow()
 
     fun getCharacterDetails(characterId: Int, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if(characterId == _currentId && !isRefresh) return@launch else {
+            if(characterDetails.value is Resource.Success && !isRefresh) return@launch else {
                 _characterDetails.value = Resource.Loading()
             }
 
@@ -31,7 +30,6 @@ class CharacterDetailsViewModel @Inject constructor(
             result.fold(
                 onSuccess = { details ->
                     _characterDetails.value = Resource.Success(details)
-                    _currentId = characterId
                 },
                 onFailure = { exception ->
                     _characterDetails.value = Resource.Error(exception.message ?: "Unknown error")

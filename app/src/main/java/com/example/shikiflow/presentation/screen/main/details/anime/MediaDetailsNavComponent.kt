@@ -16,7 +16,7 @@ import com.example.shikiflow.presentation.screen.more.GeneralItem
 import com.example.shikiflow.utils.IconResource
 
 @Composable
-fun AnimeDetailsNavComponent(
+fun MediaDetailsNavComponent(
     authType: AuthType,
     onThreadsClick: () -> Unit,
     onSimilarClick: () -> Unit,

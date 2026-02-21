@@ -6,6 +6,8 @@ import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadSort
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 class ShikimoriCommentsDataSource @Inject constructor(
@@ -26,7 +28,9 @@ class ShikimoriCommentsDataSource @Inject constructor(
             }
 
             Result.success(response)
-        } catch (e: Exception) {
+        } catch (e: IOException) {
+            Result.failure(Exception("${e.message}: Missing Internet Connection"))
+        } catch (e: HttpException) {
             Result.failure(e)
         }
     }

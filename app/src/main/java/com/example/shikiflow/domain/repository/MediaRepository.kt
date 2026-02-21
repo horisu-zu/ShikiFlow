@@ -14,10 +14,16 @@ interface MediaRepository {
 
     suspend fun getMediaDetails(id: Int, mediaType: MediaType): Result<MediaDetails>
 
-    fun browseMedia(
+    fun paginatedBrowseMedia(
         browseType: BrowseType? = null,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>>
+
+    suspend fun browseMedia(
+        page: Int,
+        size: Int,
+        browseOptions: BrowseOptions
+    ): Result<List<Browse>>
 
     fun getSimilarMedia(mediaType: MediaType, mediaId: Int): Flow<PagingData<Browse>>
 

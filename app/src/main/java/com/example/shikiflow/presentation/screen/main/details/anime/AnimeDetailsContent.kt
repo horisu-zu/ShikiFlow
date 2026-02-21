@@ -7,10 +7,12 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
@@ -20,12 +22,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
@@ -46,6 +52,7 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
+import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
@@ -70,6 +77,7 @@ fun AnimeDetailsContent(
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
     val horizontalPadding = 12.dp
     val context = LocalContext.current
+    val density = LocalDensity.current
 
     LazyColumn(
         modifier = modifier,
@@ -123,8 +131,11 @@ fun AnimeDetailsContent(
                 }
             }
         }
-        item {
-            if(animeDetails.characters.isNotEmpty()) {
+        if(animeDetails.characters.entries.isNotEmpty()) {
+            item {
+                var maxCardHeight by remember { mutableIntStateOf(0) }
+                val characterCardWidth = 96.dp
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -161,13 +172,35 @@ fun AnimeDetailsContent(
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(animeDetails.characters) { characterItem ->
+                        items(animeDetails.characters.entries) { characterItem ->
                             CharacterCard(
                                 characterPoster = characterItem.imageUrl,
                                 characterName = characterItem.fullName,
                                 onClick = { mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id) },
-                                modifier = Modifier.width(96.dp)
+                                modifier = Modifier.width(characterCardWidth)
+                                    .onSizeChanged { size ->
+                                        maxCardHeight = size.height
+                                    }
                             )
+                        }
+                        if(animeDetails.characters.hasNextPage) {
+                            item {
+                                PaginatedListNavigateIcon(
+                                    onNavigate = {
+                                        mediaNavOptions.navigateToMediaCharacters(
+                                            mediaId = animeDetails.id,
+                                            mediaTitle = animeDetails.title,
+                                            mediaType = MediaType.ANIME
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .height(
+                                            height = with(density) { maxCardHeight.toDp() }
+                                        )
+                                        .width(characterCardWidth)
+                                        .clip(CircleShape)
+                                )
+                            }
                         }
                     }
                 }
@@ -211,7 +244,7 @@ fun AnimeDetailsContent(
             HorizontalDivider()
         }
         item {
-            AnimeDetailsNavComponent(
+            MediaDetailsNavComponent(
                 authType = currentAuthType,
                 onThreadsClick = {
                     mediaNavOptions.navigateToThreads(mediaId = animeDetails.id)

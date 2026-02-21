@@ -5,24 +5,31 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
@@ -42,7 +49,9 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
+import com.example.shikiflow.presentation.screen.main.details.anime.MediaDetailsNavComponent
 import com.example.shikiflow.presentation.screen.main.details.anime.MediaStatsComponent
+import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
@@ -66,6 +75,7 @@ fun MangaDetailsContent(
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
     val horizontalPadding = 12.dp
     val context = LocalContext.current
+    val density = LocalDensity.current
 
     LazyColumn(
         modifier = modifier,
@@ -82,14 +92,17 @@ fun MangaDetailsContent(
                 mangaDexResource = mangaDexResource,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
-                onMangaDexNavigateClick = { title ->
-                    mediaNavOptions.navigateToMangaRead(
-                        mangaDexIds = mangaDexResource.data ?: emptyList(),
-                        title = title,
-                        completedChapters = mangaDetails.userRate?.progress ?: 0
-                    )
-                },
-                onMangaDexRefreshClick = onMangaDexRefreshClick
+                onMangaDexIconClick = {
+                    if(!mangaDexResource.data.isNullOrEmpty()) {
+                        mediaNavOptions.navigateToMangaRead(
+                            mangaDexIds = mangaDexResource.data,
+                            title = mangaDetails.title,
+                            completedChapters = mangaDetails.userRate?.progress ?: 0
+                        )
+                    } else if(mangaDexResource is Resource.Error) {
+                        onMangaDexRefreshClick()
+                    }
+                }
             )
         }
         item {
@@ -110,8 +123,11 @@ fun MangaDetailsContent(
                 )
             }
         }
-        if(mangaDetails.characters.isNotEmpty()) {
+        if(mangaDetails.characters.entries.isNotEmpty()) {
             item {
+                var maxCardHeight by remember { mutableIntStateOf(0) }
+                val characterCardWidth = 96.dp
+
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
@@ -147,15 +163,37 @@ fun MangaDetailsContent(
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(mangaDetails.characters) { characterItem ->
+                        items(mangaDetails.characters.entries) { characterItem ->
                             CharacterCard(
                                 characterPoster = characterItem.imageUrl,
                                 characterName = characterItem.fullName,
                                 onClick = {
                                     mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id)
                                 },
-                                modifier = Modifier.width(96.dp)
+                                modifier = Modifier.width(characterCardWidth)
+                                    .onSizeChanged { size ->
+                                        maxCardHeight = size.height
+                                    }
                             )
+                        }
+                        if(mangaDetails.characters.hasNextPage) {
+                            item {
+                                PaginatedListNavigateIcon(
+                                    onNavigate = {
+                                        mediaNavOptions.navigateToMediaCharacters(
+                                            mediaId = mangaDetails.id,
+                                            mediaTitle = mangaDetails.title,
+                                            mediaType = MediaType.MANGA
+                                        )
+                                    },
+                                    modifier = Modifier
+                                        .height(
+                                            height = with(density) { maxCardHeight.toDp() }
+                                        )
+                                        .width(characterCardWidth)
+                                        .clip(CircleShape)
+                                )
+                            }
                         }
                     }
                 }
@@ -173,6 +211,26 @@ fun MangaDetailsContent(
                     onArrowClick = { showRelatedBottomSheet = true }
                 )
             }
+        }
+        item {
+            HorizontalDivider()
+        }
+        item {
+            MediaDetailsNavComponent(
+                authType = authType,
+                onThreadsClick = {
+                    mediaNavOptions.navigateToThreads(mangaDetails.id)
+                },
+                onSimilarClick = {
+                    mediaNavOptions.navigateToSimilarPage(mangaDetails.id, mangaDetails.title, mangaDetails.mediaType)
+                },
+                onExternalLinksClick = {
+                    mediaNavOptions.navigateToLinksPage(mangaDetails.id, mangaDetails.mediaType)
+                }
+            )
+        }
+        item {
+            HorizontalDivider()
         }
         item {
             MediaStatsComponent(

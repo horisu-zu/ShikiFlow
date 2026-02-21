@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
@@ -116,8 +117,6 @@ fun DescriptionElementsList(
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = Int.MAX_VALUE
 ) {
-    var isExpanded by remember { mutableStateOf(false) }
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -130,8 +129,6 @@ fun DescriptionElementsList(
                         collapsedMaxLines = collapsedMaxLines,
                         style = style.copy(),
                         brushColor = brushColor,
-                        isExpanded = isExpanded,
-                        onExpandToggle = { isExpanded = !isExpanded },
                         onEntityClick = { entityType, id ->
                             Log.d("FormattedText", "Clicked on Entity with type $entityType: $id")
                             onEntityClick(entityType, id)
@@ -181,12 +178,11 @@ private fun AnnotatedText(
     onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier,
     collapsedMaxLines: Int = Int.MAX_VALUE,
-    isExpanded: Boolean = false,
-    onExpandToggle: () -> Unit = { /**/ },
     brushColor: Color = MaterialTheme.colorScheme.primary
 ) {
     val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
     var containerWidth by remember { mutableIntStateOf(0) }
+    var isExpanded by remember { mutableStateOf(false) }
     val textMeasurer = rememberTextMeasurer()
 
     val fullLineCount by remember(text, style, containerWidth) {
@@ -286,7 +282,9 @@ private fun AnnotatedText(
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = null
-                    ) { onExpandToggle() }
+                    ) {
+                        isExpanded = !isExpanded
+                    }
             )
         }
     }
@@ -450,26 +448,41 @@ private fun VideoItem(
     onVideoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val imageType = ImageType.Screenshot(
+        defaultWidth = Int.MAX_VALUE.dp
+    )
+
     Box(
-        modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.BottomEnd
+        modifier = modifier.fillMaxWidth()
+            .clip(imageType.defaultClip)
+            .clickable { onVideoClick() },
+        contentAlignment = Alignment.Center
     ) {
         BaseImage(
             model = thumbnailUrl,
-            imageType = ImageType.Screenshot(defaultWidth = Int.MAX_VALUE.dp),
-            modifier = Modifier.clickable { onVideoClick() },
+            imageType = imageType,
             error = {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surface),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(imageVector = Icons.Default.PlayArrow, contentDescription = null)
-                }
+                        .background(MaterialTheme.colorScheme.surface)
+                )
             }
         )
+        Box(
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.75f))
+                .padding(all = 8.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.PlayArrow,
+                contentDescription = null,
+                modifier = Modifier.size(32.dp)
+            )
+        }
     }
 }

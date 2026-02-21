@@ -1,6 +1,7 @@
 package com.example.shikiflow.data.mapper.anilist
 
 import android.util.Log
+import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.fragment.ALThread
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
@@ -97,6 +98,35 @@ object AnilistThreadsMapper {
             childComments = childComments.parseChildComments().map { it.toDomain() },
             likesCount = likeCount
         )
+    }
+
+    fun TopicCommentQuery.ThreadComment.toDomain(): ALComment {
+        return ALComment(
+            id = id,
+            commentBody = comment ?: "",
+            dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
+            sender = User(
+                id = user?.id.toString(),
+                avatarUrl = user?.avatar?.medium ?: "",
+                nickname = user?.name ?: ""
+            ),
+            childComments = childComments.parseChildComments().map { it.toDomain() },
+            likesCount = likeCount
+        )
+    }
+
+    //For some reason Anilist API returns not the Comment with the said ID, but the Root Comment
+    fun ALComment.findComment(targetId: Int): ALComment? {
+        if (id == targetId) return this
+
+        childComments.forEach { child ->
+            val targetComment = child.findComment(targetId)
+            targetComment?.let { comment ->
+                return comment
+            }
+        }
+
+        return null
     }
 
     private fun Any?.parseChildComments(): List<TopicCommentsQuery.ThreadComment> {

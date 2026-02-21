@@ -52,7 +52,7 @@ class BrowseSearchViewModel @Inject constructor(
     ): Flow<PagingData<Browse>> {
         val currentState = SearchState(options.mediaType, options)
 
-        val pagerFlow = mediaRepository.browseMedia(browseOptions = options).cachedIn(viewModelScope)
+        val pagerFlow = mediaRepository.paginatedBrowseMedia(browseOptions = options).cachedIn(viewModelScope)
 
         return if(_searchState != currentState) {
             _searchState = currentState

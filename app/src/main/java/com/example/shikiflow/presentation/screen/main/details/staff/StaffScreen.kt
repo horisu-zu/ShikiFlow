@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -46,6 +47,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,7 +55,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
@@ -67,6 +71,7 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterMediaSection
+import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.presentation.viewmodel.person.StaffViewModel
@@ -84,6 +89,7 @@ fun StaffScreen(
     val staffDetails by staffViewModel.personDetails.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val density = LocalDensity.current
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
@@ -163,6 +169,9 @@ fun StaffScreen(
                         }
                         details.staffCharacterRoles?.let { characterRoles ->
                             item {
+                                var roleCardHeight by remember { mutableIntStateOf(0) }
+                                val cardWidth = 96.dp
+
                                 SnapFlingLazyRow(
                                     modifier = Modifier
                                         .ignoreHorizontalParentPadding(horizontalPadding)
@@ -177,8 +186,26 @@ fun StaffScreen(
                                             onClick = { navOptions.navigateToCharacterDetails(
                                                 characterId = character.id
                                             ) },
-                                            modifier = Modifier.width(96.dp)
+                                            modifier = Modifier.width(cardWidth)
+                                                .onSizeChanged { size ->
+                                                    roleCardHeight = size.height
+                                                }
                                         )
+                                    }
+                                    if(characterRoles.hasNextPage) {
+                                        item {
+                                            PaginatedListNavigateIcon(
+                                                onNavigate = { /**/ },
+                                                modifier = Modifier
+                                                    .height(
+                                                        height = with(density) {
+                                                            roleCardHeight.toDp()
+                                                        }
+                                                    )
+                                                    .width(cardWidth)
+                                                    .clip(CircleShape)
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -187,7 +214,7 @@ fun StaffScreen(
                             item {
                                 CharacterMediaSection(
                                     sectionTitle = stringResource(R.string.main_track_mode_anime),
-                                    items = animeRoles.entries,
+                                    items = animeRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToAnimeDetails(id)
                                     },
@@ -199,7 +226,7 @@ fun StaffScreen(
                             item {
                                 CharacterMediaSection(
                                     sectionTitle = stringResource(R.string.settings_manga_section_title),
-                                    items = mangaRoles.entries,
+                                    items = mangaRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToMangaDetails(id)
                                     },

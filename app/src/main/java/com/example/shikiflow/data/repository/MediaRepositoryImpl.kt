@@ -40,10 +40,16 @@ class MediaRepositoryImpl @Inject constructor(
         mediaType: MediaType
     ): Result<MediaDetails> = getSource().getMediaDetails(id, mediaType)
 
-    override fun browseMedia(
+    override fun paginatedBrowseMedia(
         browseType: BrowseType?,
         browseOptions: BrowseOptions
-    ): Flow<PagingData<Browse>> = getSource().browseMedia(browseType, browseOptions)
+    ): Flow<PagingData<Browse>> = getSource().paginatedBrowseMedia(browseType, browseOptions)
+
+    override suspend fun browseMedia(
+        page: Int,
+        size: Int,
+        browseOptions: BrowseOptions
+    ): Result<List<Browse>> = getSource().browseMedia(page, size,browseOptions)
 
     override fun getSimilarMedia(
         mediaType: MediaType,

@@ -31,7 +31,6 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.FullScreenImageDialog
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
-import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -43,10 +42,6 @@ fun AnimeDetailsScreen(
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
     val animeDetails by animeDetailsViewModel.animeDetails.collectAsStateWithLifecycle()
-
-    val rateUpdateState by animeDetailsViewModel.rateUpdateState
-    val isRefreshing by animeDetailsViewModel.isRefreshing
-
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(id) {
@@ -54,76 +49,71 @@ fun AnimeDetailsScreen(
     }
 
     Scaffold { paddingValues ->
-        when (animeDetails) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(animeDetails.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+        } else if(animeDetails.detailsError != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(
+                        id = R.string.details_error,
+                        R.string.browse_search_media_anime
+                    ),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
+                )
             }
-
-            is Resource.Success -> {
-                SharedTransitionLayout {
-                    AnimatedVisibility(
-                        visible = selectedScreenshotIndex != null,
-                        modifier = Modifier.fillMaxSize().zIndex(1f)
-                    ) {
-                        animeDetails.data?.let { details ->
-                            FullScreenImageDialog(
-                                imageUrls = details.screenshots,
-                                initialIndex = selectedScreenshotIndex ?: 0,
-                                visibilityScope = this@AnimatedVisibility,
-                                onImageChange = { index ->
-                                    selectedScreenshotIndex = index
-                                }
-                            )
-                        }
-                    }
-                    PullToRefreshBox(
-                        isRefreshing = isRefreshing,
-                        onRefresh = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
-                    ) {
-                        animeDetails.data?.let { details ->
-                            AnimeDetailsContent(
-                                userId = userId?.toInt() ?: 0,
-                                currentAuthType = authType,
-                                animeDetails = details,
-                                rateUpdateState = rateUpdateState,
-                                sharedTransitionScope = this@SharedTransitionLayout,
-                                selectedScreenshotIndex = selectedScreenshotIndex,
-                                onScreenshotClick = { index ->
-                                    selectedScreenshotIndex = index
-                                },
-                                onSaveUserRate = { id, save, shortData ->
-                                    animeDetailsViewModel.saveUserRate(
-                                        userId = id,
-                                        saveUserRate = save,
-                                        animeShortData = shortData
-                                    )
-                                },
-                                mediaNavOptions = navOptions,
-                                modifier = Modifier.padding(
-                                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                                )
-                            )
-                        }
+        } else {
+            SharedTransitionLayout {
+                AnimatedVisibility(
+                    visible = selectedScreenshotIndex != null,
+                    modifier = Modifier.fillMaxSize().zIndex(1f)
+                ) {
+                    animeDetails.details?.let { details ->
+                        FullScreenImageDialog(
+                            imageUrls = details.screenshots,
+                            initialIndex = selectedScreenshotIndex ?: 0,
+                            visibilityScope = this@AnimatedVisibility,
+                            onImageChange = { index ->
+                                selectedScreenshotIndex = index
+                            }
+                        )
                     }
                 }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                PullToRefreshBox(
+                    isRefreshing = animeDetails.isRefreshing,
+                    onRefresh = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
                 ) {
-                    ErrorItem(
-                        message = stringResource(
-                            id = R.string.details_error,
-                            R.string.browse_search_media_anime
-                        ),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
-                    )
+                    animeDetails.details?.let { details ->
+                        AnimeDetailsContent(
+                            userId = userId?.toInt() ?: 0,
+                            currentAuthType = authType,
+                            animeDetails = details,
+                            rateUpdateState = animeDetails.rateUpdateState,
+                            sharedTransitionScope = this@SharedTransitionLayout,
+                            selectedScreenshotIndex = selectedScreenshotIndex,
+                            onScreenshotClick = { index ->
+                                selectedScreenshotIndex = index
+                            },
+                            onSaveUserRate = { id, save, shortData ->
+                                animeDetailsViewModel.saveUserRate(
+                                    userId = id,
+                                    saveUserRate = save,
+                                    animeShortData = shortData
+                                )
+                            },
+                            mediaNavOptions = navOptions,
+                            modifier = Modifier.padding(
+                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                            )
+                        )
+                    }
                 }
             }
         }

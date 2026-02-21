@@ -175,7 +175,7 @@ fun CharacterDetailsScreen(
                                 }
                             }
                         }
-                        if(!characterDetails.animeRoles.isEmpty()) {
+                        if(characterDetails.animeRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
                                     sectionTitle = stringResource(R.string.main_track_mode_anime),
@@ -187,7 +187,7 @@ fun CharacterDetailsScreen(
                                 )
                             }
                         }
-                        if(!characterDetails.mangaRoles.isEmpty()) {
+                        if(characterDetails.mangaRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
                                     sectionTitle = stringResource(R.string.settings_manga_section_title),

@@ -36,7 +36,7 @@ fun ScreenshotSection(
     horizontalPadding: Dp = 12.dp
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(

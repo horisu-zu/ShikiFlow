@@ -23,33 +23,27 @@ class GetMangaDexUseCase @Inject constructor(
                  val nativeResult = nativeTitle?.let { async { mangaDexRepository.getMangaList(title = nativeTitle) } }
                  val titleResult = async { mangaDexRepository.getMangaList(title = title) }
 
-                Pair(nativeResult?.await(), titleResult.await())
-            }
+                 Pair(nativeResult?.await(), titleResult.await())
+             }
 
-            val result = buildList {
-                results.first?.data?.let { addAll(it) }
-                results.second.data.let { addAll(it) }
-            }.distinctBy { it.id }
+             val result = buildList {
+                 results.first?.data?.let { addAll(it) }
+                 results.second.data.let { addAll(it) }
+             }.distinctBy { it.id }
 
-            val mangaDexItems = result.filter { item ->
-                item.attributes.links?.mal == malId.toString()
-            }.map { it.id }
+             val mangaDexItems = result.filter { item ->
+                 item.attributes.links?.mal == malId.toString()
+             }.map { it.id }
 
-            when {
-                mangaDexItems.isEmpty() -> {
-                    Log.d("GetMangaDexUseCase", "No manga found with the title $title and MAL ID: $malId")
-                    emit(Resource.Error("No manga found with the title: $title"))
-                }
-                else -> {
-                    Log.d("GetMangaDexUseCase", "Items: $mangaDexItems")
-                    emit(Resource.Success(mangaDexItems))
-                }
-            }
-        } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
-        } catch (e: Exception) {
+             Log.d("GetMangaDexUseCase", "Title $title, MAL ID: $malId")
+             Log.d("GetMangaDexUseCase", "Items: $mangaDexItems")
+
+             emit(Resource.Success(mangaDexItems))
+         } catch (e: HttpException) {
+             emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+         } catch (e: Exception) {
              emit(Resource.Error("An unexpected error occurred: ${e.message}"))
-        }
+         }
     }
 
     operator fun invoke(mangaDexIds: List<String>): Flow<Resource<List<MangaData>>> = flow {

@@ -20,6 +20,7 @@ import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
@@ -47,8 +48,10 @@ object ShikimoriDetailsMapper {
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
             mediaAgeRating = rating?.toDomain(),
             genres = genres?.map { it.name } ?: emptyList(),
-            characters = characterRoles?.map { it.character.characterShort.toDomain() }
-                ?: emptyList(),
+            characters = PaginatedList(
+                hasNextPage = false,
+                entries = characterRoles?.map { it.character.characterShort.toDomain() }.orEmpty()
+            ),
             airedOn = airedOn?.dateShort?.toDomain(),
             releasedOn = releasedOn?.dateShort?.toDomain(),
             nextEpisodeAt = nextEpisodeAt?.let { Instant.parse(it.toString()) },
@@ -83,8 +86,10 @@ object ShikimoriDetailsMapper {
             format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
             genres = genres?.map { it.name } ?: emptyList(),
-            characters = characterRoles?.map { it.character.characterShort.toDomain() }
-                ?: emptyList(),
+            characters = PaginatedList(
+                hasNextPage = false,
+                entries = characterRoles?.map { it.character.characterShort.toDomain() }.orEmpty()
+            ),
             airedOn = airedOn?.dateShort?.toDomain(),
             releasedOn = releasedOn?.dateShort?.toDomain(),
             userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.MANGA),

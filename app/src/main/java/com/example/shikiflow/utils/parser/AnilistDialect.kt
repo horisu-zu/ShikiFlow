@@ -90,7 +90,7 @@ class AnilistDialect: HTMLDialect {
     }
 
     override fun getEntityDataForElement(element: Element): EntityData? {
-        if (element.tagName() != "a") {
+        if (element.tagName() != "a" || !element.attr("href").contains(BuildConfig.ANILIST_BASE_URL)) {
             return null
         }
 

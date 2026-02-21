@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.person
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.staff.StaffDetails
@@ -37,7 +36,6 @@ class StaffViewModel @Inject constructor(
                     _currentId = id
                 },
                 onFailure = { exception ->
-                    Log.e("PersonViewModel", "Error fetching person details: ${exception.message}")
                     _personDetails.value = Resource.Error(exception.localizedMessage ?: "Unknown error")
                 }
             )

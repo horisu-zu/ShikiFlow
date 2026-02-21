@@ -58,8 +58,7 @@ fun MangaDetailsHeader(
     mangaDexResource: Resource<List<String>>,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
-    onMangaDexNavigateClick: (String) -> Unit,
-    onMangaDexRefreshClick: () -> Unit,
+    onMangaDexIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val orientation = LocalConfiguration.current.orientation
@@ -71,7 +70,7 @@ fun MangaDetailsHeader(
             imageType = ImageType.Poster(
                 defaultClip = RoundedCornerShape(0.dp),
                 defaultAspectRatio = if(orientation == Configuration.ORIENTATION_PORTRAIT)
-                    2f / 2.85f else 1.75f
+                    2f / 2.85f else 1.5f
             ),
             modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
         )
@@ -151,8 +150,7 @@ fun MangaDetailsHeader(
                 isManga = mangaDetails.format.isManga(),
                 mangaDexResource = mangaDexResource,
                 onStatusClick = { onStatusClick() },
-                onMangaDexNavigateClick = { onMangaDexNavigateClick(mangaDetails.title) },
-                onMangaDexRefreshClick = onMangaDexRefreshClick
+                onMangaDexIconClick = onMangaDexIconClick,
             )
 
             LazyRow(
@@ -179,8 +177,7 @@ fun MangaUserRateItem(
     isManga: Boolean,
     mangaDexResource: Resource<List<String>>,
     onStatusClick: () -> Unit,
-    onMangaDexNavigateClick: () -> Unit,
-    onMangaDexRefreshClick: () -> Unit,
+    onMangaDexIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -196,7 +193,7 @@ fun MangaUserRateItem(
                 .border(
                     width = 1.dp,
                     color = StatusColor.getStatusColor(
-                        userRateStatus ?: UserRateStatus.UNKNOWN
+                        status = userRateStatus ?: UserRateStatus.UNKNOWN
                     ),
                     shape = RoundedCornerShape(12.dp)
                 )
@@ -231,11 +228,7 @@ fun MangaUserRateItem(
                     .clip(RoundedCornerShape(12.dp))
                     .clickable(
                         enabled = mangaDexResource !is Resource.Loading,
-                        onClick = {
-                            if (mangaDexResource is Resource.Success) {
-                                onMangaDexNavigateClick()
-                            } else onMangaDexRefreshClick()
-                        }
+                        onClick = { onMangaDexIconClick() }
                     )
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(12.dp),
@@ -249,11 +242,19 @@ fun MangaUserRateItem(
                         )
                     }
                     is Resource.Success -> {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_mangadex_v2),
-                            contentDescription = null,
-                            modifier = Modifier.size(24.dp)
-                        )
+                        if(mangaDexResource.data.isNullOrEmpty()) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_circle),
+                                contentDescription = "Empty Response",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_mangadex_v2),
+                                contentDescription = "Manga Read Navigate",
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                     }
                     is Resource.Error -> {
                         Icon(

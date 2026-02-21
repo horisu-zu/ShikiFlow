@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.MangaDetailsViewModel
-import com.example.shikiflow.utils.Resource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -34,70 +33,62 @@ fun MangaDetailsScreen(
     navOptions: MediaNavOptions,
     mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel()
 ) {
-    val mangaDetails by mangaDetailsViewModel.mangaDetails.collectAsStateWithLifecycle()
-    val mangaDexIds by mangaDetailsViewModel.mangaDexIds.collectAsStateWithLifecycle()
-    val rateUpdateState by mangaDetailsViewModel.rateUpdateState
-    val isRefreshing by mangaDetailsViewModel.isRefreshing
+    val mangaDetails by mangaDetailsViewModel.details.collectAsStateWithLifecycle()
 
     LaunchedEffect(id) {
         mangaDetailsViewModel.getMangaDetails(id)
     }
 
     Scaffold { paddingValues ->
-        when (mangaDetails) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(mangaDetails.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-            is Resource.Success -> {
+        } else if(mangaDetails.detailsError != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(id = R.string.details_error, R.string.browse_search_media_manga),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { mangaDetailsViewModel.getMangaDetails(id) }
+                )
+            }
+        } else {
+            mangaDetails.details?.let { details ->
                 PullToRefreshBox(
-                    isRefreshing = isRefreshing,
+                    isRefreshing = mangaDetails.isRefreshing,
                     onRefresh = { mangaDetailsViewModel.getMangaDetails(id, isRefresh = true) }
                 ) {
-                    mangaDetails.data?.let { mangaDetails ->
-                        MangaDetailsContent(
-                            userId = userId?.toInt() ?: 0,
-                            authType = authType,
-                            mangaDetails = mangaDetails,
-                            mangaDexResource = mangaDexIds,
-                            rateUpdateState = rateUpdateState,
-                            mediaNavOptions = navOptions,
-                            onMangaDexRefreshClick = {
-                                mangaDetailsViewModel.getMangaDexId(
-                                    title = mangaDetails.title,
-                                    nativeTitle = mangaDetails.native,
-                                    malId = mangaDetails.malId
-                                )
-                            },
-                            onSaveUserRate = { id, save, shortData ->
-                                mangaDetailsViewModel.saveUserRate(
-                                    userId = id,
-                                    saveUserRate = save,
-                                    mangaShortData = shortData
-                                )
-                            },
-                            modifier = Modifier.padding(
-                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                    MangaDetailsContent(
+                        userId = userId?.toInt() ?: 0,
+                        authType = authType,
+                        mangaDetails = details,
+                        mangaDexResource = mangaDetails.mangaDexIds,
+                        rateUpdateState = mangaDetails.rateUpdateState,
+                        mediaNavOptions = navOptions,
+                        onMangaDexRefreshClick = {
+                            mangaDetailsViewModel.getMangaDexId(
+                                title = details.title,
+                                nativeTitle = details.native,
+                                malId = details.malId
                             )
+                        },
+                        onSaveUserRate = { id, save, shortData ->
+                            mangaDetailsViewModel.saveUserRate(
+                                userId = id,
+                                saveUserRate = save,
+                                mangaShortData = shortData
+                            )
+                        },
+                        modifier = Modifier.padding(
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                         )
-                    }
-                }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = stringResource(
-                            id = R.string.details_error,
-                            R.string.browse_search_media_manga
-                        ),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { mangaDetailsViewModel.getMangaDetails(id) }
                     )
                 }
             }

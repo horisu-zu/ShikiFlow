@@ -23,6 +23,9 @@ query MediaDetails(
         genres
         source
         characters(sort: [RELEVANCE, ROLE]) {
+            pageInfo {
+                hasNextPage
+            }
             nodes {
                 ...ALCharacterShort
             }

@@ -18,23 +18,15 @@ interface MediaDetailsDataSource {
 
     suspend fun getMediaDetails(id: Int, mediaType: MediaType): Result<MediaDetails>
 
-    fun browseMedia(
+    fun paginatedBrowseMedia(
         browseType: BrowseType?,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>>
 
-    suspend fun paginatedMedia(
+    suspend fun browseMedia(
         page: Int,
         limit: Int,
-        mediaType: MediaType,
-        search: String?,
-        status: MediaStatus?,
-        order: OrderOption?,
-        format: MediaFormat?,
-        season: MediaSeason?,
-        score: Int?,
-        genre: String?,
-        rating: MediaAgeRating?
+        browseOptions: BrowseOptions
     ): Result<List<Browse>>
 
     fun getSimilarMedia(mediaType: MediaType, mediaId: Int): Flow<PagingData<Browse>>

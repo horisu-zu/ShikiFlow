@@ -11,7 +11,7 @@ query MediaThreads(
     }
 }
 
-# Okay, so this is a bit weird. Kudos to AnyHyou dev for figuring this bug.
+# Okay, so this is a bit weird. Kudos to AniHyou dev for figuring out this bug.
 # ThreadComments as the title of the query causes query to always return null for childComments.
 # But turns out, there is one more thing that causes this weird behavior.
 # If I have any fragments (like I tend to use in other queries), it does the same thing.
@@ -36,5 +36,25 @@ query TopicComments(
             childComments
             likeCount
         }
+    }
+}
+
+query TopicComment(
+    $commentId: Int!
+) {
+    ThreadComment(id: $commentId) {
+        id
+        user {
+            id
+            name
+            avatar {
+                large
+                medium
+            }
+        }
+        comment(asHtml: true)
+        createdAt
+        childComments
+        likeCount
     }
 }

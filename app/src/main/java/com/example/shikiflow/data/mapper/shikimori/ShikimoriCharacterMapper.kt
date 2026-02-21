@@ -12,6 +12,7 @@ import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaRole
+import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 
@@ -85,8 +86,14 @@ object ShikimoriCharacterMapper {
             imageUrl = BuildConfig.SHIKI_BASE_URL + this.image.original,
             description = this.descriptionHtml,
             voiceActors = this.seyu?.map { it.toDomain() } ?: emptyList(),
-            animeRoles = this.animes?.map { it.toDomain() } ?: emptyList(),
-            mangaRoles = this.mangas?.map { it.toDomain() } ?: emptyList(),
+            animeRoles = PaginatedList(
+                hasNextPage = false,
+                entries = this.animes?.map { it.toDomain() }.orEmpty()
+            ),
+            mangaRoles = PaginatedList(
+                hasNextPage = false,
+                entries = this.mangas?.map { it.toDomain() }.orEmpty()
+            ),
             topicId = this.topicId
         )
     }

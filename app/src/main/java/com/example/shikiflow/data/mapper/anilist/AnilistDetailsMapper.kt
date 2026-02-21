@@ -13,6 +13,7 @@ import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
@@ -39,7 +40,10 @@ object AnilistDetailsMapper {
             format = this.format?.toDomain() ?: MediaFormat.UNKNOWN,
             status = this.status?.toDomain() ?: MediaStatus.UNKNOWN,
             genres = this.genres?.mapNotNull { it } ?: emptyList(),
-            characters = this.characters?.nodes?.mapNotNull { it?.aLCharacterShort?.toDomain() } ?: emptyList(),
+            characters = PaginatedList(
+                hasNextPage = this.characters?.pageInfo?.hasNextPage == true,
+                entries = this.characters?.nodes?.mapNotNull { it?.aLCharacterShort?.toDomain() }.orEmpty()
+            ),
             airedOn = this.startDate?.date?.toDomain(),
             releasedOn = this.endDate?.date?.toDomain(),
             nextEpisodeAt = this.nextAiringEpisode?.let {

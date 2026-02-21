@@ -32,8 +32,7 @@ class AuthRepositoryImpl @Inject constructor(
                 "${BuildConfig.ANILIST_BASE_URL}/api/v2/oauth/authorize" +
                         "?client_id=${BuildConfig.ANILIST_CLIENT_ID}" +
                         "&redirect_uri=${BuildConfig.ANILIST_REDIRECT_URI}" +
-                        "&response_type=code" +
-                        "&scope="
+                        "&response_type=code"
             }
         }
     }

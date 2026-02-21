@@ -74,7 +74,7 @@ class BrowseViewModel @Inject constructor(
     ): Flow<PagingData<Browse>> {
         val browseOptions = options ?: type.getBrowseOptions()
 
-        val pagerFlow = mediaRepository.browseMedia(
+        val pagerFlow = mediaRepository.paginatedBrowseMedia(
             browseType = type,
             browseOptions = browseOptions
         ).cachedIn(viewModelScope)

@@ -32,6 +32,9 @@ query CharacterDetails(
             large
         }
         anime: media(sort: [POPULARITY_DESC], type: ANIME) {
+            pageInfo {
+                hasNextPage
+            }
             edges {
                 characterRole
                 node {
@@ -40,6 +43,9 @@ query CharacterDetails(
             }
         }
         manga: media(sort: [POPULARITY_DESC], type: MANGA) {
+            pageInfo {
+                hasNextPage
+            }
             edges {
                 characterRole
                 node {

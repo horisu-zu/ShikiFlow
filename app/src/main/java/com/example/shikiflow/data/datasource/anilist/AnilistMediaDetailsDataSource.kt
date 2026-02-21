@@ -25,12 +25,8 @@ import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
-import com.example.shikiflow.domain.model.media_details.MediaAgeRating
 import com.example.shikiflow.domain.model.media_details.MediaDetails
-import com.example.shikiflow.domain.model.media_details.MediaSeason
-import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.search.BrowseOptions
-import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.OrderOption
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.coroutines.flow.Flow
@@ -61,7 +57,7 @@ class AnilistMediaDetailsDataSource @Inject constructor(
         }
     }
 
-    override fun browseMedia(
+    override fun paginatedBrowseMedia(
         browseType: BrowseType?,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>> {
@@ -82,31 +78,23 @@ class AnilistMediaDetailsDataSource @Inject constructor(
         ).flow
     }
 
-    override suspend fun paginatedMedia(
+    override suspend fun browseMedia(
         page: Int,
         limit: Int,
-        mediaType: MediaType,
-        search: String?,
-        status: MediaStatus?,
-        order: OrderOption?,
-        format: MediaFormat?,
-        season: MediaSeason?,
-        score: Int?,
-        genre: String?,
-        rating: MediaAgeRating?
+        browseOptions: BrowseOptions
     ): Result<List<Browse>> {
         val browseQuery = MediaBrowseQuery(
             page = page,
             perPage = limit,
-            search = Optional.presentIfNotNull(search),
-            mediaType = mediaType.toAnilistType(),
-            status = Optional.presentIfNotNull(status?.toAnilistStatus()),
-            sort = order?.toAnilistBrowseOrder() ?: MediaSort.SCORE_DESC,
-            format = Optional.presentIfNotNull(format?.toAnilistFormat()),
-            score = Optional.presentIfNotNull(score),
-            genre = Optional.presentIfNotNull(genre),
-            season = Optional.presentIfNotNull(season?.season?.toAnilistSeason()),
-            seasonYear = Optional.presentIfNotNull(season?.year)
+            search = Optional.presentIfNotNull(browseOptions.name),
+            mediaType = browseOptions.mediaType.toAnilistType(),
+            status = Optional.presentIfNotNull(browseOptions.status?.toAnilistStatus()),
+            sort = browseOptions.order?.toAnilistBrowseOrder() ?: MediaSort.SCORE_DESC,
+            format = Optional.presentIfNotNull(browseOptions.format?.toAnilistFormat()),
+            score = Optional.presentIfNotNull(browseOptions.score),
+            genre = Optional.presentIfNotNull(browseOptions.genre),
+            season = Optional.presentIfNotNull(browseOptions.season?.season?.toAnilistSeason()),
+            seasonYear = Optional.presentIfNotNull(browseOptions.season?.year)
         )
 
         return try {
@@ -116,7 +104,7 @@ class AnilistMediaDetailsDataSource @Inject constructor(
                 ?.Page
                 ?.media
                 ?.mapNotNull { media ->
-                    media?.mediaBrowse?.toBrowse(mediaType)
+                    media?.mediaBrowse?.toBrowse(browseOptions.mediaType)
                 }
 
             result?.let {

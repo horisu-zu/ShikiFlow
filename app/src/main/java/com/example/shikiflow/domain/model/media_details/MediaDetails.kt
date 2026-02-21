@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.media_details
 
+import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -24,7 +25,7 @@ data class MediaDetails(
     val status: MediaStatus,
     val mediaAgeRating: MediaAgeRating? = null,
     val genres: List<String>,
-    val characters: List<MediaPersonShort>,
+    val characters: PaginatedList<MediaPersonShort>,
     val airedOn: Date?,
     val releasedOn: Date?,
     val nextEpisodeAt: Instant? = null,

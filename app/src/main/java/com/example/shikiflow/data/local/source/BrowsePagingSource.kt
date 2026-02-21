@@ -33,18 +33,10 @@ class BrowsePagingSource @Inject constructor(
                 return LoadResult.Page(emptyList(), null, null)
             }
 
-            val response = mediaDetailsDataSource.paginatedMedia(
+            val response = mediaDetailsDataSource.browseMedia(
                 page = page,
                 limit = pageSize,
-                search = options.name,
-                mediaType = options.mediaType,
-                status = options.status,
-                order = options.order,
-                format = options.format,
-                season = options.season,
-                genre = options.genre,
-                score = options.score,
-                rating = options.ageRating
+                browseOptions = options
             )
 
             response.fold(

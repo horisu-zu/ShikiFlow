@@ -12,6 +12,7 @@ import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaRole
+import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 
@@ -60,8 +61,14 @@ object AnilistCharacterMapper {
             imageUrl = image?.large ?: "",
             description = description,
             voiceActors = emptyList(),
-            animeRoles = anime?.edges?.mapNotNull { it?.node?.aLMediaBrowseShort?.toDomain() }.orEmpty(),
-            mangaRoles = manga?.edges?.mapNotNull { it?.node?.aLMediaBrowseShort?.toDomain() }.orEmpty(),
+            animeRoles = PaginatedList(
+                hasNextPage = anime?.pageInfo?.hasNextPage == true,
+                entries = anime?.edges?.mapNotNull { it?.node?.aLMediaBrowseShort?.toDomain() }.orEmpty()
+            ),
+            mangaRoles = PaginatedList(
+                hasNextPage = manga?.pageInfo?.hasNextPage == true,
+                entries = manga?.edges?.mapNotNull { it?.node?.aLMediaBrowseShort?.toDomain() }.orEmpty()
+            ),
             topicId = null
         )
     }

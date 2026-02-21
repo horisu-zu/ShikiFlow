@@ -2,10 +2,13 @@ package com.example.shikiflow.data.datasource.anilist
 
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.anilist.MediaThreadsQuery
+import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.shikiflow.data.datasource.CommentsDataSource
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
+import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadSort
@@ -45,7 +48,20 @@ class AnilistThreadsDataSource @Inject constructor(
     }
 
     override suspend fun getCommentById(commentId: Int): Comment {
-        TODO("Not yet implemented")
+        val response = apolloClient
+            .query(TopicCommentQuery(commentId))
+            .execute()
+
+        val branches = response.data
+            ?.ThreadComment
+            .orEmpty()
+            .map { it?.toDomain() }
+
+        return branches
+            .asSequence()
+            .mapNotNull { it?.findComment(commentId) }
+            .firstOrNull()
+            ?: throw NoSuchElementException("No Comment with ID: $commentId")
     }
 
     override suspend fun getMediaThreads(

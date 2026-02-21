@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.manga
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.data.mapper.local.MangaEntityMapper.toMangaEntity
@@ -24,6 +23,15 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class MangaDetailsUiState(
+    val details: MediaDetails? = null,
+    val mangaDexIds: Resource<List<String>> = Resource.Loading(),
+    val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
+    val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val detailsError: String? = null
+)
+
 @HiltViewModel
 class MangaDetailsViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
@@ -32,47 +40,53 @@ class MangaDetailsViewModel @Inject constructor(
     private val getMangaDexUseCase: GetMangaDexUseCase
 ): ViewModel() {
 
-    private var currentId: Int? = null
-
-    private val _mangaDetails = MutableStateFlow<Resource<MediaDetails>>(Resource.Loading())
-    val mangaDetails = _mangaDetails.asStateFlow()
-
-    private val _mangaDexIds = MutableStateFlow<Resource<List<String>>>(Resource.Loading())
-    val mangaDexIds = _mangaDexIds.asStateFlow()
-
-    var rateUpdateState = mutableStateOf(RateUpdateState.INITIAL)
-        private set
-
-    var isRefreshing = mutableStateOf(false)
-        private set
+    private val _details = MutableStateFlow(MangaDetailsUiState())
+    val details = _details.asStateFlow()
 
     fun getMangaDetails(id: Int, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if(!isRefresh && currentId != id) {
-                _mangaDetails.value = Resource.Loading()
+            if(_details.value.details == null) {
+                _details.update { state ->
+                    state.copy(
+                        isLoading = true
+                    )
+                }
             } else if(!isRefresh) {
                 return@launch
             } else {
-                isRefreshing.value = true
+                _details.update { state ->
+                    state.copy(
+                        isRefreshing = true
+                    )
+                }
             }
 
             val result = mediaRepository.getMediaDetails(id, mediaType = MediaType.MANGA)
 
             result.fold(
                 onSuccess = { mediaDetails ->
-                    _mangaDetails.value = Resource.Success(mediaDetails)
+                    _details.update { state ->
+                        state.copy(
+                            details = mediaDetails,
+                            isLoading = false,
+                            isRefreshing = false
+                        )
+                    }
 
-                    getMangaDexId(
-                        title = mediaDetails.title,
-                        nativeTitle = mediaDetails.native,
-                        malId = mediaDetails.malId
-                    )
-
-                    currentId = id
-                    if(isRefreshing.value) { isRefreshing.value = false }
+                    if(_details.value.mangaDexIds !is Resource.Success) {
+                        getMangaDexId(
+                            title = mediaDetails.title,
+                            nativeTitle = mediaDetails.native,
+                            malId = mediaDetails.malId
+                        )
+                    }
                 },
                 onFailure = { exception ->
-                    _mangaDetails.value = Resource.Error(exception.message ?: "Unknown error")
+                    _details.update { state ->
+                        state.copy(
+                            detailsError = exception.message ?: "Unknown error"
+                        )
+                    }
                 }
             )
         }
@@ -81,7 +95,11 @@ class MangaDetailsViewModel @Inject constructor(
     fun getMangaDexId(title: String, nativeTitle: String?, malId: Int) {
         Log.d("MangaDetailsViewModel", "Fetching MangaDex ID for title: $title, MAL ID: $malId")
         getMangaDexUseCase(title, nativeTitle, malId).onEach { result ->
-            _mangaDexIds.value = result
+            _details.update { state ->
+                state.copy(
+                    mangaDexIds = result
+                )
+            }
 
             when(result) {
                 is Resource.Success -> {
@@ -104,7 +122,11 @@ class MangaDetailsViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             try {
-                rateUpdateState.value = RateUpdateState.LOADING
+                _details.update { state ->
+                    state.copy(
+                        rateUpdateState = RateUpdateState.LOADING
+                    )
+                }
 
                 val result = userRepository.saveUserRate(
                     userId = userId,
@@ -123,15 +145,21 @@ class MangaDetailsViewModel @Inject constructor(
                     mangaShortData = if(saveUserRate.rateId != null ) null else mangaShortData
                 )
 
-                _mangaDetails.update { resource ->
-                    if (resource is Resource.Success) {
-                        Resource.Success(resource.data?.copy(userRate = result))
-                    } else { resource }
+                _details.update { state ->
+                    state.copy(
+                        details = state.details?.copy(
+                            userRate = result
+                        )
+                    )
                 }
             } catch (e: Exception) {
                 Log.e("MangaDetailsViewModel", "Error creating user rate: ${e.message}")
             } finally {
-                rateUpdateState.value = RateUpdateState.FINISHED
+                _details.update { state ->
+                    state.copy(
+                        rateUpdateState = RateUpdateState.FINISHED
+                    )
+                }
             }
         }
     }

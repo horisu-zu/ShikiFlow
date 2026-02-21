@@ -104,7 +104,8 @@ fun MangaTracksPage(
                         },
                         onLongItemClick = { item ->
                             selectedItem = item
-                        }
+                        },
+                        modifier = Modifier.animateItem()
                     )
                 }
                 mangaTrackItems.apply {
