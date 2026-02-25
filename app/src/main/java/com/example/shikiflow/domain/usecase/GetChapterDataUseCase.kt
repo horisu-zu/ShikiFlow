@@ -23,7 +23,7 @@ class GetChapterDataUseCase @Inject constructor(
                 chapterIds.map { chapterId ->
                     async {
                         val response = mangaDexRepository.getChapterMetadata(chapterId)
-                        response.data.let { chapterMetadata ->
+                        response.let { chapterMetadata ->
                             val scanlationGroupIds = chapterMetadata.relationships
                                 .filter { it.type == "scanlation_group" }
                                 .map { it.id }
@@ -49,7 +49,7 @@ class GetChapterDataUseCase @Inject constructor(
             }
 
             val sortedChapters = chapters.sortedBy { chapter ->
-                chapter.publishAt
+                chapter.publishedAt
             }
 
             emit(Resource.Success(sortedChapters))

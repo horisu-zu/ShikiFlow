@@ -6,8 +6,10 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.presentation.screen.LocalBottomBarController
 
@@ -23,8 +25,7 @@ fun MangaReadNavigator(
     val mangaReadBackstack = when(mangaDexIds.size) {
         1 -> rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
             mangaDexId = mangaDexIds[0],
-            title = title,
-            source = ChaptersScreenSource.AUTOMATED
+            title = title
         ))
         else -> {
             rememberNavBackStack(MangaReadNavRoute.MangaSelectionScreen(
@@ -47,10 +48,9 @@ fun MangaReadNavigator(
     val navOptions = object : MangaReadNavOptions {
         override fun navigateToChapters(
             mangaDexId: String,
-            title: String,
-            source: ChaptersScreenSource
+            title: String
         ) {
-            mangaReadBackstack.add(MangaReadNavRoute.ChaptersScreen(mangaDexId, title, source))
+            mangaReadBackstack.add(MangaReadNavRoute.ChaptersScreen(mangaDexId, title))
         }
 
         override fun navigateToChapterTranslations(chapterTranslationIds: List<String>, chapterNumber: String) {
@@ -59,13 +59,15 @@ fun MangaReadNavigator(
             ))
         }
 
-        override fun navigateToChapter(mangaDexChapterId: String, title: String?, chapterNumber: String) {
-            mangaReadBackstack.add(MangaReadNavRoute.ChapterScreen(mangaDexChapterId, title, chapterNumber))
+        override fun navigateToChapter(chapterUiData: ChapterUiData) {
+            mangaReadBackstack.add(MangaReadNavRoute.ChapterScreen(chapterUiData))
         }
 
         override fun navigateBack() {
             if(mangaReadBackstack.size > 1) {
                 mangaReadBackstack.removeLastOrNull()
+            } else {
+                onNavigateBack()
             }
         }
     }
@@ -79,7 +81,6 @@ fun MangaReadNavigator(
                     mangaDexIds = route.mangaDexIds,
                     title = route.title,
                     navOptions = navOptions,
-                    onNavigateBack = onNavigateBack,
                     mangaSelectionViewModel = hiltViewModel(key = "${source}_selection")
                 )
             }
@@ -89,9 +90,7 @@ fun MangaReadNavigator(
                     title = route.title,
                     completedChapters = completedChapters,
                     navOptions = navOptions,
-                    onNavigateBack = onNavigateBack,
-                    mangaChaptersViewModel = hiltViewModel(key = "${source}_chapters"),
-                    navigationSource = route.source
+                    mangaChaptersViewModel = hiltViewModel(key = "${source}_chapters")
                 )
             }
             entry<MangaReadNavRoute.ChapterTranslationsScreen> { route ->
@@ -105,18 +104,15 @@ fun MangaReadNavigator(
             }
             entry<MangaReadNavRoute.ChapterScreen> { route ->
                 ChapterScreen(
-                    mangaDexChapterId = route.mangaDexChapterId,
-                    chapterNumber = route.chapterNumber,
-                    title = route.title,
+                    chapterUiData = route.chapterUiData,
                     navOptions = navOptions,
                     chapterViewModel = hiltViewModel(key = "${source}_chapter")
                 )
             }
-        }
+        },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        )
     )
-}
-
-enum class ChaptersScreenSource {
-    AUTOMATED,
-    MANUAL
 }

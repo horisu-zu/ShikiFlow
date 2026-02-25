@@ -1,0 +1,22 @@
+package com.example.shikiflow.data.datasource.dto.mangadex.chapter_metadata
+
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
+import kotlin.time.Instant
+
+@Serializable
+data class ChapterMetadataAttributes(
+    val title: String? = null,
+    val volume: String? = null,
+    val chapter: String? = null,
+    val pages: Int,
+    val translatedLanguage: String,
+    val uploader: String? = null,
+    val externalUrl: String? = null,
+    val version: Int,
+    val createdAt: String,
+    val updatedAt: String,
+    @Contextual val publishAt: Instant,
+    val readableAt: String,
+    val isUnavailable: Boolean
+)

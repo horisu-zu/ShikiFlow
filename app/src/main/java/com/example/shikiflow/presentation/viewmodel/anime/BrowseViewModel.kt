@@ -70,13 +70,11 @@ class BrowseViewModel @Inject constructor(
 
     fun paginatedBrowse(
         type: BrowseType = BrowseType.AnimeBrowseType.ONGOING,
-        options: BrowseOptions? = null
+        options: BrowseOptions = type.getBrowseOptions()
     ): Flow<PagingData<Browse>> {
-        val browseOptions = options ?: type.getBrowseOptions()
-
         val pagerFlow = mediaRepository.paginatedBrowseMedia(
             browseType = type,
-            browseOptions = browseOptions
+            browseOptions = options
         ).cachedIn(viewModelScope)
 
         return if(type == BrowseType.AnimeBrowseType.ONGOING) {

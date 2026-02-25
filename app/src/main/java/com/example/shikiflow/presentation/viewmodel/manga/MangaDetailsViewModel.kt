@@ -93,7 +93,6 @@ class MangaDetailsViewModel @Inject constructor(
     }
 
     fun getMangaDexId(title: String, nativeTitle: String?, malId: Int) {
-        Log.d("MangaDetailsViewModel", "Fetching MangaDex ID for title: $title, MAL ID: $malId")
         getMangaDexUseCase(title, nativeTitle, malId).onEach { result ->
             _details.update { state ->
                 state.copy(

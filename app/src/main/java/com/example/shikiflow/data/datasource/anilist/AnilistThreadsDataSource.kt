@@ -8,7 +8,6 @@ import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
-import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadSort

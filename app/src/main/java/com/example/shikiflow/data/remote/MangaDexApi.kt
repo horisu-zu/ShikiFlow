@@ -1,12 +1,13 @@
 package com.example.shikiflow.data.remote
 
-import com.example.shikiflow.domain.model.mangadex.aggregate.AggregateResponse
-import com.example.shikiflow.domain.model.mangadex.chapter.ChapterResponse
-import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadataResponse
-import com.example.shikiflow.domain.model.mangadex.cover.CoverResponse
-import com.example.shikiflow.domain.model.mangadex.manga.MangaDexResponse
-import com.example.shikiflow.domain.model.mangadex.scanlation_group.ScanlationGroupResponse
-import com.example.shikiflow.domain.model.mangadex.user.MangaDexUserResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.ChaptersListResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.aggregate.AggregateResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.chapter.ChapterResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.chapter_metadata.ChapterMetadataResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.cover.CoverResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.manga.MangaDexResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.scanlation_group.ScanlationGroupResponse
+import com.example.shikiflow.data.datasource.dto.mangadex.user.MangaDexUserResponse
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -44,6 +45,15 @@ interface MangaDexApi {
     suspend fun getScanlationGroup(
         @Path("id") groupId: String
     ): ScanlationGroupResponse
+
+    @GET("/chapter")
+    suspend fun getGroupChaptersList(
+        @Query("limit") limit: Int,
+        @Query("offset") offset: Int,
+        @Query("manga") mangaId: String,
+        @Query("groups") scanlationGroups: List<String> = emptyList(),
+        @Query("uploader") uploader: String? = null
+    ): ChaptersListResponse
 
     @GET("user/{id}")
     suspend fun getUser(

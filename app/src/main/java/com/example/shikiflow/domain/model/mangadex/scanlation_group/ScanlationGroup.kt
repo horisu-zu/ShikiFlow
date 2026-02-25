@@ -5,15 +5,4 @@ data class ScanlationGroup(
     val name: String,
     val isOfficial: Boolean,
     val website: String?
-) {
-    companion object {
-        fun GroupData.toDomain(): ScanlationGroup {
-            return ScanlationGroup(
-                id = this.id,
-                name = this.attributes.name,
-                isOfficial = this.attributes.official,
-                website = this.attributes.website
-            )
-        }
-    }
-}
+)

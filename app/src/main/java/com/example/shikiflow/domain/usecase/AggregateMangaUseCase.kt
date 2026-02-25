@@ -30,9 +30,9 @@ class AggregateMangaUseCase @Inject constructor(
                     key to chaptersList
                 }*/
 
-            val chaptersMap = mangaResponse.volumes.values
+            val chaptersMap = mangaResponse.volumes
                 .flatMap { volume ->
-                    volume.chapters.values
+                    volume.chapters
                 }
                 .groupBy { volume ->
                     volume.chapter

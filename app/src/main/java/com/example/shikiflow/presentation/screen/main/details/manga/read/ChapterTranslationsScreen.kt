@@ -48,7 +48,6 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
-import com.example.shikiflow.presentation.screen.LocalBottomBarController
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.IconResource
@@ -130,20 +129,18 @@ fun ChapterTranslationsScreen(
                             top = paddingValues.calculateTopPadding(),
                             start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                             end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                        ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                        ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     translations.data?.let { chapterTranslations ->
                         items(chapterTranslations.size) { index ->
                             ChapterTranslationItem(
                                 mangaDexChapter = chapterTranslations[index],
-                                onTranslationClick = { translationId, chapterTitle ->
+                                onTranslationClick = { chapterUiData ->
                                     chapterTranslations[index].externalUrl?.let { externalUrl ->
                                         WebIntent.openUrlCustomTab(context, externalUrl)
                                     } ?: navOptions.navigateToChapter(
-                                        mangaDexChapterId = translationId,
-                                        title = chapterTitle,
-                                        chapterNumber = chapterNumber
+                                        chapterUiData = chapterUiData
                                     )
                                 }
                             )
@@ -172,13 +169,22 @@ fun ChapterTranslationsScreen(
 @Composable
 private fun ChapterTranslationItem(
     mangaDexChapter: ChapterMetadata,
-    onTranslationClick: (String, String?) -> Unit,
+    onTranslationClick: (ChapterUiData) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onTranslationClick(mangaDexChapter.id, mangaDexChapter.title) }
+            .clickable { onTranslationClick(
+                ChapterUiData(
+                    title = mangaDexChapter.title,
+                    mangaId = mangaDexChapter.mangaId,
+                    chapterId = mangaDexChapter.chapterId,
+                    scanlationGroupIds = mangaDexChapter.scanlationGroups.map { it.id },
+                    chapterNumber = mangaDexChapter.chapterNumber ?: "",
+                    uploader = mangaDexChapter.uploader?.id
+                )
+            ) }
             .padding(horizontal = 6.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
@@ -193,7 +199,7 @@ private fun ChapterTranslationItem(
             )
             Text(
                 text = if(!mangaDexChapter.title.isNullOrEmpty()) mangaDexChapter.title
-                    else stringResource(R.string.chapter_empty_title, mangaDexChapter.chapterNumber ?: "?"),
+                    else stringResource(R.string.chapter_short_title, mangaDexChapter.chapterNumber ?: "?"),
                 style = MaterialTheme.typography.bodyLarge.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
@@ -213,7 +219,7 @@ private fun ChapterTranslationItem(
                             if(scanlationGroup.isOfficial) {
                                 IconResource.Vector(imageVector = Icons.Default.Check)
                             } else {
-                                IconResource.Vector(imageVector = Icons.Default.Person)
+                                IconResource.Drawable(resId = R.drawable.ic_group)
                             }
                         ),
                         style = MaterialTheme.typography.bodyMedium,
@@ -224,9 +230,9 @@ private fun ChapterTranslationItem(
                     )
                 }
             } else {
-                mangaDexChapter.uploaderNickname?.let { uploaderName ->
+                mangaDexChapter.uploader?.let { uploader ->
                     TextWithIcon(
-                        text = uploaderName,
+                        text = uploader.username,
                         iconResources = listOf(
                             IconResource.Vector(imageVector = Icons.Default.Person)
                         ),

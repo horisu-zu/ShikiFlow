@@ -1,66 +1,145 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapterMetadata
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
+import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.usecase.DownloadChapterUseCase
+import com.example.shikiflow.domain.usecase.LoadChapterUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
+data class ChapterUiState(
+    val chapterData: List<String> = emptyList(),
+    val uiSettings: MangaChapterSettings = MangaChapterSettings(),
+    val isNavigationVisible: Boolean = false,
+
+    val isLoading: Boolean = true,
+    val chapterError: String? = null
+)
+
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class ChapterViewModel @Inject constructor(
-    private val downloadChapterUseCase: DownloadChapterUseCase,
+    private val loadChapterUseCase: LoadChapterUseCase,
+    private val mangaDexRepository: MangaDexRepository,
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
-    val mangaSettings: StateFlow<MangaChapterSettings> = settingsRepository.mangaSettingsFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = MangaChapterSettings()
-        )
+    private val _interactionEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val _isFocused = MutableStateFlow(false)
+    private val _chapterUiState = MutableStateFlow(ChapterUiState())
+    val chapterUiState = _chapterUiState.asStateFlow()
 
-    private var currentChapterId = MutableStateFlow<String?>(null)
+    private val _pagingChaptersCache = mutableMapOf<String, Flow<PagingData<MangaChapterMetadata>>>()
+    private val hideDelayMs = 2500L
 
-    val chapterContent: StateFlow<Resource<List<String>>> =
-        combine(
-            settingsRepository.mangaSettingsFlow,
-            currentChapterId
-        ) { settings, chapterId ->
-            if (chapterId == null) {
-                flowOf(Resource.Loading())
-            } else {
-                downloadChapterUseCase(chapterId, settings.isDataSaverEnabled)
+    init {
+        settingsRepository.mangaSettingsFlow.onEach { mangaChapterSettings ->
+            _chapterUiState.update { state ->
+                state.copy(
+                    uiSettings = mangaChapterSettings
+                )
             }
-        }.flatMapLatest { it }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.Lazily,
-                initialValue = Resource.Loading()
-            )
+        }.launchIn(viewModelScope)
 
-    fun downloadMangaChapter(mangaDexChapterId: String, isRefresh: Boolean = false) {
-        if(isRefresh) {
-            currentChapterId.value = null
+        _interactionEvent
+            .flatMapLatest {
+                _isFocused.flatMapLatest { isFocused ->
+                    Log.d("ChapterViewModel", "Is Focused: $isFocused")
+                    if(isFocused) {
+                        flowOf(true)
+                    } else {
+                        flow {
+                            emit(true)
+                            delay(hideDelayMs)
+                            emit(false)
+                        }
+                    }
+                }
+            }
+            .onEach { isInteracting ->
+                _chapterUiState.update { state ->
+                    state.copy(isNavigationVisible = isInteracting)
+                }
+            }.launchIn(viewModelScope)
+    }
+
+    fun loadChapter(mangaDexChapterId: String, isDataSaver: Boolean) {
+        loadChapterUseCase(
+            mangaDexChapterId = mangaDexChapterId,
+            isDataSaver = isDataSaver
+        ).onEach { resource ->
+            when(resource) {
+                is Resource.Loading -> {
+                    _chapterUiState.update { state ->
+                        state.copy(isLoading = true)
+                    }
+                }
+                is Resource.Error -> {
+                    _chapterUiState.update { state ->
+                        state.copy(
+                            chapterError = resource.message,
+                            isLoading = false
+                        )
+                    }
+                }
+                is Resource.Success -> {
+                    _chapterUiState.update { state ->
+                        state.copy(
+                            chapterData = resource.data ?: emptyList(),
+                            isLoading = false
+                        )
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    fun getMangaChapters(
+        mangaId: String,
+        groupIds: List<String>,
+        uploader: String?
+    ): Flow<PagingData<MangaChapterMetadata>> {
+        return _pagingChaptersCache.getOrPut(mangaId) {
+            mangaDexRepository.getGroupMangaChapters(
+                mangaId = mangaId,
+                groupIds = groupIds,
+                uploader = if(groupIds.isEmpty()) uploader else null
+            ).cachedIn(viewModelScope)
         }
-        currentChapterId.value = mangaDexChapterId
     }
 
     fun updateSettings(newSettings: MangaChapterSettings) {
         viewModelScope.launch {
             settingsRepository.updateMangaSettings(newSettings)
         }
+    }
+
+    fun onInteractionStart() {
+        _interactionEvent.tryEmit(Unit)
+    }
+
+    fun changeFocusedState(newValue: Boolean) {
+        _isFocused.value = newValue
     }
 }

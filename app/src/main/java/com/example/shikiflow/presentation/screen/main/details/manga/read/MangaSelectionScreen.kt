@@ -43,7 +43,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -58,7 +57,6 @@ fun MangaSelectionScreen(
     mangaDexIds: List<String>,
     title: String,
     navOptions: MangaReadNavOptions,
-    onNavigateBack: () -> Unit,
     mangaSelectionViewModel: MangaSelectionViewModel = hiltViewModel()
 ) {
     val mangaListState = mangaSelectionViewModel.mangaList.collectAsStateWithLifecycle()
@@ -88,10 +86,10 @@ fun MangaSelectionScreen(
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = { onNavigateBack() }
+                            onClick = { navOptions.navigateBack() }
                         ) {
                             Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back to Main"
                             )
                         }
@@ -127,8 +125,7 @@ fun MangaSelectionScreen(
                                 onClick = { mangaDexId ->
                                     navOptions.navigateToChapters(
                                         mangaDexId = mangaDexId,
-                                        title = title,
-                                        source = ChaptersScreenSource.MANUAL
+                                        title = title
                                     )
                                 }
                             )
@@ -162,12 +159,12 @@ private fun MangaItem(
     Row(
         modifier = Modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick(mangaItem.data.id) },
+            .clickable { onClick(mangaItem.id) },
         verticalAlignment = Alignment.Top,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         BaseImage(
-            model = "${BuildConfig.MANGADEX_UPLOADS_URL}/covers/${mangaItem.data.id}/${mangaItem.coverUrl}",
+            model = mangaItem.coverUrl,
             contentDescription = "Cover Art",
             modifier = Modifier.width(96.dp)
         )
@@ -176,7 +173,7 @@ private fun MangaItem(
             verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
         ) {
             Text(
-                text = mangaItem.data.attributes.title.en ?: mangaItem.data.attributes.title.jaRo ?: "",
+                text = mangaItem.title,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
@@ -191,10 +188,10 @@ private fun MangaItem(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(StatusColor.getMangaDexStatusColor(mangaItem.data.attributes.status))
+                        .background(StatusColor.getMangaDexStatusColor(mangaItem.status))
                 )
                 Text(
-                    text = mangaItem.data.attributes.status.replaceFirstChar { it.uppercase() },
+                    text = mangaItem.status.replaceFirstChar { it.uppercase() },
                     style = MaterialTheme.typography.bodySmall
                 )
             }

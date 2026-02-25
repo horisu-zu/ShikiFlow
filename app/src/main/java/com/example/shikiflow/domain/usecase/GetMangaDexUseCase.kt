@@ -27,12 +27,12 @@ class GetMangaDexUseCase @Inject constructor(
              }
 
              val result = buildList {
-                 results.first?.data?.let { addAll(it) }
-                 results.second.data.let { addAll(it) }
+                 results.first?.let { addAll(it) }
+                 addAll(results.second)
              }.distinctBy { it.id }
 
              val mangaDexItems = result.filter { item ->
-                 item.attributes.links?.mal == malId.toString()
+                 item.attributes.malId == malId.toString()
              }.map { it.id }
 
              Log.d("GetMangaDexUseCase", "Title $title, MAL ID: $malId")
@@ -52,7 +52,7 @@ class GetMangaDexUseCase @Inject constructor(
             val result = mangaDexRepository.getMangaList(ids = mangaDexIds)
 
             val coversResponse = coroutineScope {
-                result.data.map { mangaData ->
+                result.map { mangaData ->
                     val coverId = mangaData.relationships.first { it.type == "cover_art" }.id
                     async {
                         mangaDexRepository.getCover(coverId)
@@ -60,12 +60,17 @@ class GetMangaDexUseCase @Inject constructor(
                 }.awaitAll()
             }
 
-            val mangaDataWithCovers = result.data.map { mangaData ->
-                val coverUrl = coversResponse.first { covers ->
-                    covers.data.relationships.first { rel -> rel.type == "manga"}.id == mangaData.id
-                }.data.attributes.fileName
+            val mangaDataWithCovers = result.map { mangaData ->
+                val coverUrl = coversResponse.first { item ->
+                    item.coverUrl.contains(mangaData.id)
+                }.coverUrl
 
-                MangaData(data = mangaData, coverUrl = coverUrl)
+                MangaData(
+                    id = mangaData.id,
+                    title = mangaData.attributes.title,
+                    status = mangaData.attributes.status,
+                    coverUrl = coverUrl
+                )
             }
             emit(Resource.Success(mangaDataWithCovers))
         } catch (e: HttpException) {

@@ -43,11 +43,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,8 +61,8 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
-import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.common.SortDirection.Companion.changeDirection
 import com.example.shikiflow.utils.Converter.parseChapterNumber
 import kotlinx.coroutines.launch
 
@@ -76,14 +73,11 @@ fun MangaChaptersScreen(
     title: String,
     completedChapters: Int,
     navOptions: MangaReadNavOptions,
-    onNavigateBack: () -> Unit,
-    navigationSource: ChaptersScreenSource,
     mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
 ) {
-    val mangaChapters = mangaChaptersViewModel.mangaChapters.collectAsStateWithLifecycle()
-    var sortDirection by rememberSaveable { mutableStateOf(SortDirection.ASCENDING) }
+    val chaptersUiState by mangaChaptersViewModel.chaptersUiState.collectAsStateWithLifecycle()
     val rotationState by animateFloatAsState(
-        targetValue = if (sortDirection == SortDirection.ASCENDING) 180f else 0f,
+        targetValue = if (chaptersUiState.sortDirection == SortDirection.ASCENDING) 180f else 0f,
         animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
 
@@ -91,14 +85,16 @@ fun MangaChaptersScreen(
     val scope = rememberCoroutineScope()
     val isAtTop by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
+            lazyListState.firstVisibleItemIndex == 0 &&
+            lazyListState.firstVisibleItemScrollOffset == 0
         }
     }
 
     val isOnCurrentChapter by remember {
         derivedStateOf {
-            lazyListState.layoutInfo.visibleItemsInfo.any { it.key == completedChapters.toString() }
-                    || completedChapters == 0
+            lazyListState.layoutInfo.visibleItemsInfo.any {
+                it.key == "${chaptersUiState.sortDirection}_${completedChapters}"
+            } || completedChapters == 0
         }
     }
 
@@ -120,10 +116,7 @@ fun MangaChaptersScreen(
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = { when(navigationSource) {
-                                ChaptersScreenSource.AUTOMATED -> onNavigateBack()
-                                ChaptersScreenSource.MANUAL -> navOptions.navigateBack()
-                            } }
+                            onClick = { navOptions.navigateBack() }
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
@@ -134,9 +127,9 @@ fun MangaChaptersScreen(
                     actions = {
                         IconButton(
                             onClick = {
-                                sortDirection = if(sortDirection == SortDirection.ASCENDING) {
-                                    SortDirection.DESCENDING
-                                } else SortDirection.ASCENDING
+                                mangaChaptersViewModel.changeDirection(
+                                    sortDirection = chaptersUiState.sortDirection.changeDirection()
+                                )
                             },
                             modifier = Modifier.rotate(rotationState)
                         ) {
@@ -182,68 +175,64 @@ fun MangaChaptersScreen(
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        when(val chapters = mangaChapters.value) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(chaptersUiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+        } else if(chaptersUiState.errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { mangaChaptersViewModel.getMangaChapters(mangaDexId) }
+                )
             }
-            is Resource.Success -> {
-                val chapters = chapters.data
-                val sortedChapters = remember(sortDirection) {
-                    val baseList = chapters?.keys?.toList() ?: emptyList()
-                    when(sortDirection) {
-                        SortDirection.ASCENDING -> baseList
-                        SortDirection.DESCENDING -> baseList.sortedByDescending { it.toFloatOrNull() ?: 0f }
-                    }
-                }
-
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier.fillMaxSize()
-                        .padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                        ),
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    items(
-                        items = sortedChapters,
-                        key = { chapterNumber -> chapterNumber }
-                    ) { chapterNumber ->
-                        val chapterNum = parseChapterNumber(chapterNumber)
-
-                        MediaItem(
-                            mediaNumber = chapterNumber,
-                            onItemClick = {
-                                val chapterIds = chapters?.get(chapterNumber) ?: emptyList()
-
-                                navOptions.navigateToChapterTranslations(
-                                    chapterTranslationIds = chapterIds,
-                                    chapterNumber = chapterNumber
-                                )
-                            },
-                            mediaType = MediaType.MANGA,
-                            isCompleted = when {
-                                completedChapters <= 0 -> false
-                                else -> chapterNum <= completedChapters
-                            }
-                        )
-                    }
+        } else {
+            val sortedChapters = remember(chaptersUiState.sortDirection) {
+                val baseList = chaptersUiState.chaptersMap.keys.toList()
+                when(chaptersUiState.sortDirection) {
+                    SortDirection.ASCENDING -> baseList
+                    SortDirection.DESCENDING -> baseList.reversed()
                 }
             }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { mangaChaptersViewModel.getMangaChapters(mangaDexId) }
+
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                    ),
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                items(
+                    items = sortedChapters,
+                    key = { chapterNumber -> "${chaptersUiState.sortDirection}_$chapterNumber" }
+                ) { chapterNumber ->
+                    val chapterNum = parseChapterNumber(chapterNumber)
+
+                    MediaItem(
+                        mediaNumber = chapterNumber,
+                        onItemClick = {
+                            val chapterIds = chaptersUiState.chaptersMap[chapterNumber] ?: emptyList()
+
+                            navOptions.navigateToChapterTranslations(
+                                chapterTranslationIds = chapterIds,
+                                chapterNumber = chapterNumber
+                            )
+                        },
+                        mediaType = MediaType.MANGA,
+                        isCompleted = when {
+                            completedChapters <= 0 -> false
+                            else -> chapterNum <= completedChapters
+                        }
                     )
                 }
             }

@@ -1,9 +1,8 @@
 package com.example.shikiflow.domain.model.mangadex.manga
 
-import kotlinx.serialization.Serializable
-
-@Serializable
 data class MangaData(
-    val data: Data,
+    val id: String,
+    val title: String,
+    val status: String,
     val coverUrl: String
 )

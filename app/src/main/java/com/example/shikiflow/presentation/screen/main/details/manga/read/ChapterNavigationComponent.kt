@@ -2,13 +2,11 @@ package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -32,32 +30,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun ChapterNavigationComponent(
     currentPage: Int,
     pageCount: Int,
     onNavigateClick: (Int) -> Unit,
-    modifier: Modifier = Modifier,
-    onInteractionStart: () -> Unit,
-    onInteractionEnd: () -> Unit
+    onFocusChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var pageInput by remember { mutableStateOf("") }
+    var pageInput by remember { mutableStateOf(currentPage.toString()) }
     var isEditing by remember { mutableStateOf(false) }
     val focusManager = LocalFocusManager.current
-    val imeBottom = WindowInsets.ime.getBottom(LocalDensity.current)
+    val isKeyboardVisible = WindowInsets.isImeVisible
 
-    val displayValue = if (isEditing) pageInput else currentPage.toString()
-
-    LaunchedEffect(imeBottom) {
-        if (imeBottom == 0) {
+    LaunchedEffect(isKeyboardVisible) {
+        if(!isKeyboardVisible) {
             focusManager.clearFocus()
+        }
+    }
+
+    LaunchedEffect(currentPage) {
+        if(!isEditing) {
+            pageInput = currentPage.toString()
         }
     }
 
@@ -76,14 +76,8 @@ fun ChapterNavigationComponent(
             )
         }
         BasicTextField(
-            value = displayValue,
-            onValueChange = { newValue ->
-                if (!isEditing) {
-                    isEditing = true
-                    pageInput = currentPage.toString()
-                }
-                pageInput = newValue
-            },
+            value = pageInput,
+            onValueChange = { pageInput = it },
             textStyle = MaterialTheme.typography.bodyMedium.copy(
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center
@@ -92,24 +86,27 @@ fun ChapterNavigationComponent(
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
-            modifier = Modifier.width(32.dp)
+            modifier = Modifier.width(40.dp)
                 .onFocusChanged { focusState ->
-                    if (focusState.isFocused) {
-                        onInteractionStart()
-                        if (!isEditing) {
-                            isEditing = true
+                    if(focusState.isFocused) {
+                        isEditing = true
+                        onFocusChange(true)
+                    } else if(isEditing) {
+                        val targetPage = pageInput.toIntOrNull()
+
+                        if (targetPage != null) {
+                            val coercedValue = targetPage.coerceIn(1, pageCount)
+
+                            if (coercedValue != currentPage) {
+                                onNavigateClick(coercedValue)
+                            }
+                            pageInput = coercedValue.toString()
+                        } else {
                             pageInput = currentPage.toString()
                         }
-                    } else {
-                        onInteractionEnd()
-                        if (isEditing) {
-                            pageInput.toInt().coerceIn(1..pageCount).let { value ->
-                                if (value != currentPage) {
-                                    onNavigateClick(value)
-                                }
-                                isEditing = false
-                            }
-                        }
+
+                        isEditing = false
+                        onFocusChange(false)
                     }
                 },
             decorationBox = { innerTextField ->

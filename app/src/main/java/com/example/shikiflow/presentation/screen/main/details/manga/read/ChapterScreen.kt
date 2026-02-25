@@ -1,21 +1,17 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Settings
@@ -37,40 +33,32 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.common.image.ChapterItem
-import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterNavigationViewModel
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel
-import com.example.shikiflow.utils.Resource
-import kotlinx.coroutines.flow.distinctUntilChanged
-import net.engawapg.lib.zoomable.rememberZoomState
-import net.engawapg.lib.zoomable.zoomable
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ChapterScreen(
-    mangaDexChapterId: String,
-    chapterNumber: String,
-    title: String?,
+    chapterUiData: ChapterUiData,
     navOptions: MangaReadNavOptions,
-    chapterViewModel: ChapterViewModel = hiltViewModel(),
-    chapterNavigationViewModel: ChapterNavigationViewModel = hiltViewModel()
+    chapterViewModel: ChapterViewModel = hiltViewModel()
 ) {
-    val chapterSettings by chapterViewModel.mangaSettings.collectAsStateWithLifecycle()
-    val chapterContent by chapterViewModel.chapterContent.collectAsStateWithLifecycle()
-    val isNavigationVisible by chapterNavigationViewModel.isNavigationVisible.collectAsStateWithLifecycle()
+    val chapterUiState by chapterViewModel.chapterUiState.collectAsStateWithLifecycle()
+    val chaptersList = chapterViewModel.getMangaChapters(
+        mangaId = chapterUiData.mangaId,
+        groupIds = chapterUiData.scanlationGroupIds,
+        uploader = chapterUiData.uploader
+    ).collectAsLazyPagingItems()
 
     val showBottomSheet = remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -78,13 +66,17 @@ fun ChapterScreen(
     )
     var chapterPage by remember { mutableIntStateOf(1) }
 
-    LaunchedEffect(mangaDexChapterId) {
-        chapterViewModel.downloadMangaChapter(mangaDexChapterId)
+    LaunchedEffect(chapterUiState.uiSettings.isDataSaverEnabled) {
+        chapterViewModel.loadChapter(
+            mangaDexChapterId = chapterUiData.chapterId,
+            isDataSaver = chapterUiState.uiSettings.isDataSaverEnabled
+        )
     }
+
 
     Scaffold(
         modifier = Modifier.then(
-            other = if(chapterSettings.chapterUIMode == ChapterUIMode.SCROLL) {
+            other = if(chapterUiState.uiSettings.chapterUIMode == ChapterUIMode.SCROLL) {
                 Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
             } else Modifier
         ),
@@ -93,10 +85,16 @@ fun ChapterScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if(!title.isNullOrEmpty()) {
-                                stringResource(id = R.string.chapter_title, chapterNumber, title)
-                            } else {
-                                stringResource(id = R.string.chapter_empty_title, chapterNumber)
+                            text = buildString {
+                                append(
+                                    stringResource(
+                                        id = R.string.chapter_short_title,
+                                        chapterUiData.chapterNumber
+                                    )
+                                )
+                                if(!chapterUiData.title.isNullOrEmpty()) {
+                                    append(" — ${chapterUiData.title}")
+                                }
                             },
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -130,141 +128,101 @@ fun ChapterScreen(
             }
         }
     ) { paddingValues ->
-        when(chapterContent) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(chapterUiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
             }
-            is Resource.Success -> {
-                chapterContent.data?.let { pageUrls ->
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        when(chapterSettings.chapterUIMode) {
-                            ChapterUIMode.PAGE -> {
-                                ChapterPageModeComponent(
-                                    chapterPageUrls = pageUrls,
-                                    chapterPage = chapterPage,
-                                    onPageChange = { pageNumber -> chapterPage = pageNumber },
-                                    onScrollDetected = { chapterNavigationViewModel.onScrollDetected() },
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(
-                                            top = paddingValues.calculateTopPadding(),
-                                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                                        )
+        } else if(chapterUiState.chapterError != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = chapterUiState.chapterError ?: stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = {
+                        chapterViewModel.loadChapter(
+                            mangaDexChapterId = chapterUiData.chapterId,
+                            isDataSaver = chapterUiState.uiSettings.isDataSaverEnabled
+                        )
+                    }
+                )
+            }
+        } else {
+            Box(modifier = Modifier.fillMaxSize()) {
+                when(chapterUiState.uiSettings.chapterUIMode) {
+                    ChapterUIMode.PAGE -> {
+                        ChapterPageModeComponent(
+                            chapterPageUrls = chapterUiState.chapterData,
+                            chapterPage = chapterPage,
+                            onPageChange = { pageNumber -> chapterPage = pageNumber },
+                            onScrollDetected = chapterViewModel::onInteractionStart,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(
+                                    top = paddingValues.calculateTopPadding()
                                 )
-                            }
-                            ChapterUIMode.SCROLL -> {
-                                ChapterScrollModeComponent(
-                                    chapterPageUrls = pageUrls,
-                                    chapterPage = chapterPage,
-                                    onPageChange = { pageNumber -> chapterPage = pageNumber },
-                                    onScrollDetected = { chapterNavigationViewModel.onScrollDetected() },
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(
-                                            top = paddingValues.calculateTopPadding(),
-                                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                                        )
-                                )
-                            }
-                        }
-                        AnimatedVisibility(
-                            visible = isNavigationVisible,
-                            enter = fadeIn(),
-                            exit = fadeOut(),
-                            modifier = Modifier.align(Alignment.BottomCenter)
-                                .navigationBarsPadding()
-                                .imePadding()
-                        ) {
-                            ChapterNavigationComponent(
-                                currentPage = chapterPage,
-                                pageCount = pageUrls.size,
-                                onNavigateClick = { pageNumber ->
-                                    chapterPage = pageNumber.coerceIn(1, pageUrls.size)
-                                },
-                                onInteractionStart = chapterNavigationViewModel::onUserInteractionStart,
-                                onInteractionEnd = chapterNavigationViewModel::onUserInteractionEnd
-                            )
-                        }
+                        )
+                    }
+                    ChapterUIMode.SCROLL -> {
+                        ChapterScrollModeComponent(
+                            chapterPageUrls = chapterUiState.chapterData,
+                            chapterPage = chapterPage,
+                            onPageChange = { pageNumber -> chapterPage = pageNumber },
+                            onScrollDetected = chapterViewModel::onInteractionStart,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .padding(top = paddingValues.calculateTopPadding())
+                        )
                     }
                 }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = chapterContent.message ?: stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { chapterViewModel.downloadMangaChapter(mangaDexChapterId, true) }
-                    )
+                AnimatedContent(
+                    targetState = chapterUiState.isNavigationVisible,
+                    transitionSpec = {
+                        fadeIn() togetherWith fadeOut() using SizeTransform(clip = false)
+                    },
+                    contentAlignment = Alignment.BottomCenter,
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                ) { isVisible ->
+                    when(isVisible) {
+                        true -> {
+                            ChapterNavigationComponent(
+                                currentPage = chapterPage,
+                                pageCount = chapterUiState.chapterData.size,
+                                onNavigateClick = { pageNumber -> chapterPage = pageNumber },
+                                onFocusChange = { isFocused ->
+                                    chapterViewModel.changeFocusedState(isFocused)
+                                },
+                                modifier = Modifier
+                                    .navigationBarsPadding()
+                                    .imePadding()
+                                    .padding(bottom = 4.dp)
+                            )
+                        }
+                        false -> {
+                            if(chapterUiState.uiSettings.chapterUIMode == ChapterUIMode.PAGE) {
+                                ChapterProgressBarComponent(
+                                    currentPage = chapterPage,
+                                    pageCount = chapterUiState.chapterData.size,
+                                    onSegmentClick = { pageNumber -> chapterPage = pageNumber },
+                                    modifier = Modifier.navigationBarsPadding()
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
         if(showBottomSheet.value) {
             ChapterSettingsBottomSheet(
-                mangaSettings = chapterSettings,
+                mangaSettings = chapterUiState.uiSettings,
                 onDismiss = { showBottomSheet.value = false },
                 onSettingsChange = { newSettings ->
                     chapterViewModel.updateSettings(newSettings)
                 }
-            )
-        }
-    }
-}
-
-@Composable
-private fun ChapterScrollModeComponent(
-    chapterPageUrls: List<String>,
-    chapterPage: Int,
-    onPageChange: (Int) -> Unit,
-    onScrollDetected: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val lazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chapterPage - 1
-    )
-
-    LaunchedEffect(lazyListState) {
-        snapshotFlow { lazyListState.firstVisibleItemIndex }
-            .distinctUntilChanged()
-            .collect { index ->
-                onPageChange(index + 1)
-            }
-    }
-
-    LaunchedEffect(lazyListState.isScrollInProgress) {
-        if (lazyListState.isScrollInProgress) {
-            onScrollDetected()
-        }
-    }
-
-    LaunchedEffect(chapterPage) {
-        val pageIndex = chapterPage - 1
-
-        if(lazyListState.firstVisibleItemIndex != pageIndex) {
-            lazyListState.scrollToItem(index = pageIndex)
-        }
-    }
-
-    LazyColumn(
-        state = lazyListState,
-        modifier = modifier.zoomable(rememberZoomState()),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(vertical = 8.dp)
-    ) {
-        items(chapterPageUrls.size) { index ->
-            val chapterPageUrl = chapterPageUrls[index]
-
-            ChapterItem(
-                pageUrl = chapterPageUrl,
-                pageNumber = index + 1,
-                contentScale = ContentScale.FillWidth
             )
         }
     }

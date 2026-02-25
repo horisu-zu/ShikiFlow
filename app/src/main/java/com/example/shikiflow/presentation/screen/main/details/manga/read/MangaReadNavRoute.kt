@@ -4,7 +4,6 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 sealed interface MangaReadNavRoute : NavKey {
-
     @Serializable
     data class MangaSelectionScreen(
         val mangaDexIds: List<String>,
@@ -14,8 +13,7 @@ sealed interface MangaReadNavRoute : NavKey {
     @Serializable
     data class ChaptersScreen(
         val mangaDexId: String,
-        val title: String,
-        val source: ChaptersScreenSource
+        val title: String
     ) : MangaReadNavRoute
 
     @Serializable
@@ -27,8 +25,16 @@ sealed interface MangaReadNavRoute : NavKey {
 
     @Serializable
     data class ChapterScreen(
-        val mangaDexChapterId: String,
-        val title: String?,
-        val chapterNumber: String
+        val chapterUiData: ChapterUiData
     ) : MangaReadNavRoute
 }
+
+@Serializable
+data class ChapterUiData(
+    val title: String?,
+    val mangaId: String,
+    val chapterId: String,
+    val scanlationGroupIds: List<String>,
+    val uploader: String?,
+    val chapterNumber: String
+)
