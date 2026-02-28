@@ -3,6 +3,8 @@ package com.example.shikiflow.presentation.screen.main.details
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -247,6 +249,21 @@ fun DetailsNavigator(
             ) togetherWith ExitTransition.KeepUntilTransitionsFinished
         },
         popTransitionSpec = {
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+        },
+        predictivePopTransitionSpec = {
             slideInHorizontally(
                 initialOffsetX = { -it },
                 animationSpec = spring(

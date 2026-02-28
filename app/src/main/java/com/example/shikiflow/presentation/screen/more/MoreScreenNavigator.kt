@@ -2,6 +2,8 @@ package com.example.shikiflow.presentation.screen.more
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -131,8 +133,18 @@ fun MoreScreenNavigator(
             )
         },
         predictivePopTransitionSpec = {
-            EnterTransition.None togetherWith fadeOut(
-                animationSpec = tween(300)
+            slideInHorizontally(
+                initialOffsetX = { -it },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) togetherWith slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
             )
         },
         entryDecorators = listOf(

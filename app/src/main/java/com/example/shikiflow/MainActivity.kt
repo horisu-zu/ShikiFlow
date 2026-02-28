@@ -26,8 +26,8 @@ class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         val splashScreen = installSplashScreen()
+        enableEdgeToEdge()
 
         super.onCreate(savedInstanceState)
 
