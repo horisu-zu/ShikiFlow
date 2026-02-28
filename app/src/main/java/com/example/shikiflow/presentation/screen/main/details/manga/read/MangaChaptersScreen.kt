@@ -119,7 +119,7 @@ fun MangaChaptersScreen(
                             onClick = { navOptions.navigateBack() }
                         ) {
                             Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back to Main"
                             )
                         }

@@ -11,6 +11,7 @@ import com.example.shikiflow.data.datasource.dto.mangadex.user.MangaDexUserRespo
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.QueryMap
 
 interface MangaDexApi {
 
@@ -51,8 +52,9 @@ interface MangaDexApi {
         @Query("limit") limit: Int,
         @Query("offset") offset: Int,
         @Query("manga") mangaId: String,
-        @Query("groups") scanlationGroups: List<String> = emptyList(),
-        @Query("uploader") uploader: String? = null
+        @Query("groups[]") scanlationGroups: List<String> = emptyList(),
+        @Query("uploader") uploader: String? = null,
+        @QueryMap order: Map<String, String> = mapOf("order[chapter]" to "asc")
     ): ChaptersListResponse
 
     @GET("user/{id}")

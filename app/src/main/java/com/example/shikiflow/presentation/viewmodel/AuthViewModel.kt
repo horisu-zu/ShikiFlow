@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -8,6 +7,7 @@ import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
@@ -22,8 +22,7 @@ class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ): ViewModel() {
 
-    var _authType = mutableStateOf<AuthType?>(null)
-        private set
+    val _authType = MutableStateFlow<AuthType?>(null)
 
     val authState: StateFlow<AuthState> = tokenRepository.authCredentials
         .map { tokens ->

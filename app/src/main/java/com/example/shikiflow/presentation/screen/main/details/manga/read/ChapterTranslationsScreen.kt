@@ -181,7 +181,7 @@ private fun ChapterTranslationItem(
                     mangaId = mangaDexChapter.mangaId,
                     chapterId = mangaDexChapter.chapterId,
                     scanlationGroupIds = mangaDexChapter.scanlationGroups.map { it.id },
-                    chapterNumber = mangaDexChapter.chapterNumber ?: "",
+                    chapterNumber = mangaDexChapter.chapterNumber,
                     uploader = mangaDexChapter.uploader?.id
                 )
             ) }

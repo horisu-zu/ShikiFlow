@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -188,6 +189,7 @@ fun ChapterItem(
 ) {
     val context = LocalContext.current
     var retryKey by remember { mutableIntStateOf(0) }
+    var isLoaded by remember { mutableStateOf(false) }
 
     key(retryKey) {
         val imageRequest = remember(pageUrl) {
@@ -204,12 +206,15 @@ fun ChapterItem(
             model = imageRequest,
             contentDescription = pageUrl,
             contentScale = contentScale,
-            modifier = modifier.fillMaxWidth(),
+            modifier = modifier.fillMaxWidth()
+                .then(
+                    other = if(!isLoaded) Modifier.aspectRatio(0.85f)
+                        else Modifier
+                ),
+            onSuccess = { isLoaded = true },
             loading = {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(0.85f),
+                    modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -223,9 +228,7 @@ fun ChapterItem(
             },
             error = {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(0.85f),
+                    modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
@@ -237,9 +240,7 @@ fun ChapterItem(
                         )
                     )
                     Button(
-                        onClick = {
-                            retryKey++
-                        },
+                        onClick = { retryKey++ },
                         modifier = Modifier
                             .wrapContentWidth()
                             .clip(CircleShape)

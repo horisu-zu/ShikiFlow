@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -65,12 +63,9 @@ class ChapterViewModel @Inject constructor(
         _interactionEvent
             .flatMapLatest {
                 _isFocused.flatMapLatest { isFocused ->
-                    Log.d("ChapterViewModel", "Is Focused: $isFocused")
-                    if(isFocused) {
-                        flowOf(true)
-                    } else {
-                        flow {
-                            emit(true)
+                    flow {
+                        emit(true)
+                        if(!isFocused) {
                             delay(hideDelayMs)
                             emit(false)
                         }

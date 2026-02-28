@@ -33,12 +33,32 @@ class AuthRepositoryImpl @Inject constructor(
                         "?client_id=${BuildConfig.ANILIST_CLIENT_ID}" +
                         "&redirect_uri=${BuildConfig.ANILIST_REDIRECT_URI}" +
                         "&response_type=code"
+                /*"${BuildConfig.ANILIST_BASE_URL}/api/v2/oauth/authorize" +
+                        "?client_id=${BuildConfig.ANILIST_CLIENT_ID}" +
+                        "&response_type=token"*/
             }
         }
     }
 
     override suspend fun handleAuthCode(code: String, authType: AuthType) {
         try {
+            /*val tokens = when(authType) {
+                AuthType.SHIKIMORI -> {
+                    val response = shikiAuthApi.getAccessToken(code = code)
+
+                    response.body() ?: throw IllegalStateException("Token response body is null")
+                }
+                AuthType.ANILIST -> {
+                    Log.d("AuthRepositoryImpl", "Response: $code")
+
+                    TokenResponse(
+                        accessToken = code,
+                        refreshToken = null
+                    )
+                }
+            }
+
+            tokenRepository.saveTokens(tokens)*/
             val response = when(authType) {
                 AuthType.SHIKIMORI -> shikiAuthApi.getAccessToken(code = code)
                 AuthType.ANILIST -> anilistAuthApi.getAccessToken(

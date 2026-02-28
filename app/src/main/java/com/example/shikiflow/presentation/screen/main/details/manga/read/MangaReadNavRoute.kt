@@ -36,5 +36,5 @@ data class ChapterUiData(
     val chapterId: String,
     val scanlationGroupIds: List<String>,
     val uploader: String?,
-    val chapterNumber: String
+    val chapterNumber: String?
 )

@@ -17,7 +17,6 @@ import com.example.shikiflow.data.datasource.dto.mangadex.chapter_metadata.Manga
 import com.example.shikiflow.data.datasource.dto.mangadex.scanlation_group.ScanlationGroupResponse
 import com.example.shikiflow.data.datasource.dto.mangadex.user.MangaDexUserResponse
 import com.example.shikiflow.domain.model.mangadex.chapter.MangaChapter
-import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapterMetadata
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MetadataAttributes
 import com.example.shikiflow.domain.model.mangadex.cover.MangaCover

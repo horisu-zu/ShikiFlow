@@ -343,6 +343,7 @@
 
     <string name="spoiler_label">Spoiler</string>
     <string name="error_imgur_image">Open Imgur Image</string>
+    <string name="chapter_list_label">Chapters from the same translator</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>
