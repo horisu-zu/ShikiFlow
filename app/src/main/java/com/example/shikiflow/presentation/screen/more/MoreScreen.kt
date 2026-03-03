@@ -78,11 +78,11 @@ fun MoreScreen(
                                 start = 8.dp,
                                 end = horizontalPadding
                             ),
-                            activeContainerColor = MaterialTheme.colorScheme.surface
+                            activeContainerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = if(screenState.isSearchActive) MaterialTheme.colorScheme.surface
+                        containerColor = if(screenState.isSearchActive) MaterialTheme.colorScheme.surfaceVariant
                             else MaterialTheme.colorScheme.background
                     )
                 )

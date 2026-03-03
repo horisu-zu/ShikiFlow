@@ -32,7 +32,9 @@ object DateMapper {
         )
     }
 
-    fun ALDate.toLocalDate(): LocalDate {
-        return LocalDate(year ?: 0, month ?: 0, day ?: 0)
+    fun ALDate.toLocalDate(): LocalDate? {
+        return year?.let {
+             LocalDate(year, month ?: 0, day ?: 0)
+        }
     }
 }

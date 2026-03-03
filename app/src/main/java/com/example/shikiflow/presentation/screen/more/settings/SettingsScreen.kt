@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -33,7 +34,10 @@ import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.utils.AppUiMode
+import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ThemeMode
+import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
+import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,11 +48,7 @@ fun SettingsScreen(
 ) {
     val resources = LocalResources.current
 
-    val settings by settingsViewModel.settings.collectAsStateWithLifecycle()
-    val themeSettings by settingsViewModel.themeSettings.collectAsStateWithLifecycle()
-    val mangaSettings by settingsViewModel.mangaSettings.collectAsStateWithLifecycle()
-
-    val cacheSize by settingsViewModel.cacheSize.collectAsStateWithLifecycle()
+    val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
     val openCacheDialog = remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState()
@@ -69,144 +69,193 @@ fun SettingsScreen(
     }
 
     Scaffold { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    top = innerPadding.calculateTopPadding(),
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
-                    bottom = 12.dp
-                ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
-        ) {
-            SettingsSection(
-                title = stringResource(R.string.settings_account_section_title),
-                items = listOfNotNull(
-                    userData?.let {
-                        SectionItem.Image(
-                            title = userData.nickname,
-                            displayValue = stringResource(R.string.settings_sign_out),
-                            imageUrl = userData.avatarUrl,
-                            onClick = { settingsViewModel.logout() }
+        settingsState.themeSettings?.let { themeSettings ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
+                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
+                        bottom = 12.dp
+                    ),
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+            ) {
+                SettingsSection(
+                    title = stringResource(R.string.settings_account_section_title),
+                    items = listOfNotNull(
+                        userData?.let {
+                            SectionItem.Image(
+                                title = userData.nickname,
+                                displayValue = stringResource(R.string.settings_sign_out),
+                                imageUrl = userData.avatarUrl,
+                                onClick = { settingsViewModel.logout() }
+                            )
+                        }
+                    )
+                )
+                SettingsSection(
+                    title = stringResource(R.string.settings_theme_section_title),
+                    items = buildList {
+                        add(
+                            SectionItem.Mode(
+                                title = stringResource(R.string.settings_dynamic_theme_label),
+                                mode = when (themeSettings.isDynamicThemeEnabled) {
+                                    true -> stringResource(R.string.settings_enabled)
+                                    false -> stringResource(R.string.settings_disabled)
+                                },
+                                entries = listOf(
+                                    stringResource(R.string.settings_enabled),
+                                    stringResource(R.string.settings_disabled)
+                                ),
+                                iconResources = listOf(
+                                    IconResource.Drawable(resId = R.drawable.ic_palette),
+                                    IconResource.Drawable(resId = R.drawable.ic_format_paint)
+                                ),
+                                onClick = { newMode ->
+                                    settingsViewModel.setDynamicTheme(newMode == resources.getString(R.string.settings_enabled))
+                                }
+                            )
                         )
+                        if(themeSettings.isDynamicThemeEnabled) {
+                            add(
+                                SectionItem.Default(
+                                    title = stringResource(R.string.settings_palette_style_label),
+                                    displayValue = stringResource(R.string.settings_palette_style_desc),
+                                    onClick = {
+                                        bottomSheetConfig.value = BottomSheetConfig(
+                                            title = resources.getString(R.string.settings_palette_style_bottom_title),
+                                            options = PaletteStyle.entries.map { it.name },
+                                            currentValue = themeSettings.paletteStyle.name,
+                                            onOptionClick = { selectedIndex ->
+                                                settingsViewModel.setPaletteStyle(PaletteStyle.entries[selectedIndex])
+                                                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                                    bottomSheetConfig.value = null
+                                                }
+                                            }
+                                        )
+                                    }
+                                )
+                            )
+                        }
+                        add(
+                            SectionItem.Mode(
+                                title = stringResource(R.string.settings_app_theme_label),
+                                mode = stringResource(themeSettings.themeMode.displayValue),
+                                entries = ThemeMode.entries.map { stringResource(it.displayValue) },
+                                iconResources = ThemeMode.entries.map { it.icon },
+                                weights = listOf(3f, 2f, 2f),
+                                onClick = { newTheme ->
+                                    settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
+                                }
+                            )
+                        )
+                        if(themeSettings.themeMode.isDarkTheme(isSystemInDarkTheme())) {
+                            add(
+                                SectionItem.Switch(
+                                    title = stringResource(R.string.settings_oled_theme),
+                                    displayValue = stringResource(R.string.settings_oled_desc),
+                                    isChecked = themeSettings.isOledEnabled,
+                                    onClick = {
+                                        settingsViewModel.setOled(!themeSettings.isOledEnabled)
+                                    }
+                                )
+                            )
+                        }
                     }
                 )
-            )
-            SettingsSection(
-                title = stringResource(R.string.settings_theme_section_title),
-                items = listOf(
-                    SectionItem.Mode(
-                        title = stringResource(R.string.settings_app_theme),
-                        mode = stringResource(themeSettings.themeMode.displayValue),
-                        entries = ThemeMode.entries.map { stringResource(it.displayValue) },
-                        iconResources = ThemeMode.entries.map { it.icon },
-                        weights = listOf(3f, 2f, 2f),
-                        onClick = { newTheme ->
-                            settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
-                        }
-                    ),
-                    SectionItem.Switch(
-                        title = stringResource(R.string.settings_oled_theme),
-                        displayValue = stringResource(R.string.settings_oled_desc),
-                        isChecked = themeSettings.isOledEnabled,
-                        onClick = {
-                            settingsViewModel.setOled(!themeSettings.isOledEnabled)
-                        }
-                    )
-                )
-            )
-            SettingsSection(
-                title = stringResource(R.string.seetings_interface_section_title),
-                items = listOf(
-                    SectionItem.Default(
-                        title = stringResource(R.string.settings_track_mode),
-                        displayValue = stringResource(settings.trackMode.displayValue),
-                        onClick = {
-                            bottomSheetConfig.value = BottomSheetConfig(
-                                title = resources.getString(R.string.settings_track_mode_select),
-                                options = MainTrackMode.entries.map { resources.getString(it.displayValue) },
-                                currentValue = resources.getString(settings.trackMode.displayValue),
-                                onOptionClick = { selectedIndex ->
-                                    settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        bottomSheetConfig.value = null
-                                    }
-                                }
-                            )
-                        }
-                    ),
-                    SectionItem.Default(
-                        title = stringResource(R.string.settings_app_ui_mode),
-                        displayValue = stringResource(settings.appUiMode.displayValue),
-                        onClick = {
-                            bottomSheetConfig.value = BottomSheetConfig(
-                                title = resources.getString(R.string.settings_app_mode_select),
-                                options = AppUiMode.entries.map { resources.getString(it.displayValue) },
-                                currentValue = resources.getString(settings.appUiMode.displayValue),
-                                onOptionClick = { selectedIndex ->
-                                    settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
-                                    scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                        bottomSheetConfig.value = null
-                                    }
-                                }
-                            )
-                        }
-                    )
-                )
-            )
-            SettingsSection(
-                title = stringResource(R.string.settings_data_section_title),
-                items = listOf(
-                    SectionItem.Default(
-                        title = stringResource(R.string.settings_clear_cache),
-                        displayValue = buildString {
-                            cacheSize?.let { size ->
-                                append(stringResource(R.string.settings_cache_size))
-                                append(": ")
-                                append(
-                                    when(size.unit) {
-                                        FileSize.SizeUnit.B -> stringResource(R.string.cache_size_bytes, size.value.toLong())
-                                        FileSize.SizeUnit.KB -> stringResource(R.string.cache_size_kbytes, size.value)
-                                        FileSize.SizeUnit.MB -> stringResource(R.string.cache_size_mbytes, size.value)
-                                        FileSize.SizeUnit.GB -> stringResource(R.string.cache_size_gbytes, size.value)
+                SettingsSection(
+                    title = stringResource(R.string.seetings_interface_section_title),
+                    items = listOf(
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_track_mode),
+                            displayValue = stringResource(settingsState.settings.trackMode.displayValue),
+                            onClick = {
+                                bottomSheetConfig.value = BottomSheetConfig(
+                                    title = resources.getString(R.string.settings_track_mode_select),
+                                    options = MainTrackMode.entries.map { resources.getString(it.displayValue) },
+                                    currentValue = resources.getString(settingsState.settings.trackMode.displayValue),
+                                    onOptionClick = { selectedIndex ->
+                                        settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            bottomSheetConfig.value = null
+                                        }
                                     }
                                 )
                             }
-                        },
-                        onClick = {
-                            if(cacheSize != FileSize(value = 0.0, unit = FileSize.SizeUnit.B))
-                                openCacheDialog.value = true
-                        }
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_app_ui_mode),
+                            displayValue = stringResource(settingsState.settings.appUiMode.displayValue),
+                            onClick = {
+                                bottomSheetConfig.value = BottomSheetConfig(
+                                    title = resources.getString(R.string.settings_app_mode_select),
+                                    options = AppUiMode.entries.map { resources.getString(it.displayValue) },
+                                    currentValue = resources.getString(settingsState.settings.appUiMode.displayValue),
+                                    onOptionClick = { selectedIndex ->
+                                        settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            bottomSheetConfig.value = null
+                                        }
+                                    }
+                                )
+                            }
+                        )
                     )
                 )
-            )
-            SettingsSection(
-                title = stringResource(R.string.settings_manga_section_title),
-                items = listOf(
-                    SectionItem.Mode(
-                        title = stringResource(R.string.settings_chapter_ui_mode),
-                        mode = stringResource(mangaSettings.chapterUIMode.displayValue),
-                        entries = ChapterUIMode.entries.map { stringResource(it.displayValue) },
-                        iconResources = ChapterUIMode.entries.map { it.icon },
-                        onClick = { newMode ->
-                            settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(newMode.uppercase()))
-                        }
-                    ),
-                    SectionItem.Switch(
-                        title = stringResource(R.string.settings_data_saver_mode),
-                        displayValue = stringResource(R.string.settings_data_saver_desc),
-                        onClick = {
-                            settingsViewModel.setDataSaver(!mangaSettings.isDataSaverEnabled)
-                        },
-                        isChecked = mangaSettings.isDataSaverEnabled
+                SettingsSection(
+                    title = stringResource(R.string.settings_data_section_title),
+                    items = listOf(
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_clear_cache),
+                            displayValue = buildString {
+                                settingsState.cacheSize?.let { size ->
+                                    append(stringResource(R.string.settings_cache_size))
+                                    append(": ")
+                                    append(
+                                        when(size.unit) {
+                                            FileSize.SizeUnit.B -> stringResource(R.string.cache_size_bytes, size.value.toLong())
+                                            FileSize.SizeUnit.KB -> stringResource(R.string.cache_size_kbytes, size.value)
+                                            FileSize.SizeUnit.MB -> stringResource(R.string.cache_size_mbytes, size.value)
+                                            FileSize.SizeUnit.GB -> stringResource(R.string.cache_size_gbytes, size.value)
+                                        }
+                                    )
+                                }
+                            },
+                            onClick = {
+                                if(settingsState.cacheSize != FileSize(value = 0.0, unit = FileSize.SizeUnit.B))
+                                    openCacheDialog.value = true
+                            }
+                        )
                     )
                 )
-            )
+                SettingsSection(
+                    title = stringResource(R.string.settings_manga_section_title),
+                    items = listOf(
+                        SectionItem.Mode(
+                            title = stringResource(R.string.settings_chapter_ui_mode),
+                            mode = stringResource(settingsState.mangaSettings.chapterUIMode.displayValue),
+                            entries = ChapterUIMode.entries.map { stringResource(it.displayValue) },
+                            iconResources = ChapterUIMode.entries.map { it.icon },
+                            onClick = { newMode ->
+                                settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(newMode.uppercase()))
+                            }
+                        ),
+                        SectionItem.Switch(
+                            title = stringResource(R.string.settings_data_saver_mode),
+                            displayValue = stringResource(R.string.settings_data_saver_desc),
+                            onClick = {
+                                settingsViewModel.setDataSaver(!settingsState.mangaSettings.isDataSaverEnabled)
+                            },
+                            isChecked = settingsState.mangaSettings.isDataSaverEnabled
+                        )
+                    )
+                )
+            }
         }
         bottomSheetConfig.value?.let { config ->
             SettingsBottomSheet(
-                sheetState = sheetState,
                 title = config.title,
                 currentValue = config.currentValue,
                 options = config.options,

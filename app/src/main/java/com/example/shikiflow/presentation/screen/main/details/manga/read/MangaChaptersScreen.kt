@@ -263,11 +263,11 @@ fun MediaItem(
         if(isCompleted) {
             Icon(
                 imageVector = Icons.Default.Check,
-                tint = MaterialTheme.colorScheme.onSurface,
+                tint = MaterialTheme.colorScheme.onPrimary,
                 contentDescription = "Completed Chapter/Episode",
                 modifier = Modifier.size(24.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.75f))
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(4.dp)
             )
         }

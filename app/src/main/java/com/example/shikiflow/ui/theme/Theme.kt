@@ -15,6 +15,9 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.materialkolor.PaletteStyle
+import com.materialkolor.dynamicColorScheme
+import com.materialkolor.dynamiccolor.ColorSpec
 
 private val lightScheme = lightColorScheme(
     primary = primaryLight,
@@ -137,12 +140,31 @@ fun ShikiFlowTheme(
     oledTheme: Boolean = false,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
+    paletteStyle: PaletteStyle = PaletteStyle.Expressive,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            val colors = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+
+            dynamicColorScheme(
+                primary = colors.primary,
+                isDark = darkTheme,
+                isAmoled = oledTheme,
+                style = paletteStyle,
+                specVersion = ColorSpec.SpecVersion.SPEC_2025
+            )
+        }
+
+        dynamicColor -> {
+            dynamicColorScheme(
+                seedColor = seedColor,
+                isDark = darkTheme,
+                isAmoled = oledTheme,
+                style = paletteStyle,
+                specVersion = ColorSpec.SpecVersion.SPEC_2025
+            )
         }
 
         darkTheme && oledTheme -> oledScheme

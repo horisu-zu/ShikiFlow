@@ -38,6 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -67,7 +68,7 @@ fun MainNavigator(
     val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
-    val currentUser by userViewModel.userFlow.collectAsState(initial = null)
+    val currentUser by userViewModel.userFlow.collectAsStateWithLifecycle()
     val authType by userViewModel.authTypeFlow.collectAsState()
 
     val isKeyboardVisible = WindowInsets.isImeVisible && LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -91,8 +92,8 @@ fun MainNavigator(
     NavigationSuiteScaffold(
         navigationSuiteType = customNavType,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = MaterialTheme.colorScheme.surface,
-            navigationRailContainerColor = MaterialTheme.colorScheme.surface
+            navigationBarContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+            navigationRailContainerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         navigationItems = {
             items.forEach { navItem ->
@@ -113,7 +114,7 @@ fun MainNavigator(
                         Text(
                             text = stringResource(id = navItem.title),
                             style = LocalTextStyle.current.copy(
-                                color = MaterialTheme.colorScheme.onSurface
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         )
                     },

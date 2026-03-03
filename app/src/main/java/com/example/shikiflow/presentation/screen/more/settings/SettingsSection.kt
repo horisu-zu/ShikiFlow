@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -20,7 +21,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.util.fastForEachIndexed
 import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
@@ -40,6 +40,7 @@ fun SettingsSection(
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(12.dp)
             )
+            .animateContentSize()
     ) {
         Text(
             text = title,
@@ -55,7 +56,7 @@ fun SettingsSection(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        items.fastForEachIndexed { index, item ->
+        items.forEach { item ->
             when(item) {
                 is SectionItem.Default -> {
                     TextItem(
@@ -251,24 +252,36 @@ private fun ModeRowItem(
     Column(
         modifier = modifier.clip(RoundedCornerShape(12.dp))
             .clickable { onClick(entry) }
-            .background(if(isCurrentMode) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.background)
-            .border(
-                width = if(isCurrentMode) 1.dp else 0.dp,
-                color = if(isCurrentMode) MaterialTheme.colorScheme.inversePrimary else MaterialTheme.colorScheme.outline,
-                shape = RoundedCornerShape(12.dp)
-            ).padding(16.dp),
+            .background(
+                color = if(isCurrentMode) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.background
+            )
+            .then(
+                other = if(!isCurrentMode) {
+                    Modifier.border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                } else Modifier
+            )
+            .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         iconResource?.let {
             iconResource.toIcon(
                 modifier = Modifier.size(24.dp),
-                tint = MaterialTheme.colorScheme.onSurface
+                tint = if(isCurrentMode) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurface
             )
         }
         Text(
             text = entry,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = if(isCurrentMode) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurface
+            ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )

@@ -14,13 +14,23 @@ import com.example.shikiflow.presentation.screen.main.MainTrackMode
 import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
 import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.ThemeMode
+import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+data class SettingsUiState(
+    val settings: Settings = Settings(),
+    val themeSettings: ThemeSettings? = null,
+    val mangaSettings: MangaChapterSettings = MangaChapterSettings(),
+    val cacheSize: FileSize? = null
+)
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -29,37 +39,34 @@ class SettingsViewModel @Inject constructor(
     private val cacheRepository: CacheRepository
 ): ViewModel() {
 
-    val settings = settingsRepository.settingsFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = Settings()
-        )
-
-    val themeSettings = settingsRepository.themeSettingsFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = ThemeSettings()
-        )
-
-    val mangaSettings = settingsRepository.mangaSettingsFlow
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Eagerly,
-            initialValue = MangaChapterSettings()
-        )
-
-    private val _cacheSize = MutableStateFlow<FileSize?>(null)
-    val cacheSize = _cacheSize.asStateFlow()
+    private val _settingsState = MutableStateFlow(SettingsUiState())
+    val settingsState = _settingsState.asStateFlow()
 
     init {
         loadCacheSize()
+
+        viewModelScope.launch {
+            combine(
+                settingsRepository.settingsFlow.distinctUntilChanged(),
+                settingsRepository.themeSettingsFlow.distinctUntilChanged(),
+                settingsRepository.mangaSettingsFlow.distinctUntilChanged()
+            ) { settings, themeSettings, mangaSettings ->
+                _settingsState.update { state ->
+                    state.copy(
+                        settings = settings,
+                        themeSettings = themeSettings,
+                        mangaSettings = mangaSettings
+                    )
+                }
+            }.collect()
+        }
     }
 
     fun loadCacheSize() {
         viewModelScope.launch {
-            _cacheSize.value = cacheRepository.getCacheSize()
+            _settingsState.update { state ->
+                state.copy(cacheSize = cacheRepository.getCacheSize())
+            }
         }
     }
 
@@ -97,6 +104,20 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             Log.d("SettingsViewModel", "setOled: $isEnabled")
             settingsRepository.saveOLEDMode(isEnabled)
+        }
+    }
+
+    fun setDynamicTheme(isDynamicTheme: Boolean) {
+        viewModelScope.launch {
+            Log.d("SettingsViewModel", "setDynamicTheme: $isDynamicTheme")
+            settingsRepository.saveDynamicMode(isDynamicTheme)
+        }
+    }
+
+    fun setPaletteStyle(paletteStyle: PaletteStyle) {
+        viewModelScope.launch {
+            Log.d("SettingsViewModel", "setPaletteStyle: $paletteStyle")
+            settingsRepository.savePaletteStyle(paletteStyle)
         }
     }
 

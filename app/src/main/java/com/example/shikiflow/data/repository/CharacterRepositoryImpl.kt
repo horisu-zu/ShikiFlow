@@ -13,6 +13,8 @@ import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -22,9 +24,11 @@ class CharacterRepositoryImpl @Inject constructor(
     private val settingsRepository: SettingsRepository
 ): CharacterRepository {
 
-    private fun getSource() = when(settingsRepository.authTypeFlow.value) {
-        AuthType.SHIKIMORI -> shikimoriDataSource
-        AuthType.ANILIST -> anilistDataSource
+    private fun getSource() = runBlocking {
+        when(settingsRepository.authTypeFlow.first()) {
+            AuthType.SHIKIMORI -> shikimoriDataSource
+            AuthType.ANILIST -> anilistDataSource
+        }
     }
 
     override suspend fun getCharacterDetails(

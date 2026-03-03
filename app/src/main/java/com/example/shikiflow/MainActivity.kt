@@ -9,7 +9,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -17,7 +16,7 @@ import com.example.shikiflow.presentation.navigation.AppNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 import com.example.shikiflow.presentation.viewmodel.ThemeViewModel
 import com.example.shikiflow.ui.theme.ShikiFlowTheme
-import com.example.shikiflow.utils.ThemeMode
+import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -32,14 +31,23 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val (darkTheme, oledTheme) = observeTheme()
+            val themeSettings by themeViewModel.themeSettings.collectAsState()
+
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 window.isNavigationBarContrastEnforced = false
             }
 
+            val systemTheme = when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
+                Configuration.UI_MODE_NIGHT_YES -> true
+                Configuration.UI_MODE_NIGHT_NO -> false
+                else -> false
+            }
+
             ShikiFlowTheme(
-                darkTheme = darkTheme,
-                oledTheme = oledTheme
+                darkTheme = themeSettings.themeMode.isDarkTheme(systemTheme),
+                oledTheme = themeSettings.isOledEnabled,
+                dynamicColor = themeSettings.isDynamicThemeEnabled,
+                paletteStyle = themeSettings.paletteStyle
             ) {
                 AppNavigator(
                     onFinishActivity = { this.moveTaskToBack(true) },
@@ -49,29 +57,6 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-
-        //window.fitSystemWindowsWithAdjustResize()
-    }
-
-    @Composable
-    private fun observeTheme(): Pair<Boolean, Boolean> {
-        val settings by themeViewModel.themeSettings.collectAsState()
-
-        val systemTheme =
-            when (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) {
-                Configuration.UI_MODE_NIGHT_YES -> true
-                Configuration.UI_MODE_NIGHT_NO -> false
-                else -> false
-            }
-
-        Log.d("MainActivity", "Theme: ${settings.themeMode}, OLED: ${settings.isOledEnabled}")
-        val isDarkTheme = when (settings.themeMode) {
-            ThemeMode.SYSTEM -> systemTheme
-            ThemeMode.LIGHT -> false
-            ThemeMode.DARK -> true
-        }
-
-        return Pair(isDarkTheme, settings.isOledEnabled && isDarkTheme)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -94,13 +94,8 @@ class HTMLParser(private val strategy: HTMLDialect) {
                         }
                         null -> {
                             //Anilist-only handling
-                            if(node.tagName() == "p" || node.tagName() == "center") {
-                                processNodes(
-                                    nodes = node.childNodes(),
-                                    elements,
-                                    htmlBuffer,
-                                    linkColor
-                                )
+                            if (node.tagName() == "p" || node.tagName() == "center") {
+                                processNodes(node.childNodes(), elements, htmlBuffer, linkColor)
 
                                 htmlBuffer.append("<br><br>")
                             } else {
@@ -118,10 +113,19 @@ class HTMLParser(private val strategy: HTMLDialect) {
         elements: MutableList<DescriptionElement>,
         linkColor: Color
     ) {
-        if(htmlBuffer.isNotBlank()) {
-            val annotatedString = parseInnerHtml(htmlBuffer.toString(), linkColor)
-            if (annotatedString.isNotBlank()) {
-                elements.add(DescriptionElement.Text(annotatedString))
+        val rawHtml = htmlBuffer.toString().trim()
+        if (rawHtml.isNotBlank()) {
+            val annotatedString = parseInnerHtml(rawHtml, linkColor)
+
+            val trimmed = annotatedString.text.trimEnd()
+            val finalString = if (trimmed.length != annotatedString.length) {
+                annotatedString.subSequence(0, trimmed.length)
+            } else {
+                annotatedString
+            }
+
+            if (finalString.isNotEmpty()) {
+                elements.add(DescriptionElement.Text(finalString))
             }
             htmlBuffer.clear()
         }
@@ -135,11 +139,7 @@ class HTMLParser(private val strategy: HTMLDialect) {
 
         processInlineContent(doc.body(), builder, linkColor)
 
-        val result = builder.toAnnotatedString()
-        val trimmedLength = result.text.trimEnd().length
-
-        //Have to trim to avoid double paragraph spacing with Anilist HTML at the end of the text
-        return result.subSequence(0, trimmedLength)
+        return builder.toAnnotatedString()
     }
 
     private fun processInlineContent(
@@ -150,9 +150,13 @@ class HTMLParser(private val strategy: HTMLDialect) {
         element.childNodes().forEach { node ->
             when(node) {
                 is TextNode -> {
+                    val lastChar = if (builder.length > 0) {
+                        builder.toAnnotatedString().text.last()
+                    } else null
+
                     val innerText = strategy.getInnerTextNode(
                         node = node,
-                        currentText = builder.toAnnotatedString().text
+                        currentText = if (lastChar == '\n') "\n" else ""
                     )
 
                     Log.d("HTMLParser", "Inner Text: $innerText")

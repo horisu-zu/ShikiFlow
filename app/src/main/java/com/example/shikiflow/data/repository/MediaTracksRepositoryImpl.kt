@@ -20,6 +20,8 @@ import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -33,8 +35,8 @@ class MediaTracksRepositoryImpl @Inject constructor(
     val animeTracksDao = appRoomDatabase.animeTracksDao()
     val mangaTracksDao = appRoomDatabase.mangaTracksDao()
 
-    private fun getSource(): MediaTracksDataSource {
-        return when(settingsRepository.authTypeFlow.value) {
+    private fun getSource() = runBlocking {
+        when(settingsRepository.authTypeFlow.first()) {
             AuthType.SHIKIMORI -> shikimoriTracksDataSource
             AuthType.ANILIST -> anilistTracksDataSource
         }

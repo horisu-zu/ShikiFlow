@@ -39,25 +39,11 @@ fun CardItem(
         Text(
             text = item,
             style = style.copy(
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onPrimaryContainer
             ),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
         )
     }
-    /*Card(
-        shape = RoundedCornerShape(8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        ),
-        onClick = { *//*TODO*//* },
-        modifier = modifier
-    ) {
-        Text(
-            text = item,
-            style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-        )
-    }*/
 }
 
 @Composable
@@ -83,7 +69,9 @@ fun NavigationCard(
         )
         Text(
             text = title,
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            )
         )
     }
 }

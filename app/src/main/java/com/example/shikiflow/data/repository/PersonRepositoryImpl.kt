@@ -6,6 +6,8 @@ import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.repository.PersonRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -15,9 +17,11 @@ class PersonRepositoryImpl @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) : PersonRepository {
 
-    private fun getSource() = when(settingsRepository.authTypeFlow.value) {
-        AuthType.SHIKIMORI -> shikimoriDataSource
-        AuthType.ANILIST -> anilistDataSource
+    private fun getSource() = runBlocking {
+        when(settingsRepository.authTypeFlow.first()) {
+            AuthType.SHIKIMORI -> shikimoriDataSource
+            AuthType.ANILIST -> anilistDataSource
+        }
     }
 
     override suspend fun getStaffDetails(id: Int): Result<StaffDetails> {

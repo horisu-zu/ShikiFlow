@@ -1,18 +1,16 @@
 package com.example.shikiflow.data.repository
 
 import android.content.Context
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.utils.Converter.formatFileSize
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
 
 class CacheRepositoryImpl @Inject constructor(
-    @ApplicationContext private val context: Context
+    private val context: Context
 ): CacheRepository {
 
     override suspend fun getCacheSize(): FileSize {

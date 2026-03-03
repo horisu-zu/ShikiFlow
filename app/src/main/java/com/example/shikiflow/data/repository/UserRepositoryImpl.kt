@@ -16,6 +16,8 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -25,10 +27,8 @@ class UserRepositoryImpl @Inject constructor(
     private val settingsRepository: SettingsRepository
 ): UserRepository {
 
-    private fun getSource(): UserDataSource {
-        val authType = settingsRepository.authTypeFlow.value
-
-        return when(authType) {
+    private fun getSource() = runBlocking {
+        when(settingsRepository.authTypeFlow.first()) {
             AuthType.SHIKIMORI -> shikimoriUserDataSource
             AuthType.ANILIST -> anilistUserDataSource
         }

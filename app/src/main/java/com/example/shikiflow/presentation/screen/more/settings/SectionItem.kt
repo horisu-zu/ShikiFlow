@@ -16,7 +16,7 @@ sealed interface SectionItem {
         override val title: String,
         override val displayValue: String,
         val onClick: () -> Unit,
-        val isChecked: Boolean,
+        val isChecked: Boolean
     ): SectionItem
 
     data class Image(

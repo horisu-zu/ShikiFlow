@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -18,6 +19,13 @@ class UserViewModel @Inject constructor(
 ) : ViewModel() {
 
     val userFlow = settingsRepository.userFlow
+        .filterNotNull()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+
     val authTypeFlow = settingsRepository.authTypeFlow
         .stateIn(
             scope = viewModelScope,

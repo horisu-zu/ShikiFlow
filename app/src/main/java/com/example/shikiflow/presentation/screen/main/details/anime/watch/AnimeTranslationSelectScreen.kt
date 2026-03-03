@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -104,7 +107,6 @@ fun AnimeTranslationSelectScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    expandedHeight = 48.dp,
                     title = {
                         Text(
                             text = title,
@@ -124,7 +126,8 @@ fun AnimeTranslationSelectScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
                             else MaterialTheme.colorScheme.surface
-                    )
+                    ),
+                    windowInsets = WindowInsets.statusBars.only(WindowInsetsSides.Top)
                 )
                 TopAppBar(
                     windowInsets = WindowInsets(),

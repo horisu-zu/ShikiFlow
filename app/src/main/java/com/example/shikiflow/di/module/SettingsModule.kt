@@ -1,6 +1,10 @@
 package com.example.shikiflow.di.module
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStoreFile
 import com.example.shikiflow.data.repository.CacheRepositoryImpl
 import com.example.shikiflow.data.repository.SettingsRepositoryImpl
 import com.example.shikiflow.domain.repository.CacheRepository
@@ -10,7 +14,6 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -26,7 +29,12 @@ class SettingsModule {
     @Provides
     @Singleton
     fun provideSettingsRepository(
-        @ApplicationContext context: Context,
-        scope: CoroutineScope
-    ): SettingsRepository { return SettingsRepositoryImpl(context, scope) }
+        @ApplicationContext context: Context
+    ): SettingsRepository { return SettingsRepositoryImpl(providePreferencesDataStore(context)) }
+
+    private fun providePreferencesDataStore(appContext: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create(
+            produceFile = { appContext.preferencesDataStoreFile("app_settings") }
+        )
+    }
 }

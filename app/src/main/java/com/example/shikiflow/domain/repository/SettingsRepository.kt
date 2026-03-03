@@ -12,12 +12,12 @@ import com.example.shikiflow.presentation.screen.main.details.manga.read.Chapter
 import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.ThemeMode
+import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.StateFlow
 
 interface SettingsRepository {
     val userFlow: Flow<User?>
-    val authTypeFlow: StateFlow<AuthType>
+    val authTypeFlow: Flow<AuthType>
     val settingsFlow: Flow<Settings>
     val themeSettingsFlow: Flow<ThemeSettings>
     val browseUiSettingsFlow: Flow<BrowseUiSettings>
@@ -31,6 +31,8 @@ interface SettingsRepository {
     suspend fun saveBrowseOngoingOrder(ongoingOrder: BrowseOrder)
     suspend fun saveTheme(themeMode: ThemeMode)
     suspend fun saveOLEDMode(isEnabled: Boolean)
+    suspend fun saveDynamicMode(isDynamicTheme: Boolean)
+    suspend fun savePaletteStyle(paletteStyle: PaletteStyle)
     suspend fun saveLocale(locale: String)
     suspend fun saveTrackMode(trackMode: MainTrackMode)
     suspend fun saveDataSaverMode(newMode: Boolean)

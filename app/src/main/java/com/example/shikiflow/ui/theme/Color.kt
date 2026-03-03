@@ -2,6 +2,8 @@ package com.example.shikiflow.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val seedColor = Color(0xFF526CFD)
+
 val primaryLight = Color(0xFF3B7AA4)
 val onPrimaryLight = Color(0xFFFFFFFF)
 val primaryContainerLight = Color(0xFFCDE7FF)

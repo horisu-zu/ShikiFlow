@@ -5,8 +5,8 @@ import kotlin.time.Instant
 
 @Serializable
 data class User(
-    val id: String,
-    val avatarUrl: String,
-    val nickname: String,
+    val id: String = "",
+    val avatarUrl: String = "",
+    val nickname: String = "",
     val lastOnlineAt: Instant? = null
 )

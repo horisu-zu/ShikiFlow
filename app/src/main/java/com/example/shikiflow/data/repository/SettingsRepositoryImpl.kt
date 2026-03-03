@@ -1,12 +1,10 @@
 package com.example.shikiflow.data.repository
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
@@ -21,21 +19,16 @@ import com.example.shikiflow.presentation.screen.main.details.manga.read.Chapter
 import com.example.shikiflow.utils.AppUiMode
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.ThemeMode
-import kotlinx.coroutines.CoroutineScope
+import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import java.util.Locale
 import javax.inject.Inject
 
 class SettingsRepositoryImpl @Inject constructor(
-    private val context: Context,
-    private val scope: CoroutineScope
+    private val dataStore: DataStore<Preferences>
 ): SettingsRepository {
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("app_settings")
 
     companion object {
         private val USER_AVATAR_URL = stringPreferencesKey("user_avatar_url")
@@ -49,14 +42,17 @@ class SettingsRepositoryImpl @Inject constructor(
         private val SHIKI_BROWSE_ONGOING_ORDER = stringPreferencesKey("shiki_browse_ongoing_order")
 
         private val THEME_KEY = stringPreferencesKey("theme")
-        private val OLED_KEY = stringPreferencesKey("oled")
+        private val OLED_KEY = booleanPreferencesKey("oled")
+        private val DYNAMIC_THEME_KEY = booleanPreferencesKey("dynamic_mode")
+        private val PALETTE_STYLE_KEY = stringPreferencesKey("palette_style")
+
         private val LOCALE_KEY = stringPreferencesKey("locale")
         private val TRACK_MODE = stringPreferencesKey("track_theme")
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
     }
 
-    override val userFlow: Flow<User?> = context.dataStore.data
+    override val userFlow: Flow<User?> = dataStore.data
         .map { preferences ->
             preferences[USER_ID]?.let { userId ->
                 User(
@@ -67,19 +63,14 @@ class SettingsRepositoryImpl @Inject constructor(
             }
     }
 
-    override val authTypeFlow: StateFlow<AuthType> = context.dataStore.data
+    override val authTypeFlow = dataStore.data
         .map { preferences ->
             preferences[AUTH_TYPE]?.let { authType ->
                 AuthType.valueOf(authType)
             } ?: AuthType.SHIKIMORI
         }
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.Eagerly,
-            initialValue = AuthType.SHIKIMORI
-        )
 
-    override val settingsFlow: Flow<Settings> = context.dataStore.data
+    override val settingsFlow: Flow<Settings> = dataStore.data
         .map { preferences ->
             Settings(
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
@@ -89,15 +80,17 @@ class SettingsRepositoryImpl @Inject constructor(
                 )
     }
 
-    override val themeSettingsFlow: Flow<ThemeSettings> = context.dataStore.data
+    override val themeSettingsFlow: Flow<ThemeSettings> = dataStore.data
         .map { preferences ->
             ThemeSettings(
                 themeMode = ThemeMode.fromString(preferences[THEME_KEY]),
-                isOledEnabled = preferences[OLED_KEY]?.toBoolean() ?: false
+                isOledEnabled = preferences[OLED_KEY] ?: false,
+                isDynamicThemeEnabled = preferences[DYNAMIC_THEME_KEY] ?: false,
+                paletteStyle = PaletteStyle.valueOf(preferences[PALETTE_STYLE_KEY] ?: PaletteStyle.Expressive.name),
             )
         }
 
-    override val browseUiSettingsFlow: Flow<BrowseUiSettings> = context.dataStore.data
+    override val browseUiSettingsFlow: Flow<BrowseUiSettings> = dataStore.data
         .map { preferences ->
             BrowseUiSettings(
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
@@ -117,7 +110,7 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
-    override val mangaSettingsFlow: Flow<MangaChapterSettings> = context.dataStore.data
+    override val mangaSettingsFlow: Flow<MangaChapterSettings> = dataStore.data
         .map { preferences ->
             MangaChapterSettings(
                 chapterUIMode = ChapterUIMode.entries.find { it.name == preferences[CHAPTER_UI_MODE] }
@@ -126,19 +119,19 @@ class SettingsRepositoryImpl @Inject constructor(
             )
         }
 
-    override val localeFlow: Flow<String> = context.dataStore.data
+    override val localeFlow: Flow<String> = dataStore.data
         .map { preferences ->
             preferences[LOCALE_KEY] ?: Locale.getDefault().language
         }
 
     override suspend fun saveAuthType(authType: AuthType) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[AUTH_TYPE] = authType.name
         }
     }
 
     override suspend fun saveUserData(user: User) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[USER_ID] = user.id
             preferences[USER_NICKNAME] = user.nickname
             preferences[USER_AVATAR_URL] = user.avatarUrl
@@ -146,19 +139,19 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveAppUiMode(appUiMode: AppUiMode) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[APP_UI_MODE] = appUiMode.name
         }
     }
 
     override suspend fun saveBrowseUiMode(browseUiMode: BrowseUiMode) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[BROWSE_UI_MODE] = browseUiMode.name
         }
     }
 
     override suspend fun saveBrowseOngoingOrder(ongoingOrder: BrowseOrder) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             when (ongoingOrder) {
                 is BrowseOrder.Shikimori -> preferences[SHIKI_BROWSE_ONGOING_ORDER] = ongoingOrder.name
                 is BrowseOrder.Anilist -> preferences[AL_BROWSE_ONGOING_ORDER] = ongoingOrder.name
@@ -167,50 +160,62 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveTheme(themeMode: ThemeMode) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[THEME_KEY] = themeMode.name
         }
     }
 
     override suspend fun saveOLEDMode(isEnabled: Boolean) {
-        context.dataStore.edit { preferences ->
-            preferences[OLED_KEY] = isEnabled.toString()
+        dataStore.edit { preferences ->
+            preferences[OLED_KEY] = isEnabled
+        }
+    }
+
+    override suspend fun saveDynamicMode(isDynamicTheme: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[DYNAMIC_THEME_KEY] = isDynamicTheme
+        }
+    }
+
+    override suspend fun savePaletteStyle(paletteStyle: PaletteStyle) {
+        dataStore.edit { preferences ->
+            preferences[PALETTE_STYLE_KEY] = paletteStyle.name
         }
     }
 
     override suspend fun saveLocale(locale: String) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[LOCALE_KEY] = locale
         }
     }
 
     override suspend fun saveTrackMode(trackMode: MainTrackMode) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[TRACK_MODE] = trackMode.name
         }
     }
 
     override suspend fun saveDataSaverMode(newMode: Boolean) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[DATA_SAVER_MODE] = newMode
         }
     }
 
     override suspend fun saveChapterUiMode(newMode: ChapterUIMode) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[CHAPTER_UI_MODE] = newMode.name
         }
     }
 
     override suspend fun updateMangaSettings(settings: MangaChapterSettings) {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences[CHAPTER_UI_MODE] = settings.chapterUIMode.name
             preferences[DATA_SAVER_MODE] = settings.isDataSaverEnabled
         }
     }
 
     override suspend fun clearUserData() {
-        context.dataStore.edit { preferences ->
+        dataStore.edit { preferences ->
             preferences.remove(USER_ID)
             preferences.remove(USER_NICKNAME)
             preferences.remove(USER_AVATAR_URL)

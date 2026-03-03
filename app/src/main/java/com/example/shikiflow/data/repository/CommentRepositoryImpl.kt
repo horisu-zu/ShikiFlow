@@ -13,6 +13,8 @@ import com.example.shikiflow.domain.model.thread.ThreadSort
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor(
@@ -21,9 +23,11 @@ class CommentRepositoryImpl @Inject constructor(
     private val settingsRepository: SettingsRepository
 ): CommentRepository {
 
-    private fun getSource() = when(settingsRepository.authTypeFlow.value) {
-        AuthType.SHIKIMORI -> shikimoriDataSource
-        AuthType.ANILIST -> anilistDataSource
+    private fun getSource() = runBlocking {
+        when(settingsRepository.authTypeFlow.first()) {
+            AuthType.SHIKIMORI -> shikimoriDataSource
+            AuthType.ANILIST -> anilistDataSource
+        }
     }
 
     override suspend fun getComments(

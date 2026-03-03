@@ -61,7 +61,7 @@ fun RelatedSection(
                 Text(
                     text = relatedItems.size.toString(),
                     style = MaterialTheme.typography.labelSmall.copy(
-                        color = MaterialTheme.colorScheme.background
+                        color = MaterialTheme.colorScheme.onPrimary
                     )
                 )
             }

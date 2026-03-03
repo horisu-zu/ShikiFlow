@@ -40,7 +40,7 @@ fun CustomSearchField(
     modifier: Modifier = Modifier,
     isActive: Boolean = true,
     activeContainerColor: Color = MaterialTheme.colorScheme.background,
-    inactiveContainerColor: Color = MaterialTheme.colorScheme.surface
+    inactiveContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -75,7 +75,7 @@ fun CustomSearchField(
                         onExitSearch()
                     }) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = null,
                         )
                     }
@@ -105,14 +105,14 @@ fun CustomSearchField(
                     color = MaterialTheme.colorScheme.onSurface
                 ),
                 singleLine = true,
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
                 decorationBox = { innerTextField ->
                     Box {
                         if (query.isEmpty()) {
                             Text(
                                 text = label,
                                 style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         innerTextField()

@@ -81,7 +81,11 @@ fun SearchPage(
                 FilterChip(
                     selected = chips[selectedTabSearch] == rateStatus,
                     onClick = { selectedTabSearch = chips.indexOf(rateStatus) },
-                    label = { Text(stringResource(id = userRateStatus)) },
+                    label = {
+                        Text(
+                            text = stringResource(id = userRateStatus)
+                        )
+                    },
                     leadingIcon = if (chips[selectedTabSearch] == rateStatus) {
                         {
                             Icon(

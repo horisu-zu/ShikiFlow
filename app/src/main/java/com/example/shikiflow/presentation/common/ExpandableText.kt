@@ -277,7 +277,7 @@ private fun AnnotatedText(
                 style = MaterialTheme.typography.labelMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
-                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.8f),
                 modifier = Modifier
                     .clickable(
                         interactionSource = remember { MutableInteractionSource() },

@@ -45,12 +45,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_21
         targetCompatibility = JavaVersion.VERSION_21
     }
-    kotlin {
-        compilerOptions {
-            compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
-            optIn.add("kotlin.time.ExperimentalTime")
-        }
-    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -60,25 +54,34 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    apollo {
-        service("shikimori-api") {
-            packageName.set("com.example.graphql.shikimori")
-            schemaFile.set(file("src/main/graphql/shikimori/schema.graphql"))
-            srcDir("src/main/graphql/shikimori/sources")
-            generateKotlinModels.set(true)
-        }
-        service("anilist-api") {
-            packageName.set("com.example.graphql.anilist")
-            schemaFile.set(file("src/main/graphql/anilist/schema.graphql"))
-            srcDir("src/main/graphql/anilist/sources")
-            generateKotlinModels.set(true)
-        }
+}
+
+kotlin {
+    compilerOptions {
+        compilerOptions.jvmTarget.set(JvmTarget.JVM_21)
+        optIn.add("kotlin.time.ExperimentalTime")
     }
-    ksp {
-        //[OUTDATED] Set ksp.incremental.log = true in gradle.properties and now KSP2 works fine...
-        //Enabled aggregating task for Hilt and there're no problems now...
-        ksp.useKsp2 = true // PSI issue with KSP2 I don't know how to fix
+}
+
+apollo {
+    service("shikimori-api") {
+        packageName.set("com.example.graphql.shikimori")
+        schemaFile.set(file("src/main/graphql/shikimori/schema.graphql"))
+        srcDir("src/main/graphql/shikimori/sources")
+        generateKotlinModels.set(true)
     }
+    service("anilist-api") {
+        packageName.set("com.example.graphql.anilist")
+        schemaFile.set(file("src/main/graphql/anilist/schema.graphql"))
+        srcDir("src/main/graphql/anilist/sources")
+        generateKotlinModels.set(true)
+    }
+}
+
+ksp {
+    //[OUTDATED] Set ksp.incremental.log = true in gradle.properties and now KSP2 works fine...
+    //Enabled aggregating task for Hilt and there are no problems now...
+    ksp.useKsp2 = true // PSI issue with KSP2 I don't know how to fix
 }
 
 hilt {
@@ -173,4 +176,7 @@ dependencies {
 
     //Splash Screen
     implementation(libs.androidx.core.splash.screen)
+
+    //Material Kolor
+    implementation(libs.material.kolor)
 }

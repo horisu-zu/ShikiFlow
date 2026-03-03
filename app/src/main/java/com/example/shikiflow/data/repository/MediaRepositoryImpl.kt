@@ -17,6 +17,8 @@ import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -26,10 +28,8 @@ class MediaRepositoryImpl @Inject constructor(
     private val settingsRepository: SettingsRepository
 ): MediaRepository {
 
-    private fun getSource(): MediaDetailsDataSource {
-        val authType = settingsRepository.authTypeFlow.value
-
-        return when(authType) {
+    private fun getSource() = runBlocking {
+        when(settingsRepository.authTypeFlow.first()) {
             AuthType.SHIKIMORI -> shikimoriDataSource
             AuthType.ANILIST -> anilistDataSource
         }

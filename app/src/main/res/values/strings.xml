@@ -44,12 +44,16 @@
 
     <string name="settings_data_saver_mode">Data Saver Mode</string>
     <string name="settings_data_saver_desc">Reduce data usage by loading lower quality versions of chapters</string>
-    <string name="settings_data_saver_mode_enabled">Enabled</string>
-    <string name="settings_data_saver_mode_disabled">Disabled</string>
+    <string name="settings_enabled">Enabled</string>
+    <string name="settings_disabled">Disabled</string>
 
-    <string name="settings_app_theme">Application Theme</string>
+    <string name="settings_dynamic_theme_label">Dynamic Theme</string>
+    <string name="settings_app_theme_label">App Theme</string>
+    <string name="settings_app_theme">Theme</string>
     <string name="settings_oled_theme">OLED theme</string>
     <string name="settings_oled_desc">Enable OLED mode for darker backgrounds</string>
+    <string name="settings_palette_style_label">Palette Style</string>
+    <string name="settings_palette_style_desc">Select Palette Style for Dynamic Theme</string>
 
     <string name="settings_cache_confirmation">Are you sure you want to clear the image cache?</string>
     <string name="settings_cache_size">Cache Size</string>
@@ -344,6 +348,7 @@
     <string name="spoiler_label">Spoiler</string>
     <string name="error_imgur_image">Open Imgur Image</string>
     <string name="chapter_list_label">Chapters from the same translator</string>
+    <string name="settings_palette_style_bottom_title">Select Palette Style</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

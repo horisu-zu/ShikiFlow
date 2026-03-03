@@ -79,7 +79,7 @@ fun BrowseListItem(
                             withStyle(
                                 style = SpanStyle(
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             ) {
                                 append(studio)
@@ -122,7 +122,7 @@ fun BrowseListItem(
                         withStyle(
                             style = SpanStyle(
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         ) {
                             append(Converter.formatInstant(instant, includeDayOfWeek = true))

@@ -72,11 +72,11 @@ fun ChapterSettingsBottomSheet(
             )
             ChapterSettingsRow(
                 title = stringResource(R.string.settings_data_saver_mode),
-                currentValue = if(mangaSettings.isDataSaverEnabled) stringResource(R.string.settings_data_saver_mode_enabled)
-                    else stringResource(R.string.settings_data_saver_mode_disabled),
+                currentValue = if(mangaSettings.isDataSaverEnabled) stringResource(R.string.settings_enabled)
+                    else stringResource(R.string.settings_disabled),
                 values = listOf(
-                    stringResource(R.string.settings_data_saver_mode_enabled),
-                    stringResource(R.string.settings_data_saver_mode_disabled)
+                    stringResource(R.string.settings_enabled),
+                    stringResource(R.string.settings_disabled)
                 ),
                 onSettingClick = { selectedIndex ->
                     onSettingsChange(mangaSettings.copy(

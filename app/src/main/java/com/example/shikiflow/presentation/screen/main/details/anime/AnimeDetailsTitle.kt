@@ -235,6 +235,7 @@ private fun UserStatusItem(
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(24.dp)
                 )
             }

@@ -246,12 +246,14 @@ fun MangaUserRateItem(
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_circle),
                                 contentDescription = "Empty Response",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         } else {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_mangadex_v2),
                                 contentDescription = "Manga Read Navigate",
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.size(24.dp)
                             )
                         }
@@ -260,6 +262,7 @@ fun MangaUserRateItem(
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.size(24.dp)
                         )
                     }

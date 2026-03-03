@@ -146,11 +146,10 @@ class AnilistDialect: HTMLDialect {
             node.hasClass("b-link") &&
             node.hasAttr("data-attrs")
         ) {
-            val hasNameSpans = node.select("span.name-en, span.name-ru").isNotEmpty()
+            val hasNameSpans = node.select("span.name-en").isNotEmpty()
             if (hasNameSpans) {
                 val json = JSONObject(node.attr("data-attrs"))
-                val display = json.optString("russian")
-                    .ifBlank { json.optString("name") }
+                val display = json.optString("name")
                 builder.append(display)
                 return true
             }
