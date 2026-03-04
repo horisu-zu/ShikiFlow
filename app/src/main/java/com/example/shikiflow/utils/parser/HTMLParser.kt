@@ -150,13 +150,9 @@ class HTMLParser(private val strategy: HTMLDialect) {
         element.childNodes().forEach { node ->
             when(node) {
                 is TextNode -> {
-                    val lastChar = if (builder.length > 0) {
-                        builder.toAnnotatedString().text.last()
-                    } else null
-
                     val innerText = strategy.getInnerTextNode(
                         node = node,
-                        currentText = if (lastChar == '\n') "\n" else ""
+                        currentText = builder.toAnnotatedString().text
                     )
 
                     Log.d("HTMLParser", "Inner Text: $innerText")

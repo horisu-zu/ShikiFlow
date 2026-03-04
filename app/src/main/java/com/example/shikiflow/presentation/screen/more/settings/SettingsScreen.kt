@@ -97,73 +97,63 @@ fun SettingsScreen(
                 )
                 SettingsSection(
                     title = stringResource(R.string.settings_theme_section_title),
-                    items = buildList {
-                        add(
-                            SectionItem.Mode(
-                                title = stringResource(R.string.settings_dynamic_theme_label),
-                                mode = when (themeSettings.isDynamicThemeEnabled) {
-                                    true -> stringResource(R.string.settings_enabled)
-                                    false -> stringResource(R.string.settings_disabled)
-                                },
-                                entries = listOf(
-                                    stringResource(R.string.settings_enabled),
-                                    stringResource(R.string.settings_disabled)
-                                ),
-                                iconResources = listOf(
-                                    IconResource.Drawable(resId = R.drawable.ic_palette),
-                                    IconResource.Drawable(resId = R.drawable.ic_format_paint)
-                                ),
-                                onClick = { newMode ->
-                                    settingsViewModel.setDynamicTheme(newMode == resources.getString(R.string.settings_enabled))
-                                }
-                            )
-                        )
-                        if(themeSettings.isDynamicThemeEnabled) {
-                            add(
-                                SectionItem.Default(
-                                    title = stringResource(R.string.settings_palette_style_label),
-                                    displayValue = stringResource(R.string.settings_palette_style_desc),
-                                    onClick = {
-                                        bottomSheetConfig.value = BottomSheetConfig(
-                                            title = resources.getString(R.string.settings_palette_style_bottom_title),
-                                            options = PaletteStyle.entries.map { it.name },
-                                            currentValue = themeSettings.paletteStyle.name,
-                                            onOptionClick = { selectedIndex ->
-                                                settingsViewModel.setPaletteStyle(PaletteStyle.entries[selectedIndex])
-                                                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                                    bottomSheetConfig.value = null
-                                                }
-                                            }
-                                        )
+                    items = listOf(
+                        SectionItem.Mode(
+                            title = stringResource(R.string.settings_dynamic_theme_label),
+                            mode = when (themeSettings.isDynamicThemeEnabled) {
+                                true -> stringResource(R.string.settings_enabled)
+                                false -> stringResource(R.string.settings_disabled)
+                            },
+                            entries = listOf(
+                                stringResource(R.string.settings_enabled),
+                                stringResource(R.string.settings_disabled)
+                            ),
+                            iconResources = listOf(
+                                IconResource.Drawable(resId = R.drawable.ic_palette),
+                                IconResource.Drawable(resId = R.drawable.ic_format_paint)
+                            ),
+                            onClick = { newMode ->
+                                settingsViewModel.setDynamicTheme(newMode == resources.getString(R.string.settings_enabled))
+                            }
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_palette_style_label),
+                            displayValue = stringResource(R.string.settings_palette_style_desc),
+                            isVisible = themeSettings.isDynamicThemeEnabled,
+                            onClick = {
+                                bottomSheetConfig.value = BottomSheetConfig(
+                                    title = resources.getString(R.string.settings_palette_style_bottom_title),
+                                    options = PaletteStyle.entries.map { it.name },
+                                    currentValue = themeSettings.paletteStyle.name,
+                                    onOptionClick = { selectedIndex ->
+                                        settingsViewModel.setPaletteStyle(PaletteStyle.entries[selectedIndex])
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            bottomSheetConfig.value = null
+                                        }
                                     }
                                 )
-                            )
-                        }
-                        add(
-                            SectionItem.Mode(
-                                title = stringResource(R.string.settings_app_theme_label),
-                                mode = stringResource(themeSettings.themeMode.displayValue),
-                                entries = ThemeMode.entries.map { stringResource(it.displayValue) },
-                                iconResources = ThemeMode.entries.map { it.icon },
-                                weights = listOf(3f, 2f, 2f),
-                                onClick = { newTheme ->
-                                    settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
-                                }
-                            )
+                            }
+                        ),
+                        SectionItem.Mode(
+                            title = stringResource(R.string.settings_app_theme_label),
+                            mode = stringResource(themeSettings.themeMode.displayValue),
+                            entries = ThemeMode.entries.map { stringResource(it.displayValue) },
+                            iconResources = ThemeMode.entries.map { it.icon },
+                            weights = listOf(3f, 2f, 2f),
+                            onClick = { newTheme ->
+                                settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
+                            }
+                        ),
+                        SectionItem.Switch(
+                            title = stringResource(R.string.settings_oled_theme),
+                            displayValue = stringResource(R.string.settings_oled_desc),
+                            isChecked = themeSettings.isOledEnabled,
+                            isVisible = themeSettings.themeMode.isDarkTheme(isSystemInDarkTheme()),
+                            onClick = {
+                                settingsViewModel.setOled(!themeSettings.isOledEnabled)
+                            }
                         )
-                        if(themeSettings.themeMode.isDarkTheme(isSystemInDarkTheme())) {
-                            add(
-                                SectionItem.Switch(
-                                    title = stringResource(R.string.settings_oled_theme),
-                                    displayValue = stringResource(R.string.settings_oled_desc),
-                                    isChecked = themeSettings.isOledEnabled,
-                                    onClick = {
-                                        settingsViewModel.setOled(!themeSettings.isOledEnabled)
-                                    }
-                                )
-                            )
-                        }
-                    }
+                    )
                 )
                 SettingsSection(
                     title = stringResource(R.string.seetings_interface_section_title),

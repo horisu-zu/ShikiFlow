@@ -21,22 +21,22 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
-import com.example.shikiflow.presentation.viewmodel.MainViewModel
+import com.example.shikiflow.presentation.viewmodel.MainScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainScreen(
     currentUser: User?,
-    mainViewModel: MainViewModel = hiltViewModel(),
+    mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
     navOptions: MainScreenNavOptions
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
 
-    val currentTrackMode by mainViewModel.currentTrackMode.collectAsStateWithLifecycle()
-    val screenState by mainViewModel.screenState.collectAsStateWithLifecycle()
-    val searchQuery by mainViewModel.searchQuery.collectAsStateWithLifecycle()
+    val currentTrackMode by mainScreenViewModel.currentTrackMode.collectAsStateWithLifecycle()
+    val screenState by mainScreenViewModel.screenState.collectAsStateWithLifecycle()
+    val searchQuery by mainScreenViewModel.searchQuery.collectAsStateWithLifecycle()
 
     currentTrackMode?.let { trackMode ->
         Scaffold(
@@ -48,10 +48,10 @@ fun MainScreen(
                     user = currentUser,
                     query = screenState.query,
                     isSearchActive = screenState.isSearchActive,
-                    onModeChange = { trackMode -> mainViewModel.setCurrentTrackMode(trackMode) },
-                    onQueryChange = mainViewModel::onQueryChange,
-                    onSearchToggle = mainViewModel::onSearchActiveChange,
-                    onExitSearch = mainViewModel::exitSearchState
+                    onModeChange = { trackMode -> mainScreenViewModel.setCurrentTrackMode(trackMode) },
+                    onQueryChange = mainScreenViewModel::onQueryChange,
+                    onSearchToggle = mainScreenViewModel::onSearchActiveChange,
+                    onExitSearch = mainScreenViewModel::exitSearchState
                 )
             }
         ) { innerPadding ->

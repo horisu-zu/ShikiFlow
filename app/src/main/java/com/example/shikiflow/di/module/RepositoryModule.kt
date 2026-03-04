@@ -1,6 +1,7 @@
 package com.example.shikiflow.di.module
 
 import android.content.Context
+import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.datasource.MediaDetailsDataSource
@@ -8,13 +9,9 @@ import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.data.remote.GithubApi
 import com.example.shikiflow.data.remote.KodikApi
 import com.example.shikiflow.data.remote.MangaDexApi
-import com.example.shikiflow.data.remote.PersonApi
-import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
-import com.example.shikiflow.data.remote.auth.AnilistAuthApi
 import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
@@ -54,11 +51,11 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideAuthRepository(
-        shikiAuthApi: ShikimoriAuthApi,
-        anilistAuthApi: AnilistAuthApi,
+        @Shikimori shikiAuthDataSource: AuthDataSource,
+        @AniList anilistAuthDataSource: AuthDataSource,
         tokenRepository: TokenRepository,
         appRoomDatabase: AppRoomDatabase
-    ): AuthRepository = AuthRepositoryImpl(shikiAuthApi, anilistAuthApi, tokenRepository, appRoomDatabase)
+    ): AuthRepository = AuthRepositoryImpl(shikiAuthDataSource, anilistAuthDataSource, tokenRepository, appRoomDatabase)
 
     @Provides
     @Singleton

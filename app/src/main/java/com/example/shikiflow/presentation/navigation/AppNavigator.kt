@@ -1,47 +1,37 @@
 package com.example.shikiflow.presentation.navigation
 
 import android.util.Log
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthState
-import com.example.shikiflow.presentation.viewmodel.AuthViewModel
 
 @Composable
 fun AppNavigator(
-    onFinishActivity: () -> Unit,
-    onSplashNavigate: (Boolean) -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    authState: AuthState,
+    onAuthorize: (AuthType) -> String,
+    onFinishActivity: () -> Unit
 ) {
-    val appBackstack = rememberNavBackStack(AppNavRoute.Splash)
-    val authState by viewModel.authState.collectAsState()
-
-    val isOnSplash by remember(authState) {
-        derivedStateOf {
-            authState is AuthState.Loading
+    val startKey = remember {
+        when(authState) {
+            AuthState.Success -> AppNavRoute.Main
+            else -> AppNavRoute.Auth
         }
     }
-
-    LaunchedEffect(isOnSplash) {
-        onSplashNavigate(isOnSplash)
-    }
+    val appBackstack = rememberNavBackStack(startKey)
 
     val options = object : AppNavOptions {
         override fun navigateToAuth() {
@@ -63,11 +53,10 @@ fun AppNavigator(
                 Log.d("AppNavigator", "Navigating to main")
                 options.navigateToMain()
             }
-            AuthState.Initial -> {
+            else -> {
                 Log.d("AppNavigator", "Navigating to auth")
                 options.navigateToAuth()
             }
-            else -> {}
         }
     }
 
@@ -75,11 +64,10 @@ fun AppNavigator(
         backStack = appBackstack,
         onBack = { if(appBackstack.size > 1) appBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<AppNavRoute.Splash> { /**/ }
             entry<AppNavRoute.Auth> {
                 AuthScreen(
                     onAuth = { authType ->
-                        viewModel.getAuthorizationUrl(authType)
+                        onAuthorize(authType)
                     }
                 )
             }
@@ -90,14 +78,12 @@ fun AppNavigator(
             }
         },
         transitionSpec = {
-            fadeIn(initialAlpha = 0.1f, animationSpec = tween(300)) togetherWith
-                ExitTransition.KeepUntilTransitionsFinished
-        },
-        popTransitionSpec = {
-            EnterTransition.None togetherWith fadeOut(targetAlpha = 0.5f)
-        },
-        predictivePopTransitionSpec = {
-            EnterTransition.None togetherWith fadeOut(targetAlpha = 0.5f)
+            fadeIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) togetherWith ExitTransition.None
         },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),

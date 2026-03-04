@@ -1,71 +1,70 @@
 package com.example.shikiflow.presentation.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.search.ScreenSearchState
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.settings.ThemeSettings
+import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
+import com.example.shikiflow.domain.repository.TokenRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(FlowPreview::class)
+
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val authRepository: AuthRepository,
+    private val tokenRepository: TokenRepository
 ): ViewModel() {
 
-    private val _currentTrackMode = MutableStateFlow<MainTrackMode?>(null)
-    val currentTrackMode = _currentTrackMode.asStateFlow()
+    val _authType = MutableStateFlow<AuthType?>(null)
 
-    private val _screenState = MutableStateFlow(ScreenSearchState())
-    val screenState: StateFlow<ScreenSearchState> = _screenState.asStateFlow()
-
-    val searchQuery = _screenState
-        .map { it.query }
-        .debounce(500L)
+    val themeSettings = settingsRepository.themeSettingsFlow
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = ""
+            started = SharingStarted.Eagerly,
+            initialValue = ThemeSettings()
         )
 
-    init {
+    val authState: StateFlow<AuthState> = tokenRepository.authCredentials
+        .map { tokens ->
+            when(tokens.accessToken) {
+                null -> AuthState.Initial
+                else -> AuthState.Success
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = AuthState.Loading
+        )
+
+    fun getAuthorizationUrl(authType: AuthType): String {
+        _authType.value = authType
+        return authRepository.getAuthorizationUrl(authType)
+    }
+
+    fun handleAuthCode(uriResponse: Uri) {
         viewModelScope.launch {
-            _currentTrackMode.value = settingsRepository.settingsFlow
-                .map { it.trackMode }
-                .first()
+            _authType.value?.let { type ->
+                authRepository.handleAuthResponse(uriResponse, type)
+                settingsRepository.saveAuthType(type)
+            }
         }
     }
+}
 
-    fun setCurrentTrackMode(mode: MainTrackMode) {
-        viewModelScope.launch {
-            _currentTrackMode.value = mode
-        }
-    }
-
-    fun onQueryChange(newQuery: String) {
-        _screenState.update { it.copy(query = newQuery) }
-    }
-
-    fun onSearchActiveChange(isActive: Boolean) {
-        _screenState.update { it.copy(isSearchActive = isActive) }
-    }
-
-    fun exitSearchState() {
-        _screenState.update { it.copy(
-            isSearchActive = false,
-            query = ""
-        ) }
-    }
+sealed interface AuthState {
+    object Initial : AuthState
+    object Loading : AuthState
+    object Success : AuthState
+    data class Error(val message: String) : AuthState
 }

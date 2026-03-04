@@ -9,14 +9,16 @@ sealed interface SectionItem {
     data class Default(
         override val title: String,
         override val displayValue: String,
-        val onClick: () -> Unit
+        val onClick: () -> Unit,
+        val isVisible: Boolean = true
     ): SectionItem
 
     data class Switch(
         override val title: String,
         override val displayValue: String,
         val onClick: () -> Unit,
-        val isChecked: Boolean
+        val isChecked: Boolean,
+        val isVisible: Boolean = true
     ): SectionItem
 
     data class Image(
@@ -41,7 +43,8 @@ sealed interface SectionItem {
         val iconResources: List<IconResource> = emptyList(),
         val weights: List<Float> = emptyList(),
         val onClick: (String) -> Unit,
-        val mode: String
+        val mode: String,
+        val isVisible: Boolean = true
     ): SectionItem {
         override val displayValue: String
             get() = mode.lowercase().replaceFirstChar { it.uppercase() }

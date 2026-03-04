@@ -1,6 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
-import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -40,7 +40,6 @@ fun SettingsSection(
                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                 shape = RoundedCornerShape(12.dp)
             )
-            .animateContentSize()
     ) {
         Text(
             text = title,
@@ -59,11 +58,13 @@ fun SettingsSection(
         items.forEach { item ->
             when(item) {
                 is SectionItem.Default -> {
-                    TextItem(
-                        title = item.title,
-                        subtitle = item.displayValue,
-                        onClick = item.onClick
-                    )
+                    AnimatedVisibility(item.isVisible) {
+                        TextItem(
+                            title = item.title,
+                            subtitle = item.displayValue,
+                            onClick = item.onClick
+                        )
+                    }
                 }
                 is SectionItem.Image -> {
                     ImageItem(
@@ -74,22 +75,26 @@ fun SettingsSection(
                     )
                 }
                 is SectionItem.Switch -> {
-                    SwitchItem(
-                        title = item.title,
-                        displayValue = item.displayValue,
-                        isChecked = item.isChecked,
-                        onClick = item.onClick
-                    )
+                    AnimatedVisibility(item.isVisible) {
+                        SwitchItem(
+                            title = item.title,
+                            displayValue = item.displayValue,
+                            isChecked = item.isChecked,
+                            onClick = item.onClick
+                        )
+                    }
                 }
                 is SectionItem.Mode -> {
-                    ModeItem(
-                        title = item.title,
-                        entries = item.entries,
-                        iconResources = item.iconResources,
-                        weights = item.weights,
-                        mode = item.mode,
-                        onClick = item.onClick
-                    )
+                    AnimatedVisibility(item.isVisible) {
+                        ModeItem(
+                            title = item.title,
+                            entries = item.entries,
+                            iconResources = item.iconResources,
+                            weights = item.weights,
+                            mode = item.mode,
+                            onClick = item.onClick
+                        )
+                    }
                 }
             }
         }
@@ -213,7 +218,7 @@ private fun <T> ModeItem(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 6.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Text(

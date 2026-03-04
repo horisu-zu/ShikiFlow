@@ -9,7 +9,6 @@ import com.example.shikiflow.domain.model.comment.EntityType.Companion.getAnilis
 import com.fleeksoft.ksoup.nodes.Element
 import com.fleeksoft.ksoup.nodes.TextNode
 import org.json.JSONObject
-import java.net.URI
 
 class AnilistDialect: HTMLDialect {
     override fun getNodeType(element: Element): NodeType? {
@@ -40,26 +39,27 @@ class AnilistDialect: HTMLDialect {
     }
 
     override fun getImage(node: Element): DescriptionElement.Image {
-        val img = when (node.tagName()) {
-            "img" -> node
-            else -> node.selectFirst("img")
-        }
-
-        val aspectRatio = (16f / 9f)
+        val img = if(node.tagName() == "img") node else node.selectFirst("img")
 
         return DescriptionElement.Image(
             imageUrl = img?.attr("src"),
-            aspectRatio = aspectRatio
+            aspectRatio = 16f / 9f
         )
     }
 
     override fun getQuote(node: Element): DescriptionElement.Quote {
-        val senderAvatarUrl = node.selectFirst("img")
-            ?.attr("srcset") ?: node.selectFirst("img")?.attr("src")
+        val imgNode = node.selectFirst("img")
+        val senderAvatarUrl = imgNode?.attr("srcset")
+            ?: imgNode?.attr("src")
+
         val senderNickname = node.selectFirst("span")?.text()
-        val content = if(!node.selectFirst(".quote-content")?.text().isNullOrEmpty()) {
-            node.selectFirst(".quote-content")?.text() ?: ""
-        } else { node.text() }
+
+        val quoteContentNodeText = node.selectFirst(".quote-content")?.text()
+        val content = if (!quoteContentNodeText.isNullOrEmpty()) {
+            quoteContentNodeText
+        } else {
+            node.text()
+        }
 
         return DescriptionElement.Quote(
             senderAvatarUrl,
@@ -90,13 +90,18 @@ class AnilistDialect: HTMLDialect {
     }
 
     override fun getEntityDataForElement(element: Element): EntityData? {
-        if (element.tagName() != "a" || !element.attr("href").contains(BuildConfig.ANILIST_BASE_URL)) {
+        val href = element.attr("href")
+        if (element.tagName() != "a" || !href.contains(BuildConfig.ANILIST_BASE_URL)) {
             return null
         }
 
-        val href = element.attr("href")
-        val path = URI(href).path.trim('/')
+        val path = href.substringAfter(BuildConfig.ANILIST_BASE_URL)
+            .substringBefore('?')
+            .trim('/')
+
         val parts = path.split('/')
+
+        if (parts.size < 2) return null
 
         val type = parts[0]
         val id = parts[1]

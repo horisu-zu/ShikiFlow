@@ -1,18 +1,21 @@
 package com.example.shikiflow.di.module
 
 import com.apollographql.apollo.ApolloClient
+import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.datasource.MediaDetailsDataSource
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.datasource.UserDataSource
+import com.example.shikiflow.data.datasource.anilist.AnilistAuthDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistCharactersDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistMediaDetailsDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistThreadsDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistTracksDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistUserDataSource
+import com.example.shikiflow.data.datasource.shikimori.ShikimoriAuthDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriCharactersDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriCommentsDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriMediaDetailsDataSource
@@ -20,14 +23,14 @@ import com.example.shikiflow.data.datasource.shikimori.ShikimoriStaffDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriTracksDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriUserDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.dao.AnimeTracksDao
-import com.example.shikiflow.data.local.dao.MangaTracksDao
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.data.remote.UserApi
+import com.example.shikiflow.data.remote.auth.AnilistAuthApi
+import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.di.annotations.Shikimori
@@ -41,6 +44,19 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object DataSourceModule {
+
+    @Shikimori
+    @Provides
+    @Singleton
+    fun provideShikimoriAuthDataSource(
+        shikiAuthApi: ShikimoriAuthApi
+    ): AuthDataSource = ShikimoriAuthDataSource(shikiAuthApi)
+
+    //No need for Auth API cuz I implemented implicit grant
+    @AniList
+    @Provides
+    @Singleton
+    fun provideAnilistAuthDataSource(): AuthDataSource = AnilistAuthDataSource()
 
     @Shikimori
     @Provides
