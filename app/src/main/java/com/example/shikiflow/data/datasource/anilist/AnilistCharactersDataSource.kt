@@ -1,14 +1,22 @@
 package com.example.shikiflow.data.datasource.anilist
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.anilist.CharacterDetailsQuery
+import com.example.graphql.anilist.CharacterMediaAppearancesQuery
 import com.example.graphql.anilist.CharactersQuery
 import com.example.shikiflow.data.datasource.CharactersDataSource
+import com.example.shikiflow.data.local.source.CharacterMediaPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
+import com.example.shikiflow.domain.model.character.CharacterMediaRole
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.tracks.MediaType
-import java.lang.IllegalStateException
+import com.example.shikiflow.utils.AnilistUtils.toResult
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistCharactersDataSource @Inject constructor(
@@ -17,18 +25,54 @@ class AnilistCharactersDataSource @Inject constructor(
     override suspend fun getCharacterDetails(characterId: Int): Result<MediaCharacter> {
         val characterQuery = CharacterDetailsQuery(characterId)
 
-        return try {
-            val response = apolloClient.query(characterQuery).execute()
+        val response = apolloClient.query(characterQuery).execute()
 
-            val result = response.data
-                ?.Character
-                ?.toDomain()
+        return response.toResult().map { data ->
+            data.Character?.toDomain() ?: throw NoSuchElementException("Character Not Found")
+        }
+    }
 
-            result?.let {
-                Result.success(result)
-            } ?: Result.failure(exception = IllegalStateException("No Data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+    override fun getCharacterMediaAppearances(
+        characterId: Int,
+        mediaType: MediaType
+    ): Flow<PagingData<CharacterMediaRole>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 24
+            ),
+            pagingSourceFactory = {
+                CharacterMediaPagingSource(
+                    characterId = characterId,
+                    mediaType = mediaType,
+                    charactersDataSource = this
+                )
+            }
+        ).flow
+    }
+
+    suspend fun paginatedCharacterMediaAppearances(
+        page: Int,
+        limit: Int,
+        characterId: Int,
+        mediaType: MediaType
+    ): Result<List<CharacterMediaRole>> {
+        val characterMediaAppearanceQuery = CharacterMediaAppearancesQuery(
+            page = page,
+            perPage = limit,
+            characterId = characterId,
+            mediaType = mediaType.toAnilistType()
+        )
+
+        val response = apolloClient.query(characterMediaAppearanceQuery).execute()
+
+        return response.toResult().map { data ->
+            data.Character
+                ?.media
+                ?.aLCharacterMediaRoles
+                ?.toDomain() ?: emptyList()
         }
     }
 
@@ -40,20 +84,19 @@ class AnilistCharactersDataSource @Inject constructor(
     ): Result<List<MediaCharacterShort>> {
         val charactersQuery = CharactersQuery(mediaId, page, limit)
 
-        return try {
-            val response = apolloClient.query(charactersQuery).execute()
+        val response = apolloClient.query(charactersQuery).execute()
 
-            val result = response.data
-                ?.Media
+        if(response.hasErrors()) {
+            return Result.failure(Exception("Response Errors: ${response.errors}"))
+        }
+
+        return response.toResult().map { data ->
+            data.Media
                 ?.characters
                 ?.edges
-                ?.mapNotNull { it?.toDomain() }
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.success(emptyList())
-        } catch (e: Exception) {
-            Result.failure(e)
+                ?.mapNotNull { characterEdge ->
+                    characterEdge?.toDomain()
+                } ?: emptyList()
         }
     }
 }

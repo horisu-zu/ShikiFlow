@@ -287,6 +287,18 @@ fragment ALMediaStaffRoles on MediaConnection {
     }
 }
 
+fragment ALCharacterMediaRoles on MediaConnection {
+    pageInfo {
+        hasNextPage
+    }
+    edges {
+        characterRole
+        node {
+            ...ALMediaBrowseShort
+        }
+    }
+}
+
 fragment ALThread on Thread {
     id
     title

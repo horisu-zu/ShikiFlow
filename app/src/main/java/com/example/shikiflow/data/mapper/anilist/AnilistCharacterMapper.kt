@@ -2,6 +2,7 @@ package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.CharacterDetailsQuery
 import com.example.graphql.anilist.CharactersQuery
+import com.example.graphql.anilist.fragment.ALCharacterMediaRoles
 import com.example.graphql.anilist.fragment.ALCharacterShort
 import com.example.graphql.anilist.fragment.ALMediaBrowseShort
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
@@ -11,7 +12,7 @@ import com.example.graphql.anilist.type.CharacterRole as AnilistCharacterRole
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
-import com.example.shikiflow.domain.model.character.MediaRole
+import com.example.shikiflow.domain.model.character.CharacterMediaRole
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -42,13 +43,14 @@ object AnilistCharacterMapper {
         )
     }
 
-    fun ALMediaBrowseShort.toDomain(): MediaRole {
-        return MediaRole(
+    fun ALMediaBrowseShort.toDomain(characterRole: CharacterRole): CharacterMediaRole {
+        return CharacterMediaRole(
             id = id,
             mediaType = type?.toDomain() ?: MediaType.ANIME,
             title = title?.romaji ?: "",
             coverImageUrl = coverImage?.large ?: "",
-            userRateStatus = mediaListEntry?.status?.toDomain()
+            userRateStatus = mediaListEntry?.status?.toDomain(),
+            characterRole = characterRole
         )
     }
 
@@ -62,14 +64,26 @@ object AnilistCharacterMapper {
             description = description,
             voiceActors = emptyList(),
             animeRoles = PaginatedList(
-                hasNextPage = anime?.pageInfo?.hasNextPage == true,
-                entries = anime?.edges?.mapNotNull { it?.node?.aLMediaBrowseShort?.toDomain() }.orEmpty()
+                hasNextPage = anime?.aLCharacterMediaRoles?.pageInfo?.hasNextPage == true,
+                entries = anime?.aLCharacterMediaRoles?.edges?.mapNotNull {
+                    it?.node?.aLMediaBrowseShort?.toDomain()
+                }.orEmpty(),
             ),
             mangaRoles = PaginatedList(
-                hasNextPage = manga?.pageInfo?.hasNextPage == true,
-                entries = manga?.edges?.mapNotNull { it?.node?.aLMediaBrowseShort?.toDomain() }.orEmpty()
+                hasNextPage = manga?.aLCharacterMediaRoles?.pageInfo?.hasNextPage == true,
+                entries = manga?.aLCharacterMediaRoles?.edges?.mapNotNull {
+                    it?.node?.aLMediaBrowseShort?.toDomain()
+                }.orEmpty()
             ),
             topicId = null
         )
+    }
+
+    fun ALCharacterMediaRoles.toDomain(): List<CharacterMediaRole> {
+        return this.edges?.mapNotNull {
+            it?.node?.aLMediaBrowseShort?.toDomain(
+                characterRole = it.characterRole?.toDomain() ?: CharacterRole.UNKNOWN
+            )
+        }.orEmpty()
     }
 }

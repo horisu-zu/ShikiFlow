@@ -25,6 +25,7 @@ import com.example.shikiflow.domain.model.track.UserRateOrder
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -73,15 +74,11 @@ class ShikimoriTracksDataSource @Inject constructor(
             order = Optional.presentIfNotNull(order?.toShikimoriOrder())
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let {
-                Result.success(it.userRates.map { userRate ->
-                    userRate.animeUserRateWithModel.toDomain()
-                })
-            } ?: Result.failure(Exception(response.exception))
-        } catch (e: Exception) {
-            Result.failure(e)
+        val response = apolloClient.query(query).execute()
+        return response.toResult().map { data ->
+            data.userRates.map { userRate ->
+                userRate.animeUserRateWithModel.toDomain()
+            }
         }
     }
 
@@ -130,18 +127,12 @@ class ShikimoriTracksDataSource @Inject constructor(
         )
         Log.d("ShikimoriTracksDataSource", "Query: $query")
 
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let { data ->
-                Result.success(
-                    value = data.animes.mapNotNull { anime ->
-                        anime.userRate?.animeUserRateWithModel?.toDomain()
-                    }
-                )
-            } ?: Result.success(emptyList())
-        } catch (e: Exception) {
-            Log.d("ShikimoriTracksDataSource", "$e")
-            Result.failure(e)
+        val response = apolloClient.query(query).execute()
+
+        return response.toResult().map { data ->
+            data.animes.mapNotNull { anime ->
+                anime.userRate?.animeUserRateWithModel?.toDomain()
+            }
         }
     }
 
@@ -179,15 +170,12 @@ class ShikimoriTracksDataSource @Inject constructor(
 
         Log.d("MangaTracksRepository", "Query for status $status: $query")
 
-        return try {
-            val response = apolloClient.query(query).execute()
-            response.data?.let {
-                Result.success(it.userRates.map { userRate ->
-                    userRate.mangaUserRateWithModel.toDomain() }
-                )
-            } ?: Result.failure(Exception(response.exception))
-        } catch (e: Exception) {
-            Result.failure(e)
+        val response = apolloClient.query(query).execute()
+
+        return response.toResult().map { data ->
+            data.userRates.map { userRate ->
+                userRate.mangaUserRateWithModel.toDomain()
+            }
         }
     }
 }

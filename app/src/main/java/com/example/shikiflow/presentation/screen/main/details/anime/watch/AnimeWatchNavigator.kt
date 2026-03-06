@@ -23,8 +23,7 @@ fun AnimeWatchNavigator(
     title: String,
     shikimoriId: Int,
     completedEpisodes: Int,
-    onNavigateBack: () -> Unit,
-    source: String
+    onNavigateBack: () -> Unit
 ) {
     val bottomBarController = LocalBottomBarController.current
     val watchBackstack = rememberNavBackStack(AnimeWatchNavRoute.TranslationSelect(shikimoriId))
@@ -64,8 +63,7 @@ fun AnimeWatchNavigator(
                     title = title,
                     shikimoriId = route.shikimoriId,
                     navOptions = options,
-                    onNavigateBack = onNavigateBack,
-                    animeTranslationsViewModel = hiltViewModel(key = source)
+                    onNavigateBack = onNavigateBack
                 )
             }
             entry<AnimeWatchNavRoute.EpisodeSelection> { route ->

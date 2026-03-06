@@ -46,6 +46,7 @@ class MangaChaptersViewModel @Inject constructor(
                     _chaptersUiState.update { state ->
                         state.copy(
                             isLoading = false,
+                            errorMessage = null,
                             chaptersMap = result.data ?: emptyMap()
                         )
                     }

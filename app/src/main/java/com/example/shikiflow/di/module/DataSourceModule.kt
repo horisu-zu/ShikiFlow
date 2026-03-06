@@ -29,7 +29,6 @@ import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.data.remote.UserApi
-import com.example.shikiflow.data.remote.auth.AnilistAuthApi
 import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.AnilistApollo

@@ -1,0 +1,46 @@
+query StaffDetails(
+    $staffId: Int!
+) {
+    Staff(id: $staffId) {
+        id
+        name {
+            full
+            native
+        }
+        image {
+            large
+        }
+        primaryOccupations
+        dateOfBirth {
+            ...Date
+        }
+        description
+        characters(sort: [FAVOURITES_DESC]) {
+            pageInfo {
+                hasNextPage
+            }
+            nodes {
+                ...ALCharacterShort
+            }
+        }
+        animeStaffRoles: staffMedia(sort: [POPULARITY_DESC], type: ANIME) {
+            ...ALMediaStaffRoles
+        }
+        mangaStaffRoles: staffMedia(sort: [POPULARITY_DESC], type: MANGA) {
+            ...ALMediaStaffRoles
+        }
+    }
+}
+
+query StaffMediaAppearance(
+    $staffId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $mediaType: MediaType!
+) {
+    Staff(id: $staffId) {
+        staffMedia(page: $page, perPage: $perPage, type: $mediaType) {
+            ...ALMediaStaffRoles
+        }
+    }
+}

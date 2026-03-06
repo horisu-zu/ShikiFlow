@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.auth
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -104,8 +103,7 @@ fun AuthScreen(
                     ),
                     onClick = {
                         val authUrl = onAuth(authType)
-                        Log.d("AuthScreen", "Launching Custom Tab with URL: $authUrl")
-                        WebIntent.openUrlCustomTab(context, authUrl)
+                        WebIntent.openActionView(context, authUrl)
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

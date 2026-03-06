@@ -56,12 +56,14 @@ class AnimeDetailsViewModel @Inject constructor(
             }
 
             val result = mediaRepository.getMediaDetails(id, mediaType = MediaType.ANIME)
+            Log.d("AnimeDetailsViewModel", "Result: $result")
 
             result.fold(
                 onSuccess = { mediaDetails ->
                     _animeDetails.update { state ->
                         state.copy(
                             details = mediaDetails,
+                            detailsError = null,
                             isLoading = false,
                             isRefreshing = false
                         )
@@ -70,7 +72,8 @@ class AnimeDetailsViewModel @Inject constructor(
                 onFailure = { exception ->
                     _animeDetails.update { state ->
                         state.copy(
-                            detailsError = exception.message ?: "Unknown error"
+                            detailsError = exception.message ?: "Unknown error",
+                            isLoading = false
                         )
                     }
                 }

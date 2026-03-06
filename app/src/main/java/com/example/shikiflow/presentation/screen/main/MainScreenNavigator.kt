@@ -50,8 +50,7 @@ fun MainScreenNavigator(
                     currentUserData = currentUserData,
                     authType = authType,
                     mediaId = route.mediaId,
-                    mediaType = route.mediaType,
-                    source = "main"
+                    mediaType = route.mediaType
                 )
             }
         },

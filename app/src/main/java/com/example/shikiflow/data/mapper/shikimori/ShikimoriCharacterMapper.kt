@@ -8,11 +8,12 @@ import com.example.shikiflow.data.datasource.dto.ShikiCharacter
 import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.datasource.dto.ShikiSeyu
 import com.example.shikiflow.data.datasource.dto.person.Character
+import com.example.shikiflow.domain.model.character.CharacterMediaRole
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
-import com.example.shikiflow.domain.model.character.MediaRole
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ShortMediaRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 
@@ -49,8 +50,8 @@ object ShikimoriCharacterMapper {
         )
     }
 
-    fun ShikiAnime.toDomain(): MediaRole {
-        return MediaRole(
+    fun ShikiAnime.toDomain(): ShortMediaRole {
+        return ShortMediaRole(
             id = this.id ?: 0,
             mediaType = MediaType.ANIME,
             title = this.name ?: "",
@@ -59,8 +60,8 @@ object ShikimoriCharacterMapper {
         )
     }
 
-    fun ShikiManga.toDomain(): MediaRole {
-        return MediaRole(
+    fun ShikiManga.toDomain(): ShortMediaRole {
+        return ShortMediaRole(
             id = this.id ?: 0,
             mediaType = MediaType.MANGA,
             title = this.name ?: "",
@@ -95,6 +96,16 @@ object ShikimoriCharacterMapper {
                 entries = this.mangas?.map { it.toDomain() }.orEmpty()
             ),
             topicId = this.topicId
+        )
+    }
+
+    fun ShortMediaRole.toCharacterRole(): CharacterMediaRole {
+        return CharacterMediaRole(
+            id = id,
+            mediaType = mediaType,
+            title = title,
+            coverImageUrl = coverImageUrl,
+            userRateStatus = userRateStatus
         )
     }
 }

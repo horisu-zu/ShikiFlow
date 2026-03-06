@@ -29,6 +29,7 @@ import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
 import com.example.shikiflow.domain.model.user.UserRateStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlin.let
@@ -183,14 +184,13 @@ class AnilistUserDataSource @Inject constructor(
             search = Optional.presentIfNotNull(nickname)
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query).execute()
 
-            response.data?.Page?.users?.let { users ->
-                Result.success(users.mapNotNull { it?.aLUserShort?.toDomain() })
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+        return response.toResult().map { data ->
+            data.Page?.users
+                ?.mapNotNull { user ->
+                    user?.aLUserShort?.toDomain()
+                } ?: emptyList()
         }
     }
 

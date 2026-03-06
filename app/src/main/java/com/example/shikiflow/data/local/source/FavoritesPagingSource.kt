@@ -11,6 +11,7 @@ import com.example.graphql.anilist.UserFavoriteStudiosQuery
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toUserFavorite
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
+import com.example.shikiflow.utils.AnilistUtils.toResult
 
 class FavoritesPagingSource(
     private val apolloClient: ApolloClient,
@@ -29,63 +30,96 @@ class FavoritesPagingSource(
         val currentPage = params.key ?: 1
         val pageSize = params.loadSize
 
-        return try {
-            val nodes = when (favoriteCategory) {
-                FavoriteCategory.ANIME -> loadAnime(currentPage, pageSize)
-                FavoriteCategory.MANGA -> loadManga(currentPage, pageSize)
-                FavoriteCategory.CHARACTER -> loadCharacters(currentPage, pageSize)
-                FavoriteCategory.STAFF -> loadStaff(currentPage, pageSize)
-                FavoriteCategory.STUDIO -> loadStudios(currentPage, pageSize)
-                else -> emptyList()
-            }
+        val nodesResult = when (favoriteCategory) {
+            FavoriteCategory.ANIME -> loadAnime(currentPage, pageSize)
+            FavoriteCategory.MANGA -> loadManga(currentPage, pageSize)
+            FavoriteCategory.CHARACTER -> loadCharacters(currentPage, pageSize)
+            FavoriteCategory.STAFF -> loadStaff(currentPage, pageSize)
+            FavoriteCategory.STUDIO -> loadStudios(currentPage, pageSize)
+            else -> Result.success(emptyList())
+        }
 
-            LoadResult.Page(
-                data = nodes,
-                prevKey = if (currentPage > 1) currentPage - 1 else null,
-                nextKey = if (nodes.size < pageSize) null else currentPage + 1
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
+        return nodesResult.fold(
+            onSuccess = { nodes ->
+                LoadResult.Page(
+                    data = nodes,
+                    prevKey = if (currentPage > 1) currentPage - 1 else null,
+                    nextKey = if (nodes.size < pageSize) null else currentPage + 1
+                )
+            },
+            onFailure = { e ->
+                LoadResult.Error(e)
+            }
+        )
+    }
+
+    private suspend fun loadAnime(page: Int, size: Int): Result<List<UserFavorite>> {
+        val response = apolloClient.query(UserFavoriteAnimeQuery(page, size, userId)).execute()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.anime
+                ?.nodes
+                ?.mapNotNull { favoriteMedia ->
+                    favoriteMedia?.aLFavoriteMediaShort?.toUserFavorite(favoriteCategory)
+                } ?: emptyList()
         }
     }
 
-    private suspend fun loadAnime(page: Int, size: Int): List<UserFavorite> {
-        val response = apolloClient.query(UserFavoriteAnimeQuery(page, size, userId)).execute()
-
-        val animeNodes = response.data?.User?.favourites?.anime?.nodes
-
-        val result = animeNodes?.mapNotNull { favoriteMedia ->
-            favoriteMedia?.aLFavoriteMediaShort?.toUserFavorite(favoriteCategory)
-        } ?: emptyList()
-
-        return result
-    }
-
-    private suspend fun loadManga(page: Int, size: Int): List<UserFavorite> {
+    private suspend fun loadManga(page: Int, size: Int): Result<List<UserFavorite>> {
         val response = apolloClient.query(UserFavoriteMangaQuery(page, size, userId)).execute()
-        return response.data?.User?.favourites?.manga?.nodes?.mapNotNull { favoriteMedia ->
-            favoriteMedia?.aLFavoriteMediaShort?.toUserFavorite(favoriteCategory)
-        } ?: emptyList()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.manga
+                ?.nodes
+                ?.mapNotNull { favoriteMedia ->
+                    favoriteMedia?.aLFavoriteMediaShort?.toUserFavorite(favoriteCategory)
+                } ?: emptyList()
+        }
     }
 
-    private suspend fun loadCharacters(page: Int, size: Int): List<UserFavorite> {
+    private suspend fun loadCharacters(page: Int, size: Int): Result<List<UserFavorite>> {
         val response = apolloClient.query(UserFavoriteCharactersQuery(page, size, userId)).execute()
-        return response.data?.User?.favourites?.characters?.nodes?.mapNotNull { favoriteMedia ->
-            favoriteMedia?.aLFavoriteCharacterShort?.toUserFavorite()
-        } ?: emptyList()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.characters
+                ?.nodes
+                ?.mapNotNull { favoriteCharacter ->
+                    favoriteCharacter?.aLFavoriteCharacterShort?.toUserFavorite()
+                } ?: emptyList()
+        }
     }
 
-    private suspend fun loadStaff(page: Int, size: Int): List<UserFavorite> {
+    private suspend fun loadStaff(page: Int, size: Int): Result<List<UserFavorite>> {
         val response = apolloClient.query(UserFavoriteStaffQuery(page, size, userId)).execute()
-        return response.data?.User?.favourites?.staff?.nodes?.mapNotNull { favoriteMedia ->
-            favoriteMedia?.aLFavoriteStaffShort?.toUserFavorite()
-        } ?: emptyList()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.staff
+                ?.nodes
+                ?.mapNotNull { favoriteStaff ->
+                    favoriteStaff?.aLFavoriteStaffShort?.toUserFavorite()
+                } ?: emptyList()
+        }
     }
 
-    private suspend fun loadStudios(page: Int, size: Int): List<UserFavorite> {
+    private suspend fun loadStudios(page: Int, size: Int): Result<List<UserFavorite>> {
         val response = apolloClient.query(UserFavoriteStudiosQuery(page, size, userId)).execute()
-        return response.data?.User?.favourites?.studios?.nodes?.mapNotNull { favoriteMedia ->
-            favoriteMedia?.aLFavoriteStudioShort?.toUserFavorite()
-        } ?: emptyList()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.studios
+                ?.nodes
+                ?.mapNotNull { favoriteStudio ->
+                    favoriteStudio?.aLFavoriteStudioShort?.toUserFavorite()
+                } ?: emptyList()
+        }
     }
 }

@@ -79,69 +79,74 @@ fun ThreadsScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
-            if(threadsState.loadState.refresh is LoadState.Loading) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            } else if(threadsState.loadState.append is LoadState.Error) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = stringResource(R.string.common_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { threadsState.refresh() }
-                        )
+            when(threadsState.loadState.refresh) {
+                is LoadState.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
                     }
                 }
-            } else {
-                items(threadsState.itemCount) { index ->
-                    threadsState[index]?.let { threadData ->
-                        ThreadItem(
-                            threadData = threadData,
-                            resources = resources,
-                            onThreadClick = { id ->
-                                navOptions.navigateToComments(
-                                    screenMode = CommentsScreenMode.TOPIC,
-                                    threadHeader = threadData,
-                                    id = id
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                is LoadState.Error -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { threadsState.refresh() }
+                            )
+                        }
                     }
                 }
-                threadsState.apply {
-                    when {
-                        loadState.append is LoadState.Error -> {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    ErrorItem(
-                                        message = stringResource(R.string.common_error),
-                                        buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { threadsState.refresh() }
+                else -> {
+                    items(threadsState.itemCount) { index ->
+                        threadsState[index]?.let { threadData ->
+                            ThreadItem(
+                                threadData = threadData,
+                                resources = resources,
+                                onThreadClick = { id ->
+                                    navOptions.navigateToComments(
+                                        screenMode = CommentsScreenMode.TOPIC,
+                                        threadHeader = threadData,
+                                        id = id
                                     )
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                    threadsState.apply {
+                        when {
+                            loadState.append is LoadState.Error -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { threadsState.refresh() }
+                                        )
+                                    }
                                 }
                             }
-                        }
-                        loadState.append is LoadState.Loading -> {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
+
+                            loadState.append is LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
                             }
                         }
                     }

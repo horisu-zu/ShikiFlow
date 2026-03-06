@@ -29,6 +29,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.track.OrderOption
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -42,18 +43,10 @@ class AnilistMediaDetailsDataSource @Inject constructor(
     ): Result<MediaDetails> {
         val detailsQuery = MediaDetailsQuery(mediaType.toAnilistType(), id)
 
-        return try {
-            val response = apolloClient.query(detailsQuery).execute()
+        val response = apolloClient.query(detailsQuery).execute()
 
-            val result = response.data
-                ?.Media
-                ?.toDomain()
-
-            result?.let { mediaDetails ->
-                Result.success(mediaDetails)
-            } ?: Result.failure(Exception("No Data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+        return response.toResult().map { data ->
+            data.Media?.toDomain() ?: throw NoSuchElementException("Empty Response")
         }
     }
 
@@ -97,21 +90,14 @@ class AnilistMediaDetailsDataSource @Inject constructor(
             seasonYear = Optional.presentIfNotNull(browseOptions.season?.year)
         )
 
-        return try {
-            val response = apolloClient.query(browseQuery).execute()
+        val response = apolloClient.query(browseQuery).execute()
 
-            val result = response.data
-                ?.Page
+        return response.toResult().map { data ->
+            data.Page
                 ?.media
                 ?.mapNotNull { media ->
                     media?.mediaBrowse?.toBrowse(browseOptions.mediaType)
-                }
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+                } ?: throw NoSuchElementException("Empty Response")
         }
     }
 
@@ -144,22 +130,15 @@ class AnilistMediaDetailsDataSource @Inject constructor(
     ): Result<List<Browse>> {
         val recommendationsQuery = MediaRecommendationsQuery(mediaId, page, limit)
 
-        return try {
-            val response = apolloClient.query(recommendationsQuery).execute()
+        val response = apolloClient.query(recommendationsQuery).execute()
 
-            val result = response.data
-                ?.Media
+        return response.toResult().map { data ->
+            data.Media
                 ?.recommendations
                 ?.nodes
                 ?.mapNotNull { mediaRecommendation ->
                     mediaRecommendation?.mediaRecommendation?.mediaBrowse?.toBrowse(mediaType)
-                }
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+                } ?: throw NoSuchElementException("Empty Response")
         }
     }
 
@@ -179,22 +158,15 @@ class AnilistMediaDetailsDataSource @Inject constructor(
             onList = Optional.presentIfNotNull(onList)
         )
 
-        return try {
-            val response = apolloClient.query(studioBrowseQuery).execute()
+        val response = apolloClient.query(studioBrowseQuery).execute()
 
-            val result = response.data
-                ?.Studio
+        return response.toResult().map { data ->
+            data.Studio
                 ?.media
                 ?.nodes
                 ?.mapNotNull { node ->
                     node?.mediaBrowse?.toBrowse(mediaType = MediaType.ANIME)
-                }
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+                } ?: throw NoSuchElementException("Empty Response")
         }
     }
 
@@ -204,21 +176,14 @@ class AnilistMediaDetailsDataSource @Inject constructor(
     ): Result<List<ExternalLinkData>> {
         val linksQuery = MediaExternalLinksQuery(mediaId)
 
-        return try {
-            val response = apolloClient.query(linksQuery).execute()
+        val response = apolloClient.query(linksQuery).execute()
 
-            val result = response.data
-                ?.Media
+        return response.toResult().map { data ->
+            data.Media
                 ?.externalLinks
                 ?.mapNotNull { link ->
                     link?.toDomain()
-                }
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+                } ?: throw NoSuchElementException("Empty Response")
         }
     }
 }

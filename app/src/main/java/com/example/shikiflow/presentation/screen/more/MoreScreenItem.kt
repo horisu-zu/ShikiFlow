@@ -40,7 +40,7 @@ fun ExpandedItem(
             model = avatar,
             contentDescription = "Avatar",
             imageType = ImageType.Square(),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(56.dp)
         )
         Column {
             Text(

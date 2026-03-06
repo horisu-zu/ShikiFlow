@@ -1,6 +1,7 @@
 package com.example.shikiflow.domain.model.character
 
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ShortMediaRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 
 data class MediaCharacter(
@@ -11,7 +12,7 @@ data class MediaCharacter(
     val imageUrl: String,
     val description: String?,
     val voiceActors: List<MediaPersonShort>,
-    val animeRoles: PaginatedList<MediaRole>,
-    val mangaRoles: PaginatedList<MediaRole>,
+    val animeRoles: PaginatedList<ShortMediaRole>,
+    val mangaRoles: PaginatedList<ShortMediaRole>,
     val topicId: Int? = null
 )

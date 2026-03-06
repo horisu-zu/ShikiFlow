@@ -63,24 +63,16 @@ fun AnimeTracksPage(
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
     val rateUpdateState by tracksViewModel.rateUpdateState
 
-    var isRefreshing by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
 
-    PullToRefreshCustomBox(
-        isRefreshing = isRefreshing,
-        enabled = isAppBarVisible,
-        onRefresh = {
-            isRefreshing = true
-            animeTrackItems.refresh()
-            isRefreshing = false
-        }
-    ) {
-        if(animeTrackItems.loadState.refresh is LoadState.Loading) {
+    when (animeTrackItems.loadState.refresh) {
+        is LoadState.Loading -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-        } else if(animeTrackItems.loadState.refresh is LoadState.Error) {
+        }
+        is LoadState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -91,25 +83,33 @@ fun AnimeTracksPage(
                     onButtonClick = { animeTrackItems.refresh() }
                 )
             }
-        } else {
-            when(appUiMode) {
-                AppUiMode.LIST -> {
-                    AnimeTracksListComponent(
-                        trackItems = animeTrackItems,
-                        onAnimeClick = onAnimeClick,
-                        onLongClick = { item ->
-                            selectedItem = item
-                        }, modifier = modifier
-                    )
-                }
-                AppUiMode.GRID -> {
-                    AnimeTracksGridComponent(
-                        trackItems = animeTrackItems,
-                        onAnimeClick = onAnimeClick,
-                        onLongClick = { item ->
-                            selectedItem = item
-                        }, modifier = modifier
-                    )
+        }
+        else -> {
+            PullToRefreshCustomBox(
+                isRefreshing = animeTrackItems.loadState.refresh is LoadState.Loading,
+                enabled = isAppBarVisible,
+                onRefresh = { animeTrackItems.refresh() }
+            ) {
+                when (appUiMode) {
+                    AppUiMode.LIST -> {
+                        AnimeTracksListComponent(
+                            trackItems = animeTrackItems,
+                            onAnimeClick = onAnimeClick,
+                            onLongClick = { item ->
+                                selectedItem = item
+                            }, modifier = modifier
+                        )
+                    }
+
+                    AppUiMode.GRID -> {
+                        AnimeTracksGridComponent(
+                            trackItems = animeTrackItems,
+                            onAnimeClick = onAnimeClick,
+                            onLongClick = { item ->
+                                selectedItem = item
+                            }, modifier = modifier
+                        )
+                    }
                 }
             }
 

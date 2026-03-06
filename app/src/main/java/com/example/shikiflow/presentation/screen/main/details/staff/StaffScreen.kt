@@ -218,6 +218,7 @@ fun StaffScreen(
                                     onItemClick = { id ->
                                         navOptions.navigateToAnimeDetails(id)
                                     },
+                                    onPaginatedNavigate = { /**/ },
                                     horizontalPadding = horizontalPadding
                                 )
                             }
@@ -230,6 +231,7 @@ fun StaffScreen(
                                     onItemClick = { id ->
                                         navOptions.navigateToMangaDetails(id)
                                     },
+                                    onPaginatedNavigate = { /**/ },
                                     horizontalPadding = horizontalPadding
                                 )
                             }

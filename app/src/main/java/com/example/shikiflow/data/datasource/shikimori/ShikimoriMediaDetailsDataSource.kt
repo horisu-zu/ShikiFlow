@@ -34,6 +34,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.track.OrderOption
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -47,44 +48,34 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
         id: Int,
         mediaType: MediaType
     ): Result<MediaDetails> {
-        return try {
-            val result = when (mediaType) {
-                MediaType.ANIME -> {
-                    val response = apolloClient
-                        .query(
-                            AnimeDetailsQuery(
-                                ids = Optional.presentIfNotNull(id.toString())
-                            )
-                        ).execute()
+        return when (mediaType) {
+            MediaType.ANIME -> {
+                val response = apolloClient
+                    .query(
+                        AnimeDetailsQuery(
+                            ids = Optional.presentIfNotNull(id.toString())
+                        )
+                    ).execute()
 
-                    val anime = response.data
-                        ?.animes
-                        ?.firstOrNull()
+                response.toResult().map { data ->
+                    data.animes.firstOrNull()?.toDomain()
                         ?: throw IllegalStateException("No Anime Details data returned")
-
-                    anime.toDomain()
-                }
-
-                MediaType.MANGA -> {
-                    val response = apolloClient
-                        .query(
-                            MangaDetailsQuery(
-                                ids = Optional.presentIfNotNull(id.toString())
-                            )
-                        ).execute()
-
-                    val manga = response.data
-                        ?.mangas
-                        ?.firstOrNull()
-                        ?: throw IllegalStateException("No Manga Details data returned")
-
-                    manga.toDomain()
                 }
             }
 
-            Result.success(result)
-        } catch (e: Exception) {
-            Result.failure(exception = e)
+            MediaType.MANGA -> {
+                val response = apolloClient
+                    .query(
+                        MangaDetailsQuery(
+                            ids = Optional.presentIfNotNull(id.toString())
+                        )
+                    ).execute()
+
+                response.toResult().map { data ->
+                    data.mangas.firstOrNull()?.toDomain()
+                        ?: throw IllegalStateException("No Anime Details data returned")
+                }
+            }
         }
     }
 
@@ -114,60 +105,52 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
         limit: Int,
         browseOptions: BrowseOptions
     ): Result<List<Browse>> {
-        return try {
-            val result = when(browseOptions.mediaType) {
-                MediaType.ANIME -> {
-                    val query = AnimeBrowseQuery(
-                        page = Optional.presentIfNotNull(page),
-                        limit = Optional.presentIfNotNull(limit),
-                        search = Optional.presentIfNotNull(browseOptions.name),
-                        order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
-                        kind = Optional.presentIfNotNull(browseOptions.format?.toShikiAnimeKind()?.name),
-                        status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriAnimeStatus()?.name),
-                        season = Optional.presentIfNotNull(browseOptions.season?.toShikiSeason()),
-                        score = Optional.presentIfNotNull(browseOptions.score),
-                        genre = Optional.presentIfNotNull(browseOptions.genre),
-                        rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name)
-                    )
+        return  when(browseOptions.mediaType) {
+            MediaType.ANIME -> {
+                val query = AnimeBrowseQuery(
+                    page = Optional.presentIfNotNull(page),
+                    limit = Optional.presentIfNotNull(limit),
+                    search = Optional.presentIfNotNull(browseOptions.name),
+                    order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
+                    kind = Optional.presentIfNotNull(browseOptions.format?.toShikiAnimeKind()?.name),
+                    status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriAnimeStatus()?.name),
+                    season = Optional.presentIfNotNull(browseOptions.season?.toShikiSeason()),
+                    score = Optional.presentIfNotNull(browseOptions.score),
+                    genre = Optional.presentIfNotNull(browseOptions.genre),
+                    rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name)
+                )
 
-                    val response = apolloClient.query(query).execute()
+                val response = apolloClient.query(query).execute()
 
-                    Log.d("ShikimoriMediaDataSource", "Query: $query")
-                    Log.d("ShikimoriMediaDataSource", "Response: $response")
+                Log.d("ShikimoriMediaDataSource", "Query: $query")
+                Log.d("ShikimoriMediaDataSource", "Response: $response")
 
-                    response.data?.let { data ->
-                        data.animes.map { anime ->
-                            anime.toBrowseAnime()
-                        }
-                    }
-                }
-                MediaType.MANGA -> {
-                    val query = MangaBrowseQuery(
-                        page = Optional.presentIfNotNull(page),
-                        limit = Optional.presentIfNotNull(limit),
-                        search = Optional.presentIfNotNull(browseOptions.name),
-                        order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
-                        kind = Optional.presentIfNotNull(browseOptions.format?.toShikiMangaKind()?.name),
-                        status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriMangaStatus()?.name),
-                        genre = Optional.presentIfNotNull(browseOptions.genre),
-                        score = Optional.presentIfNotNull(browseOptions.score),
-                    )
-
-                    val response = apolloClient.query(query).execute()
-
-                    response.data?.let { data ->
-                        data.mangas.map { anime ->
-                            anime.toBrowseManga()
-                        }
+                response.toResult().map { data ->
+                    data.animes.map { anime ->
+                        anime.toBrowseAnime()
                     }
                 }
             }
+            MediaType.MANGA -> {
+                val query = MangaBrowseQuery(
+                    page = Optional.presentIfNotNull(page),
+                    limit = Optional.presentIfNotNull(limit),
+                    search = Optional.presentIfNotNull(browseOptions.name),
+                    order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
+                    kind = Optional.presentIfNotNull(browseOptions.format?.toShikiMangaKind()?.name),
+                    status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriMangaStatus()?.name),
+                    genre = Optional.presentIfNotNull(browseOptions.genre),
+                    score = Optional.presentIfNotNull(browseOptions.score),
+                )
 
-            result?.let {
-                Result.success(result)
-            } ?: Result.success(emptyList())
-        } catch (e: Exception) {
-            Result.failure(e)
+                val response = apolloClient.query(query).execute()
+
+                response.toResult().map { data ->
+                    data.mangas.map { anime ->
+                        anime.toBrowseManga()
+                    }
+                }
+            }
         }
     }
 
@@ -245,20 +228,13 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
             studio = Optional.presentIfNotNull(studioId.toString())
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query).execute()
 
-            val result = response.data?.let { data ->
-                data.animes.map { anime ->
-                    anime.toBrowseAnime()
-                }
+
+        return response.toResult().map { data ->
+            data.animes.map { anime ->
+                anime.toBrowseAnime()
             }
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.success(emptyList())
-        } catch (e: Exception) {
-            Result.failure(exception = e)
         }
     }
 }

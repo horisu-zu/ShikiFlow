@@ -5,6 +5,7 @@ import com.example.graphql.anilist.StaffDetailsQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import javax.inject.Inject
 
 class AnilistStaffDataSource @Inject constructor(
@@ -13,18 +14,10 @@ class AnilistStaffDataSource @Inject constructor(
     override suspend fun getStaffDetails(staffId: Int): Result<StaffDetails> {
         val staffQuery = StaffDetailsQuery(staffId)
 
-        return try {
-            val response = apolloClient.query(staffQuery).execute()
+        val response = apolloClient.query(staffQuery).execute()
 
-            val result = response.data
-                ?.Staff
-                ?.toDomain()
-
-            result?.let {
-                Result.success(result)
-            } ?: Result.failure(Exception("No Data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+        return response.toResult().map { data ->
+            data.Staff?.toDomain() ?: throw NoSuchElementException("Empty Response")
         }
     }
 }

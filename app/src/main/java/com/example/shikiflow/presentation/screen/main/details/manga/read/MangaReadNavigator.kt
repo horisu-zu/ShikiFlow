@@ -10,7 +10,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -23,8 +22,7 @@ fun MangaReadNavigator(
     mangaDexIds: List<String>,
     title: String,
     completedChapters: Int,
-    onNavigateBack: () -> Unit,
-    source: String
+    onNavigateBack: () -> Unit
 ) {
     val bottomBarController = LocalBottomBarController.current
     val mangaReadBackstack = when(mangaDexIds.size) {
@@ -85,8 +83,7 @@ fun MangaReadNavigator(
                 MangaSelectionScreen(
                     mangaDexIds = route.mangaDexIds,
                     title = route.title,
-                    navOptions = navOptions,
-                    mangaSelectionViewModel = hiltViewModel(key = "${source}_selection")
+                    navOptions = navOptions
                 )
             }
             entry<MangaReadNavRoute.ChaptersScreen> { route ->
@@ -94,8 +91,7 @@ fun MangaReadNavigator(
                     mangaDexId = route.mangaDexId,
                     title = route.title,
                     completedChapters = completedChapters,
-                    navOptions = navOptions,
-                    mangaChaptersViewModel = hiltViewModel(key = "${source}_chapters")
+                    navOptions = navOptions
                 )
             }
             entry<MangaReadNavRoute.ChapterTranslationsScreen> { route ->
@@ -103,15 +99,13 @@ fun MangaReadNavigator(
                     chapterTranslationIds = route.chapterTranslationIds,
                     title = route.title,
                     chapterNumber = route.chapterNumber,
-                    navOptions = navOptions,
-                    chapterTranslationsViewModel = hiltViewModel(key = "${source}_translations")
+                    navOptions = navOptions
                 )
             }
             entry<MangaReadNavRoute.ChapterScreen> { route ->
                 ChapterScreen(
                     chapterUiData = route.chapterUiData,
-                    navOptions = navOptions,
-                    chapterViewModel = hiltViewModel(key = "${source}_chapter")
+                    navOptions = navOptions
                 )
             }
         },

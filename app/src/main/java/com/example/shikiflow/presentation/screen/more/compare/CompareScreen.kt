@@ -24,12 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
-import com.example.shikiflow.presentation.viewmodel.user.CompareScreenViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -37,13 +35,9 @@ import kotlinx.coroutines.launch
 fun CompareScreen(
     currentUser: User?,
     targetUser: User,
-    moreNavOptions: MoreNavOptions,
-    compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
+    moreNavOptions: MoreNavOptions
 ) {
-    val tabs = linkedMapOf(
-        MediaType.ANIME to stringResource(R.string.main_track_mode_anime),
-        MediaType.MANGA to stringResource(R.string.main_track_mode_manga)
-    )
+    val tabs = MediaType.entries
     val pagerState = rememberPagerState { tabs.size }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
@@ -84,7 +78,7 @@ fun CompareScreen(
                 )
         ) {
             CompareTabRow(
-                tabs = tabs.map { it.value },
+                tabs = tabs.map { it.displayValue },
                 selectedTab = pagerState.currentPage,
                 containerColor = MaterialTheme.colorScheme.surface,
                 onTabSelected = { pageIndex ->
@@ -105,10 +99,9 @@ fun CompareScreen(
             ) { page ->
                 currentUser?.let {
                     CompareScreenContent(
-                        mediaType = tabs.map { it.key }[page],
+                        mediaType = tabs[page],
                         currentUser = currentUser,
-                        targetUser = targetUser,
-                        compareScreenViewModel = compareScreenViewModel
+                        targetUser = targetUser
                     )
                 }
             }

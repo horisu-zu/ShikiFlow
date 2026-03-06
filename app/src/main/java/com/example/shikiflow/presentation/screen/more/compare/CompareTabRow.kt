@@ -10,13 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun CompareTabRow(
-    tabs: List<String>,
+    tabs: List<Int>,
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -35,13 +36,13 @@ fun CompareTabRow(
         divider = { /**/ },
         modifier = modifier
     ) {
-        tabs.forEachIndexed { index, title ->
+        tabs.forEachIndexed { index, titleRes ->
             Tab(
                 selected = selectedTab == index,
                 onClick = { onTabSelected(index) },
                 text = {
                     Text(
-                        text = title,
+                        text = stringResource(id = titleRes) ,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )

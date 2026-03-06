@@ -102,6 +102,7 @@ class ChapterViewModel @Inject constructor(
                     _chapterUiState.update { state ->
                         state.copy(
                             chapterData = resource.data ?: emptyList(),
+                            chapterError = null,
                             isLoading = false
                         )
                     }

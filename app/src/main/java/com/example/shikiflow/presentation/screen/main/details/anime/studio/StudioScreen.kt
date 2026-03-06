@@ -70,7 +70,7 @@ fun StudioScreen(
     onMediaNavigate: (Int) -> Unit,
     studioViewModel: StudioViewModel = hiltViewModel()
 ) {
-    val titleQuery by studioViewModel.titleQuery.collectAsStateWithLifecycle()
+    val studioState by studioViewModel.studioUiState.collectAsStateWithLifecycle()
     var orderOption by rememberSaveable {
         mutableStateOf<OrderOption>(
             when(authType) {
@@ -125,7 +125,7 @@ fun StudioScreen(
                 )
                 if(authType == AuthType.SHIKIMORI) {
                     SearchPanel(
-                        query = titleQuery,
+                        query = studioState.titleQuery,
                         label = stringResource(R.string.browse_page_search),
                         onQueryChange = studioViewModel::updateTitleQuery,
                         modifier = Modifier.background(

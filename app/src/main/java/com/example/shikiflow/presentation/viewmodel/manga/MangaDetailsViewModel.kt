@@ -68,6 +68,7 @@ class MangaDetailsViewModel @Inject constructor(
                     _details.update { state ->
                         state.copy(
                             details = mediaDetails,
+                            detailsError = null,
                             isLoading = false,
                             isRefreshing = false
                         )
@@ -84,7 +85,8 @@ class MangaDetailsViewModel @Inject constructor(
                 onFailure = { exception ->
                     _details.update { state ->
                         state.copy(
-                            detailsError = exception.message ?: "Unknown error"
+                            detailsError = exception.message ?: "Unknown error",
+                            isLoading = false
                         )
                     }
                 }

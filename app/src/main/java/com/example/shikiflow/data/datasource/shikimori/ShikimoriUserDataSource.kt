@@ -27,18 +27,14 @@ import com.example.shikiflow.domain.model.user.UserRateStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import jakarta.inject.Inject
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 
 class ShikimoriUserDataSource @Inject constructor(
     private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): UserDataSource {
-
-    private var cachedData: List<UserFavorite>? = null
-    private var cachedUserId: Int? = null
-
     override suspend fun fetchCurrentUser(): User? {
         val response = apolloClient.query(CurrentUserQuery()).execute()
 
@@ -96,10 +92,6 @@ class ShikimoriUserDataSource @Inject constructor(
                     val favorites = getShikiFavorites(userId)
                         .filter { it.favoriteCategory == favoriteCategory }
 
-                    //Eww... Well, it's certainly a way of faking data load
-                    //(it's better than having a loading indicator appear for an instant)
-                    delay(200)
-
                     return LoadResult.Page(
                         data = favorites,
                         prevKey = null,
@@ -120,18 +112,7 @@ class ShikimoriUserDataSource @Inject constructor(
 
     private suspend fun getShikiFavorites(
         userId: Int
-    ): List<UserFavorite> {
-        return if (cachedUserId == userId && cachedData != null) {
-            cachedData!!
-        } else {
-            val response = userApi.getUserFavorites(userId.toLong()).toDomain()
-
-            cachedData = response
-            cachedUserId = userId
-
-            response
-        }
-    }
+    ): List<UserFavorite> = userApi.getUserFavorites(userId.toLong()).toDomain()
 
     override fun getUsers(query: String): Flow<PagingData<User>> {
         return Pager(
@@ -161,14 +142,12 @@ class ShikimoriUserDataSource @Inject constructor(
             search = Optional.present(nickname)
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query).execute()
 
-            response.data?.let { users ->
-                Result.success(users.users.map { it.userShort.toDomain() })
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
+        return response.toResult().map { data ->
+            data.users.map { userData ->
+                userData.userShort.toDomain()
+            }
         }
     }
 

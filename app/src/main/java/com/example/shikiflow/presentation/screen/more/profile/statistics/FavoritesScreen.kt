@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -44,7 +47,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
@@ -55,7 +57,6 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.viewmodel.user.UserFavoritesViewModel
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -84,7 +85,26 @@ fun FavoritesScreen(
         favoriteCategory = currentFavorite
     ).collectAsLazyPagingItems()
 
-    Scaffold { paddingValues ->
+    Scaffold(
+        topBar = {
+            FavoriteScreenHeader(
+                currentFavorite = currentFavorite,
+                favoriteCategories = favoriteCategories,
+                onFavoriteClick = { favorite -> currentFavorite = favorite },
+                paddingValues = PaddingValues(
+                    start = 12.dp,
+                    end = 12.dp,
+                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
+                    bottom = 4.dp
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onSizeChanged { size ->
+                        headerHeightPx = size.height
+                    }
+            )
+        }
+    ) { paddingValues ->
         LazyVerticalGrid(
             state = lazyGridState,
             columns = GridCells.Adaptive(108.dp),
@@ -93,28 +113,11 @@ fun FavoritesScreen(
             contentPadding = PaddingValues(
                 start = 12.dp,
                 end = 12.dp,
+                top = paddingValues.calculateTopPadding() + 12.dp,
                 bottom = paddingValues.calculateBottomPadding()
             ),
             modifier = Modifier.fillMaxSize()
         ) {
-            stickyHeader {
-                FavoriteScreenHeader(
-                    currentFavorite = currentFavorite,
-                    favoriteCategories = favoriteCategories,
-                    onFavoriteClick = { favorite -> currentFavorite = favorite },
-                    paddingValues = PaddingValues(
-                        start = 12.dp,
-                        end = 12.dp,
-                        top = paddingValues.calculateTopPadding(),
-                        bottom = 4.dp
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                        .onSizeChanged { size ->
-                            headerHeightPx = size.height
-                        }
-                )
-            }
-
             if(userFavoriteItems.loadState.refresh is LoadState.Loading) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
@@ -190,7 +193,6 @@ private fun FavoriteScreenHeader(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(bottomEndPercent = 24, bottomStartPercent = 24))
-            .ignoreHorizontalParentPadding(horizontal = paddingValues.calculateLeftPadding(LayoutDirection.Ltr))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(paddingValues),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),

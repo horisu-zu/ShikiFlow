@@ -29,6 +29,8 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.utils.AnilistUtils.flatMap
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -106,21 +108,16 @@ class AnilistTracksDataSource @Inject constructor(
             idsIn = Optional.presentIfNotNull(idsList)
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query).execute()
 
-            response.data?.let { result ->
-                val value = result.Page?.mediaList?.let { list ->
+        return response.toResult().map { data ->
+            data.Page
+                ?.mediaList
+                ?.let { list ->
                     list.mapNotNull { mediaList ->
                         mediaList?.mediaListShort?.toAnimeDomain()
                     }
                 } ?: emptyList()
-
-                Result.success(value)
-            } ?: Result.failure(Exception(response.exception))
-        } catch (e: Exception) {
-            Log.d("AnilistTracksDataSource", "Error: $e")
-            Result.failure(e)
         }
     }
 
@@ -140,8 +137,8 @@ class AnilistTracksDataSource @Inject constructor(
 
         val response = apolloClient.query(idsQuery).execute()
 
-        return response.data?.let { result ->
-            val idsList = result.Page?.media?.mapNotNull { it?.id }
+        return response.toResult().flatMap { data ->
+            val idsList = data.Page?.media?.mapNotNull { it?.id }
             Log.d("AnilistTracksDataSource", "Ids: $idsList")
             Log.d("AnilistTracksDataSource", "User ID: $userId")
 
@@ -156,7 +153,7 @@ class AnilistTracksDataSource @Inject constructor(
                     sort = SortDirection.DESCENDING
                 )
             )
-        } ?: Result.failure(Exception(response.exception))
+        }
     }
 
     override fun getMangaTracks(status: UserRateStatus, userId: String?): Flow<PagingData<MangaTrack>> {
@@ -192,22 +189,14 @@ class AnilistTracksDataSource @Inject constructor(
             order = Optional.presentIfNotNull(listOf(order?.toAnilistOrder()))
         )
 
-        return try {
-            val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query).execute()
 
-            response.data?.let { result ->
-                val value = result.Page?.mediaList?.let { list ->
-                    list.mapNotNull { mediaList ->
-                        mediaList?.mediaListShort?.toMangaDomain()
-                    }
-                } ?: emptyList()
-
-                Result.success(
-                    value = value
-                )
-            } ?: Result.failure(Exception(response.exception))
-        } catch (e: Exception) {
-            Result.failure(e)
+        return response.toResult().map { data ->
+            data.Page?.mediaList?.let { list ->
+                list.mapNotNull { mediaList ->
+                    mediaList?.mediaListShort?.toMangaDomain()
+                }
+            } ?: emptyList()
         }
     }
 }

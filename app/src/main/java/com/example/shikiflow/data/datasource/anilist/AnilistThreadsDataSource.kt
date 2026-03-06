@@ -11,8 +11,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadSort
-import retrofit2.HttpException
-import java.io.IOException
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import javax.inject.Inject
 
 class AnilistThreadsDataSource @Inject constructor(
@@ -29,20 +28,13 @@ class AnilistThreadsDataSource @Inject constructor(
             perPage = limit
         )
 
-        return try {
-            val commentsResponse = apolloClient.query(topicCommentsQuery).execute()
+        val commentsResponse = apolloClient.query(topicCommentsQuery).execute()
 
-            val commentsResult = commentsResponse.data
-                ?.Page
+        return commentsResponse.toResult().map { data ->
+            data.Page
                 ?.threadComments
                 ?.mapNotNull { it?.toDomain() }
                 ?: emptyList()
-
-            Result.success(commentsResult)
-        } catch (e: IOException) {
-            Result.failure(Exception("${e.message}: Missing Internet Connection"))
-        } catch (e: HttpException) {
-            Result.failure(e)
         }
     }
 
@@ -51,16 +43,18 @@ class AnilistThreadsDataSource @Inject constructor(
             .query(TopicCommentQuery(commentId))
             .execute()
 
-        val branches = response.data
-            ?.ThreadComment
-            .orEmpty()
-            .map { it?.toDomain() }
+        return response.data?.let { responseData ->
+            val data = responseData
+                .ThreadComment
+                .orEmpty()
+                .map { it?.toDomain() }
 
-        return branches
-            .asSequence()
-            .mapNotNull { it?.findComment(commentId) }
-            .firstOrNull()
-            ?: throw NoSuchElementException("No Comment with ID: $commentId")
+            data
+                .asSequence()
+                .mapNotNull { it?.findComment(commentId) }
+                .firstOrNull()
+                ?: throw NoSuchElementException("No Comment with ID: $commentId")
+        } ?: throw Exception(response.exception)
     }
 
     override suspend fun getMediaThreads(
@@ -76,20 +70,13 @@ class AnilistThreadsDataSource @Inject constructor(
             sort = threadSort.toAnilistThreadSort()
         )
 
-        return try {
-            val response = apolloClient.query(threadsQuery).execute()
+        val response = apolloClient.query(threadsQuery).execute()
 
-            val result = response.data
-                ?.Page
+        return response.toResult().map { data ->
+            data.Page
                 ?.threads
                 ?.mapNotNull { it?.aLThread?.toDomain() }
                 ?: emptyList()
-
-            Result.success(result)
-        } catch (e: IOException) {
-            Result.failure(Exception("${e.message}: Missing Internet Connection"))
-        } catch (e: HttpException) {
-            Result.failure(e)
         }
     }
 }

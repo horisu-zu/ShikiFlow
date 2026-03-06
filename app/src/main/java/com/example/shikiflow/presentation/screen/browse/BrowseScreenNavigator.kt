@@ -59,8 +59,7 @@ fun BrowseScreenNavigator(
                     currentUserData = currentUserData,
                     authType = authType,
                     mediaId = route.mediaId,
-                    mediaType = route.mediaType,
-                    source = "browse"
+                    mediaType = route.mediaType
                 )
             }
         },

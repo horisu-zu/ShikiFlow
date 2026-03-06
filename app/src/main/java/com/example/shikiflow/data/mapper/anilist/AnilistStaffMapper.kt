@@ -6,12 +6,13 @@ import com.example.graphql.anilist.fragment.ALMediaStaffRoles
 import com.example.graphql.anilist.fragment.ALStaffShort
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.common.DateMapper.toLocalDate
+import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
-import com.example.shikiflow.domain.model.character.MediaRole
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ShortMediaRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.staff.StaffDetails
-import com.example.shikiflow.domain.model.staff.StaffMediaRole
+import com.example.shikiflow.domain.model.tracks.MediaType
 
 object AnilistStaffMapper {
     fun ALStaffShort.toDomain(): MediaPersonShort {
@@ -22,17 +23,17 @@ object AnilistStaffMapper {
         )
     }
 
-    fun ALMediaBrowseShort.toDomain(staffRoles: List<String>): StaffMediaRole {
-        return StaffMediaRole(
+    fun ALMediaBrowseShort.toDomain(): ShortMediaRole {
+        return ShortMediaRole(
             id = id,
             title = title?.romaji ?: "",
-            coverImageUrl = coverImage?.large,
-            staffRoles = staffRoles,
+            mediaType = type?.toDomain() ?: MediaType.ANIME,
+            coverImageUrl = coverImage?.large ?: "",
             userRateStatus = mediaListEntry?.status?.toDomain()
         )
     }
 
-    fun ALMediaStaffRoles?.toDomain(): PaginatedList<MediaRole>? {
+    fun ALMediaStaffRoles?.toDomain(): PaginatedList<ShortMediaRole>? {
         val hasNextPage = this?.pageInfo?.hasNextPage == true
         val mediaRoles = this?.edges
             ?.filterNotNull()

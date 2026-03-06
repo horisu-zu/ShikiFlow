@@ -226,7 +226,7 @@ private fun UserItem(
     ) {
         RoundedImage(
             model = user.avatarUrl,
-            modifier = Modifier.size(36.dp),
+            modifier = Modifier.size(48.dp),
         )
         Column(
             verticalArrangement = Arrangement.SpaceBetween
