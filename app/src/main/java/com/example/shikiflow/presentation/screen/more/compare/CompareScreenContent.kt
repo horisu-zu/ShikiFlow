@@ -77,7 +77,7 @@ fun CompareScreenContent(
                     contentPadding = PaddingValues(bottom = 8.dp)
                 ) {
                     mediaRates.data?.let { userRatesMap ->
-                        userRatesMap.forEach { comparisonType, media ->
+                        userRatesMap.forEach { (comparisonType, media) ->
                             stickyHeader {
                                 CompareHeader(
                                     currentUserNickname = currentUser.nickname,
@@ -146,7 +146,7 @@ private fun CompareHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .clickable { onClick() }
                 .padding(horizontal = 12.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
@@ -248,7 +248,7 @@ private fun ComparisonItem(
                 )
             }
             VerticalDivider(
-                color = MaterialTheme.colorScheme.surface,
+                color = MaterialTheme.colorScheme.surfaceBright,
                 thickness = 2.dp,
                 modifier = Modifier.fillMaxHeight()
             )
@@ -277,7 +277,7 @@ private fun ComparisonItem(
             }
             if(comparisonType == ComparisonType.SHARED) {
                 VerticalDivider(
-                    color = MaterialTheme.colorScheme.surface,
+                    color = MaterialTheme.colorScheme.surfaceBright,
                     thickness = 2.dp,
                     modifier = Modifier.fillMaxHeight()
                 )

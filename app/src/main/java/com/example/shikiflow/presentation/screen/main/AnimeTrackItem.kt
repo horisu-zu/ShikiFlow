@@ -53,6 +53,7 @@ fun AnimeTrackItem(
         )
 
         Column(
+            modifier = Modifier.padding(vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
         ) {
             Text(

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.CharactersDataSource
-import com.example.shikiflow.data.datasource.shikimori.ShikimoriCharactersDataSource
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 

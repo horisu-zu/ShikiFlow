@@ -119,7 +119,7 @@ fun StudioScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         scrolledContainerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceVariant
                     ),
                     scrollBehavior = scrollBehavior
                 )
@@ -130,7 +130,7 @@ fun StudioScreen(
                         onQueryChange = studioViewModel::updateTitleQuery,
                         modifier = Modifier.background(
                             color = if(isAtTop) MaterialTheme.colorScheme.background
-                                else MaterialTheme.colorScheme.surface
+                                else MaterialTheme.colorScheme.surfaceVariant
                         ).padding(horizontal = 12.dp, vertical = 8.dp)
                     )
                 }

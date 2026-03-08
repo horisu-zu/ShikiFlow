@@ -138,7 +138,6 @@ private val oledScheme = darkColorScheme(
 fun ShikiFlowTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     oledTheme: Boolean = false,
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = false,
     paletteStyle: PaletteStyle = PaletteStyle.Expressive,
     content: @Composable () -> Unit

@@ -3,6 +3,8 @@ package com.example.shikiflow.presentation.screen.main.details
 import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.common.MediaRolesType
+import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
@@ -48,4 +50,11 @@ sealed interface DetailsNavRoute : NavKey {
 
     @Serializable
     data class Studio(val id: Int, val studioName: String, val authType: AuthType) : DetailsNavRoute
+
+    @Serializable
+    data class MediaRoles(
+        val id: Int,
+        val mediaRolesType: MediaRolesType,
+        val roleTypes: List<RoleType>
+    ): DetailsNavRoute
 }

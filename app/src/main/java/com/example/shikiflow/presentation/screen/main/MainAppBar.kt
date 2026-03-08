@@ -48,7 +48,7 @@ fun MainAppBar(
 ) {
     var dropdownExpanded by remember { mutableStateOf(false) }
     val containerColor = if (scrollBehavior.state.collapsedFraction >= 1f) {
-        MaterialTheme.colorScheme.surface
+        MaterialTheme.colorScheme.surfaceVariant
     } else { MaterialTheme.colorScheme.background }
 
     TopAppBar(

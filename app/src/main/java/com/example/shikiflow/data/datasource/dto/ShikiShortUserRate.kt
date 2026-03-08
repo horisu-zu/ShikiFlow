@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.datasource.dto
 
+import com.example.graphql.shikimori.type.UserRateStatusEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import kotlinx.serialization.Serializable
@@ -7,19 +8,19 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class ShikiShortUserRate {
     abstract val score: Int
-    abstract val status: UserRateStatus
+    abstract val status: UserRateStatusEnum
 
     @Serializable
     data class ShikiShortAnimeRate(
         override val score: Int,
-        override val status: UserRateStatus,
+        override val status: UserRateStatusEnum,
         val anime: ShikiShortAnime,
     ) : ShikiShortUserRate()
 
     @Serializable
     data class ShikiShortMangaRate(
         override val score: Int,
-        override val status: UserRateStatus,
+        override val status: UserRateStatusEnum,
         val manga: ShikiShortManga,
     ) : ShikiShortUserRate()
 

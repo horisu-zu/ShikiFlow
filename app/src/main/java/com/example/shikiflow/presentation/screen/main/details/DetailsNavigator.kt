@@ -7,7 +7,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -16,6 +15,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.common.MediaRolesType
+import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -24,6 +25,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetails
 import com.example.shikiflow.presentation.screen.main.details.anime.studio.StudioScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavigator
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
+import com.example.shikiflow.presentation.screen.main.details.character.MediaRolesScreen
 import com.example.shikiflow.presentation.screen.main.details.character.MediaCharactersScreen
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
@@ -37,8 +39,7 @@ fun DetailsNavigator(
     currentUserData: User?,
     authType: AuthType,
     mediaId: Int,
-    mediaType: MediaType,
-    source: String,
+    mediaType: MediaType
 ) {
     val detailsBackstack = rememberNavBackStack(when(mediaType) {
         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId, authType)
@@ -103,6 +104,14 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.Studio(id, studioName, authType))
         }
 
+        override fun navigateToMediaRoles(
+            id: Int,
+            mediaRolesType: MediaRolesType,
+            roleTypes: List<RoleType>
+        ) {
+            detailsBackstack.add(DetailsNavRoute.MediaRoles(id, mediaRolesType, roleTypes))
+        }
+
         override fun navigateByEntity(entityType: EntityType, id: Int) {
             when (entityType) {
                 EntityType.CHARACTER -> {
@@ -136,8 +145,7 @@ fun DetailsNavigator(
                     id = route.id,
                     authType = route.authType,
                     userId = currentUserData?.id,
-                    navOptions = options,
-                    animeDetailsViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.MangaDetails> { route ->
@@ -145,16 +153,14 @@ fun DetailsNavigator(
                     id = route.id,
                     authType = route.authType,
                     userId = currentUserData?.id,
-                    navOptions = options,
-                    mangaDetailsViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
                     authType = authType,
-                    navOptions = options,
-                    characterDetailsViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.SimilarPage> { route ->
@@ -162,16 +168,14 @@ fun DetailsNavigator(
                     mediaTitle = route.title,
                     mediaId = route.id,
                     mediaType = route.mediaType,
-                    navOptions = options,
-                    similarMediaViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.ExternalLinks> { route ->
                 ExternalLinksScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    navOptions = options,
-                    externalLinksViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.MangaRead> { route ->
@@ -179,15 +183,13 @@ fun DetailsNavigator(
                     mangaDexIds = route.mangaDexIds,
                     title = route.title,
                     completedChapters = route.completedChapters,
-                    onNavigateBack = { options.navigateBack() },
-                    source = source
+                    onNavigateBack = { options.navigateBack() }
                 )
             }
             entry<DetailsNavRoute.Threads> { route ->
                 ThreadsScreen(
                     mediaId = route.mediaId,
-                    navOptions = options,
-                    threadsViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.Comments> { route ->
@@ -196,15 +198,13 @@ fun DetailsNavigator(
                     screenMode = route.screenMode,
                     authType = route.authType,
                     id = route.id,
-                    navOptions = options,
-                    commentViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.Staff> { route ->
                 StaffScreen(
                     personId = route.staffId,
-                    navOptions = options,
-                    staffViewModel = hiltViewModel(key = source)
+                    navOptions = options
                 )
             }
             entry<DetailsNavRoute.AnimeWatch> { route ->
@@ -212,8 +212,7 @@ fun DetailsNavigator(
                     title = route.title,
                     shikimoriId = route.shikimoriId,
                     completedEpisodes = route.completedEpisodes,
-                    onNavigateBack = { options.navigateBack() },
-                    source = source
+                    onNavigateBack = { options.navigateBack() }
                 )
             }
             entry<DetailsNavRoute.Studio> { route ->
@@ -224,8 +223,7 @@ fun DetailsNavigator(
                     onNavigateBack = { options.navigateBack() },
                     onMediaNavigate = { animeId ->
                         options.navigateToAnimeDetails(animeId)
-                    },
-                    studioViewModel = hiltViewModel(key = source)
+                    }
                 )
             }
             entry<DetailsNavRoute.MediaCharacters> { route ->
@@ -233,6 +231,14 @@ fun DetailsNavigator(
                     mediaId = route.mediaId,
                     mediaTitle = route.mediaTitle,
                     mediaType = route.mediaType,
+                    navOptions = options
+                )
+            }
+            entry<DetailsNavRoute.MediaRoles> { route ->
+                MediaRolesScreen(
+                    id = route.id,
+                    mediaRolesType = route.mediaRolesType,
+                    roleTypes = route.roleTypes,
                     navOptions = options
                 )
             }

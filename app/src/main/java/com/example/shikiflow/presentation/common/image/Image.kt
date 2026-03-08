@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.common.image
 
 import android.util.Log
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ fun BaseImage(
     contentScale: ContentScale = ContentScale.Crop,
     contentDescription: String? = null,
     imageType: ImageType = ImageType.Poster(),
+    onClick: (() -> Unit)? = null,
     error: @Composable () -> Unit = {
         BaseImage(
             model = BuildConfig.SHIKI_MISSING_IMAGE_URL,
@@ -76,7 +78,12 @@ fun BaseImage(
         modifier = modifier
             .width(imageType.defaultWidth)
             .aspectRatio(imageType.defaultAspectRatio)
-            .clip(imageType.defaultClip),
+            .clip(imageType.defaultClip)
+            .then(
+                if(onClick != null) {
+                    Modifier.clickable { onClick() }
+                } else Modifier
+            ),
         loading = {
             Box(
                 modifier = Modifier

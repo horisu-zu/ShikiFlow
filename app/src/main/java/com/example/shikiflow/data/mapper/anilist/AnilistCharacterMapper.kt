@@ -6,16 +6,13 @@ import com.example.graphql.anilist.fragment.ALCharacterMediaRoles
 import com.example.graphql.anilist.fragment.ALCharacterShort
 import com.example.graphql.anilist.fragment.ALMediaBrowseShort
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
-import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
-import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.graphql.anilist.type.CharacterRole as AnilistCharacterRole
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
-import com.example.shikiflow.domain.model.character.CharacterMediaRole
+import com.example.shikiflow.domain.model.common.CharacterMediaRole
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
-import com.example.shikiflow.domain.model.tracks.MediaType
 
 object AnilistCharacterMapper {
     fun AnilistCharacterRole.toDomain(): CharacterRole {
@@ -45,11 +42,7 @@ object AnilistCharacterMapper {
 
     fun ALMediaBrowseShort.toDomain(characterRole: CharacterRole): CharacterMediaRole {
         return CharacterMediaRole(
-            id = id,
-            mediaType = type?.toDomain() ?: MediaType.ANIME,
-            title = title?.romaji ?: "",
-            coverImageUrl = coverImage?.large ?: "",
-            userRateStatus = mediaListEntry?.status?.toDomain(),
+            shortMedia = this.toDomain(),
             characterRole = characterRole
         )
     }
@@ -79,7 +72,7 @@ object AnilistCharacterMapper {
         )
     }
 
-    fun ALCharacterMediaRoles.toDomain(): List<CharacterMediaRole> {
+    fun ALCharacterMediaRoles.toCharacterMediaRole(): List<CharacterMediaRole> {
         return this.edges?.mapNotNull {
             it?.node?.aLMediaBrowseShort?.toDomain(
                 characterRole = it.characterRole?.toDomain() ?: CharacterRole.UNKNOWN

@@ -41,6 +41,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.common.MediaRolesType
+import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
@@ -97,7 +99,7 @@ fun CharacterDetailsScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceVariant
                     )
                 )
                 HorizontalDivider()
@@ -164,11 +166,11 @@ fun CharacterDetailsScreen(
                                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
-                                    items(items = characterDetails.voiceActors) { seyuItem ->
+                                    items(items = characterDetails.voiceActors) { vaItem ->
                                         CharacterCard(
-                                            characterPoster = seyuItem.imageUrl,
-                                            characterName = seyuItem.fullName,
-                                            onClick = { navOptions.navigateToStaff(seyuItem.id) },
+                                            characterPoster = vaItem.imageUrl,
+                                            characterName = vaItem.fullName,
+                                            onClick = { navOptions.navigateToStaff(vaItem.id) },
                                             modifier = Modifier.width(96.dp)
                                         )
                                     }
@@ -183,6 +185,18 @@ fun CharacterDetailsScreen(
                                     onItemClick = { id ->
                                         navOptions.navigateToAnimeDetails(id)
                                     },
+                                    onPaginatedNavigate = {
+                                        navOptions.navigateToMediaRoles(
+                                            id = characterId,
+                                            mediaRolesType = MediaRolesType.CHARACTER,
+                                            roleTypes = buildList {
+                                                add(RoleType.ANIME)
+                                                if(characterDetails.mangaRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.MANGA)
+                                                }
+                                            }
+                                        )
+                                    },
                                     horizontalPadding = horizontalPadding
                                 )
                             }
@@ -194,6 +208,18 @@ fun CharacterDetailsScreen(
                                     items = characterDetails.mangaRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToMangaDetails(id)
+                                    },
+                                    onPaginatedNavigate = {
+                                        navOptions.navigateToMediaRoles(
+                                            id = characterId,
+                                            mediaRolesType = MediaRolesType.CHARACTER,
+                                            roleTypes = buildList {
+                                                add(RoleType.MANGA)
+                                                if(characterDetails.animeRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.ANIME)
+                                                }
+                                            }
+                                        )
                                     },
                                     horizontalPadding = horizontalPadding
                                 )

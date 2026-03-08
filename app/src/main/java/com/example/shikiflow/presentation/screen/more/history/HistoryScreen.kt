@@ -85,7 +85,7 @@ fun HistoryScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.surface
+                        else MaterialTheme.colorScheme.surfaceVariant
                     ),
                 )
                 if(!isAtTop) HorizontalDivider()

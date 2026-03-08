@@ -20,7 +20,7 @@ import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MediaRepositoryImpl
 import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
-import com.example.shikiflow.data.repository.PersonRepositoryImpl
+import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.TokenRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
 import com.example.shikiflow.di.annotations.AniList
@@ -33,7 +33,7 @@ import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
-import com.example.shikiflow.domain.repository.PersonRepository
+import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
 import com.example.shikiflow.domain.repository.UserRepository
@@ -108,7 +108,7 @@ object RepositoryModule {
         @Shikimori shikimoriDataSource: StaffDataSource,
         @AniList anilistDataSource: StaffDataSource,
         settingsRepository: SettingsRepository
-    ): PersonRepository = PersonRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
+    ): StaffRepository = StaffRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
 
     @Provides
     @Singleton

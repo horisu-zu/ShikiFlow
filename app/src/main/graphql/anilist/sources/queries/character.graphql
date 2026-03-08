@@ -32,61 +32,24 @@ query CharacterDetails(
             large
         }
         anime: media(sort: [POPULARITY_DESC], type: ANIME) {
-            pageInfo {
-                hasNextPage
-            }
-            edges {
-                characterRole
-                node {
-                    ...ALMediaBrowseShort
-                }
-            }
+            ...ALCharacterMediaRoles
         }
         manga: media(sort: [POPULARITY_DESC], type: MANGA) {
-            pageInfo {
-                hasNextPage
-            }
-            edges {
-                characterRole
-                node {
-                    ...ALMediaBrowseShort
-                }
-            }
+            ...ALCharacterMediaRoles
         }
         description(asHtml: true)
     }
 }
 
-query StaffDetails(
-    $staffId: Int!
+query CharacterMediaAppearances(
+    $characterId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $mediaType: MediaType!
 ) {
-    Staff(id: $staffId) {
-        id
-        name {
-            full
-            native
-        }
-        image {
-            large
-        }
-        primaryOccupations
-        dateOfBirth {
-            ...Date
-        }
-        description
-        characters(sort: [FAVOURITES_DESC]) {
-            pageInfo {
-                hasNextPage
-            }
-            nodes {
-                ...ALCharacterShort
-            }
-        }
-        animeStaffRoles: staffMedia(sort: [POPULARITY_DESC], type: ANIME) {
-            ...ALMediaStaffRoles
-        }
-        mangaStaffRoles: staffMedia(sort: [POPULARITY_DESC], type: MANGA) {
-            ...ALMediaStaffRoles
+    Character(id: $characterId) {
+        media(page: $page, perPage: $perPage, type: $mediaType) {
+            ...ALCharacterMediaRoles
         }
     }
 }

@@ -426,8 +426,8 @@ private fun RoundBox(
             .size(36.dp)
             .clip(CircleShape)
             .background(
-                if (enabled) MaterialTheme.colorScheme.surface
-                else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                color = if (enabled) MaterialTheme.colorScheme.surface
+                    else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
             )
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center

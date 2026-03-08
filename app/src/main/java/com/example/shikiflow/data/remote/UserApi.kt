@@ -28,7 +28,7 @@ interface UserApi {
     suspend fun getUserAnimeRates(
         @Path("userId") userId: Long,
         @Query("page") page: Int? = null,
-        @Query("limit") limit: Int? = null,
+        @Query("limit") limit: Int = 5000,
         @Query("status") status: String? = null,
         @Query("censored") censored: Boolean? = true
     ): List<ShikiShortUserRate.ShikiShortAnimeRate>
@@ -37,7 +37,7 @@ interface UserApi {
     suspend fun getUserMangaRates(
         @Path("userId") userId: Long,
         @Query("page") page: Int? = null,
-        @Query("limit") limit: Int? = null,
+        @Query("limit") limit: Int = 5000,
         @Query("status") status: String? = null,
         @Query("censored") censored: Boolean? = true
     ): List<ShikiShortUserRate.ShikiShortMangaRate>

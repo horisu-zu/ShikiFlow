@@ -142,16 +142,20 @@ fun BrowseCoverItem(
     userRateStatus: UserRateStatus?,
     coverWidth: Dp,
     cornerShape: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null,
 ) {
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+    ) {
         BaseImage(
             model = posterUrl,
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
                 defaultWidth = coverWidth,
                 defaultClip = RoundedCornerShape(cornerShape)
-            )
+            ),
+            onClick = onClick
         )
         userRateStatus ?.let {
             Box(

@@ -12,12 +12,11 @@ import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toCharacterRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.remote.CharacterApi
-import com.example.shikiflow.domain.model.character.CharacterMediaRole
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
+import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -37,19 +36,17 @@ class ShikimoriCharactersDataSource @Inject constructor(
         }
     }
 
-    override fun getCharacterMediaAppearances(
+    override fun getCharacterMediaRoles(
         characterId: Int,
         mediaType: MediaType
-    ): Flow<PagingData<CharacterMediaRole>> {
+    ): Flow<PagingData<MediaRole>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
-            object : PagingSource<Int, CharacterMediaRole>() {
-                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, CharacterMediaRole> {
+            object : PagingSource<Int, MediaRole>() {
+                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {
                     val detailsResult = getCharacterDetails(characterId)
 
                     return detailsResult.fold(
                         onSuccess = { details ->
-                            delay(200)
-
                             val mediaRoles = when(mediaType) {
                                 MediaType.ANIME -> details.animeRoles.entries
                                 MediaType.MANGA -> details.mangaRoles.entries
@@ -67,7 +64,7 @@ class ShikimoriCharactersDataSource @Inject constructor(
                     )
                 }
 
-                override fun getRefreshKey(state: PagingState<Int, CharacterMediaRole>): Int? = null
+                override fun getRefreshKey(state: PagingState<Int, MediaRole>): Int? = null
             }
         }.flow
     }
@@ -84,7 +81,6 @@ class ShikimoriCharactersDataSource @Inject constructor(
                     .query(
                         AnimeCharactersQuery(mediaId.toString())
                     ).execute()
-
 
                 response.toResult().map { data ->
                     data.animes

@@ -62,8 +62,8 @@ fun CompareScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 scrollBehavior = scrollBehavior
             )
@@ -80,7 +80,7 @@ fun CompareScreen(
             CompareTabRow(
                 tabs = tabs.map { it.displayValue },
                 selectedTab = pagerState.currentPage,
-                containerColor = MaterialTheme.colorScheme.surface,
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 onTabSelected = { pageIndex ->
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(

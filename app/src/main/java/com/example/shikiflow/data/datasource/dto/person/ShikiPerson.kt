@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.datasource.dto.person
 
-import com.example.shikiflow.data.datasource.dto.person.GroupedRolesSerializer
 import com.example.shikiflow.data.datasource.dto.ShikiImage
 import com.example.shikiflow.data.datasource.dto.ShikiImageSerializer
 import kotlinx.serialization.SerialName
@@ -28,7 +27,7 @@ data class ShikiPerson(
 
 @Serializable
 data class ShikiDate(
-    val day: Int,
-    val month: Int,
-    val year: Int
+    val day: Int?,
+    val month: Int?,
+    val year: Int?
 )

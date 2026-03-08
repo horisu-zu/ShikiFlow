@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.model.staff
 
-import com.example.shikiflow.domain.model.character.MediaRole
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import kotlinx.datetime.LocalDate
 
@@ -13,8 +13,8 @@ data class StaffDetails(
     val imageUrl: String?,
     val birthDate: LocalDate?,
     val shortRoles: Map<String, Int?>,
-    val staffCharacterRoles: PaginatedList<MediaPersonShort>?,
-    val staffAnimeRoles: PaginatedList<MediaRole>?,
-    val staffMangaRoles: PaginatedList<MediaRole>?,
+    val staffCharacterRoles: PaginatedList<MediaPersonShort>,
+    val staffAnimeRoles: PaginatedList<ShortMedia>,
+    val staffMangaRoles: PaginatedList<ShortMedia>,
     val topicId: Int? = null
 )

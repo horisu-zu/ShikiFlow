@@ -32,7 +32,7 @@ query StaffDetails(
     }
 }
 
-query StaffMediaAppearance(
+query StaffMediaRoles(
     $staffId: Int!,
     $page: Int!,
     $perPage: Int!,
@@ -41,6 +41,30 @@ query StaffMediaAppearance(
     Staff(id: $staffId) {
         staffMedia(page: $page, perPage: $perPage, type: $mediaType) {
             ...ALMediaStaffRoles
+        }
+    }
+}
+
+query VoiceActorRoles(
+    $staffId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $sort: CharacterSort = FAVOURITES_DESC
+) {
+    Staff(id: $staffId) {
+        characters(
+            page: $page,
+            perPage: $perPage,
+            sort: [$sort]
+        ) {
+            edges {
+                node {
+                    ...ALCharacterShort
+                }
+                media {
+                    ...ALMediaBrowseShort
+                }
+            }
         }
     }
 }

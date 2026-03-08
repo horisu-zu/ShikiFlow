@@ -125,7 +125,7 @@ fun AnimeTranslationSelectScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceVariant
                     ),
                     windowInsets = WindowInsets.statusBars.only(WindowInsetsSides.Top)
                 )

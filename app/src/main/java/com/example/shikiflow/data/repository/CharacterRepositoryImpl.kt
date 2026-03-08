@@ -8,6 +8,7 @@ import com.example.shikiflow.data.local.source.CharactersPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
+import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -34,19 +35,11 @@ class CharacterRepositoryImpl @Inject constructor(
     override suspend fun getCharacterDetails(
         characterId: Int
     ): Result<MediaCharacter> = getSource().getCharacterDetails(characterId)
-        /*val query = CharacterDetailsQuery(
-            ids = Optional.presentIfNotNull(listOf(characterId))
-        )
 
-        return try {
-            val response = apolloClient.query(query).execute()
-
-            response.data?.let { charactersResponse ->
-                Result.success(charactersResponse.characters.first())
-            } ?: Result.failure(Exception("No data"))
-        } catch (e: Exception) {
-            Result.failure(e)
-        }*/
+    override fun getCharacterMediaRoles(
+        characterId: Int,
+        mediaType: MediaType
+    ): Flow<PagingData<MediaRole>> = getSource().getCharacterMediaRoles(characterId, mediaType)
 
     override fun getMediaCharacters(
         mediaId: Int,

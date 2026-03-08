@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -47,7 +49,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -55,17 +56,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.common.MediaRolesType
+import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.RoleType
+import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.RoundedImage
@@ -89,7 +93,6 @@ fun StaffScreen(
     val staffDetails by staffViewModel.personDetails.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
-    val density = LocalDensity.current
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
@@ -126,7 +129,7 @@ fun StaffScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surface
+                            else MaterialTheme.colorScheme.surfaceVariant
                     )
                 )
                 if(!isAtTop) { HorizontalDivider() }
@@ -146,7 +149,8 @@ fun StaffScreen(
 
                     LazyColumn(
                         state = lazyListState,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
                             .padding(
                                 top = paddingValues.calculateTopPadding(),
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
@@ -167,71 +171,82 @@ fun StaffScreen(
                                 modifier = Modifier.height(148.dp)
                             )
                         }
-                        details.staffCharacterRoles?.let { characterRoles ->
+                        if(details.staffCharacterRoles.entries.isNotEmpty()) {
                             item {
-                                var roleCardHeight by remember { mutableIntStateOf(0) }
-                                val cardWidth = 96.dp
-
-                                SnapFlingLazyRow(
-                                    modifier = Modifier
-                                        .ignoreHorizontalParentPadding(horizontalPadding)
-                                        .fillMaxWidth(),
-                                    contentPadding = PaddingValues(horizontal = horizontalPadding),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    items(characterRoles.entries) { character ->
-                                        CharacterCard(
-                                            characterPoster = character.imageUrl,
-                                            characterName = character.fullName,
-                                            onClick = { navOptions.navigateToCharacterDetails(
-                                                characterId = character.id
-                                            ) },
-                                            modifier = Modifier.width(cardWidth)
-                                                .onSizeChanged { size ->
-                                                    roleCardHeight = size.height
+                                VoiceActorRolesSection(
+                                    characterRoles = details.staffCharacterRoles,
+                                    horizontalPadding = horizontalPadding,
+                                    onCharacterClick = { characterId ->
+                                        navOptions.navigateToCharacterDetails(characterId)
+                                    },
+                                    onPaginatedNavigate = {
+                                        navOptions.navigateToMediaRoles(
+                                            id = personId,
+                                            mediaRolesType = MediaRolesType.STAFF,
+                                            roleTypes = buildList {
+                                                add(RoleType.VA)
+                                                if(details.staffAnimeRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.ANIME)
                                                 }
+                                                if(details.staffMangaRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.MANGA)
+                                                }
+                                            }
                                         )
                                     }
-                                    if(characterRoles.hasNextPage) {
-                                        item {
-                                            PaginatedListNavigateIcon(
-                                                onNavigate = { /**/ },
-                                                modifier = Modifier
-                                                    .height(
-                                                        height = with(density) {
-                                                            roleCardHeight.toDp()
-                                                        }
-                                                    )
-                                                    .width(cardWidth)
-                                                    .clip(CircleShape)
-                                            )
-                                        }
-                                    }
-                                }
+                                )
                             }
                         }
-                        details.staffAnimeRoles?.let { animeRoles ->
+                        if(details.staffAnimeRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
                                     sectionTitle = stringResource(R.string.main_track_mode_anime),
-                                    items = animeRoles,
+                                    items = details.staffAnimeRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToAnimeDetails(id)
                                     },
-                                    onPaginatedNavigate = { /**/ },
+                                    onPaginatedNavigate = {
+                                        navOptions.navigateToMediaRoles(
+                                            id = personId,
+                                            mediaRolesType = MediaRolesType.STAFF,
+                                            roleTypes = buildList {
+                                                add(RoleType.ANIME)
+                                                if(details.staffCharacterRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.VA)
+                                                }
+                                                if(details.staffMangaRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.MANGA)
+                                                }
+                                            }
+                                        )
+                                    },
                                     horizontalPadding = horizontalPadding
                                 )
                             }
                         }
-                        details.staffMangaRoles?.let { mangaRoles ->
+                        if(details.staffMangaRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.settings_manga_section_title),
-                                    items = mangaRoles,
+                                    sectionTitle = stringResource(R.string.main_track_mode_manga),
+                                    items = details.staffMangaRoles,
                                     onItemClick = { id ->
-                                        navOptions.navigateToMangaDetails(id)
+                                        navOptions.navigateToAnimeDetails(id)
                                     },
-                                    onPaginatedNavigate = { /**/ },
+                                    onPaginatedNavigate = {
+                                        navOptions.navigateToMediaRoles(
+                                            id = personId,
+                                            mediaRolesType = MediaRolesType.STAFF,
+                                            roleTypes = buildList {
+                                                add(RoleType.MANGA)
+                                                if(details.staffCharacterRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.VA)
+                                                }
+                                                if(details.staffAnimeRoles.entries.isNotEmpty()) {
+                                                    add(RoleType.ANIME)
+                                                }
+                                            }
+                                        )
+                                    },
                                     horizontalPadding = horizontalPadding
                                 )
                             }
@@ -289,7 +304,9 @@ private fun StaffTitleSection(
     )
 
     Row(
-        modifier = modifier.fillMaxWidth().padding(vertical = 12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         //horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
@@ -333,12 +350,14 @@ private fun StaffTitleSection(
         Box(
             modifier = Modifier
                 .fillMaxHeight()
-                .clip(RoundedCornerShape(
-                    topStart = 12.dp,
-                    bottomStart = 12.dp,
-                    topEnd = if(isExpanded) 0.dp else 4.dp,
-                    bottomEnd = if(isExpanded) 0.dp else 4.dp,
-                ))
+                .clip(
+                    RoundedCornerShape(
+                        topStart = 12.dp,
+                        bottomStart = 12.dp,
+                        topEnd = if (isExpanded) 0.dp else 4.dp,
+                        bottomEnd = if (isExpanded) 0.dp else 4.dp,
+                    )
+                )
                 .clickable(
                     interactionSource = mutableInteractionSource,
                     indication = null,
@@ -346,7 +365,7 @@ private fun StaffTitleSection(
                         isExpanded = !isExpanded
                     }
                 )
-                .background(MaterialTheme.colorScheme.surface),
+                .background(MaterialTheme.colorScheme.surfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -372,9 +391,10 @@ private fun StaffTitleSection(
                     stiffness = Spring.StiffnessMedium
                 )
             ),
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier
+                .fillMaxHeight()
                 .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(
                 modifier = modifier.fillMaxSize(),
@@ -390,6 +410,70 @@ private fun StaffTitleSection(
                         },
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(horizontal = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun VoiceActorRolesSection(
+    characterRoles: PaginatedList<MediaPersonShort>,
+    horizontalPadding: Dp,
+    onCharacterClick: (Int) -> Unit,
+    onPaginatedNavigate: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val cardWidth = 96.dp
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.staff_va_roles_label),
+                style = MaterialTheme.typography.titleMedium
+            )
+            IconButton(
+                onClick = { onPaginatedNavigate() }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Navigate to Page"
+                )
+            }
+        }
+        SnapFlingLazyRow(
+            modifier = Modifier
+                .ignoreHorizontalParentPadding(horizontalPadding)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = horizontalPadding),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(characterRoles.entries) { character ->
+                CharacterCard(
+                    characterPoster = character.imageUrl,
+                    characterName = character.fullName,
+                    onClick = {
+                        onCharacterClick(character.id)
+                    },
+                    modifier = Modifier.width(cardWidth)
+                )
+            }
+            if(characterRoles.hasNextPage) {
+                item {
+                    PaginatedListNavigateIcon(
+                        onNavigate = { onPaginatedNavigate() },
+                        modifier = Modifier
+                            .width(cardWidth)
+                            .aspectRatio(2f / 2.85f)
+                            .clip(CircleShape)
                     )
                 }
             }

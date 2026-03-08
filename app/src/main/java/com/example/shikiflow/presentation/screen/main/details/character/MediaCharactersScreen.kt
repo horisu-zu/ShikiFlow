@@ -12,7 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -95,64 +96,70 @@ fun MediaCharactersScreen(
             }
         }
     ) { paddingValues ->
-        if(mediaCharacterItems.loadState.refresh is LoadState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(mediaCharacterItems.loadState.refresh is LoadState.Error) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = stringResource(R.string.common_error),
-                    buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { mediaCharacterItems.refresh() }
-                )
+        when (mediaCharacterItems.loadState.refresh) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { mediaCharacterItems.refresh() }
+                    )
+                }
+            }
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(360.dp),
+                    contentPadding = PaddingValues(
+                        horizontal = 12.dp,
+                        vertical = 8.dp
                     ),
-                contentPadding = PaddingValues(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
-            ) {
-                items(
-                    count = mediaCharacterItems.itemCount,
-                    key = mediaCharacterItems.itemKey { it.mediaCharacter.id }
-                ) { index ->
-                    val mediaCharacterShort = mediaCharacterItems[index] ?: return@items
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = paddingValues.calculateTopPadding(),
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+                ) {
+                    items(
+                        count = mediaCharacterItems.itemCount,
+                        key = mediaCharacterItems.itemKey { it.mediaCharacter.id }
+                    ) { index ->
+                        val mediaCharacterShort = mediaCharacterItems[index] ?: return@items
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        MediaCharacterItem(
-                            mediaPerson = mediaCharacterShort.mediaCharacter,
-                            role = stringResource(id = mediaCharacterShort.role.displayValue),
-                            leftToRight = true,
-                            onItemClick = { characterId ->
-                                navOptions.navigateToCharacterDetails(characterId)
-                            },
-                            modifier = Modifier.weight(1f)
-                        )
-                        mediaCharacterShort.mediaPerson?.let { va ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
                             MediaCharacterItem(
-                                mediaPerson = va,
-                                leftToRight = false,
-                                onItemClick = { personId ->
-                                    navOptions.navigateToStaff(personId)
+                                mediaPerson = mediaCharacterShort.mediaCharacter,
+                                role = stringResource(id = mediaCharacterShort.role.displayValue),
+                                leftToRight = true,
+                                onItemClick = { characterId ->
+                                    navOptions.navigateToCharacterDetails(characterId)
                                 },
                                 modifier = Modifier.weight(1f)
                             )
+                            mediaCharacterShort.mediaPerson?.let { va ->
+                                MediaCharacterItem(
+                                    mediaPerson = va,
+                                    leftToRight = false,
+                                    onItemClick = { personId ->
+                                        navOptions.navigateToStaff(personId)
+                                    },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
                     }
                 }

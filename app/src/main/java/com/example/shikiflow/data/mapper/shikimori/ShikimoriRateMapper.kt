@@ -54,7 +54,7 @@ object ShikimoriRateMapper {
             title = this.getMediaTitle(),
             imageUrl = this.getImageUrl() ?: "",
             score = this.score,
-            status = this.status,
+            status = this.status.toDomain(),
             progress = this.getProgress()
         )
     }

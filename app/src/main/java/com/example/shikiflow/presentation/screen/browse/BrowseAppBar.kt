@@ -45,7 +45,7 @@ fun BrowseAppBar(
                             onActiveChange = onSearchActiveChange,
                             onExitSearch = onExitSearch,
                             modifier = Modifier.fillMaxWidth().padding(end = 16.dp),
-                            activeContainerColor = MaterialTheme.colorScheme.surface,
+                            activeContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                             inactiveContainerColor = MaterialTheme.colorScheme.background
                         )
                     } else { Text(title) }
@@ -65,7 +65,7 @@ fun BrowseAppBar(
             },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = if(isAtTop && !isSearchActive) MaterialTheme.colorScheme.background
-                    else MaterialTheme.colorScheme.surface
+                    else MaterialTheme.colorScheme.surfaceVariant
             ),
             modifier = modifier
         )

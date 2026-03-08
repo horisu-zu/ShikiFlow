@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,8 +29,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.domain.model.character.MediaRole
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -37,9 +39,10 @@ import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 @Composable
 fun CharacterMediaSection(
     sectionTitle: String,
-    items: PaginatedList<MediaRole>,
+    items: PaginatedList<ShortMedia>,
     horizontalPadding: Dp = 12.dp,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Int) -> Unit,
+    onPaginatedNavigate: () -> Unit
 ) {
     val mediaItemWidth = 120.dp
     val imageType = ImageType.Poster(
@@ -47,12 +50,26 @@ fun CharacterMediaSection(
     )
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
-        Text(
-            text = sectionTitle,
-            style = MaterialTheme.typography.titleMedium
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = sectionTitle,
+                style = MaterialTheme.typography.titleMedium
+            )
+            IconButton(
+                onClick = { onPaginatedNavigate() }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Navigate to Page"
+                )
+            }
+        }
         SnapFlingLazyRow(
             modifier = Modifier
                 .height(210.dp)
@@ -78,7 +95,7 @@ fun CharacterMediaSection(
                             .width(mediaItemWidth)
                             .aspectRatio(imageType.defaultAspectRatio)
                             .clip(RoundedCornerShape(12.dp)),
-                        onNavigate = { /*Have to create an appropriate screen*/ }
+                        onNavigate = { onPaginatedNavigate() }
                     )
                 }
             }
@@ -88,7 +105,7 @@ fun CharacterMediaSection(
 
 @Composable
 private fun MediaRoleItem(
-    mediaItem: MediaRole,
+    mediaItem: ShortMedia,
     imageType: ImageType,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier

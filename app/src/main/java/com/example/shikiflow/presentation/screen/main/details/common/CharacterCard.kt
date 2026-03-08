@@ -34,7 +34,8 @@ fun CharacterCard(
     ) {
         RoundedImage(
             model = characterPoster, //character.characterShort.poster?.posterShort?.previewUrl,
-            modifier = Modifier.fillMaxWidth().aspectRatio(2f / 2.85f),
+            modifier = Modifier.fillMaxWidth()
+                .aspectRatio(2f / 2.85f),
             clip = CircleShape,
             contentScale = ContentScale.Crop
         )
