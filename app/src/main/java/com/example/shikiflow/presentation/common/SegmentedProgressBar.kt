@@ -35,9 +35,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapUserRateStatus
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.StatusColor
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
@@ -96,7 +96,7 @@ fun SegmentedProgressBar(
                 ) {
                     groupedData.forEach { (status, count) ->
                         SegmentedDataRowItem(
-                            status = stringResource(id = mapUserRateStatus(status, mediaType)),
+                            status = stringResource(id = status.mapStatus(mediaType)),
                             count = count,
                             size = barType.itemSize,
                             color = StatusColor.getStatusColor(status)
@@ -222,7 +222,7 @@ private fun SegmentedDataColumnItem(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(id = mapUserRateStatus(status, mediaType)),
+                text = stringResource(id = status.mapStatus(mediaType)),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium,
                     color = StatusColor.getStatusColor(status)

@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.manga.read
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.usecase.AggregateMangaUseCase
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel

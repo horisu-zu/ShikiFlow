@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,7 +42,7 @@ fun BrowseSideScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = stringResource(id = browseType.displayValueRes)
+                            text = stringResource(id = browseType.displayValue())
                         )
                     },
                     navigationIcon = {

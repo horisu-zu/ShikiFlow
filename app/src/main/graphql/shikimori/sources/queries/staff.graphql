@@ -1,0 +1,19 @@
+query AnimeStaff(
+    $id: String!
+) {
+    animes(ids: $id) {
+        personRoles {
+            ...PersonRoleShort
+        }
+    }
+}
+
+query MangaStaff(
+    $id: String!
+) {
+    mangas(ids: $id) {
+        personRoles {
+            ...PersonRoleShort
+        }
+    }
+}

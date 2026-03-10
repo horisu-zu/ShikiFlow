@@ -41,6 +41,7 @@ import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.viewmodel.manga.MangaTracksViewModel
 
 @Composable
@@ -196,7 +197,7 @@ private fun MangaTrackItem(
         Text(
             text = listOfNotNull(
                 trackItem.manga.kind?.let {
-                    stringResource(id = it.displayValue)
+                    stringResource(id = it.displayValue())
                 },
                 trackItem.manga.score?.let { score ->
                     stringResource(id = R.string.media_score, score)

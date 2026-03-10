@@ -31,7 +31,9 @@ interface MediaNavOptions: MainNavOptions {
 
     fun navigateByEntity(entityType: EntityType, id: Int)
 
-    fun navigateToStaff(personId: Int)
+    fun navigateToStaff(staffId: Int)
+
+    fun navigateToMediaStaff(mediaId: Int, mediaType: MediaType)
 
     fun navigateToStudio(id: Int, studioName: String)
 

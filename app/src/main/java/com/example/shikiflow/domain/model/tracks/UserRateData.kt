@@ -1,15 +1,14 @@
 package com.example.shikiflow.domain.model.tracks
 
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import kotlin.time.Clock
 import kotlin.time.Instant
 
-enum class MediaType(val displayValue: Int) {
-    ANIME(R.string.browse_search_media_anime),
-    MANGA(R.string.browse_search_media_manga);
+enum class MediaType {
+    ANIME,
+    MANGA;
 }
 
 data class UserRateData(

@@ -1,7 +1,7 @@
 package com.example.shikiflow.data.datasource
 
 import androidx.paging.PagingData
-import com.example.shikiflow.domain.model.track.UserRateOrder
+import com.example.shikiflow.domain.model.sort.UserRateOrder
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack

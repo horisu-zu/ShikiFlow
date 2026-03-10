@@ -83,6 +83,7 @@ retrofit-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "con
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
+apollo-normalized-cache = { group = "com.apollographql.apollo", name = "apollo-normalized-cache", version.ref = "apollo" }
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo"}
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 zoomable = { group = "net.engawapg.lib", name = "zoomable", version.ref = "zoomable" }

@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import kotlinx.coroutines.launch
 
@@ -78,7 +79,7 @@ fun CompareScreen(
                 )
         ) {
             CompareTabRow(
-                tabs = tabs.map { it.displayValue },
+                tabs = tabs.map { it.displayValue() },
                 selectedTab = pagerState.currentPage,
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                 onTabSelected = { pageIndex ->

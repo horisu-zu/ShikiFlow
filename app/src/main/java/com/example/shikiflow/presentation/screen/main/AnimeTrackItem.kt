@@ -20,12 +20,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.determineSeason
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.SeasonMapper.determineSeason
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -68,9 +70,9 @@ fun AnimeTrackItem(
             Text(
                 text = buildString {
                     userRate.anime.status?.let { mediaStatus ->
-                        append(stringResource(id = mediaStatus.displayValue))
+                        append(stringResource(id = mediaStatus.displayValue()))
                     }
-                    userRate.anime.kind?.displayValue?.let { formatRes ->
+                    userRate.anime.kind?.displayValue()?.let { formatRes ->
                         append(" • ")
                         append(stringResource(id = formatRes))
                     }

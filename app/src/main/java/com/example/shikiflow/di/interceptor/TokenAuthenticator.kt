@@ -2,6 +2,7 @@ package com.example.shikiflow.di.interceptor
 
 import android.util.Log
 import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
+import com.example.shikiflow.domain.model.auth.AuthCredentials
 import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
@@ -29,7 +30,7 @@ class TokenAuthenticator @Inject constructor(
                     shikiAuthApi.refreshToken(refreshToken = it).body()
                 }
                 tokenResponse?.let {
-                    tokenRepository.saveTokens(it)
+                    tokenRepository.saveTokens(AuthCredentials(it.accessToken, it.refreshToken))
                     response.request.newBuilder()
                         .header("Authorization", "Bearer ${it.accessToken}")
                         .build()

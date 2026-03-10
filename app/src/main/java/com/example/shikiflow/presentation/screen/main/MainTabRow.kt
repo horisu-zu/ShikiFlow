@@ -14,9 +14,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 
 @Composable
 fun MainTabRow(
@@ -41,7 +41,7 @@ fun MainTabRow(
         divider = { if(!isAtTop) HorizontalDivider() }
     ) {
         tabs.forEachIndexed { index, status ->
-            val rateStatus = UserRateMapper.mapUserRateStatus(status, mediaType)
+            val rateStatus = status.mapStatus(mediaType)
 
             Tab(
                 selected = selectedTab == index,

@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.AuthDataSource
-import com.example.shikiflow.domain.model.auth.TokenResponse
+import com.example.shikiflow.domain.model.auth.AuthCredentials
 
 class AnilistAuthDataSource: AuthDataSource  {
     override fun getAuthorizationUrl(): String {
@@ -13,14 +13,14 @@ class AnilistAuthDataSource: AuthDataSource  {
                 "&response_type=token"
     }
 
-    override suspend fun handleAuthorizationResponse(uriResponse: Uri): TokenResponse {
+    override suspend fun handleAuthorizationResponse(uriResponse: Uri): AuthCredentials {
         Log.d("AnilistAuthDataSource", "Uri Response: $uriResponse")
         val accessToken = uriResponse.fragment?.split("&")
             ?.find { it.startsWith("access_token=") }
             ?.substringAfter("access_token=")
 
         return accessToken?.let {
-            TokenResponse(accessToken)
+            AuthCredentials(accessToken, null)
         } ?: throw IllegalStateException("Token response body is null")
     }
 }

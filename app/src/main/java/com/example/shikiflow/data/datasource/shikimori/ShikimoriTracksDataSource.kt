@@ -21,7 +21,7 @@ import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
 import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toDomain
 import com.example.shikiflow.data.mapper.local.MangaEntityMapper.toDomain
-import com.example.shikiflow.domain.model.track.UserRateOrder
+import com.example.shikiflow.domain.model.sort.UserRateOrder
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack

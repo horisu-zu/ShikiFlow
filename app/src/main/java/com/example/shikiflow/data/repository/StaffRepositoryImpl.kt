@@ -5,6 +5,8 @@ import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -32,12 +34,20 @@ class StaffRepositoryImpl @Inject constructor(
         return getSource().getStaffDetails(id)
     }
 
+    override fun getMediaStaff(
+        mediaId: Int,
+        mediaType: MediaType,
+        orderOption: OrderOption?
+    ): Flow<PagingData<StaffShort>> = getSource().getMediaStaff(mediaId, mediaType, orderOption)
+
     override fun getStaffMediaRoles(
         staffId: Int,
-        mediaType: MediaType
-    ): Flow<PagingData<MediaRole>> = getSource().getStaffMediaRoles(staffId, mediaType)
+        mediaType: MediaType,
+        orderOption: OrderOption?
+    ): Flow<PagingData<MediaRole>> = getSource().getStaffMediaRoles(staffId, mediaType, orderOption)
 
     override fun getVoiceActorRoles(
-        staffId: Int
-    ): Flow<PagingData<MediaRole>> = getSource().getVoiceActorRoles(staffId)
+        staffId: Int,
+        orderOption: OrderOption?
+    ): Flow<PagingData<MediaRole>> = getSource().getVoiceActorRoles(staffId, orderOption)
 }

@@ -6,7 +6,7 @@ import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.fragment.ALThread
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.domain.model.comment.ALComment
-import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.graphql.anilist.type.ThreadSort as ALThreadSort
 import com.example.shikiflow.domain.model.thread.ThreadSort

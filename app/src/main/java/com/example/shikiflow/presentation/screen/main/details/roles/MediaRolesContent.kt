@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main.details.character
+package com.example.shikiflow.presentation.screen.main.details.roles
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +42,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.BrowseCoverItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.character.MediaRolesViewModel
@@ -86,7 +87,14 @@ fun MediaRolesContent(
         else -> {
             PullToRefreshCustomBox(
                 isRefreshing = mediaRoles.loadState.refresh == LoadState.Loading,
-                onRefresh = { mediaRoles.refresh() }
+                onRefresh = { mediaRoles.refresh() },
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                    )
             ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(
@@ -95,13 +103,7 @@ fun MediaRolesContent(
                             else -> 240.dp
                         }
                     ),
-                    modifier = modifier
-                        .fillMaxSize()
-                        .padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
                         horizontal = 12.dp,
                         vertical = 8.dp
@@ -208,7 +210,7 @@ private fun CharacterMediaRoleItem(
             )
             mediaRole.characterRole?.let { role ->
                 Text(
-                    text = stringResource(id = role.displayValue),
+                    text = stringResource(id = role.displayValue()),
                     style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onBackground.copy(

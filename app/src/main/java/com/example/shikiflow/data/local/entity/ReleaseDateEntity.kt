@@ -26,9 +26,9 @@ data class ReleaseDateEntity(
 
         fun ReleaseDateEntity.toDomain(): Date {
             return Date(
-                year = this.year,
-                month = this.month,
-                day = this.day,
+                year = this.year ?: 0,
+                month = this.month ?: 0,
+                day = this.day ?: 0,
                 date = this.date
             )
         }

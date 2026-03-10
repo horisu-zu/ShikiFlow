@@ -52,8 +52,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.track.BrowseOrder
-import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.OrderOption
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem

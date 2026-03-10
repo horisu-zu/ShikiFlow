@@ -1,4 +1,4 @@
-package com.example.shikiflow.domain.model.auth
+package com.example.shikiflow.data.datasource.dto.auth
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

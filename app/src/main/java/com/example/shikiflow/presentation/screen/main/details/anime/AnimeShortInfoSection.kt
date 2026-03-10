@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -21,12 +20,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapOriginToString
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.presentation.common.CardItem
+import com.example.shikiflow.presentation.common.mappers.MediaOriginMapper.displayValue
+import com.example.shikiflow.utils.Converter.formatDate
 import com.example.shikiflow.utils.Converter.formatInstant
-import kotlin.time.Instant
+import kotlinx.datetime.LocalDate
 
 @Composable
 fun AnimeShortInfoSection(
@@ -63,7 +63,7 @@ fun AnimeShortInfoSection(
                     label = stringResource(R.string.details_info_origin),
                     content = {
                         Text(
-                            text = stringResource(id = mapOriginToString(origin)),
+                            text = stringResource(id = origin.displayValue()),
                             overflow = TextOverflow.Ellipsis,
                             textAlign = TextAlign.End,
                             maxLines = 1,
@@ -90,14 +90,18 @@ fun AnimeShortInfoSection(
                 }
             )
         }
-        animeDetails.airedOn?.date?.let {
+        animeDetails.airedOn?.let { airedOn ->
             DetailRow(
                 label = stringResource(R.string.details_info_aired_on),
                 content = {
                     Text(
-                        text = formatInstant(
-                            instant = Instant.parse(it.toString()),
-                            includeTime = false
+                        text = airedOn.date?.let { date ->
+                            formatInstant(
+                                instant = date,
+                                includeTime = false
+                            )
+                        } ?: formatDate(
+                            date = LocalDate(airedOn.year, airedOn.month, airedOn.day)
                         ),
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.End,
@@ -108,13 +112,13 @@ fun AnimeShortInfoSection(
             )
         }
         if (animeDetails.status == MediaStatus.ONGOING) {
-            animeDetails.nextEpisodeAt?.let { nextEpisode ->
+            animeDetails.nextEpisodeAt?.let { nextEpisodeInstant ->
                 DetailRow(
                     label = stringResource(R.string.details_info_next_episode_at),
                     content = {
                         Text(
                             text = formatInstant(
-                                Instant.parse(nextEpisode.toString()),
+                                instant = nextEpisodeInstant,
                                 includeTime = true
                             ),
                             textAlign = TextAlign.End,
@@ -125,14 +129,26 @@ fun AnimeShortInfoSection(
                     }
                 )
             }
-        } else if (animeDetails.status == MediaStatus.RELEASED && animeDetails.releasedOn?.date != null) {
+        } else if (
+            animeDetails.status == MediaStatus.RELEASED
+            && animeDetails.releasedOn != null
+            && animeDetails.releasedOn != animeDetails.airedOn
+        ) {
             DetailRow(
                 label = stringResource(R.string.details_info_released_on),
                 content = {
                     Text(
-                        text = formatInstant(
-                            Instant.parse(animeDetails.releasedOn.date.toString()),
-                            includeTime = false
+                        text = animeDetails.releasedOn.date?.let { date ->
+                            formatInstant(
+                                instant = date,
+                                includeTime = false
+                            )
+                        } ?: formatDate(
+                            date = LocalDate(
+                                animeDetails.releasedOn.year,
+                                animeDetails.releasedOn.month,
+                                animeDetails.releasedOn.day
+                            )
                         ),
                         textAlign = TextAlign.End,
                         overflow = TextOverflow.Ellipsis,

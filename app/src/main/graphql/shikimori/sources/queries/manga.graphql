@@ -3,7 +3,6 @@ query MangaDetails(
 ) {
     mangas(ids: $ids) {
         id
-        malId
         name
         english
         japanese
@@ -25,9 +24,7 @@ query MangaDetails(
             character { ...CharacterShort }
         }
         personRoles {
-            id
-            rolesEn
-            person { id name poster { originalUrl } }
+            ...PersonRoleShort
         }
 
         related {

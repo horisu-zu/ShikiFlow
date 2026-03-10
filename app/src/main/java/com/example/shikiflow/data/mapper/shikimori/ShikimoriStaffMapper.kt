@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.mapper.shikimori
 
+import com.example.graphql.shikimori.fragment.PersonRoleShort
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.dto.ShikiAnime
 import com.example.shikiflow.data.datasource.dto.ShikiManga
@@ -11,6 +12,7 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.domain.model.staff.StaffShort
 
 object ShikimoriStaffMapper {
     fun ShikiPerson.toDomain(): StaffDetails {
@@ -54,6 +56,15 @@ object ShikimoriStaffMapper {
                     )
                 } ?: PaginatedList(false, emptyList()),
             topicId = topicId
+        )
+    }
+
+    fun PersonRoleShort.toDomain(): StaffShort {
+        return StaffShort(
+            id = person.id.toInt(),
+            fullName = person.name,
+            imageUrl = person.poster?.originalUrl ?: "",
+            roles = rolesEn
         )
     }
 

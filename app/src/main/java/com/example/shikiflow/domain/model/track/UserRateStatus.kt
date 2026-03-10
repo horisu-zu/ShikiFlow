@@ -8,4 +8,14 @@ enum class UserRateStatus {
     PAUSED,
     DROPPED,
     UNKNOWN;
+
+    companion object {
+        fun isWatched(status: UserRateStatus): Boolean {
+            return setOf(
+                WATCHING,
+                DROPPED,
+                PAUSED
+            ).contains(status)
+        }
+    }
 }

@@ -1,11 +1,13 @@
 package com.example.shikiflow.di.module
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
+import com.apollographql.apollo.cache.normalized.normalizedCache
 import com.apollographql.apollo.network.okHttpClient
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.di.annotations.GithubOkHttpClient
 import com.example.shikiflow.di.annotations.GithubRetrofit
-import com.example.shikiflow.di.annotations.MainRetrofit
+import com.example.shikiflow.di.annotations.ShikimoriRetrofit
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
@@ -22,6 +24,7 @@ import com.example.shikiflow.di.annotations.KodikRetrofit
 import com.example.shikiflow.di.annotations.MainOkHttpClient
 import com.example.shikiflow.di.annotations.MangaDexRetrofit
 import com.example.shikiflow.di.annotations.ShikimoriApollo
+import com.example.shikiflow.di.annotations.ShikimoriOkHttpClient
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.KodikInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
@@ -46,7 +49,15 @@ class NetworkModule {
     @Provides
     @Singleton
     @MainOkHttpClient
-    fun provideMainOkHttpClient(
+    fun provideMainOkHttpClient(): OkHttpClient {
+        return OkHttpClient.Builder()
+            .build()
+    }
+
+    @Provides
+    @Singleton
+    @ShikimoriOkHttpClient
+    fun provideShikimoriOkHttpClient(
         tokenRepository: TokenRepository,
         tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
@@ -99,9 +110,9 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    @MainRetrofit
+    @ShikimoriRetrofit
     fun provideMainRetrofit(
-        @MainOkHttpClient okHttpClient: OkHttpClient,
+        @ShikimoriOkHttpClient okHttpClient: OkHttpClient,
         json: Json
     ): Retrofit {
         return Retrofit.Builder()
@@ -157,11 +168,14 @@ class NetworkModule {
     @Singleton
     @ShikimoriApollo
     fun provideShikimoriApolloClient(
-        @MainOkHttpClient okHttpClient: OkHttpClient
+        @ShikimoriOkHttpClient okHttpClient: OkHttpClient
     ): ApolloClient {
+        val cacheFactory = MemoryCacheFactory(10 * 1024 * 1024)
+
         return ApolloClient.Builder()
             .serverUrl("${BuildConfig.SHIKI_BASE_URL}/api/graphql")
             .okHttpClient(okHttpClient)
+            .normalizedCache(cacheFactory)
             .build()
     }
 
@@ -171,25 +185,28 @@ class NetworkModule {
     fun provideAnilistApolloClient(
         @AnilistOkHttpClient okHttpClient: OkHttpClient
     ): ApolloClient {
+        val cacheFactory = MemoryCacheFactory(10 * 1024 * 1024)
+
         return ApolloClient.Builder()
             .serverUrl(BuildConfig.ANILIST_GRAPHQL_URL)
             .okHttpClient(okHttpClient)
+            .normalizedCache(cacheFactory)
             .build()
     }
 
     @Provides
     @Singleton
-    fun provideUserApi(@MainRetrofit retrofit: Retrofit): UserApi =
+    fun provideUserApi(@ShikimoriRetrofit retrofit: Retrofit): UserApi =
         retrofit.create()
 
     @Provides
     @Singleton
-    fun provideCharacterApi(@MainRetrofit retrofit: Retrofit): CharacterApi =
+    fun provideCharacterApi(@ShikimoriRetrofit retrofit: Retrofit): CharacterApi =
         retrofit.create()
 
     @Provides
     @Singleton
-    fun providePersonApi(@MainRetrofit retrofit: Retrofit): PersonApi =
+    fun providePersonApi(@ShikimoriRetrofit retrofit: Retrofit): PersonApi =
         retrofit.create()
 
     @Provides
@@ -199,17 +216,17 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideAnimeApi(@MainRetrofit retrofit: Retrofit): AnimeApi =
+    fun provideAnimeApi(@ShikimoriRetrofit retrofit: Retrofit): AnimeApi =
         retrofit.create()
 
     @Provides
     @Singleton
-    fun provideMangaApi(@MainRetrofit retrofit: Retrofit): MangaApi =
+    fun provideMangaApi(@ShikimoriRetrofit retrofit: Retrofit): MangaApi =
         retrofit.create()
 
     @Provides
     @Singleton
-    fun provideCommentApi(@MainRetrofit retrofit: Retrofit): CommentApi =
+    fun provideCommentApi(@ShikimoriRetrofit retrofit: Retrofit): CommentApi =
         retrofit.create()
 
     @Provides

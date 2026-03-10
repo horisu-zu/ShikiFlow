@@ -58,13 +58,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapUserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
-import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
+import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
@@ -263,7 +263,7 @@ private fun StatusChips(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         items(chips) { userRateStatus ->
-            val rateStatus = mapUserRateStatus(userRateStatus, mediaType)
+            val rateStatus = userRateStatus.mapStatus(mediaType)
 
             FilterChip(
                 selected = selectedStatus != -1 && chips.getOrNull(selectedStatus) == userRateStatus,

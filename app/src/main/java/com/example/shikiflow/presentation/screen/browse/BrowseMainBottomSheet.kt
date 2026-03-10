@@ -30,8 +30,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.track.BrowseOrder
-import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.presentation.common.mappers.OrderMapper.displayValue
 import com.example.shikiflow.utils.BrowseUiMode
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.launch
@@ -135,7 +136,7 @@ fun BrowseMainBottomSheet(
                             onClick = { /**/ }
                         )
                         Text(
-                            text = stringResource(id = option.displayValue),
+                            text = stringResource(id = option.displayValue()),
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }

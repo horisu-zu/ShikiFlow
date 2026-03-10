@@ -34,15 +34,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
+import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
 import com.example.shikiflow.presentation.screen.main.details.anime.ScoreItem
 import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoItem
 import com.example.shikiflow.utils.Converter.formatInstant
@@ -102,9 +104,9 @@ fun MangaDetailsHeader(
                 ShortInfoItem(
                     infoType = stringResource(R.string.details_short_info_manga_type),
                     infoItem = buildString {
-                        append(stringResource(mangaDetails.format.displayValue))
+                        append(stringResource(mangaDetails.format.displayValue()))
                         append(" ∙ ")
-                        append(stringResource(id = mangaDetails.status.displayValue))
+                        append(stringResource(id = mangaDetails.status.displayValue()))
                     }
                 )
                 if (mangaDetails.status != MediaStatus.ONGOING && mangaDetails.status != MediaStatus.ANNOUNCED) {
@@ -209,7 +211,7 @@ fun MangaUserRateItem(
                 tint = color
             )
             Text(
-                text = UserRateMapper.mapUserRateStatusToString(
+                text = UserRateStatusMapper.mapUserRateStatusToString(
                     status = userRateStatus ?: UserRateStatus.UNKNOWN,
                     allEpisodes = allChapters,
                     watchedEpisodes = readChapters,

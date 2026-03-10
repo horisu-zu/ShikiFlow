@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -45,6 +46,7 @@ import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.character.MediaCharactersViewModel
 
@@ -111,7 +113,7 @@ fun MediaCharactersScreen(
                     ErrorItem(
                         message = stringResource(R.string.common_error),
                         buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { mediaCharacterItems.refresh() }
+                        onButtonClick = { mediaCharacterItems.retry() }
                     )
                 }
             }
@@ -143,7 +145,7 @@ fun MediaCharactersScreen(
                         ) {
                             MediaCharacterItem(
                                 mediaPerson = mediaCharacterShort.mediaCharacter,
-                                role = stringResource(id = mediaCharacterShort.role.displayValue),
+                                role = stringResource(id = mediaCharacterShort.role.displayValue()),
                                 leftToRight = true,
                                 onItemClick = { characterId ->
                                     navOptions.navigateToCharacterDetails(characterId)
@@ -158,6 +160,30 @@ fun MediaCharactersScreen(
                                         navOptions.navigateToStaff(personId)
                                     },
                                     modifier = Modifier.weight(1f)
+                                )
+                            }
+                        }
+                    }
+
+                    mediaCharacterItems.apply {
+                        if(loadState.append is LoadState.Loading) {
+                            item(
+                                span = { GridItemSpan(maxLineSpan) }
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
+                        } else if(loadState.append is LoadState.Error) {
+                            item(
+                                span = { GridItemSpan(maxLineSpan) }
+                            ) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    showFace = false,
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { mediaCharacterItems.retry() }
                                 )
                             }
                         }

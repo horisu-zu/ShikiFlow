@@ -2,7 +2,9 @@ package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.StaffDetailsQuery
 import com.example.graphql.anilist.fragment.ALMediaBrowseShort
+import com.example.graphql.anilist.fragment.ALMediaStaffRole
 import com.example.graphql.anilist.fragment.ALMediaStaffRoles
+import com.example.graphql.anilist.fragment.ALStaffEdgeShort
 import com.example.graphql.anilist.fragment.ALStaffShort
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.common.DateMapper.toLocalDate
@@ -13,6 +15,7 @@ import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 
 object AnilistStaffMapper {
@@ -34,7 +37,20 @@ object AnilistStaffMapper {
         )
     }
 
-    fun ALMediaBrowseShort.toDomain(staffRoles: List<String>): StaffMediaRole {
+    fun ALStaffEdgeShort.toDomain(): StaffShort? {
+        val personShort = this.node?.aLStaffShort?.toDomain()
+
+        return personShort?.let { personShort ->
+            StaffShort(
+                id = personShort.id,
+                fullName = personShort.fullName,
+                imageUrl = personShort.imageUrl,
+                roles = listOfNotNull(this.role)
+            )
+        }
+    }
+
+    fun ALMediaBrowseShort.toStaffRole(staffRoles: List<String>): StaffMediaRole {
         return StaffMediaRole(
             shortMedia = this.toDomain(),
             staffRoles = staffRoles
@@ -44,12 +60,12 @@ object AnilistStaffMapper {
     fun ALMediaStaffRoles?.toDomain(): PaginatedList<ShortMedia> {
         val hasNextPage = this?.pageInfo?.hasNextPage == true
         val mediaRoles = this?.edges
-            ?.filterNotNull()
-            ?.distinctBy { it.node?.aLMediaBrowseShort?.id }
-            ?.mapNotNull { edge -> edge.node?.aLMediaBrowseShort?.toDomain() }
+            ?.distinctBy { it?.aLMediaStaffRole?.node?.aLMediaBrowseShort?.id }
+            ?.mapNotNull { edge ->
+                edge?.aLMediaStaffRole?.node?.aLMediaBrowseShort?.toDomain()
+            }
 
         return mediaRoles
-            ?.takeIf { it.isNotEmpty() }
             ?.let { entries ->
                 PaginatedList(
                     hasNextPage = hasNextPage,
@@ -58,7 +74,7 @@ object AnilistStaffMapper {
             } ?: PaginatedList(false, emptyList())
     }
 
-    fun ALMediaStaffRoles?.toStaffMediaRoles(): List<StaffMediaRole> {
+    /*fun ALMediaStaffRoles?.toStaffMediaRoles(): List<StaffMediaRole> {
         return this?.edges
             ?.filterNotNull()
             ?.groupBy { it.node?.aLMediaBrowseShort?.id }
@@ -66,6 +82,12 @@ object AnilistStaffMapper {
                 val staffRoles = edges.mapNotNull { it.staffRole }
                 edges.first().node?.aLMediaBrowseShort?.toDomain(staffRoles)
             } ?: emptyList()
+    }*/
+
+    fun ALMediaStaffRole?.toStaffMediaRole(): StaffMediaRole? {
+        return this?.node
+            ?.aLMediaBrowseShort
+            ?.toStaffRole(staffRoles = listOfNotNull(staffRole))
     }
 
     fun StaffDetailsQuery.Staff.toDomain(): StaffDetails {
@@ -82,7 +104,6 @@ object AnilistStaffMapper {
             staffCharacterRoles = characters?.nodes?.mapNotNull { node ->
                 node?.aLCharacterShort?.toDomain()
             }
-                ?.takeIf { it.isNotEmpty() }
                 ?.let { characterRoles ->
                     PaginatedList(
                         hasNextPage = characters.pageInfo?.hasNextPage == true,

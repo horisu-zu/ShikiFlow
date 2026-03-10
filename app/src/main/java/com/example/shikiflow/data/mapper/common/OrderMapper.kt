@@ -6,11 +6,11 @@ import com.example.graphql.shikimori.type.OrderEnum
 import com.example.graphql.shikimori.type.SortOrderEnum
 import com.example.graphql.shikimori.type.UserRateOrderFieldEnum
 import com.example.graphql.shikimori.type.UserRateOrderInputType
-import com.example.shikiflow.domain.model.common.SortDirection
-import com.example.shikiflow.domain.model.track.BrowseOrder
-import com.example.shikiflow.domain.model.track.UserRateOrder
-import com.example.shikiflow.domain.model.track.OrderOption
-import com.example.shikiflow.domain.model.track.UserRateOrderType
+import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.UserRateOrder
+import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.UserRateOrderType
 
 object OrderMapper {
 

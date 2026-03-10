@@ -18,4 +18,4 @@ Kotlin - Jetpack Compose - MVVM - Hilt - Room - GraphQL (Apollo) - Coil - ExoPla
 1. Go to [Releases](https://github.com/horisu-zu/ShikiFlow/releases) and download latest (preferably) version.
 2. Launch the app and sign in using your existing Shikimori or AniList account credentials. 
 In case you don't have an account yet, you'll need to create one on the 
-correspondent [Shikimori](https://shikimori.one/) and [AniList](https://anilist.co) website first.
+correspondent [Shikimori](https://shikimori.one/) or [AniList](https://anilist.co) website first.

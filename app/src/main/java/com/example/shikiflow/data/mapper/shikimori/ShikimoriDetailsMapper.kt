@@ -19,6 +19,7 @@ import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
@@ -46,7 +47,7 @@ object ShikimoriDetailsMapper {
             volumes = null,
             format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
-            mediaAgeRating = rating?.toDomain(),
+            ageRating = rating?.toDomain(),
             genres = genres?.map { it.name } ?: emptyList(),
             characters = PaginatedList(
                 hasNextPage = false,
@@ -94,6 +95,7 @@ object ShikimoriDetailsMapper {
             releasedOn = releasedOn?.dateShort?.toDomain(),
             userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.MANGA),
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
+            staffList = personRoles?.map { it.personRoleShort.toDomain() } ?: emptyList(),
             scoreStats = scoresStats?.associate {
                 it.score to it.count
             }?.toSortedMap() ?: emptyMap(),

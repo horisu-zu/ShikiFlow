@@ -12,9 +12,9 @@ import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toDto
-import com.example.shikiflow.domain.model.common.SortDirection
-import com.example.shikiflow.domain.model.track.UserRateOrder
-import com.example.shikiflow.domain.model.track.UserRateOrderType
+import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.domain.model.sort.UserRateOrder
+import com.example.shikiflow.domain.model.sort.UserRateOrderType
 import retrofit2.HttpException
 import java.io.IOException
 

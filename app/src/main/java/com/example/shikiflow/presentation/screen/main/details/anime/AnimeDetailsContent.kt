@@ -55,6 +55,7 @@ import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
+import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 import com.example.shikiflow.utils.WebIntent
@@ -206,8 +207,8 @@ fun AnimeDetailsContent(
                 }
             }
         }
-        item {
-            if(!animeDetails.relatedMedia.isEmpty()) {
+        if(animeDetails.relatedMedia.isNotEmpty()) {
+            item {
                 RelatedSection(
                     relatedItems = animeDetails.relatedMedia,
                     onArrowClick = { showRelatedBottomSheet = true },
@@ -220,8 +221,23 @@ fun AnimeDetailsContent(
                 )
             }
         }
-        item {
-            if(animeDetails.screenshots.isNotEmpty()) {
+        if(animeDetails.staffList.isNotEmpty()) {
+            item {
+                StaffSection(
+                    staffShortList = animeDetails.staffList,
+                    onMediaStaffClick = {
+                        mediaNavOptions.navigateToMediaStaff(animeDetails.id, MediaType.MANGA)
+                    },
+                    onStaffClick = { staffId ->
+                        mediaNavOptions.navigateToStaff(staffId)
+                    },
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+        if(animeDetails.screenshots.isNotEmpty()) {
+            item {
                 ScreenshotSection(
                     screenshots = animeDetails.screenshots,
                     selectedIndex = selectedScreenshotIndex,

@@ -34,10 +34,10 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
 
 @Composable
@@ -75,7 +75,7 @@ fun SearchPage(
         ) {
             items(chips) { rateStatus ->
                 val userRateStatus = rateStatus?.let {
-                    UserRateMapper.mapUserRateStatus(rateStatus, MediaType.ANIME)
+                    rateStatus.mapStatus(MediaType.ANIME)
                 } ?: R.string.media_user_status_all
 
                 FilterChip(
@@ -104,36 +104,40 @@ fun SearchPage(
             contentPadding = PaddingValues(vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            if(trackItems.loadState.refresh is LoadState.Loading) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            } else if(trackItems.loadState.refresh is LoadState.Error) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = stringResource(R.string.atp_loading_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { trackItems.refresh() }
-                        )
+            when (trackItems.loadState.refresh) {
+                is LoadState.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
                     }
                 }
-            } else {
-                items(
-                    count = trackItems.itemCount,
-                    key = trackItems.itemKey { it.anime.id }
-                ) { index ->
-                    val item = trackItems[index] ?: return@items
-                    SearchAnimeTrackItem(
-                        animeItem = item,
-                        onItemClick = { id -> onAnimeClick(id) }
-                    )
+                is LoadState.Error -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.atp_loading_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { trackItems.refresh() }
+                            )
+                        }
+                    }
+                }
+                else -> {
+                    items(
+                        count = trackItems.itemCount,
+                        key = trackItems.itemKey { it.anime.id }
+                    ) { index ->
+                        val item = trackItems[index] ?: return@items
+                        SearchAnimeTrackItem(
+                            animeItem = item,
+                            onItemClick = { id -> onAnimeClick(id) }
+                        )
+                    }
                 }
             }
         }

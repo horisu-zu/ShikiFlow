@@ -31,10 +31,11 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
+import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.StatusColor
 import com.example.shikiflow.utils.toIcon
@@ -93,7 +94,7 @@ fun BrowseListItem(
             }
             Text(
                 text = listOfNotNull(
-                    stringResource(id = browseItem.mediaFormat.displayValue),
+                    stringResource(id = browseItem.mediaFormat.displayValue()),
                     "${browseItem.episodesAired} / ${browseItem.episodes.takeIf { it != 0 } ?: "?"}",
                     browseItem.score?.let { score ->
                         stringResource(id = R.string.media_score, score)

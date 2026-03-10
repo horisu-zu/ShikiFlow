@@ -37,7 +37,7 @@ object Converter {
                 append(" yyyy")
             }
             if (includeTime && instantYear == currentYear) {
-                append(", HH:mm")
+                append(" HH:mm")
             }
         }
 
@@ -60,7 +60,7 @@ object Converter {
                     append(" yyyy")
                 }
                 if (includeTime) {
-                    append(", HH:mm")
+                    append(" HH:mm")
                 }
             }
 

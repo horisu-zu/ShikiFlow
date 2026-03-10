@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.comment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.thread.ThreadSort
 import com.example.shikiflow.domain.model.thread.ThreadSortType
 import com.example.shikiflow.domain.repository.CommentRepository

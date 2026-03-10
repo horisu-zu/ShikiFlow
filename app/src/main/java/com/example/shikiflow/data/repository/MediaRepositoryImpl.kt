@@ -11,7 +11,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
-import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.model.sort.OrderOption
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository

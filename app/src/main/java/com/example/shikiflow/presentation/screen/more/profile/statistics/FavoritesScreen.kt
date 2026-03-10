@@ -56,6 +56,8 @@ import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.FavoriteCategoryMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.FavoriteCategoryMapper.iconResource
 import com.example.shikiflow.presentation.viewmodel.user.UserFavoritesViewModel
 import com.example.shikiflow.utils.toIcon
 
@@ -118,54 +120,19 @@ fun FavoritesScreen(
             ),
             modifier = Modifier.fillMaxSize()
         ) {
-            if(userFavoriteItems.loadState.refresh is LoadState.Loading) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier.height(screenHeight),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            } else if(userFavoriteItems.loadState.refresh is LoadState.Error) {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier.height(screenHeight),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = stringResource(R.string.common_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { userFavoriteItems.refresh() }
-                        )
-                    }
-                }
-            } else {
-                items(
-                    count = userFavoriteItems.itemCount,
-                    key = { index -> userFavoriteItems[index]?.id ?: index }
-                ) { index ->
-                    userFavoriteItems[index]?.let { item ->
-                        FavoriteMediaItem(
-                            id = item.id,
-                            title = item.name,
-                            imageUrl = item.imageUrl,
-                            onItemClick = { id ->
-                                /*Details Navigator*/
-                            },
-                            modifier = Modifier.width(108.dp)
-                                .animateItem()
-                        )
-                    }
-                }
-
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    if (userFavoriteItems.loadState.append is LoadState.Loading) {
+            when (userFavoriteItems.loadState.refresh) {
+                is LoadState.Loading -> {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Box(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier.height(screenHeight),
                             contentAlignment = Alignment.Center
                         ) { CircularProgressIndicator() }
-                    } else if(userFavoriteItems.loadState.append is LoadState.Loading) {
+                    }
+                }
+                is LoadState.Error -> {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         Box(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier.height(screenHeight),
                             contentAlignment = Alignment.Center
                         ) {
                             ErrorItem(
@@ -173,6 +140,45 @@ fun FavoritesScreen(
                                 buttonLabel = stringResource(R.string.common_retry),
                                 onButtonClick = { userFavoriteItems.refresh() }
                             )
+                        }
+                    }
+                }
+                else -> {
+                    items(
+                        count = userFavoriteItems.itemCount,
+                        key = { index -> userFavoriteItems[index]?.id ?: index }
+                    ) { index ->
+                        userFavoriteItems[index]?.let { item ->
+                            FavoriteMediaItem(
+                                id = item.id,
+                                title = item.name,
+                                imageUrl = item.imageUrl,
+                                onItemClick = { id ->
+                                    /*Details Navigator*/
+                                },
+                                modifier = Modifier.width(108.dp)
+                                    .animateItem()
+                            )
+                        }
+                    }
+
+                    item(span = { GridItemSpan(maxLineSpan) }) {
+                        if (userFavoriteItems.loadState.append is LoadState.Loading) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        } else if (userFavoriteItems.loadState.append is LoadState.Loading) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { userFavoriteItems.refresh() }
+                                )
+                            }
                         }
                     }
                 }
@@ -218,12 +224,12 @@ private fun FavoriteScreenHeader(
                     ),
                     modifier = Modifier.weight(1f)
                 ) {
-                    type.iconRes.toIcon(modifier = Modifier.size(24.dp))
+                    type.iconResource().toIcon(modifier = Modifier.size(24.dp))
                 }
             }
         }
         Text(
-            text = stringResource(currentFavorite.titleResId),
+            text = stringResource(currentFavorite.displayValue()),
             style = MaterialTheme.typography.titleMedium
         )
     }

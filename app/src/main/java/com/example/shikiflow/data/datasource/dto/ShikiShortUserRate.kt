@@ -2,7 +2,6 @@ package com.example.shikiflow.data.datasource.dto
 
 import com.example.graphql.shikimori.type.UserRateStatusEnum
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import kotlinx.serialization.Serializable
 
 @Serializable

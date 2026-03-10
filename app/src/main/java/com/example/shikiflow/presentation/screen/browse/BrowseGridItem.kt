@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 
 @Composable
 fun BrowseGridItem(
@@ -52,7 +53,7 @@ fun BrowseGridItem(
 
         Text(
             text = listOfNotNull(
-                browseItem.mediaFormat?.displayValue?.let { formatRes ->
+                browseItem.mediaFormat?.displayValue()?.let { formatRes ->
                     stringResource(id = formatRes)
                 },
                 browseItem.score?.let { score ->

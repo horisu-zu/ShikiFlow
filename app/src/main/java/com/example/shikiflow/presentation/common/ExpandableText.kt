@@ -368,7 +368,7 @@ private fun ImageItem(
                     .fillMaxWidth()
                     .aspectRatio(imageData.aspectRatio)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceBright)
                     .clickable {
                         imageData.imageUrl?.let { imageUrl ->
                             onLinkClick(imageUrl)
@@ -404,7 +404,7 @@ private fun QuoteItem(
     Row(
         modifier = modifier.height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(4.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.surfaceBright)
     ) {
         VerticalDivider(
             modifier = Modifier.fillMaxHeight(),
@@ -467,7 +467,7 @@ private fun VideoItem(
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                        .background(MaterialTheme.colorScheme.surfaceBright)
                 )
             }
         )

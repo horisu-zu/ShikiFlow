@@ -1,7 +1,6 @@
 package com.example.shikiflow.domain.model.anime
 
 import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -9,16 +8,15 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-sealed interface BrowseType {
-    val displayValueRes: Int
+sealed interface BrowseType{
 
-    enum class AnimeBrowseType(override val displayValueRes: Int): BrowseType {
-        ONGOING(R.string.browse_type_anime_ongoing),
-        ANIME_TOP(R.string.browse_type_anime_top)
+    enum class AnimeBrowseType: BrowseType {
+        ONGOING,
+        ANIME_TOP
     }
 
-    enum class MangaBrowseType(override val displayValueRes: Int): BrowseType {
-        MANGA_TOP(R.string.browse_type_manga_top)
+    enum class MangaBrowseType: BrowseType {
+        MANGA_TOP
     }
 
     companion object {

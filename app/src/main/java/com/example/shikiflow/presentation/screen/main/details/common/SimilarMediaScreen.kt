@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.main
+package com.example.shikiflow.presentation.screen.main.details.common
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
@@ -103,54 +104,78 @@ fun SimilarMediaScreen(
             }
         }
     ) { innerPadding ->
-        if(similarMediaState.loadState.refresh is LoadState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(similarMediaState.loadState.refresh is LoadState.Error) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = (similarMediaState.loadState.refresh as LoadState.Error)
-                        .error.message?: stringResource(R.string.similar_media_error),
-                    buttonLabel = stringResource(R.string.common_retry)
-                )
+        when (similarMediaState.loadState.refresh) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(96.dp),
-                state = lazyGridState,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = (similarMediaState.loadState.refresh as LoadState.Error)
+                            .error.message ?: stringResource(R.string.similar_media_error),
+                        buttonLabel = stringResource(R.string.common_retry)
+                    )
+                }
+            }
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(96.dp),
+                    state = lazyGridState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                        ),
+                    contentPadding = PaddingValues(
+                        horizontal = horizontalPadding,
+                        vertical = 12.dp
                     ),
-                contentPadding = PaddingValues(
-                    horizontal = horizontalPadding,
-                    vertical = 12.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                items(
-                    count = similarMediaState.itemCount,
-                    key = { index -> similarMediaState[index]?.id ?: index }
-                ) { index ->
-                    similarMediaState[index]?.let { mediaRecommendation ->
-                        BrowseGridItem(
-                            browseItem = mediaRecommendation,
-                            onItemClick = { id, mediaType ->
-                                when(mediaType) {
-                                    MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                    MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    items(
+                        count = similarMediaState.itemCount,
+                        key = { index -> similarMediaState[index]?.id ?: index }
+                    ) { index ->
+                        similarMediaState[index]?.let { mediaRecommendation ->
+                            BrowseGridItem(
+                                browseItem = mediaRecommendation,
+                                onItemClick = { id, mediaType ->
+                                    when (mediaType) {
+                                        MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                        MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
+                                    }
                                 }
+                            )
+                        }
+                    }
+                    similarMediaState.apply {
+                        if (loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
                             }
-                        )
+                        }
+                        if (loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    showFace = false,
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { similarMediaState.retry() }
+                                )
+                            }
+                        }
                     }
                 }
             }

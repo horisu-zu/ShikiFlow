@@ -36,11 +36,19 @@ query StaffMediaRoles(
     $staffId: Int!,
     $page: Int!,
     $perPage: Int!,
-    $mediaType: MediaType!
+    $mediaType: MediaType!,
+    $sort: MediaSort = POPULARITY_DESC
 ) {
     Staff(id: $staffId) {
-        staffMedia(page: $page, perPage: $perPage, type: $mediaType) {
-            ...ALMediaStaffRoles
+        staffMedia(
+            page: $page,
+            perPage: $perPage,
+            type: $mediaType,
+            sort: [$sort]
+        ) {
+            edges {
+                ...ALMediaStaffRole
+            }
         }
     }
 }
@@ -64,6 +72,21 @@ query VoiceActorRoles(
                 media {
                     ...ALMediaBrowseShort
                 }
+            }
+        }
+    }
+}
+
+query MediaStaff(
+    $mediaId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $sort: StaffSort = RELEVANCE
+) {
+    Media(id: $mediaId) {
+        staff(page: $page, perPage: $perPage, sort: [$sort]) {
+            edges {
+                ...ALStaffEdgeShort
             }
         }
     }

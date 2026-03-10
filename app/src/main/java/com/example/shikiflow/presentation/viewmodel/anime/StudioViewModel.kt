@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.model.sort.OrderOption
 import com.example.shikiflow.domain.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi

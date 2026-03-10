@@ -1,4 +1,4 @@
-package com.example.shikiflow.domain.model.tracks
+package com.example.shikiflow.presentation.common.mappers
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
@@ -7,6 +7,7 @@ import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Refresh
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.IconResource
 
 object UserRateIconProvider {

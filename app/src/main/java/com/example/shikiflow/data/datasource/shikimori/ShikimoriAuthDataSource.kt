@@ -4,7 +4,7 @@ import android.net.Uri
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
-import com.example.shikiflow.domain.model.auth.TokenResponse
+import com.example.shikiflow.domain.model.auth.AuthCredentials
 import javax.inject.Inject
 
 class ShikimoriAuthDataSource @Inject constructor(
@@ -18,11 +18,18 @@ class ShikimoriAuthDataSource @Inject constructor(
                 "&scope="
     }
 
-    override suspend fun handleAuthorizationResponse(uriResponse: Uri): TokenResponse {
+    override suspend fun handleAuthorizationResponse(uriResponse: Uri): AuthCredentials {
         val code = uriResponse.getQueryParameter("code")
 
-        return code?.let {
+        val tokenResponse = code?.let {
             shikiAuthApi.getAccessToken(code = code)
-        }?.body() ?: throw IllegalStateException("Token response body is null")
+        }?.body()
+
+        return tokenResponse?.let {
+            AuthCredentials(
+                accessToken = it.accessToken,
+                refreshToken = it.refreshToken
+            )
+        } ?: throw IllegalStateException("Token response body is null")
     }
 }

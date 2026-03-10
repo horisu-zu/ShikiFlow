@@ -20,18 +20,19 @@ import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.main.SimilarMediaScreen
+import com.example.shikiflow.presentation.screen.main.details.common.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.studio.StudioScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.AnimeWatchNavigator
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterDetailsScreen
-import com.example.shikiflow.presentation.screen.main.details.character.MediaRolesScreen
+import com.example.shikiflow.presentation.screen.main.details.roles.MediaRolesScreen
 import com.example.shikiflow.presentation.screen.main.details.character.MediaCharactersScreen
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MangaReadNavigator
+import com.example.shikiflow.presentation.screen.main.details.staff.MediaStaffScreen
 import com.example.shikiflow.presentation.screen.main.details.staff.StaffScreen
 
 @Composable
@@ -92,8 +93,15 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.Comments(screenMode, authType, id, threadHeader))
         }
 
-        override fun navigateToStaff(personId: Int) {
-            detailsBackstack.add(DetailsNavRoute.Staff(personId))
+        override fun navigateToStaff(staffId: Int) {
+            detailsBackstack.add(DetailsNavRoute.Staff(staffId))
+        }
+
+        override fun navigateToMediaStaff(
+            mediaId: Int,
+            mediaType: MediaType
+        ) {
+            detailsBackstack.add(DetailsNavRoute.MediaStaff(mediaId, mediaType))
         }
 
         override fun navigateToAnimeWatch(title: String, shikimoriId: Int, completedEpisodes: Int) {
@@ -207,6 +215,13 @@ fun DetailsNavigator(
                     navOptions = options
                 )
             }
+            entry<DetailsNavRoute.MediaStaff> { route ->
+                MediaStaffScreen(
+                    mediaId = route.mediaId,
+                    mediaType = route.mediaType,
+                    navOptions = options
+                )
+            }
             entry<DetailsNavRoute.AnimeWatch> { route ->
                 AnimeWatchNavigator(
                     title = route.title,
@@ -239,6 +254,7 @@ fun DetailsNavigator(
                     id = route.id,
                     mediaRolesType = route.mediaRolesType,
                     roleTypes = route.roleTypes,
+                    authType = authType,
                     navOptions = options
                 )
             }

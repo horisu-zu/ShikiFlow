@@ -129,6 +129,7 @@ dependencies {
 
     //Apollo (GraphQL)
     implementation(libs.apollo.runtime)
+    implementation(libs.apollo.normalized.cache)
 
     //Coil
     implementation(libs.coil.compose)

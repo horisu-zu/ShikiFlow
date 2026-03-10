@@ -123,8 +123,9 @@ object DataSourceModule {
     @Provides
     @Singleton
     fun provideShikimoriStaffDataSource(
-        personApi: PersonApi
-    ): StaffDataSource = ShikimoriStaffDataSource(personApi)
+        personApi: PersonApi,
+        @ShikimoriApollo apolloClient: ApolloClient
+    ): StaffDataSource = ShikimoriStaffDataSource(personApi, apolloClient)
 
     @AniList
     @Provides

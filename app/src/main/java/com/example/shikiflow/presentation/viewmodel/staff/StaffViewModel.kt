@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.viewmodel.person
+package com.example.shikiflow.presentation.viewmodel.staff
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,13 +16,12 @@ class StaffViewModel @Inject constructor(
     private val staffRepository: StaffRepository
 ): ViewModel() {
 
-    private var _currentId: Int? = null
     private val _personDetails = MutableStateFlow<Resource<StaffDetails>>(Resource.Loading())
     val personDetails = _personDetails.asStateFlow()
 
     fun getPersonDetails(id: Int, isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if (_currentId == id && !isRefresh) {
+            if (_personDetails.value is Resource.Success && !isRefresh) {
                 return@launch
             } else {
                 _personDetails.value = Resource.Loading()
@@ -33,7 +32,6 @@ class StaffViewModel @Inject constructor(
             result.fold(
                 onSuccess = { details ->
                     _personDetails.value = Resource.Success(details)
-                    _currentId = id
                 },
                 onFailure = { exception ->
                     _personDetails.value = Resource.Error(exception.localizedMessage ?: "Unknown error")

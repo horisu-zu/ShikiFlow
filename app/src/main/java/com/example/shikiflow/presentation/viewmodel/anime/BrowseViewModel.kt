@@ -11,7 +11,7 @@ import com.example.shikiflow.domain.model.anime.BrowseType.Companion.getBrowseOp
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
-import com.example.shikiflow.domain.model.track.BrowseOrder
+import com.example.shikiflow.domain.model.sort.BrowseOrder
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository

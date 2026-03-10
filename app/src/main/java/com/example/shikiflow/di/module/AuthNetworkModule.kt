@@ -2,10 +2,10 @@ package com.example.shikiflow.di.module
 
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.remote.auth.AnilistAuthApi
-import com.example.shikiflow.di.annotations.AuthOkHttpClient
 import com.example.shikiflow.di.annotations.ShikiAuthRetrofit
 import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
 import com.example.shikiflow.di.annotations.AnilistAuthRetrofit
+import com.example.shikiflow.di.annotations.AuthOkHttpClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -25,7 +25,7 @@ class AuthNetworkModule {
     @Provides
     @Singleton
     @AuthOkHttpClient
-    fun provideAuthOkHttpClient(): OkHttpClient {
+    fun provideShikimoriAuthOkHttpClient(): OkHttpClient {
         return OkHttpClient.Builder()
             .addInterceptor { chain ->
                 val original = chain.request()

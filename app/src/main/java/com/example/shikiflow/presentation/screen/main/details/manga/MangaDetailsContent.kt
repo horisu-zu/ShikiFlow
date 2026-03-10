@@ -54,6 +54,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.MediaStatsCo
 import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
+import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
@@ -209,6 +210,20 @@ fun MangaDetailsContent(
                         } else mediaNavOptions.navigateToMangaDetails(id)
                     },
                     onArrowClick = { showRelatedBottomSheet = true }
+                )
+            }
+        }
+        if(mangaDetails.staffList.isNotEmpty()) {
+            item {
+                StaffSection(
+                    staffShortList = mangaDetails.staffList,
+                    onMediaStaffClick = {
+                        mediaNavOptions.navigateToMediaStaff(mangaDetails.id, MediaType.MANGA)
+                    },
+                    onStaffClick = { staffId ->
+                        mediaNavOptions.navigateToStaff(staffId)
+                    },
+                    horizontalPadding = horizontalPadding
                 )
             }
         }

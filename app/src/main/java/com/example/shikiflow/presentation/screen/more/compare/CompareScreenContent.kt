@@ -34,7 +34,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.ComparisonType
@@ -42,6 +41,7 @@ import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.presentation.viewmodel.user.CompareScreenViewModel
 import com.example.shikiflow.utils.Resource
 
@@ -264,8 +264,7 @@ private fun ComparisonItem(
                         }
                     } else {
                         stringResource(
-                            id = UserRateMapper.mapUserRateStatus(
-                                status = currentUserScore?.status ?: UserRateStatus.PLANNED,
+                            id = (currentUserScore?.status ?:  UserRateStatus.PLANNED).mapStatus(
                                 mediaType = mediaType
                             )
                         )
@@ -294,8 +293,7 @@ private fun ComparisonItem(
                         }
                     } else {
                         stringResource(
-                            id = UserRateMapper.mapUserRateStatus(
-                                status = targetUserScore?.status ?: UserRateStatus.PLANNED,
+                            id = (targetUserScore?.status ?:  UserRateStatus.PLANNED).mapStatus(
                                 mediaType = mediaType
                             )
                         )

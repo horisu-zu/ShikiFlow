@@ -26,10 +26,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapRelationKind
 import com.example.shikiflow.domain.model.media_details.RelatedMedia
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.RelationKindMapper.displayValue
 
 @Composable
 fun RelatedSection(
@@ -126,9 +127,9 @@ fun RelatedItem(
             relatedMedia.let { media ->
                 Text(
                     text = buildString {
-                        append(stringResource(id = media.mediaFormat.displayValue))
+                        append(stringResource(id = media.mediaFormat.displayValue()))
                         append(" ∙ ")
-                        append(stringResource(id = mapRelationKind(media.relationKind)))
+                        append(stringResource(id = media.relationKind.displayValue()))
                     },
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

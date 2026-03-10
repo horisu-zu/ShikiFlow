@@ -275,15 +275,26 @@ fragment ALStaffShort on Staff {
     }
 }
 
+fragment ALStaffEdgeShort on StaffEdge {
+    node {
+        ...ALStaffShort
+    }
+    role
+}
+
 fragment ALMediaStaffRoles on MediaConnection {
     pageInfo {
         hasNextPage
     }
     edges {
-        staffRole
-        node {
-            ...ALMediaBrowseShort
-        }
+        ...ALMediaStaffRole
+    }
+}
+
+fragment ALMediaStaffRole on MediaEdge {
+    staffRole
+    node {
+        ...ALMediaBrowseShort
     }
 }
 

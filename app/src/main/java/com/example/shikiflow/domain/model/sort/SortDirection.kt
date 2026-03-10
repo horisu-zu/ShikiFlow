@@ -1,4 +1,4 @@
-package com.example.shikiflow.domain.model.common
+package com.example.shikiflow.domain.model.sort
 
 enum class SortDirection {
     ASCENDING,

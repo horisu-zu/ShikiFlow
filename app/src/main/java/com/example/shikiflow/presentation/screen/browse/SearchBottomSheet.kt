@@ -19,13 +19,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.media_details.MediaAgeRating
+import com.example.shikiflow.domain.model.media_details.AgeRating
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.track.BrowseOrder
+import com.example.shikiflow.domain.model.sort.BrowseOrder
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ChipSection
+import com.example.shikiflow.presentation.common.mappers.AgeRatingMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.OrderMapper.displayValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,7 +67,7 @@ fun SearchBottomSheet(
                 label = stringResource(R.string.browse_search_label_media),
                 items = MediaType.entries,
                 selectedItem = searchOptions.mediaType,
-                itemLabel = { stringResource(it.displayValue) },
+                itemLabel = { stringResource(it.displayValue()) },
                 onItemSelected = { newType ->
                     onTypeChanged(newType)
                 }
@@ -75,7 +80,7 @@ fun SearchBottomSheet(
                     authType in formatEntry.supportedBy
                 },
                 selectedItem = searchOptions.format,
-                itemLabel = { stringResource(it.displayValue) },
+                itemLabel = { stringResource(it.displayValue()) },
                 onItemSelected = { newFormat ->
                     onOptionsChanged(
                         searchOptions.copy(
@@ -92,7 +97,7 @@ fun SearchBottomSheet(
                     searchOptions.mediaType in status.mediaType
                 },
                 selectedItem = searchOptions.status,
-                itemLabel = { stringResource(it.displayValue) },
+                itemLabel = { stringResource(it.displayValue()) },
                 onItemSelected = { newStatus ->
                     onOptionsChanged(
                         searchOptions.copy(
@@ -108,7 +113,7 @@ fun SearchBottomSheet(
                     AuthType.ANILIST -> BrowseOrder.Anilist.entries
                 },
                 selectedItem = searchOptions.order,
-                itemLabel = { stringResource(it.displayValue) },
+                itemLabel = { stringResource(it.displayValue()) },
                 onItemSelected = { newOrder ->
                     onOptionsChanged(
                         searchOptions.copy(
@@ -120,9 +125,9 @@ fun SearchBottomSheet(
             if(authType == AuthType.SHIKIMORI && searchOptions.mediaType == MediaType.ANIME) {
                 ChipSection(
                     label = stringResource(R.string.browse_search_label_age_rating),
-                    items = MediaAgeRating.entries,
+                    items = AgeRating.entries,
                     selectedItem = searchOptions.ageRating,
-                    itemLabel = { stringResource(it.displayValue) },
+                    itemLabel = { stringResource(it.displayValue()) },
                     onItemSelected = { newRating ->
                         onOptionsChanged(
                             searchOptions.copy(

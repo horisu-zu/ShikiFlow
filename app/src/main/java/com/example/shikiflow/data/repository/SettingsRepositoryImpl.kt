@@ -10,8 +10,7 @@ import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
-import com.example.shikiflow.domain.model.track.BrowseOrder
-import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.model.sort.BrowseOrder
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.presentation.screen.main.MainTrackMode
@@ -99,7 +98,7 @@ class SettingsRepositoryImpl @Inject constructor(
             )
         }
 
-    private suspend fun getBrowseOngoingOrder(preferences: Preferences): OrderOption {
+    private suspend fun getBrowseOngoingOrder(preferences: Preferences): BrowseOrder {
         return when(authTypeFlow.first()) {
             AuthType.SHIKIMORI -> BrowseOrder.Shikimori.valueOf(
                 value = preferences[SHIKI_BROWSE_ONGOING_ORDER] ?: BrowseOrder.Shikimori.RANKED_MAL.name

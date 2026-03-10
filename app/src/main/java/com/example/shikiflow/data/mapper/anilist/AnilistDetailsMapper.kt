@@ -4,6 +4,7 @@ import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.fragment.MediaBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaOriginMapper.toDomain
@@ -52,6 +53,7 @@ object AnilistDetailsMapper {
             origin = this.source?.toDomain() ?: MediaOrigin.UNKNOWN,
             userRate = this.mediaListEntry?.aLRateEntry?.toDomain(),
             studios = this.studios?.nodes?.mapNotNull { it?.aLStudioShort?.toDomain() } ?: emptyList(),
+            staffList = this.staff?.edges?.mapNotNull { it?.aLStaffEdgeShort?.toDomain() } ?: emptyList(),
             durationMins = this.duration,
             relatedMedia = this.relations?.edges?.mapNotNull { it?.aLRelatedMediaShort?.toDomain() } ?: emptyList(),
             scoreStats = this.stats?.aLMediaStats?.scoreDistribution?.associate {

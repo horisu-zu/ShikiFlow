@@ -46,7 +46,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.track.BrowseOrder
+import com.example.shikiflow.domain.model.sort.BrowseOrder
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
@@ -260,55 +260,59 @@ private fun BrowseGridComponent(
             )
         }
 
-        if(browseState.loadState.refresh is LoadState.Loading) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Box(
-                    modifier = Modifier.height(componentHeight),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
-        } else if(browseState.loadState.refresh is LoadState.Error) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Box(
-                    modifier = Modifier.height(componentHeight),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { browseState.refresh() }
-                    )
+        when (browseState.loadState.refresh) {
+            is LoadState.Loading -> {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
+                        modifier = Modifier.height(componentHeight),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
                 }
             }
-        } else {
-            items(
-                count = browseState.itemCount,
-                key = browseState.itemKey { it.id }
-            ) { index ->
-                browseState[index]?.let { browseItem ->
-                    BrowseGridItem(
-                        browseItem = browseItem,
-                        onItemClick = onNavigate
-                    )
-                }
-            }
-            browseState.apply {
-                if(loadState.append is LoadState.Loading) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
+            is LoadState.Error -> {
+                item(span = { GridItemSpan(maxLineSpan) }) {
+                    Box(
+                        modifier = Modifier.height(componentHeight),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = stringResource(R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { browseState.refresh() }
+                        )
                     }
                 }
-                if(browseState.loadState.append is LoadState.Error) {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        ErrorItem(
-                            message = stringResource(R.string.b_mss_error),
-                            showFace = false,
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { browseState.retry() }
+            }
+            else -> {
+                items(
+                    count = browseState.itemCount,
+                    key = browseState.itemKey { it.id }
+                ) { index ->
+                    browseState[index]?.let { browseItem ->
+                        BrowseGridItem(
+                            browseItem = browseItem,
+                            onItemClick = onNavigate
                         )
+                    }
+                }
+                browseState.apply {
+                    if (loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        }
+                    }
+                    if (browseState.loadState.append is LoadState.Error) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            ErrorItem(
+                                message = stringResource(R.string.b_mss_error),
+                                showFace = false,
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { browseState.retry() }
+                            )
+                        }
                     }
                 }
             }

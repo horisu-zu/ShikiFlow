@@ -19,11 +19,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.isWatched
-import com.example.shikiflow.domain.model.mapper.UserRateMapper.Companion.mapUserRateStatus
+import com.example.shikiflow.domain.model.track.UserRateStatus.Companion.isWatched
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.StatusColor
 
 @Composable
@@ -57,11 +57,7 @@ fun SearchAnimeTrackItem(
             animeItem.let {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     StatusCard(
-                        text = stringResource(
-                            id = mapUserRateStatus(
-                                status = animeItem.track.status
-                            )
-                        ) ,
+                        text = stringResource(id = animeItem.track.status.mapStatus()) ,
                         containerColor = animeItem.track.status.let {
                             StatusColor.getStatusColor(it)
                         }

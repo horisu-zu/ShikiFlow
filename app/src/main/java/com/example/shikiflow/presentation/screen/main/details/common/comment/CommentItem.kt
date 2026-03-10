@@ -22,11 +22,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
@@ -304,28 +301,26 @@ private fun CommentUserItem(
             model = userData.avatarUrl,
             modifier = Modifier.size(24.dp)
         )
-        Text(
-            text = buildAnnotatedString {
-                withStyle(
-                    style = SpanStyle(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                ) {
-                    append(userData.nickname)
-                }
-                append(" · ")
-                withStyle(
-                    style = SpanStyle(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    )
-                ) {
-                    append(formatInstant(commentInstant, includeTime = true))
-                }
-            },
-            style = MaterialTheme.typography.labelMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = userData.nickname,
+                style = MaterialTheme.typography.labelMedium.copy(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, fill = false)
+            )
+            Text(
+                text = " · ${formatInstant(commentInstant, includeTime = true)}",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                ),
+                maxLines = 1
+            )
+        }
     }
 }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,11 +18,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -31,7 +34,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -64,36 +69,48 @@ fun ExternalLinksScreen(
     val context = LocalContext.current
     val externalLinks by externalLinksViewModel.externalLinks.collectAsStateWithLifecycle()
 
+    val lazyListState = rememberLazyListState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex == 0 &&
+            lazyListState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
     LaunchedEffect(mediaId, mediaType) {
         externalLinksViewModel.getExternalLinks(mediaId, mediaType)
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.external_links_label),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                },
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navOptions.navigateBack() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = null
+            Column {
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = stringResource(R.string.external_links_label),
+                            style = MaterialTheme.typography.bodyLarge
                         )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = { navOptions.navigateBack() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background
+                    )
                 )
-            )
+                if(!isAtTop) { HorizontalDivider() }
+            }
         }
     ) { innerPadding ->
         LazyColumn(
+            state = lazyListState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(

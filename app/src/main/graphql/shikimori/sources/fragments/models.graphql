@@ -48,6 +48,17 @@ fragment PersonShort on Person {
     url
 }
 
+fragment PersonRoleShort on PersonRole {
+    rolesEn
+    person {
+        id
+        name
+        poster {
+            originalUrl
+        }
+    }
+}
+
 fragment AnimeUserRate on UserRate {
     id
     status

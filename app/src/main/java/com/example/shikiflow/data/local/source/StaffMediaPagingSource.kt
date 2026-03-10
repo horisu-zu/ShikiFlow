@@ -4,12 +4,15 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.common.StaffMediaRole
+import com.example.shikiflow.domain.model.sort.OrderOption
 import com.example.shikiflow.domain.model.tracks.MediaType
 import javax.inject.Inject
 
 class StaffMediaPagingSource @Inject constructor(
     private val staffId: Int,
     private val mediaType: MediaType,
+    private val sort: OrderOption?,
     private val staffDataSource: AnilistStaffDataSource
 ): PagingSource<Int, MediaRole>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {
@@ -20,16 +23,27 @@ class StaffMediaPagingSource @Inject constructor(
             page = currentPage,
             limit = pageSize,
             staffId = staffId,
-            mediaType = mediaType
+            mediaType = mediaType,
+            sort = sort
         )
 
         return result.fold(
             onSuccess = { response ->
                 val prevKey =  if(currentPage > 1) currentPage - 1 else null
-                val nextKey = if(response.isNotEmpty()) currentPage + 1 else null
+                val nextKey = if(response.size < pageSize) null else currentPage + 1
+
+                val groupedData = response
+                    .groupBy { it.shortMedia.id }
+                    .mapValues { (_, staffRoles) ->
+                        StaffMediaRole(
+                            shortMedia = staffRoles.first().shortMedia,
+                            staffRoles = staffRoles.flatMap { it.staffRoles }
+                        )
+                    }.values
+                    .toList()
 
                 LoadResult.Page(
-                    data = response,
+                    data = groupedData,
                     prevKey = prevKey,
                     nextKey = nextKey
                 )

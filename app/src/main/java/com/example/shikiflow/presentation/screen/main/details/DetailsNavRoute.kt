@@ -46,6 +46,9 @@ sealed interface DetailsNavRoute : NavKey {
     data class Staff(val staffId: Int) : DetailsNavRoute
 
     @Serializable
+    data class MediaStaff(val mediaId: Int, val mediaType: MediaType) : DetailsNavRoute
+
+    @Serializable
     data class AnimeWatch(val title: String, val shikimoriId: Int, val completedEpisodes: Int) : DetailsNavRoute
 
     @Serializable

@@ -7,7 +7,6 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.example.shikiflow.domain.model.auth.AuthCredentials
-import com.example.shikiflow.domain.model.auth.TokenResponse
 import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,12 +30,12 @@ class TokenRepositoryImpl @Inject constructor(
             )
         }
 
-    override suspend fun saveTokens(tokenResponse: TokenResponse) {
+    override suspend fun saveTokens(authCredentials: AuthCredentials) {
         context.dataStore.edit { preferences ->
-            tokenResponse.accessToken?.let { accessToken ->
+            authCredentials.accessToken?.let { accessToken ->
                 preferences[ACCESS_TOKEN_KEY] = accessToken
             }
-            tokenResponse.refreshToken?.let { refreshToken ->
+            authCredentials.refreshToken?.let { refreshToken ->
                 preferences[REFRESH_TOKEN_KEY] = refreshToken
             }
         }

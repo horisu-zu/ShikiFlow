@@ -4,7 +4,7 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.MediaDetailsDataSource
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.track.OrderOption
+import com.example.shikiflow.domain.model.sort.OrderOption
 
 class StudioMediaPagingSource(
     private val mediaDetailsDataSource: MediaDetailsDataSource,

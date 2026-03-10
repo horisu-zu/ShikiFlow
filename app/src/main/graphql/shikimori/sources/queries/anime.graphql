@@ -27,13 +27,16 @@ query AnimeDetails(
         studios { id name imageUrl }
 
         characterRoles {
-            id
             character { ...CharacterShort }
         }
 
         related {
             ...RelatedMediaShort
         }
+
+        #personRoles {
+        #    ...PersonRoleShort
+        #}
 
         screenshots { id originalUrl }
 

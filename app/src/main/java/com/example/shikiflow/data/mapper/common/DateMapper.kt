@@ -9,14 +9,16 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
 
 object DateMapper {
-    fun DateShort.toDomain(): Date {
-        return Date(
-            year = this.year,
-            month = this.month,
-            day = this.day,
-            date = this.date?.let { LocalDate.parse(it.toString())
-                .atStartOfDayIn(TimeZone.currentSystemDefault()) }
-        )
+    fun DateShort.toDomain(): Date? {
+        return year?.let {
+            Date(
+                year = this.year,
+                month = this.month ?: 0,
+                day = this.day ?: 0,
+                date = this.date?.let { LocalDate.parse(it.toString())
+                    .atStartOfDayIn(TimeZone.currentSystemDefault()) }
+            )
+        }
     }
 
     fun ShikiDate.toLocalDate(): LocalDate? {
@@ -27,9 +29,9 @@ object DateMapper {
 
     fun ALDate.toDomain(): Date {
         return Date(
-            year = this.year,
-            month = this.month,
-            day = this.day,
+            year = this.year ?: 0,
+            month = this.month ?: 0,
+            day = this.day ?: 0,
             date = null
         )
     }

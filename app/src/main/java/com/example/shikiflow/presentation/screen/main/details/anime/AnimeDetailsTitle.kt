@@ -30,14 +30,17 @@ import androidx.compose.ui.unit.sp
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.mapper.UserRateMapper
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserRateIconProvider.icon
+import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.StarScore
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.AgeRatingMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 
@@ -88,9 +91,9 @@ fun AnimeDetailsTitle(
                 ShortInfoItem(
                     infoType = stringResource(id = R.string.details_short_info_type),
                     infoItem = buildString {
-                        append(stringResource(id = animeDetails.format.displayValue))
+                        append(stringResource(id = animeDetails.format.displayValue()))
                         append(" ∙ ")
-                        append(stringResource(id = animeDetails.status.displayValue))
+                        append(stringResource(id = animeDetails.status.displayValue()))
                     }
                 )
                 ShortInfoItem(
@@ -108,10 +111,10 @@ fun AnimeDetailsTitle(
                         )
                     }
                 )
-                animeDetails.mediaAgeRating?.let { ratingEnum ->
+                animeDetails.ageRating?.let { ratingEnum ->
                     ShortInfoItem(
                         infoType = stringResource(id = R.string.details_short_info_age_rating),
-                        infoItem = stringResource(ratingEnum.displayValue)
+                        infoItem = stringResource(ratingEnum.displayValue())
                     )
                 }
             }
@@ -212,7 +215,7 @@ private fun UserStatusItem(
                 tint = MaterialTheme.colorScheme.surface
             )
             Text(
-                text = UserRateMapper.mapUserRateStatusToString(
+                text = UserRateStatusMapper.mapUserRateStatusToString(
                     status = status ?: UserRateStatus.UNKNOWN,
                     allEpisodes = allEpisodes,
                     watchedEpisodes = watchedEpisodes,

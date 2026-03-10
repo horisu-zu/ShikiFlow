@@ -20,6 +20,10 @@ annotation class MainOkHttpClient
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
+annotation class ShikimoriOkHttpClient
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class AnilistOkHttpClient
 
 @Qualifier
@@ -48,7 +52,7 @@ annotation class AnilistAuthRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
-annotation class MainRetrofit
+annotation class ShikimoriRetrofit
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)

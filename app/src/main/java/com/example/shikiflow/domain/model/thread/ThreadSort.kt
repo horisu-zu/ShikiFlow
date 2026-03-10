@@ -1,6 +1,6 @@
 package com.example.shikiflow.domain.model.thread
 
-import com.example.shikiflow.domain.model.common.SortDirection
+import com.example.shikiflow.domain.model.sort.SortDirection
 
 data class ThreadSort(
     val threadSortType: ThreadSortType,

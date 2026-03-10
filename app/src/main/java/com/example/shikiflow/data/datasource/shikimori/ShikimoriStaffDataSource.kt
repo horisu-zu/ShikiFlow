@@ -5,6 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
+import com.apollographql.apollo.ApolloClient
+import com.example.graphql.shikimori.AnimeStaffQuery
+import com.example.graphql.shikimori.MangaStaffQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffRole
@@ -12,12 +15,16 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toVoiceA
 import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ShikimoriStaffDataSource @Inject constructor(
-    private val staffApi: PersonApi
+    private val staffApi: PersonApi,
+    private val apolloClient: ApolloClient
 ): StaffDataSource {
     override suspend fun getStaffDetails(staffId: Int): Result<StaffDetails> {
         return try {
@@ -29,9 +36,69 @@ class ShikimoriStaffDataSource @Inject constructor(
         }
     }
 
+    override fun getMediaStaff(
+        mediaId: Int,
+        mediaType: MediaType,
+        sort: OrderOption?
+    ): Flow<PagingData<StaffShort>> {
+        return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
+            object : PagingSource<Int, StaffShort>() {
+                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StaffShort> {
+                    val result = getShikiMediaStaff(mediaId, mediaType)
+
+                    return result.fold(
+                        onSuccess = { response ->
+                            LoadResult.Page(
+                                data = response,
+                                prevKey = null,
+                                nextKey = null
+                            )
+                        },
+                        onFailure = { e ->
+                            LoadResult.Error(e)
+                        }
+                    )
+                }
+
+                override fun getRefreshKey(state: PagingState<Int, StaffShort>): Int? = null
+            }
+        }.flow
+    }
+
+    suspend fun getShikiMediaStaff(
+        mediaId: Int,
+        mediaType: MediaType
+    ): Result<List<StaffShort>> {
+        return when(mediaType) {
+            MediaType.ANIME -> {
+                val response = apolloClient.query(AnimeStaffQuery(id = mediaId.toString())).execute()
+
+                response.toResult().map { data ->
+                    data.animes.firstOrNull()
+                        ?.personRoles
+                        ?.map { role ->
+                            role.personRoleShort.toDomain()
+                        } ?: throw IllegalStateException("No Staff data returned")
+                }
+            }
+            MediaType.MANGA -> {
+                val response = apolloClient.query(MangaStaffQuery(id = mediaId.toString())).execute()
+
+                response.toResult().map { data ->
+                    data.mangas.firstOrNull()
+                        ?.personRoles
+                        ?.map { role ->
+                            role.personRoleShort.toDomain()
+                        } ?: throw IllegalStateException("No Staff data returned")
+                }
+            }
+        }
+    }
+
     override fun getStaffMediaRoles(
         staffId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: OrderOption?
     ): Flow<PagingData<MediaRole>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, MediaRole>() {
@@ -61,7 +128,10 @@ class ShikimoriStaffDataSource @Inject constructor(
         }.flow
     }
 
-    override fun getVoiceActorRoles(staffId: Int): Flow<PagingData<MediaRole>> {
+    override fun getVoiceActorRoles(
+        staffId: Int,
+        sort: OrderOption?
+    ): Flow<PagingData<MediaRole>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, MediaRole>() {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {

@@ -8,6 +8,7 @@ import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.common.MediaRolesType
 import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.domain.model.common.RoleType.Companion.toMediaType
+import com.example.shikiflow.domain.model.sort.OrderOption
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,18 +30,26 @@ class MediaRolesViewModel @Inject constructor(
     fun getMediaRoles(
         id: Int,
         mediaRolesType: MediaRolesType,
-        roleType: RoleType
+        roleType: RoleType,
+        orderOption: OrderOption? = null
     ): Flow<PagingData<MediaRole>> {
         val cacheKey = CacheKey(mediaRolesType, roleType)
 
         return _typeCache.getOrPut(cacheKey) {
             when(mediaRolesType) {
                 MediaRolesType.CHARACTER ->
-                    characterRepository.getCharacterMediaRoles(id, roleType.toMediaType())
+                    characterRepository.getCharacterMediaRoles(
+                        characterId = id,
+                        mediaType = roleType.toMediaType()
+                    )
                 MediaRolesType.STAFF -> {
                     when(roleType) {
-                        RoleType.VA -> staffRepository.getVoiceActorRoles(id)
-                        else -> staffRepository.getStaffMediaRoles(id, roleType.toMediaType())
+                        RoleType.VA -> staffRepository.getVoiceActorRoles(staffId = id)
+                        else -> staffRepository.getStaffMediaRoles(
+                            staffId = id,
+                            mediaType = roleType.toMediaType(),
+                            orderOption = orderOption
+                        )
                     }
                 }
             }.cachedIn(viewModelScope)
