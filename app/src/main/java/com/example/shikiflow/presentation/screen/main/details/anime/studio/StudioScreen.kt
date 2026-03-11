@@ -65,7 +65,7 @@ import com.example.shikiflow.utils.IconResource
 fun StudioScreen(
     authType: AuthType,
     id: Int,
-    studioName: String,
+    studioName: String?,
     onNavigateBack: () -> Unit,
     onMediaNavigate: (Int) -> Unit,
     studioViewModel: StudioViewModel = hiltViewModel()
@@ -102,10 +102,12 @@ fun StudioScreen(
             Column {
                 TopAppBar(
                     title = {
-                        Text(
-                            text = studioName,
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                        studioName?.let {
+                            Text(
+                                text = studioName,
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                     },
                     //expandedHeight = 48.dp, //IconButton Size
                     navigationIcon = {
@@ -138,64 +140,68 @@ fun StudioScreen(
             }
         }
     ) { paddingValues ->
-        if(studioAnimeData.loadState.refresh is LoadState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(studioAnimeData.loadState.refresh is LoadState.Error) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = stringResource(id = R.string.common_error),
-                    buttonLabel = stringResource(id = R.string.common_retry)
-                )
+        when (studioAnimeData.loadState.refresh) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        } else {
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = GridCells.Adaptive(120.dp),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                    ),
-                contentPadding = PaddingValues(all = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(
-                    count = studioAnimeData.itemCount,
-                    key = studioAnimeData.itemKey { it.id }
-                ) { index ->
-                    studioAnimeData[index]?.let { browseItem ->
-                        BrowseGridItem(
-                            browseItem = browseItem,
-                            onItemClick = { id, _ -> onMediaNavigate(id) }
-                        )
-                    }
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(id = R.string.common_error),
+                        buttonLabel = stringResource(id = R.string.common_retry)
+                    )
                 }
-                studioAnimeData.apply {
-                    if(loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
+            }
+            else -> {
+                LazyVerticalGrid(
+                    state = lazyGridState,
+                    columns = GridCells.Adaptive(120.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = paddingValues.calculateTopPadding(),
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
+                        ),
+                    contentPadding = PaddingValues(all = 12.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(
+                        count = studioAnimeData.itemCount,
+                        key = studioAnimeData.itemKey { it.id }
+                    ) { index ->
+                        studioAnimeData[index]?.let { browseItem ->
+                            BrowseGridItem(
+                                browseItem = browseItem,
+                                onItemClick = { id, _ -> onMediaNavigate(id) }
+                            )
                         }
                     }
-                    if(loadState.append is LoadState.Error) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            ErrorItem(
-                                message = stringResource(R.string.common_error),
-                                showFace = false,
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { studioAnimeData.retry() }
-                            )
+                    studioAnimeData.apply {
+                        if (loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
+                        }
+                        if (loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    showFace = false,
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { studioAnimeData.retry() }
+                                )
+                            }
                         }
                     }
                 }

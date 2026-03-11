@@ -33,6 +33,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private val USER_AVATAR_URL = stringPreferencesKey("user_avatar_url")
         private val USER_ID = stringPreferencesKey("user_id")
         private val USER_NICKNAME = stringPreferencesKey("user_nickname")
+        private val USER_BANNER_URL = stringPreferencesKey("user_banner")
         private val AUTH_TYPE = stringPreferencesKey("auth_type")
 
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
@@ -57,7 +58,8 @@ class SettingsRepositoryImpl @Inject constructor(
                 User(
                     id = userId,
                     nickname = preferences[USER_NICKNAME] ?: "",
-                    avatarUrl = preferences[USER_AVATAR_URL] ?: ""
+                    avatarUrl = preferences[USER_AVATAR_URL] ?: "",
+                    profileBannerUrl = preferences[USER_BANNER_URL]
                 )
             }
     }
@@ -134,6 +136,9 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences[USER_ID] = user.id
             preferences[USER_NICKNAME] = user.nickname
             preferences[USER_AVATAR_URL] = user.avatarUrl
+            user.profileBannerUrl?.let { profileBannerUrl ->
+                preferences[USER_BANNER_URL] = profileBannerUrl
+            }
         }
     }
 
@@ -218,6 +223,7 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences.remove(USER_ID)
             preferences.remove(USER_NICKNAME)
             preferences.remove(USER_AVATAR_URL)
+            preferences.remove(USER_BANNER_URL)
         }
     }
 }

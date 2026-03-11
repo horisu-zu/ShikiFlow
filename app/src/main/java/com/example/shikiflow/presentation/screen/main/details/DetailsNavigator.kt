@@ -39,13 +39,9 @@ import com.example.shikiflow.presentation.screen.main.details.staff.StaffScreen
 fun DetailsNavigator(
     currentUserData: User?,
     authType: AuthType,
-    mediaId: Int,
-    mediaType: MediaType
+    detailsNavRoute: DetailsNavRoute
 ) {
-    val detailsBackstack = rememberNavBackStack(when(mediaType) {
-        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId, authType)
-        MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId, authType)
-    })
+    val detailsBackstack = rememberNavBackStack(detailsNavRoute)
 
     val options = object : MediaNavOptions {
         //Removed two pane scene strategy due to the changes in the Material Adaptive API
@@ -62,11 +58,11 @@ fun DetailsNavigator(
         }
 
         override fun navigateToAnimeDetails(animeId: Int) {
-            detailsBackstack.add(DetailsNavRoute.AnimeDetails(animeId, authType))
+            detailsBackstack.add(DetailsNavRoute.AnimeDetails(animeId))
         }
 
         override fun navigateToMangaDetails(mangaId: Int) {
-            detailsBackstack.add(DetailsNavRoute.MangaDetails(mangaId, authType))
+            detailsBackstack.add(DetailsNavRoute.MangaDetails(mangaId))
         }
 
         override fun navigateToSimilarPage(id: Int, title: String, mediaType: MediaType) {
@@ -74,7 +70,7 @@ fun DetailsNavigator(
         }
 
         override fun navigateToLinksPage(id: Int, mediaType: MediaType) {
-            detailsBackstack.add(DetailsNavRoute.ExternalLinks(mediaId, mediaType))
+            detailsBackstack.add(DetailsNavRoute.ExternalLinks(id, mediaType))
         }
 
         override fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int) {
@@ -90,7 +86,7 @@ fun DetailsNavigator(
             id: Int,
             threadHeader: Thread?
         ) {
-            detailsBackstack.add(DetailsNavRoute.Comments(screenMode, authType, id, threadHeader))
+            detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id, threadHeader))
         }
 
         override fun navigateToStaff(staffId: Int) {
@@ -109,7 +105,7 @@ fun DetailsNavigator(
         }
 
         override fun navigateToStudio(id: Int, studioName: String) {
-            detailsBackstack.add(DetailsNavRoute.Studio(id, studioName, authType))
+            detailsBackstack.add(DetailsNavRoute.Studio(id, studioName))
         }
 
         override fun navigateToMediaRoles(
@@ -151,7 +147,7 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
                     id = route.id,
-                    authType = route.authType,
+                    authType = authType,
                     userId = currentUserData?.id,
                     navOptions = options
                 )
@@ -159,7 +155,7 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.MangaDetails> { route ->
                 MangaDetailsScreen(
                     id = route.id,
-                    authType = route.authType,
+                    authType = authType,
                     userId = currentUserData?.id,
                     navOptions = options
                 )
@@ -204,7 +200,7 @@ fun DetailsNavigator(
                 CommentsScreen(
                     threadHeader = route.threadHeader,
                     screenMode = route.screenMode,
-                    authType = route.authType,
+                    authType = authType,
                     id = route.id,
                     navOptions = options
                 )
@@ -234,7 +230,7 @@ fun DetailsNavigator(
                 StudioScreen(
                     id = route.id,
                     studioName = route.studioName,
-                    authType = route.authType,
+                    authType = authType,
                     onNavigateBack = { options.navigateBack() },
                     onMediaNavigate = { animeId ->
                         options.navigateToAnimeDetails(animeId)

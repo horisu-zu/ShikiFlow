@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.retain.retain
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +49,7 @@ fun TrackItem(
     itemsCount: Int,
     modifier: Modifier = Modifier
 ) {
-    var isExpanded by retain { mutableStateOf(false) }
+    var isExpanded by rememberSaveable { mutableStateOf(false) }
     val shouldShowExpand = remember(ratesList) {
         ratesList.scoreStats
             .map { (score, count) -> score * count }
@@ -57,7 +57,7 @@ fun TrackItem(
     }
 
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
     ) {
         TypeItem(
             icon = iconResource,
@@ -67,7 +67,6 @@ fun TrackItem(
             isExpanded = isExpanded,
             onExpandClick = { isExpanded = !isExpanded }
         )
-
         SegmentedProgressBar(
             mediaType = mediaType,
             groupedData = ratesList.statusesStats,
@@ -85,10 +84,11 @@ fun TrackItem(
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                    .padding(all = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
             ) {
                 Text(

@@ -17,7 +17,8 @@ object AnilistUserMapper {
         return User(
             id = this.id.toString(),
             nickname = this.name,
-            avatarUrl = this.avatar?.large ?: ""
+            avatarUrl = this.avatar?.large ?: "",
+            profileBannerUrl = this.bannerImage
         )
     }
 

@@ -130,9 +130,9 @@
     <string name="release_notes_release_date">Release Date: %1$s</string>
     <string name="release_notes_update_size">Size</string>
 
-    <string name="profile_screen_missing_nickname">NoNickname!</string>
     <string name="profile_screen_track_lists_label">Lists</string>
     <string name="profile_screen_favorites">Favorites</string>
+    <string name="profile_screen_empty">%1$s\'s Profile is empty</string>
     <string name="more_screen_profile">My Profile</string>
     <string name="more_screen_clubs">Clubs</string>
     <string name="more_screen_history">Activity History</string>

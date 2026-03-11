@@ -116,6 +116,7 @@ fragment ALUserShort on User {
         large
         medium
     }
+    bannerImage
 }
 
 fragment ALUserActivity on ListActivity {

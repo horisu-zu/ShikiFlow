@@ -22,9 +22,9 @@ object DateMapper {
     }
 
     fun ShikiDate.toLocalDate(): LocalDate? {
-        return year?.let {
-            LocalDate(year, month ?: 0, day ?: 0)
-        }
+        return if(year != null && month != null && day != null) {
+            LocalDate(year, month, day)
+        } else null
     }
 
     fun ALDate.toDomain(): Date {
@@ -37,8 +37,8 @@ object DateMapper {
     }
 
     fun ALDate.toLocalDate(): LocalDate? {
-        return year?.let {
-             LocalDate(year, month ?: 0, day ?: 0)
-        }
+        return if(year != null && month != null && day != null) {
+            LocalDate(year, month, day)
+        } else null
     }
 }

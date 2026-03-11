@@ -17,19 +17,21 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
 import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
 import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
-import com.example.shikiflow.presentation.screen.more.profile.statistics.FavoritesScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
 fun MoreScreenNavigator(
     moreScreenBackStack: NavBackStack<NavKey>,
-    currentUser: User?
+    currentUser: User?,
+    authType: AuthType
 ) {
     //val moreBackstack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
@@ -51,8 +53,8 @@ fun MoreScreenNavigator(
             moreScreenBackStack.add(MoreNavRoute.CompareScreen(targetUser))
         }
 
-        override fun navigateToFavorites(userId: String, userFavorites: List<FavoriteCategory>) {
-            moreScreenBackStack.add(MoreNavRoute.FavoritesScreen(userId, userFavorites))
+        override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
+            moreScreenBackStack.add(MoreNavRoute.Details(detailsNavRoute))
         }
 
         override fun navigateBack() {
@@ -112,24 +114,31 @@ fun MoreScreenNavigator(
                     moreNavOptions = moreNavOptions
                 )
             }
-            entry<MoreNavRoute.FavoritesScreen> { route ->
-                FavoritesScreen(
-                    userId = route.userId,
-                    favoriteCategories = route.userFavorites
-                )
-            }
             entry<MoreNavRoute.AboutAppScreen> {
                 AboutAppScreen()
+            }
+            entry<MoreNavRoute.Details> { route ->
+                DetailsNavigator(
+                    currentUserData = currentUser,
+                    authType = authType,
+                    detailsNavRoute = route.detailsNavRoute
+                )
             }
         },
         transitionSpec = {
             fadeIn(
-                animationSpec = tween(300)
-            ) togetherWith ExitTransition.KeepUntilTransitionsFinished
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) togetherWith ExitTransition.None
         },
         popTransitionSpec = {
             EnterTransition.None togetherWith fadeOut(
-                animationSpec = tween(300)
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
             )
         },
         predictivePopTransitionSpec = {

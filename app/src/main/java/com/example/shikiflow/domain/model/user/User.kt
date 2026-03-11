@@ -8,5 +8,6 @@ data class User(
     val id: String = "",
     val avatarUrl: String = "",
     val nickname: String = "",
-    val lastOnlineAt: Instant? = null
+    val lastOnlineAt: Instant? = null,
+    val profileBannerUrl: String? = null
 )

@@ -162,7 +162,8 @@ fun MainNavigator(
                     entry<MainNavRoute.More> {
                         MoreScreenNavigator(
                             moreScreenBackStack = moreScreenBackStack,
-                            currentUser = currentUser
+                            currentUser = currentUser,
+                            authType = authType
                         )
                     }
                 },

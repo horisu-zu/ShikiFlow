@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,9 +9,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,7 +25,6 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.MediaTypeStats
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun TrackSection(
@@ -68,11 +68,7 @@ fun TrackSection(
             }
         }
 
-        userRateData.entries.forEachIndexed { index, (mediaType, ratesList) ->
-            if (index > 0) {
-                HorizontalDivider(modifier = Modifier.ignoreHorizontalParentPadding(12.dp))
-            }
-
+        userRateData.entries.forEach { (mediaType, ratesList) ->
             TrackItem(
                 mediaType = mediaType,
                 iconResource = when (mediaType) {
@@ -80,11 +76,16 @@ fun TrackSection(
                     MediaType.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
                 },
                 type = when (mediaType) {
-                    MediaType.ANIME -> stringResource(R.string.main_track_mode_anime)
-                    MediaType.MANGA -> stringResource(R.string.main_track_mode_manga)
+                    MediaType.ANIME -> stringResource(R.string.browse_search_media_anime)
+                    MediaType.MANGA -> stringResource(R.string.browse_search_media_manga)
                 },
                 ratesList = ratesList,
-                itemsCount = ratesList.count
+                itemsCount = ratesList.count,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                    .padding(all = 12.dp)
             )
         }
     }

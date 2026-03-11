@@ -4,6 +4,7 @@ import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import kotlinx.serialization.Serializable
 
 sealed interface MoreNavRoute : NavKey {
@@ -26,5 +27,5 @@ sealed interface MoreNavRoute : NavKey {
     data class CompareScreen(val targetUser: User) : MoreNavRoute
 
     @Serializable
-    data class FavoritesScreen(val userId: String, val userFavorites: List<FavoriteCategory>) : MoreNavRoute
+    data class Details(val detailsNavRoute: DetailsNavRoute) : MoreNavRoute
 }

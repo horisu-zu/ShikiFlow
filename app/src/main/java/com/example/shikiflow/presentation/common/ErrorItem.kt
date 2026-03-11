@@ -36,7 +36,9 @@ fun ErrorItem(
     val errorFace = ErrorFaces.facesList.random()
 
     Column(
-        modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
     ) {

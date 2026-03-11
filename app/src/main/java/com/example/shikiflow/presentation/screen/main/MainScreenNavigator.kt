@@ -17,6 +17,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.MainScreenNavRoute
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 
 @Composable
@@ -26,8 +27,8 @@ fun MainScreenNavigator(
     authType: AuthType
 ) {
     val options = object : MainScreenNavOptions {
-        override fun navigateToDetails(mediaId: Int, mediaType: MediaType) {
-            mainScreenBackStack.add(MainScreenNavRoute.Details(mediaId, mediaType))
+        override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
+            mainScreenBackStack.add(MainScreenNavRoute.Details(detailsNavRoute))
         }
 
         override fun navigateBack() {
@@ -49,8 +50,7 @@ fun MainScreenNavigator(
                 DetailsNavigator(
                     currentUserData = currentUserData,
                     authType = authType,
-                    mediaId = route.mediaId,
-                    mediaType = route.mediaType
+                    detailsNavRoute = route.detailsNavRoute
                 )
             }
         },

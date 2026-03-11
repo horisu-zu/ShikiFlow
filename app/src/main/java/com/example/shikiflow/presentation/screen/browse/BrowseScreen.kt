@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseSearchViewModel
 
 @Composable
@@ -55,7 +56,12 @@ fun BrowseScreen(
                         start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
                         end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)),
                     onMediaNavigate = { id, mediaType ->
-                        browseNavOptions.navigateToDetails(id, mediaType)
+                        val detailsNavRoute = when(mediaType) {
+                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                        }
+
+                        browseNavOptions.navigateToDetails(detailsNavRoute)
                     },
                     onIsAtTopChange = { isAtTop = it },
                 )
@@ -63,7 +69,12 @@ fun BrowseScreen(
                 BrowseMainPage(
                     authType = authType,
                     onNavigate = { id, mediaType ->
-                        browseNavOptions.navigateToDetails(id, MediaType.ANIME)
+                        val detailsNavRoute = when(mediaType) {
+                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                        }
+
+                        browseNavOptions.navigateToDetails(detailsNavRoute)
                     },
                     onSideScreenNavigate = { sideScreen ->
                         browseNavOptions.navigateToSideScreen(sideScreen)

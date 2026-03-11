@@ -21,6 +21,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.MainScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -71,7 +72,7 @@ fun MainScreen(
                             searchQuery = searchQuery,
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
                             onAnimeClick = { animeId ->
-                                navOptions.navigateToDetails(animeId, MediaType.ANIME)
+                                navOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(animeId))
                             }
                         )
                     } else {
@@ -84,7 +85,12 @@ fun MainScreen(
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
                             isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
                             onMediaClick = { mediaId, mediaType ->
-                                navOptions.navigateToDetails(mediaId, mediaType)
+                                val detailsNavRoute = when(mediaType) {
+                                    MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)
+                                    MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId)
+                                }
+
+                                navOptions.navigateToDetails(detailsNavRoute)
                             }
                         )
                     }

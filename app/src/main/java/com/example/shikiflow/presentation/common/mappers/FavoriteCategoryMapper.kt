@@ -4,6 +4,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.presentation.common.TabRowItem
 import com.example.shikiflow.utils.IconResource
 
 object FavoriteCategoryMapper {
@@ -33,5 +34,13 @@ object FavoriteCategoryMapper {
             FavoriteCategory.PRODUCER -> IconResource.Drawable(R.drawable.ic_film_camera)
             FavoriteCategory.OTHER_PERSON -> IconResource.Vector(Icons.Default.Person)
         }
+    }
+
+    fun FavoriteCategory.toTabRowItem(): TabRowItem<FavoriteCategory> {
+        return TabRowItem(
+            value = this,
+            titleRes = this.displayValue(),
+            iconResource = this.iconResource()
+        )
     }
 }

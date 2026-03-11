@@ -16,6 +16,7 @@ import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 
 @Composable
@@ -30,8 +31,8 @@ fun BrowseScreenNavigator(
             browseScreenBackStack.add(BrowseNavRoute.SideScreen(browseType))
         }
 
-        override fun navigateToDetails(mediaId: Int, mediaType: MediaType) {
-            browseScreenBackStack.add(BrowseNavRoute.Details(mediaId, mediaType))
+        override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
+            browseScreenBackStack.add(BrowseNavRoute.Details(detailsNavRoute))
         }
 
         override fun navigateBack() { browseScreenBackStack.removeLastOrNull() }
@@ -58,8 +59,7 @@ fun BrowseScreenNavigator(
                 DetailsNavigator(
                     currentUserData = currentUserData,
                     authType = authType,
-                    mediaId = route.mediaId,
-                    mediaType = route.mediaType
+                    detailsNavRoute = route.detailsNavRoute
                 )
             }
         },

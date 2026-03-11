@@ -11,10 +11,10 @@ import kotlinx.serialization.Serializable
 
 sealed interface DetailsNavRoute : NavKey {
     @Serializable
-    data class AnimeDetails(val id: Int, val authType: AuthType) : DetailsNavRoute
+    data class AnimeDetails(val id: Int) : DetailsNavRoute
 
     @Serializable
-    data class MangaDetails(val id: Int, val authType: AuthType) : DetailsNavRoute
+    data class MangaDetails(val id: Int) : DetailsNavRoute
 
     @Serializable
     data class CharacterDetails(val characterId: Int) : DetailsNavRoute
@@ -37,7 +37,6 @@ sealed interface DetailsNavRoute : NavKey {
     @Serializable
     data class Comments(
         val screenMode: CommentsScreenMode,
-        val authType: AuthType,
         val id: Int,
         val threadHeader: Thread?
     ) : DetailsNavRoute
@@ -52,7 +51,7 @@ sealed interface DetailsNavRoute : NavKey {
     data class AnimeWatch(val title: String, val shikimoriId: Int, val completedEpisodes: Int) : DetailsNavRoute
 
     @Serializable
-    data class Studio(val id: Int, val studioName: String, val authType: AuthType) : DetailsNavRoute
+    data class Studio(val id: Int, val studioName: String? = null) : DetailsNavRoute
 
     @Serializable
     data class MediaRoles(

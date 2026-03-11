@@ -7,143 +7,115 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.FavoriteCategoryMapper.displayValue
-import com.example.shikiflow.presentation.common.mappers.FavoriteCategoryMapper.iconResource
+import com.example.shikiflow.presentation.common.mappers.FavoriteCategoryMapper.toTabRowItem
 import com.example.shikiflow.presentation.viewmodel.user.UserFavoritesViewModel
-import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun FavoritesScreen(
+fun FavoritesSection(
     userId: String,
     favoriteCategories: List<FavoriteCategory>,
+    horizontalPadding: Dp,
+    onFavoriteClick: (Int, FavoriteCategory) -> Unit,
+    modifier: Modifier = Modifier,
     userFavoritesViewModel: UserFavoritesViewModel = hiltViewModel()
 ) {
     val lazyGridState = rememberLazyGridState()
-    val density = LocalDensity.current
-    val localWindowInfo = LocalWindowInfo.current
-    var headerHeightPx by remember { mutableIntStateOf(0) }
 
-    val screenHeight by remember {
-        derivedStateOf {
-            with(density) {
-                localWindowInfo.containerDpSize.height - headerHeightPx.toDp()
-            }
-        }
-    }
-
-    var currentFavorite by remember { mutableStateOf(favoriteCategories.first()) }
+    var currentFavorite by rememberSaveable { mutableStateOf(favoriteCategories.first()) }
     val userFavoriteItems = userFavoritesViewModel.loadUserFavorites(
         userId = userId,
         favoriteCategory = currentFavorite
     ).collectAsLazyPagingItems()
 
     Scaffold(
+        modifier = modifier,
         topBar = {
-            FavoriteScreenHeader(
+            FavoritesSectionHeader(
                 currentFavorite = currentFavorite,
                 favoriteCategories = favoriteCategories,
                 onFavoriteClick = { favorite -> currentFavorite = favorite },
                 paddingValues = PaddingValues(
                     start = 12.dp,
                     end = 12.dp,
-                    top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                    bottom = 4.dp
+                    bottom = 8.dp
                 ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .onSizeChanged { size ->
-                        headerHeightPx = size.height
-                    }
+                modifier = Modifier.fillMaxWidth()
             )
         }
     ) { paddingValues ->
-        LazyVerticalGrid(
-            state = lazyGridState,
-            columns = GridCells.Adaptive(108.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            contentPadding = PaddingValues(
-                start = 12.dp,
-                end = 12.dp,
-                top = paddingValues.calculateTopPadding() + 12.dp,
-                bottom = paddingValues.calculateBottomPadding()
-            ),
-            modifier = Modifier.fillMaxSize()
-        ) {
-            when (userFavoriteItems.loadState.refresh) {
-                is LoadState.Loading -> {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Box(
-                            modifier = Modifier.height(screenHeight),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
-                    }
+        when (userFavoriteItems.loadState.refresh) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
+            }
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { userFavoriteItems.refresh() }
+                    )
                 }
-                is LoadState.Error -> {
-                    item(span = { GridItemSpan(maxLineSpan) }) {
-                        Box(
-                            modifier = Modifier.height(screenHeight),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = stringResource(R.string.common_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { userFavoriteItems.refresh() }
-                            )
-                        }
-                    }
-                }
-                else -> {
+            }
+            else -> {
+                LazyVerticalGrid(
+                    state = lazyGridState,
+                    columns = GridCells.Adaptive(108.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    contentPadding = PaddingValues(
+                        start = horizontalPadding,
+                        end = horizontalPadding,
+                        top = paddingValues.calculateTopPadding() + 12.dp,
+                        bottom = 12.dp
+                    ),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
                     items(
                         count = userFavoriteItems.itemCount,
                         key = { index -> userFavoriteItems[index]?.id ?: index }
@@ -154,10 +126,9 @@ fun FavoritesScreen(
                                 title = item.name,
                                 imageUrl = item.imageUrl,
                                 onItemClick = { id ->
-                                    /*Details Navigator*/
+                                    onFavoriteClick(id, currentFavorite)
                                 },
-                                modifier = Modifier.width(108.dp)
-                                    .animateItem()
+                                modifier = Modifier.animateItem()
                             )
                         }
                     }
@@ -189,7 +160,7 @@ fun FavoritesScreen(
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun FavoriteScreenHeader(
+private fun FavoritesSectionHeader(
     currentFavorite: FavoriteCategory,
     favoriteCategories: List<FavoriteCategory>,
     onFavoriteClick: (FavoriteCategory) -> Unit,
@@ -198,36 +169,24 @@ private fun FavoriteScreenHeader(
 ) {
     Column(
         modifier = modifier
-            .clip(RoundedCornerShape(bottomEndPercent = 24, bottomStartPercent = 24))
+            .clip(
+                shape = RoundedCornerShape(
+                    bottomEndPercent = 24,
+                    bottomStartPercent = 24
+                )
+            )
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(paddingValues),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(horizontalArrangement = Arrangement.spacedBy(3.dp)) {
-            favoriteCategories.forEachIndexed { index, type ->
-                ToggleButton(
-                    checked = currentFavorite == type,
-                    onCheckedChange = { onFavoriteClick(type) },
-                    shapes = when {
-                        favoriteCategories.size == 1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                        index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
-                        index == favoriteCategories.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
-                        else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
-                    },
-                    contentPadding = ButtonDefaults.ExtraSmallContentPadding,
-                    colors = ToggleButtonDefaults.toggleButtonColors(
-                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                        checkedContainerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        checkedContentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                    modifier = Modifier.weight(1f)
-                ) {
-                    type.iconResource().toIcon(modifier = Modifier.size(24.dp))
-                }
+        ConnectedButtonGroup(
+            items = favoriteCategories.map { it.toTabRowItem() },
+            selectedIndex = favoriteCategories.indexOf(currentFavorite),
+            onItemSelection = { index ->
+                onFavoriteClick(favoriteCategories[index])
             }
-        }
+        )
         Text(
             text = stringResource(currentFavorite.displayValue()),
             style = MaterialTheme.typography.titleMedium
@@ -244,7 +203,8 @@ private fun FavoriteMediaItem(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .clickable(
                 onClick = { onItemClick(id) },
                 interactionSource = remember { MutableInteractionSource() },

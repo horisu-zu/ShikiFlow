@@ -1,7 +1,6 @@
 package com.example.shikiflow.data.datasource
 
 import android.net.Uri
-import com.example.shikiflow.data.datasource.dto.auth.TokenResponse
 import com.example.shikiflow.domain.model.auth.AuthCredentials
 
 interface AuthDataSource {

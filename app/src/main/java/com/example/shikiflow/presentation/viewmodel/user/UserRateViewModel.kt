@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.user
 
 import android.util.Log
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -24,20 +23,12 @@ class UserRateViewModel @Inject constructor(
     private val _userRateStats = MutableStateFlow<Resource<ProfileStats>>(Resource.Loading())
     val userRateStats = _userRateStats.asStateFlow()
 
-    var isRefreshing = mutableStateOf(false)
-        private set
-
-    fun loadUserRates(
-        userId: String,
-        isRefresh: Boolean = false
-    ) {
+    fun loadUserRates(userId: String) {
         viewModelScope.launch {
-            if (!isRefresh && _userId == userId) {
+            if (_userRateStats.value is Resource.Success) {
                 return@launch
-            } else if(!isRefresh) {
-                _userRateStats.value = Resource.Loading()
             } else {
-                isRefreshing.value = true
+                _userRateStats.value = Resource.Loading()
             }
 
             _userRateStats.value = getUserRatesUseCase(userId.toLong())
@@ -46,7 +37,6 @@ class UserRateViewModel @Inject constructor(
                 is Resource.Loading -> { /**/ }
                 is Resource.Success -> {
                     _userId = userId
-                    if(isRefreshing.value) isRefreshing.value = false
                 }
                 is Resource.Error -> {
                     Log.e("UserRateViewModel", "Error: ${result.message}")

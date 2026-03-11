@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +67,9 @@ fun BrowseSideScreen(
     ) { innerPadding ->
         if (browseType == BrowseType.AnimeBrowseType.ONGOING) {
             OngoingSideScreen(
-                onNavigate = { id -> navOptions.navigateToDetails(id, MediaType.ANIME) },
+                onNavigate = { id ->
+                    navOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(id))
+                },
                 onScrollStateChange = { newValue -> isAtTop = newValue },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
                     start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
@@ -77,7 +80,12 @@ fun BrowseSideScreen(
             MainSideScreen(
                 browseType = browseType,
                 onMediaNavigate = { id, mediaType ->
-                    navOptions.navigateToDetails(id, mediaType)
+                    val detailsNavRoute = when(mediaType) {
+                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                    }
+
+                    navOptions.navigateToDetails(detailsNavRoute)
                 },
                 onScrollStateChange = { newValue -> isAtTop = newValue },
                 modifier = Modifier.padding(top = innerPadding.calculateTopPadding(),
