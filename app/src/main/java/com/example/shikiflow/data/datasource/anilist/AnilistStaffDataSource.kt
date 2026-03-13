@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.Optional
 import com.example.graphql.anilist.MediaStaffQuery
 import com.example.graphql.anilist.StaffDetailsQuery
 import com.example.graphql.anilist.StaffMediaRolesQuery
@@ -17,12 +16,17 @@ import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toStaffMediaRole
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
-import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistCharacterSort
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistStaffSort
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
+import com.example.shikiflow.domain.model.sort.CharacterType
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.staff.StaffDetails
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
@@ -45,7 +49,7 @@ class AnilistStaffDataSource @Inject constructor(
     override fun getMediaStaff(
         mediaId: Int,
         mediaType: MediaType,
-        sort: OrderOption?
+        sort: Sort<StaffType>
     ): Flow<PagingData<StaffShort>> {
         return Pager(
             config = PagingConfig(
@@ -68,13 +72,13 @@ class AnilistStaffDataSource @Inject constructor(
         mediaId: Int,
         page: Int,
         limit: Int,
-        //sort: OrderOption?
+        sort: Sort<StaffType>
     ): Result<List<StaffShort>> {
         val mediaStaffQuery = MediaStaffQuery(
             mediaId = mediaId,
             page = page,
             perPage = limit,
-            //sort = Optional.presentIfNotNull(sort)
+            sort = sort.toAnilistStaffSort()
         )
 
         val response = apolloClient.query(mediaStaffQuery).execute()
@@ -92,8 +96,11 @@ class AnilistStaffDataSource @Inject constructor(
     override fun getStaffMediaRoles(
         staffId: Int,
         mediaType: MediaType,
-        sort: OrderOption?
+        sort: Sort<MediaSort>
     ): Flow<PagingData<MediaRole>> {
+        val sortType = sort.type as? MediaSort.Anilist ?: MediaSort.Anilist.POPULARITY
+        val anilistSort = Sort(sortType, sort.direction)
+
         return Pager(
             config = PagingConfig(
                 pageSize = 24,
@@ -105,7 +112,7 @@ class AnilistStaffDataSource @Inject constructor(
                 StaffMediaPagingSource(
                     staffId = staffId,
                     mediaType = mediaType,
-                    sort = sort,
+                    sort = anilistSort,
                     staffDataSource = this
                 )
             }
@@ -117,14 +124,14 @@ class AnilistStaffDataSource @Inject constructor(
         limit: Int,
         staffId: Int,
         mediaType: MediaType,
-        sort: OrderOption?
+        sort: Sort<MediaSort.Anilist>
     ): Result<List<StaffMediaRole>> {
         val staffMediaQuery = StaffMediaRolesQuery(
             staffId = staffId,
             page = page,
             perPage = limit,
             mediaType = mediaType.toAnilistType(),
-            sort = Optional.presentIfNotNull(sort?.toAnilistBrowseOrder())
+            sort = sort.toAnilistMediaSort()
         )
 
         val response = apolloClient.query(staffMediaQuery).execute()
@@ -141,7 +148,7 @@ class AnilistStaffDataSource @Inject constructor(
 
     override fun getVoiceActorRoles(
         staffId: Int,
-        sort: OrderOption?
+        sort: Sort<CharacterType>
     ): Flow<PagingData<MediaRole>> {
         return Pager(
             config = PagingConfig(
@@ -153,6 +160,7 @@ class AnilistStaffDataSource @Inject constructor(
             pagingSourceFactory = {
                 VoiceActorRolesPagingSource(
                     staffId = staffId,
+                    sort = sort,
                     staffDataSource = this
                 )
             }
@@ -163,12 +171,13 @@ class AnilistStaffDataSource @Inject constructor(
         page: Int,
         limit: Int,
         staffId: Int,
-        //sort: VASort = VASort.FAVORITES
+        sort: Sort<CharacterType>
     ): Result<List<VoiceActorMediaRole>> {
         val voiceActorRolesQuery = VoiceActorRolesQuery(
             staffId = staffId,
             page = page,
-            perPage = limit
+            perPage = limit,
+            sort = sort.toAnilistCharacterSort()
         )
 
         val response = apolloClient.query(voiceActorRolesQuery).execute()

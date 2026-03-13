@@ -5,14 +5,15 @@ import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.common.StaffMediaRole
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import javax.inject.Inject
 
 class StaffMediaPagingSource @Inject constructor(
     private val staffId: Int,
     private val mediaType: MediaType,
-    private val sort: OrderOption?,
+    private val sort: Sort<MediaSort.Anilist>,
     private val staffDataSource: AnilistStaffDataSource
 ): PagingSource<Int, MediaRole>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {

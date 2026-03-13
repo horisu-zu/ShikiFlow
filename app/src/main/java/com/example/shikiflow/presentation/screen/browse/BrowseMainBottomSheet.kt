@@ -30,10 +30,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.sort.BrowseOrder
-import com.example.shikiflow.domain.model.sort.OrderOption
-import com.example.shikiflow.presentation.common.mappers.OrderMapper.displayValue
-import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
+import com.example.shikiflow.domain.model.settings.BrowseUiMode
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.launch
 
@@ -41,11 +43,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun BrowseMainBottomSheet(
     currentBrowseMode: BrowseUiMode,
-    ongoingOrder: List<BrowseOrder>,
-    currentOngoingMode: OrderOption,
+    ongoingOrder: List<MediaSort>,
+    currentOngoingMode: SortType,
     onDismiss: () -> Unit,
     onModeSelect: (BrowseUiMode) -> Unit,
-    onOrderSelect: (BrowseOrder) -> Unit
+    onOrderSelect: (MediaSort) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -94,7 +96,7 @@ fun BrowseMainBottomSheet(
                         ),
                         label = {
                             Text(
-                                text = stringResource(browseEntry.displayValue),
+                                text = stringResource(browseEntry.displayValue()),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         },
@@ -102,7 +104,7 @@ fun BrowseMainBottomSheet(
                             SegmentedButtonDefaults.Icon(
                                 active = browseEntry == currentBrowseMode
                             ) {
-                                browseEntry.icon.toIcon(
+                                browseEntry.iconResource().toIcon(
                                     tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }

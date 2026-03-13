@@ -10,8 +10,8 @@ import com.example.shikiflow.utils.IconResource
 object FavoriteCategoryMapper {
     fun FavoriteCategory.displayValue(): Int {
         return when(this) {
-            FavoriteCategory.ANIME -> R.string.main_track_mode_anime
-            FavoriteCategory.MANGA -> R.string.main_track_mode_manga
+            FavoriteCategory.ANIME -> R.string.media_type_anime
+            FavoriteCategory.MANGA -> R.string.media_type_manga
             FavoriteCategory.CHARACTER -> R.string.details_characters
             FavoriteCategory.STAFF -> R.string.favorite_staff
             FavoriteCategory.STUDIO -> R.string.favorite_studios

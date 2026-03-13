@@ -21,7 +21,8 @@ import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
 import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toDomain
 import com.example.shikiflow.data.mapper.local.MangaEntityMapper.toDomain
-import com.example.shikiflow.domain.model.sort.UserRateOrder
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
@@ -63,7 +64,7 @@ class ShikimoriTracksDataSource @Inject constructor(
         limit: Int,
         userId: String?,
         status: UserRateStatus?,
-        order: UserRateOrder?,
+        order: Sort<UserRateType>?,
         idsList: List<Int>?
     ): Result<List<AnimeTrack>> {
         val query = AnimeTracksQuery(
@@ -158,7 +159,7 @@ class ShikimoriTracksDataSource @Inject constructor(
         limit: Int,
         userId: String?,
         status: UserRateStatus?,
-        order: UserRateOrder?
+        order: Sort<UserRateType>?
     ): Result<List<MangaTrack>> {
         val query = MangaTracksQuery(
             page = Optional.presentIfNotNull(page),

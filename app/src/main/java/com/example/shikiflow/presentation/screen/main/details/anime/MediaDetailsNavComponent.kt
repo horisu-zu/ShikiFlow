@@ -12,13 +12,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.more.GeneralItem
 import com.example.shikiflow.utils.IconResource
 
 @Composable
 fun MediaDetailsNavComponent(
     authType: AuthType,
+    mediaType: MediaType,
     onThreadsClick: () -> Unit,
+    onStaffClick: () -> Unit,
     onSimilarClick: () -> Unit,
     onExternalLinksClick: () -> Unit
 ) {
@@ -29,12 +32,23 @@ fun MediaDetailsNavComponent(
         verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start
     ) {
-        if(authType == AuthType.ANILIST) {
-            GeneralItem(
-                icon = IconResource.Drawable(resId = R.drawable.ic_thread),
-                title = stringResource(R.string.details_info_threads),
-                onClick = { onThreadsClick() }
-            )
+        when(authType) {
+            AuthType.ANILIST -> {
+                GeneralItem(
+                    icon = IconResource.Drawable(resId = R.drawable.ic_thread),
+                    title = stringResource(R.string.details_info_threads),
+                    onClick = { onThreadsClick() }
+                )
+            }
+            AuthType.SHIKIMORI -> {
+                if(mediaType == MediaType.ANIME) {
+                    GeneralItem(
+                        icon = IconResource.Drawable(resId = R.drawable.ic_group),
+                        title = stringResource(id = R.string.staff_title),
+                        onClick = { onStaffClick() }
+                    )
+                }
+            }
         }
         GeneralItem(
             icon = IconResource.Drawable(resId = R.drawable.ic_intersection),

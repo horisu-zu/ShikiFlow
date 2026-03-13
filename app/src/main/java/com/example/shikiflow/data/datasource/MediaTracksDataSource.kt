@@ -1,7 +1,8 @@
 package com.example.shikiflow.data.datasource
 
 import androidx.paging.PagingData
-import com.example.shikiflow.domain.model.sort.UserRateOrder
+import com.example.shikiflow.domain.model.sort.UserRateType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
@@ -24,7 +25,7 @@ interface MediaTracksDataSource {
         limit: Int = 50,
         userId: String? = null,
         status: UserRateStatus? = null,
-        order: UserRateOrder? = null,
+        order: Sort<UserRateType>? = null,
         idsList: List<Int>? = null
     ): Result<List<AnimeTrack>>
 
@@ -43,6 +44,6 @@ interface MediaTracksDataSource {
         limit: Int = 50,
         userId: String? = null,
         status: UserRateStatus? = null,
-        order: UserRateOrder? = null
+        order: Sort<UserRateType>? = null
     ): Result<List<MangaTrack>>
 }

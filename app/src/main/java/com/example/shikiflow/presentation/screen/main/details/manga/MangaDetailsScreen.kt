@@ -53,7 +53,7 @@ fun MangaDetailsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(id = R.string.details_error, R.string.browse_search_media_manga),
+                    message = stringResource(id = R.string.details_error, R.string.media_type_manga),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { mangaDetailsViewModel.getMangaDetails(id) }
                 )

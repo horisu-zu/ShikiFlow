@@ -46,12 +46,12 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
-import com.example.shikiflow.utils.AppUiMode
-import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.settings.BrowseUiMode
 
 @Composable
 fun BrowseMainPage(
@@ -98,8 +98,8 @@ fun BrowseMainPage(
         BrowseMainBottomSheet(
             currentBrowseMode = browseUiSettings.browseUiMode,
             ongoingOrder = when(authType) {
-                AuthType.ANILIST -> BrowseOrder.Anilist.getOngoingOrderOptions()
-                AuthType.SHIKIMORI -> BrowseOrder.Shikimori.getOngoingOrderOptions()
+                AuthType.ANILIST -> MediaSort.Anilist.getOngoingOrderOptions()
+                AuthType.SHIKIMORI -> MediaSort.Shikimori.getOngoingOrderOptions()
             },
             currentOngoingMode = browseUiSettings.browseOngoingOrder,
             onDismiss = { showBottomSheet.value = false },

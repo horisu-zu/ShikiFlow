@@ -37,6 +37,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.ComparisonType
+import com.example.shikiflow.domain.model.user.MediaComparison
 import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -50,6 +51,7 @@ fun CompareScreenContent(
     mediaType: MediaType,
     currentUser: User,
     targetUser: User,
+    onMediaItemClick: (Int, MediaType) -> Unit,
     compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
 ) {
     val ratesState by compareScreenViewModel.userRates.collectAsStateWithLifecycle()
@@ -71,9 +73,7 @@ fun CompareScreenContent(
             }
             is Resource.Success -> {
                 LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(bottom = 8.dp)
                 ) {
                     mediaRates.data?.let { userRatesMap ->
@@ -87,22 +87,28 @@ fun CompareScreenContent(
                                     onClick = {
                                         showState[comparisonType]?.value = !(showState[comparisonType]?.value ?: true)
                                     },
-                                    modifier = Modifier.animateItem()
+                                    modifier = Modifier
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .animateItem()
                                 )
                             }
                             if(showState[comparisonType]?.value == true) {
                                 items(
                                     count = media.size,
-                                    key = { index -> media[index].mediaId }
+                                    key = { index -> media[index].id }
                                 ) { index ->
                                     ComparisonItem(
+                                        mediaItem = media[index],
                                         mediaType = mediaType,
-                                        mediaTitle = media[index].mediaTitle,
-                                        mediaImageUrl = media[index].mediaImage,
                                         currentUserScore = media[index].currentUserScore,
                                         targetUserScore = media[index].targetUserScore,
                                         comparisonType = comparisonType,
-                                        modifier = Modifier.animateItem()
+                                        onItemClick = { mediaId ->
+                                            onMediaItemClick(mediaId, mediaType)
+                                        },
+                                        modifier = Modifier
+                                            .background(MaterialTheme.colorScheme.background)
+                                            .animateItem()
                                     )
                                 }
                             }
@@ -146,7 +152,6 @@ private fun CompareHeader(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(IntrinsicSize.Min)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .clickable { onClick() }
                 .padding(horizontal = 12.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
@@ -213,12 +218,12 @@ private fun CompareHeader(
 
 @Composable
 private fun ComparisonItem(
+    mediaItem: MediaComparison,
     mediaType: MediaType,
-    mediaTitle: String,
-    mediaImageUrl: String?,
     currentUserScore: ShortUserRateData?,
     targetUserScore: ShortUserRateData?,
     comparisonType: ComparisonType,
+    onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -236,19 +241,20 @@ private fun ComparisonItem(
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
             ) {
                 BaseImage(
-                    model = mediaImageUrl,
+                    model = mediaItem.imageUrl,
                     contentDescription = "Media Image",
-                    imageType = ImageType.Poster(defaultWidth = 48.dp)
+                    imageType = ImageType.Poster(defaultWidth = 48.dp),
+                    onClick = { onItemClick(mediaItem.id.toInt()) }
                 )
                 Text(
-                    text = mediaTitle,
+                    text = mediaItem.title,
                     style = MaterialTheme.typography.bodySmall,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis
                 )
             }
             VerticalDivider(
-                color = MaterialTheme.colorScheme.surfaceBright,
+                color = MaterialTheme.colorScheme.surfaceContainerLowest,
                 thickness = 2.dp,
                 modifier = Modifier.fillMaxHeight()
             )
@@ -276,7 +282,7 @@ private fun ComparisonItem(
             }
             if(comparisonType == ComparisonType.SHARED) {
                 VerticalDivider(
-                    color = MaterialTheme.colorScheme.surfaceBright,
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
                     thickness = 2.dp,
                     modifier = Modifier.fillMaxHeight()
                 )

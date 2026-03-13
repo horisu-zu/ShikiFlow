@@ -49,6 +49,7 @@ fragment PersonShort on Person {
 }
 
 fragment PersonRoleShort on PersonRole {
+    id
     rolesEn
     person {
         id

@@ -53,6 +53,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapterMetadata
+import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SideSheet
 import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel

@@ -3,14 +3,15 @@ package com.example.shikiflow.data.local.source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.CommentsDataSource
+import com.example.shikiflow.domain.model.sort.ThreadType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.domain.model.thread.ThreadSort
 import javax.inject.Inject
 
 class ThreadPagingSource @Inject constructor(
     private val commentsDataSource: CommentsDataSource,
     private val mediaId: Int,
-    private val threadSort: ThreadSort
+    private val threadSort: Sort<ThreadType>
 ): PagingSource<Int, Thread>() {
     override fun getRefreshKey(state: PagingState<Int, Thread>): Int? {
         return state.anchorPosition?.let { anchorPosition ->

@@ -10,9 +10,9 @@ import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
-import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
-import com.example.shikiflow.utils.AppUiMode
+import com.example.shikiflow.domain.model.track.MainTrackMode
+import com.example.shikiflow.domain.model.settings.ChapterUIMode
+import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel

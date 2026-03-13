@@ -4,8 +4,11 @@ import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.CharacterType
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.staff.StaffDetails
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.StaffRepository
@@ -37,17 +40,17 @@ class StaffRepositoryImpl @Inject constructor(
     override fun getMediaStaff(
         mediaId: Int,
         mediaType: MediaType,
-        orderOption: OrderOption?
-    ): Flow<PagingData<StaffShort>> = getSource().getMediaStaff(mediaId, mediaType, orderOption)
+        sort: Sort<StaffType>
+    ): Flow<PagingData<StaffShort>> = getSource().getMediaStaff(mediaId, mediaType, sort)
 
     override fun getStaffMediaRoles(
         staffId: Int,
         mediaType: MediaType,
-        orderOption: OrderOption?
-    ): Flow<PagingData<MediaRole>> = getSource().getStaffMediaRoles(staffId, mediaType, orderOption)
+        sort: Sort<MediaSort>
+    ): Flow<PagingData<MediaRole>> = getSource().getStaffMediaRoles(staffId, mediaType, sort)
 
     override fun getVoiceActorRoles(
         staffId: Int,
-        orderOption: OrderOption?
-    ): Flow<PagingData<MediaRole>> = getSource().getVoiceActorRoles(staffId, orderOption)
+        sort: Sort<CharacterType>
+    ): Flow<PagingData<MediaRole>> = getSource().getVoiceActorRoles(staffId, sort)
 }

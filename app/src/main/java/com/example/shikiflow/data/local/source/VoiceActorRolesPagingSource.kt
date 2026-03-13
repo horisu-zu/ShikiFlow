@@ -4,10 +4,13 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.CharacterType
+import com.example.shikiflow.domain.model.sort.Sort
 import javax.inject.Inject
 
 class VoiceActorRolesPagingSource @Inject constructor(
     private val staffId: Int,
+    private val sort: Sort<CharacterType>,
     private val staffDataSource: AnilistStaffDataSource
 ): PagingSource<Int, MediaRole>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {
@@ -17,7 +20,8 @@ class VoiceActorRolesPagingSource @Inject constructor(
         val result = staffDataSource.paginatedVoiceActorRoles(
             page = currentPage,
             limit = pageSize,
-            staffId = staffId
+            staffId = staffId,
+            sort = sort
         )
 
         return result.fold(

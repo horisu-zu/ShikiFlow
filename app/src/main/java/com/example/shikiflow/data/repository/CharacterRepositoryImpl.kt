@@ -9,6 +9,8 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -38,8 +40,9 @@ class CharacterRepositoryImpl @Inject constructor(
 
     override fun getCharacterMediaRoles(
         characterId: Int,
-        mediaType: MediaType
-    ): Flow<PagingData<MediaRole>> = getSource().getCharacterMediaRoles(characterId, mediaType)
+        mediaType: MediaType,
+        sort: Sort<MediaSort>
+    ): Flow<PagingData<MediaRole>> = getSource().getCharacterMediaRoles(characterId, mediaType, sort)
 
     override fun getMediaCharacters(
         mediaId: Int,

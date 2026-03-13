@@ -35,10 +35,9 @@ fun ProfileAppBar(
     userData: User?,
     scrollBehavior: TopAppBarScrollBehavior,
     statusBarsPadding: PaddingValues,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
-    val backgroundColor = MaterialTheme.colorScheme.surfaceVariant
-
     DynamicTopAppBar(
         expandedHeight = 144.dp,
         collapsedHeight = 92.dp,

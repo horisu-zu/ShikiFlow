@@ -27,7 +27,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -61,9 +64,9 @@ fun ChapterSettingsBottomSheet(
         ) {
             ChapterSettingsRow(
                 title = stringResource(R.string.settings_app_ui_mode),
-                currentValue = stringResource(mangaSettings.chapterUIMode.displayValue),
-                values = ChapterUIMode.entries.map { stringResource(it.displayValue)  },
-                iconResources = ChapterUIMode.entries.map { it.icon },
+                currentValue = stringResource(mangaSettings.chapterUIMode.displayValue()),
+                values = ChapterUIMode.entries.map { stringResource(it.displayValue())  },
+                iconResources = ChapterUIMode.entries.map { it.iconResource() },
                 onSettingClick = { selectedIndex ->
                     onSettingsChange(mangaSettings.copy(
                         chapterUIMode = ChapterUIMode.entries[selectedIndex]
@@ -107,10 +110,11 @@ private fun ChapterSettingsRow(
             style = MaterialTheme.typography.titleMedium
         )
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(12.dp))
                 .background(MaterialTheme.colorScheme.background)
+                .padding(4.dp)
         ) {
             values.forEachIndexed { index, settingValue ->
                 ChapterSettingsItem(
@@ -118,9 +122,7 @@ private fun ChapterSettingsRow(
                     icon = iconResources?.get(values.indexOf(settingValue)),
                     isChecked = settingValue == currentValue,
                     onClick = { onSettingClick(index) },
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(4.dp)
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

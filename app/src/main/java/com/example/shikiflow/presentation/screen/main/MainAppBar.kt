@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.track.MainTrackMode
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomSearchField
 
@@ -77,7 +78,7 @@ fun MainAppBar(
                         }
                         MainTrackMode.MANGA -> {
                             Text(
-                                text = stringResource(R.string.browse_search_media_manga),
+                                text = stringResource(R.string.media_type_manga),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         }

@@ -1,33 +1,24 @@
 package com.example.shikiflow.presentation.screen.more.compare
 
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
-import com.example.shikiflow.R
+import androidx.compose.ui.graphics.Color
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import kotlinx.coroutines.launch
 
@@ -40,59 +31,28 @@ fun CompareScreen(
 ) {
     val tabs = MediaType.entries
     val pagerState = rememberPagerState { tabs.size }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
-        snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
-    )
     val coroutineScope = rememberCoroutineScope()
 
-    Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.compare_label)
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { moreNavOptions.navigateBack() }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back to Main"
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
-                scrollBehavior = scrollBehavior
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier.fillMaxSize()
-                .padding(
-                    top = paddingValues.calculateTopPadding(),
-                    start = paddingValues.calculateLeftPadding(LayoutDirection.Ltr),
-                    end = paddingValues.calculateRightPadding(LayoutDirection.Ltr)
-                )
-        ) {
+    Scaffold { paddingValues ->
+        Column {
             CompareTabRow(
                 tabs = tabs.map { it.displayValue() },
                 selectedTab = pagerState.currentPage,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                containerColor = Color.Transparent,
                 onTabSelected = { pageIndex ->
                     coroutineScope.launch {
                         pagerState.animateScrollToPage(
                             page = pageIndex,
-                            animationSpec = tween(
-                                durationMillis = 500,
-                                easing = FastOutSlowInEasing
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMediumLow
                             )
                         )
                     }
-                }
+                },
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .padding(top = paddingValues.calculateTopPadding())
             )
             HorizontalPager(
                 state = pagerState,
@@ -102,7 +62,15 @@ fun CompareScreen(
                     CompareScreenContent(
                         mediaType = tabs[page],
                         currentUser = currentUser,
-                        targetUser = targetUser
+                        targetUser = targetUser,
+                        onMediaItemClick = { id, mediaType ->
+                            val detailsNavRoute = when(mediaType) {
+                                MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                                MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                            }
+
+                            moreNavOptions.navigateToDetails(detailsNavRoute)
+                        }
                     )
                 }
             }

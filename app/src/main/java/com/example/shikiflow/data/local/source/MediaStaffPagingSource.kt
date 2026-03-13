@@ -3,12 +3,13 @@ package com.example.shikiflow.data.local.source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 
 class MediaStaffPagingSource(
     private val mediaId: Int,
-    private val sort: OrderOption?,
+    private val sort: Sort<StaffType>,
     private val staffDataSource: AnilistStaffDataSource
 ): PagingSource<Int, StaffShort>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, StaffShort> {
@@ -17,6 +18,7 @@ class MediaStaffPagingSource(
 
         val result = staffDataSource.paginatedMediaStaff(
             mediaId = mediaId,
+            sort = sort,
             page = currentPage,
             limit = pageSize
         )

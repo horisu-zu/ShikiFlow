@@ -1,64 +1,132 @@
 package com.example.shikiflow.data.mapper.common
 
+import com.example.graphql.anilist.type.CharacterSort
 import com.example.graphql.anilist.type.MediaListSort
-import com.example.graphql.anilist.type.MediaSort
+import com.example.graphql.anilist.type.StaffSort
+import com.example.graphql.anilist.type.MediaSort as ALMediaSort
 import com.example.graphql.shikimori.type.OrderEnum
 import com.example.graphql.shikimori.type.SortOrderEnum
 import com.example.graphql.shikimori.type.UserRateOrderFieldEnum
 import com.example.graphql.shikimori.type.UserRateOrderInputType
+import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.SortDirection
-import com.example.shikiflow.domain.model.sort.BrowseOrder
-import com.example.shikiflow.domain.model.sort.UserRateOrder
-import com.example.shikiflow.domain.model.sort.OrderOption
-import com.example.shikiflow.domain.model.sort.UserRateOrderType
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.sort.UserRateType
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.StaffType
 
 object OrderMapper {
-
-    fun UserRateOrder.toAnilistOrder(): MediaListSort {
+    fun Sort<MediaSort.Anilist>.toAnilistMediaSort(): ALMediaSort {
         return when(type) {
-            UserRateOrderType.ID -> when(sort) {
+            MediaSort.Anilist.POPULARITY -> when(direction) {
+                SortDirection.ASCENDING -> ALMediaSort.POPULARITY
+                SortDirection.DESCENDING -> ALMediaSort.POPULARITY_DESC
+            }
+            MediaSort.Anilist.SCORE -> when(direction) {
+                SortDirection.ASCENDING -> ALMediaSort.SCORE
+                SortDirection.DESCENDING -> ALMediaSort.SCORE_DESC
+            }
+            MediaSort.Anilist.TRENDING -> when(direction) {
+                SortDirection.ASCENDING -> ALMediaSort.TRENDING
+                SortDirection.DESCENDING -> ALMediaSort.TRENDING_DESC
+            }
+            MediaSort.Anilist.FAVORITES -> when(direction) {
+                SortDirection.ASCENDING -> ALMediaSort.FAVOURITES
+                SortDirection.DESCENDING -> ALMediaSort.FAVOURITES_DESC
+            }
+            MediaSort.Anilist.DATE_ADDED -> when(direction) {
+                SortDirection.ASCENDING -> ALMediaSort.START_DATE
+                SortDirection.DESCENDING -> ALMediaSort.START_DATE_DESC
+            }
+            MediaSort.Anilist.RELEASE_DATE -> when(direction) {
+                SortDirection.ASCENDING -> ALMediaSort.END_DATE
+                SortDirection.DESCENDING -> ALMediaSort.END_DATE_DESC
+            }
+        }
+    }
+
+    fun Sort<UserRateType>.toAnilistOrder(): MediaListSort {
+        return when(type) {
+            UserRateType.ID -> when(direction) {
                 SortDirection.ASCENDING -> MediaListSort.MEDIA_ID
                 SortDirection.DESCENDING -> MediaListSort.MEDIA_ID_DESC
             }
-            UserRateOrderType.ADDED_AT -> when(sort) {
+            UserRateType.ADDED_AT -> when(direction) {
                 SortDirection.ASCENDING -> MediaListSort.ADDED_TIME
                 SortDirection.DESCENDING -> MediaListSort.ADDED_TIME_DESC
             }
-            UserRateOrderType.UPDATED_AT -> when(sort) {
+            UserRateType.UPDATED_AT -> when(direction) {
                 SortDirection.ASCENDING -> MediaListSort.UPDATED_TIME
                 SortDirection.DESCENDING -> MediaListSort.UPDATED_TIME_DESC
             }
-            UserRateOrderType.SCORE -> when(sort) {
+            UserRateType.SCORE -> when(direction) {
                 SortDirection.ASCENDING -> MediaListSort.SCORE
                 SortDirection.DESCENDING -> MediaListSort.SCORE_DESC
             }
-            UserRateOrderType.PROGRESS -> when(sort) {
+            UserRateType.PROGRESS -> when(direction) {
                 SortDirection.ASCENDING -> MediaListSort.PROGRESS
                 SortDirection.DESCENDING -> MediaListSort.PROGRESS_DESC
             }
         }
     }
 
-    fun UserRateOrder.toShikimoriOrder(): UserRateOrderInputType {
+    fun Sort<StaffType>.toAnilistStaffSort(): StaffSort {
+        return when(type) {
+            StaffType.ID ->  when(direction) {
+                SortDirection.ASCENDING -> StaffSort.ID
+                SortDirection.DESCENDING -> StaffSort.ID_DESC
+            }
+            StaffType.ROLE -> when(direction) {
+                SortDirection.ASCENDING -> StaffSort.ROLE
+                SortDirection.DESCENDING -> StaffSort.ROLE_DESC
+            }
+            StaffType.FAVORITES -> when(direction) {
+                SortDirection.ASCENDING -> StaffSort.FAVOURITES
+                SortDirection.DESCENDING -> StaffSort.FAVOURITES_DESC
+            }
+            StaffType.RELEVANCE -> StaffSort.RELEVANCE
+        }
+    }
+
+    fun Sort<CharacterType>.toAnilistCharacterSort(): CharacterSort {
+        return when(type) {
+            CharacterType.RELEVANCE -> CharacterSort.RELEVANCE
+            CharacterType.FAVORITES -> when(direction) {
+                SortDirection.ASCENDING -> CharacterSort.FAVOURITES
+                SortDirection.DESCENDING -> CharacterSort.FAVOURITES_DESC
+            }
+            CharacterType.ROLE -> when(direction) {
+                SortDirection.ASCENDING -> CharacterSort.ROLE
+                SortDirection.DESCENDING -> CharacterSort.ROLE_DESC
+            }
+            CharacterType.ID -> when(direction) {
+                SortDirection.ASCENDING -> CharacterSort.ID
+                SortDirection.DESCENDING -> CharacterSort.ID_DESC
+            }
+        }
+    }
+
+    fun Sort<UserRateType>.toShikimoriOrder(): UserRateOrderInputType {
         val orderType = when(type) {
-            UserRateOrderType.ID -> UserRateOrderFieldEnum.id
-            UserRateOrderType.UPDATED_AT -> UserRateOrderFieldEnum.updated_at
+            UserRateType.ID -> UserRateOrderFieldEnum.id
+            UserRateType.UPDATED_AT -> UserRateOrderFieldEnum.updated_at
             else -> UserRateOrderFieldEnum.UNKNOWN__
         }
 
         return UserRateOrderInputType(
             field = orderType,
-            order = this.sort.toShikimoriOrder()
+            order = this.direction.toShikimoriOrder()
         )
     }
 
-    fun UserRateOrderType.toShikimoriOrder(): OrderEnum {
-        return when(this) {
-            UserRateOrderType.ID -> OrderEnum.id_desc
-            UserRateOrderType.ADDED_AT -> OrderEnum.created_at_desc
-            UserRateOrderType.UPDATED_AT -> OrderEnum.aired_on
-            UserRateOrderType.SCORE -> OrderEnum.ranked
-            UserRateOrderType.PROGRESS -> OrderEnum.episodes
+    fun Sort<UserRateType>.toShikimoriOrderEnum(): OrderEnum {
+        return when(type) {
+            UserRateType.ID -> OrderEnum.id_desc
+            UserRateType.ADDED_AT -> OrderEnum.created_at_desc
+            UserRateType.UPDATED_AT -> OrderEnum.aired_on
+            UserRateType.SCORE -> OrderEnum.ranked
+            UserRateType.PROGRESS -> OrderEnum.episodes
         }
     }
 
@@ -69,26 +137,26 @@ object OrderMapper {
         }
     }
 
-    fun OrderOption.toShikimoriBrowseOrder(): OrderEnum {
+    fun SortType.toShikimoriBrowseOrder(): OrderEnum {
         return when(this) {
-            BrowseOrder.Shikimori.POPULARITY -> OrderEnum.popularity
-            BrowseOrder.Shikimori.RANKED -> OrderEnum.ranked_shiki
-            BrowseOrder.Shikimori.RANKED_MAL -> OrderEnum.ranked
-            BrowseOrder.Shikimori.EPISODES -> OrderEnum.episodes
-            BrowseOrder.Shikimori.STATUS -> OrderEnum.status
+            MediaSort.Shikimori.POPULARITY -> OrderEnum.popularity
+            MediaSort.Shikimori.RANKED -> OrderEnum.ranked_shiki
+            MediaSort.Shikimori.RANKED_MAL -> OrderEnum.ranked
+            MediaSort.Shikimori.EPISODES -> OrderEnum.episodes
+            MediaSort.Shikimori.STATUS -> OrderEnum.status
             else -> OrderEnum.UNKNOWN__
         }
     }
 
-    fun OrderOption.toAnilistBrowseOrder(): MediaSort {
+    fun SortType.toAnilistBrowseOrder(): ALMediaSort {
         return when(this) {
-            BrowseOrder.Anilist.POPULARITY -> MediaSort.POPULARITY_DESC
-            BrowseOrder.Anilist.SCORE -> MediaSort.SCORE_DESC
-            BrowseOrder.Anilist.TRENDING -> MediaSort.TRENDING_DESC
-            BrowseOrder.Anilist.FAVORITES -> MediaSort.FAVOURITES_DESC
-            BrowseOrder.Anilist.DATE_ADDED -> MediaSort.UPDATED_AT
-            BrowseOrder.Anilist.RELEASE_DATE -> MediaSort.END_DATE_DESC
-            else -> MediaSort.UNKNOWN__
+            MediaSort.Anilist.POPULARITY -> ALMediaSort.POPULARITY_DESC
+            MediaSort.Anilist.SCORE -> ALMediaSort.SCORE_DESC
+            MediaSort.Anilist.TRENDING -> ALMediaSort.TRENDING_DESC
+            MediaSort.Anilist.FAVORITES -> ALMediaSort.FAVOURITES_DESC
+            MediaSort.Anilist.DATE_ADDED -> ALMediaSort.START_DATE_DESC
+            MediaSort.Anilist.RELEASE_DATE -> ALMediaSort.END_DATE_DESC
+            else -> ALMediaSort.UNKNOWN__
         }
     }
 }

@@ -2,8 +2,6 @@ package com.example.shikiflow.presentation.screen.main.details
 
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.common.MediaRolesType
-import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.MainNavOptions

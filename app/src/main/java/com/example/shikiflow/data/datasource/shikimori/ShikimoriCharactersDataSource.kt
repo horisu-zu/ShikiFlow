@@ -15,6 +15,8 @@ import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +40,8 @@ class ShikimoriCharactersDataSource @Inject constructor(
 
     override fun getCharacterMediaRoles(
         characterId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: Sort<MediaSort>
     ): Flow<PagingData<MediaRole>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, MediaRole>() {

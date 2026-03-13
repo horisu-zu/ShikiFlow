@@ -62,7 +62,7 @@ fun AnimeDetailsScreen(
                 ErrorItem(
                     message = stringResource(
                         id = R.string.details_error,
-                        R.string.browse_search_media_anime
+                        R.string.media_type_anime
                     ),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }

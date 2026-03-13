@@ -4,13 +4,13 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.MediaDetailsDataSource
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.SortType
 
 class StudioMediaPagingSource(
     private val mediaDetailsDataSource: MediaDetailsDataSource,
     private val studioId: Int,
     private val search: String?,
-    private val order: OrderOption,
+    private val order: SortType,
     private val onList: Boolean?
 ): PagingSource<Int, Browse>() {
     override fun getRefreshKey(state: PagingState<Int, Browse>): Int? {

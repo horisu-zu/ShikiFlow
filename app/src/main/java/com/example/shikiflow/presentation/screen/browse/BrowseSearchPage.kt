@@ -67,55 +67,59 @@ fun BrowseSearchPage(
     }
 
     Box(modifier = modifier) {
-        if(browseSearchData.loadState.refresh is LoadState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(browseSearchData.loadState.refresh is LoadState.Error) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = stringResource(R.string.b_mss_error),
-                    buttonLabel = stringResource(id = R.string.common_retry),
-                    onButtonClick = { browseSearchData.refresh() }
-                )
+        when (browseSearchData.loadState.refresh) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        } else {
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = GridCells.Adaptive(120.dp),
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
-            ) {
-                items(browseSearchData.itemCount) { index ->
-                    browseSearchData[index]?.let { browseItem ->
-                        BrowseGridItem(
-                            browseItem = browseItem,
-                            onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
-                        )
-                    }
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.b_mss_error),
+                        buttonLabel = stringResource(id = R.string.common_retry),
+                        onButtonClick = { browseSearchData.refresh() }
+                    )
                 }
-                browseSearchData.apply {
-                    if(loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
-                        }
-                    } else if(loadState.append is LoadState.Error) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            ErrorItem(
-                                message = stringResource(R.string.b_mss_error),
-                                showFace = false,
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { browseSearchData.retry() }
+            }
+            else -> {
+                LazyVerticalGrid(
+                    state = lazyGridState,
+                    columns = GridCells.Adaptive(120.dp),
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                ) {
+                    items(browseSearchData.itemCount) { index ->
+                        browseSearchData[index]?.let { browseItem ->
+                            BrowseGridItem(
+                                browseItem = browseItem,
+                                onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
                             )
+                        }
+                    }
+                    browseSearchData.apply {
+                        if (loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
+                        } else if (loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ErrorItem(
+                                    message = stringResource(R.string.b_mss_error),
+                                    showFace = false,
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { browseSearchData.retry() }
+                                )
+                            }
                         }
                     }
                 }

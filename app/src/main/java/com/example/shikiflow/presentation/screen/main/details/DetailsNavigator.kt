@@ -15,8 +15,6 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.common.MediaRolesType
-import com.example.shikiflow.domain.model.common.RoleType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -215,6 +213,7 @@ fun DetailsNavigator(
                 MediaStaffScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
+                    authType = authType,
                     navOptions = options
                 )
             }

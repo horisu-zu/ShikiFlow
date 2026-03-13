@@ -76,8 +76,8 @@ fun TrackSection(
                     MediaType.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
                 },
                 type = when (mediaType) {
-                    MediaType.ANIME -> stringResource(R.string.browse_search_media_anime)
-                    MediaType.MANGA -> stringResource(R.string.browse_search_media_manga)
+                    MediaType.ANIME -> stringResource(R.string.media_type_anime)
+                    MediaType.MANGA -> stringResource(R.string.media_type_manga)
                 },
                 ratesList = ratesList,
                 itemsCount = ratesList.count,

@@ -5,12 +5,12 @@ import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
-import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
-import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
-import com.example.shikiflow.utils.AppUiMode
-import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.domain.model.track.MainTrackMode
+import com.example.shikiflow.domain.model.settings.ChapterUIMode
+import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
@@ -28,7 +28,7 @@ interface SettingsRepository {
     suspend fun saveUserData(user: User)
     suspend fun saveAppUiMode(appUiMode: AppUiMode)
     suspend fun saveBrowseUiMode(browseUiMode: BrowseUiMode)
-    suspend fun saveBrowseOngoingOrder(ongoingOrder: BrowseOrder)
+    suspend fun saveBrowseOngoingOrder(ongoingOrder: MediaSort)
     suspend fun saveTheme(themeMode: ThemeMode)
     suspend fun saveOLEDMode(isEnabled: Boolean)
     suspend fun saveDynamicMode(isDynamicTheme: Boolean)

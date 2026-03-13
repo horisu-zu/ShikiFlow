@@ -31,6 +31,9 @@
     <string name="b_oss_error">Error Loading Ongoings</string>
     <string name="b_mss_error">Error Loading Browse Data</string>
 
+    <string name="media_type_anime">Anime</string>
+    <string name="media_type_manga">Manga</string>
+
     <string name="details_error">Error Loading %1s Details</string>
 
     <string name="error_image">Error Loading Image</string>
@@ -64,7 +67,6 @@
     <string name="settings_theme_section_title">Theme</string>
     <string name="seetings_interface_section_title">Interface</string>
     <string name="settings_data_section_title">Data</string>
-    <string name="settings_manga_section_title">Manga</string>
     <string name="settings_track_mode">Track Mode by default</string>
     <string name="settings_track_mode_select">Select Track Mode when opening the app</string>
     <string name="settings_sign_out">Sign Out</string>
@@ -81,8 +83,6 @@
     <string name="ongoing_browse_mode_trending">Trending</string>
 
     <string name="browse_search_label_media">Media</string>
-    <string name="browse_search_media_anime">Anime</string>
-    <string name="browse_search_media_manga">Manga</string>
     <string name="browse_search_label_kind">Kind</string>
     <string name="browse_search_label_status">Status</string>
     <!--<string name="browse_search_label_in_my_list">In my list</string>-->
@@ -98,9 +98,6 @@
     <string name="theme_mode_system">System</string>
     <string name="theme_mode_light">Light</string>
     <string name="theme_mode_dark">Dark</string>
-
-    <string name="main_track_mode_anime">Anime</string>
-    <string name="main_track_mode_manga"><![CDATA[Manga & Ranobe]]></string>
 
     <string name="cache_size_bytes">%1$d B</string>
     <string name="cache_size_kbytes">%.2f KB</string>
@@ -350,6 +347,19 @@
     <string name="error_imgur_image">Open Imgur Image</string>
     <string name="chapter_list_label">Chapters from the same translator</string>
     <string name="settings_palette_style_bottom_title">Select Palette Style</string>
+
+    <string name="sort_type_title">Title</string>
+    <string name="sort_type_relevance">Relevance</string>
+    <string name="sort_type_role">Role</string>
+    <string name="sort_type_id">ID</string>
+    <string name="sort_type_created_at">Created At</string>
+    <string name="sort_type_replied_at">Replied At</string>
+    <string name="sort_type_reply_count">Reply Count</string>
+    <string name="sort_type_view_count">View Count</string>
+    <string name="sort_type_updated_at">Updated At</string>
+    <string name="sort_type_progress">Progress</string>
+    <string name="sort_direction_ascending">Ascending</string>
+    <string name="sort_direction_descending">Descending</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

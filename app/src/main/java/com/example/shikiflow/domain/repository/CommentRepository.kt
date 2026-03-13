@@ -2,8 +2,9 @@ package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.sort.ThreadType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.domain.model.thread.ThreadSort
 import kotlinx.coroutines.flow.Flow
 
 interface CommentRepository {
@@ -21,6 +22,6 @@ interface CommentRepository {
 
     fun getPaginatedThreads(
         mediaId: Int,
-        threadSort: ThreadSort
+        threadSort: Sort<ThreadType>
     ): Flow<PagingData<Thread>>
 }

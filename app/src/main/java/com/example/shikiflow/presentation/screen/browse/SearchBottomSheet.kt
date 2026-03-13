@@ -22,7 +22,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.AgeRating
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ChipSection
@@ -30,7 +30,7 @@ import com.example.shikiflow.presentation.common.mappers.AgeRatingMapper.display
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
-import com.example.shikiflow.presentation.common.mappers.OrderMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -109,8 +109,8 @@ fun SearchBottomSheet(
             ChipSection(
                 label = stringResource(R.string.browse_search_label_sort_by),
                 items = when(authType) {
-                    AuthType.SHIKIMORI -> BrowseOrder.Shikimori.entries
-                    AuthType.ANILIST -> BrowseOrder.Anilist.entries
+                    AuthType.SHIKIMORI -> MediaSort.Shikimori.entries
+                    AuthType.ANILIST -> MediaSort.Anilist.entries
                 },
                 selectedItem = searchOptions.order,
                 itemLabel = { stringResource(it.displayValue()) },

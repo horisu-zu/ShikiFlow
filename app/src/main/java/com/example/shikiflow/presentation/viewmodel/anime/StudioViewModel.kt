@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.repository.MediaRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,7 +38,7 @@ class StudioViewModel @Inject constructor(
 
     fun getStudioAnime(
         studioId: Int,
-        orderOption: OrderOption
+        orderOption: SortType
     ): Flow<PagingData<Browse>> {
         return _studioCache.getOrPut(studioId) {
             _studioUiState

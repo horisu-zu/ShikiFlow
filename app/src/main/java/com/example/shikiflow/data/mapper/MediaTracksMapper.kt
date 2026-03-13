@@ -5,7 +5,6 @@ import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
-import kotlin.time.Instant
 
 object MediaTracksMapper {
     fun AnimeTrack.toUserRateData() = UserRateData(
@@ -19,8 +18,8 @@ object MediaTracksMapper {
         mediaId = anime.id,
         title = anime.name,
         posterUrl = anime.poster?.previewUrl,
-        createDate = Instant.parse(track.createdAt.toString()),
-        updateDate = Instant.parse(track.updatedAt.toString()),
+        createDate = track.createdAt,
+        updateDate = track.updatedAt,
         totalCount = if (anime.status == MediaStatus.RELEASED) anime.episodes
             else anime.episodesAired,
         volumesCount = 0
@@ -37,9 +36,9 @@ object MediaTracksMapper {
         mediaId = manga.id,
         title = manga.name,
         posterUrl = manga.poster?.previewUrl,
-        createDate = Instant.parse(track.createdAt.toString()),
-        updateDate = Instant.parse(track.updatedAt.toString()),
-        totalCount = manga.chapters,
-        volumesCount = manga.volumes
+        createDate = track.createdAt,
+        updateDate = track.updatedAt,
+        totalCount = if(manga.status == MediaStatus.RELEASED) manga.chapters else Int.MAX_VALUE,
+        volumesCount = if(manga.status == MediaStatus.RELEASED) manga.volumes else Int.MAX_VALUE
     )
 }

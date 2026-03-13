@@ -37,7 +37,7 @@ query StaffMediaRoles(
     $page: Int!,
     $perPage: Int!,
     $mediaType: MediaType!,
-    $sort: MediaSort = POPULARITY_DESC
+    $sort: MediaSort! #POPULARITY_DESC
 ) {
     Staff(id: $staffId) {
         staffMedia(
@@ -57,7 +57,7 @@ query VoiceActorRoles(
     $staffId: Int!,
     $page: Int!,
     $perPage: Int!,
-    $sort: CharacterSort = FAVOURITES_DESC
+    $sort: CharacterSort! #FAVOURITES_DESC
 ) {
     Staff(id: $staffId) {
         characters(
@@ -81,7 +81,7 @@ query MediaStaff(
     $mediaId: Int!,
     $page: Int!,
     $perPage: Int!,
-    $sort: StaffSort = RELEVANCE
+    $sort: StaffSort!
 ) {
     Media(id: $mediaId) {
         staff(page: $page, perPage: $perPage, sort: [$sort]) {

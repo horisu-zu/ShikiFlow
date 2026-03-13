@@ -76,7 +76,7 @@ fun SettingsBottomSheet(
                 ) {
                     RadioButton(
                         selected = (value == currentValue),
-                        onClick = { /**/ }
+                        onClick = { onOptionClick(index) }
                     )
                     Text(
                         text = value,

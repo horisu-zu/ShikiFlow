@@ -4,12 +4,15 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.anilist.AnilistCharactersDataSource
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import javax.inject.Inject
 
 class CharacterMediaPagingSource @Inject constructor(
     private val characterId: Int,
     private val mediaType: MediaType,
+    private val sort: Sort<MediaSort.Anilist>,
     private val charactersDataSource: AnilistCharactersDataSource
 ): PagingSource<Int, MediaRole>() {
 
@@ -21,7 +24,8 @@ class CharacterMediaPagingSource @Inject constructor(
             page = currentPage,
             limit = pageSize,
             characterId = characterId,
-            mediaType = mediaType
+            mediaType = mediaType,
+            sort = sort
         )
 
         return result.fold(

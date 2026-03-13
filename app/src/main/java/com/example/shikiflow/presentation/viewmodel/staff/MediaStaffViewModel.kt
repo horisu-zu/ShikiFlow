@@ -2,29 +2,61 @@ package com.example.shikiflow.presentation.viewmodel.staff
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.staff.StaffShort
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.StaffRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+data class MediaStaffParams(
+    val mediaId: Int? = null,
+    val mediaType: MediaType = MediaType.ANIME,
+    val staffSort: Sort<StaffType> = Sort(type = StaffType.RELEVANCE, direction = SortDirection.DESCENDING)
+)
+
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MediaStaffViewModel @Inject constructor(
     private val staffRepository: StaffRepository
 ): ViewModel() {
 
-    private var _staffMap = mutableMapOf<Int, Flow<PagingData<StaffShort>>>()
+    private val _mediaStaffParams = MutableStateFlow(MediaStaffParams())
+    val mediaStaffParams = _mediaStaffParams.asStateFlow()
 
-    fun getMediaStaff(
-        mediaId: Int,
-        mediaType: MediaType,
-        //orderOption: OrderOption
-    ): Flow<PagingData<StaffShort>> {
-        return _staffMap.getOrPut(mediaId) {
-            staffRepository.getMediaStaff(mediaId, mediaType).cachedIn(viewModelScope)
+    val mediaStaffItems = _mediaStaffParams
+        .filter { it.mediaId != null }
+        .flatMapLatest { params ->
+            staffRepository.getMediaStaff(
+                mediaId = params.mediaId ?: 0,
+                mediaType = params.mediaType,
+                sort = params.staffSort
+            )
+        }
+        .cachedIn(viewModelScope)
+
+    fun setParams(mediaId: Int, mediaType: MediaType) {
+        _mediaStaffParams.update { state ->
+            state.copy(
+                mediaId = mediaId,
+                mediaType = mediaType
+            )
+        }
+    }
+
+    fun setSort(sort: Sort<StaffType>) {
+        _mediaStaffParams.update { state ->
+            state.copy(
+                staffSort = sort
+            )
         }
     }
 }

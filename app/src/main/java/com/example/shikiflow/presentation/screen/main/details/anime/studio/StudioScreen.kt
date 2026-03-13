@@ -52,8 +52,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.sort.BrowseOrder
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
@@ -71,18 +71,18 @@ fun StudioScreen(
     studioViewModel: StudioViewModel = hiltViewModel()
 ) {
     val studioState by studioViewModel.studioUiState.collectAsStateWithLifecycle()
-    var orderOption by rememberSaveable {
-        mutableStateOf<OrderOption>(
+    var sortType by rememberSaveable {
+        mutableStateOf<SortType>(
             when(authType) {
-                AuthType.SHIKIMORI -> BrowseOrder.Shikimori.RANKED
-                AuthType.ANILIST -> BrowseOrder.Anilist.POPULARITY
+                AuthType.SHIKIMORI -> MediaSort.Shikimori.RANKED
+                AuthType.ANILIST -> MediaSort.Anilist.POPULARITY
             }
         )
     }
 
     val studioAnimeData = studioViewModel.getStudioAnime(
         studioId = id,
-        orderOption = orderOption
+        orderOption = sortType
     ).collectAsLazyPagingItems()
 
     val lazyGridState = rememberLazyGridState()

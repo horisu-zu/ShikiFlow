@@ -11,12 +11,12 @@ import com.example.shikiflow.domain.model.anime.BrowseType.Companion.getBrowseOp
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
-import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.GetOngoingsCalendarUseCase
-import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -109,7 +109,7 @@ class BrowseViewModel @Inject constructor(
         }
     }
 
-    fun setBrowseOngoingOrder(order: BrowseOrder) {
+    fun setBrowseOngoingOrder(order: MediaSort) {
         viewModelScope.launch {
             settingsRepository.saveBrowseOngoingOrder(order)
         }

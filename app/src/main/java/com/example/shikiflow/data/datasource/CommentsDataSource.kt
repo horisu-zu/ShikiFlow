@@ -1,8 +1,9 @@
 package com.example.shikiflow.data.datasource
 
 import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.sort.ThreadType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.domain.model.thread.ThreadSort
 
 interface CommentsDataSource {
     suspend fun getComments(
@@ -17,6 +18,6 @@ interface CommentsDataSource {
         mediaId: Int,
         page: Int,
         limit: Int,
-        threadSort: ThreadSort
+        threadSort: Sort<ThreadType>
     ): Result<List<Thread>>
 }

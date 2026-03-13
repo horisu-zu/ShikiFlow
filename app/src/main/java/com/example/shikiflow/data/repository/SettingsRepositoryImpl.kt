@@ -10,13 +10,13 @@ import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
-import com.example.shikiflow.domain.model.sort.BrowseOrder
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
-import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
-import com.example.shikiflow.utils.AppUiMode
-import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.domain.model.track.MainTrackMode
+import com.example.shikiflow.domain.model.settings.ChapterUIMode
+import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
@@ -84,7 +84,7 @@ class SettingsRepositoryImpl @Inject constructor(
     override val themeSettingsFlow: Flow<ThemeSettings> = dataStore.data
         .map { preferences ->
             ThemeSettings(
-                themeMode = ThemeMode.fromString(preferences[THEME_KEY]),
+                themeMode = ThemeMode.valueOf(preferences[THEME_KEY] ?: ThemeMode.SYSTEM.name),
                 isOledEnabled = preferences[OLED_KEY] ?: false,
                 isDynamicThemeEnabled = preferences[DYNAMIC_THEME_KEY] ?: false,
                 paletteStyle = PaletteStyle.valueOf(preferences[PALETTE_STYLE_KEY] ?: PaletteStyle.Expressive.name),
@@ -100,13 +100,13 @@ class SettingsRepositoryImpl @Inject constructor(
             )
         }
 
-    private suspend fun getBrowseOngoingOrder(preferences: Preferences): BrowseOrder {
+    private suspend fun getBrowseOngoingOrder(preferences: Preferences): MediaSort {
         return when(authTypeFlow.first()) {
-            AuthType.SHIKIMORI -> BrowseOrder.Shikimori.valueOf(
-                value = preferences[SHIKI_BROWSE_ONGOING_ORDER] ?: BrowseOrder.Shikimori.RANKED_MAL.name
+            AuthType.SHIKIMORI -> MediaSort.Shikimori.valueOf(
+                value = preferences[SHIKI_BROWSE_ONGOING_ORDER] ?: MediaSort.Shikimori.RANKED_MAL.name
             )
-            AuthType.ANILIST -> BrowseOrder.Anilist.valueOf(
-                value = preferences[AL_BROWSE_ONGOING_ORDER] ?: BrowseOrder.Anilist.POPULARITY.name
+            AuthType.ANILIST -> MediaSort.Anilist.valueOf(
+                value = preferences[AL_BROWSE_ONGOING_ORDER] ?: MediaSort.Anilist.POPULARITY.name
             )
         }
     }
@@ -154,11 +154,11 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveBrowseOngoingOrder(ongoingOrder: BrowseOrder) {
+    override suspend fun saveBrowseOngoingOrder(ongoingOrder: MediaSort) {
         dataStore.edit { preferences ->
             when (ongoingOrder) {
-                is BrowseOrder.Shikimori -> preferences[SHIKI_BROWSE_ONGOING_ORDER] = ongoingOrder.name
-                is BrowseOrder.Anilist -> preferences[AL_BROWSE_ONGOING_ORDER] = ongoingOrder.name
+                is MediaSort.Shikimori -> preferences[SHIKI_BROWSE_ONGOING_ORDER] = ongoingOrder.name
+                is MediaSort.Anilist -> preferences[AL_BROWSE_ONGOING_ORDER] = ongoingOrder.name
             }
         }
     }

@@ -23,8 +23,8 @@ import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toAnimeDomain
 import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toDomain
 import com.example.shikiflow.data.mapper.local.MangaEntityMapper.toMangaDomain
 import com.example.shikiflow.domain.model.sort.SortDirection
-import com.example.shikiflow.domain.model.sort.UserRateOrder
-import com.example.shikiflow.domain.model.sort.UserRateOrderType
+import com.example.shikiflow.domain.model.sort.UserRateType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.domain.model.track.manga.MangaTrack
@@ -95,7 +95,7 @@ class AnilistTracksDataSource @Inject constructor(
         limit: Int,
         userId: String?,
         status: UserRateStatus?,
-        order: UserRateOrder?,
+        order: Sort<UserRateType>?,
         idsList: List<Int>?
     ): Result<List<AnimeTrack>> {
         val query = MediaListTracksQuery(
@@ -148,9 +148,9 @@ class AnilistTracksDataSource @Inject constructor(
                 userId = userId,
                 idsList = idsList,
                 status = userStatus,
-                order = UserRateOrder(
-                    type = UserRateOrderType.SCORE,
-                    sort = SortDirection.DESCENDING
+                order = Sort(
+                    type = UserRateType.SCORE,
+                    direction = SortDirection.DESCENDING
                 )
             )
         }
@@ -178,7 +178,7 @@ class AnilistTracksDataSource @Inject constructor(
         limit: Int,
         userId: String?,
         status: UserRateStatus?,
-        order: UserRateOrder?
+        order: Sort<UserRateType>?
     ): Result<List<MangaTrack>> {
         val query = MediaListTracksQuery(
             type = Optional.present(MediaType.MANGA.toAnilistType()),

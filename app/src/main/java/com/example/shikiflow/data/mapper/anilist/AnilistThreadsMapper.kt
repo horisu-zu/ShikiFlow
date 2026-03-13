@@ -7,48 +7,42 @@ import com.example.graphql.anilist.fragment.ALThread
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.domain.model.sort.ThreadType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.graphql.anilist.type.ThreadSort as ALThreadSort
-import com.example.shikiflow.domain.model.thread.ThreadSort
-import com.example.shikiflow.domain.model.thread.ThreadSortType
 import com.example.shikiflow.domain.model.user.User
 import kotlin.time.Instant
 
 object AnilistThreadsMapper {
-    fun ThreadSort.toAnilistThreadSort(): ALThreadSort {
-        return when(threadSortType) {
-            ThreadSortType.ID -> {
-                when(sortDirection) {
-                    SortDirection.ASCENDING -> ALThreadSort.ID
-                    SortDirection.DESCENDING -> ALThreadSort.ID_DESC
-                }
-            }
-            ThreadSortType.TITLE -> {
-                when(sortDirection) {
+    fun Sort<ThreadType>.toAnilistThreadSort(): ALThreadSort {
+        return when(this.type) {
+            ThreadType.TITLE -> {
+                when(direction) {
                     SortDirection.ASCENDING -> ALThreadSort.TITLE
                     SortDirection.DESCENDING -> ALThreadSort.TITLE_DESC
                 }
             }
-            ThreadSortType.CREATED_AT -> {
-                when(sortDirection) {
+            ThreadType.CREATED_AT -> {
+                when(direction) {
                     SortDirection.ASCENDING -> ALThreadSort.CREATED_AT
                     SortDirection.DESCENDING -> ALThreadSort.CREATED_AT_DESC
                 }
             }
-            ThreadSortType.REPLIED_AT -> {
-                when(sortDirection) {
+            ThreadType.REPLIED_AT -> {
+                when(direction) {
                     SortDirection.ASCENDING -> ALThreadSort.REPLIED_AT
                     SortDirection.DESCENDING -> ALThreadSort.REPLIED_AT_DESC
                 }
             }
-            ThreadSortType.REPLY_COUNT -> {
-                when(sortDirection) {
+            ThreadType.REPLY_COUNT -> {
+                when(direction) {
                     SortDirection.ASCENDING -> ALThreadSort.REPLY_COUNT
                     SortDirection.DESCENDING -> ALThreadSort.REPLY_COUNT_DESC
                 }
             }
-            ThreadSortType.VIEW_COUNT -> {
-                when(sortDirection) {
+            ThreadType.VIEW_COUNT -> {
+                when(direction) {
                     SortDirection.ASCENDING -> ALThreadSort.VIEW_COUNT
                     SortDirection.DESCENDING -> ALThreadSort.VIEW_COUNT_DESC
                 }

@@ -28,8 +28,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -66,9 +68,9 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
-import com.example.shikiflow.domain.model.common.MediaRolesType
+import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.domain.model.common.PaginatedList
-import com.example.shikiflow.domain.model.common.RoleType
+import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
@@ -96,7 +98,13 @@ fun StaffScreen(
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0
+            lazyListState.firstVisibleItemIndex == 0 &&
+            lazyListState.firstVisibleItemScrollOffset == 0
+        }
+    }
+    val scrolledFirst by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex != 0
         }
     }
 
@@ -110,7 +118,7 @@ fun StaffScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if(isAtTop) stringResource(R.string.staff_title)
+                            text = if(!scrolledFirst) stringResource(R.string.staff_title)
                                 else staffDetails.data?.fullName ?: stringResource(R.string.staff_title),
                             style = MaterialTheme.typography.titleLarge,
                             maxLines = 1,
@@ -200,7 +208,7 @@ fun StaffScreen(
                         if(details.staffAnimeRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.browse_search_media_anime),
+                                    sectionTitle = stringResource(R.string.media_type_anime),
                                     items = details.staffAnimeRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToAnimeDetails(id)
@@ -227,7 +235,7 @@ fun StaffScreen(
                         if(details.staffMangaRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.browse_search_media_manga),
+                                    sectionTitle = stringResource(R.string.media_type_manga),
                                     items = details.staffMangaRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToMangaDetails(id)
@@ -397,7 +405,10 @@ private fun StaffTitleSection(
                 .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Column(
-                modifier = modifier.fillMaxSize(),
+                modifier = modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(vertical = 12.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
             ) {
                 staffRoles.forEach { role ->

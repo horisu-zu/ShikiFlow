@@ -12,10 +12,13 @@ import com.example.shikiflow.data.local.source.CharacterMediaPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toCharacterMediaRole
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.CharacterMediaRole
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import kotlinx.coroutines.flow.Flow
@@ -36,8 +39,12 @@ class AnilistCharactersDataSource @Inject constructor(
 
     override fun getCharacterMediaRoles(
         characterId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: Sort<MediaSort>
     ): Flow<PagingData<MediaRole>> {
+        val sortType = sort.type as? MediaSort.Anilist ?: MediaSort.Anilist.POPULARITY
+        val anilistSort = Sort(sortType, sort.direction)
+
         return Pager(
             config = PagingConfig(
                 pageSize = 24,
@@ -49,6 +56,7 @@ class AnilistCharactersDataSource @Inject constructor(
                 CharacterMediaPagingSource(
                     characterId = characterId,
                     mediaType = mediaType,
+                    sort = anilistSort,
                     charactersDataSource = this
                 )
             }
@@ -59,13 +67,15 @@ class AnilistCharactersDataSource @Inject constructor(
         page: Int,
         limit: Int,
         characterId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: Sort<MediaSort.Anilist>
     ): Result<List<CharacterMediaRole>> {
         val characterMediaAppearanceQuery = CharacterMediaAppearancesQuery(
             page = page,
             perPage = limit,
             characterId = characterId,
-            mediaType = mediaType.toAnilistType()
+            mediaType = mediaType.toAnilistType(),
+            sort = sort.toAnilistMediaSort()
         )
 
         val response = apolloClient.query(characterMediaAppearanceQuery).execute()

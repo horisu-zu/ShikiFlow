@@ -1,45 +1,67 @@
 package com.example.shikiflow.presentation.viewmodel.user
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserRateStats
-import com.example.shikiflow.domain.usecase.GetUserRatesUseCase
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class UserRatesUiState(
+    val userMediaStats: UserRateStats = UserRateStats(emptyMap()),
+    val favoriteCategories: List<FavoriteCategory> = emptyList(),
+
+    val errorMessage: String? = null,
+    val isLoading: Boolean = true
+)
+
 @HiltViewModel
 class UserRateViewModel @Inject constructor(
-    private val getUserRatesUseCase: GetUserRatesUseCase
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
-    private var _userId: String? = null
-
-    private val _userRateStats = MutableStateFlow<Resource<ProfileStats>>(Resource.Loading())
-    val userRateStats = _userRateStats.asStateFlow()
+    private val _userRatesUiState = MutableStateFlow(UserRatesUiState())
+    val userRatesUiState = _userRatesUiState.asStateFlow()
 
     fun loadUserRates(userId: String) {
         viewModelScope.launch {
-            if (_userRateStats.value is Resource.Success) {
-                return@launch
-            } else {
-                _userRateStats.value = Resource.Loading()
-            }
-
-            _userRateStats.value = getUserRatesUseCase(userId.toLong())
-
-            when(val result = _userRateStats.value) {
-                is Resource.Loading -> { /**/ }
-                is Resource.Success -> {
-                    _userId = userId
+            try {
+                if(_userRatesUiState.value.userMediaStats.mediaStats.isNotEmpty()) {
+                    return@launch
+                } else {
+                    _userRatesUiState.update { state ->
+                        state.copy(isLoading = true)
+                    }
                 }
-                is Resource.Error -> {
-                    Log.e("UserRateViewModel", "Error: ${result.message}")
+
+                val (userMediaStats, favoriteCategories) = coroutineScope {
+                    val mediaStats = async { userRepository.getUserRates(userId.toInt()) }
+                    val categories = async { userRepository.getFavoriteCategories(userId.toInt()) }
+
+                    mediaStats.await() to categories.await()
+                }
+
+                _userRatesUiState.update { state ->
+                    state.copy(
+                        userMediaStats = userMediaStats,
+                        favoriteCategories = favoriteCategories,
+                        errorMessage = null
+                    )
+                }
+            } catch (e: Exception) {
+                _userRatesUiState.update { state ->
+                    state.copy(errorMessage = e.message)
+                }
+            } finally {
+                _userRatesUiState.update { state ->
+                    state.copy(isLoading = false)
                 }
             }
         }
@@ -167,8 +189,3 @@ class UserRateViewModel @Inject constructor(
         }
     }*/
 }
-
-data class ProfileStats(
-    val userMediaStats: UserRateStats,
-    val favoriteCategories: List<FavoriteCategory>
-)

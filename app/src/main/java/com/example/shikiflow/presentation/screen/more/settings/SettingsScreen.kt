@@ -30,10 +30,12 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomDialog
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
-import com.example.shikiflow.presentation.screen.main.details.manga.read.ChapterUIMode
+import com.example.shikiflow.domain.model.track.MainTrackMode
+import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
-import com.example.shikiflow.utils.AppUiMode
+import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ThemeMode
 import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
@@ -136,9 +138,9 @@ fun SettingsScreen(
                         ),
                         SectionItem.Mode(
                             title = stringResource(R.string.settings_app_theme_label),
-                            mode = stringResource(themeSettings.themeMode.displayValue),
-                            entries = ThemeMode.entries.map { stringResource(it.displayValue) },
-                            iconResources = ThemeMode.entries.map { it.icon },
+                            mode = stringResource(themeSettings.themeMode.displayValue()),
+                            entries = ThemeMode.entries.map { stringResource(it.displayValue()) },
+                            iconResources = ThemeMode.entries.map { it.iconResource() },
                             weights = listOf(3f, 2f, 2f),
                             onClick = { newTheme ->
                                 settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
@@ -160,12 +162,12 @@ fun SettingsScreen(
                     items = listOf(
                         SectionItem.Default(
                             title = stringResource(R.string.settings_track_mode),
-                            displayValue = stringResource(settingsState.settings.trackMode.displayValue),
+                            displayValue = stringResource(settingsState.settings.trackMode.displayValue()),
                             onClick = {
                                 bottomSheetConfig.value = BottomSheetConfig(
                                     title = resources.getString(R.string.settings_track_mode_select),
-                                    options = MainTrackMode.entries.map { resources.getString(it.displayValue) },
-                                    currentValue = resources.getString(settingsState.settings.trackMode.displayValue),
+                                    options = MainTrackMode.entries.map { resources.getString(it.displayValue()) },
+                                    currentValue = resources.getString(settingsState.settings.trackMode.displayValue()),
                                     onOptionClick = { selectedIndex ->
                                         settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -177,12 +179,12 @@ fun SettingsScreen(
                         ),
                         SectionItem.Default(
                             title = stringResource(R.string.settings_app_ui_mode),
-                            displayValue = stringResource(settingsState.settings.appUiMode.displayValue),
+                            displayValue = stringResource(settingsState.settings.appUiMode.displayValue()),
                             onClick = {
                                 bottomSheetConfig.value = BottomSheetConfig(
                                     title = resources.getString(R.string.settings_app_mode_select),
-                                    options = AppUiMode.entries.map { resources.getString(it.displayValue) },
-                                    currentValue = resources.getString(settingsState.settings.appUiMode.displayValue),
+                                    options = AppUiMode.entries.map { resources.getString(it.displayValue()) },
+                                    currentValue = resources.getString(settingsState.settings.appUiMode.displayValue()),
                                     onOptionClick = { selectedIndex ->
                                         settingsViewModel.setAppUiMode(AppUiMode.entries[selectedIndex])
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
@@ -221,13 +223,13 @@ fun SettingsScreen(
                     )
                 )
                 SettingsSection(
-                    title = stringResource(R.string.settings_manga_section_title),
+                    title = stringResource(R.string.media_type_manga),
                     items = listOf(
                         SectionItem.Mode(
                             title = stringResource(R.string.settings_chapter_ui_mode),
-                            mode = stringResource(settingsState.mangaSettings.chapterUIMode.displayValue),
-                            entries = ChapterUIMode.entries.map { stringResource(it.displayValue) },
-                            iconResources = ChapterUIMode.entries.map { it.icon },
+                            mode = stringResource(settingsState.mangaSettings.chapterUIMode.displayValue()),
+                            entries = ChapterUIMode.entries.map { stringResource(it.displayValue()) },
+                            iconResources = ChapterUIMode.entries.map { it.iconResource() },
                             onClick = { newMode ->
                                 settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(newMode.uppercase()))
                             }

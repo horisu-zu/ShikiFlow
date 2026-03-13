@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.search.ScreenSearchState
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
+import com.example.shikiflow.domain.model.track.MainTrackMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow

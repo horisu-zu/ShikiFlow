@@ -18,6 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.track.MainTrackMode
+import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
 
 @Composable
 fun MainDropdown(
@@ -58,7 +60,7 @@ fun MainDropdown(
                         onClick = null
                     )
                     Text(
-                        text = stringResource(mode.displayValue),
+                        text = stringResource(mode.displayValue()),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }

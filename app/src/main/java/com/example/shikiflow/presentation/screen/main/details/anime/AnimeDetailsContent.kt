@@ -262,8 +262,12 @@ fun AnimeDetailsContent(
         item {
             MediaDetailsNavComponent(
                 authType = currentAuthType,
+                mediaType = animeDetails.mediaType,
                 onThreadsClick = {
                     mediaNavOptions.navigateToThreads(mediaId = animeDetails.id)
+                },
+                onStaffClick = {
+                    mediaNavOptions.navigateToMediaStaff(mediaId = animeDetails.id, MediaType.ANIME)
                 },
                 onSimilarClick = {
                     mediaNavOptions.navigateToSimilarPage(animeDetails.id, animeDetails.title, MediaType.ANIME)

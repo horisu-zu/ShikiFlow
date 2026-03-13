@@ -6,7 +6,7 @@ import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.coroutines.flow.Flow
 
@@ -30,7 +30,7 @@ interface MediaRepository {
     fun getStudioMedia(
         studioId: Int,
         search: String? = null,
-        order: OrderOption,
+        order: SortType,
         onList: Boolean? = null
     ): Flow<PagingData<Browse>>
 

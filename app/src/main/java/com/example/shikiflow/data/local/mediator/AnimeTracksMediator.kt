@@ -12,9 +12,9 @@ import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackDto
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toDto
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
-import com.example.shikiflow.domain.model.sort.UserRateOrder
-import com.example.shikiflow.domain.model.sort.UserRateOrderType
+import com.example.shikiflow.domain.model.sort.UserRateType
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -62,9 +62,9 @@ class AnimeTracksMediator(
                 limit = state.config.pageSize,
                 status = userRateStatus,
                 userId = userId,
-                order = UserRateOrder(
-                    type = UserRateOrderType.UPDATED_AT,
-                    sort = SortDirection.DESCENDING
+                order = Sort(
+                    type = UserRateType.UPDATED_AT,
+                    direction = SortDirection.DESCENDING
                 )
             )
 

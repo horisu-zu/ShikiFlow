@@ -16,15 +16,22 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -32,13 +39,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.SortBottomSheet
+import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -55,14 +66,29 @@ fun ThreadsScreen(
     threadsViewModel: ThreadsViewModel = hiltViewModel()
 ) {
     val threadsState = threadsViewModel.paginatedThreads.collectAsLazyPagingItems()
+    val threadParams by threadsViewModel.threadParams.collectAsStateWithLifecycle()
     val resources = LocalResources.current
+
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     LaunchedEffect(mediaId) {
         threadsViewModel.setMediaId(mediaId)
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showBottomSheet = true },
+                containerColor = MaterialTheme.colorScheme.surface,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_sort),
+                    contentDescription = "Show Sort Bottom Sheet"
+                )
+            }
+        }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
@@ -152,6 +178,18 @@ fun ThreadsScreen(
                     }
                 }
             }
+        }
+        if(showBottomSheet) {
+            SortBottomSheet(
+                config = SortConfig<ThreadType>(
+                    options = ThreadType.entries,
+                    selected = threadParams.sort,
+                    onSortChange = { threadSort ->
+                        threadsViewModel.setSort(threadSort)
+                    }
+                ),
+                onDismiss = { showBottomSheet = false }
+            )
         }
     }
 }

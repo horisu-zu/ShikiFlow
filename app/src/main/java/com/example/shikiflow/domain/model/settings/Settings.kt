@@ -1,8 +1,6 @@
 package com.example.shikiflow.domain.model.settings
 
-import com.example.shikiflow.presentation.screen.main.MainTrackMode
-import com.example.shikiflow.utils.AppUiMode
-import com.example.shikiflow.utils.BrowseUiMode
+import com.example.shikiflow.domain.model.track.MainTrackMode
 
 data class Settings(
     val appUiMode: AppUiMode = AppUiMode.LIST,

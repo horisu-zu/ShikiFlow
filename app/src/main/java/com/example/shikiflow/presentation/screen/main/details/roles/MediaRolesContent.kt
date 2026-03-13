@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -26,43 +24,31 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.CharacterMediaRole
-import com.example.shikiflow.domain.model.common.MediaRolesType
-import com.example.shikiflow.domain.model.common.RoleType
+import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.BrowseCoverItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
-import com.example.shikiflow.presentation.viewmodel.character.MediaRolesViewModel
 
 @Composable
 fun MediaRolesContent(
-    id: Int,
-    mediaRolesType: MediaRolesType,
     roleType: RoleType,
+    mediaRoles: LazyPagingItems<MediaRole>,
     navOptions: MediaNavOptions,
     paddingValues: PaddingValues,
-    modifier: Modifier = Modifier,
-    mediaRolesViewModel: MediaRolesViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
-    val mediaRoles = mediaRolesViewModel.getMediaRoles(
-        id = id,
-        mediaRolesType = mediaRolesType,
-        roleType = roleType
-    ).collectAsLazyPagingItems()
-
     when (mediaRoles.loadState.refresh) {
         is LoadState.Loading -> {
             Box(
@@ -71,7 +57,8 @@ fun MediaRolesContent(
             ) { CircularProgressIndicator() }
         }
         is LoadState.Error -> {
-            val errorMessage = (mediaRoles.loadState.refresh as LoadState.Error).error.localizedMessage
+            val errorMessage = (mediaRoles.loadState.refresh as LoadState.Error)
+                .error.localizedMessage
 
             Box(
                 modifier = modifier.fillMaxSize(),
@@ -85,92 +72,82 @@ fun MediaRolesContent(
             }
         }
         else -> {
-            PullToRefreshCustomBox(
-                isRefreshing = mediaRoles.loadState.refresh == LoadState.Loading,
-                onRefresh = { mediaRoles.refresh() },
-                modifier = modifier
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(
+                    minSize = when(roleType) {
+                        RoleType.VA -> 480.dp
+                        else -> 240.dp
+                    }
+                ),
+                modifier = Modifier
                     .fillMaxSize()
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                    )
+                    .padding(top = paddingValues.calculateTopPadding()),
+                contentPadding = PaddingValues(
+                    horizontal = 12.dp,
+                    vertical = 8.dp
+                ),
+                horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
             ) {
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(
-                        minSize = when(roleType) {
-                            RoleType.VA -> 480.dp
-                            else -> 240.dp
-                        }
-                    ),
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        horizontal = 12.dp,
-                        vertical = 8.dp
-                    ),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
-                ) {
-                    items(count = mediaRoles.itemCount) { index ->
-                        mediaRoles[index]?.let { mediaRole ->
-                            when(mediaRole) {
-                                is CharacterMediaRole -> {
-                                    CharacterMediaRoleItem(
-                                        mediaRole = mediaRole,
-                                        onMediaClick = { id, mediaType ->
-                                            when (mediaType) {
-                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                            }
+                items(count = mediaRoles.itemCount) { index ->
+                    mediaRoles[index]?.let { mediaRole ->
+                        when(mediaRole) {
+                            is CharacterMediaRole -> {
+                                CharacterMediaRoleItem(
+                                    mediaRole = mediaRole,
+                                    onMediaClick = { id, mediaType ->
+                                        when (mediaType) {
+                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
                                         }
-                                    )
-                                }
-                                is StaffMediaRole -> {
-                                    StaffMediaRoleItem(
-                                        mediaRole = mediaRole,
-                                        onMediaClick = { id, mediaType ->
-                                            when (mediaType) {
-                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                            }
+                                    }
+                                )
+                            }
+                            is StaffMediaRole -> {
+                                StaffMediaRoleItem(
+                                    mediaRole = mediaRole,
+                                    onMediaClick = { id, mediaType ->
+                                        when (mediaType) {
+                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
                                         }
-                                    )
-                                }
-                                is VoiceActorMediaRole -> {
-                                    VoiceActorMediaRoleItem(
-                                        vaRole = mediaRole,
-                                        onCharacterClick = { id ->
-                                            navOptions.navigateToCharacterDetails(id)
-                                        },
-                                        onMediaClick = { id, mediaType ->
-                                            when (mediaType) {
-                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                            }
+                                    }
+                                )
+                            }
+                            is VoiceActorMediaRole -> {
+                                VoiceActorMediaRoleItem(
+                                    vaRole = mediaRole,
+                                    onCharacterClick = { id ->
+                                        navOptions.navigateToCharacterDetails(id)
+                                    },
+                                    onMediaClick = { id, mediaType ->
+                                        when (mediaType) {
+                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
                                         }
-                                    )
-                                }
+                                    }
+                                )
                             }
                         }
                     }
-                    mediaRoles.apply {
-                        if (loadState.append is LoadState.Loading) {
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
-                            }
+                }
+                mediaRoles.apply {
+                    if (loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
                         }
-                        if (loadState.append is LoadState.Error) {
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                ErrorItem(
-                                    message = stringResource(R.string.common_error),
-                                    showFace = false,
-                                    buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { mediaRoles.retry() }
-                                )
-                            }
+                    }
+                    if (loadState.append is LoadState.Error) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                showFace = false,
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { mediaRoles.retry() }
+                            )
                         }
                     }
                 }

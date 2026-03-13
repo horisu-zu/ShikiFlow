@@ -16,7 +16,7 @@ import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
-import com.example.shikiflow.utils.AppUiMode
+import com.example.shikiflow.domain.model.settings.AppUiMode
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted

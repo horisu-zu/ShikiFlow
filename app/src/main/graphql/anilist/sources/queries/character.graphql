@@ -45,10 +45,11 @@ query CharacterMediaAppearances(
     $characterId: Int!,
     $page: Int!,
     $perPage: Int!,
-    $mediaType: MediaType!
+    $mediaType: MediaType!,
+    $sort: MediaSort!
 ) {
     Character(id: $characterId) {
-        media(page: $page, perPage: $perPage, type: $mediaType) {
+        media(page: $page, perPage: $perPage, type: $mediaType, sort: [$sort]) {
             ...ALCharacterMediaRoles
         }
     }

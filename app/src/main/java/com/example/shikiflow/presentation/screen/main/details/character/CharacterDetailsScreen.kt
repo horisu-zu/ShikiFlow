@@ -41,8 +41,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
-import com.example.shikiflow.domain.model.common.MediaRolesType
-import com.example.shikiflow.domain.model.common.RoleType
+import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
+import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
@@ -180,7 +180,7 @@ fun CharacterDetailsScreen(
                         if(characterDetails.animeRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.main_track_mode_anime),
+                                    sectionTitle = stringResource(R.string.media_type_anime),
                                     items = characterDetails.animeRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToAnimeDetails(id)
@@ -204,7 +204,7 @@ fun CharacterDetailsScreen(
                         if(characterDetails.mangaRoles.entries.isNotEmpty()) {
                             item {
                                 CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.settings_manga_section_title),
+                                    sectionTitle = stringResource(R.string.media_type_manga),
                                     items = characterDetails.mangaRoles,
                                     onItemClick = { id ->
                                         navOptions.navigateToMangaDetails(id)

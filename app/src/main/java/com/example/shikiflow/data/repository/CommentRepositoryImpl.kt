@@ -8,8 +8,9 @@ import com.example.shikiflow.data.local.source.CommentPagingSource
 import com.example.shikiflow.data.local.source.ThreadPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.sort.ThreadType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.domain.model.thread.ThreadSort
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
@@ -57,7 +58,7 @@ class CommentRepositoryImpl @Inject constructor(
 
     override fun getPaginatedThreads(
         mediaId: Int,
-        threadSort: ThreadSort
+        threadSort: Sort<ThreadType>
     ): Flow<PagingData<Thread>> {
         return Pager(
             config = PagingConfig(

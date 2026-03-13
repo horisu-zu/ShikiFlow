@@ -29,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,6 +56,7 @@ fun FavoritesSection(
     horizontalPadding: Dp,
     onFavoriteClick: (Int, FavoriteCategory) -> Unit,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.background,
     userFavoritesViewModel: UserFavoritesViewModel = hiltViewModel()
 ) {
     val lazyGridState = rememberLazyGridState()
@@ -66,7 +68,7 @@ fun FavoritesSection(
     ).collectAsLazyPagingItems()
 
     Scaffold(
-        modifier = modifier,
+        modifier = modifier.background(backgroundColor),
         topBar = {
             FavoritesSectionHeader(
                 currentFavorite = currentFavorite,
@@ -107,14 +109,12 @@ fun FavoritesSection(
                     verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     contentPadding = PaddingValues(
-                        start = horizontalPadding,
-                        end = horizontalPadding,
-                        top = paddingValues.calculateTopPadding() + 12.dp,
-                        bottom = 12.dp
+                        horizontal = horizontalPadding,
+                        vertical = 12.dp
                     ),
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
+                        .padding(top = paddingValues.calculateTopPadding())
                 ) {
                     items(
                         count = userFavoriteItems.itemCount,
@@ -147,7 +147,7 @@ fun FavoritesSection(
                                 ErrorItem(
                                     message = stringResource(R.string.common_error),
                                     buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { userFavoriteItems.refresh() }
+                                    onButtonClick = { userFavoriteItems.retry() }
                                 )
                             }
                         }
@@ -175,7 +175,7 @@ private fun FavoritesSectionHeader(
                     bottomStartPercent = 24
                 )
             )
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.background)
             .padding(paddingValues),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
         horizontalAlignment = Alignment.CenterHorizontally

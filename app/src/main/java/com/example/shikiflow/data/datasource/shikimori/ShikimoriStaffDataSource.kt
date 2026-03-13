@@ -14,8 +14,11 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffR
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toVoiceActorRole
 import com.example.shikiflow.data.remote.PersonApi
 import com.example.shikiflow.domain.model.common.MediaRole
+import com.example.shikiflow.domain.model.sort.CharacterType
+import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.staff.StaffDetails
-import com.example.shikiflow.domain.model.sort.OrderOption
+import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
@@ -39,7 +42,7 @@ class ShikimoriStaffDataSource @Inject constructor(
     override fun getMediaStaff(
         mediaId: Int,
         mediaType: MediaType,
-        sort: OrderOption?
+        sort: Sort<StaffType>
     ): Flow<PagingData<StaffShort>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, StaffShort>() {
@@ -98,7 +101,7 @@ class ShikimoriStaffDataSource @Inject constructor(
     override fun getStaffMediaRoles(
         staffId: Int,
         mediaType: MediaType,
-        sort: OrderOption?
+        sort: Sort<MediaSort>
     ): Flow<PagingData<MediaRole>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, MediaRole>() {
@@ -130,7 +133,7 @@ class ShikimoriStaffDataSource @Inject constructor(
 
     override fun getVoiceActorRoles(
         staffId: Int,
-        sort: OrderOption?
+        sort: Sort<CharacterType>
     ): Flow<PagingData<MediaRole>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, MediaRole>() {
