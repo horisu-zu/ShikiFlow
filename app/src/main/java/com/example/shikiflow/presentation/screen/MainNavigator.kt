@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen
 
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
@@ -58,12 +59,14 @@ fun MainNavigator(
     onFinishActivity: () -> Unit,
     userViewModel: UserViewModel = hiltViewModel()
 ) {
+    val configuration = LocalConfiguration.current
+
     val items = listOf(
         BottomNavItem.Home,
         BottomNavItem.Browse,
         BottomNavItem.More
     )
-    val mainNavBackStack = rememberNavBackStack(MainNavRoute.Home)
+    val mainNavBackStack = rememberNavBackStack(MainNavRoute.Main)
     val mainScreenBackStack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
     val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
@@ -71,19 +74,22 @@ fun MainNavigator(
     val currentUser by userViewModel.userFlow.collectAsStateWithLifecycle()
     val authType by userViewModel.authTypeFlow.collectAsState()
 
-    val isKeyboardVisible = WindowInsets.isImeVisible && LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
+    val isKeyboardVisible = WindowInsets.isImeVisible &&
+        configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     var isBottomBarVisible by remember { mutableStateOf(true) }
 
     val adaptiveInfo = currentWindowAdaptiveInfo()
-    val customNavType = with(adaptiveInfo) {
-        if(isKeyboardVisible || !isBottomBarVisible) {
-            NavigationSuiteType.None
-        } else if(windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)) {
-            NavigationSuiteType.NavigationRail
-        } else {
-            NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(adaptiveInfo)
-        }
+    val isExpanded = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(
+        widthDpBreakpoint = WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
+    )
+
+    val customNavType = when {
+        isKeyboardVisible || !isBottomBarVisible -> NavigationSuiteType.None
+        isExpanded -> NavigationSuiteType.NavigationRail
+        else -> NavigationSuiteScaffoldDefaults.navigationSuiteType(adaptiveInfo)
     }
+
+    Log.d("MainNavigator", "Nav Type: $customNavType")
 
     LaunchedEffect(Unit) {
         userViewModel.fetchCurrentUser()
@@ -145,7 +151,7 @@ fun MainNavigator(
                 backStack = mainNavBackStack,
                 onBack = { onFinishActivity() },
                 entryProvider = entryProvider {
-                    entry<MainNavRoute.Home> {
+                    entry<MainNavRoute.Main> {
                         MainScreenNavigator(
                             mainScreenBackStack = mainScreenBackStack,
                             currentUserData = currentUser,
@@ -197,7 +203,7 @@ sealed class BottomNavItem(
         title = R.string.bottom_navigator_main,
         selectedIconRes = R.drawable.ic_selected_book,
         unselectedIconRes = R.drawable.ic_unselected_book,
-        route = MainNavRoute.Home
+        route = MainNavRoute.Main
     )
 
     object Browse : BottomNavItem(

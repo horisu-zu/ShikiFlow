@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -137,6 +138,36 @@ fun SearchPage(
                             animeItem = item,
                             onItemClick = { id -> onAnimeClick(id) }
                         )
+                    }
+                    trackItems.apply {
+                        when {
+                            loadState.append is LoadState.Error -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { trackItems.retry() }
+                                        )
+                                    }
+                                }
+                            }
+                            loadState.append is LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
+                            }
+                        }
                     }
                 }
             }

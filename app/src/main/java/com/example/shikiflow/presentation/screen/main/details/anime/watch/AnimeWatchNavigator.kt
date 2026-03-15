@@ -10,13 +10,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.presentation.screen.LocalBottomBarController
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.EpisodeScreen
-import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.EpisodeMetadata
 
 @Composable
 fun AnimeWatchNavigator(
@@ -43,8 +44,11 @@ fun AnimeWatchNavigator(
             watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link, translationGroup, episodesCount))
         }
 
-        override fun navigateToEpisodeScreen(playerNavigate: PlayerNavigate) {
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(playerNavigate))
+        override fun navigateToEpisodeScreen(episodeMetadata: EpisodeMetadata) {
+            watchBackstack.removeAll { navKey ->
+                navKey is AnimeWatchNavRoute.EpisodeScreen
+            }
+            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(episodeMetadata))
         }
 
         override fun navigateBack() {
@@ -78,7 +82,7 @@ fun AnimeWatchNavigator(
             }
             entry<AnimeWatchNavRoute.EpisodeScreen> { route ->
                 EpisodeScreen(
-                    playerNavigate = route.playerNavigate,
+                    playerNavigate = route.episodeMetadata,
                     navOptions = options
                 )
             }
@@ -97,6 +101,10 @@ fun AnimeWatchNavigator(
                     stiffness = Spring.StiffnessMediumLow
                 )
             )
-        }
+        },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        )
     )
 }

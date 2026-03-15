@@ -19,11 +19,11 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -39,12 +39,12 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.MediaSort
-import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.presentation.common.SortBottomSheet
 import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.RoleSort
 import com.example.shikiflow.presentation.viewmodel.character.MediaRolesViewModel
 import kotlinx.coroutines.launch
 
@@ -58,7 +58,7 @@ fun MediaRolesScreen(
     navOptions: MediaNavOptions,
     mediaRolesViewModel: MediaRolesViewModel = hiltViewModel()
 ) {
-    val typesList = rememberSaveable { roleTypes.sortedBy { it.ordinal } }
+    val typesList = roleTypes.sortedBy { it.ordinal }
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
@@ -68,6 +68,10 @@ fun MediaRolesScreen(
     val currentType = typesList[pagerState.currentPage]
 
     val sortMap by mediaRolesViewModel.sortMap.collectAsStateWithLifecycle()
+
+    LaunchedEffect(id) {
+        mediaRolesViewModel.initializeSortMap(roleTypes, authType)
+    }
 
     Scaffold(
         topBar = {
@@ -149,26 +153,30 @@ fun MediaRolesScreen(
         }
 
         if(showBottomSheet) {
-            SortBottomSheet(
-                config = if(currentType == RoleType.VA) {
-                    SortConfig<CharacterType>(
-                        options = CharacterType.entries,
-                        selected = sortMap[currentType] as Sort<CharacterType>,
-                        onSortChange = { sort ->
-                            mediaRolesViewModel.setSort(currentType, sort)
-                        }
-                    )
-                } else {
-                    SortConfig<MediaSort>(
-                        options = MediaSort.Anilist.entries,
-                        selected = sortMap[currentType] as Sort<MediaSort>,
-                        onSortChange = { sort ->
-                            mediaRolesViewModel.setSort(currentType, sort)
-                        }
-                    )
-                },
-                onDismiss = { showBottomSheet = false }
-            )
+            val sortConfig = when(val roleSort = sortMap[currentType]) {
+                is RoleSort.Media -> SortConfig(
+                    options = MediaSort.Anilist.entries,
+                    selected = roleSort.sort,
+                    onSortChange = { sort ->
+                        mediaRolesViewModel.setSort(currentType, RoleSort.Media(sort))
+                    }
+                )
+                is RoleSort.VA -> SortConfig(
+                    options = CharacterType.entries,
+                    selected = roleSort.sort,
+                    onSortChange = { sort ->
+                        mediaRolesViewModel.setSort(currentType, RoleSort.VA(sort))
+                    }
+                )
+                else -> null
+            }
+
+            sortConfig?.let {
+                SortBottomSheet(
+                    config = sortConfig,
+                    onDismiss = { showBottomSheet = false }
+                )
+            }
         }
     }
 }

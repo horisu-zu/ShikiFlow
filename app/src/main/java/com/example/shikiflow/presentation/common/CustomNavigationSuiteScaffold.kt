@@ -8,6 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -44,14 +45,16 @@ fun CustomNavigationSuiteScaffold(
     navigationType: NavigationSuiteType,
     navItems: List<BottomNavItem>,
     onNavClick: (NavKey) -> Unit,
-    navContainerColor: Color = MaterialTheme.colorScheme.surface,
+    navContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val isRail = navigationType == NavigationSuiteType.NavigationRail
     val isBottomBar = navigationType == NavigationSuiteType.NavigationBar
 
     Row(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
     ) {
         AnimatedVisibility(
             visible = isRail,

@@ -254,7 +254,7 @@ private fun ComparisonItem(
                 )
             }
             VerticalDivider(
-                color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
                 thickness = 2.dp,
                 modifier = Modifier.fillMaxHeight()
             )
@@ -282,7 +282,7 @@ private fun ComparisonItem(
             }
             if(comparisonType == ComparisonType.SHARED) {
                 VerticalDivider(
-                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
                     thickness = 2.dp,
                     modifier = Modifier.fillMaxHeight()
                 )

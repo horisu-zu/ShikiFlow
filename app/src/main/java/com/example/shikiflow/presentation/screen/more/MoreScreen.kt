@@ -174,37 +174,61 @@ private fun MoreSearchContent(
         userSearchViewModel.paginatedUsers(query)
     }.collectAsLazyPagingItems()
 
-    if(userSearchData.loadState.refresh is LoadState.Loading) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) { CircularProgressIndicator() }
-    } else if(userSearchData.loadState.refresh is LoadState.Error) {
-        Box(
-            modifier = modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            ErrorItem(
-                message = stringResource(R.string.common_error),
-                buttonLabel = stringResource(R.string.common_retry),
-                onButtonClick = { userSearchData.refresh() }
-            )
+    when (userSearchData.loadState.refresh) {
+        is LoadState.Loading -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
         }
-    } else {
-        LazyColumn(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
-            contentPadding = PaddingValues(vertical = 12.dp)
-        ) {
-            items(
-                count = userSearchData.itemCount,
-                key = userSearchData.itemKey { it.id }
-            ) { index ->
-                userSearchData[index]?.let { user ->
-                    UserItem(
-                        user = user,
-                        onClick = { userId -> moreNavOptions.navigateToProfile(user) }
-                    )
+        is LoadState.Error -> {
+            Box(
+                modifier = modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { userSearchData.refresh() }
+                )
+            }
+        }
+        else -> {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
+                items(
+                    count = userSearchData.itemCount,
+                    key = userSearchData.itemKey { it.id }
+                ) { index ->
+                    userSearchData[index]?.let { user ->
+                        UserItem(
+                            user = user,
+                            onClick = { moreNavOptions.navigateToProfile(user) }
+                        )
+                    }
+                }
+                userSearchData.apply {
+                    if(loadState.append is LoadState.Loading) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        }
+                    }
+                    if(loadState.append is LoadState.Error) {
+                        item {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                showFace = false,
+                                onButtonClick = { userSearchData.retry() }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -214,12 +238,13 @@ private fun MoreSearchContent(
 @Composable
 private fun UserItem(
     user: User,
-    onClick: (String) -> Unit,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth()
-            .clickable { onClick(user.id) }
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically

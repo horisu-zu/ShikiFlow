@@ -30,7 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerNavigate
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.EpisodeMetadata
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MediaItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -98,7 +98,7 @@ fun EpisodeSelectionScreen(
                     onItemClick = {
                         Log.d("EpisodeSelectionScreen", "Navigating to episode $serialNum")
                         navOptions.navigateToEpisodeScreen(
-                            PlayerNavigate(title, link, translationGroup, serialNum, episodesCount)
+                            EpisodeMetadata(title, link, translationGroup, serialNum, episodesCount)
                         )
                     },
                     isCompleted = serialNum <= completedEpisodes,

@@ -158,12 +158,11 @@ fun ThreadsScreen(
                                         ErrorItem(
                                             message = stringResource(R.string.common_error),
                                             buttonLabel = stringResource(R.string.common_retry),
-                                            onButtonClick = { threadsState.refresh() }
+                                            onButtonClick = { threadsState.retry() }
                                         )
                                     }
                                 }
                             }
-
                             loadState.append is LoadState.Loading -> {
                                 item {
                                     Box(

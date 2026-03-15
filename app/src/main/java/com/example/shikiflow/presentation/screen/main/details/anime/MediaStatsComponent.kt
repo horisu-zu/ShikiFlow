@@ -51,7 +51,7 @@ fun MediaStatsComponent(
     val barHorizontalPadding = 12.dp
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 
-    val windowWidthSize by remember(windowSizeClass) {
+    val windowSize by remember(windowSizeClass) {
         derivedStateOf {
             when {
                 windowSizeClass.isWidthAtLeastBreakpoint(
@@ -67,7 +67,7 @@ fun MediaStatsComponent(
         }
     }
 
-    when(windowWidthSize) {
+    when(windowSize) {
         WindowSize.EXPANDED -> {
             RowMediaStats(
                 mediaType = mediaType,
@@ -75,7 +75,7 @@ fun MediaStatsComponent(
                 titleScore = titleScore,
                 scoreStats = scoreStats,
                 statusesStats = statusesStats,
-                windowWidthSize = windowWidthSize,
+                windowWidthSize = windowSize,
                 barHorizontalPadding = barHorizontalPadding,
                 modifier = modifier
             )
@@ -87,7 +87,7 @@ fun MediaStatsComponent(
                 titleScore = titleScore,
                 scoreStats = scoreStats,
                 statusesStats = statusesStats,
-                windowSize = windowWidthSize,
+                windowSize = windowSize,
                 barHorizontalPadding = barHorizontalPadding,
                 modifier = modifier
             )

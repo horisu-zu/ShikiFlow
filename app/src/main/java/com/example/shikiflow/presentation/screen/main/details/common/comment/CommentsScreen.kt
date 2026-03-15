@@ -115,71 +115,75 @@ private fun TopicCommentsSection(
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if(paginatedComments.loadState.refresh is LoadState.Error) {
-            item {
-                Box(
-                    modifier = Modifier.fillParentMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { paginatedComments.refresh() }
-                    )
-                }
-            }
-        } else if(paginatedComments.loadState.refresh is LoadState.Loading) {
-            item {
-                Box(
-                    modifier = Modifier.fillParentMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
-        } else {
-            threadHeader?.let { header ->
+        when (paginatedComments.loadState.refresh) {
+            is LoadState.Error -> {
                 item {
-                    ThreadHeaderItem(
-                        threadHeader = header,
-                        onEntityClick = onEntityClick,
-                        onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
-                        modifier = Modifier
-                    )
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = stringResource(R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { paginatedComments.refresh() }
+                        )
+                    }
                 }
             }
-            items(paginatedComments.itemCount) { index ->
-                paginatedComments[index]?.let { comment ->
-                    CommentItem(
-                        comment = comment,
-                        onEntityClick = onEntityClick,
-                        onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
-                        modifier = Modifier
-                    )
+            is LoadState.Loading -> {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
                 }
             }
-            paginatedComments.apply {
-                when {
-                    loadState.append is LoadState.Error -> {
-                        item {
-                            Box(
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                ErrorItem(
-                                    message = stringResource(R.string.common_error),
-                                    buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { paginatedComments.refresh() }
-                                )
+            else -> {
+                threadHeader?.let { header ->
+                    item {
+                        ThreadHeaderItem(
+                            threadHeader = header,
+                            onEntityClick = onEntityClick,
+                            onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
+                            modifier = Modifier
+                        )
+                    }
+                }
+                items(paginatedComments.itemCount) { index ->
+                    paginatedComments[index]?.let { comment ->
+                        CommentItem(
+                            comment = comment,
+                            onEntityClick = onEntityClick,
+                            onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
+                            modifier = Modifier
+                        )
+                    }
+                }
+                paginatedComments.apply {
+                    when {
+                        loadState.append is LoadState.Error -> {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    ErrorItem(
+                                        message = stringResource(R.string.common_error),
+                                        buttonLabel = stringResource(R.string.common_retry),
+                                        onButtonClick = { paginatedComments.retry() }
+                                    )
+                                }
                             }
                         }
-                    }
-                    loadState.append is LoadState.Loading -> {
-                        item {
-                            Box(
-                                modifier = Modifier.fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
+                        loadState.append is LoadState.Loading -> {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
                         }
                     }
                 }

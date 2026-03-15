@@ -71,8 +71,8 @@ enum class StaffType : SortType {
 }
 
 enum class CharacterType : SortType {
-    RELEVANCE,
     FAVORITES,
+    RELEVANCE,
     ROLE,
     ID;
 

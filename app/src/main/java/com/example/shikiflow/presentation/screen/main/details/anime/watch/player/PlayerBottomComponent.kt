@@ -51,7 +51,6 @@ fun PlayerBottomComponent(
     isFit: Boolean,
     onSkipOp: () -> Unit,
     onSeek: (Long) -> Unit,
-    onSkip: () -> Unit,
     onResize: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -103,14 +102,6 @@ fun PlayerBottomComponent(
                     DurationBox(currentProgress)
                     DurationBox(duration)
                 }
-            }
-            IconButton(onClick = onSkip) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_double_arrow),
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = Color.White
-                )
             }
             IconButton(onClick = onResize) {
                 Icon(

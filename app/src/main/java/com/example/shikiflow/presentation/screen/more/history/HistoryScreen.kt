@@ -145,7 +145,7 @@ fun HistoryScreen(
                                         ErrorItem(
                                             message = stringResource(R.string.common_error),
                                             buttonLabel = stringResource(R.string.common_retry),
-                                            onButtonClick = { historyData.refresh() }
+                                            onButtonClick = { historyData.retry() }
                                         )
                                     }
                                 }

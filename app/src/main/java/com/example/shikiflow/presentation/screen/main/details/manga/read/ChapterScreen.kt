@@ -106,42 +106,76 @@ fun ChapterScreen(
                     )
                 }
             }
-            if(chaptersList.loadState.refresh is LoadState.Loading) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            } else if(chaptersList.loadState.refresh is LoadState.Error) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = stringResource(R.string.common_error),
-                            buttonLabel = stringResource(id = R.string.common_retry),
-                            onButtonClick = { chaptersList.refresh() }
-                        )
+            when (chaptersList.loadState.refresh) {
+                is LoadState.Loading -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
                     }
                 }
-            } else {
-                items(chaptersList.itemCount) { index ->
-                    chaptersList[index]?.let { chapterItem ->
-                        ChaptersListItem(
-                            chapterMetadata = chapterItem,
-                            onItemClick = { id, chapterNum, title ->
-                                navOptions.navigateToChapter(
-                                    chapterUiData = chapterUiData.copy(
-                                        chapterId = id,
-                                        chapterNumber = chapterNum,
-                                        title = title
+                is LoadState.Error -> {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(id = R.string.common_retry),
+                                onButtonClick = { chaptersList.refresh() }
+                            )
+                        }
+                    }
+                }
+                else -> {
+                    items(chaptersList.itemCount) { index ->
+                        chaptersList[index]?.let { chapterItem ->
+                            ChaptersListItem(
+                                chapterMetadata = chapterItem,
+                                onItemClick = { id, chapterNum, title ->
+                                    navOptions.navigateToChapter(
+                                        chapterUiData = chapterUiData.copy(
+                                            chapterId = id,
+                                            chapterNumber = chapterNum,
+                                            title = title
+                                        )
                                     )
-                                )
-                            },
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                                },
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                    chaptersList.apply {
+                        when {
+                            loadState.append is LoadState.Error -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { chaptersList.retry() }
+                                        )
+                                    }
+                                }
+                            }
+                            loadState.append is LoadState.Loading -> {
+                                item {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
+                            }
+                        }
                     }
                 }
             }
