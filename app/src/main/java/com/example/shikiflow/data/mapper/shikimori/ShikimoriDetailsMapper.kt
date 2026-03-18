@@ -26,7 +26,9 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.MediaFormat
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.Stat
 import kotlin.time.Instant
 
 object ShikimoriDetailsMapper {
@@ -62,11 +64,18 @@ object ShikimoriDetailsMapper {
             studios = studios.map { it.toDomain() },
             durationMins = duration,
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
-            scoreStats = scoresStats?.associate {
-                it.score to it.count
-            }?.toSortedMap() ?: emptyMap(),
-            statusesStats = statusesStats?.associate { it.status.toDomain() to it.count }
-                ?: emptyMap(),
+            scoreStats = scoresStats?.map { (score, count) ->
+                Stat<Int>(
+                    type = score,
+                    value = count.toFloat()
+                )
+            }?.sortedBy { it.type }.orEmpty(),
+            statusesStats = statusesStats?.map { (status, count) ->
+                Stat<UserRateStatus>(
+                    type = status.toDomain(),
+                    value = count.toFloat()
+                )
+            }.orEmpty(),
             threadId = topic?.id?.toInt()
         )
     }
@@ -96,11 +105,18 @@ object ShikimoriDetailsMapper {
             userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.MANGA),
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             staffList = personRoles?.map { it.personRoleShort.toDomain() } ?: emptyList(),
-            scoreStats = scoresStats?.associate {
-                it.score to it.count
-            }?.toSortedMap() ?: emptyMap(),
-            statusesStats = statusesStats?.associate { it.status.toDomain() to it.count }
-                ?: emptyMap(),
+            scoreStats = scoresStats?.map { (score, count) ->
+                Stat<Int>(
+                    type = score,
+                    value = count.toFloat()
+                )
+            }?.sortedBy { it.type }.orEmpty(),
+            statusesStats = statusesStats?.map { (status, count) ->
+                Stat<UserRateStatus>(
+                    type = status.toDomain(),
+                    value = count.toFloat()
+                )
+            }.orEmpty(),
             threadId = topic?.id?.toInt()
         )
     }

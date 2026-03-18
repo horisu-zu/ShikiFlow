@@ -4,6 +4,8 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaStaffQuery
 import com.example.graphql.anilist.StaffDetailsQuery
 import com.example.graphql.anilist.StaffMediaRolesQuery
@@ -29,21 +31,23 @@ import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistStaffDataSource @Inject constructor(
     private val apolloClient: ApolloClient
-): StaffDataSource {
-    override suspend fun getStaffDetails(staffId: Int): Result<StaffDetails> {
-        val staffQuery = StaffDetailsQuery(staffId)
-
-        val response = apolloClient.query(staffQuery).execute()
-
-        return response.toResult().map { data ->
-            data.Staff?.toDomain() ?: throw NoSuchElementException("Empty Response")
-        }
+): StaffDataSource, BaseNetworkRepository() {
+    override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> {
+        return apolloClient
+            .query(StaffDetailsQuery(staffId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .toFlow()
+            .asDataResult { response ->
+                response.Staff?.toDomain() ?: throw NoSuchElementException("Empty Response")
+            }
     }
 
     override fun getMediaStaff(

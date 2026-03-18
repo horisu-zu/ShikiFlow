@@ -23,8 +23,9 @@ import com.example.shikiflow.domain.model.track.UserRateStatus.Companion.isWatch
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
-import com.example.shikiflow.utils.StatusColor
+import com.materialkolor.ktx.harmonize
 
 @Composable
 fun SearchAnimeTrackItem(
@@ -54,22 +55,19 @@ fun SearchAnimeTrackItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            animeItem.let {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                StatusCard(
+                    text = stringResource(id = animeItem.track.status.mapStatus()) ,
+                    containerColor = animeItem.track.status.color()
+                        .harmonize(MaterialTheme.colorScheme.onBackground)
+                )
+                if(isWatched(animeItem.track.status)) {
                     StatusCard(
-                        text = stringResource(id = animeItem.track.status.mapStatus()) ,
-                        containerColor = animeItem.track.status.let {
-                            StatusColor.getStatusColor(it)
-                        }
-                    )
-                    if(isWatched(animeItem.track.status)) {
-                        StatusCard(
-                            text = stringResource(
-                                id = R.string.episodes_watched,
-                                animeItem.track.episodes
-                            )
+                        text = stringResource(
+                            id = R.string.episodes_watched,
+                            animeItem.track.episodes
                         )
-                    }
+                    )
                 }
             }
         }

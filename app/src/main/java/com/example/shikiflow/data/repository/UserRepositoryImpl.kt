@@ -10,10 +10,13 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.user.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -42,13 +45,12 @@ class UserRepositoryImpl @Inject constructor(
         userId: Int,
     ): Flow<PagingData<UserHistory>> = getSource().getUserHistory(userId)
 
-    override suspend fun getUserRates(
-        userId: Int
-    ): UserRateStats = getSource().getUserRates(userId)
+    override fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>> =
+        getSource().getUserRates(userId)
 
-    override suspend fun getFavoriteCategories(userId: Int): List<FavoriteCategory> {
-        return getSource().getFavoriteCategories(userId)
-    }
+    override fun getUserStatsCategories(
+        userId: Int
+    ): Flow<DataResult<UserStatsCategories>> = getSource().getUserStatsCategories(userId)
 
     override fun getUserFavorites(
         userId: Int,

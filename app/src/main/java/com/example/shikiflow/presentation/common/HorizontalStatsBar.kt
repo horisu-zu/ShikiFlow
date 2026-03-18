@@ -35,11 +35,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
-import com.example.shikiflow.utils.StatusColor
+import com.example.shikiflow.domain.model.user.Stat
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.materialkolor.ktx.harmonize
+import kotlin.math.roundToInt
 
 sealed interface SegmentedProgressBarType {
     val barHeight: Dp
@@ -61,10 +60,10 @@ sealed interface SegmentedProgressBarType {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun SegmentedProgressBar(
-    mediaType: MediaType,
-    groupedData: Map<UserRateStatus, Int>,
-    totalCount: Int,
+fun <T> HorizontalStatsBar(
+    stats: List<Stat<T>>,
+    label: (T) -> Int,
+    color: (T) -> Color,
     modifier: Modifier = Modifier,
     barType: SegmentedProgressBarType = SegmentedProgressBarType.Row(
         barHeight = 12.dp,
@@ -75,13 +74,12 @@ fun SegmentedProgressBar(
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceBetween
-        //verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Bottom)
     ) {
         when(barType) {
             is SegmentedProgressBarType.Row -> {
                 SegmentedProgressBarItem(
-                    groupedData = groupedData,
-                    totalCount = totalCount,
+                    stats = stats,
+                    color = color,
                     barHeight = barType.barHeight,
                     barShape = barType.barShape,
                     modifier = Modifier.fillMaxWidth()
@@ -94,12 +92,12 @@ fun SegmentedProgressBar(
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    groupedData.forEach { (status, count) ->
+                    stats.forEach { (status, count) ->
                         SegmentedDataRowItem(
-                            status = stringResource(id = status.mapStatus(mediaType)),
-                            count = count,
+                            status = stringResource(id = label(status)),
+                            count = count.roundToInt(),
                             size = barType.itemSize,
-                            color = StatusColor.getStatusColor(status)
+                            color = color(status)
                         )
                     }
                 }
@@ -113,19 +111,19 @@ fun SegmentedProgressBar(
                     horizontalArrangement = barType.arrangement
                 ) {
                     items(
-                        items = groupedData.entries.toList(),
-                        key = { it.key }
-                    ) { statusStat ->
+                        items = stats,
+                        key = { it.type.toString() }
+                    ) { stat ->
                         SegmentedDataColumnItem(
-                            status = statusStat.key,
-                            count = statusStat.value,
-                            mediaType = mediaType
+                            label = label(stat.type),
+                            color = color(stat.type),
+                            count = stat.value.roundToInt()
                         )
                     }
                 }
                 SegmentedProgressBarItem(
-                    groupedData = groupedData,
-                    totalCount = totalCount,
+                    stats = stats,
+                    color = color,
                     barHeight = barType.barHeight,
                     barShape = barType.barShape,
                     modifier = Modifier
@@ -138,9 +136,9 @@ fun SegmentedProgressBar(
 }
 
 @Composable
-private fun SegmentedProgressBarItem(
-    groupedData: Map<UserRateStatus, Int>,
-    totalCount: Int,
+private fun <T> SegmentedProgressBarItem(
+    stats: List<Stat<T>>,
+    color: (T) -> Color,
     barHeight: Dp,
     barShape: Shape,
     modifier: Modifier = Modifier
@@ -151,14 +149,13 @@ private fun SegmentedProgressBarItem(
             .clip(barShape),
         horizontalArrangement = Arrangement.spacedBy(barHeight / 4)
     ) {
-        groupedData.forEach { (status, count) ->
-            val progress = count.toFloat() / totalCount
+        stats.forEach { (status, count) ->
             Box(
                 modifier = Modifier
-                    .weight(progress)
+                    .weight(count)
                     .fillMaxHeight()
                     .background(
-                        color = StatusColor.getStatusColor(status)
+                        color = color(status).harmonize(MaterialTheme.colorScheme.onBackground)
                     )
             )
         }
@@ -173,6 +170,8 @@ private fun SegmentedDataRowItem(
     size: Dp,
     modifier: Modifier = Modifier
 ) {
+    val onBackgroundColor = MaterialTheme.colorScheme.onBackground
+
     Row(
         modifier = modifier.height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
@@ -180,7 +179,7 @@ private fun SegmentedDataRowItem(
     ) {
         Canvas(modifier = Modifier.size(size)) {
             drawCircle(
-                color = color,
+                color = color.harmonize(onBackgroundColor),
                 style = Fill
             )
         }
@@ -202,9 +201,9 @@ private fun SegmentedDataRowItem(
 
 @Composable
 private fun SegmentedDataColumnItem(
-    status: UserRateStatus,
+    label: Int,
+    color: Color,
     count: Int,
-    mediaType: MediaType,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -216,16 +215,18 @@ private fun SegmentedDataColumnItem(
             modifier = Modifier.fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(
-                    color = StatusColor.getStatusColor(status).copy(alpha = 0.3f)
+                    color = color
+                        .harmonize(MaterialTheme.colorScheme.onBackground)
+                        .copy(alpha = 0.3f)
                 )
                 .padding(horizontal = 8.dp, vertical = 6.dp),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = stringResource(id = status.mapStatus(mediaType)),
+                text = stringResource(id = label),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium,
-                    color = StatusColor.getStatusColor(status)
+                    color = color.harmonize(MaterialTheme.colorScheme.onBackground)
                 )
             )
         }
@@ -233,7 +234,7 @@ private fun SegmentedDataColumnItem(
             text = count.toString(),
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.SemiBold,
-                color = StatusColor.getStatusColor(status)
+                color = color.harmonize(MaterialTheme.colorScheme.onBackground)
             )
         )
     }

@@ -205,7 +205,7 @@ fun DetailsNavigator(
             }
             entry<DetailsNavRoute.Staff> { route ->
                 StaffScreen(
-                    personId = route.staffId,
+                    staffId = route.staffId,
                     navOptions = options
                 )
             }

@@ -45,14 +45,15 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.presentation.screen.main.details.anime.ScoreItem
 import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoItem
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.Converter.isManga
 import com.example.shikiflow.utils.Resource
-import com.example.shikiflow.utils.StatusColor
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
+import com.materialkolor.ktx.harmonize
 
 @Composable
 fun MangaDetailsHeader(
@@ -182,6 +183,9 @@ fun MangaUserRateItem(
     onMangaDexIconClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val rateColor = (userRateStatus ?: UserRateStatus.UNKNOWN).color()
+        .harmonize(MaterialTheme.colorScheme.onBackground)
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -194,9 +198,7 @@ fun MangaUserRateItem(
                 .background(MaterialTheme.colorScheme.background)
                 .border(
                     width = 1.dp,
-                    color = StatusColor.getStatusColor(
-                        status = userRateStatus ?: UserRateStatus.UNKNOWN
-                    ),
+                    color = rateColor,
                     shape = RoundedCornerShape(12.dp)
                 )
                 .clickable { onStatusClick() }
@@ -204,11 +206,9 @@ fun MangaUserRateItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val color = StatusColor.getStatusColor(userRateStatus ?: UserRateStatus.UNKNOWN)
-
             userRateStatus.icon(MediaType.MANGA).toIcon(
                 modifier = Modifier.size(24.dp),
-                tint = color
+                tint = rateColor
             )
             Text(
                 text = UserRateStatusMapper.mapUserRateStatusToString(
@@ -219,7 +219,7 @@ fun MangaUserRateItem(
                     mediaType = MediaType.MANGA
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(
-                    color = color,
+                    color = rateColor,
                     fontWeight = FontWeight.SemiBold
                 )
             )

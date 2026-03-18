@@ -153,14 +153,30 @@ fragment ALRateEntry on MediaList {
 
 fragment ALUserListStats on UserStatistics {
     count
+    episodesWatched
+    minutesWatched
+    chaptersRead
+    volumesRead
+    standardDeviation
     meanScore
     scores {
         score
+        count
+        minutesWatched
+        chaptersRead
+    }
+    lengths {
+        length
+        minutesWatched
+        chaptersRead
+        meanScore
         count
     }
     statuses {
         status
         count
+        minutesWatched
+        chaptersRead
     }
 }
 

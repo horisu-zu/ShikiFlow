@@ -36,9 +36,10 @@ import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.utils.Converter
-import com.example.shikiflow.utils.StatusColor
 import com.example.shikiflow.utils.toIcon
+import com.materialkolor.ktx.harmonize
 
 @Composable
 fun BrowseListItem(
@@ -158,7 +159,7 @@ fun BrowseCoverItem(
             ),
             onClick = onClick
         )
-        userRateStatus ?.let {
+        userRateStatus ?.let { status ->
             Box(
                 modifier = Modifier.align(Alignment.BottomEnd)
                     .clip(
@@ -169,7 +170,9 @@ fun BrowseCoverItem(
                             topStart = 18.dp
                         )
                     )
-                    .background(StatusColor.getDullStatusColor(userRateStatus)),
+                    .background(
+                        color = status.color().harmonize(MaterialTheme.colorScheme.onBackground)
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 userRateStatus.icon(mediaType).toIcon(

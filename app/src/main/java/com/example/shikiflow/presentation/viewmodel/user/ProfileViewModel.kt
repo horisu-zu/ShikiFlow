@@ -1,69 +1,78 @@
 package com.example.shikiflow.presentation.viewmodel.user
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.presentation.UiState
+import com.example.shikiflow.presentation.UiStateViewModel
+import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UserRatesUiState(
-    val userMediaStats: UserRateStats = UserRateStats(emptyMap()),
-    val favoriteCategories: List<FavoriteCategory> = emptyList(),
+data class ProfileUiState(
+    val userId: Int? = null,
+    val userStatsCategories: UserStatsCategories = UserStatsCategories(),
 
-    val errorMessage: String? = null,
-    val isLoading: Boolean = true
-)
+    override val errorMessage: String? = null,
+    override val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false
+) : UiState() {
+    override fun setError(value: String?) = copy(errorMessage = value)
+    override fun setLoading(value: Boolean) = copy(isLoading = value)
+}
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class UserRateViewModel @Inject constructor(
+class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository
-) : ViewModel() {
+) : UiStateViewModel<ProfileUiState>() {
 
-    private val _userRatesUiState = MutableStateFlow(UserRatesUiState())
-    val userRatesUiState = _userRatesUiState.asStateFlow()
+    override val initialState: ProfileUiState = ProfileUiState()
 
-    fun loadUserRates(userId: String) {
-        viewModelScope.launch {
-            try {
-                if(_userRatesUiState.value.userMediaStats.mediaStats.isNotEmpty()) {
-                    return@launch
-                } else {
-                    _userRatesUiState.update { state ->
-                        state.copy(isLoading = true)
+    init {
+        mutableUiState
+            .filter { state ->
+                state.userId != null
+            }
+            .distinctUntilChanged { old, new ->
+                old.userId == new.userId && !new.isRefreshing
+            }
+            .flatMapLatest { state ->
+                userRepository.getUserStatsCategories(state.userId!!)
+            }
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    if(result is DataResult.Success) {
+                        state.copy(
+                            isLoading = false,
+                            errorMessage = null,
+                            userStatsCategories = result.data
+                        )
+                    } else {
+                        result.toUiState()
                     }
                 }
+            }.launchIn(viewModelScope)
+    }
 
-                val (userMediaStats, favoriteCategories) = coroutineScope {
-                    val mediaStats = async { userRepository.getUserRates(userId.toInt()) }
-                    val categories = async { userRepository.getFavoriteCategories(userId.toInt()) }
+    fun setUserId(userId: Int) {
+        mutableUiState.update { state ->
+            state.copy(userId = userId)
+        }
+    }
 
-                    mediaStats.await() to categories.await()
-                }
-
-                _userRatesUiState.update { state ->
-                    state.copy(
-                        userMediaStats = userMediaStats,
-                        favoriteCategories = favoriteCategories,
-                        errorMessage = null
-                    )
-                }
-            } catch (e: Exception) {
-                _userRatesUiState.update { state ->
-                    state.copy(errorMessage = e.message)
-                }
-            } finally {
-                _userRatesUiState.update { state ->
-                    state.copy(isLoading = false)
-                }
-            }
+    fun onRefresh() {
+        mutableUiState.update { state ->
+            state.copy(
+                isRefreshing = true
+            )
         }
     }
 

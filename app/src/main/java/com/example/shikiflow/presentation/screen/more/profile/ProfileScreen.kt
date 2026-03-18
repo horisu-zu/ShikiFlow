@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -41,32 +39,32 @@ import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
-import com.example.shikiflow.presentation.screen.more.profile.statistics.FavoritesSection
-import com.example.shikiflow.presentation.viewmodel.user.UserRateViewModel
-import com.example.shikiflow.presentation.viewmodel.user.UserRatesUiState
+import com.example.shikiflow.presentation.screen.more.profile.favorites.FavoritesSection
+import com.example.shikiflow.presentation.viewmodel.user.ProfileViewModel
+import com.example.shikiflow.presentation.viewmodel.user.ProfileUiState
 
 @Composable
 fun ProfileScreen(
     currentUserId: String?,
     userData: User?,
     moreNavOptions: MoreNavOptions,
-    userRateViewModel: UserRateViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val userRatesUiState by userRateViewModel.userRatesUiState.collectAsStateWithLifecycle()
+    val userRatesUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         userData?.id?.let { userId ->
-            userRateViewModel.loadUserRates(userId)
+            profileViewModel.setUserId(userId.toInt())
         }
     }
 
     userData?.let {
         ProfileScreenContent(
             userData = userData,
-            userRatesUiState = userRatesUiState,
+            uiState = userRatesUiState,
             isCurrentUser = currentUserId == userData.id,
             moreNavOptions = moreNavOptions,
-            onRefresh = { userRateViewModel.loadUserRates(userData.id) },
+            onRefresh = { profileViewModel.onRefresh() },
             modifier = Modifier
         )
     }
@@ -76,19 +74,12 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     userData: User,
-    userRatesUiState: UserRatesUiState,
+    uiState: ProfileUiState,
     isCurrentUser: Boolean,
     moreNavOptions: MoreNavOptions,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val horizontalPadding = 16.dp
-    var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val sectionsList = ProfileSectionType.getTabRows(
-        hasEntries = userRatesUiState.userMediaStats.mediaStats.isNotEmpty(),
-        hasFavorites = userRatesUiState.favoriteCategories.isNotEmpty()
-    )
-
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
@@ -105,23 +96,27 @@ fun ProfileScreenContent(
             )
         }
     ) { paddingValues ->
-        if(userRatesUiState.isLoading) {
+        if(uiState.isLoading) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-        } else if(userRatesUiState.errorMessage != null) {
+        } else if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = userRatesUiState.errorMessage,
+                    message = uiState.errorMessage,
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { onRefresh() }
                 )
             }
         } else {
+            val horizontalPadding = 16.dp
+            var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
+            val sectionsList = ProfileSectionType.getTabRows(uiState.userStatsCategories)
+
             Column(
                 modifier = modifier
                     .padding(
@@ -143,36 +138,22 @@ fun ProfileScreenContent(
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
                     when(sectionsList[selectedTabIndex].value) {
-                        ProfileSectionType.OVERVIEW -> {
-                            TrackSection(
+                        ProfileSectionType.USER_STATS -> {
+                            UserStatsSection(
+                                userId = userData.id.toInt(),
                                 isCurrentUser = isCurrentUser,
-                                userRateData = userRatesUiState.userMediaStats.mediaStats,
+                                isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                 onCompareClick = {
                                     moreNavOptions.navigateToCompare(userData)
                                 },
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(backgroundColor)
-                                    .clip(
-                                        shape = RoundedCornerShape(
-                                            topStart = 24.dp,
-                                            topEnd = 24.dp
-                                        )
-                                    )
-                                    .verticalScroll(rememberScrollState())
-                                    .background(MaterialTheme.colorScheme.background)
-                                    .padding(
-                                        horizontal = horizontalPadding,
-                                        vertical = 12.dp
-                                    )
+                                horizontalPadding = horizontalPadding
                             )
                         }
                         ProfileSectionType.FAVORITES -> {
                             FavoritesSection(
                                 userId = userData.id,
-                                favoriteCategories = userRatesUiState.favoriteCategories,
+                                favoriteCategories = uiState.userStatsCategories.favoriteCategories,
                                 horizontalPadding = horizontalPadding,
-                                backgroundColor = backgroundColor,
                                 onFavoriteClick = { id, category ->
                                     val detailsNavRoute = when(category) {
                                         FavoriteCategory.ANIME -> DetailsNavRoute.AnimeDetails(id)

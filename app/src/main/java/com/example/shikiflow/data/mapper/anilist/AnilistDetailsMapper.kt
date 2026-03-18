@@ -21,6 +21,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.Stat
 import kotlin.time.Instant
 
 object AnilistDetailsMapper {
@@ -56,12 +57,20 @@ object AnilistDetailsMapper {
             staffList = this.staff?.edges?.mapNotNull { it?.aLStaffEdgeShort?.toDomain() } ?: emptyList(),
             durationMins = this.duration,
             relatedMedia = this.relations?.edges?.mapNotNull { it?.aLRelatedMediaShort?.toDomain() } ?: emptyList(),
-            scoreStats = this.stats?.aLMediaStats?.scoreDistribution?.associate {
-                (it?.score ?: 0) to (it?.amount ?: 0)
-            } ?: emptyMap(),
-            statusesStats = this.stats?.aLMediaStats?.statusDistribution?.associate {
-                (it?.status?.toDomain() ?: UserRateStatus.UNKNOWN) to (it?.amount ?: 0)
-            }?.filter { it.value != 0 } ?: emptyMap()
+            scoreStats = stats?.aLMediaStats?.scoreDistribution?.mapNotNull { scoreItem ->
+                Stat<Int>(
+                    type = scoreItem?.score ?: 0,
+                    value = scoreItem?.amount?.toFloat() ?: 0f
+                )
+            }.orEmpty(),
+            statusesStats = stats?.aLMediaStats?.statusDistribution?.mapNotNull { statusItem ->
+                Stat<UserRateStatus>(
+                    type = statusItem?.status?.toDomain() ?: UserRateStatus.UNKNOWN,
+                    value = statusItem?.amount?.toFloat() ?: 0f
+                )
+            }
+                ?.filter { it.value != 0f }
+                .orEmpty()
         )
     }
 

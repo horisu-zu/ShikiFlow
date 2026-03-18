@@ -3,6 +3,7 @@ package com.example.shikiflow.utils
 import android.content.res.Resources
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
+import com.example.shikiflow.domain.model.track.Date as DomainDate
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.fleeksoft.ksoup.Ksoup
 import kotlinx.datetime.LocalDate
@@ -49,24 +50,43 @@ object Converter {
         includeTime: Boolean = false,
         locale: Locale = Locale.getDefault()
     ): String {
-        date.let { date ->
-            val currentYear = Clock.System.now()
-                .toLocalDateTime(TimeZone.currentSystemDefault()).year
-            val instantYear = date.year
+        val currentYear = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault()).year
+        val instantYear = date.year
 
-            val pattern = buildString {
-                append ("dd MMM")
-                if (instantYear != currentYear) {
-                    append(" yyyy")
-                }
-                if (includeTime) {
-                    append(" HH:mm")
-                }
+        val pattern = buildString {
+            append ("dd MMM")
+            if (instantYear != currentYear) {
+                append(" yyyy")
             }
-
-            val formatter = DateTimeFormatter.ofPattern(pattern, locale)
-            return date.toJavaLocalDate().format(formatter)
+            if (includeTime) {
+                append(" HH:mm")
+            }
         }
+
+        val formatter = DateTimeFormatter.ofPattern(pattern, locale)
+        return date.toJavaLocalDate().format(formatter)
+    }
+
+    fun DomainDate.format(locale: Locale = Locale.getDefault()): String? {
+        if(day == null && month == null && year == null) return null
+
+        val currentYear = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault()).year
+
+        val pattern = buildString {
+            if (day != null) append("dd ")
+            if (month != null) append("MMM ")
+            if ((year != null && year != currentYear) || month == null || day == null) append("yyyy")
+        }.trim()
+
+        val safeDate = java.time.LocalDate.of(
+            year ?: currentYear,
+            month ?: 1,
+            day ?: 1
+        )
+
+        return DateTimeFormatter.ofPattern(pattern, locale).format(safeDate)
     }
 
     fun convertInstantToString(resources: Resources, instant: Instant): String {

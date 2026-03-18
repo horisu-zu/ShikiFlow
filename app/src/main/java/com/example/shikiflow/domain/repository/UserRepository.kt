@@ -8,8 +8,11 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.user.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
@@ -17,9 +20,10 @@ interface UserRepository {
 
     fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>>
 
-    suspend fun getUserRates(userId: Int): UserRateStats
+    fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>>
 
-    suspend fun getFavoriteCategories(userId: Int): List<FavoriteCategory>
+    fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
+
     fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
 
     suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>

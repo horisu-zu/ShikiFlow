@@ -29,9 +29,9 @@ object DateMapper {
 
     fun ALDate.toDomain(): Date {
         return Date(
-            year = this.year ?: 0,
-            month = this.month ?: 0,
-            day = this.day ?: 0,
+            year = this.year,
+            month = this.month,
+            day = this.day,
             date = null
         )
     }
@@ -41,4 +41,7 @@ object DateMapper {
             LocalDate(year, month, day)
         } else null
     }
+
+
+    fun Int.minutesToDays(): Double = this / 60.0 / 24.0
 }

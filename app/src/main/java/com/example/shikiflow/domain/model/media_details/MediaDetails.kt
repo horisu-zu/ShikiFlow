@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
+import com.example.shikiflow.domain.model.user.Stat
 import kotlin.time.Instant
 
 data class MediaDetails(
@@ -37,7 +38,7 @@ data class MediaDetails(
     val staffList: List<StaffShort> = emptyList(),
     val durationMins: Int? = null,
     val relatedMedia: List<RelatedMedia>,
-    val scoreStats: Map<Int, Int>,
-    val statusesStats: Map<UserRateStatus, Int>,
+    val scoreStats: List<Stat<Int>>,
+    val statusesStats: List<Stat<UserRateStatus>>,
     val threadId: Int? = null
 )

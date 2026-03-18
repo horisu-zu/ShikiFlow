@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.viewmodel.user
+package com.example.shikiflow.presentation.viewmodel.user.favorites
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,15 +12,19 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 @HiltViewModel
-class UserFavoritesViewModel @Inject constructor(
+class FavoritesViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 
     private val _pagingFavoritesMap = mutableMapOf<FavoriteCategory, Flow<PagingData<UserFavorite>>>()
 
-    fun loadUserFavorites(userId: String, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>> {
+    fun loadUserFavorites(
+        userId: String,
+        favoriteCategory: FavoriteCategory
+    ): Flow<PagingData<UserFavorite>> {
         return _pagingFavoritesMap.getOrPut(favoriteCategory) {
-            userRepository.getUserFavorites(userId.toInt(), favoriteCategory).cachedIn(viewModelScope)
+            userRepository.getUserFavorites(userId.toInt(), favoriteCategory)
+                .cachedIn(viewModelScope)
         }
     }
 }

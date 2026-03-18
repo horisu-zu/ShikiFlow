@@ -1,41 +1,93 @@
 package com.example.shikiflow.presentation.viewmodel.staff
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.repository.StaffRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.UiState
+import com.example.shikiflow.presentation.UiStateViewModel
+import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+data class StaffUiState(
+    val staffId: Int? = null,
+    val staffDetails: StaffDetails? = null,
+
+    override val errorMessage: String? = null,
+    override val isLoading: Boolean = true,
+    val isRefreshing: Boolean = false
+) : UiState() {
+    override fun setError(value: String?) = copy(errorMessage = value)
+    override fun setLoading(value: Boolean) = copy(isLoading = value)
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StaffViewModel @Inject constructor(
     private val staffRepository: StaffRepository
-): ViewModel() {
+) : UiStateViewModel<StaffUiState>() {
 
-    private val _personDetails = MutableStateFlow<Resource<StaffDetails>>(Resource.Loading())
-    val personDetails = _personDetails.asStateFlow()
+    override val initialState: StaffUiState = StaffUiState()
 
-    fun getPersonDetails(id: Int, isRefresh: Boolean = false) {
-        viewModelScope.launch {
-            if (_personDetails.value is Resource.Success && !isRefresh) {
-                return@launch
-            } else {
-                _personDetails.value = Resource.Loading()
+    init {
+        mutableUiState
+            .filter { state ->
+                state.staffId != null
             }
-
-            val result = staffRepository.getStaffDetails(id)
-
-            result.fold(
-                onSuccess = { details ->
-                    _personDetails.value = Resource.Success(details)
-                },
-                onFailure = { exception ->
-                    _personDetails.value = Resource.Error(exception.localizedMessage ?: "Unknown error")
+            .distinctUntilChanged { old, new ->
+                old.staffId == new.staffId && !new.isRefreshing
+            }
+            .flatMapLatest { uiState ->
+                staffRepository.getStaffDetails(uiState.staffId!!)
+            }
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    when (result) {
+                        is DataResult.Success -> {
+                            state.copy(
+                                staffDetails = result.data,
+                                isLoading = false,
+                                errorMessage = null
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                isLoading = false,
+                                errorMessage = result.message
+                            )
+                        }
+                        else -> {
+                            state.copy(
+                                isLoading = true,
+                                isRefreshing = false,
+                                errorMessage = null
+                            )
+                        }
+                    }
                 }
+            }.launchIn(viewModelScope)
+    }
+
+    fun setStaffId(staffId: Int) {
+        mutableUiState.update { state ->
+            state.copy(
+                staffId = staffId
+            )
+        }
+    }
+
+    fun onRefresh() {
+        mutableUiState.update { state ->
+            state.copy(
+                isRefreshing = true,
+                isLoading = true
             )
         }
     }

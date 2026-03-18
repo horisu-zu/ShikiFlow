@@ -13,6 +13,7 @@ import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -33,7 +34,7 @@ class StaffRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getStaffDetails(id: Int): Result<StaffDetails> {
+    override fun getStaffDetails(id: Int): Flow<DataResult<StaffDetails>> {
         return getSource().getStaffDetails(id)
     }
 

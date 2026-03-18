@@ -23,13 +23,20 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.user.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import jakarta.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class ShikimoriUserDataSource @Inject constructor(
     private val apolloClient: ApolloClient,
@@ -67,19 +74,45 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getUserRates(
-        userId: Int
-    ): UserRateStats {
-        val response = userApi.getUserRates(userId = userId.toLong())
+    override fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>> = flow {
+        emit(DataResult.Loading)
 
-        return response.map { response -> response.toDomain() }
-            .toDomain()
+        try {
+            val (userRates, favorites) = coroutineScope {
+                val userRates = async {
+                    userApi.getUserRates(userId = userId.toLong())
+                        .map { response -> response.toDomain() }
+                        .toDomain()
+                }
+                val favorites = async { getShikiFavorites(userId) }
+
+                userRates.await() to favorites.await()
+            }
+
+            val userStatsCategories = mapUserStats(userRates, favorites)
+
+            emit(DataResult.Success(userStatsCategories))
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Unknown Error"))
+        }
     }
 
-    override suspend fun getFavoriteCategories(userId: Int): List<FavoriteCategory> {
-        val response = getShikiFavorites(userId)
+    override fun getUserRates(
+        userId: Int
+    ): Flow<DataResult<MediaTypeStats<OverviewStats>>> = flow {
+        emit(DataResult.Loading)
 
-        return response.map { it.favoriteCategory }.distinct()
+        try {
+            val response = userApi.getUserRates(userId = userId.toLong())
+
+            val overviewStats = response
+                .map { response -> response.toDomain() }
+                .toDomain()
+
+            emit(DataResult.Success(overviewStats))
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Unknown Error"))
+        }
     }
 
     override fun getUserFavorites(

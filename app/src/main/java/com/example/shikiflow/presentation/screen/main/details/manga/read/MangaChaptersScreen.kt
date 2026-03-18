@@ -99,7 +99,7 @@ fun MangaChaptersScreen(
     }
 
     LaunchedEffect(mangaDexId) {
-        mangaChaptersViewModel.getMangaChapters(mangaDexId)
+        mangaChaptersViewModel.setId(mangaDexId)
     }
 
     Scaffold(
@@ -188,7 +188,7 @@ fun MangaChaptersScreen(
                 ErrorItem(
                     message = stringResource(R.string.common_error),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { mangaChaptersViewModel.getMangaChapters(mangaDexId) }
+                    onButtonClick = { mangaChaptersViewModel.onRefresh() }
                 )
             }
         } else {

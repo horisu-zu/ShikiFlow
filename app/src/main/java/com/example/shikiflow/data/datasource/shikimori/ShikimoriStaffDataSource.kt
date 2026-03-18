@@ -22,20 +22,22 @@ import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ShikimoriStaffDataSource @Inject constructor(
     private val staffApi: PersonApi,
     private val apolloClient: ApolloClient
 ): StaffDataSource {
-    override suspend fun getStaffDetails(staffId: Int): Result<StaffDetails> {
-        return try {
+    override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> = flow {
+        emit(DataResult.Loading)
+        try {
             val response = staffApi.getPersonDetails(staffId.toString())
-
-            Result.success(response.toDomain())
+            emit(DataResult.Success(response.toDomain()))
         } catch (e: Exception) {
-            Result.failure(e)
+            emit(DataResult.Error(e.message ?: ""))
         }
     }
 

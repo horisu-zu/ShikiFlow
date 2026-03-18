@@ -24,13 +24,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.Stat
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
-import kotlin.collections.component1
-import kotlin.collections.component2
 
 sealed interface BarsChartMode {
     data class FillWidth(
@@ -45,11 +46,12 @@ sealed interface BarsChartMode {
 
 @Composable
 fun VerticalBarsChart(
-    barData: Map<String, Int>,
+    barData: List<Stat<String>>,
     modifier: Modifier = Modifier,
     chartMode: BarsChartMode = BarsChartMode.FillWidth(),
     maxBarHeight: Dp = 120.dp,
-    barColor: Color = MaterialTheme.colorScheme.primary
+    barColor: Color = MaterialTheme.colorScheme.primary,
+    mapToInt: Boolean = true
 ) {
     when(chartMode) {
         is BarsChartMode.FillWidth -> {
@@ -58,6 +60,7 @@ fun VerticalBarsChart(
                 barFraction = chartMode.barFraction,
                 barColor = barColor,
                 maxBarHeight = maxBarHeight,
+                mapToInt = mapToInt,
                 modifier = modifier
             )
         }
@@ -69,6 +72,7 @@ fun VerticalBarsChart(
                 maxBarHeight = maxBarHeight,
                 barSpacing = chartMode.barSpacing,
                 horizontalPadding = chartMode.horizontalPadding,
+                mapToInt = mapToInt,
                 modifier = modifier
             )
         }
@@ -77,15 +81,16 @@ fun VerticalBarsChart(
 
 @Composable
 fun ScrollableVerticalBarsChart(
-    barData: Map<String, Int>,
+    barData: List<Stat<String>>,
     barColor: Color,
     barWidth: Dp,
     maxBarHeight: Dp,
     barSpacing: Dp,
     horizontalPadding: Dp,
+    mapToInt: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val maxValue = remember(barData) { barData.values.maxOrNull() ?: 0 }
+    val maxValue = remember(barData) { barData.maxOfOrNull { it.value } ?: 0f }
     val autoSize = TextAutoSize.StepBased(
         minFontSize = 10.sp,
         maxFontSize = 14.sp,
@@ -104,23 +109,24 @@ fun ScrollableVerticalBarsChart(
         //Imitating LazyRow's Content Padding
         Spacer(modifier = Modifier.width(horizontalPadding - barSpacing))
 
-        barData.entries.forEach { (key, value) ->
+        barData.forEach { (key, value) ->
             Column(
                 modifier = Modifier,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 //verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                val barHeight = (value.toFloat() / maxValue * maxBarHeight.value).dp
+                val barHeight = (value / maxValue * maxBarHeight.value)
+                val textValue = if(mapToInt) value.toInt() else value
 
                 AutoSizedText(
-                    text = value.toString(),
+                    text = textValue.toString(),
                     autoSize = autoSize,
                     style = LocalTextStyle.current.copy(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
                 Canvas(
-                    modifier = Modifier.size(barWidth, barHeight)
+                    modifier = Modifier.size(barWidth, barHeight.dp)
                 ) {
                     drawRoundRect(
                         color = barColor,
@@ -129,7 +135,7 @@ fun ScrollableVerticalBarsChart(
                     )
                 }
                 AutoSizedText(
-                    text = key,
+                    text = key.ifBlank { stringResource(R.string.common_unknown) },
                     autoSize = autoSize,
                     style = LocalTextStyle.current.copy(
                         color = MaterialTheme.colorScheme.onSurface
@@ -144,13 +150,14 @@ fun ScrollableVerticalBarsChart(
 
 @Composable
 private fun FixedWidthVerticalBarsChart(
-    barData: Map<String, Int>,
+    barData: List<Stat<String>>,
     barFraction: Float,
     barColor: Color,
     maxBarHeight: Dp,
+    mapToInt: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val maxValue = remember(barData) { barData.values.maxOrNull() ?: 0 }
+    val maxValue = remember(barData) { barData.maxOfOrNull { it.value } ?: 0f }
     val autoSize = TextAutoSize.StepBased(
         minFontSize = 10.sp,
         maxFontSize = 14.sp,
@@ -168,10 +175,11 @@ private fun FixedWidthVerticalBarsChart(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 //verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                val barHeight = (value.toFloat() / maxValue * maxBarHeight.value).dp
+                val barHeight = (value / maxValue * maxBarHeight.value).dp
+                val textValue = if(mapToInt) value.toInt() else value
 
                 AutoSizedText(
-                    text = value.toString(),
+                    text = textValue.toString(),
                     autoSize = autoSize,
                     style = LocalTextStyle.current.copy(
                         color = MaterialTheme.colorScheme.onSurface
@@ -189,7 +197,7 @@ private fun FixedWidthVerticalBarsChart(
                     )
                 }
                 AutoSizedText(
-                    text = key,
+                    text = key.ifBlank { stringResource(R.string.common_unknown) },
                     autoSize = autoSize,
                     style = LocalTextStyle.current.copy(
                         color = MaterialTheme.colorScheme.onSurface
@@ -213,25 +221,26 @@ private fun ScrollableChartPreview() {
             text = "Test"
         )
         ScrollableVerticalBarsChart(
-            barData = mapOf(
-                "1" to 124,
-                "2" to 248,
-                "3" to 186,
-                "4" to 62,
-                "5" to 124,
-                "6" to 248,
-                "7" to 186,
-                "8" to 62,
-                "9" to 124,
-                "10" to 248,
-                "11" to 186,
-                "12" to 62,
+            barData = listOf(
+                Stat("1", value = 124f),
+                Stat("2", value = 248f),
+                Stat("3", value = 186f),
+                Stat("4", value = 62f),
+                Stat("5", value = 124f),
+                Stat("6", value = 248f),
+                Stat("7", value = 186f),
+                Stat("8", value = 62f),
+                Stat("9", value = 124f),
+                Stat("10", value = 248f),
+                Stat("11", value = 186f),
+                Stat("12", value = 62f)
             ),
             barColor = MaterialTheme.colorScheme.primary,
             barWidth = 32.dp,
             maxBarHeight = 144.dp,
             barSpacing = 12.dp,
-            horizontalPadding = 16.dp
+            horizontalPadding = 16.dp,
+            mapToInt = true
         )
     }
 }

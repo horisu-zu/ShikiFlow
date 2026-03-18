@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -24,9 +25,8 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.mappers.MediaOriginMapper.displayValue
-import com.example.shikiflow.utils.Converter.formatDate
+import com.example.shikiflow.utils.Converter.format
 import com.example.shikiflow.utils.Converter.formatInstant
-import kotlinx.datetime.LocalDate
 
 @Composable
 fun AnimeShortInfoSection(
@@ -91,25 +91,20 @@ fun AnimeShortInfoSection(
             )
         }
         animeDetails.airedOn?.let { airedOn ->
-            DetailRow(
-                label = stringResource(R.string.details_info_aired_on),
-                content = {
-                    Text(
-                        text = airedOn.date?.let { date ->
-                            formatInstant(
-                                instant = date,
-                                includeTime = false
-                            )
-                        } ?: formatDate(
-                            date = LocalDate(airedOn.year, airedOn.month, airedOn.day)
-                        ),
-                        overflow = TextOverflow.Ellipsis,
-                        textAlign = TextAlign.End,
-                        maxLines = 1,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            )
+            airedOn.format()?.let { date ->
+                DetailRow(
+                    label = stringResource(R.string.details_info_aired_on),
+                    content = {
+                        Text(
+                            text = date,
+                            overflow = TextOverflow.Ellipsis,
+                            textAlign = TextAlign.End,
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                )
+            }
         }
         if (animeDetails.status == MediaStatus.ONGOING) {
             animeDetails.nextEpisodeAt?.let { nextEpisodeInstant ->
@@ -134,29 +129,20 @@ fun AnimeShortInfoSection(
             && animeDetails.releasedOn != null
             && animeDetails.releasedOn != animeDetails.airedOn
         ) {
-            DetailRow(
-                label = stringResource(R.string.details_info_released_on),
-                content = {
-                    Text(
-                        text = animeDetails.releasedOn.date?.let { date ->
-                            formatInstant(
-                                instant = date,
-                                includeTime = false
-                            )
-                        } ?: formatDate(
-                            date = LocalDate(
-                                animeDetails.releasedOn.year,
-                                animeDetails.releasedOn.month,
-                                animeDetails.releasedOn.day
-                            )
-                        ),
-                        textAlign = TextAlign.End,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = 1,
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            )
+            animeDetails.releasedOn.format()?.let { date ->
+                DetailRow(
+                    label = stringResource(R.string.details_info_released_on),
+                    content = {
+                        Text(
+                            text = date,
+                            textAlign = TextAlign.End,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                )
+            }
         }
         HorizontalDivider()
         DetailRow(

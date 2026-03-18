@@ -9,8 +9,8 @@ import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.UserActivitiesQuery
-import com.example.graphql.anilist.UserFavoriteCategoriesQuery
 import com.example.graphql.anilist.UserRatesQuery
+import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.FavoritesPagingSource
@@ -18,6 +18,7 @@ import com.example.shikiflow.data.local.source.HistoryPagingSource
 import com.example.shikiflow.data.local.source.UserPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewStats
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -27,16 +28,20 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.user.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlin.let
 
 class AnilistUserDataSource @Inject constructor(
     private val apolloClient: ApolloClient
-): UserDataSource {
+): UserDataSource, BaseNetworkRepository() {
 
     override suspend fun fetchCurrentUser(): User? {
         val query = apolloClient.query(CurrentUserQuery()).execute()
@@ -74,48 +79,41 @@ class AnilistUserDataSource @Inject constructor(
         } ?: emptyList()
     }
 
-    override suspend fun getUserRates(userId: Int): UserRateStats {
-        val ratesQuery = UserRatesQuery(userId)
+    override fun getUserStatsCategories(
+        userId: Int
+    ): Flow<DataResult<UserStatsCategories>> {
+        val userStatsCategoriesQuery = UserStatsCategoriesQuery(userId)
 
-        val response = apolloClient.query(ratesQuery).execute()
-
-        val userStats = response.data?.User?.statistics ?:
-            throw IllegalStateException("No user statistics data returned")
-
-        val mediaStats = userStats.let { userStats ->
-            val animeStats = userStats.anime?.aLUserListStats?.toDomain()
-            val mangaStats = userStats.manga?.aLUserListStats?.toDomain()
-
-            buildMap {
-                if(!animeStats?.scoreStats.isNullOrEmpty()) {
-                    put(MediaType.ANIME, animeStats)
-                }
-                if(!mangaStats?.scoreStats.isNullOrEmpty()) {
-                    put(MediaType.MANGA, mangaStats)
-                }
+        val response = apolloClient.query(userStatsCategoriesQuery)
+            .toFlow()
+            .asDataResult { response ->
+                response.User?.toDomain()
+                    ?: throw IllegalStateException("No user statistics data returned")
             }
-        }
 
-        return UserRateStats(mediaStats)
+        return response
     }
 
-    override suspend fun getFavoriteCategories(userId: Int): List<FavoriteCategory> {
-        val categoriesQuery = UserFavoriteCategoriesQuery(userId)
+    override fun getUserRates(
+        userId: Int
+    ): Flow<DataResult<MediaTypeStats<OverviewStats>>> {
+        val ratesQuery = UserRatesQuery(userId)
 
-        val response = apolloClient.query(categoriesQuery).execute()
+        val response = apolloClient.query(ratesQuery)
+            .toFlow()
+            .asDataResult { data ->
+                val userStats = data.User?.statistics ?:
+                    throw IllegalStateException("No user statistics data returned")
 
-        val favorites = response.data?.User?.favourites
-            ?: throw IllegalStateException("No data returned from UserFavoriteCategories")
+                userStats.let { userStats ->
+                    MediaTypeStats<OverviewStats>(
+                        animeStats = userStats.anime?.aLUserListStats?.toOverviewStats(MediaType.ANIME),
+                        mangaStats = userStats.manga?.aLUserListStats?.toOverviewStats(MediaType.MANGA)
+                    )
+                }
+            }
 
-        val favoritesMap = mapOf(
-            FavoriteCategory.ANIME to (favorites.anime?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.MANGA to (favorites.manga?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.CHARACTER to (favorites.characters?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.STAFF to (favorites.staff?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.STUDIO to (favorites.studios?.pageInfo?.aLPageInfoShort?.total ?: 0)
-        )
-
-        return favoritesMap.filter { it.value > 0 }.keys.toList()
+        return response
     }
 
     override fun getUserFavorites(

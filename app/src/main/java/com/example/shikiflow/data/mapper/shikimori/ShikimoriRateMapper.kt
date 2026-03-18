@@ -16,8 +16,11 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserRate
+import com.example.shikiflow.domain.model.user.OverviewStats
 import com.example.shikiflow.domain.model.user.MediaTypeStats
-import com.example.shikiflow.domain.model.user.UserRateStats
+import com.example.shikiflow.domain.model.user.OverviewStatType
+import com.example.shikiflow.domain.model.user.ShortOverviewStat
+import com.example.shikiflow.domain.model.user.Stat
 import kotlin.time.Instant
 
 object ShikimoriRateMapper {
@@ -59,22 +62,35 @@ object ShikimoriRateMapper {
         )
     }
 
-    fun List<UserRate>.toDomain(): UserRateStats {
-        return UserRateStats(
-            mediaStats = this.groupBy { it.mediaType }
-                .mapValues { (_, rates) ->
-                    MediaTypeStats(
-                        count = rates.size,
-                        averageScore = rates.map { it.score }.average(),
-                        statusesStats = rates.groupingBy { it.status }
-                            .eachCount()
-                            .toSortedMap(compareBy { UserRateStatus.entries.indexOf(it) }),
-                        scoreStats = rates.filter { it.status == UserRateStatus.COMPLETED }
-                            .groupingBy { it.score }
-                            .eachCount()
-                            .toSortedMap(comparator = compareBy { it })
-                    )
-                }
+    fun List<UserRate>.toDomain(): MediaTypeStats<OverviewStats> {
+        val statsMap = this.groupBy { it.mediaType }
+            .mapValues { (_, rates) ->
+                OverviewStats(
+                    shortStats = listOf(
+                        ShortOverviewStat(
+                            count = rates.size.toString(),
+                            statType = OverviewStatType.TITLE
+                        ),
+                        ShortOverviewStat(
+                            count = rates.map { it.score }.average().toString(),
+                            statType = OverviewStatType.MEAN_SCORE
+                        )
+                    ),
+                    scoreStatsTitles = rates
+                        .filter { it.status == UserRateStatus.COMPLETED }
+                        .groupBy { it.score }
+                        .map { (score, rates) -> Stat(type = score, value = rates.size.toFloat()) }
+                        .sortedBy { it.type },
+                    statusesStats = rates
+                        .groupBy { it.status }
+                        .map { (status, rates) -> Stat(type = status, value = rates.size.toFloat()) }
+                        .sortedBy { UserRateStatus.entries.indexOf(it.type) }
+                )
+            }
+
+        return MediaTypeStats(
+            animeStats = statsMap[MediaType.ANIME],
+            mangaStats = statsMap[MediaType.MANGA]
         )
     }
 

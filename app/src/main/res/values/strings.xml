@@ -163,7 +163,7 @@
     <string name="details_info_title_synonyms">Alternative Titles</string>
     <string name="details_info_recommendations">Recommendations</string>
     <string name="details_info_links">Links</string>
-    <string name="details_info_score_stats">Score Distribution</string>
+    <string name="details_info_score_stats">Score</string>
     <string name="details_info_statuses_stats">Status Distribution</string>
     <string name="details_characters">Characters</string>
     <string name="details_comments">Comments</string>
@@ -360,6 +360,30 @@
     <string name="sort_type_progress">Progress</string>
     <string name="sort_direction_ascending">Ascending</string>
     <string name="sort_direction_descending">Descending</string>
+
+    <string name="user_stats_section_overview">Overview</string>
+    <string name="user_stats_section_genres">Genres</string>
+    <string name="user_stats_section_tags">Tags</string>
+    <string name="user_stats_section_voice_actors">Voice Actors</string>
+    <string name="user_stats_section_studios">Studios</string>
+
+    <string name="stats_bar_type_titles_watched">Titles Watched</string>
+    <string name="stats_bar_type_titles_read">Titles Read</string>
+    <string name="stats_bar_type_hours_watched">Hours Watched</string>
+    <string name="stats_bar_type_chapters_read">Chapters Read</string>
+    <string name="stats_bar_type_mean_score">Mean Score</string>
+    <string name="overview_stat_title_anime">Total Anime</string>
+    <string name="overview_stat_title_manga">Total Manga</string>
+    <string name="overview_stat_episodes_anime">Episodes Watched</string>
+    <string name="overview_stat_chapters_manga">Chapters Read</string>
+    <string name="overview_stat_time_anime">Days Watched</string>
+    <string name="overview_stat_volumes_manga">Volumes Read</string>
+    <string name="overview_stat_planned_anime">Days Planned</string>
+    <string name="overview_stat_planned_manga">Chapters Planned</string>
+    <string name="overview_stat_mean_score">Mean Score</string>
+    <string name="overview_stat_standard_deviation">Standard Deviation</string>
+    <string name="user_stats_length_episode_count">Episode Count</string>
+    <string name="user_stats_length_chapter_count">Chapter Count</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

@@ -10,9 +10,13 @@ import com.example.shikiflow.data.datasource.dto.ShikiCharacter
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.data.datasource.dto.person.ShikiPerson
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.OverviewStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.fleeksoft.ksoup.Ksoup
 import kotlin.time.Instant
 
@@ -86,4 +90,29 @@ object ShikimoriUserMapper {
         imageUrl = BuildConfig.SHIKI_BASE_URL + image.original?.replace("/x64/", "/original/"),
         favoriteCategory = favoriteCategory
     )
+
+    fun mapUserStats(
+        mediaTypeStats: MediaTypeStats<OverviewStats>,
+        userFavorites: List<UserFavorite>
+    ): UserStatsCategories {
+        val mediaTypes = buildList {
+            mediaTypeStats.animeStats?.scoreStatsTitles?.let { animeScores ->
+                if(animeScores.isNotEmpty()) {
+                    add(MediaType.ANIME)
+                }
+            }
+            mediaTypeStats.mangaStats?.scoreStatsTitles?.let { animeScores ->
+                if(animeScores.isNotEmpty()) {
+                    add(MediaType.MANGA)
+                }
+            }
+        }
+
+        val categories = userFavorites.map { it.favoriteCategory }.distinct()
+
+        return UserStatsCategories(
+            scoreMediaTypes = mediaTypes,
+            favoriteCategories = categories
+        )
+    }
 }

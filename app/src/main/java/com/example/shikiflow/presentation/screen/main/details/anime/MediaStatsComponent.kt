@@ -30,10 +30,13 @@ import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.Stat
 import com.example.shikiflow.presentation.common.BarsChartMode
-import com.example.shikiflow.presentation.common.SegmentedProgressBar
+import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.SegmentedProgressBarType
 import com.example.shikiflow.presentation.common.VerticalBarsChart
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 
 enum class WindowSize {
     COMPACT, MEDIUM, EXPANDED
@@ -44,8 +47,8 @@ fun MediaStatsComponent(
     mediaType: MediaType,
     isAnnounced: Boolean,
     titleScore: Float?,
-    scoreStats: Map<Int, Int>,
-    statusesStats: Map<UserRateStatus, Int>,
+    scoreStats: List<Stat<Int>>,
+    statusesStats: List<Stat<UserRateStatus>>,
     modifier: Modifier = Modifier
 ) {
     val barHorizontalPadding = 12.dp
@@ -100,8 +103,8 @@ private fun ColumnMediaStats(
     mediaType: MediaType,
     isAnnounced: Boolean,
     titleScore: Float?,
-    scoreStats: Map<Int, Int>,
-    statusesStats: Map<UserRateStatus, Int>,
+    scoreStats: List<Stat<Int>>,
+    statusesStats: List<Stat<UserRateStatus>>,
     windowSize: WindowSize,
     barHorizontalPadding: Dp,
     modifier: Modifier = Modifier
@@ -134,8 +137,8 @@ private fun RowMediaStats(
     mediaType: MediaType,
     isAnnounced: Boolean,
     titleScore: Float?,
-    scoreStats: Map<Int, Int>,
-    statusesStats: Map<UserRateStatus, Int>,
+    scoreStats: List<Stat<Int>>,
+    statusesStats: List<Stat<UserRateStatus>>,
     windowWidthSize: WindowSize,
     barHorizontalPadding: Dp,
     modifier: Modifier = Modifier
@@ -174,7 +177,7 @@ private fun RowMediaStats(
 @Composable
 private fun ScoreStatsComponent(
     titleScore: Float,
-    scoreStats: Map<Int, Int>,
+    scoreStats: List<Stat<Int>>,
     windowSize: WindowSize,
     barHorizontalPadding: Dp,
     modifier: Modifier = Modifier
@@ -193,7 +196,12 @@ private fun ScoreStatsComponent(
             style = MaterialTheme.typography.titleMedium
         )
         VerticalBarsChart(
-            barData = scoreStats.mapKeys { it.key.toString() },
+            barData = scoreStats.map {
+                Stat<String>(
+                    type = it.type.toString(),
+                    value = it.value
+                )
+            },
             chartMode = if(windowSize == WindowSize.COMPACT) BarsChartMode.Scrollable(
                 barWidth = 32.dp,
                 barSpacing = 16.dp,
@@ -209,7 +217,7 @@ private fun ScoreStatsComponent(
 @Composable
 private fun StatusesStatsComponent(
     mediaType: MediaType,
-    statusesStats: Map<UserRateStatus, Int>,
+    statusesStats: List<Stat<UserRateStatus>>,
     windowSize: WindowSize,
     barHorizontalPadding: Dp,
     modifier: Modifier = Modifier
@@ -233,10 +241,10 @@ private fun StatusesStatsComponent(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            SegmentedProgressBar(
-                mediaType = mediaType,
-                groupedData = statusesStats,
-                totalCount = statusesStats.size,
+            HorizontalStatsBar(
+                stats = statusesStats,
+                label = { status -> status.mapStatus(mediaType) },
+                color = { status -> status.color() },
                 barType = SegmentedProgressBarType.Column(
                     barHeight = 16.dp,
                     barShape = RoundedCornerShape(0.dp),

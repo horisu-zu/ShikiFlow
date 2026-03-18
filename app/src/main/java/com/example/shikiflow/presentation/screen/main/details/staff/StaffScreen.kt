@@ -81,18 +81,17 @@ import com.example.shikiflow.presentation.screen.main.details.character.Paginate
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.presentation.viewmodel.staff.StaffViewModel
-import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaffScreen(
-    personId: Int,
+    staffId: Int,
     navOptions: MediaNavOptions,
     staffViewModel: StaffViewModel = hiltViewModel()
 ) {
-    val staffDetails by staffViewModel.personDetails.collectAsStateWithLifecycle()
+    val staffUiState by staffViewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
     val lazyListState = rememberLazyListState()
@@ -108,8 +107,8 @@ fun StaffScreen(
         }
     }
 
-    LaunchedEffect(personId) {
-        staffViewModel.getPersonDetails(personId)
+    LaunchedEffect(staffId) {
+        staffViewModel.setStaffId(staffId)
     }
 
     Scaffold(
@@ -119,7 +118,7 @@ fun StaffScreen(
                     title = {
                         Text(
                             text = if(!scrolledFirst) stringResource(R.string.staff_title)
-                                else staffDetails.data?.fullName ?: stringResource(R.string.staff_title),
+                                else staffUiState.staffDetails?.fullName ?: stringResource(R.string.staff_title),
                             style = MaterialTheme.typography.titleLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -144,151 +143,147 @@ fun StaffScreen(
             }
         }
     ) { paddingValues ->
-        when(staffDetails) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(staffUiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+        } else if(staffUiState.errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = staffUiState.errorMessage ?: stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { staffViewModel.onRefresh() }
+                )
             }
-            is Resource.Success -> {
-                staffDetails.data?.let { details ->
-                    val horizontalPadding = 12.dp
+        } else {
+            staffUiState.staffDetails?.let { details ->
+                val horizontalPadding = 12.dp
 
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(
-                                top = paddingValues.calculateTopPadding(),
-                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            ),
-                        contentPadding = PaddingValues(
-                            horizontal = horizontalPadding,
-                            vertical = 8.dp
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(
+                            top = paddingValues.calculateTopPadding(),
+                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                            end = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                         ),
-                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
-                    ) {
+                    contentPadding = PaddingValues(
+                        horizontal = horizontalPadding,
+                        vertical = 8.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+                ) {
+                    item {
+                        StaffTitleSection(
+                            avatarUrl = details.imageUrl,
+                            name = details.fullName,
+                            japaneseName = details.nativeName,
+                            staffRoles = details.shortRoles,
+                            modifier = Modifier.height(148.dp)
+                        )
+                    }
+                    if(details.staffCharacterRoles.entries.isNotEmpty()) {
                         item {
-                            StaffTitleSection(
-                                avatarUrl = details.imageUrl,
-                                name = details.fullName,
-                                japaneseName = details.nativeName,
-                                staffRoles = details.shortRoles,
-                                modifier = Modifier.height(148.dp)
+                            VoiceActorRolesSection(
+                                characterRoles = details.staffCharacterRoles,
+                                horizontalPadding = horizontalPadding,
+                                onCharacterClick = { characterId ->
+                                    navOptions.navigateToCharacterDetails(characterId)
+                                },
+                                onPaginatedNavigate = {
+                                    navOptions.navigateToMediaRoles(
+                                        id = staffId,
+                                        mediaRolesType = MediaRolesType.STAFF,
+                                        roleTypes = buildList {
+                                            add(RoleType.VA)
+                                            if(details.staffAnimeRoles.entries.isNotEmpty()) {
+                                                add(RoleType.ANIME)
+                                            }
+                                            if(details.staffMangaRoles.entries.isNotEmpty()) {
+                                                add(RoleType.MANGA)
+                                            }
+                                        }
+                                    )
+                                }
                             )
                         }
-                        if(details.staffCharacterRoles.entries.isNotEmpty()) {
-                            item {
-                                VoiceActorRolesSection(
-                                    characterRoles = details.staffCharacterRoles,
-                                    horizontalPadding = horizontalPadding,
-                                    onCharacterClick = { characterId ->
-                                        navOptions.navigateToCharacterDetails(characterId)
-                                    },
-                                    onPaginatedNavigate = {
-                                        navOptions.navigateToMediaRoles(
-                                            id = personId,
-                                            mediaRolesType = MediaRolesType.STAFF,
-                                            roleTypes = buildList {
+                    }
+                    if(details.staffAnimeRoles.entries.isNotEmpty()) {
+                        item {
+                            CharacterMediaSection(
+                                sectionTitle = stringResource(R.string.media_type_anime),
+                                items = details.staffAnimeRoles,
+                                onItemClick = { id ->
+                                    navOptions.navigateToAnimeDetails(id)
+                                },
+                                onPaginatedNavigate = {
+                                    navOptions.navigateToMediaRoles(
+                                        id = staffId,
+                                        mediaRolesType = MediaRolesType.STAFF,
+                                        roleTypes = buildList {
+                                            add(RoleType.ANIME)
+                                            if(details.staffCharacterRoles.entries.isNotEmpty()) {
                                                 add(RoleType.VA)
-                                                if(details.staffAnimeRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.ANIME)
-                                                }
-                                                if(details.staffMangaRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.MANGA)
-                                                }
                                             }
-                                        )
-                                    }
-                                )
-                            }
-                        }
-                        if(details.staffAnimeRoles.entries.isNotEmpty()) {
-                            item {
-                                CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.media_type_anime),
-                                    items = details.staffAnimeRoles,
-                                    onItemClick = { id ->
-                                        navOptions.navigateToAnimeDetails(id)
-                                    },
-                                    onPaginatedNavigate = {
-                                        navOptions.navigateToMediaRoles(
-                                            id = personId,
-                                            mediaRolesType = MediaRolesType.STAFF,
-                                            roleTypes = buildList {
-                                                add(RoleType.ANIME)
-                                                if(details.staffCharacterRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.VA)
-                                                }
-                                                if(details.staffMangaRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.MANGA)
-                                                }
-                                            }
-                                        )
-                                    },
-                                    horizontalPadding = horizontalPadding
-                                )
-                            }
-                        }
-                        if(details.staffMangaRoles.entries.isNotEmpty()) {
-                            item {
-                                CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.media_type_manga),
-                                    items = details.staffMangaRoles,
-                                    onItemClick = { id ->
-                                        navOptions.navigateToMangaDetails(id)
-                                    },
-                                    onPaginatedNavigate = {
-                                        navOptions.navigateToMediaRoles(
-                                            id = personId,
-                                            mediaRolesType = MediaRolesType.STAFF,
-                                            roleTypes = buildList {
+                                            if(details.staffMangaRoles.entries.isNotEmpty()) {
                                                 add(RoleType.MANGA)
-                                                if(details.staffCharacterRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.VA)
-                                                }
-                                                if(details.staffAnimeRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.ANIME)
-                                                }
                                             }
-                                        )
-                                    },
-                                    horizontalPadding = horizontalPadding
-                                )
-                            }
-                        }
-                        details.topicId?.let { topicId ->
-                            item {
-                                CommentSection(
-                                    topicId = topicId,
-                                    onEntityClick = { entityType, id ->
-                                        navOptions.navigateByEntity(entityType, id)
-                                    },
-                                    onLinkClick = { WebIntent.openUrlCustomTab(context, it) },
-                                    onTopicNavigate = { topicId ->
-                                        navOptions.navigateToComments(
-                                            screenMode = CommentsScreenMode.TOPIC,
-                                            id = topicId
-                                        )
-                                    }
-                                )
-                            }
+                                        }
+                                    )
+                                },
+                                horizontalPadding = horizontalPadding
+                            )
                         }
                     }
-                }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = staffDetails.message ?: stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { staffViewModel.getPersonDetails(personId, true) }
-                    )
+                    if(details.staffMangaRoles.entries.isNotEmpty()) {
+                        item {
+                            CharacterMediaSection(
+                                sectionTitle = stringResource(R.string.media_type_manga),
+                                items = details.staffMangaRoles,
+                                onItemClick = { id ->
+                                    navOptions.navigateToMangaDetails(id)
+                                },
+                                onPaginatedNavigate = {
+                                    navOptions.navigateToMediaRoles(
+                                        id = staffId,
+                                        mediaRolesType = MediaRolesType.STAFF,
+                                        roleTypes = buildList {
+                                            add(RoleType.MANGA)
+                                            if(details.staffCharacterRoles.entries.isNotEmpty()) {
+                                                add(RoleType.VA)
+                                            }
+                                            if(details.staffAnimeRoles.entries.isNotEmpty()) {
+                                                add(RoleType.ANIME)
+                                            }
+                                        }
+                                    )
+                                },
+                                horizontalPadding = horizontalPadding
+                            )
+                        }
+                    }
+                    details.topicId?.let { topicId ->
+                        item {
+                            CommentSection(
+                                topicId = topicId,
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                },
+                                onLinkClick = { WebIntent.openUrlCustomTab(context, it) },
+                                onTopicNavigate = { topicId ->
+                                    navOptions.navigateToComments(
+                                        screenMode = CommentsScreenMode.TOPIC,
+                                        id = topicId
+                                    )
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

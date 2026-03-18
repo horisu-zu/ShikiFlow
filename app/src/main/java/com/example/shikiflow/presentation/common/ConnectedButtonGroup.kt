@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.common
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
@@ -19,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Dp
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -29,7 +31,9 @@ fun <T> ConnectedButtonGroup(
     selectedIndex: Int,
     onItemSelection: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    showText: Boolean = false
+    showText: Boolean = false,
+    iconSize: Dp = IconButtonDefaults.smallIconSize,
+    contentPadding: PaddingValues = ButtonDefaults.ExtraSmallContentPadding
 ) {
     Row(
         modifier = modifier,
@@ -45,7 +49,7 @@ fun <T> ConnectedButtonGroup(
                     index == items.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
                     else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                 },
-                contentPadding = ButtonDefaults.ExtraSmallContentPadding,
+                contentPadding = contentPadding,
                 colors = ToggleButtonDefaults.toggleButtonColors(
                     containerColor = MaterialTheme.colorScheme.secondaryContainer,
                     checkedContainerColor = MaterialTheme.colorScheme.primary,
@@ -57,7 +61,7 @@ fun <T> ConnectedButtonGroup(
                     .semantics { role = Role.RadioButton }
             ) {
                 item.iconResource.toIcon(
-                    modifier = Modifier.size(IconButtonDefaults.smallIconSize)
+                    modifier = Modifier.size(iconSize)
                 )
 
                 if(showText && item.titleRes != null) {

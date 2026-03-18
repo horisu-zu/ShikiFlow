@@ -9,10 +9,11 @@ import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface StaffRepository {
-    suspend fun getStaffDetails(id: Int): Result<StaffDetails>
+    fun getStaffDetails(id: Int): Flow<DataResult<StaffDetails>>
 
     fun getMediaStaff(
         mediaId: Int,

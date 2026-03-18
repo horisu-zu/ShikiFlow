@@ -45,10 +45,18 @@ query UserRates(
     }
 }
 
-query UserFavoriteCategories(
+query UserStatsCategories(
     $userId: Int!
 ) {
     User(id: $userId) {
+        statistics {
+            anime {
+                count
+            }
+            manga {
+                count
+            }
+        }
         favourites {
             anime {
                 pageInfo {

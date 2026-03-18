@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.more.profile
+package com.example.shikiflow.presentation.screen.more.profile.stats.shikimori
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
@@ -33,33 +33,37 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.Stat
 import com.example.shikiflow.presentation.common.BarsChartMode
-import com.example.shikiflow.presentation.common.SegmentedProgressBar
+import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.VerticalBarsChart
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
+import com.materialkolor.ktx.harmonize
 
 @Composable
-fun TrackItem(
+fun ShikimoriTrackItem(
     mediaType: MediaType,
     type: String,
     iconResource: IconResource,
-    ratesList: MediaTypeStats,
+    mediaStats: OverviewStats,
     itemsCount: Int,
     modifier: Modifier = Modifier
 ) {
     var isExpanded by rememberSaveable { mutableStateOf(false) }
-    val shouldShowExpand = remember(ratesList) {
-        ratesList.scoreStats
-            .map { (score, count) -> score * count }
-            .sum() > 50
+    val shouldShowExpand = remember(mediaStats) {
+        mediaStats.scoreStatsTitles.sumOf { (score, count) ->
+            score * count.toInt()
+        } > 50
     }
 
     Column(
         modifier = modifier
     ) {
-        TypeItem(
+        ShikimoriTypeItem(
             icon = iconResource,
             type = type,
             count = itemsCount,
@@ -67,20 +71,23 @@ fun TrackItem(
             isExpanded = isExpanded,
             onExpandClick = { isExpanded = !isExpanded }
         )
-        SegmentedProgressBar(
-            mediaType = mediaType,
-            groupedData = ratesList.statusesStats,
-            totalCount = itemsCount,
+
+        HorizontalStatsBar(
+            stats = mediaStats.statusesStats,
+            label = { status -> status.mapStatus(mediaType) },
+            color = { status -> status.color() },
             modifier = Modifier.padding(top = 8.dp)
         )
 
         AnimatedVisibility(visible = isExpanded) {
-            val isScrollable = ratesList.scoreStats.keys.size > 10
-            val averageScore = remember(ratesList.scoreStats) {
-                ratesList.scoreStats.entries
-                    .sumOf { (score, count) ->
-                        score * count
-                    } / ratesList.scoreStats.values.sum().toDouble()
+            val isScrollable = mediaStats.scoreStatsTitles.size > 10
+            val averageScore = remember(mediaStats.scoreStatsTitles) {
+                val totalCount = mediaStats.scoreStatsTitles.sumOf { it.value.toInt() }
+                if (totalCount == 0) {
+                    0.0f
+                } else mediaStats.scoreStatsTitles.sumOf { (score, count) ->
+                    score * count.toInt()
+                } / totalCount.toFloat()
             }
 
             Column(
@@ -101,27 +108,24 @@ fun TrackItem(
                     style = MaterialTheme.typography.titleMedium
                 )
                 VerticalBarsChart(
-                    barData = ratesList.scoreStats
-                        .mapKeys { it.key.toString() }
-                        .filter { it.value > 0 },
+                    barData = mediaStats.scoreStatsTitles.map { scoreStat ->
+                        Stat<String>(
+                            type = scoreStat.type.toString(),
+                            value = scoreStat.value
+                        )
+                    }.filter { it.value > 0 },
                     chartMode = if(isScrollable) BarsChartMode.Scrollable(barWidth = 32.dp, barSpacing = 8.dp)
                         else BarsChartMode.FillWidth(),
                     maxBarHeight = 156.dp
                 )
             }
-            /*StatsGraph(
-                scoreStats = ratesList.scoreStats.filter { it.value > 0 },
-                modifier = Modifier.fillMaxWidth()
-                    .height(240.dp)
-                    .padding(top = 8.dp)
-            )*/
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-private fun TypeItem(
+private fun ShikimoriTypeItem(
     icon: IconResource,
     type: String,
     modifier: Modifier = Modifier,
@@ -190,83 +194,3 @@ private fun TypeItem(
         }
     }
 }
-
-/*
-@Composable
-private fun StatsGraph(
-    scoreStats: Map<Int, Int>,
-    modifier: Modifier = Modifier
-) {
-    val scoreFormat = detectFormat(scoreStats)
-    val modelProducer = remember { CartesianChartModelProducer() }
-    val averageScore = remember(scoreStats) {
-        scoreStats.entries
-            .sumOf { (score, count) ->
-                score * count
-            } / scoreStats.values.sum().toDouble()
-    }
-
-    LaunchedEffect(scoreStats) {
-        val xAxis = (scoreFormat.minVal..scoreFormat.maxVal step scoreFormat.step).toList()
-        val yAxis = xAxis.map { score ->
-            scoreStats[score] ?: 0
-        }
-
-        modelProducer.runTransaction {
-            columnSeries {
-                series(x = xAxis, y = yAxis)
-            }
-        }
-    }
-
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 8.dp, vertical = 6.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
-    ) {
-        Text(
-            text = stringResource(R.string.track_average_score, "%.2f".format(averageScore)),
-            style = MaterialTheme.typography.titleMedium
-        )
-        CartesianChartHost(
-            chart = rememberCartesianChart(
-                rememberColumnCartesianLayer(
-                    columnProvider = ColumnCartesianLayer.ColumnProvider.series(
-                        columns = vicoTheme.columnCartesianLayerColors.map { color ->
-                            rememberLineComponent(
-                                fill = fill(color),
-                                thickness = 24.dp,
-                                shape = CorneredShape.rounded(topLeftPercent = 20, topRightPercent = 20)
-                            )
-                        }
-                    ),
-                    dataLabel = rememberTextComponent(
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                ),
-                startAxis = VerticalAxis.rememberStart(
-                    label = null,
-                    tickLength = 0.dp,
-                    line = null,
-                    guideline = null
-                ),
-                bottomAxis = HorizontalAxis.rememberBottom(
-                    label = rememberAxisLabelComponent(
-                        color = MaterialTheme.colorScheme.onBackground
-                    ),
-                    tickLength = 0.dp,
-                    guideline = null
-                )
-            ),
-            scrollState = rememberVicoScrollState(scrollEnabled = false),
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioNoBouncy,
-                stiffness = Spring.StiffnessLow
-            ),
-            modelProducer = modelProducer,
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}*/

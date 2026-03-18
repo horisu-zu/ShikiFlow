@@ -47,9 +47,9 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.getMangaDexStatusColor
 import com.example.shikiflow.presentation.viewmodel.manga.read.MangaSelectionViewModel
 import com.example.shikiflow.utils.Resource
-import com.example.shikiflow.utils.StatusColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -188,7 +188,7 @@ private fun MangaItem(
                     modifier = Modifier
                         .size(8.dp)
                         .clip(CircleShape)
-                        .background(StatusColor.getMangaDexStatusColor(mangaItem.status))
+                        .background(color = getMangaDexStatusColor(mangaItem.status))
                 )
                 Text(
                     text = mangaItem.status.replaceFirstChar { it.uppercase() },

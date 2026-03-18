@@ -2,12 +2,10 @@ package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.fragment.ALRateEntry
 import com.example.graphql.anilist.fragment.ALRateEntryShort
-import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
-import com.example.shikiflow.domain.model.user.MediaTypeStats
 import kotlin.time.Instant
 
 object AnilistRateMapper {
@@ -34,20 +32,6 @@ object AnilistRateMapper {
             score = this.score.score?.toInt() ?: 0,
             status = this.status?.toDomain() ?: UserRateStatus.UNKNOWN,
             progress = this.progress ?: 0
-        )
-    }
-
-    fun ALUserListStats.toDomain(): MediaTypeStats {
-        return MediaTypeStats(
-            count = this.count,
-            averageScore = this.meanScore,
-            statusesStats = this.statuses?.associate {
-                (it?.status?.toDomain() ?: UserRateStatus.UNKNOWN) to (it?.count ?: 0)
-            }?.toSortedMap(comparator = compareBy { UserRateStatus.entries.indexOf(it) })
-                ?: emptyMap(),
-            scoreStats = this.scores?.associate {
-                (it?.score ?: 0) to (it?.count ?: 0)
-            }?.toSortedMap(comparator = compareBy { it }) ?: emptyMap()
         )
     }
 }
