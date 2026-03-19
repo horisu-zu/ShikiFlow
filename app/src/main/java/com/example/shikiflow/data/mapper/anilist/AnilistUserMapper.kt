@@ -9,8 +9,12 @@ import com.example.graphql.anilist.fragment.ALUserActivity
 import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.graphql.anilist.fragment.ALUserShort
 import com.example.graphql.anilist.type.MediaListStatus
+import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
 import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
+import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
+import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
+import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -118,7 +122,15 @@ object AnilistUserMapper {
             statusesStats = toStatusesStats(),
             lengthStatsTitles = toLengthStatsTitles(),
             lengthStatsTime = toLengthStatsTime(mediaType),
-            lengthStatsScore = toLengthStatsScore()
+            lengthStatsScore = toLengthStatsScore(),
+            formatStats = toFormatStats(),
+            countryStats = toCountryStats(),
+            releaseYearStatsTitles = toReleaseYearStatsCount(),
+            releaseYearStatsTime = toReleaseYearStatsTime(mediaType),
+            releaseYearStatsScore = toReleaseYearStatsScore(),
+            startYearStatsTitles = toStartYearStatsCount(),
+            startYearStatsTime = toStartYearStatsTime(mediaType),
+            startYearStatsScore = toStartYearStatsScore()
         )
     }
 
@@ -173,9 +185,9 @@ object AnilistUserMapper {
             Stat<Int>(
                 type = score?.score ?: 0,
                 value = when(mediaType) {
-                    MediaType.ANIME -> score?.minutesWatched?.div(60)?.toFloat() ?: 0f
-                    MediaType.MANGA -> score?.chaptersRead?.toFloat() ?: 0f
-                }
+                    MediaType.ANIME -> score?.minutesWatched?.div(60)
+                    MediaType.MANGA -> score?.chaptersRead
+                }?.toFloat() ?: 0f
             )
         }?.sortedBy { it.type } ?: emptyList()
     }
@@ -205,9 +217,9 @@ object AnilistUserMapper {
             Stat<String>(
                 type = length?.length ?: "",
                 value = when(mediaType) {
-                    MediaType.ANIME -> length?.minutesWatched?.div(60)?.toFloat() ?: 0f
-                    MediaType.MANGA -> length?.chaptersRead?.toFloat() ?: 0f
-                }
+                    MediaType.ANIME -> length?.minutesWatched?.div(60)
+                    MediaType.MANGA -> length?.chaptersRead
+                }?.toFloat() ?: 0f
             )
         }?.sortedBy { length ->
             length.type.trimEnd('+').split("-").first().toIntOrNull() ?: 0
@@ -222,6 +234,100 @@ object AnilistUserMapper {
             )
         }?.sortedBy { length ->
             length.type.trimEnd('+').split("-").first().toIntOrNull() ?: 0
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toFormatStats(): List<Stat<MediaFormat>> {
+        return formats?.mapNotNull { format ->
+            Stat<MediaFormat>(
+                type = format?.format?.toDomain() ?: MediaFormat.UNKNOWN,
+                value = format?.count?.toFloat() ?: 0f
+            )
+        }?.sortedBy { format ->
+            format.type.ordinal
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toCountryStats(): List<Stat<CountryOfOrigin>> {
+        return countries?.mapNotNull { country ->
+            Stat<CountryOfOrigin>(
+                type = country?.country?.toCountryOfOrigin() ?: CountryOfOrigin.JAPAN,
+                value = country?.count?.toFloat() ?: 0f
+            )
+        }?.sortedBy { format ->
+            format.type.ordinal
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toReleaseYearStatsCount(): List<Stat<Int>> {
+        return releaseYears?.mapNotNull { releaseYear ->
+            Stat<Int>(
+                type = releaseYear?.releaseYear ?: 0,
+                value = releaseYear?.count?.toFloat() ?: 0f
+            )
+        }?.sortedBy { stat ->
+            stat.type
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toReleaseYearStatsTime(mediaType: MediaType): List<Stat<Int>> {
+        return releaseYears?.mapNotNull { releaseYear ->
+            Stat<Int>(
+                type = releaseYear?.releaseYear ?: 0,
+                value = when(mediaType) {
+                    MediaType.ANIME -> releaseYear?.minutesWatched?.div(60)
+                    MediaType.MANGA -> releaseYear?.chaptersRead
+                }?.toFloat() ?: 0f
+            )
+        }?.sortedBy { stat ->
+            stat.type
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toReleaseYearStatsScore(): List<Stat<Int>> {
+        return releaseYears?.mapNotNull { releaseYear ->
+            Stat<Int>(
+                type = releaseYear?.releaseYear ?: 0,
+                value = releaseYear?.meanScore?.toFloat() ?: 0f
+            )
+        }?.sortedBy { stat ->
+            stat.type
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toStartYearStatsCount(): List<Stat<Int>> {
+        return startYears?.mapNotNull { startYear ->
+            Stat<Int>(
+                type = startYear?.startYear ?: 0,
+                value = startYear?.count?.toFloat() ?: 0f
+            )
+        }?.sortedBy { stat ->
+            stat.type
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toStartYearStatsTime(mediaType: MediaType): List<Stat<Int>> {
+        return startYears?.mapNotNull { startYear ->
+            Stat<Int>(
+                type = startYear?.startYear ?: 0,
+                value = when(mediaType) {
+                    MediaType.ANIME -> startYear?.minutesWatched?.div(60)
+                    MediaType.MANGA -> startYear?.chaptersRead
+                }?.toFloat() ?: 0f
+            )
+        }?.sortedBy { stat ->
+            stat.type
+        } ?: emptyList()
+    }
+
+    fun ALUserListStats.toStartYearStatsScore(): List<Stat<Int>> {
+        return startYears?.mapNotNull { startYear ->
+            Stat<Int>(
+                type = startYear?.startYear ?: 0,
+                value = startYear?.meanScore?.toFloat() ?: 0f
+            )
+        }?.sortedBy { stat ->
+            stat.type
         } ?: emptyList()
     }
 }

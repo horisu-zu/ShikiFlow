@@ -64,17 +64,25 @@ kotlin {
 }
 
 apollo {
+    val appPackageName: String by rootProject.extra
+    val graphQLPackageName: String by rootProject.extra
+
     service("shikimori-api") {
-        packageName.set("com.example.graphql.shikimori")
+        packageName.set("$graphQLPackageName.shikimori")
         schemaFile.set(file("src/main/graphql/shikimori/schema.graphql"))
         srcDir("src/main/graphql/shikimori/sources")
         generateKotlinModels.set(true)
     }
     service("anilist-api") {
-        packageName.set("com.example.graphql.anilist")
+        packageName.set("$graphQLPackageName.anilist")
         schemaFile.set(file("src/main/graphql/anilist/schema.graphql"))
         srcDir("src/main/graphql/anilist/sources")
         generateKotlinModels.set(true)
+        mapScalar(
+            "CountryCode",
+            "$appPackageName.data.datasource.dto.anilist.CountryOfOriginDto",
+            "$appPackageName.data.datasource.dto.anilist.CountryOfOriginDto.countryOfOriginAdapter"
+        )
     }
 }
 

@@ -384,6 +384,15 @@
     <string name="overview_stat_standard_deviation">Standard Deviation</string>
     <string name="user_stats_length_episode_count">Episode Count</string>
     <string name="user_stats_length_chapter_count">Chapter Count</string>
+    <string name="country_japan">Japan</string>
+    <string name="country_south_korea">South Korea</string>
+    <string name="country_china">China</string>
+    <string name="country_taiwan">Taiwan</string>
+    <string name="user_stats_country">Country Distribution</string>
+    <string name="user_stats_format">Format Distribution</string>
+    <string name="user_stats_release_year">Release Year</string>
+    <string name="user_stats_watch_year">Watch Year</string>
+    <string name="user_stats_read_year">Read Year</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

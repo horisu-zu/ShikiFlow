@@ -30,6 +30,7 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.MediaTypeStats
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import jakarta.inject.Inject
@@ -41,11 +42,14 @@ import kotlinx.coroutines.flow.flow
 class ShikimoriUserDataSource @Inject constructor(
     private val apolloClient: ApolloClient,
     private val userApi: UserApi
-): UserDataSource {
-    override suspend fun fetchCurrentUser(): User? {
-        val response = apolloClient.query(CurrentUserQuery()).execute()
-
-        return response.data?.currentUser?.userShort?.toDomain()
+): UserDataSource, BaseNetworkRepository() {
+    override fun fetchCurrentUser(): Flow<DataResult<User>> {
+        return apolloClient.query(CurrentUserQuery())
+            .toFlow()
+            .asDataResult { data ->
+                data.currentUser?.userShort?.toDomain()
+                    ?: throw IllegalStateException("No user data returned")
+            }
     }
 
     override fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>> {

@@ -5,6 +5,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaBrowseQuery
 import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.MediaExternalLinksQuery
@@ -43,7 +45,9 @@ class AnilistMediaDetailsDataSource @Inject constructor(
     ): Result<MediaDetails> {
         val detailsQuery = MediaDetailsQuery(mediaType.toAnilistType(), id)
 
-        val response = apolloClient.query(detailsQuery).execute()
+        val response = apolloClient.query(detailsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.Media?.toDomain() ?: throw NoSuchElementException("Empty Response")

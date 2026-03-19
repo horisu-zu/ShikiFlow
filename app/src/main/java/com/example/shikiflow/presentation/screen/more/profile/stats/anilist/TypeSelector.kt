@@ -1,0 +1,71 @@
+package com.example.shikiflow.presentation.screen.more.profile.stats.anilist
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
+import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
+import kotlin.collections.forEach
+
+@Composable
+fun TypeSelector(
+    types: List<StatsBarType>,
+    mediaType: MediaType,
+    currentType: StatsBarType,
+    onTypeSelect: (StatsBarType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .padding(all = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        types.forEach { statsBarType ->
+            val isSelected = statsBarType == currentType
+
+            Text(
+                text = stringResource(statsBarType.displayValue(mediaType)),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    textAlign = TextAlign.Center,
+                    color = if(isSelected) MaterialTheme.colorScheme.onPrimary
+                    else MaterialTheme.colorScheme.onSurface
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable {
+                        if (!isSelected) {
+                            onTypeSelect(statsBarType)
+                        }
+                    }
+                    .background(
+                        color = if (isSelected) MaterialTheme.colorScheme.primary
+                        else Color.Transparent
+                    )
+                    .padding(
+                        horizontal = 4.dp,
+                        vertical = 2.dp
+                    )
+            )
+        }
+    }
+}

@@ -37,7 +37,7 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun fetchCurrentUser(): User? {
+    override fun fetchCurrentUser(): Flow<DataResult<User>> {
         return getSource().fetchCurrentUser()
     }
 

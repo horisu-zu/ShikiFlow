@@ -39,8 +39,8 @@ fun ProfileAppBar(
     backgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
     DynamicTopAppBar(
-        expandedHeight = 144.dp,
-        collapsedHeight = 92.dp,
+        expandedHeight = 160.dp,
+        collapsedHeight = 108.dp,
         scrollBehavior = scrollBehavior,
         modifier = modifier,
         backgroundColor = backgroundColor
@@ -49,9 +49,9 @@ fun ProfileAppBar(
         val progress = (offsetDp / maxOffsetDp).coerceIn(0f, 1f)
 
         val avatarImageType = ImageType.Custom(
-            defaultWidth = lerp(96.dp, 48.dp, progress),
+            defaultWidth = lerp(108.dp, 60.dp, progress),
             defaultAspectRatio = 1f,
-            defaultClip = RoundedCornerShape(percent = 12)
+            defaultClip = RoundedCornerShape(percent = 16)
         )
 
         Box(modifier = Modifier.fillMaxSize()) {

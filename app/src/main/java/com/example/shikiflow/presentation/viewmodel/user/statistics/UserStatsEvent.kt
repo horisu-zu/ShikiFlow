@@ -11,6 +11,8 @@ interface UserStatsEvent {
 
     fun setScoreBarType(mediaType: MediaType, scoreBarType: StatsBarType)
     fun setLengthBarType(mediaType: MediaType, lengthBarType: StatsBarType)
+    fun setReleaseYearBarType(mediaType: MediaType, releaseYearBarType: StatsBarType)
+    fun setStartYearBarType(mediaType: MediaType, startYearBarType: StatsBarType)
 
     fun onRefresh()
 }

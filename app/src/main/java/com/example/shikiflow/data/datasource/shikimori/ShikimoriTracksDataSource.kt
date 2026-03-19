@@ -8,6 +8,8 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.shikimori.AnimeTrackBrowseQuery
 import com.example.graphql.shikimori.AnimeTracksQuery
 import com.example.graphql.shikimori.MangaTracksQuery
@@ -75,7 +77,10 @@ class ShikimoriTracksDataSource @Inject constructor(
             order = Optional.presentIfNotNull(order?.toShikimoriOrder())
         )
 
-        val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
         return response.toResult().map { data ->
             data.userRates.map { userRate ->
                 userRate.animeUserRateWithModel.toDomain()

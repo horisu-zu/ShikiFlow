@@ -178,6 +178,28 @@ fragment ALUserListStats on UserStatistics {
         minutesWatched
         chaptersRead
     }
+    formats {
+        format
+        count
+    }
+    countries {
+        country
+        count
+    }
+    releaseYears {
+        releaseYear
+        count
+        minutesWatched
+        chaptersRead
+        meanScore
+    }
+    startYears {
+        startYear
+        count
+        minutesWatched
+        chaptersRead
+        meanScore
+    }
 }
 
 fragment ALFavoriteMediaShort on Media {

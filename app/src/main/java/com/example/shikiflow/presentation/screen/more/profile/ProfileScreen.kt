@@ -113,7 +113,7 @@ fun ProfileScreenContent(
                 )
             }
         } else {
-            val horizontalPadding = 16.dp
+            val horizontalPadding = 12.dp
             var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
             val sectionsList = ProfileSectionType.getTabRows(uiState.userStatsCategories)
 

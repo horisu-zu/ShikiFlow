@@ -26,10 +26,14 @@ import kotlin.collections.set
 data class UserStatsUiState(
     val userId: Int? = null,
     val authType: AuthType? = null,
+
     val statsSectionType: UserStatsSectionType = UserStatsSectionType.OVERVIEW,
     val overviewStats: MediaTypeStats<OverviewStats> = MediaTypeStats(),
+
     val scoreBarType: Map<MediaType, StatsBarType> = emptyMap(),
     val lengthBarType: Map<MediaType, StatsBarType> = emptyMap(),
+    val releaseYearBarType: Map<MediaType, StatsBarType> = emptyMap(),
+    val startYearBarType: Map<MediaType, StatsBarType> = emptyMap(),
 
     override val errorMessage: String? = null,
     override val isLoading: Boolean = true,
@@ -122,6 +126,32 @@ class UserStatsViewModel @Inject constructor(
             state.copy(
                 lengthBarType = state.lengthBarType.toMutableMap().apply {
                     this[mediaType] = lengthBarType
+                }
+            )
+        }
+    }
+
+    override fun setReleaseYearBarType(
+        mediaType: MediaType,
+        releaseYearBarType: StatsBarType
+    ) {
+        mutableUiState.update { state ->
+            state.copy(
+                releaseYearBarType = state.releaseYearBarType.toMutableMap().apply {
+                    this[mediaType] = releaseYearBarType
+                }
+            )
+        }
+    }
+
+    override fun setStartYearBarType(
+        mediaType: MediaType,
+        startYearBarType: StatsBarType
+    ) {
+        mutableUiState.update { state ->
+            state.copy(
+                startYearBarType = state.startYearBarType.toMutableMap().apply {
+                    this[mediaType] = startYearBarType
                 }
             )
         }

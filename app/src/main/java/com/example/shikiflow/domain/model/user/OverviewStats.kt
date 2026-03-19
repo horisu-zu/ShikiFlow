@@ -1,5 +1,7 @@
 package com.example.shikiflow.domain.model.user
 
+import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
+import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 
@@ -10,7 +12,15 @@ data class OverviewStats(
     val statusesStats: List<Stat<UserRateStatus>> = emptyList(),
     val lengthStatsTitles: List<Stat<String>> = emptyList(),
     val lengthStatsTime: List<Stat<String>> = emptyList(),
-    val lengthStatsScore: List<Stat<String>> = emptyList()
+    val lengthStatsScore: List<Stat<String>> = emptyList(),
+    val formatStats: List<Stat<MediaFormat>> = emptyList(),
+    val countryStats: List<Stat<CountryOfOrigin>> = emptyList(),
+    val releaseYearStatsTitles: List<Stat<Int>> = emptyList(),
+    val releaseYearStatsTime: List<Stat<Int>> = emptyList(),
+    val releaseYearStatsScore: List<Stat<Int>> = emptyList(),
+    val startYearStatsTitles: List<Stat<Int>> = emptyList(),
+    val startYearStatsTime: List<Stat<Int>> = emptyList(),
+    val startYearStatsScore: List<Stat<Int>> = emptyList()
 )
 
 data class MediaTypeStats<T> (

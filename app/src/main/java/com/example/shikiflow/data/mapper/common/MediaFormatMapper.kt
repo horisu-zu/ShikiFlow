@@ -88,7 +88,7 @@ object MediaFormatMapper {
             AnilistMediaFormat.ONA -> MediaFormat.ONA
             AnilistMediaFormat.MUSIC -> MediaFormat.MUSIC
             AnilistMediaFormat.MANGA -> MediaFormat.MANGA
-            AnilistMediaFormat.NOVEL -> MediaFormat.NOVEL
+            AnilistMediaFormat.NOVEL -> MediaFormat.LIGHT_NOVEL
             AnilistMediaFormat.ONE_SHOT -> MediaFormat.ONE_SHOT
             else -> MediaFormat.UNKNOWN
         }

@@ -9,8 +9,8 @@ import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.UserActivitiesQuery
-import com.example.graphql.anilist.UserRatesQuery
 import com.example.graphql.anilist.UserStatsCategoriesQuery
+import com.example.graphql.anilist.UserStatsQuery
 import com.example.graphql.anilist.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.FavoritesPagingSource
@@ -43,10 +43,13 @@ class AnilistUserDataSource @Inject constructor(
     private val apolloClient: ApolloClient
 ): UserDataSource, BaseNetworkRepository() {
 
-    override suspend fun fetchCurrentUser(): User? {
-        val query = apolloClient.query(CurrentUserQuery()).execute()
-
-        return query.data?.Viewer?.aLUserShort?.toDomain()
+    override fun fetchCurrentUser(): Flow<DataResult<User>> {
+        return apolloClient.query(CurrentUserQuery())
+            .toFlow()
+            .asDataResult { data ->
+                data.Viewer?.aLUserShort?.toDomain()
+                    ?: throw IllegalStateException("No user data returned")
+            }
     }
 
     override fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>> {
@@ -97,7 +100,7 @@ class AnilistUserDataSource @Inject constructor(
     override fun getUserRates(
         userId: Int
     ): Flow<DataResult<MediaTypeStats<OverviewStats>>> {
-        val ratesQuery = UserRatesQuery(userId)
+        val ratesQuery = UserStatsQuery(userId)
 
         val response = apolloClient.query(ratesQuery)
             .toFlow()

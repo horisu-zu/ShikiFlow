@@ -8,6 +8,8 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaListIDsQuery
 import com.example.graphql.anilist.MediaListTracksQuery
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
@@ -108,7 +110,9 @@ class AnilistTracksDataSource @Inject constructor(
             idsIn = Optional.presentIfNotNull(idsList)
         )
 
-        val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.Page

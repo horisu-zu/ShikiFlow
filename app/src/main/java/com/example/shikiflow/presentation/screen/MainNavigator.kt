@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.screen
 
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
@@ -27,8 +26,6 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffo
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,13 +48,13 @@ import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
 import com.example.shikiflow.presentation.screen.more.MoreNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
-import com.example.shikiflow.presentation.viewmodel.user.UserViewModel
+import com.example.shikiflow.presentation.viewmodel.user.MainNavViewModel
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainNavigator(
     onFinishActivity: () -> Unit,
-    userViewModel: UserViewModel = hiltViewModel()
+    mainNavViewModel: MainNavViewModel = hiltViewModel()
 ) {
     val configuration = LocalConfiguration.current
 
@@ -71,8 +68,7 @@ fun MainNavigator(
     val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
 
-    val currentUser by userViewModel.userFlow.collectAsStateWithLifecycle()
-    val authType by userViewModel.authTypeFlow.collectAsState()
+    val mainNavUiState by mainNavViewModel.uiState.collectAsStateWithLifecycle()
 
     val isKeyboardVisible = WindowInsets.isImeVisible &&
         configuration.orientation == Configuration.ORIENTATION_PORTRAIT
@@ -87,12 +83,6 @@ fun MainNavigator(
         isKeyboardVisible || !isBottomBarVisible -> NavigationSuiteType.None
         isExpanded -> NavigationSuiteType.NavigationRail
         else -> NavigationSuiteScaffoldDefaults.navigationSuiteType(adaptiveInfo)
-    }
-
-    Log.d("MainNavigator", "Nav Type: $customNavType")
-
-    LaunchedEffect(Unit) {
-        userViewModel.fetchCurrentUser()
     }
 
     NavigationSuiteScaffold(
@@ -154,22 +144,22 @@ fun MainNavigator(
                     entry<MainNavRoute.Main> {
                         MainScreenNavigator(
                             mainScreenBackStack = mainScreenBackStack,
-                            currentUserData = currentUser,
-                            authType = authType
+                            currentUserData = mainNavUiState.user,
+                            authType = mainNavUiState.authType
                         )
                     }
                     entry<MainNavRoute.Browse> {
                         BrowseScreenNavigator(
                             browseScreenBackStack = browseScreenBackStack,
-                            currentUserData = currentUser,
-                            authType = authType
+                            currentUserData = mainNavUiState.user,
+                            authType = mainNavUiState.authType
                         )
                     }
                     entry<MainNavRoute.More> {
                         MoreScreenNavigator(
                             moreScreenBackStack = moreScreenBackStack,
-                            currentUser = currentUser,
-                            authType = authType
+                            currentUser = mainNavUiState.user,
+                            authType = mainNavUiState.authType
                         )
                     }
                 },

@@ -42,7 +42,6 @@ import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.co
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
-import com.materialkolor.ktx.harmonize
 
 @Composable
 fun ShikimoriTrackItem(

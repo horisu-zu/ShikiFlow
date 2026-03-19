@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow

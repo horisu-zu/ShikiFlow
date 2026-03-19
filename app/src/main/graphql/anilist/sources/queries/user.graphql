@@ -30,7 +30,7 @@ query UserActivities(
     }
 }
 
-query UserRates(
+query UserStats(
     $userId: Int!
 ) {
     User(id: $userId) {

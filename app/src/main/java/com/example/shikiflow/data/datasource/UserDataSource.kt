@@ -16,7 +16,7 @@ import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserDataSource {
-    suspend fun fetchCurrentUser(): User?
+    fun fetchCurrentUser(): Flow<DataResult<User>>
 
     fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>>
 

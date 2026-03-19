@@ -58,8 +58,8 @@ fun UserStatsSection(
     userId: Int,
     isCurrentUser: Boolean,
     isRefreshEnabled: Boolean,
-    onCompareClick: () -> Unit,
     horizontalPadding: Dp,
+    onCompareClick: () -> Unit,
     userStatsViewModel: UserStatsViewModel = hiltViewModel()
 ) {
     val uiState by userStatsViewModel.uiState.collectAsStateWithLifecycle()
@@ -176,13 +176,11 @@ private fun AnilistStatsSection(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.padding(horizontal = horizontalPadding),
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         SnapFlingLazyRow(
-            modifier = Modifier
-                .ignoreHorizontalParentPadding(horizontalPadding)
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = horizontalPadding),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -216,8 +214,9 @@ private fun AnilistStatsSection(
                     OverviewSection(
                         uiState = uiState,
                         isCurrentUser = isCurrentUser,
-                        onCompareClick = onCompareClick,
-                        event = event
+                        event = event,
+                        horizontalPadding = horizontalPadding,
+                        onCompareClick = onCompareClick
                     )
                 }
             }

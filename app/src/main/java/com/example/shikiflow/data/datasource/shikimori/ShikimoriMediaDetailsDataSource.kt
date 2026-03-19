@@ -8,6 +8,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
@@ -55,7 +57,9 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
                         AnimeDetailsQuery(
                             ids = Optional.presentIfNotNull(id.toString())
                         )
-                    ).execute()
+                    )
+                    .fetchPolicy(FetchPolicy.NetworkFirst)
+                    .execute()
 
                 response.toResult().map { data ->
                     data.animes.firstOrNull()?.toDomain()
@@ -69,7 +73,9 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
                         MangaDetailsQuery(
                             ids = Optional.presentIfNotNull(id.toString())
                         )
-                    ).execute()
+                    )
+                    .fetchPolicy(FetchPolicy.NetworkFirst)
+                    .execute()
 
                 response.toResult().map { data ->
                     data.mangas.firstOrNull()?.toDomain()
