@@ -19,7 +19,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.iconResource
 import com.example.shikiflow.utils.IconResource
@@ -28,7 +29,7 @@ import com.example.shikiflow.utils.toIcon
 @Composable
 fun ShortStatsOverview(
     mediaType: MediaType,
-    overviewStats: OverviewStats,
+    overviewStats: List<ShortOverviewStat>,
     modifier: Modifier = Modifier
 ) {
     FlowRow(
@@ -37,7 +38,7 @@ fun ShortStatsOverview(
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
         modifier = modifier
     ) {
-        overviewStats.shortStats.forEach { shortStat ->
+        overviewStats.forEach { shortStat ->
             ShortStatsOverviewItem(
                 label = stringResource(id = shortStat.statType.displayValue(mediaType)),
                 value = shortStat.count,
@@ -49,7 +50,7 @@ fun ShortStatsOverview(
 }
 
 @Composable
-private fun ShortStatsOverviewItem(
+fun ShortStatsOverviewItem(
     label: String,
     value: String,
     iconResource: IconResource,

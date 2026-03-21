@@ -16,11 +16,11 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserRate
-import com.example.shikiflow.domain.model.user.OverviewStats
-import com.example.shikiflow.domain.model.user.MediaTypeStats
-import com.example.shikiflow.domain.model.user.OverviewStatType
-import com.example.shikiflow.domain.model.user.ShortOverviewStat
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStatType
+import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import kotlin.time.Instant
 
 object ShikimoriRateMapper {

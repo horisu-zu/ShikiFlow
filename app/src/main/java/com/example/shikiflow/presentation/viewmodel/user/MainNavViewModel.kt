@@ -10,7 +10,10 @@ import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -29,7 +32,7 @@ data class MainNavUiState(
     override fun setLoading(value: Boolean) = copy(isLoading = value)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class MainNavViewModel @Inject constructor(
     private val userRepository: UserRepository,
@@ -41,6 +44,7 @@ class MainNavViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             settingsRepository.userFlow
+                .filterNotNull()
                 .onEach { localUserData ->
                     mutableUiState.update { state ->
                         state.copy(user = localUserData, isLoading = true)

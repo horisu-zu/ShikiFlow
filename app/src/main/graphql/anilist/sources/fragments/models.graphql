@@ -202,6 +202,63 @@ fragment ALUserListStats on UserStatistics {
     }
 }
 
+fragment ALUserGenres on UserStatistics {
+    genres {
+        genre
+        count
+        meanScore
+        minutesWatched
+        chaptersRead
+    }
+}
+
+fragment ALUserTags on UserStatistics {
+    tags {
+        tag {
+            name
+        }
+        count
+        meanScore
+        minutesWatched
+        chaptersRead
+    }
+}
+
+fragment ALUserStaff on UserStatistics {
+    staff {
+        staff {
+            ...ALStaffShort
+        }
+        count
+        meanScore
+        minutesWatched
+        chaptersRead
+    }
+}
+
+fragment ALUserVoiceActors on UserStatistics {
+    voiceActors {
+        voiceActor {
+            ...ALStaffShort
+        }
+        count
+        meanScore
+        minutesWatched
+        chaptersRead
+    }
+}
+
+fragment ALUserStudios on UserStatistics {
+    studios {
+        studio {
+            ...ALStudioShort
+        }
+        count
+        meanScore
+        minutesWatched
+    }
+}
+
 fragment ALFavoriteMediaShort on Media {
     id
     title {

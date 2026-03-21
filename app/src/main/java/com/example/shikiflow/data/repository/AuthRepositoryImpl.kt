@@ -6,6 +6,7 @@ import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.AuthRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -15,6 +16,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val shikiAuthDataSource: AuthDataSource,
     private val anilistAuthDataSource: AuthDataSource,
     private val tokenRepository: TokenRepository,
+    private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase
 ) : AuthRepository {
 
@@ -45,6 +47,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun logout() {
         tokenRepository.clearTokens()
         withContext(Dispatchers.IO) {
+            settingsRepository.clearUserData()
             appRoomDatabase.clearAllTables()
         }
     }

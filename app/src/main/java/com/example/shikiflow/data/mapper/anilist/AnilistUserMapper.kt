@@ -6,26 +6,36 @@ import com.example.graphql.anilist.fragment.ALFavoriteMediaShort
 import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
 import com.example.graphql.anilist.fragment.ALFavoriteStudioShort
 import com.example.graphql.anilist.fragment.ALUserActivity
+import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.graphql.anilist.fragment.ALUserShort
+import com.example.graphql.anilist.fragment.ALUserStaff
+import com.example.graphql.anilist.fragment.ALUserStudios
+import com.example.graphql.anilist.fragment.ALUserTags
+import com.example.graphql.anilist.fragment.ALUserVoiceActors
 import com.example.graphql.anilist.type.MediaListStatus
+import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
 import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.user.OverviewStatType
-import com.example.shikiflow.domain.model.user.OverviewStats
-import com.example.shikiflow.domain.model.user.ShortOverviewStat
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.TypeStat
+import com.example.shikiflow.domain.model.user.stats.OverviewStatType
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
+import com.example.shikiflow.domain.model.user.stats.StaffStat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
 
 object AnilistUserMapper {
@@ -155,8 +165,16 @@ object AnilistUserMapper {
             ),
             ShortOverviewStat(
                 count = when(mediaType) {
-                    MediaType.ANIME -> "%.2f".format(plannedStatus?.minutesWatched?.minutesToDays())
-                    MediaType.MANGA -> plannedStatus?.chaptersRead.toString()
+                    MediaType.ANIME -> {
+                        if(plannedStatus?.minutesWatched != null) {
+                            "%.2f".format(plannedStatus.minutesWatched.minutesToDays())
+                        } else {
+                            0f.toString()
+                        }
+                    }
+                    MediaType.MANGA -> {
+                        (plannedStatus?.chaptersRead ?: 0f).toString()
+                    }
                 },
                 statType = OverviewStatType.PLANNED
             ),
@@ -328,6 +346,72 @@ object AnilistUserMapper {
             )
         }?.sortedBy { stat ->
             stat.type
+        } ?: emptyList()
+    }
+
+    fun ALUserGenres.toGenreStats(): List<TypeStat> {
+        return genres?.mapNotNull { genreStat ->
+            TypeStat(
+                type = genreStat?.genre ?: "",
+                count = genreStat?.count ?: 0,
+                meanScore = genreStat?.meanScore?.toFloat() ?: 0f,
+                timeWatched = genreStat?.minutesWatched?.minutesToDays() ?: 0f,
+                chaptersRead = genreStat?.chaptersRead ?: 0
+            )
+        } ?: emptyList()
+    }
+
+    fun ALUserTags.toTagsStats(): List<TypeStat> {
+        return tags?.mapNotNull { tagStat ->
+            TypeStat(
+                type = tagStat?.tag?.name ?: "",
+                count = tagStat?.count ?: 0,
+                meanScore = tagStat?.meanScore?.toFloat() ?: 0f,
+                timeWatched = tagStat?.minutesWatched?.minutesToDays() ?: 0f,
+                chaptersRead = tagStat?.chaptersRead ?: 0
+            )
+        } ?: emptyList()
+    }
+
+    fun ALUserStaff.toStaffStats(): List<StaffStat> {
+        return staff?.mapNotNull { staffStat ->
+            staffStat?.staff?.aLStaffShort?.let { staffShort ->
+                StaffStat(
+                    staffShort = staffShort.toDomain(),
+                    count = staffStat.count,
+                    meanScore = staffStat.meanScore.toFloat(),
+                    timeWatched = staffStat.minutesWatched.minutesToDays(),
+                    chaptersRead = staffStat.chaptersRead
+                )
+            }
+        } ?: emptyList()
+    }
+
+    fun ALUserVoiceActors.toStaffStats(): List<StaffStat> {
+        return voiceActors?.mapNotNull { vaStat ->
+            vaStat?.voiceActor?.aLStaffShort?.let { staffShort ->
+                StaffStat(
+                    staffShort = staffShort.toDomain(),
+                    count = vaStat.count,
+                    meanScore = vaStat.meanScore.toFloat(),
+                    timeWatched = vaStat.minutesWatched.minutesToDays(),
+                    chaptersRead = vaStat.chaptersRead
+                )
+            }
+        } ?: emptyList()
+    }
+
+    fun ALUserStudios.toStudiosStats(): List<StudioStat> {
+        return studios?.mapNotNull { studioStat ->
+            studioStat?.studio?.aLStudioShort?.let { studio ->
+                StudioStat(
+                    studioShort = studio.toDomain(),
+                    count = studioStat.count,
+                    meanScore = studioStat.meanScore.toFloat(),
+                    timeWatched = studioStat.minutesWatched.minutesToDays(),
+                    chaptersRead = 0
+                )
+            }
         } ?: emptyList()
     }
 }

@@ -60,7 +60,7 @@ fun FavoritesSection(
         topBar = {
             ConnectedButtonGroup(
                 items = favoriteCategories.map { it.toTabRowItem() },
-                selectedIndex = favoriteCategories[pagerState.currentPage].ordinal,
+                selectedIndex = pagerState.currentPage,
                 onItemSelection = { index ->
                     scope.launch {
                         pagerState.animateScrollToPage(

@@ -30,7 +30,7 @@ import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.presentation.common.BarsChartMode
 import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.SegmentedProgressBarType

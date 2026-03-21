@@ -7,21 +7,25 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.repository.TokenRepository
+import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class)
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val authRepository: AuthRepository,
-    private val tokenRepository: TokenRepository
+    private val userRepository: UserRepository
 ): ViewModel() {
 
     val _authType = MutableStateFlow<AuthType?>(null)
@@ -33,9 +37,9 @@ class MainViewModel @Inject constructor(
             initialValue = ThemeSettings()
         )
 
-    val authState: StateFlow<AuthState> = tokenRepository.authCredentials
-        .map { tokens ->
-            when(tokens.accessToken) {
+    val authState: StateFlow<AuthState> = settingsRepository.userFlow
+        .map { user ->
+            when(user) {
                 null -> AuthState.Initial
                 else -> AuthState.Success
             }
@@ -56,6 +60,14 @@ class MainViewModel @Inject constructor(
             _authType.value?.let { type ->
                 authRepository.handleAuthResponse(uriResponse, type)
                 settingsRepository.saveAuthType(type)
+
+                userRepository.fetchCurrentUser()
+                    .first { it is DataResult.Success }
+                    .let { result ->
+                        if (result is DataResult.Success) {
+                            settingsRepository.saveUserData(result.data)
+                        }
+                    }
             }
         }
     }

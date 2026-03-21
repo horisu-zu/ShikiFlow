@@ -1,4 +1,4 @@
-package com.example.shikiflow.domain.model.user
+package com.example.shikiflow.domain.model.user.stats
 
 enum class OverviewStatType {
     TITLE,

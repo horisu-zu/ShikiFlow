@@ -11,8 +11,8 @@ import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.data.datasource.dto.person.ShikiPerson
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.MediaTypeStats
-import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory

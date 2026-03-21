@@ -7,7 +7,7 @@ import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import kotlin.time.Instant
 
 data class MediaDetails(

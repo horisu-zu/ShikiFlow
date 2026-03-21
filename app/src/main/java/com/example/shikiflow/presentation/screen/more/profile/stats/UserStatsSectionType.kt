@@ -4,7 +4,7 @@ enum class UserStatsSectionType {
     OVERVIEW,
     GENRES,
     TAGS,
-    SEYU,
-    STUDIOS,
-    STAFF
+    STAFF,
+    VOICE_ACTORS,
+    STUDIOS
 }

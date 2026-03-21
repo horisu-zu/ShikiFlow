@@ -23,13 +23,16 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.TypeStat
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
@@ -117,6 +120,26 @@ class ShikimoriUserDataSource @Inject constructor(
         } catch (e: Exception) {
             emit(DataResult.Error(e.message ?: "Unknown Error"))
         }
+    }
+
+    override fun getUserGenres(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+        TODO("Not Available")
+    }
+
+    override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+        TODO("Not Available")
+    }
+
+    override fun getUserStaff(userId: Int): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> {
+        TODO("Not Available")
+    }
+
+    override fun getUserVoiceActors(userId: Int): Flow<DataResult<List<StaffStat>>> {
+        TODO("Not Available")
+    }
+
+    override fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>> {
+        TODO("Not Available")
     }
 
     override fun getUserFavorites(

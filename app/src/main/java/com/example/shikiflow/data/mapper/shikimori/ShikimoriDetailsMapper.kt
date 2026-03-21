@@ -28,7 +28,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import kotlin.time.Instant
 
 object ShikimoriDetailsMapper {

@@ -37,21 +37,24 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.OverviewStats
-import com.example.shikiflow.domain.model.user.MediaTypeStats
-import com.example.shikiflow.domain.model.user.OverviewStatType
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStatType
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.iconResource
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
-import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.OverviewSection
+import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.overview.OverviewSection
 import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSectionType
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.staff.StaffSection
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.studios.StudiosSection
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.tags.TypeStatSection
 import com.example.shikiflow.presentation.screen.more.profile.stats.shikimori.ShikimoriTrackItem
 import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsEvent
 import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsUiState
 import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsViewModel
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun UserStatsSection(
@@ -210,30 +213,84 @@ private fun AnilistStatsSection(
         }
         when(uiState.statsSectionType) {
             UserStatsSectionType.OVERVIEW -> {
-                if(!uiState.overviewStats.isEmpty()) {
-                    OverviewSection(
-                        uiState = uiState,
-                        isCurrentUser = isCurrentUser,
-                        event = event,
-                        horizontalPadding = horizontalPadding,
-                        onCompareClick = onCompareClick
-                    )
-                }
+                OverviewSection(
+                    uiState = uiState,
+                    isCurrentUser = isCurrentUser,
+                    event = event,
+                    horizontalPadding = horizontalPadding,
+                    onCompareClick = onCompareClick
+                )
             }
             UserStatsSectionType.GENRES -> {
-                /**/
+                TypeStatSection(
+                    typeStats = uiState.genreStats[uiState.mediaType],
+                    statsBarType = uiState.genresBarType[uiState.mediaType] ?: StatsBarType.TITLES,
+                    typesList =  uiState.typesList,
+                    currentMediaType = uiState.mediaType,
+                    onMediaTypeChange = { mediaType ->
+                        event.setMediaType(mediaType)
+                    },
+                    onBarTypeChange = { statsBarType ->
+                        event.setGenresBarType(statsBarType)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
             }
             UserStatsSectionType.TAGS -> {
-                /**/
+                TypeStatSection(
+                    typeStats = uiState.tagsStats[uiState.mediaType],
+                    statsBarType = uiState.tagsBarType[uiState.mediaType] ?: StatsBarType.TITLES,
+                    typesList =  uiState.typesList,
+                    currentMediaType = uiState.mediaType,
+                    onMediaTypeChange = { mediaType ->
+                        event.setMediaType(mediaType)
+                    },
+                    onBarTypeChange = { statsBarType ->
+                        event.setTagsBarType(statsBarType)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
             }
             UserStatsSectionType.STAFF -> {
-                /**/
+                StaffSection(
+                    staffStats = uiState.staffStats[uiState.mediaType],
+                    staffBarType = uiState.staffBarType[uiState.mediaType] ?: StatsBarType.TITLES,
+                    typesList = uiState.typesList,
+                    currentMediaType = uiState.mediaType,
+                    onMediaTypeChange = { mediaType ->
+                        event.setMediaType(mediaType)
+                    },
+                    onStaffBarTypeChange = { staffBarType ->
+                        event.setStaffBarType(staffBarType)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
             }
-            UserStatsSectionType.SEYU -> {
-                /**/
+            UserStatsSectionType.VOICE_ACTORS -> {
+                StaffSection(
+                    staffStats = uiState.voiceActorsStats,
+                    staffBarType = uiState.voiceActorsBarType,
+                    typesList = listOf(MediaType.ANIME),
+                    currentMediaType = MediaType.ANIME,
+                    onMediaTypeChange = { mediaType ->
+                        event.setMediaType(mediaType)
+                    },
+                    onStaffBarTypeChange = { voiceActorsBarType ->
+                        event.setVoiceActorsBarType(voiceActorsBarType)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
             }
             UserStatsSectionType.STUDIOS -> {
-                /**/
+                StudiosSection(
+                    typeStats = uiState.studiosStats,
+                    statsBarType = uiState.studiosBarType,
+                    isLoading = uiState.isLoading,
+                    onBarTypeChange = { studiosBarType ->
+                        event.setStudiosBarType(studiosBarType)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
             }
         }
     }

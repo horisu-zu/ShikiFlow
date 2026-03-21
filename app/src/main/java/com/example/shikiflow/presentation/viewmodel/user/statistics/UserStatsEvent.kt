@@ -7,12 +7,20 @@ import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSec
 interface UserStatsEvent {
     fun setUserId(userId: Int)
 
+    fun setMediaType(mediaType: MediaType)
+    fun setTypesList(typesList: List<MediaType>)
+
     fun setStatsSectionType(statsSectionType: UserStatsSectionType)
 
-    fun setScoreBarType(mediaType: MediaType, scoreBarType: StatsBarType)
-    fun setLengthBarType(mediaType: MediaType, lengthBarType: StatsBarType)
-    fun setReleaseYearBarType(mediaType: MediaType, releaseYearBarType: StatsBarType)
-    fun setStartYearBarType(mediaType: MediaType, startYearBarType: StatsBarType)
+    fun setScoreBarType(scoreBarType: StatsBarType)
+    fun setLengthBarType(lengthBarType: StatsBarType)
+    fun setReleaseYearBarType(releaseYearBarType: StatsBarType)
+    fun setStartYearBarType(startYearBarType: StatsBarType)
+    fun setGenresBarType(genresBarType: StatsBarType)
+    fun setTagsBarType(tagsBarType: StatsBarType)
+    fun setStaffBarType(staffBarType: StatsBarType)
+    fun setVoiceActorsBarType(voiceActorsBarType: StatsBarType)
+    fun setStudiosBarType(studiosBarType: StatsBarType)
 
     fun onRefresh()
 }

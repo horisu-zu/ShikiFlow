@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.materialkolor.ktx.harmonize
 import kotlin.math.roundToInt

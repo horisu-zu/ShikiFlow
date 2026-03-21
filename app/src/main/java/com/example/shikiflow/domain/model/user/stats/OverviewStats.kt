@@ -1,4 +1,4 @@
-package com.example.shikiflow.domain.model.user
+package com.example.shikiflow.domain.model.user.stats
 
 import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.track.MediaFormat
@@ -30,16 +30,5 @@ data class MediaTypeStats<T> (
     operator fun get(mediaType: MediaType): T? = when (mediaType) {
         MediaType.ANIME -> animeStats
         MediaType.MANGA -> mangaStats
-    }
-
-    fun getMediaTypes(): List<MediaType> {
-        return buildList {
-            if(animeStats != null) add(MediaType.ANIME)
-            if(mangaStats != null) add(MediaType.MANGA)
-        }
-    }
-
-    fun isEmpty(): Boolean {
-        return animeStats == null && mangaStats == null
     }
 }

@@ -34,7 +34,7 @@ fun TypeSelector(
         modifier = modifier
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
-            .padding(all = 4.dp),
+            .padding(all = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -43,10 +43,10 @@ fun TypeSelector(
 
             Text(
                 text = stringResource(statsBarType.displayValue(mediaType)),
-                style = MaterialTheme.typography.labelMedium.copy(
+                style = MaterialTheme.typography.bodySmall.copy(
                     textAlign = TextAlign.Center,
                     color = if(isSelected) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurface
+                        else MaterialTheme.colorScheme.onSurface
                 ),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -59,11 +59,11 @@ fun TypeSelector(
                     }
                     .background(
                         color = if (isSelected) MaterialTheme.colorScheme.primary
-                        else Color.Transparent
+                            else Color.Transparent
                     )
                     .padding(
-                        horizontal = 4.dp,
-                        vertical = 2.dp
+                        horizontal = 6.dp,
+                        vertical = 4.dp
                     )
             )
         }

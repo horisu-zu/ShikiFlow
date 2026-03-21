@@ -33,8 +33,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.OverviewStats
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.presentation.common.BarsChartMode
 import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.VerticalBarsChart

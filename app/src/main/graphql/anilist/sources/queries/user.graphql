@@ -45,6 +45,75 @@ query UserStats(
     }
 }
 
+query UserGenres(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        statistics {
+            anime {
+                ...ALUserGenres
+            }
+            manga {
+                ...ALUserGenres
+            }
+        }
+    }
+}
+
+query UserTags(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        statistics {
+            anime {
+                ...ALUserTags
+            }
+            manga {
+                ...ALUserTags
+            }
+        }
+    }
+}
+
+query UserStaff(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        statistics {
+            anime {
+                ...ALUserStaff
+            }
+            manga {
+                ...ALUserStaff
+            }
+        }
+    }
+}
+
+query UserVoiceActors(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        statistics {
+            anime {
+                ...ALUserVoiceActors
+            }
+        }
+    }
+}
+
+query UserStudios(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        statistics {
+            anime {
+                ...ALUserStudios
+            }
+        }
+    }
+}
+
 query UserStatsCategories(
     $userId: Int!
 ) {

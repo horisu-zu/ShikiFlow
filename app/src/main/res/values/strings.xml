@@ -393,6 +393,11 @@
     <string name="user_stats_release_year">Release Year</string>
     <string name="user_stats_watch_year">Watch Year</string>
     <string name="user_stats_read_year">Read Year</string>
+    <string name="stat_type_count">Count</string>
+    <string name="genre_stats_time_anime">Time Watched</string>
+    <string name="stats_empty_label">Not enough data to generate the stats</string>
+
+    <string name="days_hours">%1$dd %2$dh</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

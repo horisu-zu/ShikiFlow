@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.common.mappers
 
+import android.content.res.Resources
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Person
@@ -7,7 +8,8 @@ import androidx.compose.material.icons.filled.PlayArrow
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.user.OverviewStatType
+import com.example.shikiflow.domain.model.user.stats.CombinedStat
+import com.example.shikiflow.domain.model.user.stats.OverviewStatType
 import com.example.shikiflow.presentation.common.TabRowItem
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSectionType
@@ -55,7 +57,7 @@ object ProfileMapper {
             UserStatsSectionType.OVERVIEW -> R.string.user_stats_section_overview
             UserStatsSectionType.GENRES -> R.string.user_stats_section_genres
             UserStatsSectionType.TAGS -> R.string.user_stats_section_tags
-            UserStatsSectionType.SEYU -> R.string.user_stats_section_voice_actors
+            UserStatsSectionType.VOICE_ACTORS -> R.string.user_stats_section_voice_actors
             UserStatsSectionType.STUDIOS -> R.string.favorite_studios
             UserStatsSectionType.STAFF -> R.string.staff_title
         }
@@ -116,5 +118,27 @@ object ProfileMapper {
             OverviewStatType.MEAN_SCORE -> IconResource.Drawable(resId = R.drawable.ic_percentage)
             OverviewStatType.STANDARD_DEVIATION -> IconResource.Drawable(resId = R.drawable.ic_division)
         }
+    }
+
+    fun <T: CombinedStat> List<T>.sortedBy(
+        type: StatsBarType,
+        mediaType: MediaType
+    ) = when (type) {
+        StatsBarType.TITLES -> sortedByDescending { it.count }
+
+        StatsBarType.TIME ->
+            if (mediaType == MediaType.ANIME)
+                sortedByDescending { it.timeWatched }
+            else
+                sortedByDescending { it.chaptersRead }
+
+        StatsBarType.MEAN_SCORE -> sortedByDescending { it.meanScore }
+    }
+
+    fun Resources.formatDaysHours(value: Float): String {
+        val days = value.toInt()
+        val hours = ((value - days) * 24).toInt()
+
+        return getString(R.string.days_hours, days, hours)
     }
 }

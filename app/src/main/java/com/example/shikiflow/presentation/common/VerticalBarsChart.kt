@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.user.Stat
+import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 sealed interface BarsChartMode {

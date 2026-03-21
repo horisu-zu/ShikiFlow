@@ -54,8 +54,9 @@ object RepositoryModule {
         @Shikimori shikiAuthDataSource: AuthDataSource,
         @AniList anilistAuthDataSource: AuthDataSource,
         tokenRepository: TokenRepository,
+        settingsRepository: SettingsRepository,
         appRoomDatabase: AppRoomDatabase
-    ): AuthRepository = AuthRepositoryImpl(shikiAuthDataSource, anilistAuthDataSource, tokenRepository, appRoomDatabase)
+    ): AuthRepository = AuthRepositoryImpl(shikiAuthDataSource, anilistAuthDataSource, tokenRepository, settingsRepository, appRoomDatabase)
 
     @Provides
     @Singleton

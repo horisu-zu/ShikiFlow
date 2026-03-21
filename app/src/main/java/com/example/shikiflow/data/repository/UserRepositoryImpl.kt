@@ -10,10 +10,13 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.TypeStat
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
@@ -47,6 +50,26 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>> =
         getSource().getUserRates(userId)
+
+    override fun getUserGenres(
+        userId: Int
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> = getSource().getUserGenres(userId)
+
+    override fun getUserTags(
+        userId: Int
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> = getSource().getUserTags(userId)
+
+    override fun getUserStaff(
+        userId: Int
+    ): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> = getSource().getUserStaff(userId)
+
+    override fun getUserVoiceActors(
+        userId: Int
+    ): Flow<DataResult<List<StaffStat>>> = getSource().getUserVoiceActors(userId)
+
+    override fun getUserStudios(
+        userId: Int
+    ): Flow<DataResult<List<StudioStat>>> = getSource().getUserStudios(userId)
 
     override fun getUserStatsCategories(
         userId: Int

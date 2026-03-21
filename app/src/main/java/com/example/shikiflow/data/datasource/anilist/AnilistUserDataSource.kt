@@ -5,12 +5,19 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.UserActivitiesQuery
+import com.example.graphql.anilist.UserGenresQuery
+import com.example.graphql.anilist.UserStaffQuery
 import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.UserStatsQuery
+import com.example.graphql.anilist.UserStudiosQuery
+import com.example.graphql.anilist.UserTagsQuery
+import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.graphql.anilist.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.FavoritesPagingSource
@@ -18,7 +25,11 @@ import com.example.shikiflow.data.local.source.HistoryPagingSource
 import com.example.shikiflow.data.local.source.UserPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewStats
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStaffStats
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStudiosStats
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toTagsStats
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -28,18 +39,20 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.TypeStat
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
-import jakarta.inject.Inject
 import kotlinx.coroutines.flow.Flow
 import kotlin.let
 
-class AnilistUserDataSource @Inject constructor(
+class AnilistUserDataSource(
     private val apolloClient: ApolloClient
 ): UserDataSource, BaseNetworkRepository() {
 
@@ -75,7 +88,9 @@ class AnilistUserDataSource @Inject constructor(
             userId = Optional.present(userId)
         )
 
-        val response = apolloClient.query(historyQuery).execute()
+        val response = apolloClient.query(historyQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.data?.Page?.activities?.let { activities ->
             activities.mapNotNull { it?.onListActivity?.aLUserActivity?.toDomain() }
@@ -108,12 +123,96 @@ class AnilistUserDataSource @Inject constructor(
                 val userStats = data.User?.statistics ?:
                     throw IllegalStateException("No user statistics data returned")
 
-                userStats.let { userStats ->
-                    MediaTypeStats<OverviewStats>(
-                        animeStats = userStats.anime?.aLUserListStats?.toOverviewStats(MediaType.ANIME),
-                        mangaStats = userStats.manga?.aLUserListStats?.toOverviewStats(MediaType.MANGA)
-                    )
-                }
+                MediaTypeStats<OverviewStats>(
+                    animeStats = userStats.anime?.aLUserListStats?.toOverviewStats(MediaType.ANIME),
+                    mangaStats = userStats.manga?.aLUserListStats?.toOverviewStats(MediaType.MANGA)
+                )
+            }
+
+        return response
+    }
+
+    override fun getUserGenres(
+        userId: Int
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+        val genresQuery = UserGenresQuery(userId)
+
+        val response = apolloClient.query(genresQuery)
+            .toFlow()
+            .asDataResult { data ->
+                val userGenres = data.User?.statistics ?:
+                    throw IllegalStateException("No user statistics data returned")
+
+                MediaTypeStats<List<TypeStat>>(
+                    animeStats = userGenres.anime?.aLUserGenres?.toGenreStats(),
+                    mangaStats = userGenres.manga?.aLUserGenres?.toGenreStats()
+                )
+            }
+
+        return response
+    }
+
+    override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+        val tagsQuery = UserTagsQuery(userId)
+
+        val response = apolloClient.query(tagsQuery)
+            .toFlow()
+            .asDataResult { data ->
+                val userGenres = data.User?.statistics ?:
+                    throw IllegalStateException("No user statistics data returned")
+
+                MediaTypeStats<List<TypeStat>>(
+                    animeStats = userGenres.anime?.aLUserTags?.toTagsStats(),
+                    mangaStats = userGenres.manga?.aLUserTags?.toTagsStats()
+                )
+            }
+
+        return response
+    }
+
+    override fun getUserStaff(userId: Int): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> {
+        val staffQuery = UserStaffQuery(userId)
+
+        val response = apolloClient.query(staffQuery)
+            .toFlow()
+            .asDataResult { data ->
+                val userGenres = data.User?.statistics ?:
+                    throw IllegalStateException("No user statistics data returned")
+
+                MediaTypeStats<List<StaffStat>>(
+                    animeStats = userGenres.anime?.aLUserStaff?.toStaffStats(),
+                    mangaStats = userGenres.manga?.aLUserStaff?.toStaffStats()
+                )
+            }
+
+        return response
+    }
+
+    override fun getUserVoiceActors(userId: Int): Flow<DataResult<List<StaffStat>>> {
+        val voiceActorsQuery = UserVoiceActorsQuery(userId)
+
+        val response = apolloClient.query(voiceActorsQuery)
+            .toFlow()
+            .asDataResult { data ->
+                val userGenres = data.User?.statistics ?:
+                    throw IllegalStateException("No user statistics data returned")
+
+                userGenres.anime?.aLUserVoiceActors?.toStaffStats() ?: emptyList()
+            }
+
+        return response
+    }
+
+    override fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>> {
+        val studiosQuery = UserStudiosQuery(userId)
+
+        val response = apolloClient.query(studiosQuery)
+            .toFlow()
+            .asDataResult { data ->
+                val userGenres = data.User?.statistics ?:
+                    throw IllegalStateException("No user statistics data returned")
+
+                userGenres.anime?.aLUserStudios?.toStudiosStats() ?: emptyList()
             }
 
         return response

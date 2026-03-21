@@ -8,10 +8,13 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserHistory
-import com.example.shikiflow.domain.model.user.OverviewStats
+import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.user.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.TypeStat
+import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
+import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
@@ -21,6 +24,16 @@ interface UserRepository {
     fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>>
 
     fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>>
+
+    fun getUserGenres(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>>
+
+    fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>>
+
+    fun getUserStaff(userId: Int): Flow<DataResult<MediaTypeStats<List<StaffStat>>>>
+
+    fun getUserVoiceActors(userId: Int): Flow<DataResult<List<StaffStat>>>
+
+    fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>>
 
     fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
 

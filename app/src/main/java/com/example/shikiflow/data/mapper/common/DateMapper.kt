@@ -43,5 +43,5 @@ object DateMapper {
     }
 
 
-    fun Int.minutesToDays(): Double = this / 60.0 / 24.0
+    fun Int.minutesToDays(): Float = this / 60.0f / 24.0f
 }
