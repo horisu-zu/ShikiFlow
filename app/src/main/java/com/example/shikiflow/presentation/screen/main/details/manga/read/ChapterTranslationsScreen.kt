@@ -48,10 +48,9 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
-import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChapterTranslationViewModel
+import com.example.shikiflow.presentation.viewmodel.manga.read.translations.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,7 +63,7 @@ fun ChapterTranslationsScreen(
     chapterTranslationsViewModel: MangaChapterTranslationViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val chapterTranslations = chapterTranslationsViewModel.chapterTranslations.collectAsState()
+    val uiState by chapterTranslationsViewModel.uiState.collectAsState()
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -75,7 +74,7 @@ fun ChapterTranslationsScreen(
     }
 
     LaunchedEffect(chapterTranslationIds) {
-        chapterTranslationsViewModel.getChapterTranslations(chapterTranslationIds)
+        chapterTranslationsViewModel.setChapterIds(chapterTranslationIds)
     }
 
     Scaffold(
@@ -113,53 +112,47 @@ fun ChapterTranslationsScreen(
             }
         }, modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        when(val translations = chapterTranslations.value) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+        } else if(uiState.errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = uiState.errorMessage ?: stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { chapterTranslationsViewModel.onRefresh() }
+                )
             }
-            is Resource.Success -> {
-                LazyColumn(
-                    state = lazyListState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                        ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    translations.data?.let { chapterTranslations ->
-                        items(chapterTranslations.size) { index ->
-                            ChapterTranslationItem(
-                                mangaDexChapter = chapterTranslations[index],
-                                onTranslationClick = { chapterUiData ->
-                                    chapterTranslations[index].externalUrl?.let { externalUrl ->
-                                        WebIntent.openUrlCustomTab(context, externalUrl)
-                                    } ?: navOptions.navigateToChapter(
-                                        chapterUiData = chapterUiData
-                                    )
-                                }
-                            )
-                        }
+        } else {
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = paddingValues.calculateTopPadding(),
+                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
+                    ), contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                uiState.chapterTranslations.let { chapterTranslations ->
+                    items(chapterTranslations.size) { index ->
+                        ChapterTranslationItem(
+                            mangaDexChapter = chapterTranslations[index],
+                            onTranslationClick = { chapterUiData ->
+                                chapterTranslations[index].externalUrl?.let { externalUrl ->
+                                    WebIntent.openUrlCustomTab(context, externalUrl)
+                                } ?: navOptions.navigateToChapter(
+                                    chapterUiData = chapterUiData
+                                )
+                            }
+                        )
                     }
-                }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = translations.message ?: stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = {
-                            chapterTranslationsViewModel.getChapterTranslations(chapterTranslationIds)
-                        }
-                    )
                 }
             }
         }

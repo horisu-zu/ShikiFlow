@@ -48,9 +48,9 @@ import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.presentation.screen.main.details.anime.ScoreItem
 import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoItem
+import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.Converter.isManga
-import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
@@ -58,7 +58,7 @@ import com.materialkolor.ktx.harmonize
 @Composable
 fun MangaDetailsHeader(
     mangaDetails: MediaDetails,
-    mangaDexResource: Resource<List<String>>,
+    mangaDexUiState: MangaDexUiState,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onMangaDexIconClick: () -> Unit,
@@ -151,7 +151,7 @@ fun MangaDetailsHeader(
                 readChapters = mangaDetails.userRate?.progress ?: 0,
                 score = mangaDetails.userRate?.score ?: 0,
                 isManga = mangaDetails.format.isManga(),
-                mangaDexResource = mangaDexResource,
+                mangaDexUiState = mangaDexUiState,
                 onStatusClick = { onStatusClick() },
                 onMangaDexIconClick = onMangaDexIconClick,
             )
@@ -178,7 +178,7 @@ fun MangaUserRateItem(
     readChapters: Int,
     score: Int,
     isManga: Boolean,
-    mangaDexResource: Resource<List<String>>,
+    mangaDexUiState: MangaDexUiState,
     onStatusClick: () -> Unit,
     onMangaDexIconClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -229,41 +229,37 @@ fun MangaUserRateItem(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .clickable(
-                        enabled = mangaDexResource !is Resource.Loading,
+                        enabled = !mangaDexUiState.isLoading,
                         onClick = { onMangaDexIconClick() }
                     )
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(12.dp),
                 contentAlignment = Alignment.Center
             ) {
-                when(mangaDexResource) {
-                    is Resource.Loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            strokeWidth = 3.dp
-                        )
-                    }
-                    is Resource.Success -> {
-                        if(mangaDexResource.data.isNullOrEmpty()) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_circle),
-                                contentDescription = "Empty Response",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_mangadex_v2),
-                                contentDescription = "Manga Read Navigate",
-                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                    is Resource.Error -> {
+                if(mangaDexUiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 3.dp
+                    )
+                } else if(mangaDexUiState.errorMessage != null) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.size(24.dp)
+                    )
+                } else {
+                    if(mangaDexUiState.mangaDexIds.isNotEmpty()) {
                         Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
+                            painter = painterResource(id = R.drawable.ic_mangadex_v2),
+                            contentDescription = "Manga Read Navigate",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_circle),
+                            contentDescription = "Empty Response",
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.size(24.dp)
                         )

@@ -31,7 +31,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
@@ -40,14 +39,12 @@ import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
-import com.example.shikiflow.utils.Resource
 import com.example.shikiflow.utils.WebIntent
 
 @Composable
 fun CommentsScreen(
     threadHeader: Thread?,
     screenMode: CommentsScreenMode,
-    authType: AuthType,
     id: Int,
     navOptions: MediaNavOptions,
     commentViewModel: CommentViewModel = hiltViewModel()
@@ -201,52 +198,48 @@ private fun CommentThreadSection(
     onEntityClick: (EntityType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val commentsState by commentViewModel.commentsWithReplies.collectAsStateWithLifecycle()
+    val commentsState by commentViewModel.repliesUiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(commentId) {
         commentViewModel.getCommentWithReplies(commentId)
     }
 
-    LazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        when(commentsState) {
-            is Resource.Loading -> {
+    commentsState[commentId]?.let { repliesUiState ->
+        LazyColumn(
+            modifier = modifier.fillMaxWidth(),
+            contentPadding = contentPadding,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            if(repliesUiState.isLoading) {
                 item {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
                 }
-            }
-            is Resource.Success -> {
-                commentsState.data?.let { commentsMap ->
-                    commentsMap.forEach { (commentType, comments) ->
-                        item {
-                            CommentsMapSection(
-                                title = commentType,
-                                comments = comments,
-                                onEntityClick = onEntityClick,
-                                onLinkClick = { url ->
-                                    WebIntent.openUrlCustomTab(context, url)
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-            is Resource.Error -> {
+            } else if(repliesUiState.errorMessage != null) {
                 item {
                     Box(
                         modifier = Modifier.fillParentMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(
-                            message = commentsState.message ?: stringResource(id = R.string.common_error),
+                            message = repliesUiState.errorMessage,
                             buttonLabel = stringResource(R.string.common_retry),
                             onButtonClick = { commentViewModel.getCommentWithReplies(commentId) }
+                        )
+                    }
+                }
+            } else {
+                repliesUiState.commentsMap.forEach { (commentType, comments) ->
+                    item {
+                        CommentsMapSection(
+                            title = commentType,
+                            comments = comments,
+                            onEntityClick = onEntityClick,
+                            onLinkClick = { url ->
+                                WebIntent.openUrlCustomTab(context, url)
+                            }
                         )
                     }
                 }

@@ -56,7 +56,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CharacterCa
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
 import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
@@ -65,7 +65,7 @@ fun MangaDetailsContent(
     userId: Int,
     authType: AuthType,
     mangaDetails: MediaDetails,
-    mangaDexResource: Resource<List<String>>,
+    mangaDexUiState: MangaDexUiState,
     rateUpdateState: RateUpdateState,
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
@@ -90,17 +90,17 @@ fun MangaDetailsContent(
         item {
             MangaDetailsHeader(
                 mangaDetails = mangaDetails,
-                mangaDexResource = mangaDexResource,
+                mangaDexUiState = mangaDexUiState,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onMangaDexIconClick = {
-                    if(!mangaDexResource.data.isNullOrEmpty()) {
+                    if(mangaDexUiState.mangaDexIds.isNotEmpty()) {
                         mediaNavOptions.navigateToMangaRead(
-                            mangaDexIds = mangaDexResource.data,
+                            mangaDexIds = mangaDexUiState.mangaDexIds,
                             title = mangaDetails.title,
                             completedChapters = mangaDetails.userRate?.progress ?: 0
                         )
-                    } else if(mangaDexResource is Resource.Error) {
+                    } else if(mangaDexUiState.errorMessage != null) {
                         onMangaDexRefreshClick()
                     }
                 }

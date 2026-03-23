@@ -46,7 +46,7 @@ import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 
 @OptIn(ExperimentalMaterial3Api::class)

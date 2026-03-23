@@ -1,16 +1,15 @@
 package com.example.shikiflow.domain.usecase
 
-import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
-import com.example.shikiflow.utils.Converter.formatDate
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import javax.inject.Inject
@@ -18,13 +17,13 @@ import javax.inject.Inject
 class GetOngoingsCalendarUseCase @Inject constructor(
     private val mediaRepository: MediaRepository
 ) {
-    operator fun invoke(limit: Int = 25): Flow<Resource<Map<String, List<Browse>>>> = flow {
+    operator fun invoke(limit: Int = 25): Flow<DataResult<Map<LocalDate, List<Browse>>>> = flow {
         var currentSize = limit
         var currentPage = 1
         val ongoings = mutableListOf<Browse>()
 
         try {
-            emit(Resource.Loading())
+            emit(DataResult.Loading)
 
             while(currentSize == limit) {
                 mediaRepository.browseMedia(
@@ -40,8 +39,7 @@ class GetOngoingsCalendarUseCase @Inject constructor(
                     currentSize = result.size
                     currentPage++
                 }.onFailure { result ->
-                    Log.d("GetOngoingsCalendarUseCase", "Error Loading Ongoings: ${result.message}")
-                    emit(Resource.Error(result.localizedMessage ?: "Error: ${result.message}"))
+                    emit(DataResult.Error(result.message ?: "Error: ${result.message}"))
                     return@onFailure
                 }
             }
@@ -51,14 +49,14 @@ class GetOngoingsCalendarUseCase @Inject constructor(
                     .toLocalDateTime(TimeZone.currentSystemDefault()).date }
                 .toSortedMap()
                 .map { (date, values) ->
-                    formatDate(date) to values.sortedByDescending { it.score }
+                    date to values.sortedByDescending { it.score }
                 }.toMap()
 
-            emit(Resource.Success(mappedOngoings))
+            emit(DataResult.Success(mappedOngoings))
         } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+            emit(DataResult.Error(e.message ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+            emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

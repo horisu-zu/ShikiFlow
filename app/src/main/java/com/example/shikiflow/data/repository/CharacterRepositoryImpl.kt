@@ -14,6 +14,7 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -36,7 +37,7 @@ class CharacterRepositoryImpl @Inject constructor(
 
     override suspend fun getCharacterDetails(
         characterId: Int
-    ): Result<MediaCharacter> = getSource().getCharacterDetails(characterId)
+    ): Flow<DataResult<MediaCharacter>> = getSource().getCharacterDetails(characterId)
 
     override fun getCharacterMediaRoles(
         characterId: Int,

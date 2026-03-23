@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -39,7 +40,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
-import com.example.shikiflow.presentation.viewmodel.user.UserHistoryViewModel
+import com.example.shikiflow.presentation.viewmodel.user.history.UserHistoryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,9 +49,7 @@ fun HistoryScreen(
     moreNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
-    val historyData = userHistoryViewModel.loadPaginatedHistory(
-        userId = currentUserId?.toInt() ?: 0
-    ).collectAsLazyPagingItems()
+    val historyData = userHistoryViewModel.userHistory.collectAsLazyPagingItems()
 
     val lazyListState = rememberLazyListState()
     val isRefreshing by remember {
@@ -63,6 +62,10 @@ fun HistoryScreen(
             lazyListState.firstVisibleItemIndex == 0 &&
             lazyListState.firstVisibleItemScrollOffset == 0
         }
+    }
+
+    LaunchedEffect(currentUserId) {
+        userHistoryViewModel.setId(currentUserId)
     }
 
     Scaffold(

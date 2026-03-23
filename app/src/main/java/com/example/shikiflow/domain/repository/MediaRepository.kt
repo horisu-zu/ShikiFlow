@@ -8,11 +8,12 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
 
-    suspend fun getMediaDetails(id: Int, mediaType: MediaType): Result<MediaDetails>
+    fun getMediaDetails(id: Int, mediaType: MediaType): Flow<DataResult<MediaDetails>>
 
     fun paginatedBrowseMedia(
         browseType: BrowseType? = null,
@@ -30,7 +31,7 @@ interface MediaRepository {
     fun getStudioMedia(
         studioId: Int,
         search: String? = null,
-        order: SortType,
+        order: SortType? = null,
         onList: Boolean? = null
     ): Flow<PagingData<Browse>>
 

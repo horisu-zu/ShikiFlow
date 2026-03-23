@@ -5,10 +5,8 @@ import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSectionType
 
 interface UserStatsEvent {
-    fun setUserId(userId: Int)
-
+    fun setInitialParams(userId: Int, typesList: List<MediaType>)
     fun setMediaType(mediaType: MediaType)
-    fun setTypesList(typesList: List<MediaType>)
 
     fun setStatsSectionType(statsSectionType: UserStatsSectionType)
 

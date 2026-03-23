@@ -40,8 +40,8 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.screen.more.profile.favorites.FavoritesSection
-import com.example.shikiflow.presentation.viewmodel.user.ProfileViewModel
-import com.example.shikiflow.presentation.viewmodel.user.ProfileUiState
+import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileViewModel
+import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileUiState
 
 @Composable
 fun ProfileScreen(
@@ -141,6 +141,7 @@ fun ProfileScreenContent(
                         ProfileSectionType.USER_STATS -> {
                             UserStatsSection(
                                 userId = userData.id.toInt(),
+                                typesList = uiState.userStatsCategories.scoreMediaTypes,
                                 isCurrentUser = isCurrentUser,
                                 isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                 onCompareClick = {

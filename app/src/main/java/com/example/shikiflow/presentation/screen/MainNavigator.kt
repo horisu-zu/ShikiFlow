@@ -48,7 +48,7 @@ import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
 import com.example.shikiflow.presentation.screen.more.MoreNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
-import com.example.shikiflow.presentation.viewmodel.user.MainNavViewModel
+import com.example.shikiflow.presentation.viewmodel.user.navigator.MainNavViewModel
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable

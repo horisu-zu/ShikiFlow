@@ -26,8 +26,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -170,9 +170,11 @@ private fun MoreSearchContent(
     modifier: Modifier = Modifier,
     userSearchViewModel: UserSearchViewModel = hiltViewModel()
 ) {
-    val userSearchData = remember(query) {
-        userSearchViewModel.paginatedUsers(query)
-    }.collectAsLazyPagingItems()
+    val userSearchData = userSearchViewModel.users.collectAsLazyPagingItems()
+
+    LaunchedEffect(query) {
+        userSearchViewModel.setQuery(query)
+    }
 
     when (userSearchData.loadState.refresh) {
         is LoadState.Loading -> {

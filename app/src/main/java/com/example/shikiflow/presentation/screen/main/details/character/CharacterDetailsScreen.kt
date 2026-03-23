@@ -49,8 +49,7 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
-import com.example.shikiflow.presentation.viewmodel.character.CharacterDetailsViewModel
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.viewmodel.character.details.CharacterDetailsViewModel
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
@@ -62,7 +61,7 @@ fun CharacterDetailsScreen(
     navOptions: MediaNavOptions,
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
-    val characterDetailsState by characterDetailsViewModel.characterDetails.collectAsStateWithLifecycle()
+    val uiState by characterDetailsViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
     val lazyListState = rememberLazyListState()
@@ -73,7 +72,7 @@ fun CharacterDetailsScreen(
     }
 
     LaunchedEffect(characterId) {
-        characterDetailsViewModel.getCharacterDetails(characterId)
+        characterDetailsViewModel.setCharacterId(characterId)
     }
 
     Scaffold(
@@ -83,7 +82,7 @@ fun CharacterDetailsScreen(
                     title = {
                         Text(
                             text = if(isAtTop) stringResource(R.string.character_title)
-                                else characterDetailsState.data?.fullName ?: stringResource(R.string.character_title),
+                                else uiState.details?.fullName ?: stringResource(R.string.character_title),
                             style = MaterialTheme.typography.titleLarge
                         )
                     },
@@ -107,159 +106,151 @@ fun CharacterDetailsScreen(
         },
         modifier = Modifier.fillMaxSize()
     ) { innerPadding ->
-        when(characterDetailsState) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize().padding(innerPadding),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
+        if(uiState.isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize().padding(innerPadding),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+        } else if(uiState.errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = uiState.errorMessage
+                        ?: stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { characterDetailsViewModel.onRefresh() }
+                )
             }
-            is Resource.Success -> {
-                val horizontalPadding = 12.dp
+        } else {
+            val horizontalPadding = 12.dp
 
-                characterDetailsState.data?.let { characterDetails ->
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier.fillMaxSize()
-                            .padding(
-                                top = innerPadding.calculateTopPadding(),
-                                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                            ),
-                        contentPadding = PaddingValues(
-                            horizontal = horizontalPadding,
-                            vertical = 8.dp
+            uiState.details?.let { characterDetails ->
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxSize()
+                        .padding(
+                            top = innerPadding.calculateTopPadding(),
+                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
+                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
                         ),
-                        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
-                    ) {
+                    contentPadding = PaddingValues(
+                        horizontal = horizontalPadding,
+                        vertical = 8.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+                ) {
+                    item {
+                        CharacterTitleSection(
+                            avatarUrl = characterDetails.imageUrl,
+                            name = characterDetails.fullName,
+                            japaneseName = characterDetails.nativeName
+                        )
+                    }
+                    characterDetails.description?.let { description ->
                         item {
-                            CharacterTitleSection(
-                                avatarUrl = characterDetails.imageUrl,
-                                name = characterDetails.fullName,
-                                japaneseName = characterDetails.nativeName
+                            ExpandableText(
+                                htmlText = description,
+                                authType = authType,
+                                style = MaterialTheme.typography.bodySmall,
+                                collapsedMaxLines = 3,
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                },
+                                onLinkClick = { url ->
+                                    WebIntent.openUrlCustomTab(context, url)
+                                }
                             )
                         }
-                        characterDetails.description?.let { description ->
-                            item {
-                                ExpandableText(
-                                    htmlText = description,
-                                    authType = authType,
-                                    style = MaterialTheme.typography.bodySmall,
-                                    collapsedMaxLines = 3,
-                                    onEntityClick = { entityType, id ->
-                                        navOptions.navigateByEntity(entityType, id)
-                                    },
-                                    onLinkClick = { url ->
-                                        WebIntent.openUrlCustomTab(context, url)
-                                    }
-                                )
-                            }
-                        }
-                        if(!characterDetails.voiceActors.isEmpty()) {
-                            item {
-                                SnapFlingLazyRow(
-                                    modifier = Modifier
-                                        .ignoreHorizontalParentPadding(horizontalPadding)
-                                        .fillMaxWidth(),
-                                    contentPadding = PaddingValues(horizontal = horizontalPadding),
-                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                ) {
-                                    items(items = characterDetails.voiceActors) { vaItem ->
-                                        CharacterCard(
-                                            characterPoster = vaItem.imageUrl,
-                                            characterName = vaItem.fullName,
-                                            onClick = { navOptions.navigateToStaff(vaItem.id) },
-                                            modifier = Modifier.width(96.dp)
-                                        )
-                                    }
+                    }
+                    if(!characterDetails.voiceActors.isEmpty()) {
+                        item {
+                            SnapFlingLazyRow(
+                                modifier = Modifier
+                                    .ignoreHorizontalParentPadding(horizontalPadding)
+                                    .fillMaxWidth(),
+                                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                items(items = characterDetails.voiceActors) { vaItem ->
+                                    CharacterCard(
+                                        characterPoster = vaItem.imageUrl,
+                                        characterName = vaItem.fullName,
+                                        onClick = { navOptions.navigateToStaff(vaItem.id) },
+                                        modifier = Modifier.width(96.dp)
+                                    )
                                 }
                             }
                         }
-                        if(characterDetails.animeRoles.entries.isNotEmpty()) {
-                            item {
-                                CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.media_type_anime),
-                                    items = characterDetails.animeRoles,
-                                    onItemClick = { id ->
-                                        navOptions.navigateToAnimeDetails(id)
-                                    },
-                                    onPaginatedNavigate = {
-                                        navOptions.navigateToMediaRoles(
-                                            id = characterId,
-                                            mediaRolesType = MediaRolesType.CHARACTER,
-                                            roleTypes = buildList {
-                                                add(RoleType.ANIME)
-                                                if(characterDetails.mangaRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.MANGA)
-                                                }
-                                            }
-                                        )
-                                    },
-                                    horizontalPadding = horizontalPadding
-                                )
-                            }
-                        }
-                        if(characterDetails.mangaRoles.entries.isNotEmpty()) {
-                            item {
-                                CharacterMediaSection(
-                                    sectionTitle = stringResource(R.string.media_type_manga),
-                                    items = characterDetails.mangaRoles,
-                                    onItemClick = { id ->
-                                        navOptions.navigateToMangaDetails(id)
-                                    },
-                                    onPaginatedNavigate = {
-                                        navOptions.navigateToMediaRoles(
-                                            id = characterId,
-                                            mediaRolesType = MediaRolesType.CHARACTER,
-                                            roleTypes = buildList {
+                    }
+                    if(characterDetails.animeRoles.entries.isNotEmpty()) {
+                        item {
+                            CharacterMediaSection(
+                                sectionTitle = stringResource(R.string.media_type_anime),
+                                items = characterDetails.animeRoles,
+                                onItemClick = { id ->
+                                    navOptions.navigateToAnimeDetails(id)
+                                },
+                                onPaginatedNavigate = {
+                                    navOptions.navigateToMediaRoles(
+                                        id = characterId,
+                                        mediaRolesType = MediaRolesType.CHARACTER,
+                                        roleTypes = buildList {
+                                            add(RoleType.ANIME)
+                                            if(characterDetails.mangaRoles.entries.isNotEmpty()) {
                                                 add(RoleType.MANGA)
-                                                if(characterDetails.animeRoles.entries.isNotEmpty()) {
-                                                    add(RoleType.ANIME)
-                                                }
                                             }
-                                        )
-                                    },
-                                    horizontalPadding = horizontalPadding
-                                )
-                            }
-                        }
-                        characterDetails.topicId?.let { topicId ->
-                            item {
-                                CommentSection(
-                                    topicId = topicId,
-                                    onTopicNavigate = {
-                                        navOptions.navigateToComments(
-                                            screenMode = CommentsScreenMode.TOPIC,
-                                            id = topicId
-                                        )
-                                    },
-                                    onLinkClick = { url ->
-                                        WebIntent.openUrlCustomTab(context, url)
-                                    },
-                                    onEntityClick = { entityType, id ->
-                                        navOptions.navigateByEntity(entityType, id)
-                                    }
-                                )
-                            }
+                                        }
+                                    )
+                                },
+                                horizontalPadding = horizontalPadding
+                            )
                         }
                     }
-                }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = characterDetailsState.message
-                            ?: stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = {
-                            characterDetailsViewModel.getCharacterDetails(characterId, isRefresh = true)
+                    if(characterDetails.mangaRoles.entries.isNotEmpty()) {
+                        item {
+                            CharacterMediaSection(
+                                sectionTitle = stringResource(R.string.media_type_manga),
+                                items = characterDetails.mangaRoles,
+                                onItemClick = { id ->
+                                    navOptions.navigateToMangaDetails(id)
+                                },
+                                onPaginatedNavigate = {
+                                    navOptions.navigateToMediaRoles(
+                                        id = characterId,
+                                        mediaRolesType = MediaRolesType.CHARACTER,
+                                        roleTypes = buildList {
+                                            add(RoleType.MANGA)
+                                            if(characterDetails.animeRoles.entries.isNotEmpty()) {
+                                                add(RoleType.ANIME)
+                                            }
+                                        }
+                                    )
+                                },
+                                horizontalPadding = horizontalPadding
+                            )
                         }
-                    )
+                    }
+                    characterDetails.topicId?.let { topicId ->
+                        item {
+                            CommentSection(
+                                topicId = topicId,
+                                onTopicNavigate = {
+                                    navOptions.navigateToComments(
+                                        screenMode = CommentsScreenMode.TOPIC,
+                                        id = topicId
+                                    )
+                                },
+                                onLinkClick = { url ->
+                                    WebIntent.openUrlCustomTab(context, url)
+                                },
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }

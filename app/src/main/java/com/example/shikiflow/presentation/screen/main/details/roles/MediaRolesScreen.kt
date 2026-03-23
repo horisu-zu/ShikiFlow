@@ -45,7 +45,7 @@ import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.RoleSort
-import com.example.shikiflow.presentation.viewmodel.character.MediaRolesViewModel
+import com.example.shikiflow.presentation.viewmodel.character.roles.MediaRolesViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -68,9 +68,18 @@ fun MediaRolesScreen(
     val currentType = typesList[pagerState.currentPage]
 
     val sortMap by mediaRolesViewModel.sortMap.collectAsStateWithLifecycle()
+    val mediaRolesFlows = remember(typesList) {
+        typesList.associateWith { roleType ->
+            mediaRolesViewModel.getMediaRoles(
+                id = id,
+                mediaRolesType = mediaRolesType,
+                roleType = roleType
+            )
+        }
+    }
 
     LaunchedEffect(id) {
-        mediaRolesViewModel.initializeSortMap(roleTypes, authType)
+        mediaRolesViewModel.setRoleTypes(roleTypes)
     }
 
     Scaffold(
@@ -138,11 +147,8 @@ fun MediaRolesScreen(
             state = pagerState
         ) { page ->
             val roleType = typesList[page]
-            val mediaRoles = mediaRolesViewModel.getMediaRoles(
-                id = id,
-                mediaRolesType = mediaRolesType,
-                roleType = roleType
-            ).collectAsLazyPagingItems()
+            val mediaRoles = mediaRolesFlows[roleType]?.collectAsLazyPagingItems()
+                ?: return@HorizontalPager
 
             MediaRolesContent(
                 roleType = roleType,

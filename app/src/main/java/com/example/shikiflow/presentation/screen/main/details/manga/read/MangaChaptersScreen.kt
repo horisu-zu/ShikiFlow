@@ -60,7 +60,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.viewmodel.manga.read.MangaChaptersViewModel
+import com.example.shikiflow.presentation.viewmodel.manga.read.chapters.MangaChaptersViewModel
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.SortDirection.Companion.changeDirection
 import com.example.shikiflow.utils.Converter.parseChapterNumber

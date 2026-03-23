@@ -25,7 +25,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
+import com.example.shikiflow.presentation.viewmodel.browse.main.BrowseViewModel
 
 @Composable
 fun MainSideScreen(

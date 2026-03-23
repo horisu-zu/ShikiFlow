@@ -41,9 +41,9 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
 import com.example.shikiflow.data.response.TimeRange.Companion.isWithinRange
-import com.example.shikiflow.domain.model.kodik.KodikEpisode
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.PlayerEvent
-import com.example.shikiflow.presentation.viewmodel.anime.watch.PlayerState
+import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.KodikEpisodeUiState
+import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.PlayerState
 import com.example.shikiflow.utils.systemBarsVisibility
 import kotlinx.coroutines.delay
 
@@ -57,8 +57,7 @@ fun Player(
     episodeData: EpisodeMetadata,
     episodesCount: Int,
     currentQuality: String,
-    kodikEpisode: KodikEpisode?,
-    isLoadingEpisode: Boolean,
+    episodeUiState: KodikEpisodeUiState,
     onSeekToEpisode: (Int) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
@@ -70,11 +69,11 @@ fun Player(
     var showControls by remember { mutableStateOf(false) }
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
-    val isLoading = player?.playbackState == Player.STATE_BUFFERING || isLoadingEpisode
+    val isLoading = player?.playbackState == Player.STATE_BUFFERING || episodeUiState.isLoading
 
     val shouldShowSkipOp by remember(currentPosition) {
         derivedStateOf {
-            kodikEpisode?.opTimeCode?.isWithinRange(currentPosition) ?: false
+            episodeUiState.kodikEpisode?.opTimeCode?.isWithinRange(currentPosition) ?: false
         }
     }
 
@@ -152,7 +151,7 @@ fun Player(
                 episodesCount = episodesCount,
                 currentQuality = currentQuality,
                 translationGroup = episodeData.translationGroup,
-                qualityData = kodikEpisode?.qualityLink?.keys?.toList(),
+                qualityData = episodeUiState.kodikEpisode?.qualityLink?.keys?.toList(),
                 onNavigateBack = onNavigateBack,
                 onQualityChange = { quality ->
                     playerEvent.onQualityChange(quality)
@@ -205,7 +204,7 @@ fun Player(
                 shouldShowSkipOp = shouldShowSkipOp,
                 isFit = isFit,
                 onSkipOp = {
-                    kodikEpisode?.opTimeCode?.let { timeRange ->
+                    episodeUiState.kodikEpisode?.opTimeCode?.let { timeRange ->
                         playerEvent.onSeekTo(timeRange.endTime)
                     }
                 },

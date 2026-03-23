@@ -30,7 +30,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.FullScreenImageDialog
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
-import com.example.shikiflow.presentation.viewmodel.anime.AnimeDetailsViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.details.AnimeDetailsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -41,20 +41,20 @@ fun AnimeDetailsScreen(
     navOptions: MediaNavOptions,
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
-    val animeDetails by animeDetailsViewModel.animeDetails.collectAsStateWithLifecycle()
+    val animeDetails by animeDetailsViewModel.uiState.collectAsStateWithLifecycle()
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(id) {
-        animeDetailsViewModel.getAnimeDetails(id)
+        animeDetailsViewModel.setMediaId(id)
     }
 
     Scaffold { paddingValues ->
-        if(animeDetails.isLoading) {
+        if(animeDetails.isLoading && animeDetails.details == null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-        } else if(animeDetails.detailsError != null) {
+        } else if(animeDetails.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -65,7 +65,7 @@ fun AnimeDetailsScreen(
                         R.string.media_type_anime
                     ),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
+                    onButtonClick = { animeDetailsViewModel.onRefresh() }
                 )
             }
         } else {
@@ -87,7 +87,7 @@ fun AnimeDetailsScreen(
                 }
                 PullToRefreshBox(
                     isRefreshing = animeDetails.isRefreshing,
-                    onRefresh = { animeDetailsViewModel.getAnimeDetails(id, isRefresh = true) }
+                    onRefresh = { animeDetailsViewModel.onRefresh() }
                 ) {
                     animeDetails.details?.let { details ->
                         AnimeDetailsContent(

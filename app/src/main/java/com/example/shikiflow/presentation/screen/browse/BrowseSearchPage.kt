@@ -28,39 +28,34 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.viewmodel.anime.BrowseSearchViewModel
+import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchEvent
 
 @Composable
 fun BrowseSearchPage(
+    browseSearchData: LazyPagingItems<Browse>,
+    browseSearchEvent: BrowseSearchEvent,
     authType: AuthType,
-    query: String,
+    browseOptions: BrowseOptions,
     onMediaNavigate: (Int, MediaType) -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    browseViewModel: BrowseSearchViewModel = hiltViewModel()
+    modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
     var showBottomSheet by remember { mutableStateOf(false) }
-    var searchOptions by browseViewModel.searchOptions
     val isAtTop by remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex == 0 &&
             lazyGridState.firstVisibleItemScrollOffset == 0
         }
     }
-
-    val browseSearchData = remember(query, searchOptions) {
-        browseViewModel.paginatedBrowseSearch(
-            options = searchOptions.copy(name = query)
-        )
-    }.collectAsLazyPagingItems()
 
     LaunchedEffect(isAtTop) {
         onIsAtTopChange(isAtTop)
@@ -141,10 +136,10 @@ fun BrowseSearchPage(
     if (showBottomSheet) {
         SearchBottomSheet(
             authType = authType,
-            searchOptions = searchOptions,
-            onOptionsChanged = { newOptions -> browseViewModel.updateSearchOptions(newOptions) },
+            searchOptions = browseOptions,
+            onOptionsChanged = { newOptions -> browseSearchEvent.updateSearchOptions(newOptions) },
             onTypeChanged = { newType ->
-                browseViewModel.clearSearchOptions(newType)
+                browseSearchEvent.updateSearchOptions(BrowseOptions(newType))
             },
             onDismiss = { showBottomSheet = false }
         )

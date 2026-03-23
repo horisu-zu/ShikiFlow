@@ -1,6 +1,8 @@
 package com.example.shikiflow.data.datasource.anilist
 
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaThreadsQuery
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
@@ -29,7 +31,9 @@ class AnilistThreadsDataSource @Inject constructor(
             perPage = limit
         )
 
-        val commentsResponse = apolloClient.query(topicCommentsQuery).execute()
+        val commentsResponse = apolloClient.query(topicCommentsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return commentsResponse.toResult().map { data ->
             data.Page
@@ -42,6 +46,7 @@ class AnilistThreadsDataSource @Inject constructor(
     override suspend fun getCommentById(commentId: Int): Comment {
         val response = apolloClient
             .query(TopicCommentQuery(commentId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
             .execute()
 
         return response.data?.let { responseData ->
@@ -71,7 +76,9 @@ class AnilistThreadsDataSource @Inject constructor(
             sort = threadSort.toAnilistThreadSort()
         )
 
-        val response = apolloClient.query(threadsQuery).execute()
+        val response = apolloClient.query(threadsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.Page

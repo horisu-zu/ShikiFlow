@@ -10,7 +10,7 @@ class StudioMediaPagingSource(
     private val mediaDetailsDataSource: MediaDetailsDataSource,
     private val studioId: Int,
     private val search: String?,
-    private val order: SortType,
+    private val order: SortType?,
     private val onList: Boolean?
 ): PagingSource<Int, Browse>() {
     override fun getRefreshKey(state: PagingState<Int, Browse>): Int? {

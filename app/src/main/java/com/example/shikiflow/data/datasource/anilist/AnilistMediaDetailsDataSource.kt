@@ -31,27 +31,30 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistMediaDetailsDataSource @Inject constructor(
     private val apolloClient: ApolloClient
-): MediaDetailsDataSource {
+): MediaDetailsDataSource, BaseNetworkRepository() {
 
-    override suspend fun getMediaDetails(
+    override fun getMediaDetails(
         id: Int,
         mediaType: MediaType
-    ): Result<MediaDetails> {
+    ): Flow<DataResult<MediaDetails>> {
         val detailsQuery = MediaDetailsQuery(mediaType.toAnilistType(), id)
 
         val response = apolloClient.query(detailsQuery)
             .fetchPolicy(FetchPolicy.NetworkFirst)
-            .execute()
+            .toFlow()
+            .asDataResult { data ->
+                data.Media?.toDomain() ?: throw NoSuchElementException("Empty Response")
+            }
 
-        return response.toResult().map { data ->
-            data.Media?.toDomain() ?: throw NoSuchElementException("Empty Response")
-        }
+        return response
     }
 
     override fun paginatedBrowseMedia(
@@ -151,14 +154,14 @@ class AnilistMediaDetailsDataSource @Inject constructor(
         page: Int,
         limit: Int,
         search: String?,
-        order: SortType,
+        order: SortType?,
         onList: Boolean?
     ): Result<List<Browse>> {
         val studioBrowseQuery = StudioBrowseQuery(
             studioId = studioId,
             page = page,
             perPage = limit,
-            sort = Optional.presentIfNotNull(order.toAnilistBrowseOrder()),
+            sort = Optional.presentIfNotNull(order?.toAnilistBrowseOrder()),
             onList = Optional.presentIfNotNull(onList)
         )
 

@@ -6,21 +6,25 @@ import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.domain.model.user.MediaComparison
 import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.domain.repository.UserRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import javax.inject.Inject
 
 class GroupUserRatesUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
-    suspend operator fun invoke(
+    operator fun invoke(
         currentUserId: String,
         targetUserId: String,
         mediaType: MediaType
-    ): Resource<Map<ComparisonType, List<MediaComparison>>> {
+    ): Flow<DataResult<Map<ComparisonType, List<MediaComparison>>>> = flow {
         try {
+            emit(DataResult.Loading)
+
             val (currentUserRates, targetUserRates) = coroutineScope {
                 val currentUser = async {
                     userRepository.getMediaRates(currentUserId.toInt(), mediaType)
@@ -71,15 +75,15 @@ class GroupUserRatesUseCase @Inject constructor(
                 }
             }.toSortedMap(comparator = compareBy { it.ordinal })
 
-            return Resource.Success(result)
+            emit(DataResult.Success(result))
         } catch (e: HttpException) {
-            return if(e.response()?.code() == 403) {
-                Resource.Error(message = "Target User's rates are private")
+            if(e.response()?.code() == 403) {
+                emit(DataResult.Error(message = "Target User's rates are private"))
             } else {
-                Resource.Error(e.localizedMessage ?: "Network error: ${e.message}")
+                emit(DataResult.Error(e.localizedMessage ?: "Network error: ${e.message}"))
             }
         } catch (e: Exception) {
-            return Resource.Error("An unexpected error occurred: ${e.message}")
+            emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

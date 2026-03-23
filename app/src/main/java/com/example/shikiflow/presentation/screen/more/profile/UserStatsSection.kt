@@ -59,6 +59,7 @@ import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsVie
 @Composable
 fun UserStatsSection(
     userId: Int,
+    typesList: List<MediaType>,
     isCurrentUser: Boolean,
     isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
@@ -68,7 +69,7 @@ fun UserStatsSection(
     val uiState by userStatsViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        userStatsViewModel.setUserId(userId)
+        userStatsViewModel.setInitialParams(userId, typesList)
     }
 
     PullToRefreshCustomBox(
@@ -99,7 +100,7 @@ fun UserStatsSection(
                         isCurrentUser = isCurrentUser,
                         onCompareClick = onCompareClick,
                         event = userStatsViewModel,
-                        horizontalPadding = horizontalPadding,
+                        horizontalPadding = horizontalPadding
                     )
                 }
             }
@@ -233,7 +234,8 @@ private fun AnilistStatsSection(
                     onBarTypeChange = { statsBarType ->
                         event.setGenresBarType(statsBarType)
                     },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
             UserStatsSectionType.TAGS -> {
@@ -248,7 +250,8 @@ private fun AnilistStatsSection(
                     onBarTypeChange = { statsBarType ->
                         event.setTagsBarType(statsBarType)
                     },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
             UserStatsSectionType.STAFF -> {
@@ -257,13 +260,15 @@ private fun AnilistStatsSection(
                     staffBarType = uiState.staffBarType[uiState.mediaType] ?: StatsBarType.TITLES,
                     typesList = uiState.typesList,
                     currentMediaType = uiState.mediaType,
+                    isLoading = uiState.isLoading,
                     onMediaTypeChange = { mediaType ->
                         event.setMediaType(mediaType)
                     },
                     onStaffBarTypeChange = { staffBarType ->
                         event.setStaffBarType(staffBarType)
                     },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
             UserStatsSectionType.VOICE_ACTORS -> {
@@ -272,13 +277,15 @@ private fun AnilistStatsSection(
                     staffBarType = uiState.voiceActorsBarType,
                     typesList = listOf(MediaType.ANIME),
                     currentMediaType = MediaType.ANIME,
+                    isLoading = uiState.isLoading,
                     onMediaTypeChange = { mediaType ->
                         event.setMediaType(mediaType)
                     },
                     onStaffBarTypeChange = { voiceActorsBarType ->
                         event.setVoiceActorsBarType(voiceActorsBarType)
                     },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
             UserStatsSectionType.STUDIOS -> {
@@ -289,7 +296,8 @@ private fun AnilistStatsSection(
                     onBarTypeChange = { studiosBarType ->
                         event.setStudiosBarType(studiosBarType)
                     },
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }

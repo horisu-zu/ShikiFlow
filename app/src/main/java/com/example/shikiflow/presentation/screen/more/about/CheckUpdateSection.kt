@@ -22,24 +22,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.common.GithubRelease
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.viewmodel.more.about.AboutUiState
 
 @Composable
 fun CheckUpdateSection(
-    releaseState: Resource<GithubRelease?>,
-    isLatest: Boolean,
+    uiState: AboutUiState,
     onButtonClick: () -> Unit,
     onDownloadClick: (String) -> Unit,
     onShowBottomSheet: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val latestVersion = uiState.latestRelease
+    val isLatest = if (latestVersion == null) { true } else {
+        "v${uiState.currentRelease.tagName}" == latestVersion.tagName
+    }
+
     AnimatedContent(
         targetState = isLatest,
         modifier = modifier
     ) { targetState ->
         if(!targetState) {
-            releaseState.data?.let { latestRelease ->
+            uiState.latestRelease?.let { latestRelease ->
                 LatestReleaseItem(
                     latestRelease = latestRelease,
                     onDownloadClick = onDownloadClick,
@@ -49,7 +52,7 @@ fun CheckUpdateSection(
             }
         } else {
             CheckUpdateButton(
-                releaseState = releaseState,
+                uiState = uiState,
                 onButtonClick = onButtonClick
             )
         }
@@ -58,13 +61,13 @@ fun CheckUpdateSection(
 
 @Composable
 private fun CheckUpdateButton(
-    releaseState: Resource<GithubRelease?>,
+    uiState: AboutUiState,
     onButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Button(
         modifier = modifier.fillMaxWidth(),
-        enabled = releaseState !is Resource.Loading,
+        enabled = !uiState.isLoading,
         contentPadding = PaddingValues(vertical = 8.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = MaterialTheme.colorScheme.background,
@@ -77,28 +80,22 @@ private fun CheckUpdateButton(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            when(releaseState) {
-                is Resource.Loading -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(32.dp)
-                    )
-                    Text(
-                        text = stringResource(R.string.about_checking_updates),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-                is Resource.Success -> {
-                    if(releaseState.data != null) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.about_latest_version),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    } else {
+            if(uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(32.dp)
+                )
+                Text(
+                    text = stringResource(R.string.about_checking_updates),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else if(uiState.errorMessage != null) {
+                Text(
+                    text = stringResource(R.string.about_latest_error),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                when(uiState.latestRelease) {
+                    null -> {
                         Icon(
                             imageVector = Icons.Default.Refresh,
                             contentDescription = null,
@@ -109,12 +106,17 @@ private fun CheckUpdateButton(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     }
-                }
-                is Resource.Error -> {
-                    Text(
-                        text = stringResource(R.string.about_latest_error),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    else -> {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            modifier = Modifier.size(32.dp)
+                        )
+                        Text(
+                            text = stringResource(R.string.about_latest_version),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
             }
         }

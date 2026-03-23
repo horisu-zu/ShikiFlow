@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -43,7 +44,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
-import com.example.shikiflow.presentation.viewmodel.SimilarMediaViewModel
+import com.example.shikiflow.presentation.viewmodel.media.similar.SimilarMediaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,7 +56,7 @@ fun SimilarMediaScreen(
     similarMediaViewModel: SimilarMediaViewModel = hiltViewModel()
 ) {
     val lazyGridState = rememberLazyGridState()
-    val similarMediaState = similarMediaViewModel.getSimilarMedia(mediaId, mediaType).collectAsLazyPagingItems()
+    val similarMediaState = similarMediaViewModel.similarMediaFlow.collectAsLazyPagingItems()
 
     val horizontalPadding = 12.dp
     val isAtTop by remember {
@@ -63,6 +64,10 @@ fun SimilarMediaScreen(
             lazyGridState.firstVisibleItemIndex == 0 &&
             lazyGridState.firstVisibleItemScrollOffset == 0
         }
+    }
+
+    LaunchedEffect(mediaId) {
+        similarMediaViewModel.setMediaParams(mediaId, mediaType)
     }
 
     Scaffold(
@@ -119,7 +124,8 @@ fun SimilarMediaScreen(
                     ErrorItem(
                         message = (similarMediaState.loadState.refresh as LoadState.Error)
                             .error.message ?: stringResource(R.string.similar_media_error),
-                        buttonLabel = stringResource(R.string.common_retry)
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { similarMediaState.retry() }
                     )
                 }
             }

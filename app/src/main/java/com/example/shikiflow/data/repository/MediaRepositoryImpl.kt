@@ -15,6 +15,7 @@ import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -35,10 +36,10 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getMediaDetails(
+    override fun getMediaDetails(
         id: Int,
         mediaType: MediaType
-    ): Result<MediaDetails> = getSource().getMediaDetails(id, mediaType)
+    ): Flow<DataResult<MediaDetails>> = getSource().getMediaDetails(id, mediaType)
 
     override fun paginatedBrowseMedia(
         browseType: BrowseType?,
@@ -61,7 +62,7 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getStudioMedia(
         studioId: Int,
         search: String?,
-        order: SortType,
+        order: SortType?,
         onList: Boolean?
     ): Flow<PagingData<Browse>> {
         return Pager(

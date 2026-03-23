@@ -20,21 +20,25 @@ import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistCharactersDataSource @Inject constructor(
     private val apolloClient: ApolloClient
-): CharactersDataSource {
-    override suspend fun getCharacterDetails(characterId: Int): Result<MediaCharacter> {
+): CharactersDataSource, BaseNetworkRepository() {
+    override suspend fun getCharacterDetails(characterId: Int): Flow<DataResult<MediaCharacter>> {
         val characterQuery = CharacterDetailsQuery(characterId)
 
-        val response = apolloClient.query(characterQuery).execute()
+        val response = apolloClient.query(characterQuery)
+            .toFlow()
+            .asDataResult { data ->
+                data.Character?.toDomain() ?: throw NoSuchElementException("Character Not Found")
+            }
 
-        return response.toResult().map { data ->
-            data.Character?.toDomain() ?: throw NoSuchElementException("Character Not Found")
-        }
+        return response
     }
 
     override fun getCharacterMediaRoles(

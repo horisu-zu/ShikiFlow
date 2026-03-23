@@ -43,8 +43,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
-import com.example.shikiflow.presentation.viewmodel.user.CompareScreenViewModel
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.viewmodel.user.compare.CompareScreenViewModel
 
 @Composable
 fun CompareScreenContent(
@@ -54,84 +53,74 @@ fun CompareScreenContent(
     onMediaItemClick: (Int, MediaType) -> Unit,
     compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
 ) {
-    val ratesState by compareScreenViewModel.userRates.collectAsStateWithLifecycle()
+    val uiState by compareScreenViewModel.uiState.collectAsStateWithLifecycle()
     val showState = rememberSaveable {
         ComparisonType.entries.associateWith { mutableStateOf(true) }
     }
 
     LaunchedEffect(mediaType) {
-        compareScreenViewModel.compareUserRates(currentUser.id, targetUser.id, mediaType)
+        compareScreenViewModel.setData(currentUser.id, targetUser.id, mediaType)
     }
 
     Box {
-        when(val mediaRates = ratesState[mediaType] ?: Resource.Loading()) {
-            is Resource.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        if(uiState.mediaUiState[mediaType]?.isLoading == true) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
+        } else if(uiState.mediaUiState[mediaType]?.errorMessage != null) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = uiState.mediaUiState[mediaType]?.errorMessage ?: stringResource(R.string.common_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { compareScreenViewModel.onRefresh(mediaType) }
+                )
             }
-            is Resource.Success -> {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(bottom = 8.dp)
-                ) {
-                    mediaRates.data?.let { userRatesMap ->
-                        userRatesMap.forEach { (comparisonType, media) ->
-                            stickyHeader {
-                                CompareHeader(
-                                    currentUserNickname = currentUser.nickname,
-                                    targetUserNickname = targetUser.nickname,
-                                    count = media.size,
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 8.dp)
+            ) {
+                uiState.mediaUiState[mediaType]?.userRates?.let { userRatesMap ->
+                    userRatesMap.forEach { (comparisonType, media) ->
+                        stickyHeader {
+                            CompareHeader(
+                                currentUserNickname = currentUser.nickname,
+                                targetUserNickname = targetUser.nickname,
+                                count = media.size,
+                                comparisonType = comparisonType,
+                                onClick = {
+                                    showState[comparisonType]?.value = !(showState[comparisonType]?.value ?: true)
+                                },
+                                modifier = Modifier
+                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .animateItem()
+                            )
+                        }
+                        if(showState[comparisonType]?.value == true) {
+                            items(
+                                count = media.size,
+                                key = { index -> media[index].id }
+                            ) { index ->
+                                ComparisonItem(
+                                    mediaItem = media[index],
+                                    mediaType = mediaType,
+                                    currentUserScore = media[index].currentUserScore,
+                                    targetUserScore = media[index].targetUserScore,
                                     comparisonType = comparisonType,
-                                    onClick = {
-                                        showState[comparisonType]?.value = !(showState[comparisonType]?.value ?: true)
+                                    onItemClick = { mediaId ->
+                                        onMediaItemClick(mediaId, mediaType)
                                     },
                                     modifier = Modifier
-                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .background(MaterialTheme.colorScheme.background)
                                         .animateItem()
                                 )
                             }
-                            if(showState[comparisonType]?.value == true) {
-                                items(
-                                    count = media.size,
-                                    key = { index -> media[index].id }
-                                ) { index ->
-                                    ComparisonItem(
-                                        mediaItem = media[index],
-                                        mediaType = mediaType,
-                                        currentUserScore = media[index].currentUserScore,
-                                        targetUserScore = media[index].targetUserScore,
-                                        comparisonType = comparisonType,
-                                        onItemClick = { mediaId ->
-                                            onMediaItemClick(mediaId, mediaType)
-                                        },
-                                        modifier = Modifier
-                                            .background(MaterialTheme.colorScheme.background)
-                                            .animateItem()
-                                    )
-                                }
-                            }
                         }
                     }
-                }
-            }
-            is Resource.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = mediaRates.message ?: stringResource(R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = {
-                            compareScreenViewModel.compareUserRates(
-                                currentUser.id,
-                                targetUser.id,
-                                mediaType
-                            )
-                        }
-                    )
                 }
             }
         }

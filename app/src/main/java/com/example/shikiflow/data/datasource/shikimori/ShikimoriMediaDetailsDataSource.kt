@@ -36,7 +36,9 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -44,43 +46,41 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
     private val apolloClient: ApolloClient,
     private val animeApi: AnimeApi,
     private val mangaApi: MangaApi
-): MediaDetailsDataSource {
+): MediaDetailsDataSource, BaseNetworkRepository() {
 
-    override suspend fun getMediaDetails(
+    override fun getMediaDetails(
         id: Int,
         mediaType: MediaType
-    ): Result<MediaDetails> {
+    ): Flow<DataResult<MediaDetails>> {
         return when (mediaType) {
             MediaType.ANIME -> {
-                val response = apolloClient
+                apolloClient
                     .query(
                         AnimeDetailsQuery(
                             ids = Optional.presentIfNotNull(id.toString())
                         )
                     )
                     .fetchPolicy(FetchPolicy.NetworkFirst)
-                    .execute()
-
-                response.toResult().map { data ->
-                    data.animes.firstOrNull()?.toDomain()
-                        ?: throw IllegalStateException("No Anime Details data returned")
-                }
+                    .toFlow()
+                    .asDataResult { data ->
+                        data.animes.firstOrNull()?.toDomain()
+                            ?: throw IllegalStateException("No Anime Details data returned")
+                    }
             }
 
             MediaType.MANGA -> {
-                val response = apolloClient
+                apolloClient
                     .query(
                         MangaDetailsQuery(
                             ids = Optional.presentIfNotNull(id.toString())
                         )
                     )
                     .fetchPolicy(FetchPolicy.NetworkFirst)
-                    .execute()
-
-                response.toResult().map { data ->
-                    data.mangas.firstOrNull()?.toDomain()
-                        ?: throw IllegalStateException("No Anime Details data returned")
-                }
+                    .toFlow()
+                    .asDataResult { data ->
+                        data.mangas.firstOrNull()?.toDomain()
+                            ?: throw IllegalStateException("No Anime Details data returned")
+                    }
             }
         }
     }
@@ -222,14 +222,14 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
         page: Int,
         limit: Int,
         search: String?,
-        order: SortType,
+        order: SortType?,
         onList: Boolean?
     ): Result<List<Browse>> {
         val query = AnimeBrowseQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
             search = Optional.presentIfNotNull(search),
-            order = Optional.presentIfNotNull(order.toShikimoriBrowseOrder()),
+            order = Optional.presentIfNotNull(order?.toShikimoriBrowseOrder()),
             mylist = Optional.presentIfNotNull(onList),
             studio = Optional.presentIfNotNull(studioId.toString())
         )

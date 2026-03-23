@@ -42,7 +42,7 @@ import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
-import com.example.shikiflow.presentation.viewmodel.manga.MangaTracksViewModel
+import com.example.shikiflow.presentation.viewmodel.manga.tracks.MangaTracksViewModel
 
 @Composable
 fun MangaTracksPage(

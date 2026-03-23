@@ -49,7 +49,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.viewmodel.anime.BrowseViewModel
+import com.example.shikiflow.presentation.viewmodel.browse.main.BrowseViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 

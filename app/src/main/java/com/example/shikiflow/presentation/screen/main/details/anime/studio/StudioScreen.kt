@@ -31,12 +31,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,11 +51,10 @@ import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.sort.MediaSort
-import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
-import com.example.shikiflow.presentation.viewmodel.anime.StudioViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.studio.StudioViewModel
 import com.example.shikiflow.utils.IconResource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -71,19 +68,18 @@ fun StudioScreen(
     studioViewModel: StudioViewModel = hiltViewModel()
 ) {
     val studioState by studioViewModel.studioUiState.collectAsStateWithLifecycle()
-    var sortType by rememberSaveable {
-        mutableStateOf<SortType>(
-            when(authType) {
+
+    LaunchedEffect(id) {
+        studioViewModel.setStudioId(id)
+        studioViewModel.setSortType(
+            sortType = when(authType) {
                 AuthType.SHIKIMORI -> MediaSort.Shikimori.RANKED
                 AuthType.ANILIST -> MediaSort.Anilist.POPULARITY
             }
         )
     }
 
-    val studioAnimeData = studioViewModel.getStudioAnime(
-        studioId = id,
-        orderOption = sortType
-    ).collectAsLazyPagingItems()
+    val studioAnimeData = studioViewModel.studioTitles.collectAsLazyPagingItems()
 
     val lazyGridState = rememberLazyGridState()
     val isAtTop by remember {
@@ -127,9 +123,9 @@ fun StudioScreen(
                 )
                 if(authType == AuthType.SHIKIMORI) {
                     SearchPanel(
-                        query = studioState.titleQuery,
+                        query = studioState.query,
                         label = stringResource(R.string.browse_page_search),
-                        onQueryChange = studioViewModel::updateTitleQuery,
+                        onQueryChange = studioViewModel::setQuery,
                         modifier = Modifier.background(
                             color = if(isAtTop) MaterialTheme.colorScheme.background
                                 else MaterialTheme.colorScheme.surfaceVariant
@@ -154,7 +150,8 @@ fun StudioScreen(
                 ) {
                     ErrorItem(
                         message = stringResource(id = R.string.common_error),
-                        buttonLabel = stringResource(id = R.string.common_retry)
+                        buttonLabel = stringResource(id = R.string.common_retry),
+                        onButtonClick = { studioAnimeData.retry() }
                     )
                 }
             }

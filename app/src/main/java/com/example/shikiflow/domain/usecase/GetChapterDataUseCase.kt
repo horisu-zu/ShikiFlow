@@ -4,7 +4,7 @@ import coil3.network.HttpException
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata.Companion.toDomain
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -15,9 +15,9 @@ import javax.inject.Inject
 class GetChapterDataUseCase @Inject constructor(
     private val mangaDexRepository: MangaDexRepository
 ) {
-    operator fun invoke(chapterIds: List<String>): Flow<Resource<List<ChapterMetadata>>> = flow {
+    operator fun invoke(chapterIds: List<String>): Flow<DataResult<List<ChapterMetadata>>> = flow {
         try {
-            emit(Resource.Loading())
+            emit(DataResult.Loading)
 
             val chapters = coroutineScope {
                 chapterIds.map { chapterId ->
@@ -52,11 +52,11 @@ class GetChapterDataUseCase @Inject constructor(
                 chapter.publishedAt
             }
 
-            emit(Resource.Success(sortedChapters))
+            emit(DataResult.Success(sortedChapters))
         } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+            emit(DataResult.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+            emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

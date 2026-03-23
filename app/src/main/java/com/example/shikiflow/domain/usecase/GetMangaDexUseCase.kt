@@ -4,7 +4,7 @@ import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -15,9 +15,9 @@ import javax.inject.Inject
 class GetMangaDexUseCase @Inject constructor(
     private val mangaDexRepository: MangaDexRepository
 ) {
-     operator fun invoke(title: String, nativeTitle: String?, malId: Int): Flow<Resource<List<String>>> = flow {
+     operator fun invoke(title: String, nativeTitle: String?, malId: Int): Flow<DataResult<List<String>>> = flow {
          try {
-             emit(Resource.Loading())
+             emit(DataResult.Loading)
 
              val results = coroutineScope {
                  val nativeResult = nativeTitle?.let { async { mangaDexRepository.getMangaList(title = nativeTitle) } }
@@ -38,19 +38,19 @@ class GetMangaDexUseCase @Inject constructor(
              Log.d("GetMangaDexUseCase", "Title $title, MAL ID: $malId")
              Log.d("GetMangaDexUseCase", "Items: $mangaDexItems")
 
-             emit(Resource.Success(mangaDexItems))
+             emit(DataResult.Success(mangaDexItems))
          } catch (e: HttpException) {
-             emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+             emit(DataResult.Error(e.localizedMessage ?: "Network error: ${e.message}"))
          } catch (e: Exception) {
-             emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+             emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
          }
     }
 
-    operator fun invoke(mangaDexIds: List<String>): Flow<Resource<List<MangaData>>> = flow {
+    operator fun invoke(mangaDexIds: List<String>): Flow<DataResult<List<MangaData>>> = flow {
         try {
-            emit(Resource.Loading())
-            val result = mangaDexRepository.getMangaList(ids = mangaDexIds)
+            emit(DataResult.Loading)
 
+            val result = mangaDexRepository.getMangaList(ids = mangaDexIds)
             val coversResponse = coroutineScope {
                 result.map { mangaData ->
                     val coverId = mangaData.relationships.first { it.type == "cover_art" }.id
@@ -72,11 +72,11 @@ class GetMangaDexUseCase @Inject constructor(
                     coverUrl = coverUrl
                 )
             }
-            emit(Resource.Success(mangaDataWithCovers))
+            emit(DataResult.Success(mangaDataWithCovers))
         } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+            emit(DataResult.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+            emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

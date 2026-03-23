@@ -3,6 +3,8 @@ package com.example.shikiflow.data.local.source
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.UserFavoriteAnimeQuery
 import com.example.graphql.anilist.UserFavoriteCharactersQuery
 import com.example.graphql.anilist.UserFavoriteMangaQuery
@@ -54,7 +56,9 @@ class FavoritesPagingSource(
     }
 
     private suspend fun loadAnime(page: Int, size: Int): Result<List<UserFavorite>> {
-        val response = apolloClient.query(UserFavoriteAnimeQuery(page, size, userId)).execute()
+        val response = apolloClient.query(UserFavoriteAnimeQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.User
@@ -68,7 +72,9 @@ class FavoritesPagingSource(
     }
 
     private suspend fun loadManga(page: Int, size: Int): Result<List<UserFavorite>> {
-        val response = apolloClient.query(UserFavoriteMangaQuery(page, size, userId)).execute()
+        val response = apolloClient.query(UserFavoriteMangaQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.User
@@ -82,7 +88,9 @@ class FavoritesPagingSource(
     }
 
     private suspend fun loadCharacters(page: Int, size: Int): Result<List<UserFavorite>> {
-        val response = apolloClient.query(UserFavoriteCharactersQuery(page, size, userId)).execute()
+        val response = apolloClient.query(UserFavoriteCharactersQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.User
@@ -96,7 +104,9 @@ class FavoritesPagingSource(
     }
 
     private suspend fun loadStaff(page: Int, size: Int): Result<List<UserFavorite>> {
-        val response = apolloClient.query(UserFavoriteStaffQuery(page, size, userId)).execute()
+        val response = apolloClient.query(UserFavoriteStaffQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.User
@@ -110,7 +120,9 @@ class FavoritesPagingSource(
     }
 
     private suspend fun loadStudios(page: Int, size: Int): Result<List<UserFavorite>> {
-        val response = apolloClient.query(UserFavoriteStudiosQuery(page, size, userId)).execute()
+        val response = apolloClient.query(UserFavoriteStudiosQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.User

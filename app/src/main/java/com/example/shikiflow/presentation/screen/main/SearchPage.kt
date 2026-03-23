@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -39,7 +41,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
-import com.example.shikiflow.presentation.viewmodel.anime.AnimeTracksSearchViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.AnimeTracksSearchViewModel
 
 @Composable
 fun SearchPage(
@@ -50,18 +52,32 @@ fun SearchPage(
     onAnimeClick: (Int) -> Unit
 ) {
     val chips = listOf(null) + UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
-
     var selectedTabSearch by rememberSaveable { mutableIntStateOf(0) }
-    val selectedStatus = when (selectedTabSearch) {
-        in 1..UserRateStatus.entries.size -> UserRateStatus.entries[selectedTabSearch - 1]
-        else -> null
+
+    val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
+
+    LaunchedEffect(userId) {
+        userId?.let {
+            tracksViewModel.setUserId(userId)
+        }
     }
 
-    val trackItems = tracksViewModel.getPaginatedTracks(
-        userId = userId,
-        title = searchQuery,
-        userRateStatus = selectedStatus
-    ).collectAsLazyPagingItems()
+    LaunchedEffect(selectedTabSearch) {
+        tracksViewModel.setRateStatus(
+            userRateStatus = when (selectedTabSearch) {
+                in 1..UserRateStatus.entries.size -> UserRateStatus.entries[selectedTabSearch - 1]
+                else -> null
+            }
+        )
+    }
+
+    LaunchedEffect(searchQuery) {
+        tracksViewModel.setQuery(searchQuery)
+    }
+
+    LaunchedEffect(trackItems) {
+        Log.d("SearchPage", "Track Items State: ${trackItems.loadState}")
+    }
 
     Column {
         LazyRow(
@@ -99,7 +115,9 @@ fun SearchPage(
                 )
             }
         }
+
         HorizontalDivider()
+
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(vertical = 12.dp),

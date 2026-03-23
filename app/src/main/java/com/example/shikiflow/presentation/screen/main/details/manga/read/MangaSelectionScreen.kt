@@ -48,8 +48,7 @@ import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.getMangaDexStatusColor
-import com.example.shikiflow.presentation.viewmodel.manga.read.MangaSelectionViewModel
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.viewmodel.manga.read.selection.MangaSelectionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +58,7 @@ fun MangaSelectionScreen(
     navOptions: MangaReadNavOptions,
     mangaSelectionViewModel: MangaSelectionViewModel = hiltViewModel()
 ) {
-    val mangaListState = mangaSelectionViewModel.mangaList.collectAsStateWithLifecycle()
+    val uiState by mangaSelectionViewModel.uiState.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -69,7 +68,7 @@ fun MangaSelectionScreen(
     }
 
     LaunchedEffect(mangaDexIds) {
-        mangaSelectionViewModel.fetchMangaByIds(mangaDexIds)
+        mangaSelectionViewModel.setMangaDexIds(mangaDexIds)
     }
 
     Scaffold(
@@ -108,43 +107,37 @@ fun MangaSelectionScreen(
             contentPadding = PaddingValues(all = 12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            when(val mangaList = mangaListState.value) {
-                is Resource.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
+            if(uiState.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
+                }
+            } else if(uiState.errorMessage != null) {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = uiState.errorMessage ?: stringResource(id = R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { mangaSelectionViewModel.onRefresh() }
+                        )
                     }
                 }
-                is Resource.Success -> {
-                    mangaList.data?.let { mangaList ->
-                        items(mangaList) { mangaItem ->
-                            MangaItem(
-                                mangaItem = mangaItem,
-                                onClick = { mangaDexId ->
-                                    navOptions.navigateToChapters(
-                                        mangaDexId = mangaDexId,
-                                        title = title
-                                    )
-                                }
+            } else {
+                items(uiState.mangaList) { mangaItem ->
+                    MangaItem(
+                        mangaItem = mangaItem,
+                        onClick = { mangaDexId ->
+                            navOptions.navigateToChapters(
+                                mangaDexId = mangaDexId,
+                                title = title
                             )
                         }
-                    }
-                }
-                is Resource.Error -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = "Error: ${mangaList.message}",
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { mangaSelectionViewModel.fetchMangaByIds(mangaDexIds) }
-                            )
-                        }
-                    }
+                    )
                 }
             }
         }

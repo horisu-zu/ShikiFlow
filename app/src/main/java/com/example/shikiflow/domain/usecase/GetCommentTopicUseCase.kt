@@ -5,7 +5,7 @@ import coil3.network.HttpException
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.repository.CommentRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.DataResult
 import com.example.shikiflow.utils.parser.HTMLParser
 import com.example.shikiflow.utils.parser.ShikimoriDialect
 import kotlinx.coroutines.async
@@ -20,9 +20,9 @@ class GetCommentTopicUseCase @Inject constructor(
 ) {
     operator fun invoke(
         commentId: Int
-    ): Flow<Resource<Map<CommentType, List<Comment>>>> = flow {
+    ): Flow<DataResult<Map<CommentType, List<Comment>>>> = flow {
         try {
-            emit(Resource.Loading())
+            emit(DataResult.Loading)
 
             val originalResponse = commentRepository.getCommentById(commentId)
             val result = mutableMapOf(
@@ -63,11 +63,11 @@ class GetCommentTopicUseCase @Inject constructor(
                 .sortedBy { it.key.ordinal }
                 .associate { it.key to it.value }
 
-            emit(Resource.Success(sortedResult))
+            emit(DataResult.Success(sortedResult))
         } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+            emit(DataResult.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+            emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

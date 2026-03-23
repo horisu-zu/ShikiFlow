@@ -59,10 +59,9 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.kodik.KodikAnime
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
-import com.example.shikiflow.presentation.viewmodel.anime.watch.AnimeTranslationsViewModel
+import com.example.shikiflow.presentation.viewmodel.anime.watch.translations.AnimeTranslationsViewModel
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.toAbbreviation
-import com.example.shikiflow.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -76,11 +75,10 @@ fun AnimeTranslationSelectScreen(
     val filters = TranslationFilter.entries
     var translationFilter by rememberSaveable { mutableStateOf(TranslationFilter.ALL) }
     var isNavigating by remember { mutableStateOf(false) }
-    val isRefreshing by animeTranslationsViewModel.isRefreshing
-    val translationsState = animeTranslationsViewModel.translations.collectAsStateWithLifecycle()
+    val uiState by animeTranslationsViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(shikimoriId) {
-        animeTranslationsViewModel.getAnimeTranslations(shikimoriId)
+        animeTranslationsViewModel.setId(shikimoriId)
     }
 
     val lazyListState = rememberLazyListState()
@@ -176,9 +174,9 @@ fun AnimeTranslationSelectScreen(
         }
     ) { paddingValues ->
         PullToRefreshCustomBox(
-            isRefreshing = isRefreshing,
+            isRefreshing = uiState.isRefreshing,
             enabled = scrollBehavior.state.collapsedFraction == 0f,
-            onRefresh = { animeTranslationsViewModel.getAnimeTranslations(shikimoriId, true) },
+            onRefresh = { animeTranslationsViewModel.onRefresh() },
             modifier = Modifier.fillMaxSize()
                 .padding(
                     top = paddingValues.calculateTopPadding(),
@@ -192,50 +190,43 @@ fun AnimeTranslationSelectScreen(
                 contentPadding = PaddingValues(vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                when(val translations = translationsState.value) {
-                    is Resource.Loading -> {
-                        item {
-                            Box(
-                                modifier = Modifier.fillParentMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
+                if(uiState.isLoading) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) { CircularProgressIndicator() }
+                    }
+                } else if(uiState.errorMessage != null) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = uiState.errorMessage ?: stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { animeTranslationsViewModel.onRefresh() }
+                            )
                         }
                     }
-                    is Resource.Success -> {
-                        translations.data?.let { animeTranslations ->
-                            val currentTranslations = animeTranslations[translationFilter] ?: emptyList()
+                } else {
+                    uiState.translations.let { animeTranslations ->
+                        val currentTranslations = animeTranslations[translationFilter] ?: emptyList()
 
-                            items(
-                                count = currentTranslations.size,
-                                key = { index -> currentTranslations[index].id }
-                            ) { index ->
-                                AnimeTranslationItem(
-                                    kodikAnime = currentTranslations[index],
-                                    onTranslationClick = { link, translationGroup, episodesCount ->
-                                        navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
-                                    },
-                                    modifier = Modifier
-                                        .padding(horizontal = 12.dp)
-                                        .animateItem()
-                                )
-                            }
-                        }
-                    }
-                    is Resource.Error -> {
-                        item {
-                            Box(
-                                modifier = Modifier.fillParentMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                ErrorItem(
-                                    message = stringResource(R.string.common_error),
-                                    buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { animeTranslationsViewModel.getAnimeTranslations(
-                                        shikimoriId,
-                                        isRefresh = true
-                                    ) }
-                                )
-                            }
+                        items(
+                            count = currentTranslations.size,
+                            key = { index -> currentTranslations[index].id }
+                        ) { index ->
+                            AnimeTranslationItem(
+                                kodikAnime = currentTranslations[index],
+                                onTranslationClick = { link, translationGroup, episodesCount ->
+                                    navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
+                                },
+                                modifier = Modifier
+                                    .padding(horizontal = 12.dp)
+                                    .animateItem()
+                            )
                         }
                     }
                 }

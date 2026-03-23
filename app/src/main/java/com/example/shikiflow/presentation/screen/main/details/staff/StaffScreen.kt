@@ -80,7 +80,7 @@ import com.example.shikiflow.presentation.screen.main.details.character.Characte
 import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
-import com.example.shikiflow.presentation.viewmodel.staff.StaffViewModel
+import com.example.shikiflow.presentation.viewmodel.staff.staff_details.StaffViewModel
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 

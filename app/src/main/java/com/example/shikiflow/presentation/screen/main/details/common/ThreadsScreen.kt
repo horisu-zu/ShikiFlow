@@ -54,7 +54,7 @@ import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
-import com.example.shikiflow.presentation.viewmodel.comment.ThreadsViewModel
+import com.example.shikiflow.presentation.viewmodel.comment.threads.ThreadsViewModel
 import com.example.shikiflow.utils.Converter.convertInstantToString
 import com.example.shikiflow.utils.IconResource
 import kotlin.time.Instant

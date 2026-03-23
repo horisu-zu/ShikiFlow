@@ -1,8 +1,8 @@
 package com.example.shikiflow.presentation.viewmodel.user.statistics
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.stats.OverviewStatType
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
@@ -44,27 +44,28 @@ class UserStatsViewModel @Inject constructor(
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        val mediaTypes = result.data.let { overviewStats ->
-                            listOfNotNull(
-                                if(overviewStats.animeStats?.shortStats?.find { shortStat ->
-                                        shortStat.statType == OverviewStatType.TITLE
-                                    }?.count != "0") MediaType.ANIME else null,
-                                if(overviewStats.mangaStats?.shortStats?.find { shortStat ->
-                                        shortStat.statType == OverviewStatType.TITLE
-                                    }?.count != "0") MediaType.MANGA else null
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
                             )
                         }
 
-                        state.copy(
-                            overviewStats = result.data,
-                            typesList = mediaTypes,
-                            isLoading = false,
-                            isRefreshing = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        result.toUiState()
+                        is DataResult.Success -> {
+                            state.copy(
+                                overviewStats = result.data,
+                                isLoading = false
+                            )
+                        }
+
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
@@ -83,15 +84,26 @@ class UserStatsViewModel @Inject constructor(
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        state.copy(
-                            genreStats = result.data,
-                            isLoading = false,
-                            isRefreshing = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        result.toUiState()
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                genreStats = result.data,
+                                isLoading = false
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
@@ -109,16 +121,28 @@ class UserStatsViewModel @Inject constructor(
                 userRepository.getUserTags(state.userId!!)
             }
             .onEach { result ->
+                Log.d("UserStatsVM", "Result: $result")
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        state.copy(
-                            tagsStats = result.data,
-                            isLoading = false,
-                            isRefreshing = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        result.toUiState()
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                tagsStats = result.data,
+                                isLoading = false
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
@@ -137,15 +161,26 @@ class UserStatsViewModel @Inject constructor(
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        state.copy(
-                            staffStats = result.data,
-                            isLoading = false,
-                            isRefreshing = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        result.toUiState()
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                staffStats = result.data,
+                                isLoading = false
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
@@ -164,15 +199,26 @@ class UserStatsViewModel @Inject constructor(
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        state.copy(
-                            voiceActorsStats = result.data,
-                            isLoading = false,
-                            isRefreshing = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        result.toUiState()
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                voiceActorsStats = result.data,
+                                isLoading = false
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
@@ -191,15 +237,26 @@ class UserStatsViewModel @Inject constructor(
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        state.copy(
-                            studiosStats = result.data,
-                            isLoading = false,
-                            isRefreshing = false,
-                            errorMessage = null
-                        )
-                    } else {
-                        result.toUiState()
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                studiosStats = result.data,
+                                isLoading = false
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
                     }
                 }
             }.launchIn(viewModelScope)
@@ -221,21 +278,18 @@ class UserStatsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    override fun setUserId(userId: Int) {
+    override fun setInitialParams(userId: Int, typesList: List<MediaType>) {
         mutableUiState.update { state ->
-            state.copy(userId = userId)
+            state.copy(
+                userId = userId,
+                typesList = typesList
+            )
         }
     }
 
     override fun setMediaType(mediaType: MediaType) {
         mutableUiState.update { state ->
             state.copy(mediaType = mediaType)
-        }
-    }
-
-    override fun setTypesList(typesList: List<MediaType>) {
-        mutableUiState.update { state ->
-            state.copy(typesList = typesList)
         }
     }
 

@@ -54,8 +54,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
-import com.example.shikiflow.presentation.viewmodel.ExternalLinksViewModel
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.presentation.viewmodel.media.links.ExternalLinksViewModel
 import com.example.shikiflow.utils.WebIntent.openUrlCustomTab
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -67,7 +66,7 @@ fun ExternalLinksScreen(
     externalLinksViewModel: ExternalLinksViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val externalLinks by externalLinksViewModel.externalLinks.collectAsStateWithLifecycle()
+    val uiState by externalLinksViewModel.uiState.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -78,7 +77,7 @@ fun ExternalLinksScreen(
     }
 
     LaunchedEffect(mediaId, mediaType) {
-        externalLinksViewModel.getExternalLinks(mediaId, mediaType)
+        externalLinksViewModel.setMedia(mediaId, mediaType)
     }
 
     Scaffold(
@@ -124,45 +123,37 @@ fun ExternalLinksScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
-            when(externalLinks) {
-                is Resource.Error -> {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillParentMaxSize()
-                                .padding(horizontal = 24.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = externalLinks.message ?: stringResource(R.string.common_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = {
-                                    externalLinksViewModel.getExternalLinks(mediaId, mediaType)
-                                }
-                            )
-                        }
+            if(uiState.isLoading) {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
+                }
+            } else if(uiState.errorMessage != null) {
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillParentMaxSize()
+                            .padding(horizontal = 24.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = uiState.errorMessage ?: stringResource(R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { externalLinksViewModel.onRefresh() }
+                        )
                     }
                 }
-                is Resource.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
-                    }
-                }
-                is Resource.Success -> {
-                    externalLinks.data?.let { links ->
-                        items(links) { item ->
-                            LinkItem(
-                                link = item,
-                                onLinkClick = { url ->
-                                    openUrlCustomTab(context, url)
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    }
+            } else {
+                items(uiState.links) { item ->
+                    LinkItem(
+                        link = item,
+                        onLinkClick = { url ->
+                            openUrlCustomTab(context, url)
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }

@@ -19,7 +19,9 @@ import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ShikimoriCharactersDataSource @Inject constructor(
@@ -28,13 +30,15 @@ class ShikimoriCharactersDataSource @Inject constructor(
 ): CharactersDataSource {
     override suspend fun getCharacterDetails(
         characterId: Int
-    ): Result<MediaCharacter> {
-        return try{
+    ): Flow<DataResult<MediaCharacter>> = flow {
+        emit(DataResult.Loading)
+
+        try{
             val response = characterApi.getCharacterDetails(characterId.toString()).toDomain()
 
-            Result.success(response)
+            emit(DataResult.Success(response))
         } catch (e: Exception) {
-            Result.failure(e)
+            emit(DataResult.Error(e.message ?: "Unknown Error"))
         }
     }
 
@@ -46,25 +50,22 @@ class ShikimoriCharactersDataSource @Inject constructor(
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, MediaRole>() {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {
-                    val detailsResult = getCharacterDetails(characterId)
+                    return try {
+                        val details = characterApi.getCharacterDetails(characterId.toString()).toDomain()
 
-                    return detailsResult.fold(
-                        onSuccess = { details ->
-                            val mediaRoles = when(mediaType) {
-                                MediaType.ANIME -> details.animeRoles.entries
-                                MediaType.MANGA -> details.mangaRoles.entries
-                            }.map { it.toCharacterRole() }
+                        val mediaRoles = when(mediaType) {
+                            MediaType.ANIME -> details.animeRoles.entries
+                            MediaType.MANGA -> details.mangaRoles.entries
+                        }.map { it.toCharacterRole() }
 
-                            LoadResult.Page(
-                                data = mediaRoles,
-                                prevKey = null,
-                                nextKey = null
-                            )
-                        },
-                        onFailure = { e ->
-                            LoadResult.Error(e)
-                        }
-                    )
+                        LoadResult.Page(
+                            data = mediaRoles,
+                            prevKey = null,
+                            nextKey = null
+                        )
+                    } catch (e: Exception) {
+                        LoadResult.Error(e)
+                    }
                 }
 
                 override fun getRefreshKey(state: PagingState<Int, MediaRole>): Int? = null

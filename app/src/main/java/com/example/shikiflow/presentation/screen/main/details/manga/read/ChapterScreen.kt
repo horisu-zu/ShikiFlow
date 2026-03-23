@@ -56,7 +56,7 @@ import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapter
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SideSheet
-import com.example.shikiflow.presentation.viewmodel.manga.read.ChapterViewModel
+import com.example.shikiflow.presentation.viewmodel.manga.read.chapter.ChapterViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -80,10 +80,7 @@ fun ChapterScreen(
     var isSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(chapterUiState.uiSettings.isDataSaverEnabled) {
-        chapterViewModel.loadChapter(
-            mangaDexChapterId = chapterUiData.chapterId,
-            isDataSaver = chapterUiState.uiSettings.isDataSaverEnabled
-        )
+        chapterViewModel.setChapter(chapterId = chapterUiData.chapterId)
     }
 
     SideSheet(
@@ -258,12 +255,7 @@ fun ChapterScreen(
                         ErrorItem(
                             message = chapterUiState.chapterError ?: stringResource(R.string.common_error),
                             buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = {
-                                chapterViewModel.loadChapter(
-                                    mangaDexChapterId = chapterUiData.chapterId,
-                                    isDataSaver = chapterUiState.uiSettings.isDataSaverEnabled
-                                )
-                            }
+                            onButtonClick = { chapterViewModel.onRefresh() }
                         )
                     }
                 } else {

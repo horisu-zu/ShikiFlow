@@ -3,7 +3,7 @@ package com.example.shikiflow.domain.usecase
 import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.utils.Resource
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
@@ -14,9 +14,9 @@ class LoadChapterUseCase @Inject constructor(
     operator fun invoke(
         mangaDexChapterId: String,
         isDataSaver: Boolean
-    ): Flow<Resource<List<String>>> = flow {
+    ): Flow<DataResult<List<String>>> = flow {
         try {
-            emit(Resource.Loading())
+            emit(DataResult.Loading)
             val response = mangaDexRepository.getChapter(mangaDexChapterId)
 
             val dataString = if(!isDataSaver) "data" else "data-saver"
@@ -24,11 +24,11 @@ class LoadChapterUseCase @Inject constructor(
                 .map { response.baseUrl + "/$dataString/${response.hash}/" + it }
             Log.d("DownloadChapterUseCase", "Chapter URLs: $chapterPages")
 
-            emit(Resource.Success(chapterPages))
+            emit(DataResult.Success(chapterPages))
         } catch (e: HttpException) {
-            emit(Resource.Error(e.localizedMessage ?: "Network error: ${e.message}"))
+            emit(DataResult.Error(e.localizedMessage ?: "Network error: ${e.message}"))
         } catch (e: Exception) {
-            emit(Resource.Error("An unexpected error occurred: ${e.message}"))
+            emit(DataResult.Error("An unexpected error occurred: ${e.message}"))
         }
     }
 }

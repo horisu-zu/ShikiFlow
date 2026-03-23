@@ -198,7 +198,6 @@ fun DetailsNavigator(
                 CommentsScreen(
                     threadHeader = route.threadHeader,
                     screenMode = route.screenMode,
-                    authType = authType,
                     id = route.id,
                     navOptions = options
                 )

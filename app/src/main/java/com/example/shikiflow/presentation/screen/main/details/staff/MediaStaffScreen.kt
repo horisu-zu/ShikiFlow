@@ -43,7 +43,7 @@ import com.example.shikiflow.presentation.common.SortBottomSheet
 import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.StaffItem
-import com.example.shikiflow.presentation.viewmodel.staff.MediaStaffViewModel
+import com.example.shikiflow.presentation.viewmodel.staff.media_staff.MediaStaffViewModel
 
 @Composable
 fun MediaStaffScreen(

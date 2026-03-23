@@ -1,34 +1,37 @@
 package com.example.shikiflow.presentation.viewmodel.more
 
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class UserSearchViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 
-    private var _query: String? = null
-    private var _cache = mutableStateOf<Flow<PagingData<User>>>(emptyFlow())
+    private var _query = MutableStateFlow("")
 
-    fun paginatedUsers(query: String): Flow<PagingData<User>> {
-        return if(_query != query) {
-            _query = query
-            userRepository.getUsers(query).cachedIn(viewModelScope)
-                .also { flow ->
-                    _cache.value = flow
-                }
-        } else {
-            _cache.value
+    val users = _query
+        .debounce { query ->
+            if(query.isNotEmpty()) 300L else 0L
         }
+        .distinctUntilChanged()
+        .flatMapLatest { query ->
+            userRepository.getUsers(query)
+        }.cachedIn(viewModelScope)
+
+    fun setQuery(query: String) {
+        _query.update { query }
     }
 }

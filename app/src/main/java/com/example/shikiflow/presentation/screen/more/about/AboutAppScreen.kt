@@ -24,7 +24,7 @@ import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.SectionItem
 import com.example.shikiflow.presentation.screen.more.Section
-import com.example.shikiflow.presentation.viewmodel.more.AboutViewModel
+import com.example.shikiflow.presentation.viewmodel.more.about.AboutViewModel
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.WebIntent
 
@@ -33,8 +33,7 @@ fun AboutAppScreen(
     aboutViewModel: AboutViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val latestRelease by aboutViewModel.latestRelease.collectAsStateWithLifecycle()
-    val currentVersion = aboutViewModel.currentRelease
+    val uiState by aboutViewModel.uiState.collectAsStateWithLifecycle()
     val showBottomSheet = remember { mutableStateOf(false) }
 
     Scaffold { innerPadding ->
@@ -48,17 +47,11 @@ fun AboutAppScreen(
                     bottom = 16.dp
                 ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
-            val latestVersion = latestRelease.data
-            val isLatest = if (latestVersion == null) { true } else {
-                "v${currentVersion.tagName}" == latestVersion.tagName
-            }
-
             CurrentVersionItem(
-                currentVersion = currentVersion.tagName
+                currentVersion = uiState.currentRelease.tagName
             )
             CheckUpdateSection(
-                releaseState = latestRelease,
-                isLatest = isLatest,
+                uiState = uiState,
                 onButtonClick = { aboutViewModel.checkForUpdates() },
                 onDownloadClick = { url ->
                     WebIntent.openUrlCustomTab(context, url)
@@ -96,9 +89,9 @@ fun AboutAppScreen(
         }
     }
 
-    latestRelease.data?.let { release ->
+    uiState.latestRelease?.let { release ->
         ReleaseNotesBottomSheet(
-            currentVersion = currentVersion.tagName,
+            currentVersion = uiState.currentRelease.tagName,
             release = release,
             onDismiss = { showBottomSheet.value = false },
             onDownloadReleaseClick = {

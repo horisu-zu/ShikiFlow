@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -56,6 +57,16 @@ fun FavoritesSection(
     val pagerState = rememberPagerState { favoriteCategories.size }
     val scope = rememberCoroutineScope()
 
+    LaunchedEffect(userId) {
+        favoritesViewModel.setUserId(userId.toInt())
+    }
+
+    LaunchedEffect(pagerState.currentPage) {
+        favoritesViewModel.setCategory(
+            favoriteCategory = favoriteCategories[pagerState.currentPage]
+        )
+    }
+
     Scaffold(
         topBar = {
             ConnectedButtonGroup(
@@ -89,10 +100,8 @@ fun FavoritesSection(
         HorizontalPager(
             state = pagerState
         ) { page ->
-            val userFavoriteItems = favoritesViewModel.loadUserFavorites(
-                userId = userId,
-                favoriteCategory = favoriteCategories[page]
-            ).collectAsLazyPagingItems()
+            val userFavoriteItems = favoritesViewModel.userFavorites[favoriteCategories[page]]
+                ?.collectAsLazyPagingItems() ?: return@HorizontalPager
 
             when (userFavoriteItems.loadState.refresh) {
                 is LoadState.Loading -> {
@@ -149,7 +158,7 @@ fun FavoritesSection(
                                     modifier = Modifier.fillMaxWidth(),
                                     contentAlignment = Alignment.Center
                                 ) { CircularProgressIndicator() }
-                            } else if (userFavoriteItems.loadState.append is LoadState.Loading) {
+                            } else if (userFavoriteItems.loadState.append is LoadState.Error) {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center

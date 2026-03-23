@@ -28,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -48,7 +49,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
-import com.example.shikiflow.presentation.viewmodel.character.MediaCharactersViewModel
+import com.example.shikiflow.presentation.viewmodel.character.media.MediaCharactersViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,9 +60,11 @@ fun MediaCharactersScreen(
     navOptions: MediaNavOptions,
     mediaCharactersViewModel: MediaCharactersViewModel = hiltViewModel()
 ) {
-    val mediaCharacterItems = mediaCharactersViewModel.getMediaCharacters(
-        mediaId, mediaType
-    ).collectAsLazyPagingItems()
+    val mediaCharacterItems = mediaCharactersViewModel.mediaCharacters.collectAsLazyPagingItems()
+
+    LaunchedEffect(mediaId) {
+        mediaCharactersViewModel.setParams(mediaId, mediaType)
+    }
 
     Scaffold(
         topBar = {

@@ -193,7 +193,9 @@ class AnilistTracksDataSource @Inject constructor(
             order = Optional.presentIfNotNull(listOf(order?.toAnilistOrder()))
         )
 
-        val response = apolloClient.query(query).execute()
+        val response = apolloClient.query(query)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
 
         return response.toResult().map { data ->
             data.Page?.mediaList?.let { list ->
