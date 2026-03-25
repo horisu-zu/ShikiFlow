@@ -37,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStatType
@@ -45,6 +46,7 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.iconResource
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.overview.OverviewSection
 import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSectionType
@@ -58,18 +60,18 @@ import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsVie
 
 @Composable
 fun UserStatsSection(
-    userId: Int,
+    userData: User,
     typesList: List<MediaType>,
     isCurrentUser: Boolean,
     isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
-    onCompareClick: () -> Unit,
+    navOptions: ProfileNavOptions,
     userStatsViewModel: UserStatsViewModel = hiltViewModel()
 ) {
     val uiState by userStatsViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        userStatsViewModel.setInitialParams(userId, typesList)
+        userStatsViewModel.setInitialParams(userData.id.toInt(), typesList)
     }
 
     PullToRefreshCustomBox(
@@ -84,7 +86,9 @@ fun UserStatsSection(
                     ShikimoriTrackSection(
                         userRateData = uiState.overviewStats,
                         isCurrentUser = isCurrentUser,
-                        onCompareClick = onCompareClick,
+                        onCompareClick = {
+                            navOptions.navigateToCompare(userData)
+                        },
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
@@ -98,9 +102,12 @@ fun UserStatsSection(
                     AnilistStatsSection(
                         uiState = uiState,
                         isCurrentUser = isCurrentUser,
-                        onCompareClick = onCompareClick,
+                        onCompareClick = {
+                            navOptions.navigateToCompare(userData)
+                        },
+                        horizontalPadding = horizontalPadding,
                         event = userStatsViewModel,
-                        horizontalPadding = horizontalPadding
+                        navOptions = navOptions
                     )
                 }
             }
@@ -176,6 +183,7 @@ private fun AnilistStatsSection(
     isCurrentUser: Boolean,
     horizontalPadding: Dp,
     event: UserStatsEvent,
+    navOptions: ProfileNavOptions,
     onCompareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -261,13 +269,16 @@ private fun AnilistStatsSection(
                     typesList = uiState.typesList,
                     currentMediaType = uiState.mediaType,
                     isLoading = uiState.isLoading,
+                    horizontalPadding = horizontalPadding,
                     onMediaTypeChange = { mediaType ->
                         event.setMediaType(mediaType)
                     },
                     onStaffBarTypeChange = { staffBarType ->
                         event.setStaffBarType(staffBarType)
                     },
-                    horizontalPadding = horizontalPadding,
+                    onStaffClick = { staffId ->
+                        navOptions.navigateToDetails(DetailsNavRoute.Staff(staffId))
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -278,13 +289,16 @@ private fun AnilistStatsSection(
                     typesList = listOf(MediaType.ANIME),
                     currentMediaType = MediaType.ANIME,
                     isLoading = uiState.isLoading,
+                    horizontalPadding = horizontalPadding,
                     onMediaTypeChange = { mediaType ->
                         event.setMediaType(mediaType)
                     },
                     onStaffBarTypeChange = { voiceActorsBarType ->
                         event.setVoiceActorsBarType(voiceActorsBarType)
                     },
-                    horizontalPadding = horizontalPadding,
+                    onStaffClick = { staffId ->
+                        navOptions.navigateToDetails(DetailsNavRoute.Staff(staffId))
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
             }
@@ -293,10 +307,13 @@ private fun AnilistStatsSection(
                     typeStats = uiState.studiosStats,
                     statsBarType = uiState.studiosBarType,
                     isLoading = uiState.isLoading,
+                    horizontalPadding = horizontalPadding,
                     onBarTypeChange = { studiosBarType ->
                         event.setStudiosBarType(studiosBarType)
                     },
-                    horizontalPadding = horizontalPadding,
+                    onStudioClick = { studio ->
+                        navOptions.navigateToDetails(DetailsNavRoute.Studio(studio.id, studio.name))
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
             }

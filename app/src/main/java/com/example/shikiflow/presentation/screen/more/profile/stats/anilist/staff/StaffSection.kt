@@ -55,9 +55,10 @@ fun StaffSection(
     typesList: List<MediaType>,
     currentMediaType: MediaType,
     isLoading: Boolean,
+    horizontalPadding: Dp,
     onMediaTypeChange: (MediaType) -> Unit,
     onStaffBarTypeChange: (StatsBarType) -> Unit,
-    horizontalPadding: Dp,
+    onStaffClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -125,7 +126,7 @@ fun StaffSection(
                             positionNumber = index + 1,
                             mediaType = currentMediaType,
                             onStaffClick = { staffId ->
-                                /**/
+                                onStaffClick(staffId)
                             },
                             modifier = Modifier
                                 .fillMaxWidth()

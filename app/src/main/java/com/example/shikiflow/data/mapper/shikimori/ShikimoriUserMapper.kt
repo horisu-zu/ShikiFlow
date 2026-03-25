@@ -15,7 +15,7 @@ import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.fleeksoft.ksoup.Ksoup
 import kotlin.time.Instant
@@ -23,7 +23,7 @@ import kotlin.time.Instant
 object ShikimoriUserMapper {
     fun UserShort.toDomain(): User {
         return User(
-            id = this.id,
+            id = this.id.toInt(),
             nickname = this.nickname,
             avatarUrl = this.avatarUrl,
             lastOnlineAt = Instant.parse(this.lastOnlineAt.toString())
@@ -32,15 +32,15 @@ object ShikimoriUserMapper {
 
     fun ShikiUser.toDomain(): User {
         return User(
-            id = this.id.toString(),
+            id = this.id,
             nickname = this.nickname,
             avatarUrl = this.avatar,
             lastOnlineAt = Instant.parse(this.lastOnlineAt.toString())
         )
     }
 
-    fun ShikiHistoryResponse.toDomain(): UserHistory {
-        return UserHistory(
+    fun ShikiHistoryResponse.toDomain(): ListActivity {
+        return ListActivity(
             id = this.id.toInt(),
             mediaId = this.target?.id?.toInt() ?: 0,
             title = this.target?.name ?: "",

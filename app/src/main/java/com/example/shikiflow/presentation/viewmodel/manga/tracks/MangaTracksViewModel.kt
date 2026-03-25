@@ -32,7 +32,7 @@ class MangaTracksViewModel @Inject constructor(
     var rateUpdateState = mutableStateOf(RateUpdateState.INITIAL)
         private set
 
-    fun getMangaTracks(status: UserRateStatus, userId: String): Flow<PagingData<MangaTrack>> {
+    fun getMangaTracks(status: UserRateStatus, userId: Int): Flow<PagingData<MangaTrack>> {
         val key = "$userId-$status"
 
         return _pagingDataMap.getOrPut(key) {

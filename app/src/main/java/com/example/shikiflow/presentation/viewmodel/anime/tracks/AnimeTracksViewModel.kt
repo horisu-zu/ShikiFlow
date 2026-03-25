@@ -47,7 +47,7 @@ class AnimeTracksViewModel @Inject constructor(
             initialValue = AppUiMode.LIST
         )
 
-    fun getAnimeTracks(status: UserRateStatus, userId: String): Flow<PagingData<AnimeTrack>> {
+    fun getAnimeTracks(status: UserRateStatus, userId: Int): Flow<PagingData<AnimeTrack>> {
         val key = "$userId-$status"
 
         return _pagingDataMap.getOrPut(key) {

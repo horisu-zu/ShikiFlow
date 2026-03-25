@@ -14,10 +14,10 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
+import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
 
 @Composable
 fun BrowseScreenNavigator(
@@ -33,6 +33,10 @@ fun BrowseScreenNavigator(
 
         override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
             browseScreenBackStack.add(BrowseNavRoute.Details(detailsNavRoute))
+        }
+
+        override fun navigateToProfile(user: User?) {
+            browseScreenBackStack.add(BrowseNavRoute.Profile(user))
         }
 
         override fun navigateBack() { browseScreenBackStack.removeLastOrNull() }
@@ -59,7 +63,14 @@ fun BrowseScreenNavigator(
                 DetailsNavigator(
                     currentUserData = currentUserData,
                     authType = authType,
-                    detailsNavRoute = route.detailsNavRoute
+                    detailsNavRoute = route.detailsNavRoute,
+                    navOptions = browseNavOptions
+                )
+            }
+            entry<BrowseNavRoute.Profile> { route ->
+                ProfileNavigator(
+                    user = route.user,
+                    mainNavOptions = browseNavOptions
                 )
             }
         },

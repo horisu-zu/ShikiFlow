@@ -40,7 +40,7 @@ class ShikimoriTracksDataSource @Inject constructor(
     private val appRoomDatabase: AppRoomDatabase
 ): MediaTracksDataSource {
 
-    override fun getAnimeTracks(status: UserRateStatus, userId: String?): Flow<PagingData<AnimeTrack>> {
+    override fun getAnimeTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<AnimeTrack>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 30,
@@ -64,7 +64,7 @@ class ShikimoriTracksDataSource @Inject constructor(
     override suspend fun getAnimeTracks(
         page: Int,
         limit: Int,
-        userId: String?,
+        userId: Int?,
         status: UserRateStatus?,
         order: Sort<UserRateType>?,
         idsList: List<Int>?
@@ -72,7 +72,7 @@ class ShikimoriTracksDataSource @Inject constructor(
         val query = AnimeTracksQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
-            userId = Optional.presentIfNotNull(userId),
+            userId = Optional.presentIfNotNull(userId.toString()),
             status = Optional.presentIfNotNull(status?.toShikimoriRateStatus()),
             order = Optional.presentIfNotNull(order?.toShikimoriOrder())
         )
@@ -89,7 +89,7 @@ class ShikimoriTracksDataSource @Inject constructor(
     }
 
     override fun getBrowseTracks(
-        userId: String?,
+        userId: Int?,
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<AnimeTrack>> {
@@ -114,7 +114,7 @@ class ShikimoriTracksDataSource @Inject constructor(
     override suspend fun browseAnimeTracks(
         page: Int,
         limit: Int,
-        userId: String?,
+        userId: Int?,
         name: String?,
         userStatus: UserRateStatus?
     ): Result<List<AnimeTrack>> {
@@ -142,7 +142,7 @@ class ShikimoriTracksDataSource @Inject constructor(
         }
     }
 
-    override fun getMangaTracks(status: UserRateStatus, userId: String?): Flow<PagingData<MangaTrack>> {
+    override fun getMangaTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<MangaTrack>> {
         return Pager(
             config = PagingConfig(pageSize = 20),
             remoteMediator = MangaTracksMediator(
@@ -162,14 +162,14 @@ class ShikimoriTracksDataSource @Inject constructor(
     override suspend fun getMangaTracks(
         page: Int,
         limit: Int,
-        userId: String?,
+        userId: Int?,
         status: UserRateStatus?,
         order: Sort<UserRateType>?
     ): Result<List<MangaTrack>> {
         val query = MangaTracksQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
-            userId = Optional.presentIfNotNull(userId),
+            userId = Optional.presentIfNotNull(userId.toString()),
             status = Optional.presentIfNotNull(status?.toShikimoriRateStatus()),
             order = Optional.presentIfNotNull(order?.toShikimoriOrder())
         )

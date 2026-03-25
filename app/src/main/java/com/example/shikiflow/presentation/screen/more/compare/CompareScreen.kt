@@ -19,7 +19,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
-import com.example.shikiflow.presentation.screen.more.MoreNavOptions
+import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -27,7 +27,7 @@ import kotlinx.coroutines.launch
 fun CompareScreen(
     currentUser: User?,
     targetUser: User,
-    moreNavOptions: MoreNavOptions
+    navOptions: ProfileNavOptions
 ) {
     val tabs = MediaType.entries
     val pagerState = rememberPagerState { tabs.size }
@@ -69,7 +69,7 @@ fun CompareScreen(
                                 MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
                             }
 
-                            moreNavOptions.navigateToDetails(detailsNavRoute)
+                            navOptions.navigateToDetails(detailsNavRoute)
                         }
                     )
                 }

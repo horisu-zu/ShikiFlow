@@ -46,7 +46,7 @@ class AnilistTracksDataSource @Inject constructor(
 
     override fun getAnimeTracks(
         status: UserRateStatus,
-        userId: String?
+        userId: Int?
     ): Flow<PagingData<AnimeTrack>> {
         return Pager(
             config = PagingConfig(
@@ -70,7 +70,7 @@ class AnilistTracksDataSource @Inject constructor(
     }
 
     override fun getBrowseTracks(
-        userId: String?,
+        userId: Int?,
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<AnimeTrack>> {
@@ -95,7 +95,7 @@ class AnilistTracksDataSource @Inject constructor(
     override suspend fun getAnimeTracks(
         page: Int,
         limit: Int,
-        userId: String?,
+        userId: Int?,
         status: UserRateStatus?,
         order: Sort<UserRateType>?,
         idsList: List<Int>?
@@ -104,7 +104,7 @@ class AnilistTracksDataSource @Inject constructor(
             type = Optional.present(MediaType.ANIME.toAnilistType()),
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
-            userId = Optional.presentIfNotNull(userId?.toInt()),
+            userId = Optional.presentIfNotNull(userId),
             status = Optional.presentIfNotNull(status?.toAnilistRateStatus()),
             order = Optional.presentIfNotNull(order?.toAnilistOrder()?.let { listOf(it) }),
             idsIn = Optional.presentIfNotNull(idsList)
@@ -128,7 +128,7 @@ class AnilistTracksDataSource @Inject constructor(
     override suspend fun browseAnimeTracks(
         page: Int,
         limit: Int,
-        userId: String?,
+        userId: Int?,
         name: String?,
         userStatus: UserRateStatus?,
     ): Result<List<AnimeTrack>> {
@@ -160,7 +160,10 @@ class AnilistTracksDataSource @Inject constructor(
         }
     }
 
-    override fun getMangaTracks(status: UserRateStatus, userId: String?): Flow<PagingData<MangaTrack>> {
+    override fun getMangaTracks(
+        status: UserRateStatus,
+        userId: Int?
+    ): Flow<PagingData<MangaTrack>> {
         return Pager(
             config = PagingConfig(pageSize = 30),
             remoteMediator = MangaTracksMediator(
@@ -180,7 +183,7 @@ class AnilistTracksDataSource @Inject constructor(
     override suspend fun getMangaTracks(
         page: Int,
         limit: Int,
-        userId: String?,
+        userId: Int?,
         status: UserRateStatus?,
         order: Sort<UserRateType>?
     ): Result<List<MangaTrack>> {
@@ -188,7 +191,7 @@ class AnilistTracksDataSource @Inject constructor(
             type = Optional.present(MediaType.MANGA.toAnilistType()),
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
-            userId = Optional.presentIfNotNull(userId?.toInt()),
+            userId = Optional.presentIfNotNull(userId),
             status = Optional.presentIfNotNull(status?.toAnilistRateStatus()),
             order = Optional.presentIfNotNull(listOf(order?.toAnilistOrder()))
         )

@@ -5,6 +5,7 @@ import com.example.shikiflow.presentation.UiState
 
 data class ProfileUiState(
     val userId: Int? = null,
+    val currentUserId: Int? = null,
     val userStatsCategories: UserStatsCategories = UserStatsCategories(),
 
     override val errorMessage: String? = null,

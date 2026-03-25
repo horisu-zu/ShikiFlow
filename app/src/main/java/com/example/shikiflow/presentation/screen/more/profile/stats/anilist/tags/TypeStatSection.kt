@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.more.profile.stats.anilist.tags
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -145,7 +146,8 @@ fun StatItem(
     stat: CombinedStat,
     positionNumber: Int,
     mediaType: MediaType,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     val resources = LocalResources.current
     val stats = remember(stat, mediaType) {
@@ -162,6 +164,11 @@ fun StatItem(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
+            .then(
+                other = onClick?.let {
+                    Modifier.clickable { onClick() }
+                } ?: Modifier
+            )
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)

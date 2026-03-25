@@ -13,12 +13,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.MainScreenNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
+import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
 
 @Composable
 fun MainScreenNavigator(
@@ -29,6 +29,10 @@ fun MainScreenNavigator(
     val options = object : MainScreenNavOptions {
         override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
             mainScreenBackStack.add(MainScreenNavRoute.Details(detailsNavRoute))
+        }
+
+        override fun navigateToProfile(user: User?) {
+            mainScreenBackStack.add(MainScreenNavRoute.Profile(user))
         }
 
         override fun navigateBack() {
@@ -50,7 +54,14 @@ fun MainScreenNavigator(
                 DetailsNavigator(
                     currentUserData = currentUserData,
                     authType = authType,
-                    detailsNavRoute = route.detailsNavRoute
+                    detailsNavRoute = route.detailsNavRoute,
+                    navOptions = options
+                )
+            }
+            entry<MainScreenNavRoute.Profile> { route ->
+                ProfileNavigator(
+                    user = route.user,
+                    mainNavOptions = options
                 )
             }
         },

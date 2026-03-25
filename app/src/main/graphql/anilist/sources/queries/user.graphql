@@ -24,7 +24,13 @@ query UserActivities(
     Page(page: $page, perPage: $limit) {
         activities(userId: $userId, sort: [ID_DESC]) {
             ...on ListActivity {
-                ...ALUserActivity
+                ...ALListActivity
+            }
+            ...on TextActivity {
+                ...ALTextActivity
+            }
+            ...on MessageActivity {
+                ...ALMessageActivity
             }
         }
     }

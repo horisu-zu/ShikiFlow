@@ -25,12 +25,12 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -38,17 +38,21 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.history.UserHistoryViewModel
+import com.example.shikiflow.utils.WebIntent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HistoryScreen(
-    currentUserId: String?,
-    moreNavOptions: MoreNavOptions,
+fun UserActivityScreen(
+    profileNavOptions: MoreNavOptions,
     userHistoryViewModel: UserHistoryViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val historyData = userHistoryViewModel.userHistory.collectAsLazyPagingItems()
 
     val lazyListState = rememberLazyListState()
@@ -64,10 +68,6 @@ fun HistoryScreen(
         }
     }
 
-    LaunchedEffect(currentUserId) {
-        userHistoryViewModel.setId(currentUserId)
-    }
-
     Scaffold(
         topBar = {
             Column {
@@ -79,7 +79,7 @@ fun HistoryScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = { moreNavOptions.navigateBack() }) {
+                        IconButton(onClick = { profileNavOptions.navigateBack() }) {
                             Icon(
                                 Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back to Main"
@@ -94,13 +94,13 @@ fun HistoryScreen(
                 if(!isAtTop) HorizontalDivider()
             }
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             modifier = Modifier.padding(
-                top = innerPadding.calculateTopPadding(),
-                start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
+                top = paddingValues.calculateTopPadding(),
+                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
             ),
             onRefresh = { historyData.refresh() }
         ) {
@@ -133,7 +133,39 @@ fun HistoryScreen(
                 } else {
                     items(historyData.itemCount) { index ->
                         historyData[index]?.let { historyItem ->
-                            HistoryItem(historyItem)
+                            ActivityItem(
+                                userActivity = historyItem,
+                                onUserClick = { user ->
+                                    profileNavOptions.navigateToProfile(user)
+                                },
+                                onEntityClick = { entityType, id ->
+                                    val detailsNavRoute = when (entityType) {
+                                        EntityType.CHARACTER -> {
+                                            DetailsNavRoute.CharacterDetails(id)
+                                        }
+                                        EntityType.PERSON -> {
+                                            DetailsNavRoute.Staff(id)
+                                        }
+                                        EntityType.ANIME -> {
+                                            DetailsNavRoute.AnimeDetails(id)
+                                        }
+                                        EntityType.MANGA, EntityType.RANOBE -> {
+                                            DetailsNavRoute.MangaDetails(id)
+                                        }
+                                        EntityType.COMMENT -> {
+                                            DetailsNavRoute.Comments(CommentsScreenMode.COMMENT, id, null)
+                                        }
+                                    }
+
+                                    profileNavOptions.navigateToDetails(detailsNavRoute)
+                                },
+                                onLinkClick = { link ->
+                                    WebIntent.openUrlCustomTab(context, link)
+                                },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 16.dp)
+                            )
                         }
                     }
                     historyData.apply {
@@ -141,7 +173,8 @@ fun HistoryScreen(
                             loadState.append is LoadState.Error -> {
                                 item {
                                     Box(
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
                                             .padding(vertical = 8.dp),
                                         contentAlignment = Alignment.Center
                                     ) {

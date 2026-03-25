@@ -305,6 +305,9 @@ fun AnimeDetailsContent(
                             id = topicId
                         )
                     },
+                    onUserClick = { user ->
+                        mediaNavOptions.navigateToUserProfile(user)
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

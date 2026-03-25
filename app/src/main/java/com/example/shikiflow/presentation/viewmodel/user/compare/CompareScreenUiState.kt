@@ -5,8 +5,8 @@ import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.domain.model.user.MediaComparison
 
 data class CompareScreenUiState(
-    val currentUserId: String? = null,
-    val targetUserId: String? = null,
+    val currentUserId: Int? = null,
+    val targetUserId: Int? = null,
     val mediaType: MediaType? = null,
     val mediaUiState: Map<MediaType, CompareMediaUiState> =
         MediaType.entries.associateWith { CompareMediaUiState() }

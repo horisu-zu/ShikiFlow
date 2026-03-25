@@ -4,7 +4,6 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -22,9 +21,8 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
-import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
-import com.example.shikiflow.presentation.screen.more.history.HistoryScreen
-import com.example.shikiflow.presentation.screen.more.profile.ProfileScreen
+import com.example.shikiflow.presentation.screen.more.history.UserActivityScreen
+import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
@@ -37,20 +35,16 @@ fun MoreScreenNavigator(
 
     val moreNavOptions = object : MoreNavOptions {
         override fun navigateToProfile(user: User?) {
-            moreScreenBackStack.add(MoreNavRoute.ProfileScreen(user))
+            moreScreenBackStack.add(MoreNavRoute.Profile(user))
         }
         override fun navigateToHistory() {
-            moreScreenBackStack.add(MoreNavRoute.HistoryScreen)
+            moreScreenBackStack.add(MoreNavRoute.UserActivity)
         }
         override fun navigateToSettings() {
-            moreScreenBackStack.add(MoreNavRoute.SettingsScreen)
+            moreScreenBackStack.add(MoreNavRoute.Settings)
         }
         override fun navigateToAbout() {
-            moreScreenBackStack.add(MoreNavRoute.AboutAppScreen)
-        }
-
-        override fun navigateToCompare(targetUser: User) {
-            moreScreenBackStack.add(MoreNavRoute.CompareScreen(targetUser))
+            moreScreenBackStack.add(MoreNavRoute.AboutApp)
         }
 
         override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
@@ -66,62 +60,37 @@ fun MoreScreenNavigator(
         backStack = moreScreenBackStack,
         onBack = { moreScreenBackStack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<MoreNavRoute.MoreScreen> {
+            entry<MoreNavRoute.MoreMain> {
                 MoreScreen(
                     moreNavOptions = moreNavOptions,
                     currentUser = currentUser
                 )
             }
-            entry<MoreNavRoute.ProfileScreen> { route ->
-                ProfileScreen(
-                    currentUserId = currentUser?.id,
-                    userData = route.user,
-                    moreNavOptions = moreNavOptions
+            entry<MoreNavRoute.Profile> { route ->
+                ProfileNavigator(
+                    user = route.user,
+                    mainNavOptions = moreNavOptions
                 )
             }
-            entry<MoreNavRoute.HistoryScreen> {
-                HistoryScreen(
-                    currentUserId = currentUser?.id,
-                    moreNavOptions = moreNavOptions,
+            entry<MoreNavRoute.UserActivity> {
+                UserActivityScreen(
+                    profileNavOptions = moreNavOptions
                 )
             }
-            entry<MoreNavRoute.SettingsScreen> {
+            entry<MoreNavRoute.Settings> {
                 SettingsScreen(
                     userData = currentUser
                 )
             }
-            entry<MoreNavRoute.CompareScreen>(
-                metadata = NavDisplay.transitionSpec {
-                    slideInHorizontally(
-                        initialOffsetX = { it },
-                        animationSpec = tween(300)
-                    ) togetherWith ExitTransition.KeepUntilTransitionsFinished
-                } + NavDisplay.popTransitionSpec {
-                    EnterTransition.None togetherWith slideOutHorizontally(
-                        targetOffsetX = { it },
-                        animationSpec = tween(300)
-                    )
-                } + NavDisplay.predictivePopTransitionSpec {
-                    EnterTransition.None togetherWith slideOutHorizontally(
-                        targetOffsetX = { it },
-                        animationSpec = tween(300)
-                    )
-                }
-            ) { route ->
-                CompareScreen(
-                    currentUser = currentUser,
-                    targetUser = route.targetUser,
-                    moreNavOptions = moreNavOptions
-                )
-            }
-            entry<MoreNavRoute.AboutAppScreen> {
+            entry<MoreNavRoute.AboutApp> {
                 AboutAppScreen()
             }
             entry<MoreNavRoute.Details> { route ->
                 DetailsNavigator(
                     currentUserData = currentUser,
                     authType = authType,
-                    detailsNavRoute = route.detailsNavRoute
+                    detailsNavRoute = route.detailsNavRoute,
+                    navOptions = moreNavOptions
                 )
             }
         },

@@ -247,6 +247,9 @@ fun CharacterDetailsScreen(
                                 },
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
+                                },
+                                onUserClick = { user ->
+                                    navOptions.navigateToUserProfile(user)
                                 }
                             )
                         }

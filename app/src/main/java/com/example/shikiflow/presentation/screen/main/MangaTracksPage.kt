@@ -47,7 +47,7 @@ import com.example.shikiflow.presentation.viewmodel.manga.tracks.MangaTracksView
 @Composable
 fun MangaTracksPage(
     userStatus: UserRateStatus,
-    userId: String,
+    userId: Int,
     isAppBarVisible: Boolean,
     onMangaClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -68,81 +68,85 @@ fun MangaTracksPage(
             isRefreshing = false
         }
     ) {
-        if(mangaTrackItems.loadState.refresh is LoadState.Loading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(mangaTrackItems.loadState.refresh is LoadState.Error) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = stringResource(R.string.mtp_loading_error),
-                    buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { mangaTrackItems.refresh() }
-                )
+        when (mangaTrackItems.loadState.refresh) {
+            is LoadState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Adaptive(120.dp),
-                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = modifier.fillMaxSize()
-            ) {
-                items(
-                    count = mangaTrackItems.itemCount,
-                    key = mangaTrackItems.itemKey { it.track.id }
-                ) { index ->
-                    val trackItem = mangaTrackItems[index] ?: return@items
-
-                    MangaTrackItem(
-                        trackItem = trackItem,
-                        onItemClick = { id ->
-                            onMangaClick(id)
-                        },
-                        onLongItemClick = { item ->
-                            selectedItem = item
-                        },
-                        modifier = Modifier.animateItem()
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = stringResource(R.string.mtp_loading_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { mangaTrackItems.refresh() }
                     )
                 }
-                mangaTrackItems.apply {
-                    if(loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
-                        }
+            }
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(120.dp),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = modifier.fillMaxSize()
+                ) {
+                    items(
+                        count = mangaTrackItems.itemCount,
+                        key = mangaTrackItems.itemKey { it.track.id }
+                    ) { index ->
+                        val trackItem = mangaTrackItems[index] ?: return@items
+
+                        MangaTrackItem(
+                            trackItem = trackItem,
+                            onItemClick = { id ->
+                                onMangaClick(id)
+                            },
+                            onLongItemClick = { item ->
+                                selectedItem = item
+                            },
+                            modifier = Modifier.animateItem()
+                        )
                     }
-                    if(loadState.append is LoadState.Error) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            ErrorItem(
-                                message = stringResource(R.string.mtp_loading_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                showFace = false,
-                                onButtonClick = { mangaTrackItems.retry() }
-                            )
+                    mangaTrackItems.apply {
+                        if (loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
+                        }
+                        if (loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ErrorItem(
+                                    message = stringResource(R.string.mtp_loading_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    showFace = false,
+                                    onButtonClick = { mangaTrackItems.retry() }
+                                )
+                            }
                         }
                     }
                 }
-            }
-            selectedItem?.let {
-                UserRateBottomSheet(
-                    userRate = it.toUserRateData(),
-                    rateUpdateState = rateUpdateState,
-                    onDismiss = {
-                        if (rateUpdateState != RateUpdateState.LOADING) {
-                            selectedItem = null
+                selectedItem?.let {
+                    UserRateBottomSheet(
+                        userRate = it.toUserRateData(),
+                        rateUpdateState = rateUpdateState,
+                        onDismiss = {
+                            if (rateUpdateState != RateUpdateState.LOADING) {
+                                selectedItem = null
+                            }
+                        },
+                        onSave = { saveUserRate ->
+                            mangaTracksViewModel.saveUserRate(saveUserRate)
                         }
-                    },
-                    onSave = { saveUserRate ->
-                        mangaTracksViewModel.saveUserRate(saveUserRate)
-                    }
-                )
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.user.profile
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
@@ -8,16 +9,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val settingsRepository: SettingsRepository
 ) : UiStateViewModel<ProfileUiState>() {
 
     override val initialState: ProfileUiState = ProfileUiState()
@@ -58,6 +62,18 @@ class ProfileViewModel @Inject constructor(
                     }
                 }
             }.launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            settingsRepository.userFlow
+                .filterNotNull()
+                .collect { user ->
+                    mutableUiState.update { state ->
+                        state.copy(
+                            currentUserId = user.id
+                        )
+                    }
+                }
+        }
     }
 
     fun setUserId(userId: Int) {

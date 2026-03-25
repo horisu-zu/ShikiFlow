@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.profile.stats.anilist.studios
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -27,8 +29,9 @@ fun StudiosSection(
     typeStats: List<StudioStat>,
     statsBarType: StatsBarType,
     isLoading: Boolean,
-    onBarTypeChange: (StatsBarType) -> Unit,
     horizontalPadding: Dp,
+    onBarTypeChange: (StatsBarType) -> Unit,
+    onStudioClick: (Studio) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -64,6 +67,7 @@ fun StudiosSection(
                         stat = studioStat,
                         positionNumber = index + 1,
                         mediaType = MediaType.ANIME,
+                        onClick = { onStudioClick(studioStat.studioShort) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .animateItem()

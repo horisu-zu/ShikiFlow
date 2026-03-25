@@ -29,7 +29,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 fun MangaDetailsScreen(
     id: Int,
     authType: AuthType,
-    userId: String?,
+    userId: Int?,
     navOptions: MediaNavOptions,
     mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel()
 ) {
@@ -65,7 +65,7 @@ fun MangaDetailsScreen(
                     onRefresh = { mangaDetailsViewModel.onRefresh() }
                 ) {
                     MangaDetailsContent(
-                        userId = userId?.toInt() ?: 0,
+                        userId = userId ?: 0,
                         authType = authType,
                         mangaDetails = details,
                         mangaDexUiState = mangaDetails.mangaDexUiState,

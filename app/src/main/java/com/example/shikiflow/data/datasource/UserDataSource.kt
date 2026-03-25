@@ -10,7 +10,7 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
@@ -21,13 +21,13 @@ import kotlinx.coroutines.flow.Flow
 interface UserDataSource {
     fun fetchCurrentUser(): Flow<DataResult<User>>
 
-    fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>>
+    fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>>
 
     suspend fun getPaginatedHistory(
         userId: Int,
         page: Int?,
         limit: Int?
-    ): List<UserHistory>
+    ): List<UserActivity>
 
     fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
 

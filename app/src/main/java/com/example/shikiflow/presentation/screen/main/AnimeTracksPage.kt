@@ -53,7 +53,7 @@ import com.example.shikiflow.domain.model.settings.AppUiMode
 @Composable
 fun AnimeTracksPage(
     userStatus: UserRateStatus,
-    userId: String,
+    userId: Int,
     isAppBarVisible: Boolean,
     onAnimeClick: (Int) -> Unit,
     modifier: Modifier = Modifier,

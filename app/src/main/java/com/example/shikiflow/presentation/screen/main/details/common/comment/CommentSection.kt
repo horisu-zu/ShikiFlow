@@ -24,6 +24,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.comment.section.CommentSectionViewModel
 
@@ -33,6 +34,7 @@ fun CommentSection(
     onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
     onTopicNavigate: (Int) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
     commentsCount: Int? = null,
     commentSectionViewModel: CommentSectionViewModel = hiltViewModel(key = topicId.toString())
@@ -95,6 +97,7 @@ fun CommentSection(
                         comment = comment,
                         onEntityClick = onEntityClick,
                         onLinkClick = onLinkClick,
+                        onUserClick = onUserClick,
                         modifier = Modifier
                     )
                 }

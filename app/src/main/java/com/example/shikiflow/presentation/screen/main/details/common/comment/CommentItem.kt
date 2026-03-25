@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -46,6 +47,7 @@ fun CommentItem(
     comment: Comment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when(comment) {
@@ -54,6 +56,7 @@ fun CommentItem(
                 commentData = comment,
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick,
+                onUserClick = onUserClick,
                 modifier = modifier
             )
         }
@@ -62,6 +65,7 @@ fun CommentItem(
                 commentData = comment,
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick,
+                onUserClick = onUserClick,
                 modifier = modifier
             )
         }
@@ -73,6 +77,7 @@ private fun ShikimoriCommentItem(
     commentData: ShikiComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -87,10 +92,11 @@ private fun ShikimoriCommentItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            commentData.sender?.let { commentSender ->
+            commentData.sender?.let { sender ->
                 CommentUserItem(
-                    userData = commentSender,
+                    userData = sender,
                     commentInstant = commentData.dateTime,
+                    onUserClick = onUserClick,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -125,6 +131,7 @@ private fun AnilistCommentTree(
     commentData: ALComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
     depth: Int = 0
 ) {
@@ -143,7 +150,8 @@ private fun AnilistCommentTree(
         AnilistCommentItem(
             commentData = commentData,
             onEntityClick = onEntityClick,
-            onLinkClick = onLinkClick
+            onLinkClick = onLinkClick,
+            onUserClick = onUserClick
         )
 
         if(depth <= 2) {
@@ -152,7 +160,8 @@ private fun AnilistCommentTree(
                     commentData = childComment,
                     depth = depth + 1,
                     onEntityClick = onEntityClick,
-                    onLinkClick = onLinkClick
+                    onLinkClick = onLinkClick,
+                    onUserClick = onUserClick
                 )
             }
         } else {
@@ -185,6 +194,7 @@ private fun AnilistCommentItem(
     commentData: ALComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -196,10 +206,11 @@ private fun AnilistCommentItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            commentData.sender?.let { commentSender ->
+            commentData.sender?.let { sender ->
                 CommentUserItem(
-                    userData = commentSender,
+                    userData = sender,
                     commentInstant = commentData.dateTime,
+                    onUserClick = onUserClick,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -245,6 +256,7 @@ fun ThreadHeaderItem(
     threadHeader: Thread,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -270,7 +282,8 @@ fun ThreadHeaderItem(
         threadHeader.createdBy?.let { threadAuthor ->
             CommentUserItem(
                 userData = threadAuthor,
-                commentInstant = threadHeader.createdAt
+                commentInstant = threadHeader.createdAt,
+                onUserClick = onUserClick
             )
         }
         threadHeader.body?.let { headerBody ->
@@ -290,20 +303,26 @@ fun ThreadHeaderItem(
 private fun CommentUserItem(
     userData: User,
     commentInstant: Instant,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RoundedImage(
-            model = userData.avatarUrl,
-            modifier = Modifier.size(24.dp)
-        )
         Row(
+            modifier = Modifier
+                .offset(x = (-4).dp)
+                .clip(CircleShape)
+                .clickable { onUserClick(userData) }
+                .padding(horizontal = 4.dp, vertical = 2.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            RoundedImage(
+                model = userData.avatarUrl,
+                modifier = Modifier.size(24.dp)
+            )
             Text(
                 text = userData.nickname,
                 style = MaterialTheme.typography.labelMedium.copy(
@@ -314,13 +333,13 @@ private fun CommentUserItem(
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f, fill = false)
             )
-            Text(
-                text = " · ${formatInstant(commentInstant, includeTime = true)}",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                ),
-                maxLines = 1
-            )
         }
+        Text(
+            text = "· ${formatInstant(commentInstant, includeTime = true)}",
+            style = MaterialTheme.typography.labelMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
+            ),
+            maxLines = 1
+        )
     }
 }

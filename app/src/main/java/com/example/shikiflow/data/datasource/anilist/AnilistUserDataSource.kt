@@ -38,9 +38,9 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserHistory
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -65,7 +65,7 @@ class AnilistUserDataSource(
             }
     }
 
-    override fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>> {
+    override fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -81,7 +81,7 @@ class AnilistUserDataSource(
         userId: Int,
         page: Int?,
         limit: Int?
-    ): List<UserHistory> {
+    ): List<UserActivity> {
         val historyQuery = UserActivitiesQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
@@ -93,7 +93,11 @@ class AnilistUserDataSource(
             .execute()
 
         return response.data?.Page?.activities?.let { activities ->
-            activities.mapNotNull { it?.onListActivity?.aLUserActivity?.toDomain() }
+            activities.mapNotNull { activity ->
+                activity?.onListActivity?.aLListActivity?.toDomain() ?:
+                activity?.onMessageActivity?.aLMessageActivity?.toDomain() ?:
+                activity?.onTextActivity?.aLTextActivity?.toDomain()
+            }
         } ?: emptyList()
     }
 

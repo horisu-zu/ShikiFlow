@@ -280,6 +280,9 @@ fun StaffScreen(
                                         screenMode = CommentsScreenMode.TOPIC,
                                         id = topicId
                                     )
+                                },
+                                onUserClick = { user ->
+                                    navOptions.navigateToUserProfile(user)
                                 }
                             )
                         }

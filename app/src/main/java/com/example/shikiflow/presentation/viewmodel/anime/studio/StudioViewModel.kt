@@ -32,13 +32,10 @@ class StudioViewModel @Inject constructor(
         _studioParams.filter { state ->
             state.studioId != null && state.sortType != null
         },
-        _query.debounce(500L)
+        _query.debounce(300L)
     ) { params, query ->
         params.copy(query = query)
     }
-        .filter { state ->
-            state.query.isNotEmpty()
-        }
         .distinctUntilChanged()
         .flatMapLatest { state ->
             mediaRepository.getStudioMedia(

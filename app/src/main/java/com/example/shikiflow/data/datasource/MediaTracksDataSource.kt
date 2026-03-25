@@ -11,11 +11,11 @@ import kotlinx.coroutines.flow.Flow
 interface MediaTracksDataSource {
     fun getAnimeTracks(
         status: UserRateStatus,
-        userId: String?
+        userId: Int?
     ): Flow<PagingData<AnimeTrack>>
 
     fun getBrowseTracks(
-        userId: String?,
+        userId: Int?,
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<AnimeTrack>>
@@ -23,7 +23,7 @@ interface MediaTracksDataSource {
     suspend fun getAnimeTracks(
         page: Int = 1,
         limit: Int = 50,
-        userId: String? = null,
+        userId: Int? = null,
         status: UserRateStatus? = null,
         order: Sort<UserRateType>? = null,
         idsList: List<Int>? = null
@@ -32,17 +32,17 @@ interface MediaTracksDataSource {
     suspend fun browseAnimeTracks(
         page: Int = 1,
         limit: Int = 15,
-        userId: String?,
+        userId: Int?,
         name: String? = null,
         userStatus: UserRateStatus? = null
     ): Result<List<AnimeTrack>>
 
-    fun getMangaTracks(status: UserRateStatus, userId: String?): Flow<PagingData<MangaTrack>>
+    fun getMangaTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<MangaTrack>>
 
     suspend fun getMangaTracks(
         page: Int = 1,
         limit: Int = 50,
-        userId: String? = null,
+        userId: Int? = null,
         status: UserRateStatus? = null,
         order: Sort<UserRateType>? = null
     ): Result<List<MangaTrack>>

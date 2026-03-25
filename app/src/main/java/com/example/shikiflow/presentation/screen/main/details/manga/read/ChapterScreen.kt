@@ -66,11 +66,7 @@ fun ChapterScreen(
     chapterViewModel: ChapterViewModel = hiltViewModel()
 ) {
     val chapterUiState by chapterViewModel.chapterUiState.collectAsStateWithLifecycle()
-    val chaptersList = chapterViewModel.getMangaChapters(
-        mangaId = chapterUiData.mangaId,
-        groupIds = chapterUiData.scanlationGroupIds,
-        uploader = chapterUiData.uploader
-    ).collectAsLazyPagingItems()
+    val chaptersList = chapterViewModel.mangaChaptersItems.collectAsLazyPagingItems()
 
     val showBottomSheet = remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
@@ -80,7 +76,12 @@ fun ChapterScreen(
     var isSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(chapterUiState.uiSettings.isDataSaverEnabled) {
-        chapterViewModel.setChapter(chapterId = chapterUiData.chapterId)
+        chapterViewModel.setChapterData(
+            mangaId = chapterUiData.mangaId,
+            chapterId = chapterUiData.chapterId,
+            scanlationGroupsIds = chapterUiData.scanlationGroupIds,
+            uploader = chapterUiData.uploader
+        )
     }
 
     SideSheet(

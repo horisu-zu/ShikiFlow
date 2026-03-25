@@ -14,16 +14,19 @@ interface MediaTracksRepository {
 
     fun getAnimeTracks(
         status: UserRateStatus,
-        userId: String?
+        userId: Int?
     ): Flow<PagingData<AnimeTrack>>
 
     fun getBrowseTracks(
-        userId: String?,
+        userId: Int?,
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<AnimeTrack>>
 
-    fun getMangaTracks(status: UserRateStatus, userId: String?): Flow<PagingData<MangaTrack>>
+    fun getMangaTracks(
+        status: UserRateStatus,
+        userId: Int?
+    ): Flow<PagingData<MangaTrack>>
 
     suspend fun updateAnimeTrack(
         animeTrack: AnimeUserTrack,

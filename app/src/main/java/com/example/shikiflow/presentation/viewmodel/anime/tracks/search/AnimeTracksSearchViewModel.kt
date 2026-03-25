@@ -29,7 +29,7 @@ class AnimeTracksSearchViewModel @Inject constructor(
     val animeTracksItems = combine(
         _params.filter { it.userId != null },
         _query.debounce { query ->
-            if(query.isNotEmpty()) 300L else 0L
+            if(query.isNotBlank()) 500L else 0L
         }
     ) { params, query ->
         params.copy(query = query)
@@ -37,13 +37,13 @@ class AnimeTracksSearchViewModel @Inject constructor(
         .distinctUntilChanged()
         .flatMapLatest { params ->
             mediaTracksRepository.getBrowseTracks(
-                userId = params.userId.toString(),
+                userId = params.userId,
                 title = params.query,
                 userRateStatus = params.userRateStatus
             )
         }.cachedIn(viewModelScope)
 
-    fun setUserId(userId: String) {
+    fun setUserId(userId: Int) {
         _params.update { params ->
             params.copy(userId = userId)
         }

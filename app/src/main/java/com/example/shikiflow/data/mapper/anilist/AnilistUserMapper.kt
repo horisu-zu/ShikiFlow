@@ -5,7 +5,9 @@ import com.example.graphql.anilist.fragment.ALFavoriteCharacterShort
 import com.example.graphql.anilist.fragment.ALFavoriteMediaShort
 import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
 import com.example.graphql.anilist.fragment.ALFavoriteStudioShort
-import com.example.graphql.anilist.fragment.ALUserActivity
+import com.example.graphql.anilist.fragment.ALListActivity
+import com.example.graphql.anilist.fragment.ALMessageActivity
+import com.example.graphql.anilist.fragment.ALTextActivity
 import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.graphql.anilist.fragment.ALUserShort
@@ -33,7 +35,9 @@ import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.ListActivity
+import com.example.shikiflow.domain.model.user.MessageActivity
+import com.example.shikiflow.domain.model.user.TextActivity
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
@@ -41,15 +45,15 @@ import kotlin.time.Instant
 object AnilistUserMapper {
     fun ALUserShort.toDomain(): User {
         return User(
-            id = this.id.toString(),
+            id = this.id,
             nickname = this.name,
             avatarUrl = this.avatar?.large ?: "",
             profileBannerUrl = this.bannerImage
         )
     }
 
-    fun ALUserActivity.toDomain(): UserHistory {
-        return UserHistory(
+    fun ALListActivity.toDomain(): ListActivity {
+        return ListActivity(
             id = this.id,
             mediaId = this.id,
             title = this.media?.title?.romaji ?: "",
@@ -63,6 +67,25 @@ object AnilistUserMapper {
                 }
             },
             createdAt = Instant.fromEpochSeconds(this.createdAt.toLong())
+        )
+    }
+
+    fun ALTextActivity.toDomain(): TextActivity {
+        return TextActivity(
+            id = id,
+            text = text ?: "",
+            user = user?.aLUserShort?.toDomain() ?: User(),
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
+        )
+    }
+
+    fun ALMessageActivity.toDomain(): MessageActivity {
+        return MessageActivity(
+            id = id,
+            text = message ?: "",
+            messenger = messenger?.aLUserShort?.toDomain() ?: User(),
+            recipient = recipient?.aLUserShort?.toDomain() ?: User(),
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
         )
     }
 

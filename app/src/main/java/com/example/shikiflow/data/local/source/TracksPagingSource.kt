@@ -8,11 +8,10 @@ import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.collections.isNotEmpty
 
 class TracksPagingSource @Inject constructor(
     private val mediaTracksDataSource: MediaTracksDataSource,
-    private val userId: String?,
+    private val userId: Int?,
     private val title: String,
     private val userStatus: UserRateStatus?
 ): PagingSource<Int, AnimeTrack>() {

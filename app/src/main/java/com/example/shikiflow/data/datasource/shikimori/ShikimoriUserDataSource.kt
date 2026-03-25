@@ -22,12 +22,12 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserHistory
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -55,7 +55,7 @@ class ShikimoriUserDataSource @Inject constructor(
             }
     }
 
-    override fun getUserHistory(userId: Int): Flow<PagingData<UserHistory>> {
+    override fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
@@ -71,7 +71,7 @@ class ShikimoriUserDataSource @Inject constructor(
         userId: Int,
         page: Int?,
         limit: Int?
-    ): List<UserHistory> {
+    ): List<UserActivity> {
         return userApi.getUserHistory(
             userId = userId.toLong(),
             page = page,

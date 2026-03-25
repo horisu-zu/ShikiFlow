@@ -18,8 +18,8 @@ class GroupUserRatesUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     operator fun invoke(
-        currentUserId: String,
-        targetUserId: String,
+        currentUserId: Int,
+        targetUserId: Int,
         mediaType: MediaType
     ): Flow<DataResult<Map<ComparisonType, List<MediaComparison>>>> = flow {
         try {
@@ -27,11 +27,11 @@ class GroupUserRatesUseCase @Inject constructor(
 
             val (currentUserRates, targetUserRates) = coroutineScope {
                 val currentUser = async {
-                    userRepository.getMediaRates(currentUserId.toInt(), mediaType)
+                    userRepository.getMediaRates(currentUserId, mediaType)
                 }
 
                 val targetUser = async {
-                    userRepository.getMediaRates(targetUserId.toInt(), mediaType)
+                    userRepository.getMediaRates(targetUserId, mediaType)
                 }
 
                 Pair(currentUser.await(), targetUser.await())

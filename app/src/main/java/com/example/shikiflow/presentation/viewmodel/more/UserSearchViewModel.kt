@@ -24,7 +24,7 @@ class UserSearchViewModel @Inject constructor(
 
     val users = _query
         .debounce { query ->
-            if(query.isNotEmpty()) 300L else 0L
+            if(query.isNotBlank()) 500L else 0L
         }
         .distinctUntilChanged()
         .flatMapLatest { query ->

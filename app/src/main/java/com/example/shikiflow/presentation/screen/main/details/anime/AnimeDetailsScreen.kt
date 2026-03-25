@@ -36,7 +36,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.details.AnimeDetailsVi
 @Composable
 fun AnimeDetailsScreen(
     id: Int,
-    userId: String?,
+    userId: Int?,
     authType: AuthType,
     navOptions: MediaNavOptions,
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
@@ -91,7 +91,7 @@ fun AnimeDetailsScreen(
                 ) {
                     animeDetails.details?.let { details ->
                         AnimeDetailsContent(
-                            userId = userId?.toInt() ?: 0,
+                            userId = userId ?: 0,
                             currentAuthType = authType,
                             animeDetails = details,
                             rateUpdateState = animeDetails.rateUpdateState,

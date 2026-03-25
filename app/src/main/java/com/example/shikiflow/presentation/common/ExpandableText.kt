@@ -27,6 +27,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
@@ -79,7 +80,7 @@ fun ExpandableText(
     onLinkClick: (String) -> Unit,
     linkColor: Color = MaterialTheme.colorScheme.primary,
     collapsedMaxLines: Int = 8,
-    style: TextStyle = TextStyle.Default,
+    style: TextStyle = LocalTextStyle.current,
     brushColor: Color = MaterialTheme.colorScheme.background.copy(0.8f)
 ) {
     val parser = remember(authType) {

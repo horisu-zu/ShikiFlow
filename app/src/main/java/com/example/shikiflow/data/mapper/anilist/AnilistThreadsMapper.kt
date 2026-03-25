@@ -85,7 +85,7 @@ object AnilistThreadsMapper {
             commentBody = comment ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
-                id = user?.id.toString(),
+                id = user?.id ?: 0,
                 avatarUrl = user?.avatar?.medium ?: "",
                 nickname = user?.name ?: ""
             ),
@@ -100,7 +100,7 @@ object AnilistThreadsMapper {
             commentBody = comment ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
-                id = user?.id.toString(),
+                id = user?.id ?: 0,
                 avatarUrl = user?.avatar?.medium ?: "",
                 nickname = user?.name ?: ""
             ),

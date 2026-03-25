@@ -38,32 +38,31 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
-import com.example.shikiflow.presentation.screen.more.MoreNavOptions
 import com.example.shikiflow.presentation.screen.more.profile.favorites.FavoritesSection
+import com.example.shikiflow.presentation.screen.more.profile.activity.UserActivitySection
 import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileViewModel
 import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileUiState
 
 @Composable
 fun ProfileScreen(
-    currentUserId: String?,
     userData: User?,
-    moreNavOptions: MoreNavOptions,
+    navOptions: ProfileNavOptions,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
-    val userRatesUiState by profileViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         userData?.id?.let { userId ->
-            profileViewModel.setUserId(userId.toInt())
+            profileViewModel.setUserId(userId)
         }
     }
 
     userData?.let {
         ProfileScreenContent(
             userData = userData,
-            uiState = userRatesUiState,
-            isCurrentUser = currentUserId == userData.id,
-            moreNavOptions = moreNavOptions,
+            uiState = uiState,
+            isCurrentUser = uiState.currentUserId == userData.id,
+            navOptions = navOptions,
             onRefresh = { profileViewModel.onRefresh() },
             modifier = Modifier
         )
@@ -76,7 +75,7 @@ fun ProfileScreenContent(
     userData: User,
     uiState: ProfileUiState,
     isCurrentUser: Boolean,
-    moreNavOptions: MoreNavOptions,
+    navOptions: ProfileNavOptions,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -140,14 +139,20 @@ fun ProfileScreenContent(
                     when(sectionsList[selectedTabIndex].value) {
                         ProfileSectionType.USER_STATS -> {
                             UserStatsSection(
-                                userId = userData.id.toInt(),
+                                userData = userData,
                                 typesList = uiState.userStatsCategories.scoreMediaTypes,
                                 isCurrentUser = isCurrentUser,
                                 isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
-                                onCompareClick = {
-                                    moreNavOptions.navigateToCompare(userData)
-                                },
-                                horizontalPadding = horizontalPadding
+                                horizontalPadding = horizontalPadding,
+                                navOptions = navOptions
+                            )
+                        }
+                        ProfileSectionType.ACTIVITY -> {
+                            UserActivitySection(
+                                userId = userData.id,
+                                isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
+                                horizontalPadding = horizontalPadding,
+                                navOptions = navOptions
                             )
                         }
                         ProfileSectionType.FAVORITES -> {
@@ -164,7 +169,7 @@ fun ProfileScreenContent(
                                         else -> DetailsNavRoute.Staff(id)
                                     }
 
-                                    moreNavOptions.navigateToDetails(detailsNavRoute)
+                                    navOptions.navigateToDetails(detailsNavRoute)
                                 }
                             )
                         }

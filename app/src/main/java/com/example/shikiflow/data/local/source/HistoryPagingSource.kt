@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.UserDataSource
-import com.example.shikiflow.domain.model.user.UserHistory
+import com.example.shikiflow.domain.model.user.UserActivity
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -12,16 +12,16 @@ import javax.inject.Inject
 class HistoryPagingSource @Inject constructor(
     private val userDataSource: UserDataSource,
     private val userId: Int
-): PagingSource<Int, UserHistory>() {
+): PagingSource<Int, UserActivity>() {
 
-    override fun getRefreshKey(state: PagingState<Int, UserHistory>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, UserActivity>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserHistory> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserActivity> {
         return  try {
             val page = params.key ?: 1
             val pageSize = params.loadSize

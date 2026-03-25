@@ -1,9 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read.selection
 
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.domain.usecase.GetMangaDexUseCase
-import com.example.shikiflow.presentation.UiState
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel

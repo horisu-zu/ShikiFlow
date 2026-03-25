@@ -119,7 +119,7 @@ fragment ALUserShort on User {
     bannerImage
 }
 
-fragment ALUserActivity on ListActivity {
+fragment ALListActivity on ListActivity {
     id
     media {
         id
@@ -135,6 +135,27 @@ fragment ALUserActivity on ListActivity {
     type
     status
     progress
+    createdAt
+}
+
+fragment ALTextActivity on TextActivity {
+    id
+    text(asHtml: true)
+    user {
+        ...ALUserShort
+    }
+    createdAt
+}
+
+fragment ALMessageActivity on MessageActivity {
+    id
+    message(asHtml: true)
+    messenger {
+        ...ALUserShort
+    }
+    recipient {
+        ...ALUserShort
+    }
     createdAt
 }
 

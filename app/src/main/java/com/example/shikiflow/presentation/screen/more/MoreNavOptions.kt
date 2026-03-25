@@ -1,14 +1,9 @@
 package com.example.shikiflow.presentation.screen.more
 
-import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.MainNavOptions
-import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 
-interface MoreNavOptions: MainNavOptions {
-    fun navigateToProfile(user: User?)
+interface MoreNavOptions : MainScreenNavOptions {
     fun navigateToHistory()
     fun navigateToSettings()
     fun navigateToAbout()
-    fun navigateToCompare(targetUser: User)
-    fun navigateToDetails(detailsNavRoute: DetailsNavRoute)
 }

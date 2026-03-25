@@ -45,7 +45,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.AnimeTra
 
 @Composable
 fun SearchPage(
-    userId: String?,
+    userId: Int?,
     searchQuery: String,
     isAtTop: Boolean,
     tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel(),

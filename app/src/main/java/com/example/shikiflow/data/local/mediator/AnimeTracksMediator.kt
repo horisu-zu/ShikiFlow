@@ -23,7 +23,7 @@ class AnimeTracksMediator(
     private val mediaTracksDataSource: MediaTracksDataSource,
     private val appRoomDatabase: AppRoomDatabase,
     private val userRateStatus: UserRateStatus,
-    private val userId: String? = null
+    private val userId: Int? = null
 ): RemoteMediator<Int, AnimeTrackDto>() {
 
     private val animeTracksDao = appRoomDatabase.animeTracksDao()

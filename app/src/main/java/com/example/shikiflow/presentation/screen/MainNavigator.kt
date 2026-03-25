@@ -66,7 +66,7 @@ fun MainNavigator(
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Main)
     val mainScreenBackStack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
     val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
-    val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreScreen)
+    val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreMain)
 
     val mainNavUiState by mainNavViewModel.uiState.collectAsStateWithLifecycle()
 

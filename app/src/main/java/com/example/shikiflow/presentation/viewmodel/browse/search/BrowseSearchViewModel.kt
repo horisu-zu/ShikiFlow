@@ -36,7 +36,7 @@ class BrowseSearchViewModel @Inject constructor(
     val browseMediaItems = combine(
         _options,
         _searchState.debounce { state ->
-            if(state.query.isNotEmpty()) 300L else 0L
+            if(state.query.isNotBlank()) 500L else 0L
         }
     ) { params, screenState ->
         params.copy(name = screenState.query)

@@ -42,12 +42,12 @@ class MediaTracksRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAnimeTracks(status: UserRateStatus, userId: String?): Flow<PagingData<AnimeTrack>> {
+    override fun getAnimeTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<AnimeTrack>> {
         return getSource().getAnimeTracks(status, userId)
     }
 
     override fun getBrowseTracks(
-        userId: String?,
+        userId: Int?,
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<AnimeTrack>> = getSource().getBrowseTracks(userId, title, userRateStatus)
@@ -71,7 +71,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
 
     override fun getMangaTracks(
         status: UserRateStatus,
-        userId: String?
+        userId: Int?
     ): Flow<PagingData<MangaTrack>> = getSource().getMangaTracks(status, userId = userId)
 
     override suspend fun updateMangaTrack(

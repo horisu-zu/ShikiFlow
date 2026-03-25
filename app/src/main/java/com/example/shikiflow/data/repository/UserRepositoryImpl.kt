@@ -9,9 +9,9 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserHistory
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -46,7 +46,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserHistory(
         userId: Int,
-    ): Flow<PagingData<UserHistory>> = getSource().getUserHistory(userId)
+    ): Flow<PagingData<UserActivity>> = getSource().getUserHistory(userId)
 
     override fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>> =
         getSource().getUserRates(userId)

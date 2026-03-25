@@ -18,7 +18,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    userId: String?,
+    userId: Int?,
     mediaType: MediaType,
     isAtTop: Boolean,
     isAppBarVisible: Boolean,

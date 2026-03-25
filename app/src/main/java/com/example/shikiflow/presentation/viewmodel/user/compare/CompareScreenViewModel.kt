@@ -26,7 +26,7 @@ class CompareScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CompareScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun setData(currentUserId: String, targetUserId: String, mediaType: MediaType) {
+    fun setData(currentUserId: Int, targetUserId: Int, mediaType: MediaType) {
         _uiState.update { state ->
             state.copy(
                 currentUserId = currentUserId,

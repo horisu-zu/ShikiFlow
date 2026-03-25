@@ -2,9 +2,7 @@ package com.example.shikiflow.presentation.viewmodel.manga.read.chapter
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapterMetadata
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -14,11 +12,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -41,7 +39,6 @@ class ChapterViewModel @Inject constructor(
     private val _chapterUiState = MutableStateFlow(ChapterUiState())
     val chapterUiState = _chapterUiState.asStateFlow()
 
-    private val _pagingChaptersCache = mutableMapOf<String, Flow<PagingData<MangaChapterMetadata>>>()
     private val hideDelayMs = 2500L
 
     init {
@@ -114,19 +111,20 @@ class ChapterViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun getMangaChapters(
-        mangaId: String,
-        groupIds: List<String>,
-        uploader: String?
-    ): Flow<PagingData<MangaChapterMetadata>> {
-        return _pagingChaptersCache.getOrPut(mangaId) {
-            mangaDexRepository.getGroupMangaChapters(
-                mangaId = mangaId,
-                groupIds = groupIds,
-                uploader = if(groupIds.isEmpty()) uploader else null
-            ).cachedIn(viewModelScope)
+    val mangaChaptersItems = _chapterUiState
+        .filter { state ->
+            state.mangaId != null && state.scanlationGroupsIds != null && state.uploader != null
         }
-    }
+        .distinctUntilChangedBy { state ->
+            state.mangaId
+        }
+        .flatMapLatest { state ->
+            mangaDexRepository.getGroupMangaChapters(
+                mangaId = state.mangaId!!,
+                groupIds = state.scanlationGroupsIds!!,
+                uploader = if(state.scanlationGroupsIds.isEmpty()) state.uploader else null
+            )
+        }.cachedIn(viewModelScope)
 
     fun updateSettings(newSettings: MangaChapterSettings) {
         viewModelScope.launch {
@@ -142,10 +140,18 @@ class ChapterViewModel @Inject constructor(
         _isFocused.value = newValue
     }
 
-    fun setChapter(chapterId: String) {
+    fun setChapterData(
+        mangaId: String,
+        chapterId: String,
+        scanlationGroupsIds: List<String>,
+        uploader: String?
+    ) {
         _chapterUiState.update { state ->
             state.copy(
-                chapterId = chapterId
+                mangaId = mangaId,
+                chapterId = chapterId,
+                scanlationGroupsIds = scanlationGroupsIds,
+                uploader = uploader
             )
         }
     }

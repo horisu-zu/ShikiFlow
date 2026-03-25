@@ -48,7 +48,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun FavoritesSection(
-    userId: String,
+    userId: Int,
     favoriteCategories: List<FavoriteCategory>,
     horizontalPadding: Dp,
     onFavoriteClick: (Int, FavoriteCategory) -> Unit,
@@ -58,7 +58,7 @@ fun FavoritesSection(
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(userId) {
-        favoritesViewModel.setUserId(userId.toInt())
+        favoritesViewModel.setUserId(userId)
     }
 
     LaunchedEffect(pagerState.currentPage) {

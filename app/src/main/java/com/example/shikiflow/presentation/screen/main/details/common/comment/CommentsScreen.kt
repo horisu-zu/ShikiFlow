@@ -36,6 +36,7 @@ import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
@@ -73,6 +74,9 @@ fun CommentsScreen(
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->
                         navOptions.navigateByEntity(entityType, id)
+                    },
+                    onUserClick = { user ->
+                        navOptions.navigateToUserProfile(user)
                     }
                 )
             }
@@ -88,6 +92,9 @@ fun CommentsScreen(
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->
                         navOptions.navigateByEntity(entityType, id)
+                    },
+                    onUserClick = { user ->
+                        navOptions.navigateToUserProfile(user)
                     }
                 )
             }
@@ -103,16 +110,21 @@ private fun TopicCommentsSection(
     context: Context,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val paginatedComments = commentViewModel.paginatedComments(topicId).collectAsLazyPagingItems()
+    val commentItems = commentViewModel.comments.collectAsLazyPagingItems()
+
+    LaunchedEffect(topicId) {
+        commentViewModel.setTopicId(topicId)
+    }
 
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
         contentPadding = contentPadding,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        when (paginatedComments.loadState.refresh) {
+        when (commentItems.loadState.refresh) {
             is LoadState.Error -> {
                 item {
                     Box(
@@ -122,7 +134,7 @@ private fun TopicCommentsSection(
                         ErrorItem(
                             message = stringResource(R.string.common_error),
                             buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { paginatedComments.refresh() }
+                            onButtonClick = { commentItems.refresh() }
                         )
                     }
                 }
@@ -142,21 +154,23 @@ private fun TopicCommentsSection(
                             threadHeader = header,
                             onEntityClick = onEntityClick,
                             onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
+                            onUserClick = onUserClick,
                             modifier = Modifier
                         )
                     }
                 }
-                items(paginatedComments.itemCount) { index ->
-                    paginatedComments[index]?.let { comment ->
+                items(commentItems.itemCount) { index ->
+                    commentItems[index]?.let { comment ->
                         CommentItem(
                             comment = comment,
                             onEntityClick = onEntityClick,
                             onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
+                            onUserClick = onUserClick,
                             modifier = Modifier
                         )
                     }
                 }
-                paginatedComments.apply {
+                commentItems.apply {
                     when {
                         loadState.append is LoadState.Error -> {
                             item {
@@ -168,7 +182,7 @@ private fun TopicCommentsSection(
                                     ErrorItem(
                                         message = stringResource(R.string.common_error),
                                         buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { paginatedComments.retry() }
+                                        onButtonClick = { commentItems.retry() }
                                     )
                                 }
                             }
@@ -196,15 +210,16 @@ private fun CommentThreadSection(
     context: Context,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val commentsState by commentViewModel.repliesUiState.collectAsStateWithLifecycle()
+    val commentsState by commentViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(commentId) {
-        commentViewModel.getCommentWithReplies(commentId)
+        commentViewModel.setCommentId(commentId)
     }
 
-    commentsState[commentId]?.let { repliesUiState ->
+    commentsState.repliesMap[commentId]?.let { repliesUiState ->
         LazyColumn(
             modifier = modifier.fillMaxWidth(),
             contentPadding = contentPadding,
@@ -226,7 +241,7 @@ private fun CommentThreadSection(
                         ErrorItem(
                             message = repliesUiState.errorMessage,
                             buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { commentViewModel.getCommentWithReplies(commentId) }
+                            onButtonClick = { commentViewModel.onRefresh() }
                         )
                     }
                 }
@@ -239,7 +254,8 @@ private fun CommentThreadSection(
                             onEntityClick = onEntityClick,
                             onLinkClick = { url ->
                                 WebIntent.openUrlCustomTab(context, url)
-                            }
+                            },
+                            onUserClick = onUserClick
                         )
                     }
                 }
@@ -254,6 +270,7 @@ private fun CommentsMapSection(
     comments: List<Comment>,
     onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
+    onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -284,6 +301,7 @@ private fun CommentsMapSection(
                 comment = comment,
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick,
+                onUserClick = onUserClick,
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
             )
         }

@@ -56,7 +56,7 @@ class SettingsRepositoryImpl @Inject constructor(
         .map { preferences ->
             preferences[USER_ID]?.let { userId ->
                 User(
-                    id = userId,
+                    id = userId.toInt(),
                     nickname = preferences[USER_NICKNAME] ?: "",
                     avatarUrl = preferences[USER_AVATAR_URL] ?: "",
                     profileBannerUrl = preferences[USER_BANNER_URL]
@@ -133,7 +133,7 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun saveUserData(user: User) {
         dataStore.edit { preferences ->
-            preferences[USER_ID] = user.id
+            preferences[USER_ID] = user.id.toString()
             preferences[USER_NICKNAME] = user.nickname
             preferences[USER_AVATAR_URL] = user.avatarUrl
             user.profileBannerUrl?.let { profileBannerUrl ->

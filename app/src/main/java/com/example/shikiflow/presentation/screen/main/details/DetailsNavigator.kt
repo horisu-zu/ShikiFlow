@@ -18,6 +18,7 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.screen.MainScreenNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.studio.StudioScreen
@@ -37,7 +38,8 @@ import com.example.shikiflow.presentation.screen.main.details.staff.StaffScreen
 fun DetailsNavigator(
     currentUserData: User?,
     authType: AuthType,
-    detailsNavRoute: DetailsNavRoute
+    detailsNavRoute: DetailsNavRoute,
+    navOptions: MainScreenNavOptions
 ) {
     val detailsBackstack = rememberNavBackStack(detailsNavRoute)
 
@@ -114,6 +116,10 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.MediaRoles(id, mediaRolesType, roleTypes))
         }
 
+        override fun navigateToUserProfile(user: User) {
+            navOptions.navigateToProfile(user)
+        }
+
         override fun navigateByEntity(entityType: EntityType, id: Int) {
             when (entityType) {
                 EntityType.CHARACTER -> {
@@ -135,7 +141,9 @@ fun DetailsNavigator(
         }
 
         override fun navigateBack() {
-            if(detailsBackstack.size > 1) detailsBackstack.removeLastOrNull()
+            if(detailsBackstack.size > 1) {
+                detailsBackstack.removeLastOrNull()
+            } else navOptions.navigateBack()
         }
     }
 

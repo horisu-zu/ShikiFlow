@@ -4,6 +4,7 @@ import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.MainNavOptions
 
 interface MediaNavOptions: MainNavOptions {
@@ -36,4 +37,6 @@ interface MediaNavOptions: MainNavOptions {
     fun navigateToStudio(id: Int, studioName: String)
 
     fun navigateToMediaRoles(id: Int, mediaRolesType: MediaRolesType, roleTypes: List<RoleType>)
+
+    fun navigateToUserProfile(user: User)
 }
