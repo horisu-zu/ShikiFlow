@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.fragment.ALThread
+import com.example.graphql.anilist.fragment.ALThreadCommentWithHeader
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.sort.SortDirection
@@ -12,6 +13,7 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.graphql.anilist.type.ThreadSort as ALThreadSort
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.social.ThreadComment
 import kotlin.time.Instant
 
 object AnilistThreadsMapper {
@@ -107,6 +109,22 @@ object AnilistThreadsMapper {
             childComments = childComments.parseChildComments().map { it.toDomain() },
             likesCount = likeCount
         )
+    }
+
+    fun ALThreadCommentWithHeader.toDomain(): ThreadComment? {
+        return thread?.aLThread?.let { alThread ->
+            ThreadComment(
+                thread = alThread.toDomain(),
+                comment = ALComment(
+                    id = id,
+                    commentBody = comment ?: "",
+                    dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
+                    sender = user?.aLUserShort?.toDomain(),
+                    childComments = emptyList(),
+                    likesCount = likeCount
+                )
+            )
+        }
     }
 
     //For some reason Anilist API returns not the Comment with the said ID, but the Root Comment

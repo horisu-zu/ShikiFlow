@@ -14,6 +14,8 @@ import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.social.SocialCategory
+import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -44,6 +46,8 @@ interface UserDataSource {
     fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>>
 
     fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
+
+    fun getUserSocial(userId: Int, socialCategory: SocialCategory): Flow<PagingData<UserSocial>>
 
     suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>
 

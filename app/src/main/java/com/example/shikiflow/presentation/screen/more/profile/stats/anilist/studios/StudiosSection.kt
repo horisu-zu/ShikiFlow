@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.profile.stats.anilist.studios
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -1,9 +1,9 @@
-package com.example.shikiflow.presentation.viewmodel.user.favorites
+package com.example.shikiflow.presentation.viewmodel.user.social
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,35 +17,35 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
-class FavoritesViewModel @Inject constructor(
+class UserSocialViewModel @Inject constructor(
     private val userRepository: UserRepository
 ): ViewModel() {
 
-    private val _favoritesParams = MutableStateFlow(FavoritesParams())
-    val params = _favoritesParams.asStateFlow()
+    private val _params = MutableStateFlow(SocialParams())
+    val params = _params.asStateFlow()
 
-    val userFavorites = FavoriteCategory.entries.associateWith { favoriteCategory ->
-        _favoritesParams
+    val userSocialItems = SocialCategory.entries.associateWith { socialType ->
+        _params
             .filter { params ->
-                params.userId != null && params.currentCategory == favoriteCategory
+                params.userId != null && params.currentCategory == socialType
             }
             .distinctUntilChangedBy { params ->
                 params.userId
             }
-            .flatMapLatest { state ->
-                userRepository.getUserFavorites(state.userId!!, favoriteCategory)
+            .flatMapLatest { params ->
+                userRepository.getUserSocial(params.userId!!, socialType)
             }.cachedIn(viewModelScope)
     }
 
     fun setUserId(userId: Int) {
-        _favoritesParams.update { state ->
+        _params.update { state ->
             state.copy(userId = userId)
         }
     }
 
-    fun setCategory(favoriteCategory: FavoriteCategory) {
-        _favoritesParams.update { state ->
-            state.copy(currentCategory = favoriteCategory)
+    fun setCategory(socialCategory: SocialCategory) {
+        _params.update { state ->
+            state.copy(currentCategory = socialCategory)
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,7 +49,9 @@ fun CommentItem(
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    secondBackgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
     when(comment) {
         is ShikiComment -> {
@@ -57,7 +60,8 @@ fun CommentItem(
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
-                modifier = modifier
+                modifier = modifier,
+                backgroundColor = backgroundColor
             )
         }
         is ALComment -> {
@@ -66,7 +70,9 @@ fun CommentItem(
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
-                modifier = modifier
+                modifier = modifier,
+                backgroundColor = backgroundColor,
+                secondBackgroundColor = secondBackgroundColor
             )
         }
     }
@@ -78,12 +84,13 @@ private fun ShikimoriCommentItem(
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    backgroundColor: Color,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(backgroundColor)
             .padding(all = 12.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
@@ -132,12 +139,14 @@ private fun AnilistCommentTree(
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
+    backgroundColor: Color,
+    secondBackgroundColor: Color,
     modifier: Modifier = Modifier,
     depth: Int = 0
 ) {
     val backgroundColor = when(depth % 2) {
-        0 -> MaterialTheme.colorScheme.surfaceVariant
-        else -> MaterialTheme.colorScheme.background
+        0 -> backgroundColor
+        else -> secondBackgroundColor
     }
 
     Column(
@@ -161,7 +170,9 @@ private fun AnilistCommentTree(
                     depth = depth + 1,
                     onEntityClick = onEntityClick,
                     onLinkClick = onLinkClick,
-                    onUserClick = onUserClick
+                    onUserClick = onUserClick,
+                    backgroundColor = backgroundColor,
+                    secondBackgroundColor = secondBackgroundColor
                 )
             }
         } else {

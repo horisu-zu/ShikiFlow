@@ -194,7 +194,7 @@ fun ThreadsScreen(
 }
 
 @Composable
-private fun ThreadItem(
+fun ThreadItem(
     threadData: Thread,
     resources: Resources,
     onThreadClick: (Int) -> Unit,
@@ -277,7 +277,7 @@ private fun ShortUserItem(
 }
 
 @Composable
-private fun ThreadStatsItem(
+fun ThreadStatsItem(
     viewCount: Int,
     replyCount: Int,
     textStyle: TextStyle,

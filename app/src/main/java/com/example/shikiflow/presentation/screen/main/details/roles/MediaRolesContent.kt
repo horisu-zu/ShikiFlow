@@ -270,7 +270,8 @@ private fun VoiceActorMediaRoleItem(
                     bottomStart = 4.dp,
                     bottomEnd = 4.dp
                 )
-            ).clickable { onCharacterClick(vaRole.characterShort.id) },
+            )
+                .clickable { onCharacterClick(vaRole.characterShort.id) },
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {

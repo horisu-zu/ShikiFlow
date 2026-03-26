@@ -51,7 +51,8 @@ class ShikimoriTracksDataSource @Inject constructor(
             remoteMediator = AnimeTracksMediator(
                 mediaTracksDataSource = this,
                 appRoomDatabase = appRoomDatabase,
-                userRateStatus = status
+                userRateStatus = status,
+                userId = userId
             ),
             pagingSourceFactory = { appRoomDatabase.animeTracksDao().getTracksByStatus(status.name) }
         ).flow.map { pagingData ->
@@ -144,7 +145,12 @@ class ShikimoriTracksDataSource @Inject constructor(
 
     override fun getMangaTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<MangaTrack>> {
         return Pager(
-            config = PagingConfig(pageSize = 20),
+            config = PagingConfig(
+                pageSize = 30,
+                enablePlaceholders = true,
+                prefetchDistance = 15,
+                initialLoadSize = 30
+            ),
             remoteMediator = MangaTracksMediator(
                 mediaTracksDataSource = this,
                 appRoomDatabase = appRoomDatabase,

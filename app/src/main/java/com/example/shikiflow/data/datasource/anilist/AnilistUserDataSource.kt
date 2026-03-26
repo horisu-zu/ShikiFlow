@@ -11,19 +11,25 @@ import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.UserActivitiesQuery
+import com.example.graphql.anilist.UserFollowersQuery
+import com.example.graphql.anilist.UserFollowingsQuery
 import com.example.graphql.anilist.UserGenresQuery
 import com.example.graphql.anilist.UserStaffQuery
 import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.UserStatsQuery
 import com.example.graphql.anilist.UserStudiosQuery
 import com.example.graphql.anilist.UserTagsQuery
+import com.example.graphql.anilist.UserThreadCommentsQuery
+import com.example.graphql.anilist.UserThreadsQuery
 import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.graphql.anilist.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.FavoritesPagingSource
 import com.example.shikiflow.data.local.source.HistoryPagingSource
+import com.example.shikiflow.data.local.source.SocialPagingSource
 import com.example.shikiflow.data.local.source.UserPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewStats
@@ -45,6 +51,10 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.social.Follower
+import com.example.shikiflow.domain.model.user.social.SocialCategory
+import com.example.shikiflow.domain.model.user.social.Thread
+import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
@@ -109,8 +119,7 @@ class AnilistUserDataSource(
         val response = apolloClient.query(userStatsCategoriesQuery)
             .toFlow()
             .asDataResult { response ->
-                response.User?.toDomain()
-                    ?: throw IllegalStateException("No user statistics data returned")
+                response.toDomain()
             }
 
         return response
@@ -228,10 +237,10 @@ class AnilistUserDataSource(
     ): Flow<PagingData<UserFavorite>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 15,
+                pageSize = 21,
                 enablePlaceholders = true,
-                prefetchDistance = 9,
-                initialLoadSize = 15
+                prefetchDistance = 12,
+                initialLoadSize = 21
             ),
             pagingSourceFactory = {
                 FavoritesPagingSource(
@@ -241,6 +250,121 @@ class AnilistUserDataSource(
                 )
             }
         ).flow
+    }
+
+    override fun getUserSocial(
+        userId: Int,
+        socialCategory: SocialCategory
+    ): Flow<PagingData<UserSocial>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 18,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 18
+            ),
+            pagingSourceFactory = {
+                SocialPagingSource(
+                    dataSource = this,
+                    userId = userId,
+                    socialCategory = socialCategory
+                )
+            }
+        ).flow
+    }
+
+    suspend fun getUserFollowings(
+        userId: Int,
+        page: Int,
+        limit: Int
+    ): Result<List<UserSocial>> {
+        val followingsQuery = UserFollowingsQuery(page, limit, userId)
+
+        val response = apolloClient.query(followingsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.following
+                ?.let { list ->
+                    list.mapNotNull { user ->
+                        user?.aLUserShort?.let { alUser ->
+                            Follower(alUser.toDomain())
+                        }
+                    }
+                } ?: emptyList()
+        }
+    }
+
+    suspend fun getUserFollowers(
+        userId: Int,
+        page: Int,
+        limit: Int
+    ): Result<List<UserSocial>> {
+        val followingsQuery = UserFollowersQuery(page, limit, userId)
+
+        val response = apolloClient.query(followingsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.followers
+                ?.let { list ->
+                    list.mapNotNull { user ->
+                        user?.aLUserShort?.let { alUser ->
+                            Follower(alUser.toDomain())
+                        }
+                    }
+                } ?: emptyList()
+        }
+    }
+
+    suspend fun getUserThreads(
+        userId: Int,
+        page: Int,
+        limit: Int
+    ): Result<List<UserSocial>> {
+        val followingsQuery = UserThreadsQuery(page, limit, userId)
+
+        val response = apolloClient.query(followingsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.threads
+                ?.let { list ->
+                    list.mapNotNull { user ->
+                        user?.aLThread?.let { alThread ->
+                            Thread(alThread.toDomain())
+                        }
+                    }
+                } ?: emptyList()
+        }
+    }
+
+    suspend fun getUserThreadComments(
+        userId: Int,
+        page: Int,
+        limit: Int
+    ): Result<List<UserSocial>> {
+        val followingsQuery = UserThreadCommentsQuery(page, limit, userId)
+
+        val response = apolloClient.query(followingsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.threadComments
+                ?.let { list ->
+                    list.mapNotNull { user ->
+                        user?.aLThreadCommentWithHeader?.toDomain()
+                    }
+                } ?: emptyList()
+        }
     }
 
     override suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate> {

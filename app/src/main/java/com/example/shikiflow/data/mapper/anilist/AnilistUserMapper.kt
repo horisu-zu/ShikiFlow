@@ -39,6 +39,7 @@ import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.domain.model.user.MessageActivity
 import com.example.shikiflow.domain.model.user.TextActivity
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
 
@@ -116,26 +117,36 @@ object AnilistUserMapper {
         favoriteCategory = FavoriteCategory.STUDIO
     )
 
-    fun UserStatsCategoriesQuery.User.toDomain(): UserStatsCategories {
+    fun UserStatsCategoriesQuery.Data.toDomain(): UserStatsCategories {
         val mediaTypes = buildList {
-            statistics?.anime?.count?.let { userCount ->
+            User?.statistics?.anime?.count?.let { userCount ->
                 if(userCount > 0) {
                     add(MediaType.ANIME)
                 }
             }
-            statistics?.manga?.count?.let { userCount ->
+            User?.statistics?.manga?.count?.let { userCount ->
                 if(userCount > 0) {
                     add(MediaType.MANGA)
                 }
             }
         }
 
-        val categories = mapOf(
-            FavoriteCategory.ANIME to (favourites?.anime?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.MANGA to (favourites?.manga?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.CHARACTER to (favourites?.characters?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.STAFF to (favourites?.staff?.pageInfo?.aLPageInfoShort?.total ?: 0),
-            FavoriteCategory.STUDIO to (favourites?.studios?.pageInfo?.aLPageInfoShort?.total ?: 0)
+        val favoriteCategories = mapOf(
+            FavoriteCategory.ANIME to (User?.favourites?.anime?.pageInfo?.aLPageInfoShort?.total ?: 0),
+            FavoriteCategory.MANGA to (User?.favourites?.manga?.pageInfo?.aLPageInfoShort?.total ?: 0),
+            FavoriteCategory.CHARACTER to (User?.favourites?.characters?.pageInfo?.aLPageInfoShort?.total ?: 0),
+            FavoriteCategory.STAFF to (User?.favourites?.staff?.pageInfo?.aLPageInfoShort?.total ?: 0),
+            FavoriteCategory.STUDIO to (User?.favourites?.studios?.pageInfo?.aLPageInfoShort?.total ?: 0)
+        )
+            .filter { it.value > 0 }
+            .keys
+            .toList()
+
+        val socialCategories = mapOf(
+            SocialCategory.FOLLOWINGS to (followingsPage?.following?.size ?: 0),
+            SocialCategory.FOLLOWERS to (followersPage?.followers?.size ?: 0),
+            SocialCategory.THREADS to (threadsPage?.threads?.size ?: 0),
+            SocialCategory.COMMENTS to (commentsPage?.threadComments?.size ?: 0)
         )
             .filter { it.value > 0 }
             .keys
@@ -143,7 +154,8 @@ object AnilistUserMapper {
 
         return UserStatsCategories(
             scoreMediaTypes = mediaTypes,
-            favoriteCategories = categories
+            favoriteCategories = favoriteCategories,
+            socialCategories = socialCategories
         )
     }
 

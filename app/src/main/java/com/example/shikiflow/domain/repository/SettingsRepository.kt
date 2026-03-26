@@ -7,10 +7,10 @@ import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.track.MainTrackMode
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
@@ -34,7 +34,7 @@ interface SettingsRepository {
     suspend fun saveDynamicMode(isDynamicTheme: Boolean)
     suspend fun savePaletteStyle(paletteStyle: PaletteStyle)
     suspend fun saveLocale(locale: String)
-    suspend fun saveTrackMode(trackMode: MainTrackMode)
+    suspend fun saveTrackMode(mediaType: MediaType)
     suspend fun saveDataSaverMode(newMode: Boolean)
     suspend fun saveChapterUiMode(newMode: ChapterUIMode)
     suspend fun updateMangaSettings(settings: MangaChapterSettings)

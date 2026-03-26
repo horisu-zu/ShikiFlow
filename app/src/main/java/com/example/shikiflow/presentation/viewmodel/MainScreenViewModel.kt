@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.search.ScreenSearchState
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.model.track.MainTrackMode
+import com.example.shikiflow.domain.model.tracks.MediaType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,8 +12,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,7 +27,7 @@ class MainScreenViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
-    private val _currentTrackMode = MutableStateFlow<MainTrackMode?>(null)
+    private val _currentTrackMode = MutableStateFlow<MediaType?>(null)
     val currentTrackMode = _currentTrackMode.asStateFlow()
 
     private val _screenState = MutableStateFlow(ScreenSearchState())
@@ -41,14 +43,14 @@ class MainScreenViewModel @Inject constructor(
         )
 
     init {
-        viewModelScope.launch {
-            _currentTrackMode.value = settingsRepository.settingsFlow
-                .map { it.trackMode }
-                .first()
-        }
+        settingsRepository.settingsFlow
+            .distinctUntilChangedBy { it.trackMode }
+            .onEach { settings ->
+                _currentTrackMode.update { settings.trackMode }
+            }.launchIn(viewModelScope)
     }
 
-    fun setCurrentTrackMode(mode: MainTrackMode) {
+    fun setCurrentTrackMode(mode: MediaType) {
         viewModelScope.launch {
             _currentTrackMode.value = mode
         }

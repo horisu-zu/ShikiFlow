@@ -13,10 +13,10 @@ import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.model.track.MainTrackMode
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
@@ -76,8 +76,8 @@ class SettingsRepositoryImpl @Inject constructor(
             Settings(
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
                 browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
-                trackMode = preferences[TRACK_MODE]?.let { MainTrackMode.valueOf(it) }
-                    ?: MainTrackMode.ANIME,
+                trackMode = preferences[TRACK_MODE]?.let { MediaType.valueOf(it) }
+                    ?: MediaType.ANIME,
                 )
     }
 
@@ -193,9 +193,9 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveTrackMode(trackMode: MainTrackMode) {
+    override suspend fun saveTrackMode(mediaType: MediaType) {
         dataStore.edit { preferences ->
-            preferences[TRACK_MODE] = trackMode.name
+            preferences[TRACK_MODE] = mediaType.name
         }
     }
 

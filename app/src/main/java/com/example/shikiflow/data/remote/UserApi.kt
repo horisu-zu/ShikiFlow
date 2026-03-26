@@ -7,6 +7,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiUpdateRateRequest
 import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
 import com.example.shikiflow.data.datasource.dto.ShikiUserFavoritesResponse
 import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate
+import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PATCH
@@ -67,4 +68,9 @@ interface UserApi {
     suspend fun getUserFavorites(
         @Path("id") userId: Long
     ): ShikiUserFavoritesResponse
+
+    @GET("/api/users/{id}/friends")
+    suspend fun getUserFriends(
+        @Path("id") userId: Long
+    ): List<ShikiUser>
 }

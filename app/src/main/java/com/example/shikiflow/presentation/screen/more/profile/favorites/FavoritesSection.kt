@@ -2,8 +2,8 @@ package com.example.shikiflow.presentation.screen.more.profile.favorites
 
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -23,20 +24,24 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -51,10 +56,18 @@ fun FavoritesSection(
     userId: Int,
     favoriteCategories: List<FavoriteCategory>,
     horizontalPadding: Dp,
-    onFavoriteClick: (Int, FavoriteCategory) -> Unit,
+    onFavoriteClick: (FavoriteCategory, Int) -> Unit,
+    onStudioClick: (Int, String) -> Unit,
     favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
-    val pagerState = rememberPagerState { favoriteCategories.size }
+    val params by favoritesViewModel.params.collectAsStateWithLifecycle()
+
+    val pagerState = rememberPagerState(
+        initialPage = params.currentCategory?.let { favoriteCategory ->
+            favoriteCategories.indexOf(favoriteCategory)
+        } ?: 0,
+        pageCount = { favoriteCategories.size }
+    )
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(userId) {
@@ -140,15 +153,24 @@ fun FavoritesSection(
                             key = { index -> userFavoriteItems[index]?.id ?: index }
                         ) { index ->
                             userFavoriteItems[index]?.let { item ->
-                                FavoriteMediaItem(
-                                    id = item.id,
-                                    title = item.name,
-                                    imageUrl = item.imageUrl,
-                                    onItemClick = { id ->
-                                        onFavoriteClick(id, favoriteCategories[page])
-                                    },
-                                    modifier = Modifier.animateItem()
-                                )
+                                if(item.favoriteCategory == FavoriteCategory.STUDIO) {
+                                    FavoriteStudioItem(
+                                        id = item.id,
+                                        name = item.name,
+                                        onStudioClick = onStudioClick,
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                } else {
+                                    FavoriteItem(
+                                        userFavorite = item,
+                                        onItemClick = { id ->
+                                            onFavoriteClick(favoriteCategories[page], id)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .animateItem()
+                                    )
+                                }
                             }
                         }
 
@@ -179,33 +201,60 @@ fun FavoritesSection(
 }
 
 @Composable
-private fun FavoriteMediaItem(
-    id: Int,
-    title: String,
-    imageUrl: String?,
+private fun FavoriteItem(
+    userFavorite: UserFavorite,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val imageType = ImageType.Poster(defaultWidth = Int.MAX_VALUE.dp)
+
     Column(
         modifier = modifier
-            .fillMaxWidth()
-            .clickable(
-                onClick = { onItemClick(id) },
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null
-            ),
+            .clip(imageType.defaultClip)
+            .clickable { onItemClick(userFavorite.id) },
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
-        BaseImage(
-            model = imageUrl,
-            contentScale = ContentScale.Crop,
-            imageType = ImageType.Poster(
-                defaultWidth = Int.MAX_VALUE.dp,
+        userFavorite.imageUrl?.let { imageUrl ->
+            BaseImage(
+                model = imageUrl,
+                contentScale = ContentScale.Crop,
+                imageType = imageType
+            )
+        }
+        Text(
+            text = userFavorite.name,
+            style = MaterialTheme.typography.labelSmall,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 2,
+            modifier = Modifier.padding(
+                start = 4.dp,
+                end = 4.dp,
+                bottom = 4.dp
             )
         )
+    }
+}
+
+@Composable
+private fun FavoriteStudioItem(
+    id: Int,
+    name: String,
+    onStudioClick: (Int, String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .clickable { onStudioClick(id, name) }
+            .padding(horizontal = 12.dp, vertical = 18.dp),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
-            text = title,
-            style = MaterialTheme.typography.labelSmall,
+            text = name,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                textAlign = TextAlign.Center
+            ),
             overflow = TextOverflow.Ellipsis,
             maxLines = 2
         )

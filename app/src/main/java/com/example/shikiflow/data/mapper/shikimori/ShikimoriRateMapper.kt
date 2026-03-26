@@ -77,7 +77,10 @@ object ShikimoriRateMapper {
                         )
                     ),
                     scoreStatsTitles = rates
-                        .filter { it.status == UserRateStatus.COMPLETED }
+                        .filter { rate ->
+                            rate.status == UserRateStatus.COMPLETED &&
+                                rate.score > 0
+                        }
                         .groupBy { it.score }
                         .map { (score, rates) -> Stat(type = score, value = rates.size.toFloat()) }
                         .sortedBy { it.type },

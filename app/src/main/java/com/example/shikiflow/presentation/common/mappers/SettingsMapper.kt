@@ -6,7 +6,6 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
-import com.example.shikiflow.domain.model.track.MainTrackMode
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ThemeMode
 
@@ -61,13 +60,6 @@ object SettingsMapper {
         return when(this) {
             ChapterUIMode.PAGE -> IconResource.Drawable(resId = R.drawable.ic_manga)
             ChapterUIMode.SCROLL -> IconResource.Drawable(resId = R.drawable.ic_scroll)
-        }
-    }
-
-    fun MainTrackMode.displayValue(): Int {
-        return when(this) {
-            MainTrackMode.ANIME -> R.string.media_type_anime
-            MainTrackMode.MANGA -> R.string.media_type_manga
         }
     }
 }

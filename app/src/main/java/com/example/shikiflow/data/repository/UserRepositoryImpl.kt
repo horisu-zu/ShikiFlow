@@ -16,6 +16,8 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.social.SocialCategory
+import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
@@ -74,6 +76,11 @@ class UserRepositoryImpl @Inject constructor(
     override fun getUserStatsCategories(
         userId: Int
     ): Flow<DataResult<UserStatsCategories>> = getSource().getUserStatsCategories(userId)
+
+    override fun getUserSocial(
+        userId: Int,
+        socialCategory: SocialCategory
+    ): Flow<PagingData<UserSocial>> = getSource().getUserSocial(userId, socialCategory)
 
     override fun getUserFavorites(
         userId: Int,

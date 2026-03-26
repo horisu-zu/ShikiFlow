@@ -469,3 +469,17 @@ fragment ALThreadComment on ThreadComment {
     childComments
     likeCount
 }
+
+fragment ALThreadCommentWithHeader on ThreadComment {
+    id
+    thread {
+        ...ALThread
+    }
+    user {
+        ...ALUserShort
+    }
+    comment(asHtml: true)
+    createdAt
+    childComments
+    likeCount
+}

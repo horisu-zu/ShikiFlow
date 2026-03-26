@@ -49,7 +49,7 @@ class GroupUserRatesUseCase @Inject constructor(
                 val targetUserRate = targetRatesMap[mediaId]
 
                 MediaComparison(
-                    id = mediaId.toString(),
+                    id = mediaId,
                     title = (currentUserRate ?: targetUserRate)?.title ?: "Unknown Title",
                     imageUrl = (currentUserRate ?: targetUserRate)?.imageUrl,
                     currentUserScore = currentUserRate?.let { userRate ->

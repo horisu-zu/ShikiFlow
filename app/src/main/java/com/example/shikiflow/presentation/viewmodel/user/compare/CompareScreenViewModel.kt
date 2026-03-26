@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.user.compare
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.GroupUserRatesUseCase
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,16 +21,16 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CompareScreenViewModel @Inject constructor(
-    private val groupUserRatesUseCase: GroupUserRatesUseCase
+    private val groupUserRatesUseCase: GroupUserRatesUseCase,
+    settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(CompareScreenUiState())
     val uiState = _uiState.asStateFlow()
 
-    fun setData(currentUserId: Int, targetUserId: Int, mediaType: MediaType) {
+    fun setData(targetUserId: Int, mediaType: MediaType) {
         _uiState.update { state ->
             state.copy(
-                currentUserId = currentUserId,
                 targetUserId = targetUserId,
                 mediaType = mediaType
             )
@@ -56,7 +57,7 @@ class CompareScreenViewModel @Inject constructor(
         MediaType.entries.forEach { mediaType ->
             _uiState
                 .filter { state ->
-                    state.currentUserId != null &&
+                    state.currentUser != null &&
                         state.targetUserId != null &&
                         state.mediaType == mediaType
                 }
@@ -66,7 +67,7 @@ class CompareScreenViewModel @Inject constructor(
                 }
                 .flatMapLatest { state ->
                     groupUserRatesUseCase(
-                        currentUserId = state.currentUserId!!,
+                        currentUserId = state.currentUser!!.id,
                         targetUserId = state.targetUserId!!,
                         mediaType = state.mediaType!!
                     )
@@ -98,5 +99,15 @@ class CompareScreenViewModel @Inject constructor(
                     }
                 }.launchIn(viewModelScope)
         }
+
+        settingsRepository.userFlow
+            .distinctUntilChanged()
+            .onEach { currentUser ->
+                _uiState.update { state ->
+                    state.copy(
+                        currentUser = currentUser
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 }

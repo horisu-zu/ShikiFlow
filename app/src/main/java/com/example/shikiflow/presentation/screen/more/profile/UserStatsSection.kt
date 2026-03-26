@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,14 +12,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.typography
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,7 +68,7 @@ fun UserStatsSection(
     val uiState by userStatsViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
-        userStatsViewModel.setInitialParams(userData.id.toInt(), typesList)
+        userStatsViewModel.setInitialParams(userData.id, typesList)
     }
 
     PullToRefreshCustomBox(
@@ -85,17 +82,19 @@ fun UserStatsSection(
                 AuthType.SHIKIMORI -> {
                     ShikimoriTrackSection(
                         userRateData = uiState.overviewStats,
+                        typesList = uiState.typesList,
+                        currentType = uiState.mediaType,
                         isCurrentUser = isCurrentUser,
+                        onTypeSelect = { mediaType ->
+                            userStatsViewModel.setMediaType(mediaType)
+                        },
                         onCompareClick = {
                             navOptions.navigateToCompare(userData)
                         },
                         modifier = Modifier
                             .fillMaxSize()
                             .verticalScroll(rememberScrollState())
-                            .padding(
-                                horizontal = horizontalPadding,
-                                vertical = 12.dp
-                            )
+                            .padding(horizontal = horizontalPadding)
                     )
                 }
                 AuthType.ANILIST -> {
@@ -118,7 +117,10 @@ fun UserStatsSection(
 @Composable
 fun ShikimoriTrackSection(
     userRateData: MediaTypeStats<OverviewStats>,
+    typesList: List<MediaType>,
+    currentType: MediaType,
     isCurrentUser: Boolean,
+    onTypeSelect: (MediaType) -> Unit,
     onCompareClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -131,14 +133,35 @@ fun ShikimoriTrackSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(id = R.string.profile_screen_track_lists_label),
-                style = typography.titleLarge
-            )
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                typesList.forEach { mediaType ->
+                    val isSelected = currentType == mediaType
 
+                    FilterChip(
+                        selected = isSelected,
+                        onClick = { onTypeSelect(mediaType) },
+                        label = {
+                            Text(
+                                text = stringResource(id = mediaType.displayValue())
+                            )
+                        },
+                        leadingIcon = if(isSelected) {
+                            {
+                                Icon(
+                                    imageVector = Icons.Default.Done,
+                                    contentDescription = null
+                                )
+                            }
+                        } else { null }
+                    )
+                }
+            }
             if(!isCurrentUser) {
                 Row(
-                    modifier = Modifier.clip(CircleShape)
+                    modifier = Modifier
+                        .clip(CircleShape)
                         .clickable { onCompareClick() }
                         .padding(start = 8.dp, top = 4.dp, bottom = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
@@ -157,22 +180,16 @@ fun ShikimoriTrackSection(
             }
         }
 
-        MediaType.entries.forEach { mediaType ->
-            userRateData[mediaType]?.let { mediaStats ->
-                ShikimoriTrackItem(
-                    mediaType = mediaType,
-                    iconResource = mediaType.iconResource(),
-                    type = stringResource(id = mediaType.displayValue()),
-                    mediaStats = mediaStats,
-                    itemsCount = mediaStats.shortStats.find { it.statType == OverviewStatType.TITLE }
-                        ?.count?.toInt() ?: 0,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
-                        .padding(all = 12.dp)
-                )
-            }
+        userRateData[currentType]?.let { mediaStats ->
+            ShikimoriTrackItem(
+                mediaType = currentType,
+                iconResource = currentType.iconResource(),
+                type = stringResource(id = currentType.displayValue()),
+                mediaStats = mediaStats,
+                itemsCount = mediaStats.shortStats.find { it.statType == OverviewStatType.TITLE }
+                    ?.count?.toInt() ?: 0,
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }

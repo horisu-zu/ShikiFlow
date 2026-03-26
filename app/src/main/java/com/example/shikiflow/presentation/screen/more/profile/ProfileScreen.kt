@@ -37,9 +37,10 @@ import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute.*
 import com.example.shikiflow.presentation.screen.more.profile.favorites.FavoritesSection
 import com.example.shikiflow.presentation.screen.more.profile.activity.UserActivitySection
+import com.example.shikiflow.presentation.screen.more.profile.social.SocialSection
 import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileViewModel
 import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileUiState
 
@@ -155,21 +156,31 @@ fun ProfileScreenContent(
                                 navOptions = navOptions
                             )
                         }
+                        ProfileSectionType.SOCIAL -> {
+                            SocialSection(
+                                userId = userData.id,
+                                socialCategories = uiState.userStatsCategories.socialCategories,
+                                horizontalPadding = horizontalPadding,
+                                navOptions = navOptions
+                            )
+                        }
                         ProfileSectionType.FAVORITES -> {
                             FavoritesSection(
                                 userId = userData.id,
                                 favoriteCategories = uiState.userStatsCategories.favoriteCategories,
                                 horizontalPadding = horizontalPadding,
-                                onFavoriteClick = { id, category ->
+                                onFavoriteClick = { category, id ->
                                     val detailsNavRoute = when(category) {
-                                        FavoriteCategory.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                                        FavoriteCategory.MANGA -> DetailsNavRoute.MangaDetails(id)
-                                        FavoriteCategory.CHARACTER -> DetailsNavRoute.CharacterDetails(id)
-                                        FavoriteCategory.STUDIO -> DetailsNavRoute.Studio(id)
-                                        else -> DetailsNavRoute.Staff(id)
+                                        FavoriteCategory.ANIME -> AnimeDetails(id)
+                                        FavoriteCategory.MANGA -> MangaDetails(id)
+                                        FavoriteCategory.CHARACTER -> CharacterDetails(id)
+                                        else -> Staff(id)
                                     }
 
                                     navOptions.navigateToDetails(detailsNavRoute)
+                                },
+                                onStudioClick = { id, name ->
+                                    navOptions.navigateToDetails(Studio(id, name))
                                 }
                             )
                         }

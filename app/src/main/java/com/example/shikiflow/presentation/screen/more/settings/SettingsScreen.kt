@@ -30,10 +30,11 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomDialog
-import com.example.shikiflow.domain.model.track.MainTrackMode
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
 import com.example.shikiflow.utils.IconResource
@@ -166,10 +167,10 @@ fun SettingsScreen(
                             onClick = {
                                 bottomSheetConfig.value = BottomSheetConfig(
                                     title = resources.getString(R.string.settings_track_mode_select),
-                                    options = MainTrackMode.entries.map { resources.getString(it.displayValue()) },
+                                    options = MediaType.entries.map { resources.getString(it.displayValue()) },
                                     currentValue = resources.getString(settingsState.settings.trackMode.displayValue()),
                                     onOptionClick = { selectedIndex ->
-                                        settingsViewModel.setTrackMode(MainTrackMode.entries[selectedIndex])
+                                        settingsViewModel.setTrackMode(MediaType.entries[selectedIndex])
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                                             bottomSheetConfig.value = null
                                         }

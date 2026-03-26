@@ -398,6 +398,10 @@
     <string name="stats_empty_label">Not enough data to generate the stats</string>
 
     <string name="days_hours">%1$dd %2$dh</string>
+    <string name="social_category_followings">Followings</string>
+    <string name="social_category_followers">Followers</string>
+    <string name="social_category_threads">Threads</string>
+    <string name="social_category_thread_comments">Thread Comments</string>
     <!--<plurals name="author_plural_form">
         <item quantity="one">Author</item>
         <item quantity="other">Authors</item>

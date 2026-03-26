@@ -143,8 +143,8 @@ private fun ChapterSettingsItem(
             .clickable { if (!isChecked) onClick() }
             .heightIn(min = 48.dp)
             .background(
-                if (isChecked) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.background
+                color = if (isChecked) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.background
             )
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -153,13 +153,13 @@ private fun ChapterSettingsItem(
         icon?.toIcon(
             modifier = Modifier.size(24.dp),
             tint = if (isChecked) MaterialTheme.colorScheme.onPrimary
-                else MaterialTheme.colorScheme.onSurface
+                else MaterialTheme.colorScheme.onBackground
         )
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium.copy(
                 color = if (isChecked) MaterialTheme.colorScheme.onPrimary
-                    else MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onBackground
             ),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

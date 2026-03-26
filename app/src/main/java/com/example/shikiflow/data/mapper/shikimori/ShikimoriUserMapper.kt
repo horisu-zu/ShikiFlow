@@ -16,6 +16,7 @@ import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.ListActivity
+import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.fleeksoft.ksoup.Ksoup
 import kotlin.time.Instant
@@ -93,7 +94,8 @@ object ShikimoriUserMapper {
 
     fun mapUserStats(
         mediaTypeStats: MediaTypeStats<OverviewStats>,
-        userFavorites: List<UserFavorite>
+        userFavorites: List<UserFavorite>,
+        friends: List<User>
     ): UserStatsCategories {
         val mediaTypes = buildList {
             mediaTypeStats.animeStats?.scoreStatsTitles?.let { animeScores ->
@@ -110,9 +112,12 @@ object ShikimoriUserMapper {
 
         val categories = userFavorites.map { it.favoriteCategory }.distinct()
 
+        val friends = if(friends.isNotEmpty()) SocialCategory.FOLLOWINGS else null
+
         return UserStatsCategories(
             scoreMediaTypes = mediaTypes,
-            favoriteCategories = categories
+            favoriteCategories = categories,
+            socialCategories = listOfNotNull(friends)
         )
     }
 }

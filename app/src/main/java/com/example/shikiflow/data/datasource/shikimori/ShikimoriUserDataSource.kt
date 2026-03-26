@@ -32,6 +32,9 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.social.Follower
+import com.example.shikiflow.domain.model.user.social.SocialCategory
+import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
@@ -85,18 +88,19 @@ class ShikimoriUserDataSource @Inject constructor(
         emit(DataResult.Loading)
 
         try {
-            val (userRates, favorites) = coroutineScope {
+            val (userRates, favorites, friends) = coroutineScope {
                 val userRates = async {
                     userApi.getUserRates(userId = userId.toLong())
                         .map { response -> response.toDomain() }
                         .toDomain()
                 }
                 val favorites = async { getShikiFavorites(userId) }
+                val friends = async { getUserFriends(userId) }
 
-                userRates.await() to favorites.await()
+                Triple(userRates.await(), favorites.await(), friends.await())
             }
 
-            val userStatsCategories = mapUserStats(userRates, favorites)
+            val userStatsCategories = mapUserStats(userRates, favorites, friends)
 
             emit(DataResult.Success(userStatsCategories))
         } catch (e: Exception) {
@@ -149,16 +153,46 @@ class ShikimoriUserDataSource @Inject constructor(
         return Pager(config = PagingConfig(pageSize = 100)) {
             object : PagingSource<Int, UserFavorite>() {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserFavorite> {
-                    val favorites = getShikiFavorites(userId)
-                        .filter { it.favoriteCategory == favoriteCategory }
+                    return try {
+                        val favorites = getShikiFavorites(userId)
+                            .filter { it.favoriteCategory == favoriteCategory }
 
-                    return LoadResult.Page(
-                        data = favorites,
-                        prevKey = null,
-                        nextKey = null
-                    )
+                        return LoadResult.Page(
+                            data = favorites,
+                            prevKey = null,
+                            nextKey = null
+                        )
+                    } catch (e: Exception) {
+                        LoadResult.Error(e)
+                    }
                 }
                 override fun getRefreshKey(state: PagingState<Int, UserFavorite>): Int? = null
+            }
+        }.flow
+    }
+
+    override fun getUserSocial(
+        userId: Int,
+        socialCategory: SocialCategory
+    ): Flow<PagingData<UserSocial>> {
+        return Pager(config = PagingConfig(pageSize = 100)) {
+            object : PagingSource<Int, UserSocial>() {
+                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserSocial> {
+                    return try {
+                        val friends = getUserFriends(userId).map { user ->
+                            Follower(user)
+                        }
+
+                        LoadResult.Page(
+                            data = friends,
+                            prevKey = null,
+                            nextKey = null
+                        )
+                    } catch (e: Exception) {
+                        LoadResult.Error(e)
+                    }
+                }
+                override fun getRefreshKey(state: PagingState<Int, UserSocial>): Int? = null
             }
         }.flow
     }
@@ -173,6 +207,14 @@ class ShikimoriUserDataSource @Inject constructor(
     private suspend fun getShikiFavorites(
         userId: Int
     ): List<UserFavorite> = userApi.getUserFavorites(userId.toLong()).toDomain()
+
+    private suspend fun getUserFriends(
+        userId: Int
+    ): List<User> {
+        return userApi.getUserFriends(userId.toLong()).map { shikiUser ->
+            shikiUser.toDomain()
+        }
+    }
 
     override fun getUsers(query: String): Flow<PagingData<User>> {
         return Pager(

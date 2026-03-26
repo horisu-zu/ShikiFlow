@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.common.FileSize
@@ -10,9 +9,9 @@ import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.model.track.MainTrackMode
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -79,58 +78,50 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setTrackMode(trackMode: MainTrackMode) {
+    fun setTrackMode(mediaType: MediaType) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setTrackMode: $trackMode")
-            settingsRepository.saveTrackMode(trackMode)
+            settingsRepository.saveTrackMode(mediaType)
         }
     }
 
     fun setAppUiMode(appUiMode: AppUiMode) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setAppUiMode: $appUiMode")
             settingsRepository.saveAppUiMode(appUiMode)
         }
     }
 
     fun setTheme(themeMode: ThemeMode) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setTheme: $themeMode")
             settingsRepository.saveTheme(themeMode)
         }
     }
 
     fun setOled(isEnabled: Boolean) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setOled: $isEnabled")
             settingsRepository.saveOLEDMode(isEnabled)
         }
     }
 
     fun setDynamicTheme(isDynamicTheme: Boolean) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setDynamicTheme: $isDynamicTheme")
             settingsRepository.saveDynamicMode(isDynamicTheme)
         }
     }
 
     fun setPaletteStyle(paletteStyle: PaletteStyle) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setPaletteStyle: $paletteStyle")
             settingsRepository.savePaletteStyle(paletteStyle)
         }
     }
 
     fun setDataSaver(isEnabled: Boolean) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setDataSaver: $isEnabled")
             settingsRepository.saveDataSaverMode(isEnabled)
         }
     }
 
     fun setChapterUIMode(chapterUIMode: ChapterUIMode) {
         viewModelScope.launch {
-            Log.d("SettingsViewModel", "setChapterUIMode: $chapterUIMode")
             settingsRepository.saveChapterUiMode(chapterUIMode)
         }
     }

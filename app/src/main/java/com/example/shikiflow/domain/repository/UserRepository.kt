@@ -9,11 +9,13 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -36,6 +38,8 @@ interface UserRepository {
     fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>>
 
     fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
+
+    fun getUserSocial(userId: Int, socialCategory: SocialCategory): Flow<PagingData<UserSocial>>
 
     fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
 

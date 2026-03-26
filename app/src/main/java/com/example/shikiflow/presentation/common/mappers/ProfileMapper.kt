@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
+import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.CombinedStat
 import com.example.shikiflow.domain.model.user.stats.OverviewStatType
 import com.example.shikiflow.presentation.common.TabRowItem
@@ -140,5 +141,14 @@ object ProfileMapper {
         val hours = ((value - days) * 24).toInt()
 
         return getString(R.string.days_hours, days, hours)
+    }
+
+    fun SocialCategory.displayValue(): Int {
+        return when(this) {
+            SocialCategory.FOLLOWINGS -> R.string.social_category_followings
+            SocialCategory.FOLLOWERS -> R.string.social_category_followers
+            SocialCategory.THREADS -> R.string.social_category_threads
+            SocialCategory.COMMENTS -> R.string.social_category_thread_comments
+        }
     }
 }

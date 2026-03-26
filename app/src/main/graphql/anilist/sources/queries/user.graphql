@@ -123,6 +123,26 @@ query UserStudios(
 query UserStatsCategories(
     $userId: Int!
 ) {
+    followingsPage: Page {
+        following(userId: $userId) {
+            id
+        }
+    }
+    followersPage: Page {
+        followers(userId: $userId) {
+            id
+        }
+    }
+    threadsPage: Page {
+        threads(userId: $userId) {
+            id
+        }
+    }
+    commentsPage: Page {
+        threadComments(userId: $userId) {
+            id
+        }
+    }
     User(id: $userId) {
         statistics {
             anime {
@@ -238,6 +258,54 @@ query UserFavoriteStudios(
                     ...ALFavoriteStudioShort
                 }
             }
+        }
+    }
+}
+
+query UserFollowings(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    Page(page: $page, perPage: $limit) {
+        following(userId: $userId) {
+            ...ALUserShort
+        }
+    }
+}
+
+query UserFollowers(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    Page(page: $page, perPage: $limit) {
+        followers(userId: $userId) {
+            ...ALUserShort
+        }
+    }
+}
+
+query UserThreads(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    Page(page: $page, perPage: $limit) {
+        threads(userId: $userId, sort: [ID_DESC]) {
+            ...ALThread
+        }
+    }
+}
+
+query UserThreadComments(
+    $page: Int!,
+    $limit: Int!,
+    $userId: Int!
+) {
+    Page(page: $page, perPage: $limit) {
+        threadComments(userId: $userId, sort: [ID_DESC]) {
+            ...ALThreadCommentWithHeader
         }
     }
 }

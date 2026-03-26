@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -26,6 +27,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -48,7 +50,6 @@ import com.example.shikiflow.presentation.viewmodel.user.compare.CompareScreenVi
 @Composable
 fun CompareScreenContent(
     mediaType: MediaType,
-    currentUser: User,
     targetUser: User,
     onMediaItemClick: (Int, MediaType) -> Unit,
     compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
@@ -59,7 +60,7 @@ fun CompareScreenContent(
     }
 
     LaunchedEffect(mediaType) {
-        compareScreenViewModel.setData(currentUser.id, targetUser.id, mediaType)
+        compareScreenViewModel.setData(targetUser.id, mediaType)
     }
 
     Box {
@@ -88,7 +89,7 @@ fun CompareScreenContent(
                     userRatesMap.forEach { (comparisonType, media) ->
                         stickyHeader {
                             CompareHeader(
-                                currentUserNickname = currentUser.nickname,
+                                currentUserNickname = uiState.currentUser?.nickname ?: "",
                                 targetUserNickname = targetUser.nickname,
                                 count = media.size,
                                 comparisonType = comparisonType,
@@ -225,15 +226,17 @@ private fun ComparisonItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             Row(
-                modifier = Modifier.weight(2f),
+                modifier = Modifier
+                    .weight(2f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable { onItemClick(mediaItem.id) },
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
             ) {
                 BaseImage(
                     model = mediaItem.imageUrl,
                     contentDescription = "Media Image",
-                    imageType = ImageType.Poster(defaultWidth = 48.dp),
-                    onClick = { onItemClick(mediaItem.id.toInt()) }
+                    imageType = ImageType.Poster(defaultWidth = 48.dp)
                 )
                 Text(
                     text = mediaItem.title,

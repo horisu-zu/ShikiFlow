@@ -123,7 +123,9 @@ fun AnimeDetailsContent(
                 snapPosition = SnapPosition.Start,
                 contentPadding = PaddingValues(horizontal = horizontalPadding),
                 horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-                modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding).fillMaxWidth()
+                modifier = Modifier
+                    .ignoreHorizontalParentPadding(horizontalPadding)
+                    .fillMaxWidth()
             ) {
                 items(animeDetails.genres) { genreItem ->
                     CardItem(

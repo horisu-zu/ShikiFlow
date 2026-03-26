@@ -276,10 +276,13 @@ private fun CommentsMapSection(
     Column(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(color = when(title) {
-                CommentType.OP -> MaterialTheme.colorScheme.background
-                else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-            }).padding(horizontal = 8.dp, vertical = 12.dp),
+            .background(
+                color = when(title) {
+                    CommentType.OP -> MaterialTheme.colorScheme.background
+                        else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                }
+            )
+            .padding(horizontal = 8.dp, vertical = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         if(title != CommentType.OP) {
@@ -302,7 +305,9 @@ private fun CommentsMapSection(
                 onEntityClick = onEntityClick,
                 onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
             )
         }
     }

@@ -10,8 +10,8 @@ import com.example.shikiflow.utils.IconResource
 enum class ProfileSectionType {
     USER_STATS,
     ACTIVITY,
+    SOCIAL,
     FAVORITES;
-    /*Will add more later*/
 
     companion object {
         fun getTabRows(
@@ -21,6 +21,9 @@ enum class ProfileSectionType {
                 if(userStatsCategories.scoreMediaTypes.isNotEmpty()) {
                     add(TabRowItem(USER_STATS, IconResource.Drawable(resId = R.drawable.ic_stats)))
                     add(TabRowItem(ACTIVITY, IconResource.Drawable(resId = R.drawable.ic_history)))
+                }
+                if(userStatsCategories.socialCategories.isNotEmpty()) {
+                    add(TabRowItem(SOCIAL, IconResource.Drawable(resId = R.drawable.ic_social)))
                 }
                 if(userStatsCategories.favoriteCategories.isNotEmpty()) {
                     add(TabRowItem(FAVORITES, IconResource.Vector(imageVector = Icons.Default.Star)))
