@@ -13,7 +13,7 @@ import javax.inject.Inject
 class StaffMediaPagingSource @Inject constructor(
     private val staffId: Int,
     private val mediaType: MediaType,
-    private val sort: Sort<MediaSort.Anilist>,
+    private val sort: Sort<MediaSort>,
     private val staffDataSource: AnilistStaffDataSource
 ): PagingSource<Int, MediaRole>() {
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {

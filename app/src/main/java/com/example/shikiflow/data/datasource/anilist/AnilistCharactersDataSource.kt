@@ -46,9 +46,6 @@ class AnilistCharactersDataSource @Inject constructor(
         mediaType: MediaType,
         sort: Sort<MediaSort>
     ): Flow<PagingData<MediaRole>> {
-        val sortType = sort.type as? MediaSort.Anilist ?: MediaSort.Anilist.POPULARITY
-        val anilistSort = Sort(sortType, sort.direction)
-
         return Pager(
             config = PagingConfig(
                 pageSize = 24,
@@ -60,7 +57,7 @@ class AnilistCharactersDataSource @Inject constructor(
                 CharacterMediaPagingSource(
                     characterId = characterId,
                     mediaType = mediaType,
-                    sort = anilistSort,
+                    sort = sort,
                     charactersDataSource = this
                 )
             }
@@ -72,7 +69,7 @@ class AnilistCharactersDataSource @Inject constructor(
         limit: Int,
         characterId: Int,
         mediaType: MediaType,
-        sort: Sort<MediaSort.Anilist>
+        sort: Sort<MediaSort>
     ): Result<List<CharacterMediaRole>> {
         val characterMediaAppearanceQuery = CharacterMediaAppearancesQuery(
             page = page,

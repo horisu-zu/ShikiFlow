@@ -3,10 +3,10 @@ package com.example.shikiflow.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.StudioMediaPagingSource
+import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
@@ -24,8 +24,8 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class MediaRepositoryImpl @Inject constructor(
-    private val anilistDataSource: MediaDetailsDataSource,
-    private val shikimoriDataSource: MediaDetailsDataSource,
+    private val anilistDataSource: MediaDataSource,
+    private val shikimoriDataSource: MediaDataSource,
     private val settingsRepository: SettingsRepository
 ): MediaRepository {
 
@@ -42,15 +42,20 @@ class MediaRepositoryImpl @Inject constructor(
     ): Flow<DataResult<MediaDetails>> = getSource().getMediaDetails(id, mediaType)
 
     override fun paginatedBrowseMedia(
-        browseType: BrowseType?,
         browseOptions: BrowseOptions
-    ): Flow<PagingData<Browse>> = getSource().paginatedBrowseMedia(browseType, browseOptions)
+    ): Flow<PagingData<Browse>> = getSource().paginatedBrowseMedia(browseOptions)
 
     override suspend fun browseMedia(
         page: Int,
         size: Int,
         browseOptions: BrowseOptions
     ): Result<List<Browse>> = getSource().browseMedia(page, size,browseOptions)
+
+    override fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>> = getSource().getAiringAnimes(onList, airingAtGreater, airingAtLesser)
 
     override fun getSimilarMedia(
         mediaType: MediaType,

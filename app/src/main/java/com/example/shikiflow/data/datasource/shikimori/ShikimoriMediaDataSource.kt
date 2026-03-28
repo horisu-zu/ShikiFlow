@@ -14,7 +14,10 @@ import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
 import com.example.graphql.shikimori.MangaDetailsQuery
-import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.graphql.shikimori.type.AnimeStatusEnum
+import com.example.graphql.shikimori.type.OrderEnum
+import com.example.shikiflow.data.datasource.MediaDataSource
+import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiAnimeKind
@@ -23,14 +26,16 @@ import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriAni
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriMangaStatus
 import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriBrowseOrder
 import com.example.shikiflow.data.mapper.common.RatingMapper.toShikiRating
+import com.example.shikiflow.data.mapper.common.SeasonMapper
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toShikiSeason
-import com.example.shikiflow.data.mapper.shikimori.ShikimoriDetailsMapper.toBrowseAnime
-import com.example.shikiflow.data.mapper.shikimori.ShikimoriDetailsMapper.toBrowseManga
-import com.example.shikiflow.data.mapper.shikimori.ShikimoriDetailsMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toAiringAnime
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toBrowseAnime
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toBrowseManga
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toDomain
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.MangaApi
+import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
@@ -42,11 +47,11 @@ import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class ShikimoriMediaDetailsDataSource @Inject constructor(
+class ShikimoriMediaDataSource @Inject constructor(
     private val apolloClient: ApolloClient,
     private val animeApi: AnimeApi,
     private val mangaApi: MangaApi
-): MediaDetailsDataSource, BaseNetworkRepository() {
+): MediaDataSource, BaseNetworkRepository() {
 
     override fun getMediaDetails(
         id: Int,
@@ -86,7 +91,6 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
     }
 
     override fun paginatedBrowseMedia(
-        browseType: BrowseType?,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>> {
         return Pager(
@@ -98,8 +102,7 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
             ),
             pagingSourceFactory = {
                 BrowsePagingSource(
-                    mediaDetailsDataSource = this,
-                    browseType = browseType,
+                    mediaDataSource = this,
                     options = browseOptions
                 )
             }
@@ -152,31 +155,105 @@ class ShikimoriMediaDetailsDataSource @Inject constructor(
                 val response = apolloClient.query(query).execute()
 
                 response.toResult().map { data ->
-                    data.mangas.map { anime ->
-                        anime.toBrowseManga()
+                    data.mangas.map { manga ->
+                        manga.toBrowseManga()
                     }
                 }
             }
         }
     }
 
+    override fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>> {
+        val seenIds = mutableSetOf<Int>()
+
+        return Pager(
+            config = PagingConfig(
+                pageSize = 45,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 45
+            ),
+            pagingSourceFactory = {
+                seenIds.clear()
+                AiringPagingSource(
+                    mediaDataSource = this,
+                    onList = onList,
+                    airingAtGreater = airingAtGreater,
+                    airingAtLesser = airingAtLesser
+                )
+            }
+        ).flow
+    }
+
+    override suspend fun getAiringSchedule(
+        page: Int,
+        limit: Int,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Result<List<AiringAnime>> = runCatching {
+        val ongoingsQuery = AnimeBrowseQuery(
+            page = Optional.present(page),
+            limit = Optional.present(limit),
+            status = Optional.present(AnimeStatusEnum.ongoing.name),
+            order = Optional.present(OrderEnum.ranked),
+            score = Optional.present(1)
+        )
+
+        //Covers released on the same week titles within a season
+        val seasonQuery = AnimeBrowseQuery(
+            page = Optional.present(page),
+            limit = Optional.present(limit),
+            order = Optional.present(OrderEnum.ranked),
+            season = Optional.present(SeasonMapper.currentShikiSeason()),
+            score = Optional.present(1)
+        )
+
+        val ongoingsResult = apolloClient.query(ongoingsQuery).execute()
+            .toResult()
+            .map { data ->
+                Log.d("ShikimoriMediaDataSource", "Ongoings Size: ${data.animes.size}")
+                data.animes.map { anime ->
+                    anime.toAiringAnime()
+                }
+            }.getOrThrow()
+
+        val seasonResult = apolloClient.query(seasonQuery).execute()
+            .toResult()
+            .map { data ->
+                Log.d("ShikimoriMediaDataSource", "Season Size: ${data.animes.size}")
+                data.animes.map { anime ->
+                    anime.toAiringAnime()
+                }
+            }.getOrThrow()
+
+        (ongoingsResult + seasonResult).distinctBy { it.data.id }
+    }
+
     override fun getSimilarMedia(
         mediaType: MediaType,
         mediaId: Int
     ): Flow<PagingData<Browse>> {
-        return Pager(config = PagingConfig(pageSize = 100)) {
+        return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, Browse>() {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Browse> {
-                    val response = when(mediaType) {
-                        MediaType.ANIME -> animeApi.getSimilarAnime(mediaId.toString()).map { it.toBrowseAnime() }
-                        MediaType.MANGA -> mangaApi.getSimilarManga(mediaId.toString()).map { it.toBrowseManga() }
-                    }
+                    return try {
+                        val response = when(mediaType) {
+                            MediaType.ANIME -> animeApi.getSimilarAnime(mediaId.toString()).map { it.toBrowseAnime() }
+                            MediaType.MANGA -> mangaApi.getSimilarManga(mediaId.toString()).map { it.toBrowseManga() }
+                        }
 
-                    return LoadResult.Page(
-                        data = response,
-                        prevKey = null,
-                        nextKey = null
-                    )
+                        return LoadResult.Page(
+                            data = response,
+                            prevKey = null,
+                            nextKey = null
+                        )
+                    } catch (e: Exception) {
+                        LoadResult.Error(e)
+                    }
                 }
                 override fun getRefreshKey(state: PagingState<Int, Browse>): Int? = null
             }

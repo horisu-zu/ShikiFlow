@@ -1,65 +1,65 @@
 package com.example.shikiflow.presentation.viewmodel.browse.calendar
 
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.usecase.GetOngoingsCalendarUseCase
-import com.example.shikiflow.presentation.UiStateViewModel
-import com.example.shikiflow.utils.DataResult
+import androidx.paging.cachedIn
+import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.utils.DateUtils.thisWeekdayTimestamp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.datetime.DayOfWeek
 import javax.inject.Inject
+import kotlin.time.Clock
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class OngoingsCalendarViewModel @Inject constructor(
-    getOngoingsCalendarUseCase: GetOngoingsCalendarUseCase
-): UiStateViewModel<OngoingsCalendarUiState>() {
+    private val mediaRepository: MediaRepository
+): ViewModel() {
 
-    override val initialState: OngoingsCalendarUiState = OngoingsCalendarUiState()
+    private val _params = MutableStateFlow(OngoingsCalendarParams())
+    val params = _params.asStateFlow()
 
-    fun onRefresh() {
-        mutableUiState.update { state ->
-            state.copy(isRefreshing = true)
+    private val now = Clock.System.now()
+
+    val calendarItems = DayOfWeek.entries.associateWith { dayOfWeek ->
+        _params.filter { params ->
+            params.currentDay != null && dayOfWeek == params.currentDay
+        }
+            .distinctUntilChanged()
+            .flatMapLatest { params ->
+                val start = now.thisWeekdayTimestamp(
+                    dayOfWeek = params.currentDay!!,
+                    isEndOfDay = false
+                )
+                val end = now.thisWeekdayTimestamp(
+                    dayOfWeek = params.currentDay,
+                    isEndOfDay = true
+                )
+
+                mediaRepository.getAiringAnimes(
+                    onList = params.onList,
+                    airingAtGreater = start,
+                    airingAtLesser = end
+                )
+            }.cachedIn(viewModelScope)
+    }
+
+    fun setCurrentDay(currentDay: DayOfWeek) {
+        _params.update { params ->
+            params.copy(currentDay = currentDay)
         }
     }
 
-    init {
-        mutableUiState
-            .distinctUntilChanged { _, new ->
-                !new.isRefreshing
-            }
-            .flatMapLatest {
-                getOngoingsCalendarUseCase()
-            }
-            .onEach { result ->
-                mutableUiState.update { state ->
-                    when (result) {
-                        is DataResult.Success -> {
-                            state.copy(
-                                ongoings = result.data,
-                                isLoading = false,
-                                errorMessage = null
-                            )
-                        }
-                        is DataResult.Error -> {
-                            state.copy(
-                                isLoading = false,
-                                errorMessage = result.message
-                            )
-                        }
-                        else -> {
-                            state.copy(
-                                isLoading = true,
-                                isRefreshing = false,
-                                errorMessage = null
-                            )
-                        }
-                    }
-                }
-            }.launchIn(viewModelScope)
+    fun setOnList(onList: Boolean) {
+        _params.update { params ->
+            params.copy(onList = onList)
+        }
     }
 }

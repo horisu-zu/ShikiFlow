@@ -143,3 +143,21 @@ query MediaExternalLinks(
         }
     }
 }
+
+query AiringSchedule(
+    $page: Int!,
+    $perPage: Int!,
+    $sort: AiringSort = TIME,
+    $airingAtGreater: Int!,
+    $airingAtLesser: Int!
+) {
+    Page(page: $page, perPage: $perPage) {
+        airingSchedules(
+            sort: [$sort],
+            airingAt_greater: $airingAtGreater,
+            airingAt_lesser: $airingAtLesser
+        ) {
+            ...ALAiringAnimeShort
+        }
+    }
+}

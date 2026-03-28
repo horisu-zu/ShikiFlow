@@ -7,25 +7,27 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.example.graphql.anilist.AiringScheduleQuery
 import com.example.graphql.anilist.MediaBrowseQuery
 import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.MediaExternalLinksQuery
 import com.example.graphql.anilist.MediaRecommendationsQuery
 import com.example.graphql.anilist.StudioBrowseQuery
-import com.example.graphql.anilist.type.MediaSort
-import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.graphql.anilist.type.MediaSort as ALMediaSort
+import com.example.shikiflow.data.datasource.MediaDataSource
+import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.local.source.MediaRecommendationsPagingSource
-import com.example.shikiflow.data.mapper.anilist.AnilistDetailsMapper.toBrowse
-import com.example.shikiflow.data.mapper.anilist.AnilistDetailsMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
+import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toAnilistFormat
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatus
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
+import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
@@ -37,9 +39,9 @@ import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class AnilistMediaDetailsDataSource @Inject constructor(
+class AnilistMediaDataSource @Inject constructor(
     private val apolloClient: ApolloClient
-): MediaDetailsDataSource, BaseNetworkRepository() {
+): MediaDataSource, BaseNetworkRepository() {
 
     override fun getMediaDetails(
         id: Int,
@@ -58,7 +60,6 @@ class AnilistMediaDetailsDataSource @Inject constructor(
     }
 
     override fun paginatedBrowseMedia(
-        browseType: BrowseType?,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>> {
         return Pager(
@@ -70,8 +71,7 @@ class AnilistMediaDetailsDataSource @Inject constructor(
             ),
             pagingSourceFactory = {
                 BrowsePagingSource(
-                    mediaDetailsDataSource = this,
-                    browseType = browseType,
+                    mediaDataSource = this,
                     options = browseOptions
                 )
             }
@@ -89,7 +89,7 @@ class AnilistMediaDetailsDataSource @Inject constructor(
             search = Optional.presentIfNotNull(browseOptions.name),
             mediaType = browseOptions.mediaType.toAnilistType(),
             status = Optional.presentIfNotNull(browseOptions.status?.toAnilistStatus()),
-            sort = browseOptions.order?.toAnilistBrowseOrder() ?: MediaSort.SCORE_DESC,
+            sort = browseOptions.order?.toAnilistBrowseOrder() ?: ALMediaSort.SCORE_DESC,
             format = Optional.presentIfNotNull(browseOptions.format?.toAnilistFormat()),
             score = Optional.presentIfNotNull(browseOptions.score),
             genre = Optional.presentIfNotNull(browseOptions.genre),
@@ -108,6 +108,59 @@ class AnilistMediaDetailsDataSource @Inject constructor(
         }
     }
 
+    override fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 15
+            ),
+            pagingSourceFactory = {
+                AiringPagingSource(
+                    mediaDataSource = this,
+                    onList = onList,
+                    airingAtGreater = airingAtGreater,
+                    airingAtLesser = airingAtLesser
+                )
+            }
+        ).flow
+    }
+
+    override suspend fun getAiringSchedule(
+        page: Int,
+        limit: Int,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Result<List<AiringAnime>> {
+        val airingQuery = AiringScheduleQuery(
+            page = page,
+            perPage = limit,
+            airingAtGreater = airingAtGreater.toInt(),
+            airingAtLesser = airingAtLesser.toInt()
+        )
+
+        val response = apolloClient.query(airingQuery)
+            .execute()
+            .toResult().map { data ->
+                data
+                    .Page
+                    ?.airingSchedules
+                    ?.filter { airing ->
+                        airing?.aLAiringAnimeShort?.media?.isAdult != true
+                    }
+                    ?.mapNotNull { airing ->
+                        airing?.aLAiringAnimeShort?.toDomain()
+                    } ?: emptyList()
+            }
+
+        return response
+    }
+
     override fun getSimilarMedia(
         mediaType: MediaType,
         mediaId: Int
@@ -121,7 +174,7 @@ class AnilistMediaDetailsDataSource @Inject constructor(
             ),
             pagingSourceFactory = {
                 MediaRecommendationsPagingSource(
-                    mediaDetailsDataSource = this,
+                    mediaDataSource = this,
                     mediaType = mediaType,
                     mediaId = mediaId
                 )

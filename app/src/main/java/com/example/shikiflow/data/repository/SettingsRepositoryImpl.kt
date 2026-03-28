@@ -102,11 +102,11 @@ class SettingsRepositoryImpl @Inject constructor(
 
     private suspend fun getBrowseOngoingOrder(preferences: Preferences): MediaSort {
         return when(authTypeFlow.first()) {
-            AuthType.SHIKIMORI -> MediaSort.Shikimori.valueOf(
-                value = preferences[SHIKI_BROWSE_ONGOING_ORDER] ?: MediaSort.Shikimori.RANKED_MAL.name
+            AuthType.SHIKIMORI -> MediaSort.Shikimori.from(
+                name = preferences[SHIKI_BROWSE_ONGOING_ORDER] ?: MediaSort.Common.SCORE.name
             )
-            AuthType.ANILIST -> MediaSort.Anilist.valueOf(
-                value = preferences[AL_BROWSE_ONGOING_ORDER] ?: MediaSort.Anilist.POPULARITY.name
+            AuthType.ANILIST -> MediaSort.Anilist.from(
+                name = preferences[AL_BROWSE_ONGOING_ORDER] ?: MediaSort.Common.POPULARITY.name
             )
         }
     }
@@ -155,11 +155,13 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveBrowseOngoingOrder(ongoingOrder: MediaSort) {
+        val key = when (authTypeFlow.first()) {
+            AuthType.SHIKIMORI -> SHIKI_BROWSE_ONGOING_ORDER
+            AuthType.ANILIST -> AL_BROWSE_ONGOING_ORDER
+        }
+
         dataStore.edit { preferences ->
-            when (ongoingOrder) {
-                is MediaSort.Shikimori -> preferences[SHIKI_BROWSE_ONGOING_ORDER] = ongoingOrder.name
-                is MediaSort.Anilist -> preferences[AL_BROWSE_ONGOING_ORDER] = ongoingOrder.name
-            }
+            preferences[key] = ongoingOrder.name
         }
     }
 

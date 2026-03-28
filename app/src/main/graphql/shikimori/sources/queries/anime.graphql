@@ -88,8 +88,8 @@ query AnimeBrowse(
         episodes
         episodesAired
         duration
-        airedOn { year month day date }
-        releasedOn { year month day date }
+        airedOn { ...DateShort }
+        releasedOn { ...DateShort }
         url
         season
 

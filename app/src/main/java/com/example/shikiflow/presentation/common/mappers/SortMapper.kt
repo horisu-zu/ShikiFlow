@@ -12,13 +12,11 @@ import com.example.shikiflow.domain.model.sort.UserRateType
 object SortMapper {
     fun SortType.displayValue(): Int {
         return when(this) {
-            MediaSort.Shikimori.RANKED_MAL -> R.string.ongoing_browse_mode_ranked
-            MediaSort.Shikimori.RANKED -> R.string.ongoing_browse_mode_ranked_shiki
-            MediaSort.Shikimori.POPULARITY -> R.string.ongoing_browse_mode_popularity
+            MediaSort.Common.SCORE, UserRateType.SCORE -> R.string.ongoing_browse_mode_score
+            MediaSort.Common.POPULARITY -> R.string.ongoing_browse_mode_popularity
+            MediaSort.Shikimori.RANKED -> R.string.ongoing_browse_mode_score_shiki
             MediaSort.Shikimori.EPISODES -> R.string.browse_order_episodes_count
             MediaSort.Shikimori.STATUS -> R.string.browse_order_status
-            MediaSort.Anilist.POPULARITY -> R.string.ongoing_browse_mode_popularity
-            MediaSort.Anilist.SCORE, UserRateType.SCORE -> R.string.ongoing_browse_mode_score
             MediaSort.Anilist.TRENDING -> R.string.ongoing_browse_mode_trending
             MediaSort.Anilist.FAVORITES, StaffType.FAVORITES, CharacterType.FAVORITES -> R.string.browse_order_favorites
             MediaSort.Anilist.DATE_ADDED, UserRateType.ADDED_AT -> R.string.browse_order_date_added

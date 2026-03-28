@@ -6,40 +6,49 @@ sealed interface SortType {
 }
 
 sealed interface MediaSort : SortType {
+    val name: String
+
+    enum class Common : MediaSort {
+        SCORE,
+        POPULARITY
+    }
+
     enum class Shikimori : MediaSort {
-        RANKED_MAL,
         RANKED,
-        POPULARITY,
         EPISODES,
         STATUS;
 
         companion object {
-            fun getOngoingOrderOptions(): List<MediaSort> {
-                return listOf(
-                    RANKED_MAL,
-                    RANKED,
-                    POPULARITY
-                )
-            }
+            val ongoingOptions = listOf<MediaSort>(
+                Common.SCORE,
+                RANKED,
+                Common.POPULARITY
+            )
+
+            fun from(name: String?): MediaSort =
+                entries.find { it.name == name }
+                    ?: Common.entries.find { it.name == name }
+                    ?: Common.SCORE
         }
     }
 
     enum class Anilist : MediaSort {
-        POPULARITY,
-        SCORE,
         TRENDING,
         FAVORITES,
         DATE_ADDED,
         RELEASE_DATE;
 
         companion object {
-            fun getOngoingOrderOptions(): List<MediaSort> {
-                return listOf(
-                    POPULARITY,
-                    SCORE,
-                    TRENDING
-                )
-            }
+            val ongoingOptions = listOf<MediaSort>(
+                Common.POPULARITY,
+                Common.SCORE,
+                TRENDING
+            )
+
+            fun from(name: String?): MediaSort =
+                entries.find { it.name == name }
+                    ?: Common.entries.find { it.name == name }
+                    ?: Common.POPULARITY
         }
     }
 }

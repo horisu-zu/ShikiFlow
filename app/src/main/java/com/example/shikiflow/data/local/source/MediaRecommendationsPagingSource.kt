@@ -2,12 +2,12 @@ package com.example.shikiflow.data.local.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.tracks.MediaType
 
 class MediaRecommendationsPagingSource(
-    private val mediaDetailsDataSource: MediaDetailsDataSource,
+    private val mediaDataSource: MediaDataSource,
     private val mediaType: MediaType,
     private val mediaId: Int
 ): PagingSource<Int, Browse>() {
@@ -22,7 +22,7 @@ class MediaRecommendationsPagingSource(
         val currentPage = params.key ?: 1
         val pageSize = params.loadSize
 
-        val result = mediaDetailsDataSource.loadMediaRecommendations(
+        val result = mediaDataSource.loadMediaRecommendations(
             mediaType,
             mediaId,
             page = currentPage,

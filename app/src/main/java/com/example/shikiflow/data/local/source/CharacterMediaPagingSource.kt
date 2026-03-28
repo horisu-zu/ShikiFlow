@@ -12,7 +12,7 @@ import javax.inject.Inject
 class CharacterMediaPagingSource @Inject constructor(
     private val characterId: Int,
     private val mediaType: MediaType,
-    private val sort: Sort<MediaSort.Anilist>,
+    private val sort: Sort<MediaSort>,
     private val charactersDataSource: AnilistCharactersDataSource
 ): PagingSource<Int, MediaRole>() {
 

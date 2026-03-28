@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.common
 
-import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -21,7 +20,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
-import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -60,7 +58,7 @@ fun <T> ConnectedButtonGroup(
                     .weight(1f)
                     .semantics { role = Role.RadioButton }
             ) {
-                item.iconResource.toIcon(
+                item.iconResource?.toIcon(
                     modifier = Modifier.size(iconSize)
                 )
 
@@ -77,9 +75,3 @@ fun <T> ConnectedButtonGroup(
         }
     }
 }
-
-data class TabRowItem<T>(
-    val value: T,
-    val iconResource: IconResource,
-    @param:StringRes val titleRes: Int? = null
-)

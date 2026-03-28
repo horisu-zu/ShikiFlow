@@ -1,31 +1,44 @@
 package com.example.shikiflow.domain.model.anime
 
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-sealed interface BrowseType{
+sealed interface BrowseType {
+    val mediaType: MediaType
+    val sort: MediaSort
 
     enum class AnimeBrowseType: BrowseType {
         ONGOING,
-        ANIME_TOP
+        ANIME_TOP,
+        ANIME_POPULARITY;
+
+        override val mediaType: MediaType
+            get() = MediaType.ANIME
+
+        override val sort: MediaSort
+            get() = when(this) {
+                ONGOING, ANIME_TOP-> MediaSort.Common.SCORE
+                ANIME_POPULARITY -> MediaSort.Common.POPULARITY
+            }
     }
 
     enum class MangaBrowseType: BrowseType {
-        MANGA_TOP
-    }
+        MANGA_TOP,
+        MANGA_POPULARITY;
 
-    companion object {
-        fun BrowseType.getBrowseOptions(): BrowseOptions {
-            return when(this) {
-                is AnimeBrowseType -> BrowseOptions(mediaType = MediaType.ANIME)
-                is MangaBrowseType -> BrowseOptions(mediaType = MediaType.MANGA)
+        override val mediaType: MediaType
+            get() = MediaType.MANGA
+
+        override val sort: MediaSort
+            get() = when(this) {
+                MANGA_TOP-> MediaSort.Common.SCORE
+                MANGA_POPULARITY -> MediaSort.Common.POPULARITY
             }
-        }
     }
 }
 

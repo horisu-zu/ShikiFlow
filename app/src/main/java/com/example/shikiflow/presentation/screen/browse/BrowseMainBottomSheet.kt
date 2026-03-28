@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.sort.MediaSort
-import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
@@ -44,10 +43,10 @@ import kotlinx.coroutines.launch
 fun BrowseMainBottomSheet(
     currentBrowseMode: BrowseUiMode,
     ongoingOrder: List<MediaSort>,
-    currentOngoingMode: SortType,
+    currentOngoingMode: MediaSort,
     onDismiss: () -> Unit,
     onModeSelect: (BrowseUiMode) -> Unit,
-    onOrderSelect: (MediaSort) -> Unit
+    onSortSelect: (MediaSort) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -124,7 +123,7 @@ fun BrowseMainBottomSheet(
                             .clip(RoundedCornerShape(12.dp))
                             .clickable {
                                 if(option != currentOngoingMode) {
-                                    onOrderSelect(option)
+                                    onSortSelect(option)
                                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                                         onDismiss()
                                     }

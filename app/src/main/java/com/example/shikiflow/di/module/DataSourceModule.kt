@@ -4,13 +4,13 @@ import com.apollographql.apollo.ApolloClient
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
-import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistAuthDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistCharactersDataSource
-import com.example.shikiflow.data.datasource.anilist.AnilistMediaDetailsDataSource
+import com.example.shikiflow.data.datasource.anilist.AnilistMediaDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistThreadsDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistTracksDataSource
@@ -18,7 +18,7 @@ import com.example.shikiflow.data.datasource.anilist.AnilistUserDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriAuthDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriCharactersDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriCommentsDataSource
-import com.example.shikiflow.data.datasource.shikimori.ShikimoriMediaDetailsDataSource
+import com.example.shikiflow.data.datasource.shikimori.ShikimoriMediaDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriStaffDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriTracksDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriUserDataSource
@@ -95,14 +95,14 @@ object DataSourceModule {
         @ShikimoriApollo apolloClient: ApolloClient,
         animeApi: AnimeApi,
         mangaApi: MangaApi
-    ): MediaDetailsDataSource = ShikimoriMediaDetailsDataSource(apolloClient, animeApi, mangaApi)
+    ): MediaDataSource = ShikimoriMediaDataSource(apolloClient, animeApi, mangaApi)
 
     @AniList
     @Provides
     @Singleton
     fun provideAnilistMediaDetailsDataSource(
         @AnilistApollo apolloClient: ApolloClient
-    ): MediaDetailsDataSource = AnilistMediaDetailsDataSource(apolloClient)
+    ): MediaDataSource = AnilistMediaDataSource(apolloClient)
 
     @Shikimori
     @Provides

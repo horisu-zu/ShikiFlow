@@ -73,8 +73,8 @@ fun StudioScreen(
         studioViewModel.setStudioId(id)
         studioViewModel.setSortType(
             sortType = when(authType) {
-                AuthType.SHIKIMORI -> MediaSort.Shikimori.RANKED
-                AuthType.ANILIST -> MediaSort.Anilist.POPULARITY
+                AuthType.SHIKIMORI -> MediaSort.Common.SCORE
+                AuthType.ANILIST -> MediaSort.Common.POPULARITY
             }
         )
     }

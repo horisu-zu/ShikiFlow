@@ -20,8 +20,10 @@ import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
+import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
@@ -29,10 +31,10 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
+import com.example.shikiflow.utils.DateUtils.timeDifference
 import kotlin.time.Instant
 
-object ShikimoriDetailsMapper {
-
+object ShikimoriMediaMapper {
     fun AnimeDetailsQuery.Anime.toDomain(): MediaDetails {
         return MediaDetails(
             id = id.toInt(),
@@ -170,6 +172,23 @@ object ShikimoriDetailsMapper {
             episodesAired = this.episodesAired ?: 0,
             episodes = this.episodes ?: 0,
             userRateStatus = null
+        )
+    }
+
+    fun AnimeBrowseQuery.Anime.toAiringAnime(): AiringAnime {
+        return AiringAnime(
+            data = ShortMedia(
+                id = id.toInt(),
+                title = name,
+                mediaType = MediaType.ANIME,
+                coverImageUrl = poster?.posterShort?.originalUrl ?: "",
+                userRateStatus = userRate?.animeUserRate?.status?.toDomain()
+            ),
+            episode = episodesAired + 1,
+            timeUntilAiring = nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) }
+                ?.timeDifference(),
+            airingAt = nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
+            releasedOn = releasedOn?.dateShort?.toDomain()?.date
         )
     }
 }

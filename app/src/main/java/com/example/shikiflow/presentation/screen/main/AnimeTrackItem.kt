@@ -40,7 +40,6 @@ fun AnimeTrackItem(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(start = 12.dp, end = 16.dp)
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
                 onClick = { onClick(userRate.anime.id) },
@@ -119,7 +118,7 @@ fun AnimeTrackItem(
             } else {
                 userRate.anime.airedOn?.let { date ->
                     StatusCard(
-                        text = determineSeason(date)?.let { seasonRes ->
+                        text = determineSeason(date.month)?.let { seasonRes ->
                             buildString {
                                 append(stringResource(id = seasonRes))
                                 append(" ${date.year}")

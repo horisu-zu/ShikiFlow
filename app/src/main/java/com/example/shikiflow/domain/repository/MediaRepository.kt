@@ -1,8 +1,8 @@
 package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.anime.BrowseType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.search.BrowseOptions
@@ -16,7 +16,6 @@ interface MediaRepository {
     fun getMediaDetails(id: Int, mediaType: MediaType): Flow<DataResult<MediaDetails>>
 
     fun paginatedBrowseMedia(
-        browseType: BrowseType? = null,
         browseOptions: BrowseOptions
     ): Flow<PagingData<Browse>>
 
@@ -25,6 +24,12 @@ interface MediaRepository {
         size: Int,
         browseOptions: BrowseOptions
     ): Result<List<Browse>>
+
+    fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>>
 
     fun getSimilarMedia(mediaType: MediaType, mediaId: Int): Flow<PagingData<Browse>>
 

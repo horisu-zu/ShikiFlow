@@ -75,11 +75,10 @@
 
     <string name="browse_ongoings">Ongoings</string>
     <string name="browse_mode_select">Display Mode and Sorting</string>
-    <string name="ongoing_browse_mode_ranked">Ranked</string>
+    <string name="ongoing_browse_mode_score">Score</string>
     <string name="ongoing_browse_mode_popularity">Popularity</string>
     <string name="ongoing_browse_mode_aired_on">Aired On</string>
-    <string name="ongoing_browse_mode_ranked_shiki">Ranked Shiki</string>
-    <string name="ongoing_browse_mode_score">Score</string>
+    <string name="ongoing_browse_mode_score_shiki">Score Shiki</string>
     <string name="ongoing_browse_mode_trending">Trending</string>
 
     <string name="browse_search_label_media">Media</string>
@@ -188,10 +187,23 @@
     <string name="tracks_page_search">Search Tracks…</string>
     <string name="browse_page_search">Search…</string>
 
-    <string name="browse_type_anime_ongoing">Ongoing</string>
+    <string name="browse_type_anime_ongoing">Ongoings</string>
     <string name="browse_type_search">Search</string>
     <string name="browse_type_anime_top">Top Anime</string>
     <string name="browse_type_manga_top">Top Manga</string>
+    <string name="browse_type_popular_anime">Popular Anime</string>
+    <string name="browse_type_popular_manga">Popular Manga</string>
+    <string name="day_of_week_monday">Monday</string>
+    <string name="day_of_week_tuesday">Tuesday</string>
+    <string name="day_of_week_wednesday">Wednesday</string>
+    <string name="day_of_week_thursday">Thursday</string>
+    <string name="day_of_week_friday">Friday</string>
+    <string name="day_of_week_saturday">Saturday</string>
+    <string name="day_of_week_sunday">Sunday</string>
+
+    <string name="airing_released">Released final episode</string>
+    <string name="airing_at">"Episode %1$d airing at "</string>
+
     <string name="bottom_navigator_main">Main</string>
     <string name="bottom_navigator_browse">Browse</string>
     <string name="bottom_navigator_more">More</string>

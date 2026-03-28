@@ -3,6 +3,9 @@ package com.example.shikiflow.data.mapper.common
 import com.example.graphql.anilist.type.MediaSeason as AnilistMediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaSeasonEnum
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Clock
 
 object SeasonMapper {
     fun String.toDomainSeason(): MediaSeason {
@@ -36,6 +39,21 @@ object SeasonMapper {
     }
 
     fun MediaSeason.toShikiSeason(): String {
+        return "${season.name.lowercase()}_$year"
+    }
+
+    fun currentShikiSeason(): String {
+        val now = Clock.System.now()
+        val date = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
+
+        val year = date.year
+        val season = when(date.month.ordinal + 1) {
+            in 1..3 -> MediaSeasonEnum.WINTER
+            in 4..6 -> MediaSeasonEnum.SPRING
+            in 7..9 -> MediaSeasonEnum.SUMMER
+            else -> MediaSeasonEnum.FALL
+        }
+
         return "${season.name.lowercase()}_$year"
     }
 }

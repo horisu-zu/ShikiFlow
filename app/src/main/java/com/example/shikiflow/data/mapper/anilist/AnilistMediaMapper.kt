@@ -1,6 +1,7 @@
 package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.MediaDetailsQuery
+import com.example.graphql.anilist.fragment.ALAiringAnimeShort
 import com.example.graphql.anilist.fragment.MediaBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
@@ -13,6 +14,7 @@ import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
+import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.Browse
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
@@ -22,9 +24,11 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
-object AnilistDetailsMapper {
+object AnilistMediaMapper {
     fun MediaDetailsQuery.Media.toDomain(): MediaDetails {
         return MediaDetails(
             id = this.id,
@@ -109,6 +113,17 @@ object AnilistDetailsMapper {
                     userRateStatus = mediaListEntry?.status?.toDomain()
                 )
             }
+        }
+    }
+
+    fun ALAiringAnimeShort.toDomain(): AiringAnime? {
+        return media?.aLMediaBrowseShort?.let { browseShort ->
+            AiringAnime(
+                data = browseShort.toDomain(),
+                episode = episode,
+                timeUntilAiring = timeUntilAiring.toLong().seconds,
+                airingAt = Instant.fromEpochSeconds(airingAt.toLong())
+            )
         }
     }
 }

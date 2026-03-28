@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -158,7 +159,9 @@ fun FavoritesSection(
                                         id = item.id,
                                         name = item.name,
                                         onStudioClick = onStudioClick,
-                                        modifier = Modifier.fillMaxWidth()
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .aspectRatio(1.5f)
                                     )
                                 } else {
                                     FavoriteItem(
@@ -166,9 +169,7 @@ fun FavoritesSection(
                                         onItemClick = { id ->
                                             onFavoriteClick(favoriteCategories[page], id)
                                         },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .animateItem()
+                                        modifier = Modifier.fillMaxWidth()
                                     )
                                 }
                             }

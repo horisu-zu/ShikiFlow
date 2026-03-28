@@ -98,15 +98,15 @@ fun BrowseMainPage(
         BrowseMainBottomSheet(
             currentBrowseMode = browseUiSettings.browseUiMode,
             ongoingOrder = when(authType) {
-                AuthType.ANILIST -> MediaSort.Anilist.getOngoingOrderOptions()
-                AuthType.SHIKIMORI -> MediaSort.Shikimori.getOngoingOrderOptions()
+                AuthType.ANILIST -> MediaSort.Anilist.ongoingOptions
+                AuthType.SHIKIMORI -> MediaSort.Shikimori.ongoingOptions
             },
             currentOngoingMode = browseUiSettings.browseOngoingOrder,
             onDismiss = { showBottomSheet.value = false },
             onModeSelect = { newMode ->
                 browseViewModel.setBrowseUiMode(newMode)
             },
-            onOrderSelect = { newOrder ->
+            onSortSelect = { newOrder ->
                 browseViewModel.setBrowseOngoingOrder(newOrder)
             }
         )

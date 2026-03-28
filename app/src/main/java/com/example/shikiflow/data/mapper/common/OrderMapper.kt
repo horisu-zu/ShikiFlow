@@ -17,13 +17,13 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.StaffType
 
 object OrderMapper {
-    fun Sort<MediaSort.Anilist>.toAnilistMediaSort(): ALMediaSort {
+    fun Sort<MediaSort>.toAnilistMediaSort(): ALMediaSort {
         return when(type) {
-            MediaSort.Anilist.POPULARITY -> when(direction) {
+            MediaSort.Common.POPULARITY -> when(direction) {
                 SortDirection.ASCENDING -> ALMediaSort.POPULARITY
                 SortDirection.DESCENDING -> ALMediaSort.POPULARITY_DESC
             }
-            MediaSort.Anilist.SCORE -> when(direction) {
+            MediaSort.Common.SCORE -> when(direction) {
                 SortDirection.ASCENDING -> ALMediaSort.SCORE
                 SortDirection.DESCENDING -> ALMediaSort.SCORE_DESC
             }
@@ -43,6 +43,7 @@ object OrderMapper {
                 SortDirection.ASCENDING -> ALMediaSort.END_DATE
                 SortDirection.DESCENDING -> ALMediaSort.END_DATE_DESC
             }
+            else -> ALMediaSort.SEARCH_MATCH
         }
     }
 
@@ -139,9 +140,9 @@ object OrderMapper {
 
     fun SortType.toShikimoriBrowseOrder(): OrderEnum {
         return when(this) {
-            MediaSort.Shikimori.POPULARITY -> OrderEnum.popularity
+            MediaSort.Common.POPULARITY -> OrderEnum.popularity
             MediaSort.Shikimori.RANKED -> OrderEnum.ranked_shiki
-            MediaSort.Shikimori.RANKED_MAL -> OrderEnum.ranked
+            MediaSort.Common.SCORE -> OrderEnum.ranked
             MediaSort.Shikimori.EPISODES -> OrderEnum.episodes
             MediaSort.Shikimori.STATUS -> OrderEnum.status
             else -> OrderEnum.UNKNOWN__
@@ -150,8 +151,8 @@ object OrderMapper {
 
     fun SortType.toAnilistBrowseOrder(): ALMediaSort {
         return when(this) {
-            MediaSort.Anilist.POPULARITY -> ALMediaSort.POPULARITY_DESC
-            MediaSort.Anilist.SCORE -> ALMediaSort.SCORE_DESC
+            MediaSort.Common.POPULARITY -> ALMediaSort.POPULARITY_DESC
+            MediaSort.Common.SCORE -> ALMediaSort.SCORE_DESC
             MediaSort.Anilist.TRENDING -> ALMediaSort.TRENDING_DESC
             MediaSort.Anilist.FAVORITES -> ALMediaSort.FAVOURITES_DESC
             MediaSort.Anilist.DATE_ADDED -> ALMediaSort.START_DATE_DESC

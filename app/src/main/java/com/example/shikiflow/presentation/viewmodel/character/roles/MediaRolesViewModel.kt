@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -14,7 +13,6 @@ import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.screen.main.details.RoleType.Companion.toMediaType
 import com.example.shikiflow.domain.repository.CharacterRepository
-import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.presentation.screen.main.details.RoleSort
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,7 +25,6 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -37,8 +34,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaRolesViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
-    private val staffRepository: StaffRepository,
-    settingsRepository: SettingsRepository
+    private val staffRepository: StaffRepository
 ): ViewModel() {
 
     private val _rolesParams = MutableStateFlow(MediaRolesParams())
@@ -66,7 +62,7 @@ class MediaRolesViewModel @Inject constructor(
     init {
         _rolesParams
             .filter { params ->
-                params.roleTypes != null && params.authType != null
+                params.roleTypes != null
             }
             .distinctUntilChangedBy { params ->
                 params.roleTypes
@@ -79,29 +75,13 @@ class MediaRolesViewModel @Inject constructor(
                                 Sort(type = CharacterType.FAVORITES, direction = SortDirection.DESCENDING)
                             )
                             else -> RoleSort.Media(
-                                sort = when(params.authType!!) {
-                                    AuthType.ANILIST -> Sort(
-                                        type = MediaSort.Anilist.POPULARITY,
-                                        direction = SortDirection.DESCENDING
-                                    )
-                                    AuthType.SHIKIMORI -> Sort(
-                                        type = MediaSort.Shikimori.POPULARITY,
-                                        direction = SortDirection.DESCENDING
-                                    )
-                                }
+                                sort = Sort(
+                                    type = MediaSort.Common.POPULARITY,
+                                    direction = SortDirection.DESCENDING
+                                )
                             )
                         }
                     }
-                }
-            }.launchIn(viewModelScope)
-
-        settingsRepository.authTypeFlow
-            .distinctUntilChanged()
-            .map { authType ->
-                _rolesParams.update { params ->
-                    params.copy(
-                        authType = authType
-                    )
                 }
             }.launchIn(viewModelScope)
     }

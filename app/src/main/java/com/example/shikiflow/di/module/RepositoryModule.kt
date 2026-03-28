@@ -4,7 +4,7 @@ import android.content.Context
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
-import com.example.shikiflow.data.datasource.MediaDetailsDataSource
+import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.datasource.UserDataSource
@@ -76,8 +76,8 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideMediaDetailsRepository(
-        @Shikimori shikimoriDataSource: MediaDetailsDataSource,
-        @AniList anilistDataSource: MediaDetailsDataSource,
+        @Shikimori shikimoriDataSource: MediaDataSource,
+        @AniList anilistDataSource: MediaDataSource,
         settingsRepository: SettingsRepository,
     ): MediaRepository = MediaRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
 

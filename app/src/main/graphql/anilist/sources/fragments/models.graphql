@@ -93,6 +93,16 @@ fragment ALMediaBrowseShort on Media {
     }
 }
 
+fragment ALAiringAnimeShort on AiringSchedule {
+    media {
+        ...ALMediaBrowseShort
+        isAdult
+    }
+    episode
+    timeUntilAiring
+    airingAt
+}
+
 fragment MediaCoverShort on MediaCoverImage {
     extraLarge
     large
