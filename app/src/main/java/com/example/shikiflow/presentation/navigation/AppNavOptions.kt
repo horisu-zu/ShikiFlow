@@ -1,8 +1,6 @@
 package com.example.shikiflow.presentation.navigation
 
-import com.example.shikiflow.presentation.screen.MainNavOptions
-
-interface AppNavOptions : MainNavOptions {
+interface AppNavOptions {
     fun navigateToAuth()
     fun navigateToMain()
 }

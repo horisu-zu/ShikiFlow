@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +36,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.StarScore
+import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.AgeRatingMapper.displayValue
@@ -54,6 +56,7 @@ fun AnimeDetailsTitle(
     modifier: Modifier = Modifier
 ) {
     val orientation = LocalConfiguration.current.orientation
+    val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Box(modifier = modifier.fillMaxWidth()) {
         GradientImage(
@@ -61,80 +64,93 @@ fun AnimeDetailsTitle(
             gradientFraction = 0.9f,
             imageType = ImageType.Poster(
                 defaultClip = RoundedCornerShape(0.dp),
-                defaultAspectRatio = if(orientation == Configuration.ORIENTATION_PORTRAIT)
-                    2f / 2.85f else 2.25f
+                defaultAspectRatio = if(!isLandscape) 2f / 2.85f
+                    else 2.25f
             ),
+            //contentScale = if(isLandscape) ContentScale.FillWidth else ContentScale.Crop,
             modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
         )
 
-        Column(
-            modifier = Modifier.align(Alignment.BottomCenter)
+        Row(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.Bottom
         ) {
-            if (animeDetails.status != MediaStatus.ANNOUNCED && animeDetails.score != null
-                && animeDetails.score != 0.0f
-            ) {
-                ScoreItem(
-                    score = animeDetails.score,
-                    modifier = Modifier.padding(vertical = 4.dp)
+            if(isLandscape) {
+                BaseImage(
+                    model = animeDetails.coverImageUrl,
+                    imageType = ImageType.Poster(
+                        defaultWidth = 120.dp
+                    )
                 )
             }
-
-            Text(
-                text = animeDetails.title,
-                style = MaterialTheme.typography.headlineSmall
-            )
-
-            Row(
-                modifier = Modifier.padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                ShortInfoItem(
-                    infoType = stringResource(id = R.string.details_short_info_type),
-                    infoItem = buildString {
-                        append(stringResource(id = animeDetails.format.displayValue()))
-                        append(" ∙ ")
-                        append(stringResource(id = animeDetails.status.displayValue()))
-                    }
-                )
-                ShortInfoItem(
-                    infoType = stringResource(id = R.string.details_short_info_episodes),
-                    infoItem = if (animeDetails.status != MediaStatus.ONGOING) {
-                        stringResource(
-                            id = R.string.episodes,
-                            animeDetails.totalCount.takeIf { it != 0 } ?: "?"
-                        )
-                    } else {
-                        stringResource(
-                            id = R.string.ongoing_episodes,
-                            animeDetails.currentProgress ?: 0,
-                            animeDetails.totalCount.takeIf { it != 0 } ?: "?"
-                        )
-                    }
-                )
-                animeDetails.ageRating?.let { ratingEnum ->
-                    ShortInfoItem(
-                        infoType = stringResource(id = R.string.details_short_info_age_rating),
-                        infoItem = stringResource(ratingEnum.displayValue())
+            Column {
+                if (animeDetails.status != MediaStatus.ANNOUNCED && animeDetails.score != null
+                    && animeDetails.score != 0.0f
+                ) {
+                    ScoreItem(
+                        score = animeDetails.score,
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
-            }
 
-            UserStatusItem(
-                authType = authType,
-                onStatusClick = onStatusClick,
-                onPlayClick = { onPlayClick(
-                    animeDetails.title,
-                    animeDetails.id,
-                    animeDetails.userRate?.progress ?: 0
-                ) },
-                status = animeDetails.userRate?.rateStatus,
-                allEpisodes = (
-                    if(animeDetails.status == MediaStatus.RELEASED) animeDetails.totalCount
-                        else animeDetails.currentProgress
-                ) ?: 0,
-                watchedEpisodes = animeDetails.userRate?.progress,
-                score = animeDetails.userRate?.score
-            )
+                Text(
+                    text = animeDetails.title,
+                    style = MaterialTheme.typography.headlineSmall
+                )
+
+                Row(
+                    modifier = Modifier.padding(vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    ShortInfoItem(
+                        infoType = stringResource(id = R.string.details_short_info_type),
+                        infoItem = buildString {
+                            append(stringResource(id = animeDetails.format.displayValue()))
+                            append(" ∙ ")
+                            append(stringResource(id = animeDetails.status.displayValue()))
+                        }
+                    )
+                    ShortInfoItem(
+                        infoType = stringResource(id = R.string.details_short_info_episodes),
+                        infoItem = if (animeDetails.status != MediaStatus.ONGOING) {
+                            stringResource(
+                                id = R.string.episodes,
+                                animeDetails.totalCount.takeIf { it != 0 } ?: "?"
+                            )
+                        } else {
+                            stringResource(
+                                id = R.string.ongoing_episodes,
+                                animeDetails.currentProgress ?: 0,
+                                animeDetails.totalCount.takeIf { it != 0 } ?: "?"
+                            )
+                        }
+                    )
+                    animeDetails.ageRating?.let { ratingEnum ->
+                        ShortInfoItem(
+                            infoType = stringResource(id = R.string.details_short_info_age_rating),
+                            infoItem = stringResource(ratingEnum.displayValue())
+                        )
+                    }
+                }
+
+                UserStatusItem(
+                    authType = authType,
+                    onStatusClick = onStatusClick,
+                    onPlayClick = { onPlayClick(
+                        animeDetails.title,
+                        animeDetails.id,
+                        animeDetails.userRate?.progress ?: 0
+                    ) },
+                    status = animeDetails.userRate?.rateStatus,
+                    allEpisodes = (
+                        if(animeDetails.status == MediaStatus.RELEASED) animeDetails.totalCount
+                            else animeDetails.currentProgress
+                    ) ?: 0,
+                    watchedEpisodes = animeDetails.userRate?.progress,
+                    score = animeDetails.userRate?.score
+                )
+            }
         }
     }
 }

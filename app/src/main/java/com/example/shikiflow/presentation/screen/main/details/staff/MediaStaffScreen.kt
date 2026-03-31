@@ -1,14 +1,13 @@
 package com.example.shikiflow.presentation.screen.main.details.staff
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -28,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,16 +43,17 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.StaffItem
 import com.example.shikiflow.presentation.viewmodel.staff.media_staff.MediaStaffViewModel
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun MediaStaffScreen(
     mediaId: Int,
     mediaType: MediaType,
-    authType: AuthType,
     navOptions: MediaNavOptions,
     mediaStaffViewModel: MediaStaffViewModel = hiltViewModel()
 ) {
     val mediaStaffItems = mediaStaffViewModel.mediaStaffItems.collectAsLazyPagingItems()
     val mediaStaffParams by mediaStaffViewModel.mediaStaffParams.collectAsStateWithLifecycle()
+    val authType by mediaStaffViewModel.authType.collectAsStateWithLifecycle()
 
     var showBottomSheet by remember { mutableStateOf(false) }
 
@@ -64,20 +63,22 @@ fun MediaStaffScreen(
 
     Scaffold(
         floatingActionButton = {
-            if(authType == AuthType.ANILIST) {
-                FloatingActionButton(
-                    onClick = { showBottomSheet = true },
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_sort),
-                        contentDescription = "Show Sort Bottom Sheet"
-                    )
+            authType?.let {
+                if(authType == AuthType.ANILIST) {
+                    FloatingActionButton(
+                        onClick = { showBottomSheet = true },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_sort),
+                            contentDescription = "Show Sort Bottom Sheet"
+                        )
+                    }
                 }
             }
         }
-    ) { paddingValues ->
+    ) {
         when(mediaStaffItems.loadState.refresh) {
             is LoadState.Loading -> {
                 Box(
@@ -100,14 +101,10 @@ fun MediaStaffScreen(
             else -> {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(240.dp),
-                    modifier = Modifier.fillMaxSize()
-                        .padding(
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                    modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
-                        bottom = 8.dp,
+                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
                         start = 12.dp,
                         end = 12.dp
                     ),

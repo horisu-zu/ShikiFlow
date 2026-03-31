@@ -41,10 +41,6 @@ fun AppNavigator(
         override fun navigateToMain() {
             appBackstack.replaceAll { AppNavRoute.Main }
         }
-
-        override fun navigateBack() {
-            if(appBackstack.size > 1) appBackstack.removeLastOrNull()
-        }
     }
 
     LaunchedEffect(authState) {
@@ -73,7 +69,7 @@ fun AppNavigator(
             }
             entry<AppNavRoute.Main> {
                 MainNavigator(
-                    onFinishActivity = onFinishActivity
+                    onMoveToBack = onFinishActivity
                 )
             }
         },

@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,7 +30,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -96,11 +93,7 @@ fun MoreScreen(
                     MoreSearchContent(
                         query = searchQuery,
                         moreNavOptions = moreNavOptions,
-                        modifier = Modifier.padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                        )
+                        modifier = Modifier.padding(top = innerPadding.calculateTopPadding())
                     )
                 }
                 false -> {
@@ -109,8 +102,8 @@ fun MoreScreen(
                         moreNavOptions = moreNavOptions,
                         modifier = Modifier.padding(
                             top = innerPadding.calculateTopPadding() + 12.dp,
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + horizontalPadding,
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + horizontalPadding
+                            start = horizontalPadding,
+                            end = horizontalPadding
                         )
                     )
                 }

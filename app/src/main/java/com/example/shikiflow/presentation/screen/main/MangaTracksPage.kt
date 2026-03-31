@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
@@ -47,17 +49,21 @@ import com.example.shikiflow.presentation.viewmodel.manga.tracks.MangaTracksView
 @Composable
 fun MangaTracksPage(
     userStatus: UserRateStatus,
-    userId: Int,
     isAppBarVisible: Boolean,
     onMangaClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     mangaTracksViewModel: MangaTracksViewModel = hiltViewModel()
 ) {
-    val mangaTrackItems = mangaTracksViewModel.getMangaTracks(userStatus, userId).collectAsLazyPagingItems()
-    val rateUpdateState by mangaTracksViewModel.rateUpdateState
+    val params by mangaTracksViewModel.params.collectAsStateWithLifecycle()
+    val mangaTrackItems = mangaTracksViewModel.mangaTracks[userStatus]?.collectAsLazyPagingItems()
+        ?: return
 
     var isRefreshing by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<MangaTrack?>(null) }
+
+    LaunchedEffect(userStatus) {
+        mangaTracksViewModel.setStatus(userStatus)
+    }
 
     PullToRefreshCustomBox(
         isRefreshing = isRefreshing,
@@ -136,9 +142,9 @@ fun MangaTracksPage(
                 selectedItem?.let {
                     UserRateBottomSheet(
                         userRate = it.toUserRateData(),
-                        rateUpdateState = rateUpdateState,
+                        rateUpdateState = params.rateUpdateState,
                         onDismiss = {
-                            if (rateUpdateState != RateUpdateState.LOADING) {
+                            if (params.rateUpdateState != RateUpdateState.LOADING) {
                                 selectedItem = null
                             }
                         },

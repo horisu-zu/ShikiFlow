@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel
 
 import android.net.Uri
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -14,7 +15,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -62,10 +62,17 @@ class MainViewModel @Inject constructor(
                 settingsRepository.saveAuthType(type)
 
                 userRepository.fetchCurrentUser()
-                    .first { it is DataResult.Success }
-                    .let { result ->
-                        if (result is DataResult.Success) {
-                            settingsRepository.saveUserData(result.data)
+                    .collect { result ->
+                        when(result) {
+                            is DataResult.Loading -> {
+                                Log.d("MainViewModel", "Loading User Data...")
+                            }
+                            is DataResult.Error -> {
+                                Log.d("MainViewModel", "Error: ${result.message}")
+                            }
+                            is DataResult.Success -> {
+                                settingsRepository.saveUserData(result.data)
+                            }
                         }
                     }
             }

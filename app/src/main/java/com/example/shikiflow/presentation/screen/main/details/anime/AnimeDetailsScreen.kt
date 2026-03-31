@@ -26,7 +26,6 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.FullScreenImageDialog
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
@@ -36,12 +35,10 @@ import com.example.shikiflow.presentation.viewmodel.anime.details.AnimeDetailsVi
 @Composable
 fun AnimeDetailsScreen(
     id: Int,
-    userId: Int?,
-    authType: AuthType,
     navOptions: MediaNavOptions,
     animeDetailsViewModel: AnimeDetailsViewModel = hiltViewModel()
 ) {
-    val animeDetails by animeDetailsViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by animeDetailsViewModel.uiState.collectAsStateWithLifecycle()
     var selectedScreenshotIndex by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(id) {
@@ -49,12 +46,12 @@ fun AnimeDetailsScreen(
     }
 
     Scaffold { paddingValues ->
-        if(animeDetails.isLoading && animeDetails.details == null) {
+        if(uiState.isLoading && uiState.details == null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) { CircularProgressIndicator() }
-        } else if(animeDetails.errorMessage != null) {
+        } else if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -74,7 +71,7 @@ fun AnimeDetailsScreen(
                     visible = selectedScreenshotIndex != null,
                     modifier = Modifier.fillMaxSize().zIndex(1f)
                 ) {
-                    animeDetails.details?.let { details ->
+                    uiState.details?.let { details ->
                         FullScreenImageDialog(
                             imageUrls = details.screenshots,
                             initialIndex = selectedScreenshotIndex ?: 0,
@@ -85,34 +82,36 @@ fun AnimeDetailsScreen(
                         )
                     }
                 }
-                PullToRefreshBox(
-                    isRefreshing = animeDetails.isRefreshing,
-                    onRefresh = { animeDetailsViewModel.onRefresh() }
-                ) {
-                    animeDetails.details?.let { details ->
-                        AnimeDetailsContent(
-                            userId = userId ?: 0,
-                            currentAuthType = authType,
-                            animeDetails = details,
-                            rateUpdateState = animeDetails.rateUpdateState,
-                            sharedTransitionScope = this@SharedTransitionLayout,
-                            selectedScreenshotIndex = selectedScreenshotIndex,
-                            onScreenshotClick = { index ->
-                                selectedScreenshotIndex = index
-                            },
-                            onSaveUserRate = { id, save, shortData ->
-                                animeDetailsViewModel.saveUserRate(
-                                    userId = id,
-                                    saveUserRate = save,
-                                    animeShortData = shortData
+                uiState.details?.let { details ->
+                    PullToRefreshBox(
+                        isRefreshing = uiState.isRefreshing,
+                        onRefresh = { animeDetailsViewModel.onRefresh() }
+                    ) {
+                        uiState.authType?.let { authType ->
+                            AnimeDetailsContent(
+                                userId = uiState.userId ?: 0,
+                                currentAuthType = authType,
+                                animeDetails = details,
+                                rateUpdateState = uiState.rateUpdateState,
+                                sharedTransitionScope = this@SharedTransitionLayout,
+                                selectedScreenshotIndex = selectedScreenshotIndex,
+                                onScreenshotClick = { index ->
+                                    selectedScreenshotIndex = index
+                                },
+                                onSaveUserRate = { id, save, shortData ->
+                                    animeDetailsViewModel.saveUserRate(
+                                        userId = id,
+                                        saveUserRate = save,
+                                        animeShortData = shortData
+                                    )
+                                },
+                                mediaNavOptions = navOptions,
+                                modifier = Modifier.padding(
+                                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                    end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                                 )
-                            },
-                            mediaNavOptions = navOptions,
-                            modifier = Modifier.padding(
-                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                             )
-                        )
+                        }
                     }
                 }
             }

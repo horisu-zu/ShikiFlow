@@ -6,9 +6,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,7 +57,7 @@ fun CommentsScreen(
             start = 12.dp,
             end = 12.dp,
             top = paddingValues.calculateTopPadding(),
-            bottom = 12.dp
+            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         )
 
         when(screenMode) {
@@ -67,10 +67,6 @@ fun CommentsScreen(
                     threadHeader = threadHeader,
                     commentViewModel = commentViewModel,
                     context = context,
-                    modifier = Modifier.padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                    ),
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->
                         navOptions.navigateByEntity(entityType, id)
@@ -85,10 +81,6 @@ fun CommentsScreen(
                     commentId = id,
                     commentViewModel = commentViewModel,
                     context = context,
-                    modifier = Modifier.padding(
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
-                    ),
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->
                         navOptions.navigateByEntity(entityType, id)

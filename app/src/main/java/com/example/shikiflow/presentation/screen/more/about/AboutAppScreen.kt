@@ -2,8 +2,6 @@ package com.example.shikiflow.presentation.screen.more.about
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -16,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -42,10 +39,11 @@ fun AboutAppScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(
                     top = innerPadding.calculateTopPadding() + 12.dp,
-                    start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
-                    end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
+                    start = 24.dp,
+                    end = 24.dp,
                     bottom = 16.dp
-                ), verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+                ),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
         ) {
             CurrentVersionItem(
                 currentVersion = uiState.currentRelease.tagName

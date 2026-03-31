@@ -44,11 +44,11 @@ fun AnimeWatchNavigator(
             watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link, translationGroup, episodesCount))
         }
 
-        override fun navigateToEpisodeScreen(episodeMetadata: EpisodeMetadata) {
+        override fun navigateToEpisodeScreen(playerNavigate: EpisodeMetadata) {
             watchBackstack.removeAll { navKey ->
                 navKey is AnimeWatchNavRoute.EpisodeScreen
             }
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(episodeMetadata))
+            watchBackstack.add(AnimeWatchNavRoute.EpisodeScreen(playerNavigate))
         }
 
         override fun navigateBack() {

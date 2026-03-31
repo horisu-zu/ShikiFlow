@@ -74,7 +74,7 @@ import com.example.shikiflow.utils.parser.ShikimoriDialect
 @Composable
 fun ExpandableText(
     htmlText: String,
-    authType: AuthType,
+    authType: AuthType?,
     modifier: Modifier = Modifier,
     onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
@@ -84,15 +84,17 @@ fun ExpandableText(
     brushColor: Color = MaterialTheme.colorScheme.background.copy(0.8f)
 ) {
     val parser = remember(authType) {
-        HTMLParser(
-            strategy = when(authType) {
-                AuthType.SHIKIMORI -> ShikimoriDialect()
-                AuthType.ANILIST -> AnilistDialect()
-            }
-        )
+        authType?.let {
+            HTMLParser(
+                strategy = when(authType) {
+                    AuthType.SHIKIMORI -> ShikimoriDialect()
+                    AuthType.ANILIST -> AnilistDialect()
+                }
+            )
+        }
     }
     val elements = remember(htmlText) {
-        parser.parseHtmlString(htmlText, linkColor)
+        parser?.parseHtmlString(htmlText, linkColor)
     }
 
     elements?.let { descriptionElements ->

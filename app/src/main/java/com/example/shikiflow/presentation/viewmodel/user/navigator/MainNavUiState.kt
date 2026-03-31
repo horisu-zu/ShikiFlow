@@ -6,7 +6,7 @@ import com.example.shikiflow.presentation.UiState
 
 data class MainNavUiState(
     val user: User? = null,
-    val authType: AuthType = AuthType.SHIKIMORI,
+    val authType: AuthType? = null,
 
     override val isLoading: Boolean = true,
     override val errorMessage: String? = null

@@ -3,8 +3,6 @@ package com.example.shikiflow.presentation.screen.more.settings
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -22,13 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
@@ -46,7 +42,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    userData: User?,
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
     val resources = LocalResources.current
@@ -58,10 +53,6 @@ fun SettingsScreen(
     val scope = rememberCoroutineScope()
     val bottomSheetConfig = remember { mutableStateOf<BottomSheetConfig?>(null) }
 
-    LaunchedEffect(userData) {
-        settingsViewModel.loadCacheSize()
-    }
-
     if(openCacheDialog.value) {
         CustomDialog(
             onDismissRequest = { openCacheDialog.value = false },
@@ -69,6 +60,10 @@ fun SettingsScreen(
             confirmButtonText = stringResource(R.string.settings_cache_button_label),
             onConfirm = { settingsViewModel.clearCache() }
         )
+    }
+
+    LaunchedEffect(Unit) {
+        settingsViewModel.loadCacheSize()
     }
 
     Scaffold { innerPadding ->
@@ -79,8 +74,8 @@ fun SettingsScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(
                         top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr) + 24.dp,
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr) + 24.dp,
+                        start = 24.dp,
+                        end = 24.dp,
                         bottom = 12.dp
                     ),
                 verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
@@ -88,7 +83,7 @@ fun SettingsScreen(
                 SettingsSection(
                     title = stringResource(R.string.settings_account_section_title),
                     items = listOfNotNull(
-                        userData?.let {
+                        settingsState.user?.let { userData ->
                             SectionItem.Image(
                                 title = userData.nickname,
                                 displayValue = stringResource(R.string.settings_sign_out),

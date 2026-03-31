@@ -2,6 +2,9 @@ package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
@@ -59,7 +62,7 @@ fun ChapterScrollModeComponent(
         modifier = modifier.zoomable(rememberZoomState()),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         contentPadding = PaddingValues(
-            bottom = 12.dp
+            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
         )
     ) {
         items(chapterPageUrls.size) { index ->

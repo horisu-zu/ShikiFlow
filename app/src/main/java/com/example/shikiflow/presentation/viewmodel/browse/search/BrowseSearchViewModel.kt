@@ -7,23 +7,28 @@ import com.example.shikiflow.domain.model.search.BrowseOptions
 import com.example.shikiflow.domain.model.search.ScreenSearchState
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class BrowseSearchViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    settingsRepository: SettingsRepository
 ): ViewModel(), BrowseSearchEvent {
 
     private val _searchState = MutableStateFlow(ScreenSearchState())
@@ -44,6 +49,13 @@ class BrowseSearchViewModel @Inject constructor(
         .flatMapLatest { params ->
             mediaRepository.paginatedBrowseMedia(browseOptions = params)
         }.cachedIn(viewModelScope)
+
+    val authType = settingsRepository.authTypeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
     override fun updateSearchOptions(browseOptions: BrowseOptions) {
         _options.update { browseOptions }

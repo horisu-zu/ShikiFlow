@@ -1,11 +1,12 @@
 package com.example.shikiflow.presentation.viewmodel.user.profile
 
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.presentation.UiState
 
 data class ProfileUiState(
     val userId: Int? = null,
-    val currentUserId: Int? = null,
+    val currentUser: User? = null,
     val userStatsCategories: UserStatsCategories = UserStatsCategories(),
 
     override val errorMessage: String? = null,

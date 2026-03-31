@@ -5,9 +5,9 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.MainNavOptions
+import com.example.shikiflow.presentation.screen.NavOptions
 
-interface MediaNavOptions: MainNavOptions {
+interface MediaNavOptions: NavOptions {
     fun navigateToCharacterDetails(characterId: Int)
 
     fun navigateToMediaCharacters(mediaId: Int, mediaTitle: String, mediaType: MediaType)

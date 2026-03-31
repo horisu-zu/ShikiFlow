@@ -7,7 +7,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -83,8 +86,10 @@ fun MediaRolesContent(
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding()),
                 contentPadding = PaddingValues(
-                    horizontal = 12.dp,
-                    vertical = 8.dp
+                    start = 12.dp,
+                    end = 12.dp,
+                    top = 8.dp,
+                    bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
                 ),
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)

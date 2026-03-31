@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -13,18 +14,32 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AnimeTracksSearchViewModel @Inject constructor(
-    private val mediaTracksRepository: MediaTracksRepository
+    private val mediaTracksRepository: MediaTracksRepository,
+    private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _query = MutableStateFlow("")
     private val _params = MutableStateFlow(TracksParams())
+
+    init {
+        settingsRepository.userFlow
+            .filterNotNull()
+            .onEach { user ->
+                _params.update { params ->
+                    params.copy(userId = user.id)
+                }
+            }.launchIn(viewModelScope)
+    }
 
     val animeTracksItems = combine(
         _params.filter { it.userId != null },
@@ -42,12 +57,6 @@ class AnimeTracksSearchViewModel @Inject constructor(
                 userRateStatus = params.userRateStatus
             )
         }.cachedIn(viewModelScope)
-
-    fun setUserId(userId: Int) {
-        _params.update { params ->
-            params.copy(userId = userId)
-        }
-    }
 
     fun setRateStatus(userRateStatus: UserRateStatus?) {
         _params.update { params ->

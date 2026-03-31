@@ -12,13 +12,12 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.MainScreenNavOptions
+import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.studio.StudioScreen
@@ -36,10 +35,8 @@ import com.example.shikiflow.presentation.screen.main.details.staff.StaffScreen
 
 @Composable
 fun DetailsNavigator(
-    currentUserData: User?,
-    authType: AuthType,
     detailsNavRoute: DetailsNavRoute,
-    navOptions: MainScreenNavOptions
+    mainNavOptions: MainNavOptions
 ) {
     val detailsBackstack = rememberNavBackStack(detailsNavRoute)
 
@@ -117,7 +114,7 @@ fun DetailsNavigator(
         }
 
         override fun navigateToUserProfile(user: User) {
-            navOptions.navigateToProfile(user)
+            mainNavOptions.navigateToProfile(user)
         }
 
         override fun navigateByEntity(entityType: EntityType, id: Int) {
@@ -143,7 +140,7 @@ fun DetailsNavigator(
         override fun navigateBack() {
             if(detailsBackstack.size > 1) {
                 detailsBackstack.removeLastOrNull()
-            } else navOptions.navigateBack()
+            } else mainNavOptions.navigateBack()
         }
     }
 
@@ -153,23 +150,18 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
                     id = route.id,
-                    authType = authType,
-                    userId = currentUserData?.id,
                     navOptions = options
                 )
             }
             entry<DetailsNavRoute.MangaDetails> { route ->
                 MangaDetailsScreen(
                     id = route.id,
-                    authType = authType,
-                    userId = currentUserData?.id,
                     navOptions = options
                 )
             }
             entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
-                    authType = authType,
                     navOptions = options
                 )
             }
@@ -220,7 +212,6 @@ fun DetailsNavigator(
                 MediaStaffScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    authType = authType,
                     navOptions = options
                 )
             }
@@ -236,7 +227,6 @@ fun DetailsNavigator(
                 StudioScreen(
                     id = route.id,
                     studioName = route.studioName,
-                    authType = authType,
                     onNavigateBack = { options.navigateBack() },
                     onMediaNavigate = { animeId ->
                         options.navigateToAnimeDetails(animeId)
@@ -256,7 +246,6 @@ fun DetailsNavigator(
                     id = route.id,
                     mediaRolesType = route.mediaRolesType,
                     roleTypes = route.roleTypes,
-                    authType = authType,
                     navOptions = options
                 )
             }

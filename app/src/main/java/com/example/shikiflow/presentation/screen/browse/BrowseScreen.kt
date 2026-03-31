@@ -5,8 +5,6 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -16,7 +14,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -28,10 +25,10 @@ import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchVi
 
 @Composable
 fun BrowseScreen(
-    authType: AuthType,
     browseNavOptions: BrowseNavOptions,
     browseViewModel: BrowseSearchViewModel = hiltViewModel()
 ) {
+    val authType by browseViewModel.authType.collectAsStateWithLifecycle()
     val screenState by browseViewModel.searchState.collectAsStateWithLifecycle()
     val browseOptions by browseViewModel.options.collectAsStateWithLifecycle()
     var isAtTop by remember { mutableStateOf(true) }
@@ -41,7 +38,7 @@ fun BrowseScreen(
     Scaffold(
         topBar = {
             BrowseAppBar(
-                title = stringResource(id = R.string.bottom_navigator_browse),
+                title = stringResource(id = R.string.bottom_nav_item_browse),
                 searchQuery = screenState.query,
                 isAtTop = isAtTop,
                 onSearchQueryChange = browseViewModel::onQueryChange,
@@ -66,12 +63,9 @@ fun BrowseScreen(
                     BrowseSearchPage(
                         browseSearchData = browseSearchData,
                         browseSearchEvent = browseViewModel,
-                        authType = authType,
+                        authType = AuthType.ANILIST,
                         browseOptions = browseOptions,
-                        modifier = Modifier.padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)),
+                        modifier = Modifier.padding(top = paddingValues.calculateTopPadding()),
                         onMediaNavigate = { id, mediaType ->
                             val detailsNavRoute = when(mediaType) {
                                 MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
@@ -98,11 +92,7 @@ fun BrowseScreen(
                             browseNavOptions.navigateToSideScreen(sideScreen)
                         },
                         onIsAtTopChange = { isAtTop = it },
-                        modifier = Modifier.padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                        modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
                     )
                 }
             }

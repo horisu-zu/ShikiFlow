@@ -15,7 +15,6 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
@@ -23,50 +22,43 @@ import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
 
 @Composable
 fun BrowseScreenNavigator(
-    browseScreenBackStack: NavBackStack<NavKey>,
-    currentUserData: User?,
-    authType: AuthType
+    browseBackStack: NavBackStack<NavKey>
 ) {
-    //val browseBackstack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val browseNavOptions = object: BrowseNavOptions {
         override fun navigateToSideScreen(browseType: BrowseType) {
-            browseScreenBackStack.add(BrowseNavRoute.SideScreen(browseType))
+            browseBackStack.add(BrowseNavRoute.SideScreen(browseType))
         }
 
         override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
-            browseScreenBackStack.add(BrowseNavRoute.Details(detailsNavRoute))
+            browseBackStack.add(BrowseNavRoute.Details(detailsNavRoute))
         }
 
         override fun navigateToProfile(user: User?) {
-            browseScreenBackStack.add(BrowseNavRoute.Profile(user))
+            browseBackStack.add(BrowseNavRoute.Profile(user))
         }
 
-        override fun navigateBack() { browseScreenBackStack.removeLastOrNull() }
+        override fun navigateBack() { browseBackStack.removeLastOrNull() }
     }
 
     NavDisplay(
-        backStack = browseScreenBackStack,
-        onBack = { browseScreenBackStack.removeLastOrNull() },
+        backStack = browseBackStack,
+        onBack = { browseBackStack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<BrowseNavRoute.BrowseScreen> {
                 BrowseScreen(
-                    authType = authType,
                     browseNavOptions = browseNavOptions
                 )
             }
             entry<BrowseNavRoute.SideScreen> { route ->
                 BrowseSideScreen(
                     browseType = route.browseType,
-                    navOptions = browseNavOptions,
-                    onBackNavigate = { browseScreenBackStack.removeLastOrNull() }
+                    navOptions = browseNavOptions
                 )
             }
             entry<BrowseNavRoute.Details> { route ->
                 DetailsNavigator(
-                    currentUserData = currentUserData,
-                    authType = authType,
                     detailsNavRoute = route.detailsNavRoute,
-                    navOptions = browseNavOptions
+                    mainNavOptions = browseNavOptions
                 )
             }
             entry<BrowseNavRoute.Profile> { route ->

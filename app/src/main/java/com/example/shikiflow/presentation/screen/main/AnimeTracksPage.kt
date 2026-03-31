@@ -17,6 +17,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,17 +54,21 @@ import com.example.shikiflow.domain.model.settings.AppUiMode
 @Composable
 fun AnimeTracksPage(
     userStatus: UserRateStatus,
-    userId: Int,
     isAppBarVisible: Boolean,
     onAnimeClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     tracksViewModel: AnimeTracksViewModel = hiltViewModel(),
 ) {
-    val animeTrackItems = tracksViewModel.getAnimeTracks(userStatus, userId).collectAsLazyPagingItems()
+    val params by tracksViewModel.params.collectAsStateWithLifecycle()
+    val animeTrackItems = tracksViewModel.animeTracks[userStatus]?.collectAsLazyPagingItems()
+        ?: return
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
-    val rateUpdateState by tracksViewModel.rateUpdateState
 
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
+
+    LaunchedEffect(userStatus) {
+        tracksViewModel.setStatus(userStatus)
+    }
 
     when (animeTrackItems.loadState.refresh) {
         is LoadState.Loading -> {
@@ -116,9 +121,9 @@ fun AnimeTracksPage(
             selectedItem?.let {
                 UserRateBottomSheet(
                     userRate = it.toUserRateData(),
-                    rateUpdateState = rateUpdateState,
+                    rateUpdateState = params.rateUpdateState,
                     onDismiss = {
-                        if (rateUpdateState != RateUpdateState.LOADING) {
+                        if (params.rateUpdateState != RateUpdateState.LOADING) {
                             selectedItem = null
                         }
                     },

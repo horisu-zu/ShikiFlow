@@ -13,20 +13,24 @@ import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.screen.main.details.RoleType.Companion.toMediaType
 import com.example.shikiflow.domain.repository.CharacterRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.presentation.screen.main.details.RoleSort
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -34,13 +38,21 @@ import javax.inject.Inject
 @HiltViewModel
 class MediaRolesViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
-    private val staffRepository: StaffRepository
+    private val staffRepository: StaffRepository,
+    settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _rolesParams = MutableStateFlow(MediaRolesParams())
 
     private val _sortMap = MutableStateFlow<Map<RoleType, RoleSort>>(emptyMap())
     val sortMap = _sortMap.asStateFlow()
+
+    val authType = settingsRepository.authTypeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
     fun setRoleTypes(roleTypes: List<RoleType>) {
         _rolesParams.update { params ->

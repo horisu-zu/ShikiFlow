@@ -5,10 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -41,7 +42,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -60,23 +60,17 @@ import com.example.shikiflow.utils.IconResource
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun StudioScreen(
-    authType: AuthType,
     id: Int,
     studioName: String?,
     onNavigateBack: () -> Unit,
     onMediaNavigate: (Int) -> Unit,
     studioViewModel: StudioViewModel = hiltViewModel()
 ) {
-    val studioState by studioViewModel.studioUiState.collectAsStateWithLifecycle()
+    val studioState by studioViewModel.studioParams.collectAsStateWithLifecycle()
+    val authType by studioViewModel.authType.collectAsStateWithLifecycle()
 
     LaunchedEffect(id) {
         studioViewModel.setStudioId(id)
-        studioViewModel.setSortType(
-            sortType = when(authType) {
-                AuthType.SHIKIMORI -> MediaSort.Common.SCORE
-                AuthType.ANILIST -> MediaSort.Common.POPULARITY
-            }
-        )
     }
 
     val studioAnimeData = studioViewModel.studioTitles.collectAsLazyPagingItems()
@@ -121,16 +115,20 @@ fun StudioScreen(
                     ),
                     scrollBehavior = scrollBehavior
                 )
-                if(authType == AuthType.SHIKIMORI) {
-                    SearchPanel(
-                        query = studioState.query,
-                        label = stringResource(R.string.browse_page_search),
-                        onQueryChange = studioViewModel::setQuery,
-                        modifier = Modifier.background(
-                            color = if(isAtTop) MaterialTheme.colorScheme.background
-                                else MaterialTheme.colorScheme.surfaceVariant
-                        ).padding(horizontal = 12.dp, vertical = 8.dp)
-                    )
+                authType?.let {
+                    if(authType == AuthType.SHIKIMORI) {
+                        SearchPanel(
+                            query = studioState.query,
+                            label = stringResource(R.string.browse_page_search),
+                            onQueryChange = studioViewModel::setQuery,
+                            modifier = Modifier
+                                .background(
+                                    color = if(isAtTop) MaterialTheme.colorScheme.background
+                                        else MaterialTheme.colorScheme.surfaceVariant
+                                )
+                                .padding(horizontal = 12.dp, vertical = 8.dp)
+                        )
+                    }
                 }
                 HorizontalDivider()
             }
@@ -161,12 +159,13 @@ fun StudioScreen(
                     columns = GridCells.Adaptive(120.dp),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(
-                            top = paddingValues.calculateTopPadding(),
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
-                    contentPadding = PaddingValues(all = 12.dp),
+                        .padding(top = paddingValues.calculateTopPadding()),
+                    contentPadding = PaddingValues(
+                        start = 12.dp,
+                        end = 12.dp,
+                        top = 12.dp,
+                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    ),
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {

@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -28,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,18 +48,19 @@ fun ProfileScreen(
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
+    val user = userData ?: uiState.currentUser
 
-    LaunchedEffect(Unit) {
-        userData?.id?.let { userId ->
+    LaunchedEffect(user) {
+        user?.id?.let { userId ->
             profileViewModel.setUserId(userId)
         }
     }
 
-    userData?.let {
+    user?.let {
         ProfileScreenContent(
-            userData = userData,
+            userData = user,
             uiState = uiState,
-            isCurrentUser = uiState.currentUserId == userData.id,
+            isCurrentUser = uiState.currentUser?.id == user.id,
             navOptions = navOptions,
             onRefresh = { profileViewModel.onRefresh() },
             modifier = Modifier
@@ -90,9 +88,11 @@ fun ProfileScreenContent(
         topBar = {
             ProfileAppBar(
                 userData = userData,
+                isCurrentUser = isCurrentUser,
                 scrollBehavior = scrollBehavior,
                 statusBarsPadding = WindowInsets.statusBars.asPaddingValues(),
-                backgroundColor = backgroundColor
+                backgroundColor = backgroundColor,
+                navOptions = navOptions
             )
         }
     ) { paddingValues ->
@@ -119,11 +119,7 @@ fun ProfileScreenContent(
 
             Column(
                 modifier = modifier
-                    .padding(
-                        top = paddingValues.calculateTopPadding(),
-                        start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                        end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
-                    )
+                    .padding(top = paddingValues.calculateTopPadding())
                     .fillMaxSize()
             ) {
                 if(sectionsList.isNotEmpty()) {

@@ -24,6 +24,12 @@ class BrowsePagingSource @Inject constructor(
         val page = params.key ?: 1
         val pageSize = params.loadSize
 
+        if(options.name?.isBlank() == true) return LoadResult.Page(
+            data = emptyList(),
+            prevKey = null,
+            nextKey = null
+        )
+
         val response = mediaDataSource.browseMedia(
             page = page,
             limit = pageSize,

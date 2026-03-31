@@ -24,7 +24,6 @@ class TracksPagingSource @Inject constructor(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AnimeTrack> {
-
         if(title.isEmpty()) return LoadResult.Page(
             data = emptyList(),
             prevKey = null,

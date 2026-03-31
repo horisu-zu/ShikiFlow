@@ -2,8 +2,6 @@ package com.example.shikiflow.presentation.screen.main
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -15,21 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.MainScreenNavOptions
+import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.MainScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainScreen(
-    currentUser: User?,
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
-    navOptions: MainScreenNavOptions
+    mainNavOptions: MainNavOptions
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
@@ -58,25 +53,19 @@ fun MainScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(
-                        top = innerPadding.calculateTopPadding(),
-                        start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                        end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                    )
+                    .padding(top = innerPadding.calculateTopPadding())
             ) {
                 Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
                     if(isSearchActive) {
                         SearchPage(
-                            userId = currentUser?.id,
                             searchQuery = searchQuery,
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
                             onAnimeClick = { animeId ->
-                                navOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(animeId))
+                                mainNavOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(animeId))
                             }
                         )
                     } else {
                         MainPage(
-                            userId = currentUser?.id,
                             mediaType = trackMode,
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
                             isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
@@ -86,7 +75,7 @@ fun MainScreen(
                                     MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId)
                                 }
 
-                                navOptions.navigateToDetails(detailsNavRoute)
+                                mainNavOptions.navigateToDetails(detailsNavRoute)
                             }
                         )
                     }

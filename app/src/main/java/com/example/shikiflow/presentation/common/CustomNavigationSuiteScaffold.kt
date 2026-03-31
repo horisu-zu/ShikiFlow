@@ -5,7 +5,6 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -33,23 +31,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.presentation.screen.BottomNavItem
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun CustomNavigationSuiteScaffold(
     selectedRoute: NavKey,
     navigationType: NavigationSuiteType,
     navItems: List<BottomNavItem>,
-    onNavClick: (NavKey) -> Unit,
+    onNavClick: (BottomNavItem) -> Unit,
     navContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val isRail = navigationType == NavigationSuiteType.NavigationRail
-    val isBottomBar = navigationType == NavigationSuiteType.NavigationBar
+    val isBottomBar = navigationType == NavigationSuiteType.ShortNavigationBarCompact ||
+            navigationType == NavigationSuiteType.ShortNavigationBarMedium
 
     Row(
         modifier = Modifier
@@ -62,10 +61,16 @@ fun CustomNavigationSuiteScaffold(
                 initialWidth = { -it },
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
+                    stiffness = Spring.StiffnessLow
                 )
             ),
-            exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start)
+            exit = shrinkHorizontally(
+                shrinkTowards = Alignment.Start,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
         ) {
             NavigationRail(
                 containerColor = navContainerColor
@@ -76,12 +81,10 @@ fun CustomNavigationSuiteScaffold(
                     NavigationRailItem(
                         selected = isSelected,
                         icon = {
-                            Icon(
-                                painter = painterResource(
-                                    id = if (isSelected) navItem.selectedIconRes
-                                        else navItem.unselectedIconRes
-                                ),
-                                contentDescription = stringResource(id = navItem.title),
+                            when(isSelected) {
+                                true -> navItem.selectedIconRes
+                                false -> navItem.unselectedIconRes
+                            }.toIcon(
                                 modifier = Modifier.size(24.dp)
                             )
                         },
@@ -93,7 +96,11 @@ fun CustomNavigationSuiteScaffold(
                                 )
                             )
                         },
-                        onClick = { onNavClick(navItem.route) }
+                        onClick = {
+                            if(!isSelected) {
+                                onNavClick(navItem)
+                            }
+                        }
                     )
                 }
             }
@@ -113,10 +120,16 @@ fun CustomNavigationSuiteScaffold(
                         initialHeight = { it },
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessMediumLow
+                            stiffness = Spring.StiffnessLow
                         )
                     ),
-                    exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom)
+                    exit = shrinkVertically(
+                        shrinkTowards = Alignment.Bottom,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    )
                 ) {
                     NavigationBar(
                         containerColor = navContainerColor
@@ -127,12 +140,10 @@ fun CustomNavigationSuiteScaffold(
                             NavigationBarItem(
                                 selected = isSelected,
                                 icon = {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = if (isSelected) navItem.selectedIconRes
-                                            else navItem.unselectedIconRes
-                                        ),
-                                        contentDescription = stringResource(id = navItem.title),
+                                    when(isSelected) {
+                                        true -> navItem.selectedIconRes
+                                        false -> navItem.unselectedIconRes
+                                    }.toIcon(
                                         modifier = Modifier.size(24.dp)
                                     )
                                 },
@@ -144,14 +155,18 @@ fun CustomNavigationSuiteScaffold(
                                         )
                                     )
                                 },
-                                onClick = { onNavClick(navItem.route) }
+                                onClick = {
+                                    if(!isSelected) {
+                                        onNavClick(navItem)
+                                    }
+                                }
                             )
                         }
                     }
                 }
             }
-        ) { innerPadding ->
-            content(innerPadding)
+        ) { paddingValues ->
+            content(paddingValues)
         }
     }
 }

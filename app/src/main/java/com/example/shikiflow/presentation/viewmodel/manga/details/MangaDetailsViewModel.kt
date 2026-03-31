@@ -9,6 +9,7 @@ import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.domain.usecase.GetMangaDexUseCase
 import com.example.shikiflow.presentation.UiStateViewModel
@@ -17,6 +18,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -30,7 +32,8 @@ class MangaDetailsViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
     private val userRepository: UserRepository,
     private val mediaTracksRepository: MediaTracksRepository,
-    private val getMangaDexUseCase: GetMangaDexUseCase
+    private val getMangaDexUseCase: GetMangaDexUseCase,
+    settingsRepository: SettingsRepository
 ): UiStateViewModel<MangaDetailsUiState>() {
 
     override val initialState: MangaDetailsUiState = MangaDetailsUiState()
@@ -140,6 +143,24 @@ class MangaDetailsViewModel @Inject constructor(
                             )
                         }
                     }
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { user ->
+                mutableUiState.update { state ->
+                    state.copy(userId = user.id)
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { authType ->
+                mutableUiState.update { state ->
+                    state.copy(authType = authType)
                 }
             }.launchIn(viewModelScope)
     }

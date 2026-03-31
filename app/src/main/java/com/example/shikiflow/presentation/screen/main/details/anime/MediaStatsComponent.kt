@@ -122,13 +122,15 @@ private fun ColumnMediaStats(
                 modifier = Modifier
             )
         }
-        StatusesStatsComponent(
-            mediaType = mediaType,
-            statusesStats = statusesStats,
-            windowSize = windowSize,
-            barHorizontalPadding = barHorizontalPadding,
-            modifier = Modifier
-        )
+        if(statusesStats.isNotEmpty()) {
+            StatusesStatsComponent(
+                mediaType = mediaType,
+                statusesStats = statusesStats,
+                windowSize = windowSize,
+                barHorizontalPadding = barHorizontalPadding,
+                modifier = Modifier
+            )
+        }
     }
 }
 
@@ -162,15 +164,17 @@ private fun RowMediaStats(
                     }
             )
         }
-        StatusesStatsComponent(
-            mediaType = mediaType,
-            statusesStats = statusesStats,
-            windowSize = windowWidthSize,
-            barHorizontalPadding = barHorizontalPadding + 24.dp,
-            modifier = Modifier
-                .height(scoreComponentHeight)
-                .weight(1f)
-        )
+        if(statusesStats.isNotEmpty()) {
+            StatusesStatsComponent(
+                mediaType = mediaType,
+                statusesStats = statusesStats,
+                windowSize = windowWidthSize,
+                barHorizontalPadding = barHorizontalPadding + 24.dp,
+                modifier = Modifier
+                    .height(scoreComponentHeight)
+                    .weight(1f)
+            )
+        }
     }
 }
 

@@ -108,10 +108,13 @@ fun SearchBottomSheet(
             )
             ChipSection(
                 label = stringResource(R.string.browse_search_label_sort_by),
-                items = when(authType) {
-                    AuthType.SHIKIMORI -> MediaSort.Shikimori.entries
-                    AuthType.ANILIST -> MediaSort.Anilist.entries
-                },
+                items = listOf(
+                    MediaSort.Common.entries,
+                    when(authType) {
+                        AuthType.SHIKIMORI -> MediaSort.Shikimori.entries
+                        AuthType.ANILIST -> MediaSort.Anilist.entries
+                    }
+                ).flatten(),
                 selectedItem = searchOptions.order,
                 itemLabel = { stringResource(it.displayValue()) },
                 onItemSelected = { newOrder ->

@@ -4,10 +4,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,12 +35,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
@@ -57,7 +56,6 @@ import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 @Composable
 fun CharacterDetailsScreen(
     characterId: Int,
-    authType: AuthType,
     navOptions: MediaNavOptions,
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
@@ -129,15 +127,14 @@ fun CharacterDetailsScreen(
             uiState.details?.let { characterDetails ->
                 LazyColumn(
                     state = lazyListState,
-                    modifier = Modifier.fillMaxSize()
-                        .padding(
-                            top = innerPadding.calculateTopPadding(),
-                            start = innerPadding.calculateStartPadding(LayoutDirection.Ltr),
-                            end = innerPadding.calculateEndPadding(LayoutDirection.Ltr)
-                        ),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = innerPadding.calculateTopPadding()),
                     contentPadding = PaddingValues(
-                        horizontal = horizontalPadding,
-                        vertical = 8.dp
+                        start = horizontalPadding,
+                        end = horizontalPadding,
+                        top = 8.dp,
+                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
                     ),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                 ) {
@@ -152,7 +149,7 @@ fun CharacterDetailsScreen(
                         item {
                             ExpandableText(
                                 htmlText = description,
-                                authType = authType,
+                                authType = uiState.authType,
                                 style = MaterialTheme.typography.bodySmall,
                                 collapsedMaxLines = 3,
                                 onEntityClick = { entityType, id ->

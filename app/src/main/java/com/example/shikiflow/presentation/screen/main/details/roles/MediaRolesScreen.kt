@@ -54,7 +54,6 @@ fun MediaRolesScreen(
     id: Int,
     mediaRolesType: MediaRolesType,
     roleTypes: List<RoleType>,
-    authType: AuthType,
     navOptions: MediaNavOptions,
     mediaRolesViewModel: MediaRolesViewModel = hiltViewModel()
 ) {
@@ -68,6 +67,7 @@ fun MediaRolesScreen(
     val currentType = typesList[pagerState.currentPage]
 
     val sortMap by mediaRolesViewModel.sortMap.collectAsStateWithLifecycle()
+    val authType by mediaRolesViewModel.authType.collectAsStateWithLifecycle()
     val mediaRolesFlows = remember(typesList) {
         typesList.associateWith { roleType ->
             mediaRolesViewModel.getMediaRoles(
@@ -129,16 +129,18 @@ fun MediaRolesScreen(
             }
         },
         floatingActionButton = {
-            if(authType == AuthType.ANILIST) {
-                FloatingActionButton(
-                    onClick = { showBottomSheet = true },
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_sort),
-                        contentDescription = "Show Sort Bottom Sheet"
-                    )
+            authType?.let { authType ->
+                if(authType == AuthType.ANILIST) {
+                    FloatingActionButton(
+                        onClick = { showBottomSheet = true },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_sort),
+                            contentDescription = "Show Sort Bottom Sheet"
+                        )
+                    }
                 }
             }
         }

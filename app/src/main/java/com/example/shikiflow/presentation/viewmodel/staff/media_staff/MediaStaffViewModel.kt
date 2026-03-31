@@ -6,20 +6,24 @@ import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MediaStaffViewModel @Inject constructor(
-    private val staffRepository: StaffRepository
+    private val staffRepository: StaffRepository,
+    settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _mediaStaffParams = MutableStateFlow(MediaStaffParams())
@@ -35,6 +39,13 @@ class MediaStaffViewModel @Inject constructor(
             )
         }
         .cachedIn(viewModelScope)
+
+    val authType = settingsRepository.authTypeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
 
     fun setParams(mediaId: Int, mediaType: MediaType) {
         _mediaStaffParams.update { state ->

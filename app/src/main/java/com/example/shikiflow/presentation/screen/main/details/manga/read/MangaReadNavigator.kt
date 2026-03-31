@@ -63,6 +63,9 @@ fun MangaReadNavigator(
         }
 
         override fun navigateToChapter(chapterUiData: ChapterUiData) {
+            mangaReadBackstack.removeAll { navKey ->
+                navKey is MangaReadNavRoute.ChapterScreen
+            }
             mangaReadBackstack.add(MangaReadNavRoute.ChapterScreen(chapterUiData))
         }
 

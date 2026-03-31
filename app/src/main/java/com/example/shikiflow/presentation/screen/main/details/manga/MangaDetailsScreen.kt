@@ -21,33 +21,28 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDetailsViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.common.ErrorItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MangaDetailsScreen(
     id: Int,
-    authType: AuthType,
-    userId: Int?,
     navOptions: MediaNavOptions,
     mangaDetailsViewModel: MangaDetailsViewModel = hiltViewModel()
 ) {
-    val mangaDetails by mangaDetailsViewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by mangaDetailsViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(id) {
         mangaDetailsViewModel.setMediaId(id)
     }
 
     Scaffold { paddingValues ->
-        if(mangaDetails.isLoading && mangaDetails.details == null) {
+        if(uiState.isLoading && uiState.details == null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        } else if(mangaDetails.errorMessage != null) {
+            ) { CircularProgressIndicator() }
+        } else if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -59,31 +54,33 @@ fun MangaDetailsScreen(
                 )
             }
         } else {
-            mangaDetails.details?.let { details ->
+            uiState.details?.let { details ->
                 PullToRefreshBox(
-                    isRefreshing = mangaDetails.isRefreshing,
+                    isRefreshing = uiState.isRefreshing,
                     onRefresh = { mangaDetailsViewModel.onRefresh() }
                 ) {
-                    MangaDetailsContent(
-                        userId = userId ?: 0,
-                        authType = authType,
-                        mangaDetails = details,
-                        mangaDexUiState = mangaDetails.mangaDexUiState,
-                        rateUpdateState = mangaDetails.rateUpdateState,
-                        mediaNavOptions = navOptions,
-                        onMangaDexRefreshClick = { mangaDetailsViewModel.onMangaDexRefresh() },
-                        onSaveUserRate = { id, save, shortData ->
-                            mangaDetailsViewModel.saveUserRate(
-                                userId = id,
-                                saveUserRate = save,
-                                mangaShortData = shortData
+                    uiState.authType?.let { authType ->
+                        MangaDetailsContent(
+                            userId = uiState.userId ?: 0,
+                            authType = authType,
+                            mangaDetails = details,
+                            mangaDexUiState = uiState.mangaDexUiState,
+                            rateUpdateState = uiState.rateUpdateState,
+                            mediaNavOptions = navOptions,
+                            onMangaDexRefreshClick = { mangaDetailsViewModel.onMangaDexRefresh() },
+                            onSaveUserRate = { id, save, shortData ->
+                                mangaDetailsViewModel.saveUserRate(
+                                    userId = id,
+                                    saveUserRate = save,
+                                    mangaShortData = shortData
+                                )
+                            },
+                            modifier = Modifier.padding(
+                                start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
+                                end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                             )
-                        },
-                        modifier = Modifier.padding(
-                            start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
-                            end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                         )
-                    )
+                    }
                 }
             }
         }

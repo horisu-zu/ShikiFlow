@@ -12,6 +12,7 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,6 +26,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class SettingsUiState(
+    val user: User? = null,
     val settings: Settings = Settings(),
     val themeSettings: ThemeSettings? = null,
     val mangaSettings: MangaChapterSettings = MangaChapterSettings(),
@@ -42,16 +44,16 @@ class SettingsViewModel @Inject constructor(
     val settingsState = _settingsState.asStateFlow()
 
     init {
-        loadCacheSize()
-
         viewModelScope.launch {
             combine(
                 settingsRepository.settingsFlow.distinctUntilChanged(),
                 settingsRepository.themeSettingsFlow.distinctUntilChanged(),
-                settingsRepository.mangaSettingsFlow.distinctUntilChanged()
-            ) { settings, themeSettings, mangaSettings ->
+                settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
+                settingsRepository.userFlow.distinctUntilChanged()
+            ) { settings, themeSettings, mangaSettings, user ->
                 _settingsState.update { state ->
                     state.copy(
+                        user = user,
                         settings = settings,
                         themeSettings = themeSettings,
                         mangaSettings = mangaSettings

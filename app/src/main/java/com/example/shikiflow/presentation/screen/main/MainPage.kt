@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(
-    userId: Int?,
     mediaType: MediaType,
     isAtTop: Boolean,
     isAppBarVisible: Boolean,
@@ -46,36 +45,31 @@ fun MainPage(
             },
             isAtTop = isAtTop
         )
-        userId?.let {
-            HorizontalPager(
-                state = pagerState,
-                modifier = Modifier.fillMaxSize(),
-            ) { page ->
-                AnimatedContent(
-                    targetState = mediaType
-                ) { type ->
-                    when (type) {
-                        MediaType.ANIME -> {
-                            AnimeTracksPage(
-                                userStatus = UserRateStatus.entries[page],
-                                userId = userId,
-                                isAppBarVisible = isAppBarVisible,
-                                onAnimeClick = { animeId ->
-                                    onMediaClick(animeId, mediaType)
-                                }
-                            )
-                        }
-
-                        MediaType.MANGA -> {
-                            MangaTracksPage(
-                                userStatus = UserRateStatus.entries[page],
-                                userId = userId,
-                                isAppBarVisible = isAppBarVisible,
-                                onMangaClick = { mangaId ->
-                                    onMediaClick(mangaId, mediaType)
-                                }
-                            )
-                        }
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+        ) { page ->
+            AnimatedContent(
+                targetState = mediaType
+            ) { type ->
+                when (type) {
+                    MediaType.ANIME -> {
+                        AnimeTracksPage(
+                            userStatus = UserRateStatus.entries[page],
+                            isAppBarVisible = isAppBarVisible,
+                            onAnimeClick = { animeId ->
+                                onMediaClick(animeId, mediaType)
+                            }
+                        )
+                    }
+                    MediaType.MANGA -> {
+                        MangaTracksPage(
+                            userStatus = UserRateStatus.entries[page],
+                            isAppBarVisible = isAppBarVisible,
+                            onMangaClick = { mangaId ->
+                                onMediaClick(mangaId, mediaType)
+                            }
+                        )
                     }
                 }
             }

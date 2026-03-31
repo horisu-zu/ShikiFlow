@@ -3,30 +3,59 @@ package com.example.shikiflow.presentation.viewmodel.anime.studio
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class StudioViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository
+    private val mediaRepository: MediaRepository,
+    settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _query = MutableStateFlow("")
     private val _studioParams = MutableStateFlow(StudioParams())
-    val studioUiState = _studioParams.asStateFlow()
+    val studioParams = _studioParams.asStateFlow()
+
+    val authType = settingsRepository.authTypeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+
+    init {
+        authType
+            .filterNotNull()
+            .onEach { authType ->
+                setSortType(
+                    sortType = when(authType) {
+                        AuthType.SHIKIMORI -> MediaSort.Common.SCORE
+                        AuthType.ANILIST -> MediaSort.Common.POPULARITY
+                    }
+                )
+            }.launchIn(viewModelScope)
+    }
 
     val studioTitles = combine(
         _studioParams.filter { state ->

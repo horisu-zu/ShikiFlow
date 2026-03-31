@@ -31,7 +31,6 @@ import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
-import com.example.shikiflow.presentation.screen.more.history.ActivityItem
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.activity.UserActivityViewModel
 import com.example.shikiflow.utils.WebIntent

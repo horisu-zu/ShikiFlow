@@ -13,7 +13,7 @@ sealed interface MainNavRoute : NavKey {
     data object Browse : MainNavRoute
 
     @Serializable
-    data object More : MainNavRoute
+    data object Profile : MainNavRoute
 }
 
 sealed interface MainScreenNavRoute : NavKey {

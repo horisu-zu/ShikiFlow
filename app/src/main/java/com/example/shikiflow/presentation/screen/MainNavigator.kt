@@ -7,14 +7,18 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,49 +36,43 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.screen.BottomNavItem.Companion.isBottomNavItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavRoute
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
-import com.example.shikiflow.presentation.screen.more.MoreNavRoute
-import com.example.shikiflow.presentation.screen.more.MoreScreenNavigator
-import com.example.shikiflow.presentation.viewmodel.user.navigator.MainNavViewModel
+import com.example.shikiflow.presentation.screen.more.profile.ProfileNavRoute
+import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
+import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainNavigator(
-    onFinishActivity: () -> Unit,
-    mainNavViewModel: MainNavViewModel = hiltViewModel()
+    onMoveToBack: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
+    val adaptiveInfo = currentWindowAdaptiveInfo()
 
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Browse,
-        BottomNavItem.More
-    )
+    val items = BottomNavItem.items
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Main)
     val mainScreenBackStack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
-    val browseScreenBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
-    val moreScreenBackStack = rememberNavBackStack(MoreNavRoute.MoreMain)
-
-    val mainNavUiState by mainNavViewModel.uiState.collectAsStateWithLifecycle()
+    val browseBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
+    val profileBackstack = rememberNavBackStack(ProfileNavRoute.Profile(null))
 
     val isKeyboardVisible = WindowInsets.isImeVisible &&
         configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     var isBottomBarVisible by remember { mutableStateOf(true) }
 
-    val adaptiveInfo = currentWindowAdaptiveInfo()
     val isExpanded = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(
         widthDpBreakpoint = WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
     )
@@ -97,12 +95,10 @@ fun MainNavigator(
 
                 NavigationSuiteItem(
                     icon = {
-                        Icon(
-                            painter = painterResource(
-                                id = if (isSelected) navItem.selectedIconRes
-                                    else navItem.unselectedIconRes
-                            ),
-                            contentDescription = stringResource(id = navItem.title),
+                        when(isSelected) {
+                            true -> navItem.selectedIconRes
+                            false -> navItem.unselectedIconRes
+                        }.toIcon(
                             modifier = Modifier.size(24.dp)
                         )
                     },
@@ -116,14 +112,17 @@ fun MainNavigator(
                     },
                     selected = isSelected,
                     onClick = {
-                        if (!isSelected) {
+                        if(!isSelected) {
+                            if(mainNavBackStack.contains(navItem.route)) {
+                                mainNavBackStack.remove(navItem.route)
+                            }
                             mainNavBackStack.add(navItem.route)
                         } else {
                             when(navItem) {
-                                BottomNavItem.Home -> mainScreenBackStack
-                                BottomNavItem.Browse -> browseScreenBackStack
-                                BottomNavItem.More -> moreScreenBackStack
-                            }.also { backstack ->
+                                BottomNavItem.Main -> mainScreenBackStack
+                                BottomNavItem.Browse -> browseBackStack
+                                BottomNavItem.Profile -> profileBackstack
+                            }.let { backstack ->
                                 backstack.subList(1, backstack.size).clear()
                             }
                         }
@@ -139,45 +138,81 @@ fun MainNavigator(
         CompositionLocalProvider(LocalBottomBarController provides controller) {
             NavDisplay(
                 backStack = mainNavBackStack,
-                onBack = { onFinishActivity() },
+                onBack = {
+                    if(mainNavBackStack.last().isBottomNavItem()) {
+                        onMoveToBack()
+                    } else {
+                        mainNavBackStack.removeLastOrNull()
+                    }
+                },
                 entryProvider = entryProvider {
-                    entry<MainNavRoute.Main> {
+                    entry<MainNavRoute.Main>(
+                        metadata = BottomNavItem.topNavigationTransitionSpec
+                    ) {
                         MainScreenNavigator(
-                            mainScreenBackStack = mainScreenBackStack,
-                            currentUserData = mainNavUiState.user,
-                            authType = mainNavUiState.authType
+                            mainScreenBackStack = mainScreenBackStack
                         )
                     }
-                    entry<MainNavRoute.Browse> {
+                    entry<MainNavRoute.Browse>(
+                        metadata = BottomNavItem.topNavigationTransitionSpec
+                    ) {
                         BrowseScreenNavigator(
-                            browseScreenBackStack = browseScreenBackStack,
-                            currentUserData = mainNavUiState.user,
-                            authType = mainNavUiState.authType
+                            browseBackStack = browseBackStack
                         )
                     }
-                    entry<MainNavRoute.More> {
-                        MoreScreenNavigator(
-                            moreScreenBackStack = moreScreenBackStack,
-                            currentUser = mainNavUiState.user,
-                            authType = mainNavUiState.authType
+                    entry<MainNavRoute.Profile>(
+                        metadata = BottomNavItem.topNavigationTransitionSpec
+                    ) {
+                        ProfileNavigator(
+                            profileBackstack = profileBackstack
                         )
                     }
                 },
                 transitionSpec = {
-                    slideInVertically(
-                        initialOffsetY = { it / 2 },
+                    fadeIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) togetherWith fadeOut(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    )
+                },
+                popTransitionSpec = {
+                    fadeIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) togetherWith fadeOut(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    )
+                },
+                predictivePopTransitionSpec = {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioNoBouncy,
                             stiffness = Spring.StiffnessMediumLow
                         )
-                    ) + fadeIn() togetherWith ExitTransition.None
+                    ) togetherWith slideOutHorizontally(
+                        targetOffsetX = { it },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )
                 },
-                popTransitionSpec = {
-                    EnterTransition.None togetherWith fadeOut()
-                },
-                predictivePopTransitionSpec = {
-                    EnterTransition.None togetherWith fadeOut()
-                }
+                entryDecorators = listOf(
+                    rememberSaveableStateHolderNavEntryDecorator(),
+                    rememberViewModelStoreNavEntryDecorator()
+                )
             )
         }
     }
@@ -185,28 +220,48 @@ fun MainNavigator(
 
 sealed class BottomNavItem(
     val title: Int,
-    val selectedIconRes: Int,
-    val unselectedIconRes: Int,
+    val selectedIconRes: IconResource,
+    val unselectedIconRes: IconResource,
     val route: MainNavRoute
 ): NavKey {
-    object Home : BottomNavItem(
-        title = R.string.bottom_navigator_main,
-        selectedIconRes = R.drawable.ic_selected_book,
-        unselectedIconRes = R.drawable.ic_unselected_book,
+    object Main : BottomNavItem(
+        title = R.string.bottom_nav_item_main,
+        selectedIconRes = IconResource.Drawable(R.drawable.ic_selected_book),
+        unselectedIconRes = IconResource.Drawable(R.drawable.ic_unselected_book),
         route = MainNavRoute.Main
     )
 
     object Browse : BottomNavItem(
-        title = R.string.bottom_navigator_browse,
-        selectedIconRes = R.drawable.ic_selected_browse,
-        unselectedIconRes = R.drawable.ic_unselected_browse,
+        title = R.string.bottom_nav_item_browse,
+        selectedIconRes = IconResource.Drawable(R.drawable.ic_selected_browse),
+        unselectedIconRes = IconResource.Drawable(R.drawable.ic_unselected_browse),
         route = MainNavRoute.Browse
     )
 
-    object More : BottomNavItem(
-        title = R.string.bottom_navigator_more,
-        selectedIconRes = R.drawable.ic_selected_dots,
-        unselectedIconRes = R.drawable.ic_unselected_dots,
-        route = MainNavRoute.More
+    object Profile : BottomNavItem(
+        title = R.string.bottom_nav_item_profile,
+        selectedIconRes = IconResource.Vector(Icons.Default.Person),
+        unselectedIconRes = IconResource.Vector(Icons.Outlined.Person),
+        route = MainNavRoute.Profile
     )
+
+    companion object {
+        val items = listOf(Main, Browse, Profile)
+
+        fun NavKey.isBottomNavItem() = items.any { it.route == this }
+
+        val topNavigationTransitionSpec = NavDisplay.transitionSpec {
+            slideInVertically(
+                initialOffsetY = { it / 2 },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            ) + fadeIn() togetherWith  ExitTransition.None
+        } + NavDisplay.popTransitionSpec {
+            EnterTransition.None togetherWith fadeOut()
+        } + NavDisplay.predictivePopTransitionSpec {
+            EnterTransition.None togetherWith fadeOut()
+        }
+    }
 }

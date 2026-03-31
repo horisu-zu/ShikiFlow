@@ -45,7 +45,6 @@ import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.AnimeTra
 
 @Composable
 fun SearchPage(
-    userId: Int?,
     searchQuery: String,
     isAtTop: Boolean,
     tracksViewModel: AnimeTracksSearchViewModel = hiltViewModel(),
@@ -55,12 +54,6 @@ fun SearchPage(
     var selectedTabSearch by rememberSaveable { mutableIntStateOf(0) }
 
     val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
-
-    LaunchedEffect(userId) {
-        userId?.let {
-            tracksViewModel.setUserId(userId)
-        }
-    }
 
     LaunchedEffect(selectedTabSearch) {
         tracksViewModel.setRateStatus(

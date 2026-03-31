@@ -187,7 +187,7 @@
     <string name="tracks_page_search">Search Tracks…</string>
     <string name="browse_page_search">Search…</string>
 
-    <string name="browse_type_anime_ongoing">Ongoings</string>
+    <string name="browse_type_anime_ongoing">Ongoings Calendar</string>
     <string name="browse_type_search">Search</string>
     <string name="browse_type_anime_top">Top Anime</string>
     <string name="browse_type_manga_top">Top Manga</string>
@@ -204,9 +204,9 @@
     <string name="airing_released">Released final episode</string>
     <string name="airing_at">"Episode %1$d airing at "</string>
 
-    <string name="bottom_navigator_main">Main</string>
-    <string name="bottom_navigator_browse">Browse</string>
-    <string name="bottom_navigator_more">More</string>
+    <string name="bottom_nav_item_main">Main</string>
+    <string name="bottom_nav_item_browse">Browse</string>
+    <string name="bottom_nav_item_profile">Profile</string>
 
     <string name="chapter_short_title">Ch. %1$s</string>
 

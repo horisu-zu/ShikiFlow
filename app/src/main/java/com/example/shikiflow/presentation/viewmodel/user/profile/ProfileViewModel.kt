@@ -69,7 +69,7 @@ class ProfileViewModel @Inject constructor(
                 .collect { user ->
                     mutableUiState.update { state ->
                         state.copy(
-                            currentUserId = user.id
+                            currentUser = user
                         )
                     }
                 }

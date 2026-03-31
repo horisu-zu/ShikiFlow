@@ -42,7 +42,7 @@ import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchEv
 fun BrowseSearchPage(
     browseSearchData: LazyPagingItems<Browse>,
     browseSearchEvent: BrowseSearchEvent,
-    authType: AuthType,
+    authType: AuthType?,
     browseOptions: BrowseOptions,
     onMediaNavigate: (Int, MediaType) -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
@@ -134,14 +134,16 @@ fun BrowseSearchPage(
     }
 
     if (showBottomSheet) {
-        SearchBottomSheet(
-            authType = authType,
-            searchOptions = browseOptions,
-            onOptionsChanged = { newOptions -> browseSearchEvent.updateSearchOptions(newOptions) },
-            onTypeChanged = { newType ->
-                browseSearchEvent.updateSearchOptions(BrowseOptions(newType))
-            },
-            onDismiss = { showBottomSheet = false }
-        )
+        authType?.let {
+            SearchBottomSheet(
+                authType = authType,
+                searchOptions = browseOptions,
+                onOptionsChanged = { newOptions -> browseSearchEvent.updateSearchOptions(newOptions) },
+                onTypeChanged = { newType ->
+                    browseSearchEvent.updateSearchOptions(BrowseOptions(newType))
+                },
+                onDismiss = { showBottomSheet = false }
+            )
+        }
     }
 }

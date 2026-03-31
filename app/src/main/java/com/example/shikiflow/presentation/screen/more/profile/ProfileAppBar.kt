@@ -5,11 +5,18 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -33,8 +40,10 @@ import com.example.shikiflow.presentation.common.image.ImageType
 @Composable
 fun ProfileAppBar(
     userData: User?,
+    isCurrentUser: Boolean,
     scrollBehavior: TopAppBarScrollBehavior,
     statusBarsPadding: PaddingValues,
+    navOptions: ProfileNavOptions,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
@@ -71,37 +80,89 @@ fun ProfileAppBar(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
-            Row(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(
-                        top = statusBarsPadding.calculateTopPadding(),
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 4.dp
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-                verticalAlignment = Alignment.Bottom
-            ) {
-                BaseImage(
-                    model = userData?.avatarUrl,
-                    contentDescription = "Avatar",
-                    imageType = avatarImageType
-                )
-                Text(
-                    text = userData?.nickname ?: "",
-                    style = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+            userData?.let {
+                Row(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(percent = 24))
-                        .background(backgroundColor.copy(alpha = 0.35f))
-                        .padding(horizontal = 6.dp, vertical = 4.dp)
-                )
+                        .fillMaxWidth()
+                        .padding(
+                            top = statusBarsPadding.calculateTopPadding(),
+                            start = 16.dp,
+                            end = 16.dp
+                        ),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    UserComponent(
+                        userData = userData,
+                        imageType = avatarImageType,
+                        backgroundColor = backgroundColor,
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .align(Alignment.Bottom)
+                    )
+                    if(isCurrentUser) {
+                        Row(
+                            modifier = Modifier.align(Alignment.Top),
+                            horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
+                        ) {
+                            IconButton(
+                                onClick = { navOptions.navigateToSettings() },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = backgroundColor.copy(alpha = 0.35f)
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Settings,
+                                    contentDescription = "Settings"
+                                )
+                            }
+                            IconButton(
+                                onClick = { navOptions.navigateToAbout() },
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = backgroundColor.copy(alpha = 0.35f)
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "About App"
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun UserComponent(
+    userData: User,
+    imageType: ImageType,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        BaseImage(
+            model = userData.avatarUrl,
+            contentDescription = "Avatar",
+            imageType = imageType
+        )
+        Text(
+            text = userData.nickname,
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold
+            ),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .clip(RoundedCornerShape(percent = 24))
+                .background(backgroundColor.copy(alpha = 0.35f))
+                .padding(horizontal = 6.dp, vertical = 4.dp)
+        )
     }
 }

@@ -12,8 +12,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 @Composable
 fun BrowseSideScreen(
     browseType: BrowseType,
-    navOptions: BrowseNavOptions,
-    onBackNavigate: () -> Unit
+    navOptions: BrowseNavOptions
 ) {
     if(browseType == BrowseType.AnimeBrowseType.ONGOING) {
         OngoingSideScreen(
@@ -21,7 +20,7 @@ fun BrowseSideScreen(
             onNavigate = { id ->
                 navOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(id))
             },
-            onBackNavigate = onBackNavigate
+            onBackNavigate = { navOptions.navigateBack() }
         )
     } else {
         MainSideScreen(
@@ -34,7 +33,7 @@ fun BrowseSideScreen(
 
                 navOptions.navigateToDetails(detailsNavRoute)
             },
-            onBackNavigate = onBackNavigate
+            onBackNavigate = { navOptions.navigateBack() }
         )
     }
 }

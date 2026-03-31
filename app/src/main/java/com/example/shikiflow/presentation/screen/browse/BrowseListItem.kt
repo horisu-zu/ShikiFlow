@@ -90,13 +90,16 @@ fun BrowseListItem(
                                 append(" • ")
                             }
                         }
-                    }, style = MaterialTheme.typography.labelSmall
+                    },
+                    style = MaterialTheme.typography.labelSmall
                 )
             }
             Text(
                 text = listOfNotNull(
                     stringResource(id = browseItem.mediaFormat.displayValue()),
-                    "${browseItem.episodesAired} / ${browseItem.episodes.takeIf { it != 0 } ?: "?"}",
+                    browseItem.episodesAired?.let { epsAired ->
+                        "$epsAired / ${browseItem.episodes.takeIf { it != 0 } ?: "?"}"
+                    },
                     browseItem.score?.let { score ->
                         stringResource(id = R.string.media_score, score)
                     }

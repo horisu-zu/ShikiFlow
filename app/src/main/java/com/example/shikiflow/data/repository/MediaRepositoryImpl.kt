@@ -49,7 +49,7 @@ class MediaRepositoryImpl @Inject constructor(
         page: Int,
         size: Int,
         browseOptions: BrowseOptions
-    ): Result<List<Browse>> = getSource().browseMedia(page, size,browseOptions)
+    ): Result<List<Browse>> = getSource().browseMedia(page, size, browseOptions)
 
     override fun getAiringAnimes(
         onList: Boolean,

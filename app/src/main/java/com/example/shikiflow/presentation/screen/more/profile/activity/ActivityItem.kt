@@ -1,4 +1,4 @@
-package com.example.shikiflow.presentation.screen.more.history
+package com.example.shikiflow.presentation.screen.more.profile.activity
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

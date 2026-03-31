@@ -14,9 +14,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.screen.MainScreenNavOptions
+import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.MainScreenNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
@@ -24,11 +23,9 @@ import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
 
 @Composable
 fun MainScreenNavigator(
-    mainScreenBackStack: NavBackStack<NavKey>,
-    currentUserData: User?,
-    authType: AuthType
+    mainScreenBackStack: NavBackStack<NavKey>
 ) {
-    val options = object : MainScreenNavOptions {
+    val navOptions = object : MainNavOptions {
         override fun navigateToDetails(detailsNavRoute: DetailsNavRoute) {
             mainScreenBackStack.add(MainScreenNavRoute.Details(detailsNavRoute))
         }
@@ -48,22 +45,19 @@ fun MainScreenNavigator(
         entryProvider = entryProvider {
             entry<MainScreenNavRoute.MainTracks> {
                 MainScreen(
-                    currentUser = currentUserData,
-                    navOptions = options
+                    mainNavOptions = navOptions
                 )
             }
             entry<MainScreenNavRoute.Details> { route ->
                 DetailsNavigator(
-                    currentUserData = currentUserData,
-                    authType = authType,
                     detailsNavRoute = route.detailsNavRoute,
-                    navOptions = options
+                    mainNavOptions = navOptions
                 )
             }
             entry<MainScreenNavRoute.Profile> { route ->
                 ProfileNavigator(
                     user = route.user,
-                    mainNavOptions = options
+                    mainNavOptions = navOptions
                 )
             }
         },
