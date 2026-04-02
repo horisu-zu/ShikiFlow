@@ -191,3 +191,9 @@ fragment ShikiCharacterRole on CharacterRole {
         ...CharacterShort
     }
 }
+
+fragment ShikiStaffShort on Person {
+    id
+    name
+    poster { ...PosterShort }
+}

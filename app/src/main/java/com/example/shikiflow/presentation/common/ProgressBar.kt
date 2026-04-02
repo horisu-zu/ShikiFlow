@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 fun ProgressBar(
     progress: Float,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     progressColor: Color = MaterialTheme.colorScheme.primary,
     cornerRadius: Dp = 8.dp,
     gapSize: Dp = ProgressIndicatorDefaults.LinearIndicatorTrackGapSize,

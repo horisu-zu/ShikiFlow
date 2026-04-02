@@ -17,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,10 +64,6 @@ fun AnimeTracksPage(
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
 
     var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
-
-    LaunchedEffect(userStatus) {
-        tracksViewModel.setStatus(userStatus)
-    }
 
     when (animeTrackItems.loadState.refresh) {
         is LoadState.Loading -> {

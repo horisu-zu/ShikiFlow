@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.screen.browse
 
 import androidx.navigation3.runtime.NavKey
-import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import kotlinx.serialization.Serializable

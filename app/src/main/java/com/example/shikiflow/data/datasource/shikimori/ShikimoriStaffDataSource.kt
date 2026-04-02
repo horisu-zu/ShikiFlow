@@ -8,11 +8,14 @@ import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.shikimori.AnimeStaffQuery
 import com.example.graphql.shikimori.MangaStaffQuery
+import com.example.graphql.shikimori.StaffSearchQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaff
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toVoiceActorRole
 import com.example.shikiflow.data.remote.PersonApi
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -160,5 +163,27 @@ class ShikimoriStaffDataSource @Inject constructor(
                 override fun getRefreshKey(state: PagingState<Int, MediaRole>): Int? = null
             }
         }.flow
+    }
+
+    override suspend fun searchStaff(
+        page: Int,
+        limit: Int,
+        search: String
+    ): Result<List<Browse.Staff>> {
+        if(search.isBlank()) {
+            return Result.success(emptyList())
+        }
+
+        val searchQuery = StaffSearchQuery(page, limit, search)
+        val response = apolloClient.query(searchQuery).execute()
+
+        return response.toResult().map { data ->
+            data.people
+                .map { staff ->
+                    Browse.Staff(
+                        data = staff.shikiStaffShort.toStaff()
+                    )
+                }
+        }
     }
 }

@@ -15,7 +15,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,42 +57,34 @@ fun MangaTracksPage(
     val mangaTrackItems = mangaTracksViewModel.mangaTracks[userStatus]?.collectAsLazyPagingItems()
         ?: return
 
-    var isRefreshing by remember { mutableStateOf(false) }
     var selectedItem by remember { mutableStateOf<MangaTrack?>(null) }
 
-    LaunchedEffect(userStatus) {
-        mangaTracksViewModel.setStatus(userStatus)
-    }
-
-    PullToRefreshCustomBox(
-        isRefreshing = isRefreshing,
-        enabled = isAppBarVisible,
-        onRefresh = {
-            isRefreshing = true
-            mangaTrackItems.refresh()
-            isRefreshing = false
+    when(mangaTrackItems.loadState.refresh) {
+        LoadState.Loading -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) { CircularProgressIndicator() }
         }
-    ) {
-        when (mangaTrackItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+        is LoadState.Error -> {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                ErrorItem(
+                    message = stringResource(R.string.mtp_loading_error),
+                    buttonLabel = stringResource(R.string.common_retry),
+                    onButtonClick = { mangaTrackItems.refresh() }
+                )
             }
-            is LoadState.Error -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = stringResource(R.string.mtp_loading_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { mangaTrackItems.refresh() }
-                    )
-                }
-            }
-            else -> {
+        }
+        else -> {
+            PullToRefreshCustomBox(
+                isRefreshing = mangaTrackItems.loadState.refresh is LoadState.Loading,
+                enabled = isAppBarVisible,
+                onRefresh = { mangaTrackItems.refresh() },
+                modifier = Modifier.fillMaxSize()
+            ) {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
@@ -118,41 +109,40 @@ fun MangaTracksPage(
                             modifier = Modifier.animateItem()
                         )
                     }
-                    mangaTrackItems.apply {
-                        if (loadState.append is LoadState.Loading) {
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
-                            }
+
+                    if (mangaTrackItems.loadState.append is LoadState.Loading) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
                         }
-                        if (loadState.append is LoadState.Error) {
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                ErrorItem(
-                                    message = stringResource(R.string.mtp_loading_error),
-                                    buttonLabel = stringResource(R.string.common_retry),
-                                    showFace = false,
-                                    onButtonClick = { mangaTrackItems.retry() }
-                                )
-                            }
+                    }
+                    if (mangaTrackItems.loadState.append is LoadState.Error) {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            ErrorItem(
+                                message = stringResource(R.string.mtp_loading_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                showFace = false,
+                                onButtonClick = { mangaTrackItems.retry() }
+                            )
                         }
                     }
                 }
-                selectedItem?.let {
-                    UserRateBottomSheet(
-                        userRate = it.toUserRateData(),
-                        rateUpdateState = params.rateUpdateState,
-                        onDismiss = {
-                            if (params.rateUpdateState != RateUpdateState.LOADING) {
-                                selectedItem = null
-                            }
-                        },
-                        onSave = { saveUserRate ->
-                            mangaTracksViewModel.saveUserRate(saveUserRate)
+            }
+            selectedItem?.let {
+                UserRateBottomSheet(
+                    userRate = it.toUserRateData(),
+                    rateUpdateState = params.rateUpdateState,
+                    onDismiss = {
+                        if (params.rateUpdateState != RateUpdateState.LOADING) {
+                            selectedItem = null
                         }
-                    )
-                }
+                    },
+                    onSave = { saveUserRate ->
+                        mangaTracksViewModel.saveUserRate(saveUserRate)
+                    }
+                )
             }
         }
     }

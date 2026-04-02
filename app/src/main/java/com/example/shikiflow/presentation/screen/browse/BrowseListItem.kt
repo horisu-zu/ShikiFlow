@@ -28,7 +28,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
@@ -43,7 +43,7 @@ import com.materialkolor.ktx.harmonize
 
 @Composable
 fun BrowseListItem(
-    browseItem: Browse.Anime,
+    browseItem: BrowseMedia.Anime,
     onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {

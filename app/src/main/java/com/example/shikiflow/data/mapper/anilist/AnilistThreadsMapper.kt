@@ -88,7 +88,7 @@ object AnilistThreadsMapper {
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
                 id = user?.id ?: 0,
-                avatarUrl = user?.avatar?.medium ?: "",
+                avatarUrl = user?.avatar?.large ?: "",
                 nickname = user?.name ?: ""
             ),
             childComments = childComments.parseChildComments().map { it.toDomain() },

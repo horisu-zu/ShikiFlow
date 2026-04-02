@@ -97,7 +97,7 @@ fun CompareScreenContent(
                                     showState[comparisonType]?.value = !(showState[comparisonType]?.value ?: true)
                                 },
                                 modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                                     .animateItem()
                             )
                         }
@@ -246,7 +246,7 @@ private fun ComparisonItem(
                 )
             }
             VerticalDivider(
-                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                color = MaterialTheme.colorScheme.surfaceContainer,
                 thickness = 2.dp,
                 modifier = Modifier.fillMaxHeight()
             )
@@ -274,7 +274,7 @@ private fun ComparisonItem(
             }
             if(comparisonType == ComparisonType.SHARED) {
                 VerticalDivider(
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
                     thickness = 2.dp,
                     modifier = Modifier.fillMaxHeight()
                 )

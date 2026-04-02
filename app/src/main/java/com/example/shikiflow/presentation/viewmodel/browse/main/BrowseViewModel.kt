@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -30,6 +30,13 @@ class BrowseViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) : ViewModel() {
 
+    val authType = settingsRepository.authTypeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+
     val browseUiSettings = settingsRepository.browseUiSettingsFlow
         .stateIn(
             scope = viewModelScope,
@@ -42,7 +49,7 @@ class BrowseViewModel @Inject constructor(
         .distinctUntilChanged()
         .flatMapLatest { order ->
             mediaRepository.paginatedBrowseMedia(
-                browseOptions = BrowseOptions(
+                browseOptions = MediaBrowseOptions(
                     mediaType = MediaType.ANIME,
                     status = MediaStatus.ONGOING,
                     order = order

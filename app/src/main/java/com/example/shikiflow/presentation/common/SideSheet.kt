@@ -131,7 +131,7 @@ fun SideSheet(
                         }
                     } else RectangleShape
                 )
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .pointerInput(Unit) {
                     if(enableSwipe) {
                         detectDragGestures(

@@ -246,7 +246,7 @@ private fun FavoriteStudioItem(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable { onStudioClick(id, name) }
             .padding(horizontal = 12.dp, vertical = 18.dp),
         contentAlignment = Alignment.Center

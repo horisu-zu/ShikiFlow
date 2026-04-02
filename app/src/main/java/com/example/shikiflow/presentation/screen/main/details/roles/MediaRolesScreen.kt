@@ -86,7 +86,7 @@ fun MediaRolesScreen(
         topBar = {
             PrimaryTabRow(
                 selectedTabIndex = pagerState.currentPage,
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
                 indicator = {
                     TabRowDefaults.PrimaryIndicator(
                         modifier = Modifier
@@ -105,7 +105,7 @@ fun MediaRolesScreen(
                     )
                 },
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .windowInsetsPadding(WindowInsets.statusBars)
             ) {
                 typesList.forEachIndexed { index, type ->

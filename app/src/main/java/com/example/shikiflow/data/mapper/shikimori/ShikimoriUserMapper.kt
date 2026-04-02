@@ -35,7 +35,7 @@ object ShikimoriUserMapper {
         return User(
             id = this.id,
             nickname = this.nickname,
-            avatarUrl = this.avatar,
+            avatarUrl = this.avatar.replace("/x48/", "/x160/"),
             lastOnlineAt = Instant.parse(this.lastOnlineAt.toString())
         )
     }

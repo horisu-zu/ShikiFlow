@@ -52,7 +52,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.DateMapper.displayValue
@@ -121,7 +121,7 @@ fun OngoingSideScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceVariant
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
                 scrollBehavior = scrollBehavior
             )
@@ -164,7 +164,7 @@ private fun OngoingSideScreenContent(
         PrimaryScrollableTabRow(
             selectedTabIndex = pagerState.currentPage,
             containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                else MaterialTheme.colorScheme.surfaceVariant,
+                else MaterialTheme.colorScheme.surfaceContainer,
             edgePadding = 0.dp,
             indicator = {
                 TabRowDefaults.PrimaryIndicator(
@@ -183,7 +183,7 @@ private fun OngoingSideScreenContent(
                     color = MaterialTheme.colorScheme.surfaceBright
                 )
             },
-            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceVariant)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             DayOfWeek.entries.forEachIndexed { index, dayOfWeek ->
                 Tab(

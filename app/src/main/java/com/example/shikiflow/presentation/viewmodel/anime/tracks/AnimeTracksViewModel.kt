@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -65,21 +66,13 @@ class AnimeTracksViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun setStatus(userRateStatus: UserRateStatus) {
-        _params.update { params ->
-            params.copy(
-                userRateStatus = userRateStatus
-            )
-        }
-    }
-
     val animeTracks = UserRateStatus.entries.associateWith { userRateStatus ->
         _params
             .filter { params ->
-                params.userId != null && userRateStatus == params.userRateStatus
+                params.userId != null
             }
-            .distinctUntilChanged { old, new ->
-                old.userId == new.userId && old.userRateStatus == new.userRateStatus
+            .distinctUntilChangedBy { params ->
+                params.userId
             }
             .flatMapLatest { params ->
                 mediaTracksRepository.getAnimeTracks(userRateStatus, params.userId)

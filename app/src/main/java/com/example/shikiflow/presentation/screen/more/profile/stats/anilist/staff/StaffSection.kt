@@ -168,7 +168,7 @@ fun StaffStatItem(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(all = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

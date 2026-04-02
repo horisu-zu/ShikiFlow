@@ -1,8 +1,12 @@
 package com.example.shikiflow.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.StaffDataSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -54,4 +58,24 @@ class StaffRepositoryImpl @Inject constructor(
         staffId: Int,
         sort: Sort<CharacterType>
     ): Flow<PagingData<MediaRole>> = getSource().getVoiceActorRoles(staffId, sort)
+
+    override fun searchStaff(
+        search: String
+    ): Flow<PagingData<Browse.Staff>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 24
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource<Browse.Staff>(
+                    method = { page, limit ->
+                        getSource().searchStaff(page, limit, search)
+                    }
+                )
+            }
+        ).flow
+    }
 }

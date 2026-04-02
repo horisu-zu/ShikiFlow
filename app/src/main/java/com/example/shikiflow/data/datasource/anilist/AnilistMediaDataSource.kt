@@ -27,10 +27,10 @@ import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
 import com.example.shikiflow.domain.model.anime.AiringAnime
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -60,8 +60,8 @@ class AnilistMediaDataSource @Inject constructor(
     }
 
     override fun paginatedBrowseMedia(
-        browseOptions: BrowseOptions
-    ): Flow<PagingData<Browse>> {
+        browseOptions: MediaBrowseOptions
+    ): Flow<PagingData<BrowseMedia>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 24,
@@ -81,8 +81,8 @@ class AnilistMediaDataSource @Inject constructor(
     override suspend fun browseMedia(
         page: Int,
         limit: Int,
-        browseOptions: BrowseOptions
-    ): Result<List<Browse>> {
+        browseOptions: MediaBrowseOptions
+    ): Result<List<BrowseMedia>> {
         val browseQuery = MediaBrowseQuery(
             page = page,
             perPage = limit,
@@ -164,7 +164,7 @@ class AnilistMediaDataSource @Inject constructor(
     override fun getSimilarMedia(
         mediaType: MediaType,
         mediaId: Int
-    ): Flow<PagingData<Browse>> {
+    ): Flow<PagingData<BrowseMedia>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 15,
@@ -187,7 +187,7 @@ class AnilistMediaDataSource @Inject constructor(
         mediaId: Int,
         page: Int,
         limit: Int
-    ): Result<List<Browse>> {
+    ): Result<List<BrowseMedia>> {
         val recommendationsQuery = MediaRecommendationsQuery(mediaId, page, limit)
 
         val response = apolloClient.query(recommendationsQuery).execute()
@@ -209,7 +209,7 @@ class AnilistMediaDataSource @Inject constructor(
         search: String?,
         order: SortType?,
         onList: Boolean?
-    ): Result<List<Browse>> {
+    ): Result<List<BrowseMedia>> {
         val studioBrowseQuery = StudioBrowseQuery(
             studioId = studioId,
             page = page,

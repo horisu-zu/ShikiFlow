@@ -40,7 +40,7 @@ fun CustomSearchField(
     modifier: Modifier = Modifier,
     isActive: Boolean = true,
     activeContainerColor: Color = MaterialTheme.colorScheme.background,
-    inactiveContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant
+    inactiveContainerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current

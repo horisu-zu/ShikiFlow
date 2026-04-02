@@ -1,6 +1,7 @@
 package com.example.shikiflow.data.datasource
 
 import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.MediaRole
@@ -27,4 +28,10 @@ interface CharactersDataSource {
         mediaId: Int,
         mediaType: MediaType
     ): Result<List<MediaCharacterShort>>
+
+    suspend fun searchCharacters(
+        page: Int,
+        limit: Int,
+        search: String
+    ): Result<List<Browse.Character>>
 }

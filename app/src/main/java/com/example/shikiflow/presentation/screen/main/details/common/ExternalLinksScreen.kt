@@ -168,7 +168,7 @@ private fun LinkItem(
     Row(
         modifier = modifier.height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .clickable { onLinkClick(link.url) }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),

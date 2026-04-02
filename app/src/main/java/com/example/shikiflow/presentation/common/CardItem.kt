@@ -2,11 +2,8 @@ package com.example.shikiflow.presentation.common
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -16,8 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun CardItem(
@@ -41,35 +36,6 @@ fun CardItem(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             ),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
-        )
-    }
-}
-
-@Composable
-fun NavigationCard(
-    icon: IconResource,
-    title: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.25f))
-            .clickable { onClick() }
-            .then(modifier),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        icon.toIcon(
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.labelLarge.copy(
-                color = MaterialTheme.colorScheme.onSurface
-            )
         )
     }
 }

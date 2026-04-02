@@ -126,7 +126,7 @@ fun StaffItem(
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
                             .padding(horizontal = 6.dp, vertical = 4.dp)
                     )
                 }

@@ -15,7 +15,7 @@ import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.domain.model.anime.AiringAnime
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
@@ -24,7 +24,6 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -78,10 +77,10 @@ object AnilistMediaMapper {
         )
     }
 
-    fun MediaBrowse.toBrowse(mediaType: MediaType): Browse {
+    fun MediaBrowse.toBrowse(mediaType: MediaType): BrowseMedia {
         return when(mediaType) {
             MediaType.ANIME -> {
-                Browse.Anime(
+                BrowseMedia.Anime(
                     id = id,
                     title = title?.romaji ?: "",
                     posterUrl = coverImage?.extraLarge,
@@ -100,7 +99,7 @@ object AnilistMediaMapper {
                 )
             }
             MediaType.MANGA -> {
-                Browse.Manga(
+                BrowseMedia.Manga(
                     id = id,
                     title = title?.romaji ?: "",
                     posterUrl = coverImage?.extraLarge,

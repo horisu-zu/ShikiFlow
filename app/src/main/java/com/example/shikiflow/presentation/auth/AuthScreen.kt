@@ -84,7 +84,7 @@ fun AuthScreen(
             modifier = Modifier.fillMaxWidth()
                 .height(IntrinsicSize.Min)
                 .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
-                .background(color = MaterialTheme.colorScheme.surfaceVariant)
+                .background(color = MaterialTheme.colorScheme.surfaceContainer)
                 .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(horizontal = 24.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)

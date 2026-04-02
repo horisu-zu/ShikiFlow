@@ -47,7 +47,7 @@ fun MainAppBar(
     modifier: Modifier = Modifier
 ) {
     val containerColor = if (scrollBehavior.state.collapsedFraction >= 1f) {
-        MaterialTheme.colorScheme.surfaceVariant
+        MaterialTheme.colorScheme.surfaceContainer
     } else { MaterialTheme.colorScheme.background }
 
     TopAppBar(
@@ -96,7 +96,7 @@ fun MainAppBar(
                         onModeChange = onModeChange,
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
                             .padding(all = 8.dp)
                     )
                 }
@@ -134,7 +134,7 @@ private fun TracksTypeSelector(
                     .background(
                         color = when(isCurrent) {
                             true -> MaterialTheme.colorScheme.primary
-                            false -> MaterialTheme.colorScheme.surfaceVariant
+                            false -> MaterialTheme.colorScheme.surfaceContainer
                         }
                     )
                     .padding(all = 6.dp)

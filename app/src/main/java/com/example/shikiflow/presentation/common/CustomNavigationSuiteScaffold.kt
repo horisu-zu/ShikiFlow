@@ -43,7 +43,7 @@ fun CustomNavigationSuiteScaffold(
     navigationType: NavigationSuiteType,
     navItems: List<BottomNavItem>,
     onNavClick: (BottomNavItem) -> Unit,
-    navContainerColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    navContainerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val isRail = navigationType == NavigationSuiteType.NavigationRail

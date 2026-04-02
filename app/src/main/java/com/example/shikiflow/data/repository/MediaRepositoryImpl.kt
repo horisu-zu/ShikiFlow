@@ -6,11 +6,11 @@ import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.StudioMediaPagingSource
 import com.example.shikiflow.domain.model.anime.AiringAnime
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
@@ -42,14 +42,14 @@ class MediaRepositoryImpl @Inject constructor(
     ): Flow<DataResult<MediaDetails>> = getSource().getMediaDetails(id, mediaType)
 
     override fun paginatedBrowseMedia(
-        browseOptions: BrowseOptions
-    ): Flow<PagingData<Browse>> = getSource().paginatedBrowseMedia(browseOptions)
+        browseOptions: MediaBrowseOptions
+    ): Flow<PagingData<BrowseMedia>> = getSource().paginatedBrowseMedia(browseOptions)
 
     override suspend fun browseMedia(
         page: Int,
         size: Int,
-        browseOptions: BrowseOptions
-    ): Result<List<Browse>> = getSource().browseMedia(page, size, browseOptions)
+        browseOptions: MediaBrowseOptions
+    ): Result<List<BrowseMedia>> = getSource().browseMedia(page, size, browseOptions)
 
     override fun getAiringAnimes(
         onList: Boolean,
@@ -60,7 +60,7 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getSimilarMedia(
         mediaType: MediaType,
         mediaId: Int
-    ): Flow<PagingData<Browse>> {
+    ): Flow<PagingData<BrowseMedia>> {
         return getSource().getSimilarMedia(mediaType, mediaId)
     }
 
@@ -69,7 +69,7 @@ class MediaRepositoryImpl @Inject constructor(
         search: String?,
         order: SortType?,
         onList: Boolean?
-    ): Flow<PagingData<Browse>> {
+    ): Flow<PagingData<BrowseMedia>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 15,

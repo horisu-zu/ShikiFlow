@@ -3,11 +3,15 @@ package com.example.shikiflow.presentation.viewmodel.browse.search
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.browse.Browse.Companion.asBrowse
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.search.ScreenSearchState
-import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.domain.repository.StaffRepository
+import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.presentation.screen.browse.main.SearchType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -19,7 +23,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -28,27 +31,17 @@ import javax.inject.Inject
 @HiltViewModel
 class BrowseSearchViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
+    private val characterRepository: CharacterRepository,
+    private val staffRepository: StaffRepository,
+    private val userRepository: UserRepository,
     settingsRepository: SettingsRepository
 ): ViewModel(), BrowseSearchEvent {
 
     private val _searchState = MutableStateFlow(ScreenSearchState())
     val searchState: StateFlow<ScreenSearchState> = _searchState.asStateFlow()
 
-    private val _options = MutableStateFlow(BrowseOptions(MediaType.ANIME))
-    val options = _options.asStateFlow()
-
-    val browseMediaItems = combine(
-        _options,
-        _searchState.debounce { state ->
-            if(state.query.isNotBlank()) 500L else 0L
-        }
-    ) { params, screenState ->
-        params.copy(name = screenState.query)
-    }
-        .distinctUntilChanged()
-        .flatMapLatest { params ->
-            mediaRepository.paginatedBrowseMedia(browseOptions = params)
-        }.cachedIn(viewModelScope)
+    private val _params = MutableStateFlow(BrowseSearchParams())
+    val params = _params.asStateFlow()
 
     val authType = settingsRepository.authTypeFlow
         .stateIn(
@@ -57,8 +50,54 @@ class BrowseSearchViewModel @Inject constructor(
             initialValue = null
         )
 
-    override fun updateSearchOptions(browseOptions: BrowseOptions) {
-        _options.update { browseOptions }
+    val browseItems = combine(
+        _params,
+        _searchState.debounce { state ->
+            if(state.query.isNotBlank()) 500L else 0L
+        }
+    ) { params, screenState ->
+        params.copy(
+            mediaBrowseOptions = params.mediaBrowseOptions.copy(
+                name = screenState.query
+            )
+        )
+    }
+        .distinctUntilChanged()
+        .flatMapLatest { params ->
+            when(params.searchType) {
+                SearchType.MEDIA -> {
+                    mediaRepository.paginatedBrowseMedia(
+                        browseOptions = params.mediaBrowseOptions
+                    ).asBrowse()
+                }
+                SearchType.CHARACTER -> {
+                    characterRepository.searchCharacters(
+                        search = params.mediaBrowseOptions.name!!
+                    ).asBrowse()
+                }
+                SearchType.STAFF -> {
+                    staffRepository.searchStaff(
+                        search = params.mediaBrowseOptions.name!!
+                    ).asBrowse()
+                }
+                SearchType.USER -> {
+                    userRepository.getUsers(
+                        nickname = params.mediaBrowseOptions.name!!
+                    ).asBrowse()
+                }
+            }
+        }.cachedIn(viewModelScope)
+
+    override fun setSearchType(searchType: SearchType) {
+        _params.update { params ->
+            params.copy(searchType = searchType)
+        }
+    }
+
+    override fun updateSearchOptions(browseOptions: MediaBrowseOptions) {
+        _params.update { params ->
+            params.copy(mediaBrowseOptions = browseOptions)
+        }
     }
 
     override fun onQueryChange(query: String) {

@@ -20,7 +20,7 @@ fun StatusCard(
     text: String,
     modifier: Modifier = Modifier,
     style: TextStyle = MaterialTheme.typography.labelMedium,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceVariant
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
     Box(
         modifier = modifier.clip(RoundedCornerShape(8.dp))

@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.anilist.CharacterDetailsQuery
 import com.example.graphql.anilist.CharacterMediaAppearancesQuery
+import com.example.graphql.anilist.CharacterSearchQuery
 import com.example.graphql.anilist.CharactersQuery
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.local.source.CharacterMediaPagingSource
@@ -13,6 +14,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toCharacterMediaRole
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.CharacterMediaRole
@@ -109,6 +111,31 @@ class AnilistCharactersDataSource @Inject constructor(
                 ?.edges
                 ?.mapNotNull { characterEdge ->
                     characterEdge?.toDomain()
+                } ?: emptyList()
+        }
+    }
+
+    override suspend fun searchCharacters(
+        page: Int,
+        limit: Int,
+        search: String
+    ): Result<List<Browse.Character>> {
+        if(search.isBlank()) {
+            return Result.success(emptyList())
+        }
+
+        val searchQuery = CharacterSearchQuery(page, limit, search)
+        val response = apolloClient.query(searchQuery).execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.characters
+                ?.mapNotNull { character ->
+                    character?.aLCharacterShort?.let { aLCharacterShort ->
+                        Browse.Character(
+                            data = aLCharacterShort.toDomain()
+                        )
+                    }
                 } ?: emptyList()
         }
     }

@@ -28,7 +28,7 @@ fun ChapterProgressBarComponent(
     onSegmentClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     activeColor: Color = MaterialTheme.colorScheme.primary,
-    inactiveColor: Color = MaterialTheme.colorScheme.surfaceVariant
+    inactiveColor: Color = MaterialTheme.colorScheme.surfaceContainer
 ) {
     val animatedProgress by animateFloatAsState(
         targetValue = currentPage.toFloat(),

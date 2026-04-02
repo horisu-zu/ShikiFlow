@@ -1,6 +1,7 @@
 package com.example.shikiflow.data.datasource
 
 import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -51,13 +52,13 @@ interface UserDataSource {
 
     suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>
 
-    fun getUsers(query: String): Flow<PagingData<User>>
+    fun getUsers(query: String): Flow<PagingData<Browse.User>>
 
     suspend fun getUsersByNickname(
         page: Int,
         limit: Int,
         nickname: String
-    ): Result<List<User>>
+    ): Result<List<Browse.User>>
 
     suspend fun saveUserRate(
         userId: Int? = null,

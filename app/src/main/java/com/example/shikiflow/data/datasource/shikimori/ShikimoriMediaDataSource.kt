@@ -35,10 +35,10 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toDomain
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.MangaApi
 import com.example.shikiflow.domain.model.anime.AiringAnime
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -91,8 +91,8 @@ class ShikimoriMediaDataSource @Inject constructor(
     }
 
     override fun paginatedBrowseMedia(
-        browseOptions: BrowseOptions
-    ): Flow<PagingData<Browse>> {
+        browseOptions: MediaBrowseOptions
+    ): Flow<PagingData<BrowseMedia>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 24,
@@ -112,8 +112,8 @@ class ShikimoriMediaDataSource @Inject constructor(
     override suspend fun browseMedia(
         page: Int,
         limit: Int,
-        browseOptions: BrowseOptions
-    ): Result<List<Browse>> {
+        browseOptions: MediaBrowseOptions
+    ): Result<List<BrowseMedia>> {
         return  when(browseOptions.mediaType) {
             MediaType.ANIME -> {
                 val query = AnimeBrowseQuery(
@@ -236,10 +236,10 @@ class ShikimoriMediaDataSource @Inject constructor(
     override fun getSimilarMedia(
         mediaType: MediaType,
         mediaId: Int
-    ): Flow<PagingData<Browse>> {
+    ): Flow<PagingData<BrowseMedia>> {
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
-            object : PagingSource<Int, Browse>() {
-                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Browse> {
+            object : PagingSource<Int, BrowseMedia>() {
+                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BrowseMedia> {
                     return try {
                         val response = when(mediaType) {
                             MediaType.ANIME -> animeApi.getSimilarAnime(mediaId.toString()).map { it.toBrowseAnime() }
@@ -255,7 +255,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                         LoadResult.Error(e)
                     }
                 }
-                override fun getRefreshKey(state: PagingState<Int, Browse>): Int? = null
+                override fun getRefreshKey(state: PagingState<Int, BrowseMedia>): Int? = null
             }
         }.flow
     }
@@ -265,7 +265,7 @@ class ShikimoriMediaDataSource @Inject constructor(
         mediaId: Int,
         page: Int,
         limit: Int
-    ): Result<List<Browse>> {
+    ): Result<List<BrowseMedia>> {
         return try {
             val response = when(mediaType) {
                 MediaType.ANIME -> animeApi.getSimilarAnime(mediaId.toString()).map { it.toBrowseAnime() }
@@ -301,7 +301,7 @@ class ShikimoriMediaDataSource @Inject constructor(
         search: String?,
         order: SortType?,
         onList: Boolean?
-    ): Result<List<Browse>> {
+    ): Result<List<BrowseMedia>> {
         val query = AnimeBrowseQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),

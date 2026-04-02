@@ -78,7 +78,7 @@ fun SearchPage(
                 .fillMaxWidth()
                 .background(
                     color = if(isAtTop) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.surfaceVariant
+                        else MaterialTheme.colorScheme.surfaceContainer
                 ),
             contentPadding = PaddingValues(horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)

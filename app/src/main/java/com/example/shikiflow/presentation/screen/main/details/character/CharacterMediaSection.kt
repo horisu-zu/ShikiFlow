@@ -143,7 +143,7 @@ fun PaginatedListNavigateIcon(
     Box(
         modifier = modifier
             .clickable { onNavigate() }
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .background(MaterialTheme.colorScheme.surfaceContainer),
         contentAlignment = Alignment.Center
     ) {
         Icon(

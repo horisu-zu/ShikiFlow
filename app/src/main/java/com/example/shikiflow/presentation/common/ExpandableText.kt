@@ -371,7 +371,7 @@ private fun ImageItem(
                     .fillMaxWidth()
                     .aspectRatio(imageData.aspectRatio)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .clickable {
                         imageData.imageUrl?.let { imageUrl ->
                             onLinkClick(imageUrl)
@@ -470,7 +470,7 @@ private fun VideoItem(
                         .fillMaxWidth()
                         .aspectRatio(16f / 9f)
                         .clip(RoundedCornerShape(12.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainerLow)
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
                 )
             }
         )

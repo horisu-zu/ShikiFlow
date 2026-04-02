@@ -34,7 +34,7 @@ fun ThreadCommentItem(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable { onThreadClick() }
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(all = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {

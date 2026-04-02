@@ -86,8 +86,8 @@ fun MainNavigator(
     NavigationSuiteScaffold(
         navigationSuiteType = customNavType,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
-            navigationBarContainerColor = MaterialTheme.colorScheme.surfaceVariant,
-            navigationRailContainerColor = MaterialTheme.colorScheme.surfaceVariant
+            navigationBarContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         navigationItems = {
             items.forEach { navItem ->

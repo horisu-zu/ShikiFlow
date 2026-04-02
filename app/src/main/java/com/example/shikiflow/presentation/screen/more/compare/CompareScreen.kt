@@ -50,7 +50,7 @@ fun CompareScreen(
                     }
                 },
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .padding(top = paddingValues.calculateTopPadding())
             )
             HorizontalPager(

@@ -4,23 +4,23 @@ import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.MediaDataSource
-import com.example.shikiflow.domain.model.anime.Browse
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.browse.BrowseMedia
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import javax.inject.Inject
 
 class BrowsePagingSource @Inject constructor(
     private val mediaDataSource: MediaDataSource,
-    private val options: BrowseOptions
-): PagingSource<Int, Browse>() {
+    private val options: MediaBrowseOptions
+): PagingSource<Int, BrowseMedia>() {
 
-    override fun getRefreshKey(state: PagingState<Int, Browse>): Int? {
+    override fun getRefreshKey(state: PagingState<Int, BrowseMedia>): Int? {
         return state.anchorPosition?.let { anchorPosition ->
             state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
                 ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
         }
     }
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Browse> {
+    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BrowseMedia> {
         val page = params.key ?: 1
         val pageSize = params.loadSize
 

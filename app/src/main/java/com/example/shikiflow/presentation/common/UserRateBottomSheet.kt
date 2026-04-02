@@ -277,7 +277,7 @@ private fun StatusChips(
                     )
                 },
                 colors = FilterChipDefaults.filterChipColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    containerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
                 leadingIcon = {
                     userRateStatus.icon(mediaType).toIcon(

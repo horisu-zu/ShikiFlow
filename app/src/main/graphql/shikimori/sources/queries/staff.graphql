@@ -17,3 +17,13 @@ query MangaStaff(
         }
     }
 }
+
+query StaffSearch(
+    $page: PositiveInt!
+    $limit: PositiveInt!
+    $search: String!
+) {
+    people(page: $page, limit: $limit, search: $search) {
+        ...ShikiStaffShort
+    }
+}

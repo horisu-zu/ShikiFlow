@@ -105,7 +105,7 @@ fun ChapterTranslationsScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            else MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
                 HorizontalDivider()

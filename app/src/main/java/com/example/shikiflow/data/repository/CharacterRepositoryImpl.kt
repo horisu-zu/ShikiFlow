@@ -5,7 +5,9 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.local.source.CharactersPagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.MediaRole
@@ -61,6 +63,24 @@ class CharacterRepositoryImpl @Inject constructor(
                     charactersDataSource = getSource(),
                     mediaId = mediaId,
                     mediaType = mediaType
+                )
+            }
+        ).flow
+    }
+
+    override fun searchCharacters(search: String): Flow<PagingData<Browse.Character>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 24
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource<Browse.Character>(
+                    method = { page, limit ->
+                        getSource().searchCharacters(page, limit, search)
+                    }
                 )
             }
         ).flow

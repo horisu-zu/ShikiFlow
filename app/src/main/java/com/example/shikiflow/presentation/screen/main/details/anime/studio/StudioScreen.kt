@@ -50,7 +50,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
@@ -111,7 +110,7 @@ fun StudioScreen(
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.background,
                         scrolledContainerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            else MaterialTheme.colorScheme.surfaceContainer
                     ),
                     scrollBehavior = scrollBehavior
                 )
@@ -124,7 +123,7 @@ fun StudioScreen(
                             modifier = Modifier
                                 .background(
                                     color = if(isAtTop) MaterialTheme.colorScheme.background
-                                        else MaterialTheme.colorScheme.surfaceVariant
+                                        else MaterialTheme.colorScheme.surfaceContainer
                                 )
                                 .padding(horizontal = 12.dp, vertical = 8.dp)
                         )
@@ -216,7 +215,7 @@ private fun SearchPanel(
     Box(
         modifier = modifier.fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(all = 8.dp)
     ) {
         BasicTextField(

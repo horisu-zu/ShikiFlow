@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.mapper.shikimori
 
+import android.util.Log
 import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
@@ -21,7 +22,7 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDo
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.domain.model.anime.AiringAnime
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.media_details.MediaDetails
@@ -31,7 +32,9 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
+import com.example.shikiflow.utils.DateUtils.isInCurrentWeek
 import com.example.shikiflow.utils.DateUtils.timeDifference
+import kotlin.time.Duration.Companion.days
 import kotlin.time.Instant
 
 object ShikimoriMediaMapper {
@@ -123,8 +126,8 @@ object ShikimoriMediaMapper {
         )
     }
 
-    fun AnimeBrowseQuery.Anime.toBrowseAnime(): Browse.Anime {
-        return Browse.Anime(
+    fun AnimeBrowseQuery.Anime.toBrowseAnime(): BrowseMedia.Anime {
+        return BrowseMedia.Anime(
             id = this.id.toInt(),
             title = this.name,
             posterUrl = this.poster?.posterShort?.mainUrl,
@@ -139,8 +142,8 @@ object ShikimoriMediaMapper {
         )
     }
 
-    fun MangaBrowseQuery.Manga.toBrowseManga(): Browse.Manga {
-        return Browse.Manga(
+    fun MangaBrowseQuery.Manga.toBrowseManga(): BrowseMedia.Manga {
+        return BrowseMedia.Manga(
             id = this.id.toInt(),
             title = name,
             posterUrl = this.poster?.posterShort?.originalUrl,
@@ -151,8 +154,8 @@ object ShikimoriMediaMapper {
         )
     }
 
-    fun ShikiManga.toBrowseManga(): Browse.Manga {
-        return Browse.Manga(
+    fun ShikiManga.toBrowseManga(): BrowseMedia.Manga {
+        return BrowseMedia.Manga(
             id = this.id ?: 0,
             title = this.name ?: "Unknown",
             posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
@@ -162,8 +165,8 @@ object ShikimoriMediaMapper {
         )
     }
 
-    fun ShikiAnime.toBrowseAnime(): Browse.Anime {
-        return Browse.Anime(
+    fun ShikiAnime.toBrowseAnime(): BrowseMedia.Anime {
+        return BrowseMedia.Anime(
             id = this.id ?: 0,
             title = this.name ?: "Unknown",
             posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
@@ -176,6 +179,16 @@ object ShikimoriMediaMapper {
     }
 
     fun AnimeBrowseQuery.Anime.toAiringAnime(): AiringAnime {
+        val airedOnDate = airedOn?.dateShort?.toDomain()?.date
+        val airedThisWeek = airedOnDate?.isInCurrentWeek() ?: false
+
+        val episodeInstant = nextEpisodeAt?.let { instant ->
+            Instant.parse(input = instant.toString())
+                .let { nextEpInstant ->
+                    if(airedThisWeek) nextEpInstant.minus(7.days) else nextEpInstant
+                }
+        } ?: airedOnDate
+
         return AiringAnime(
             data = ShortMedia(
                 id = id.toInt(),
@@ -184,10 +197,9 @@ object ShikimoriMediaMapper {
                 coverImageUrl = poster?.posterShort?.originalUrl ?: "",
                 userRateStatus = userRate?.animeUserRate?.status?.toDomain()
             ),
-            episode = episodesAired + 1,
-            timeUntilAiring = nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) }
-                ?.timeDifference(),
-            airingAt = nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
+            episode = if(airedThisWeek) episodesAired else episodesAired + 1,
+            timeUntilAiring = episodeInstant?.timeDifference(),
+            airingAt = episodeInstant,
             releasedOn = releasedOn?.dateShort?.toDomain()?.date
         )
     }

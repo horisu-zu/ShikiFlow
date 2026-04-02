@@ -32,6 +32,18 @@ query StaffDetails(
     }
 }
 
+query StaffSearch(
+    $page: Int!,
+    $perPage: Int!,
+    $search: String!
+) {
+    Page(page: $page, perPage: $perPage) {
+        staff(search: $search) {
+            ...ALStaffShort
+        }
+    }
+}
+
 query StaffMediaRoles(
     $staffId: Int!,
     $page: Int!,

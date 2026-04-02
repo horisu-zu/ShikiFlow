@@ -36,4 +36,16 @@ object DateUtils {
         val now = Clock.System.now()
         return this - now
     }
+
+    fun Instant.isInCurrentWeek(): Boolean {
+        val timeZone = TimeZone.currentSystemDefault()
+
+        val today = Clock.System.now().toLocalDateTime(timeZone).date
+        val date = this.toLocalDateTime(timeZone).date
+
+        val startOfWeek = today.minus(today.dayOfWeek.ordinal, DateTimeUnit.DAY)
+        val endOfWeek = startOfWeek.plus(6, DateTimeUnit.DAY)
+
+        return date in startOfWeek..endOfWeek
+    }
 }

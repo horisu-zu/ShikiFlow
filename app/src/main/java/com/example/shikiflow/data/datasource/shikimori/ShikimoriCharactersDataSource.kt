@@ -7,11 +7,13 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
 import com.example.graphql.shikimori.AnimeCharactersQuery
+import com.example.graphql.shikimori.CharacterSearchQuery
 import com.example.graphql.shikimori.MangaCharactersQuery
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toCharacterRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.remote.CharacterApi
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.common.MediaRole
@@ -108,6 +110,28 @@ class ShikimoriCharactersDataSource @Inject constructor(
                         } ?: emptyList()
                 }
             }
+        }
+    }
+
+    override suspend fun searchCharacters(
+        page: Int,
+        limit: Int,
+        search: String
+    ): Result<List<Browse.Character>> {
+        if(search.isBlank()) {
+            return Result.success(emptyList())
+        }
+
+        val searchQuery = CharacterSearchQuery(page, limit, search)
+        val response = apolloClient.query(searchQuery).execute()
+
+        return response.toResult().map { data ->
+            data.characters
+                .map { character ->
+                    Browse.Character(
+                        data = character.characterShort.toDomain()
+                    )
+                }
         }
     }
 }

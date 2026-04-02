@@ -14,8 +14,10 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.screen.browse.main.BrowseScreen
+import com.example.shikiflow.presentation.screen.browse.side.BrowseSideScreen
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
@@ -48,6 +50,9 @@ fun BrowseScreenNavigator(
                 BrowseScreen(
                     browseNavOptions = browseNavOptions
                 )
+                /*BrowseScreen(
+                    browseNavOptions = browseNavOptions
+                )*/
             }
             entry<BrowseNavRoute.SideScreen> { route ->
                 BrowseSideScreen(

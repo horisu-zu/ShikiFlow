@@ -14,6 +14,7 @@ import com.example.graphql.anilist.UserActivitiesQuery
 import com.example.graphql.anilist.UserFollowersQuery
 import com.example.graphql.anilist.UserFollowingsQuery
 import com.example.graphql.anilist.UserGenresQuery
+import com.example.graphql.anilist.UserSearchQuery
 import com.example.graphql.anilist.UserStaffQuery
 import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.UserStatsQuery
@@ -22,7 +23,6 @@ import com.example.graphql.anilist.UserTagsQuery
 import com.example.graphql.anilist.UserThreadCommentsQuery
 import com.example.graphql.anilist.UserThreadsQuery
 import com.example.graphql.anilist.UserVoiceActorsQuery
-import com.example.graphql.anilist.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.FavoritesPagingSource
 import com.example.shikiflow.data.local.source.HistoryPagingSource
@@ -38,6 +38,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStudiosStat
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toTagsStats
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -384,7 +385,7 @@ class AnilistUserDataSource(
         return result
     }
 
-    override fun getUsers(query: String): Flow<PagingData<User>> {
+    override fun getUsers(query: String): Flow<PagingData<Browse.User>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 30,
@@ -405,8 +406,8 @@ class AnilistUserDataSource(
         page: Int,
         limit: Int,
         nickname: String
-    ): Result<List<User>> {
-        val query = UsersQuery(
+    ): Result<List<Browse.User>> {
+        val query = UserSearchQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
             search = Optional.presentIfNotNull(nickname)
@@ -417,7 +418,11 @@ class AnilistUserDataSource(
         return response.toResult().map { data ->
             data.Page?.users
                 ?.mapNotNull { user ->
-                    user?.aLUserShort?.toDomain()
+                    user?.aLUserShort?.let { alUser ->
+                        Browse.User(
+                            data = alUser.toDomain()
+                        )
+                    }
                 } ?: emptyList()
         }
     }

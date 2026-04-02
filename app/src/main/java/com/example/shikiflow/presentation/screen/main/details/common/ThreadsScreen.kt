@@ -200,7 +200,7 @@ fun ThreadItem(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable { onThreadClick(threadData.id) }
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {

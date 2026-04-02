@@ -50,7 +50,7 @@ fun CommentItem(
     onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
-    backgroundColor: Color = MaterialTheme.colorScheme.surfaceVariant,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     secondBackgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
     when(comment) {
@@ -71,7 +71,7 @@ fun CommentItem(
                 onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
                 modifier = modifier,
-                backgroundColor = backgroundColor,
+                firstBackgroundColor = backgroundColor,
                 secondBackgroundColor = secondBackgroundColor
             )
         }
@@ -139,13 +139,13 @@ private fun AnilistCommentTree(
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
-    backgroundColor: Color,
+    firstBackgroundColor: Color,
     secondBackgroundColor: Color,
     modifier: Modifier = Modifier,
     depth: Int = 0
 ) {
     val backgroundColor = when(depth % 2) {
-        0 -> backgroundColor
+        0 -> firstBackgroundColor
         else -> secondBackgroundColor
     }
 
@@ -171,7 +171,7 @@ private fun AnilistCommentTree(
                     onEntityClick = onEntityClick,
                     onLinkClick = onLinkClick,
                     onUserClick = onUserClick,
-                    backgroundColor = backgroundColor,
+                    firstBackgroundColor = firstBackgroundColor,
                     secondBackgroundColor = secondBackgroundColor
                 )
             }
@@ -180,7 +180,7 @@ private fun AnilistCommentTree(
                 Box(
                     modifier = Modifier.clip(CircleShape)
                         .clickable { onEntityClick(EntityType.COMMENT,commentData.id) }
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     contentAlignment = Alignment.CenterEnd
                 ) {
@@ -273,7 +273,7 @@ fun ThreadHeaderItem(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(all = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {

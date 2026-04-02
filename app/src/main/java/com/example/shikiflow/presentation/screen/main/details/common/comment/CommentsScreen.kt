@@ -271,7 +271,7 @@ private fun CommentsMapSection(
             .background(
                 color = when(title) {
                     CommentType.OP -> MaterialTheme.colorScheme.background
-                        else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        else -> MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f)
                 }
             )
             .padding(horizontal = 8.dp, vertical = 12.dp),

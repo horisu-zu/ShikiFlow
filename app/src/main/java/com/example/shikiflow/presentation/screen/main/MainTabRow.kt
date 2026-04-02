@@ -29,7 +29,7 @@ fun MainTabRow(
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedTab,
         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-            else MaterialTheme.colorScheme.surfaceVariant,
+            else MaterialTheme.colorScheme.surfaceContainer,
         edgePadding = 0.dp,
         indicator = {
             TabRowDefaults.PrimaryIndicator(

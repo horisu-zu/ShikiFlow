@@ -237,7 +237,7 @@ private fun StatusesStatsComponent(
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(
                     start = barHorizontalPadding,
                     end = barHorizontalPadding,

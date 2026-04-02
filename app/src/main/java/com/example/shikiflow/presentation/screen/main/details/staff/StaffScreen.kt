@@ -137,7 +137,7 @@ fun StaffScreen(
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
-                            else MaterialTheme.colorScheme.surfaceVariant
+                            else MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
                 if(!isAtTop) { HorizontalDivider() }
@@ -370,7 +370,7 @@ private fun StaffTitleSection(
                         isExpanded = !isExpanded
                     }
                 )
-                .background(MaterialTheme.colorScheme.surfaceVariant),
+                .background(MaterialTheme.colorScheme.surfaceContainer),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -399,7 +399,7 @@ private fun StaffTitleSection(
             modifier = Modifier
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
             Column(
                 modifier = modifier

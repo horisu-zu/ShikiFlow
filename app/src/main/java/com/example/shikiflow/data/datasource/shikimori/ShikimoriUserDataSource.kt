@@ -26,6 +26,7 @@ import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.stats.TypeStat
@@ -216,7 +217,7 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
-    override fun getUsers(query: String): Flow<PagingData<User>> {
+    override fun getUsers(query: String): Flow<PagingData<Browse.User>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 30,
@@ -237,7 +238,7 @@ class ShikimoriUserDataSource @Inject constructor(
         page: Int,
         limit: Int,
         nickname: String
-    ): Result<List<User>> {
+    ): Result<List<Browse.User>> {
         val query = UsersQuery(
             page = Optional.present(page),
             limit = Optional.present(limit),
@@ -248,7 +249,9 @@ class ShikimoriUserDataSource @Inject constructor(
 
         return response.toResult().map { data ->
             data.users.map { userData ->
-                userData.userShort.toDomain()
+                Browse.User(
+                    data = userData.userShort.toDomain()
+                )
             }
         }
     }

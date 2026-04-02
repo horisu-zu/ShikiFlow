@@ -18,6 +18,18 @@ query Characters(
     }
 }
 
+query CharacterSearch(
+    $page: Int!,
+    $perPage: Int!,
+    $search: String!
+) {
+    Page(page: $page, perPage: $perPage) {
+        characters(search: $search) {
+            ...ALCharacterShort
+        }
+    }
+}
+
 query CharacterDetails(
     $id: Int!
 ) {

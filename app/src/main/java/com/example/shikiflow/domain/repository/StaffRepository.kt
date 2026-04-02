@@ -1,6 +1,7 @@
 package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -31,4 +32,8 @@ interface StaffRepository {
         staffId: Int,
         sort: Sort<CharacterType>
     ): Flow<PagingData<MediaRole>>
+
+    fun searchStaff(
+        search: String
+    ): Flow<PagingData<Browse.Staff>>
 }

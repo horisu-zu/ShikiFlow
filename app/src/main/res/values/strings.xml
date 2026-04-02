@@ -189,10 +189,8 @@
 
     <string name="browse_type_anime_ongoing">Ongoings Calendar</string>
     <string name="browse_type_search">Search</string>
-    <string name="browse_type_anime_top">Top Anime</string>
-    <string name="browse_type_manga_top">Top Manga</string>
-    <string name="browse_type_popular_anime">Popular Anime</string>
-    <string name="browse_type_popular_manga">Popular Manga</string>
+    <string name="browse_type_top_score">Top Score</string>
+    <string name="browse_type_popular">Top Popular</string>
     <string name="day_of_week_monday">Monday</string>
     <string name="day_of_week_tuesday">Tuesday</string>
     <string name="day_of_week_wednesday">Wednesday</string>
@@ -307,6 +305,7 @@
     <string name="anime_origin_other">Other</string>
 
     <string name="profile">Profile</string>
+    <string name="user_label">User</string>
 
     <string name="about_check_updates">Check for Updates</string>
     <string name="about_checking_updates">Checking for updates…</string>

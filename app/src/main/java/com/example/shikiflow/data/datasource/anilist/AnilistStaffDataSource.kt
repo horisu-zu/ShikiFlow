@@ -9,6 +9,7 @@ import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaStaffQuery
 import com.example.graphql.anilist.StaffDetailsQuery
 import com.example.graphql.anilist.StaffMediaRolesQuery
+import com.example.graphql.anilist.StaffSearchQuery
 import com.example.graphql.anilist.VoiceActorRolesQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.local.source.MediaStaffPagingSource
@@ -21,6 +22,7 @@ import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistCharacterSort
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistStaffSort
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
@@ -197,6 +199,31 @@ class AnilistStaffDataSource @Inject constructor(
                         VoiceActorMediaRole(
                             characterShort = characterShort,
                             shortMediaList = shortMediaList
+                        )
+                    }
+                } ?: emptyList()
+        }
+    }
+
+    override suspend fun searchStaff(
+        page: Int,
+        limit: Int,
+        search: String
+    ): Result<List<Browse.Staff>> {
+        if(search.isBlank()) {
+            return Result.success(emptyList())
+        }
+
+        val searchQuery = StaffSearchQuery(page, limit, search)
+        val response = apolloClient.query(searchQuery).execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.staff
+                ?.mapNotNull { character ->
+                    character?.aLStaffShort?.let { aLStaffShort ->
+                        Browse.Staff(
+                            data = aLStaffShort.toDomain()
                         )
                     }
                 } ?: emptyList()

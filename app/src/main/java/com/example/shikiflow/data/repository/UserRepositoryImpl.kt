@@ -2,6 +2,7 @@ package com.example.shikiflow.data.repository
 
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.UserDataSource
+import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -92,7 +93,7 @@ class UserRepositoryImpl @Inject constructor(
         mediaType: MediaType
     ): List<ShortUserMediaRate> = getSource().getMediaRates(userId, mediaType)
 
-    override fun getUsers(nickname: String): Flow<PagingData<User>> = getSource().getUsers(nickname)
+    override fun getUsers(nickname: String): Flow<PagingData<Browse.User>> = getSource().getUsers(nickname)
 
     override suspend fun saveUserRate(
         userId: Int?,

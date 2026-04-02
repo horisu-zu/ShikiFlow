@@ -1,6 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.browse.side
 
-import com.example.shikiflow.domain.model.anime.BrowseType
+import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.domain.model.auth.AuthType
 
 data class BrowseSideParams(

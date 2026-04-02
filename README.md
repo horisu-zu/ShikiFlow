@@ -10,9 +10,11 @@ and read manga in the App via the MangaDex API.
 Kotlin - Jetpack Compose - MVVM - Hilt - Room - GraphQL (Apollo) - Coil - ExoPlayer
 
 ## Screenshots
-| <img src="screenshots/anime_tracks_page_shikiflow.jpg" width="256"/> | <img src="screenshots/details_page_shikiflow.jpg" width="256"/> | <img src="screenshots/browse_page_shikiflow.jpg" width="256"/> | <img src="screenshots/manga_tracks_page_shikiflow.jpg" width="256"/> |
-|:--------------------------------------------------------------------:|:---------------------------------------------------------------:|:--------------------------------------------------------------:|:--------------------------------------------------------------------:|
-|                          Anime Tracks Page                           |                          Details Page                           |                          Browse Page                           |                          Manga Tracks Page                           |"
+| <img src="screenshots/anime_tracks_page_shikiflow.jpg"/> |    <img src="screenshots/details_page_shikiflow.jpg"/>    | <img src="screenshots/manga_tracks_page_shikiflow.jpg"/> |
+|:--------------------------------------------------------:|:---------------------------------------------------------:|:--------------------------------------------------------:|
+|                    Anime Tracks Page                     |                       Details Page                        |                    Manga Tracks Page                     |"
+| <img src="screenshots/browse_main_page_shikiflow.jpg"/>  | <img src="screenshots/browse_search_page_shikiflow.jpg"/> |   <img src="screenshots/profile_page_shikiflow.jpg"/>    |
+|                     Browse Main Page                     |                    Browse Search Page                     |                   AniList Profile Page                   |
 
 ## How to Use the App
 1. Go to [Releases](https://github.com/horisu-zu/ShikiFlow/releases) and download latest (preferably) version.

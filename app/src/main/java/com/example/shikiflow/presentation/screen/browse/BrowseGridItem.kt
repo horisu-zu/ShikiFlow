@@ -14,13 +14,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.anime.Browse
+import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 
 @Composable
 fun BrowseGridItem(
-    browseItem: Browse,
+    browseItem: BrowseMedia,
     onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {

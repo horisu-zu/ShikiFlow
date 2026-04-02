@@ -25,29 +25,12 @@ query CharacterDetails(
 }
 
 query CharacterSearch(
-    $page: PositiveInt = 1
-    $limit: PositiveInt = 2
-    $search: String
+    $page: PositiveInt!
+    $limit: PositiveInt!
+    $search: String!
 ) {
     characters(page: $page, limit: $limit, search: $search) {
-        id
-        malId
-        name
-        russian
-        japanese
-        synonyms
-        url
-        createdAt
-        updatedAt
-        isAnime
-        isManga
-        isRanobe
-
-        poster { ...PosterShort }
-
-        description
-        descriptionHtml
-        descriptionSource
+        ...CharacterShort
     }
 }
 

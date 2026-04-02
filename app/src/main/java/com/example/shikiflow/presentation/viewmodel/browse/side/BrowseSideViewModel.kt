@@ -3,8 +3,8 @@ package com.example.shikiflow.presentation.viewmodel.browse.side
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.anime.BrowseType
-import com.example.shikiflow.domain.model.search.BrowseOptions
+import com.example.shikiflow.domain.model.browse.BrowseType
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -44,7 +44,7 @@ class BrowseSideViewModel @Inject constructor(
         .distinctUntilChanged()
         .flatMapLatest { params ->
             mediaRepository.paginatedBrowseMedia(
-                browseOptions = BrowseOptions(
+                browseOptions = MediaBrowseOptions(
                     mediaType = params.browseType?.mediaType!!,
                     order = params.browseType.sort
                 )
