@@ -58,6 +58,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.kodik.KodikAnime
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.EpisodeMetadata
 import com.example.shikiflow.presentation.viewmodel.anime.watch.translations.AnimeTranslationsViewModel
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.Converter.toAbbreviation
@@ -214,19 +215,46 @@ fun AnimeTranslationSelectScreen(
                     }
                 } else {
                     uiState.translations.let { animeTranslations ->
-                        val currentTranslations = animeTranslations[translationFilter] ?: emptyList()
+                        val translations = animeTranslations[translationFilter] ?: emptyList()
 
-                        items(
-                            count = currentTranslations.size,
-                            key = { index -> currentTranslations[index].id }
-                        ) { index ->
-                            AnimeTranslationItem(
-                                kodikAnime = currentTranslations[index],
-                                onTranslationClick = { link, translationGroup, episodesCount ->
-                                    navOptions.navigateToEpisodeSelection(link, translationGroup, episodesCount)
-                                },
-                                modifier = Modifier.animateItem()
-                            )
+                        if(translations.isNotEmpty()) {
+                            items(
+                                count = translations.size,
+                                key = { index -> translations[index].id }
+                            ) { index ->
+                                val translation = translations[index]
+
+                                AnimeTranslationItem(
+                                    kodikAnime = translation,
+                                    onTranslationClick = { link, translationGroup, episodesRange ->
+                                        if(episodesRange.last == 0) {
+                                            navOptions.navigateToEpisodeScreen(
+                                                playerNavigate = EpisodeMetadata(
+                                                    link = link,
+                                                    translationGroup = translationGroup,
+                                                    episodeNum = 0,
+                                                    firstEpisode = episodesRange.first,
+                                                    lastEpisode = 0
+                                                )
+                                            )
+                                        } else {
+                                            navOptions.navigateToEpisodeSelection(link, translationGroup, episodesRange)
+                                        }
+                                    },
+                                    modifier = Modifier.animateItem()
+                                )
+                            }
+                        } else {
+                            item {
+                                Box(
+                                    modifier = Modifier.fillParentMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    ErrorItem(
+                                        message = stringResource(R.string.translation_empty_response)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -238,14 +266,24 @@ fun AnimeTranslationSelectScreen(
 @Composable
 private fun AnimeTranslationItem(
     kodikAnime: KodikAnime,
-    onTranslationClick: (String, String, Int) -> Unit,
+    onTranslationClick: (String, String, IntRange) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val episodesRange = if(kodikAnime.episodesCount != null && kodikAnime.lastEpisode != null) {
+        (kodikAnime.lastEpisode - kodikAnime.episodesCount + 1)..(kodikAnime.lastEpisode)
+    } else 0..0
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onTranslationClick(kodikAnime.link, kodikAnime.translation.title, kodikAnime.episodesCount ?: 1) }
+            .clickable {
+                onTranslationClick(
+                    kodikAnime.link,
+                    kodikAnime.translation.title,
+                    episodesRange
+                )
+            }
             .padding(horizontal = 4.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically

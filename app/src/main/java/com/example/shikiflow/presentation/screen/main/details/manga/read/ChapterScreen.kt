@@ -365,7 +365,7 @@ private fun ChaptersListItem(
                     append(" — $chapterTitle")
                 }
             },
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }

@@ -25,6 +25,7 @@ import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -41,20 +42,27 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.data.response.TimeRange
+import com.example.shikiflow.data.response.TimeRange.Companion.isWithinRange
+import com.example.shikiflow.presentation.screen.main.details.anime.watch.PlayerEvent
 import com.example.shikiflow.utils.Converter
 
 @Composable
 fun PlayerBottomComponent(
-    currentProgress: Long,
+    currentPosition: Long,
     duration: Long,
-    shouldShowSkipOp: Boolean,
+    playerEvent: PlayerEvent,
+    opTimeCode: TimeRange?,
     isFit: Boolean,
-    onSkipOp: () -> Unit,
-    onSeek: (Long) -> Unit,
     onResize: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val thumbSize = 16.dp
+    val shouldShowSkipOp by remember(currentPosition) {
+        derivedStateOf {
+            opTimeCode?.isWithinRange(currentPosition) ?: false
+        }
+    }
 
     Column(
         modifier = modifier.padding(start = 48.dp, bottom = 16.dp)
@@ -67,7 +75,11 @@ fun PlayerBottomComponent(
             Row(
                 modifier = Modifier.clip(CircleShape)
                     .background(colorResource(R.color.blue))
-                    .clickable { onSkipOp() }
+                    .clickable {
+                        opTimeCode?.let { timeRange ->
+                            playerEvent.onSeekTo(timeRange.endTime)
+                        }
+                    }
                     .padding(horizontal = 12.dp, vertical = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically
@@ -90,8 +102,10 @@ fun PlayerBottomComponent(
             Column(modifier = Modifier.weight(1f)) {
                 PlayerSlider(
                     duration = duration,
-                    currentProgress = currentProgress,
-                    onSeek = onSeek,
+                    currentProgress = currentPosition,
+                    onSeek = { positionMs ->
+                        playerEvent.onSeekTo(positionMs)
+                    },
                     thumbSize = thumbSize
                 )
                 Row(
@@ -99,8 +113,22 @@ fun PlayerBottomComponent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    DurationBox(currentProgress)
+                    DurationBox(currentPosition)
                     DurationBox(duration)
+                }
+            }
+            if(opTimeCode == null) {
+                IconButton(
+                    onClick = {
+                        playerEvent.onSeek(87500L)
+                    }
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_double_arrow),
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.White
+                    )
                 }
             }
             IconButton(onClick = onResize) {

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +39,6 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.AspectRatioFrameLayout
 import androidx.media3.ui.PlayerView
-import com.example.shikiflow.data.response.TimeRange.Companion.isWithinRange
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.PlayerEvent
 import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.KodikEpisodeUiState
 import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.PlayerState
@@ -53,9 +51,10 @@ fun Player(
     player: ExoPlayer?,
     playerState: PlayerState,
     playerEvent: PlayerEvent,
+    title: String,
     currentPosition: Long,
     episodeData: EpisodeMetadata,
-    episodesCount: Int,
+    episodesRange: IntRange,
     currentQuality: String,
     episodeUiState: KodikEpisodeUiState,
     onSeekToEpisode: (Int) -> Unit,
@@ -70,12 +69,6 @@ fun Player(
     var isDropdownExpanded by remember { mutableStateOf(false) }
 
     val isLoading = player?.playbackState == Player.STATE_BUFFERING || episodeUiState.isLoading
-
-    val shouldShowSkipOp by remember(currentPosition) {
-        derivedStateOf {
-            episodeUiState.kodikEpisode?.opTimeCode?.isWithinRange(currentPosition) ?: false
-        }
-    }
 
     LaunchedEffect(showControls, playerState.isPlaying, isDropdownExpanded) {
         delay(3000)
@@ -146,9 +139,9 @@ fun Player(
                 .windowInsetsPadding(WindowInsets.statusBars)
         ) {
             PlayerTopComponent(
-                title = episodeData.title,
-                episodeNum = episodeData.serialNum,
-                episodesCount = episodesCount,
+                title = title,
+                episodeNum = episodeData.episodeNum,
+                episodesList = episodesRange.toList(),
                 currentQuality = currentQuality,
                 translationGroup = episodeData.translationGroup,
                 qualityData = episodeUiState.kodikEpisode?.qualityLink?.keys?.toList(),
@@ -168,10 +161,10 @@ fun Player(
         PlayerControls(
             isPlaying = playerState.isPlaying,
             isLoading = isLoading,
-            isPreviousAvailable = episodeData.serialNum > 1,
-            isNextAvailable = episodeData.serialNum < episodesCount,
+            isPreviousAvailable = episodeData.episodeNum > 1,
+            isNextAvailable = episodeData.episodeNum < episodesRange.last,
             onSeekToEpisode = { offset ->
-                onSeekToEpisode(episodeData.serialNum + offset)
+                onSeekToEpisode(episodeData.episodeNum + offset)
             },
             onPlay = { playerEvent.onPlayToggle() },
             showControls = showControls,
@@ -200,17 +193,10 @@ fun Player(
         ) {
             PlayerBottomComponent(
                 duration = playerState.duration,
-                currentProgress = currentPosition,
-                shouldShowSkipOp = shouldShowSkipOp,
+                currentPosition = currentPosition,
+                playerEvent = playerEvent,
+                opTimeCode = episodeUiState.kodikEpisode?.opTimeCode,
                 isFit = isFit,
-                onSkipOp = {
-                    episodeUiState.kodikEpisode?.opTimeCode?.let { timeRange ->
-                        playerEvent.onSeekTo(timeRange.endTime)
-                    }
-                },
-                onSeek = { position ->
-                    playerEvent.onSeekTo(position)
-                },
                 onResize = { isFit = !isFit },
                 modifier = Modifier.fillMaxWidth()
             )

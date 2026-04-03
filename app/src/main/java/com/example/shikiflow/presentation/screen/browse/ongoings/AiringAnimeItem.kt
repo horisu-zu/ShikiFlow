@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,7 +22,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
-import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.screen.browse.BrowseCoverItem
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -40,10 +40,12 @@ fun AiringAnimeItem(
             .clickable { onClick(airingAnime.data.id) },
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
     ) {
-        BaseImage(
-            model = airingAnime.data.coverImageUrl,
-            contentDescription = "Poster",
-            modifier = Modifier.width(96.dp)
+        BrowseCoverItem(
+            posterUrl = airingAnime.data.coverImageUrl,
+            mediaType = MediaType.ANIME,
+            userRateStatus = airingAnime.data.userRateStatus,
+            coverWidth = 96.dp,
+            cornerShape = 12.dp
         )
 
         Column(

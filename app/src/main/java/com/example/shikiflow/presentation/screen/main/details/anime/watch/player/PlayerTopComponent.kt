@@ -43,7 +43,7 @@ import com.example.shikiflow.R
 fun PlayerTopComponent(
     title: String,
     episodeNum: Int,
-    episodesCount: Int,
+    episodesList: List<Int>,
     currentQuality: String,
     translationGroup: String,
     qualityData: List<String>?,
@@ -89,14 +89,14 @@ fun PlayerTopComponent(
             )
         }
         qualityData?.let {
-            if(episodesCount > 1) {
+            if(episodesList.size > 1) {
                 PlayerDropdown(
                     label = stringResource(R.string.media_item_episode, episodeNum),
-                    values = (1..episodesCount).map { epNum ->
+                    values = episodesList.map { epNum ->
                         stringResource(R.string.media_item_episode, epNum)
                     },
                     onValueChange = { index ->
-                        onEpisodeChange(index + 1)
+                        onEpisodeChange(index)
                     },
                     onExpand = onExpand
                 )

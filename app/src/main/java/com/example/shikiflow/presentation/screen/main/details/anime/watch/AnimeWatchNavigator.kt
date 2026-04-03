@@ -40,8 +40,19 @@ fun AnimeWatchNavigator(
     }
 
     val options = object : AnimeWatchNavOptions {
-        override fun navigateToEpisodeSelection(link: String, translationGroup: String, episodesCount: Int) {
-            watchBackstack.add(AnimeWatchNavRoute.EpisodeSelection(link, translationGroup, episodesCount))
+        override fun navigateToEpisodeSelection(
+            link: String,
+            translationGroup: String,
+            episodesRange: IntRange
+        ) {
+            watchBackstack.add(
+                AnimeWatchNavRoute.EpisodeSelection(
+                    link,
+                    translationGroup,
+                    firstEpisode = episodesRange.first,
+                    lastEpisode = episodesRange.last
+                )
+            )
         }
 
         override fun navigateToEpisodeScreen(playerNavigate: EpisodeMetadata) {
@@ -74,7 +85,7 @@ fun AnimeWatchNavigator(
                 EpisodeSelectionScreen(
                     title = title,
                     translationGroup = route.translationGroup,
-                    episodesCount = route.episodesCount,
+                    episodesRange = route.firstEpisode..route.lastEpisode,
                     link = route.link,
                     completedEpisodes = completedEpisodes,
                     navOptions = options
@@ -82,6 +93,7 @@ fun AnimeWatchNavigator(
             }
             entry<AnimeWatchNavRoute.EpisodeScreen> { route ->
                 EpisodeScreen(
+                    title = title,
                     playerNavigate = route.episodeMetadata,
                     navOptions = options
                 )

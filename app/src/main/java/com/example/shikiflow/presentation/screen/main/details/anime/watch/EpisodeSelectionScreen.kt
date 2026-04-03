@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime.watch
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -38,7 +38,7 @@ import com.example.shikiflow.presentation.screen.main.details.manga.read.MediaIt
 fun EpisodeSelectionScreen(
     title: String,
     translationGroup: String,
-    episodesCount: Int,
+    episodesRange: IntRange,
     link: String,
     completedEpisodes: Int,
     navOptions: AnimeWatchNavOptions
@@ -48,6 +48,10 @@ fun EpisodeSelectionScreen(
         derivedStateOf {
             lazyListState.firstVisibleItemIndex == 0 && lazyListState.firstVisibleItemScrollOffset == 0
         }
+    }
+
+    val episodesList = remember(episodesRange) {
+        episodesRange.toList()
     }
 
     Scaffold(
@@ -94,18 +98,21 @@ fun EpisodeSelectionScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            items(episodesCount) { index ->
-                val serialNum = index + 1
-
+            items(episodesList) { episodeNum ->
                 MediaItem(
-                    mediaNumber = serialNum.toString(),
+                    mediaNumber = episodeNum.toString(),
                     onItemClick = {
-                        Log.d("EpisodeSelectionScreen", "Navigating to episode $serialNum")
                         navOptions.navigateToEpisodeScreen(
-                            EpisodeMetadata(title, link, translationGroup, serialNum, episodesCount)
+                            playerNavigate = EpisodeMetadata(
+                                link,
+                                translationGroup,
+                                episodeNum,
+                                firstEpisode = episodesRange.first,
+                                lastEpisode = episodesRange.last
+                            )
                         )
                     },
-                    isCompleted = serialNum <= completedEpisodes,
+                    isCompleted = episodeNum <= completedEpisodes,
                     mediaType = MediaType.ANIME
                 )
             }

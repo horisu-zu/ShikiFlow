@@ -155,7 +155,7 @@ private fun <T> SegmentedProgressBarItem(
                     .weight(count)
                     .fillMaxHeight()
                     .background(
-                        color = color(status).harmonize(MaterialTheme.colorScheme.onBackground)
+                        color = color(status).harmonize(MaterialTheme.colorScheme.background)
                     )
             )
         }
@@ -170,7 +170,7 @@ private fun SegmentedDataRowItem(
     size: Dp,
     modifier: Modifier = Modifier
 ) {
-    val onBackgroundColor = MaterialTheme.colorScheme.onBackground
+    val backgroundColor = MaterialTheme.colorScheme.background
 
     Row(
         modifier = modifier.height(IntrinsicSize.Min),
@@ -179,7 +179,7 @@ private fun SegmentedDataRowItem(
     ) {
         Canvas(modifier = Modifier.size(size)) {
             drawCircle(
-                color = color.harmonize(onBackgroundColor),
+                color = color.harmonize(backgroundColor),
                 style = Fill
             )
         }
@@ -216,7 +216,7 @@ private fun SegmentedDataColumnItem(
                 .clip(RoundedCornerShape(8.dp))
                 .background(
                     color = color
-                        .harmonize(MaterialTheme.colorScheme.onBackground)
+                        .harmonize(MaterialTheme.colorScheme.background)
                         .copy(alpha = 0.3f)
                 )
                 .padding(horizontal = 8.dp, vertical = 6.dp),
@@ -226,7 +226,7 @@ private fun SegmentedDataColumnItem(
                 text = stringResource(id = label),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Medium,
-                    color = color.harmonize(MaterialTheme.colorScheme.onBackground)
+                    color = color.harmonize(MaterialTheme.colorScheme.background)
                 )
             )
         }
@@ -234,7 +234,7 @@ private fun SegmentedDataColumnItem(
             text = count.toString(),
             style = MaterialTheme.typography.bodySmall.copy(
                 fontWeight = FontWeight.SemiBold,
-                color = color.harmonize(MaterialTheme.colorScheme.onBackground)
+                color = color.harmonize(MaterialTheme.colorScheme.background)
             )
         )
     }

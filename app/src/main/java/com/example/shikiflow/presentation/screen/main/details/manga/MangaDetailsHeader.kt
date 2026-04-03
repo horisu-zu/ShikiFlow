@@ -184,7 +184,7 @@ fun MangaUserRateItem(
     modifier: Modifier = Modifier
 ) {
     val rateColor = (userRateStatus ?: UserRateStatus.UNKNOWN).color()
-        .harmonize(MaterialTheme.colorScheme.onBackground)
+        .harmonize(MaterialTheme.colorScheme.background)
 
     Row(
         modifier = modifier.fillMaxWidth(),

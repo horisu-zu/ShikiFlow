@@ -59,7 +59,7 @@ fun SearchAnimeTrackItem(
                 StatusCard(
                     text = stringResource(id = animeItem.track.status.mapStatus()) ,
                     containerColor = animeItem.track.status.color()
-                        .harmonize(MaterialTheme.colorScheme.onBackground)
+                        .harmonize(MaterialTheme.colorScheme.background)
                 )
                 if(isWatched(animeItem.track.status)) {
                     StatusCard(

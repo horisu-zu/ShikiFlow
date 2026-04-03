@@ -113,7 +113,7 @@ class ChapterViewModel @Inject constructor(
 
     val mangaChaptersItems = _chapterUiState
         .filter { state ->
-            state.mangaId != null && state.scanlationGroupsIds != null && state.uploader != null
+            state.mangaId != null && (state.scanlationGroupsIds != null || state.uploader != null)
         }
         .distinctUntilChangedBy { state ->
             state.mangaId

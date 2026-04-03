@@ -174,7 +174,7 @@ fun BrowseCoverItem(
                         )
                     )
                     .background(
-                        color = status.color().harmonize(MaterialTheme.colorScheme.onBackground)
+                        color = status.color().harmonize(MaterialTheme.colorScheme.background)
                     ),
                 contentAlignment = Alignment.Center
             ) {

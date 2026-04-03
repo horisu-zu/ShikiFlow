@@ -4,9 +4,9 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class EpisodeMetadata(
-    val title: String,
     val link: String,
     val translationGroup: String,
-    val serialNum: Int,
-    val episodesCount: Int
+    val episodeNum: Int,
+    val firstEpisode: Int,
+    val lastEpisode: Int
 )

@@ -19,6 +19,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.EpisodeV
 @OptIn(UnstableApi::class)
 @Composable
 fun EpisodeScreen(
+    title: String,
     playerNavigate: EpisodeMetadata,
     navOptions: AnimeWatchNavOptions,
     viewModel: EpisodeViewModel = hiltViewModel()
@@ -27,8 +28,8 @@ fun EpisodeScreen(
     val episodeUiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentPosition by viewModel.currentPosition.collectAsStateWithLifecycle()
 
-    LaunchedEffect(playerNavigate.link, playerNavigate.serialNum) {
-        viewModel.setEpisode(playerNavigate.link, playerNavigate.serialNum)
+    LaunchedEffect(playerNavigate.link, playerNavigate.episodeNum) {
+        viewModel.setEpisode(playerNavigate.link, playerNavigate.episodeNum)
     }
 
     Box(
@@ -40,16 +41,17 @@ fun EpisodeScreen(
         Player(
             player = player,
             playerState = episodeUiState.playerState,
+            playerEvent = viewModel,
+            title = title,
             currentPosition = currentPosition,
             episodeData = playerNavigate,
-            episodesCount = playerNavigate.episodesCount,
+            episodesRange = playerNavigate.firstEpisode..playerNavigate.lastEpisode,
             currentQuality = episodeUiState.currentQuality ?: "",
             episodeUiState = episodeUiState.kodikEpisodeUiState,
-            playerEvent = viewModel,
             onSeekToEpisode = { episodeNum ->
                 navOptions.navigateToEpisodeScreen(
                     playerNavigate = playerNavigate.copy(
-                        serialNum = episodeNum
+                        episodeNum = episodeNum
                     )
                 )
             },

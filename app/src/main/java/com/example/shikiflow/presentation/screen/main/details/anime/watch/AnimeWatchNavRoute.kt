@@ -12,7 +12,8 @@ sealed interface AnimeWatchNavRoute : NavKey {
     data class EpisodeSelection(
         val link: String,
         val translationGroup: String,
-        val episodesCount: Int
+        val firstEpisode: Int,
+        val lastEpisode: Int
     ) : AnimeWatchNavRoute
 
     @Serializable

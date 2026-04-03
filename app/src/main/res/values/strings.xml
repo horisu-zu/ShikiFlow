@@ -73,6 +73,7 @@
 
     <string name="next_episode">"Next episode on "</string>
 
+    <string name="browse_on_my_list">On My List</string>
     <string name="browse_ongoings">Ongoings</string>
     <string name="browse_mode_select">Display Mode and Sorting</string>
     <string name="ongoing_browse_mode_score">Score</string>
@@ -144,6 +145,7 @@
     <string name="translation_filter_all">All</string>
     <string name="translation_filter_voice">Voice</string>
     <string name="translation_filter_subtitles">Subtitles</string>
+    <string name="translation_empty_response">Translations aren\'t available yet</string>
 
     <string name ="media_item_episode">Episode %1s</string>
     <string name ="media_item_chapter">Chapter %1s</string>

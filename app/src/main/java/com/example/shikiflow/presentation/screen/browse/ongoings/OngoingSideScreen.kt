@@ -94,7 +94,7 @@ fun OngoingSideScreen(
                         selected = params.onList,
                         label = {
                             Text(
-                                text = "On My List"
+                                text = stringResource(R.string.browse_on_my_list)
                             )
                         },
                         onClick = { ongoingsCalendarViewModel.setOnList(!params.onList) },
