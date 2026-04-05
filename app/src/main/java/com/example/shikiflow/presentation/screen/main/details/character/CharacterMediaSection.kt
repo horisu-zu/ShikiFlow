@@ -46,7 +46,7 @@ fun CharacterMediaSection(
 ) {
     val mediaItemWidth = 120.dp
     val imageType = ImageType.Poster(
-        defaultWidth = Int.MAX_VALUE.dp
+        width = Int.MAX_VALUE.dp
     )
 
     Column(
@@ -93,7 +93,7 @@ fun CharacterMediaSection(
                     PaginatedListNavigateIcon(
                         modifier = Modifier
                             .width(mediaItemWidth)
-                            .aspectRatio(imageType.defaultAspectRatio)
+                            .aspectRatio(imageType.aspectRatio)
                             .clip(RoundedCornerShape(12.dp)),
                         onNavigate = { onPaginatedNavigate() }
                     )

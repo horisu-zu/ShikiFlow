@@ -38,7 +38,8 @@ import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.TextWithIcon
-import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
 import kotlin.time.Instant
@@ -330,9 +331,12 @@ private fun CommentUserItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RoundedImage(
+            BaseImage(
                 model = userData.avatarUrl,
-                modifier = Modifier.size(24.dp)
+                imageType = ImageType.Square(
+                    clip = RoundedCornerShape(percent = 16),
+                    width = 24.dp
+                )
             )
             Text(
                 text = userData.nickname,

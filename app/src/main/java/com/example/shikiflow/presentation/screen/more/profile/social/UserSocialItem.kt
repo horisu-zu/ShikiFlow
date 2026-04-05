@@ -29,8 +29,8 @@ fun UserSocialItem(
         BaseImage(
             model = user.avatarUrl,
             imageType = ImageType.Square(
-                defaultWidth = 48.dp,
-                defaultClip = RoundedCornerShape(18)
+                width = 48.dp,
+                clip = RoundedCornerShape(18)
             )
         )
         Text(

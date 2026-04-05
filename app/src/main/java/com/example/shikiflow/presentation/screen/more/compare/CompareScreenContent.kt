@@ -236,7 +236,7 @@ private fun ComparisonItem(
                 BaseImage(
                     model = mediaItem.imageUrl,
                     contentDescription = "Media Image",
-                    imageType = ImageType.Poster(defaultWidth = 48.dp)
+                    imageType = ImageType.Poster(width = 48.dp)
                 )
                 Text(
                     text = mediaItem.title,

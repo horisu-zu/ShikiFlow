@@ -23,7 +23,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -52,6 +51,7 @@ import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.screen.browse.BrowseListItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
@@ -355,7 +355,7 @@ private fun OngoingTitleComponent(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
+        TextWithDivider(
             text = stringResource(R.string.browse_ongoings),
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold

@@ -1,6 +1,8 @@
 package com.example.shikiflow.domain.model.media_details
 
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.PaginatedList.Companion.emptyPaginatedList
+import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.Date
@@ -38,6 +40,7 @@ data class MediaDetails(
     val staffList: List<StaffShort> = emptyList(),
     val durationMins: Int? = null,
     val relatedMedia: List<RelatedMedia>,
+    val reviews: PaginatedList<ReviewShort> = emptyPaginatedList(),
     val scoreStats: List<Stat<Int>>,
     val statusesStats: List<Stat<UserRateStatus>>,
     val threadId: Int? = null

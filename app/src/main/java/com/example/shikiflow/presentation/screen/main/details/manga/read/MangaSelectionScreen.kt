@@ -50,7 +50,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.getMangaDexStatusColor
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.getMangaDexStatusColor
 import com.example.shikiflow.presentation.viewmodel.manga.read.selection.MangaSelectionViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)

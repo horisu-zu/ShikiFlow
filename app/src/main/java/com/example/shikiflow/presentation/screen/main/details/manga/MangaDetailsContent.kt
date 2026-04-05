@@ -20,7 +20,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -49,6 +48,7 @@ import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiModel
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
@@ -59,6 +59,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CharacterCa
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
 import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
+import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewsSection
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -140,9 +141,8 @@ fun MangaDetailsContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = stringResource(R.string.details_characters),
-                            style = MaterialTheme.typography.titleMedium
+                        TextWithDivider(
+                            text = stringResource(R.string.details_characters)
                         )
                         IconButton(
                             onClick = {
@@ -253,6 +253,20 @@ fun MangaDetailsContent(
         }
         item {
             HorizontalDivider()
+        }
+        if(mangaDetails.reviews.entries.isNotEmpty()) {
+            item {
+                ReviewsSection(
+                    reviewsList = mangaDetails.reviews,
+                    onMoreClick = {
+                        mediaNavOptions.navigateToMediaReviews(mangaDetails.id, MediaType.MANGA)
+                    },
+                    onReviewClick = { reviewId ->
+                        mediaNavOptions.navigateToReview(reviewId)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
+            }
         }
         item {
             MediaStatsComponent(

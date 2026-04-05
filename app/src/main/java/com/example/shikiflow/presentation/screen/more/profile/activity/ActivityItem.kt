@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +29,7 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.Converter.formatInstant
 
 @Composable
@@ -130,9 +129,12 @@ fun TextActivityItem(
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RoundedImage(
+            BaseImage(
                 model = textActivity.user.avatarUrl,
-                modifier = Modifier.size(24.dp)
+                imageType = ImageType.Square(
+                    width = 24.dp,
+                    clip = RoundedCornerShape(8.dp)
+                )
             )
             Text(
                 text = textActivity.user.nickname,
@@ -191,9 +193,12 @@ fun MessageActivityItem(
                     .padding(horizontal = 4.dp, vertical = 2.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                RoundedImage(
+                BaseImage(
                     model = messageActivity.messenger.avatarUrl,
-                    modifier = Modifier.size(24.dp)
+                    imageType = ImageType.Square(
+                        width = 24.dp,
+                        clip = RoundedCornerShape(8.dp)
+                    )
                 )
                 Text(
                     text = messageActivity.messenger.nickname,

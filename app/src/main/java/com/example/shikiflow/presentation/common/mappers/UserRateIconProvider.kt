@@ -27,4 +27,12 @@ object UserRateIconProvider {
             else -> IconResource.Drawable(R.drawable.ic_bookmark)
         }
     }
+
+    fun getScoreRatioIcon(scoreRatio: Float): IconResource {
+        return when {
+            scoreRatio < 1 / 3f -> IconResource.Drawable(resId = R.drawable.ic_thumb_down)
+            scoreRatio < 2 / 3f -> IconResource.Drawable(resId = R.drawable.ic_thumbs_up_down)
+            else -> IconResource.Drawable(resId = R.drawable.ic_thumb_up)
+        }
+    }
 }

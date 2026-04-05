@@ -218,7 +218,7 @@ fun StaffStatItem(
             Column(
                 modifier = Modifier
                     .height(
-                        height = (imageType.defaultWidth.value / imageType.defaultAspectRatio).dp
+                        height = (imageType.width.value / imageType.aspectRatio).dp
                     ),
                 verticalArrangement = Arrangement.SpaceBetween
             ) {

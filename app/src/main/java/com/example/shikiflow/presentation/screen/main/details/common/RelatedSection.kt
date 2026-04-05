@@ -21,14 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.RelatedMedia
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.TextWithDivider
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.RelationKindMapper.displayValue
 
@@ -47,9 +48,8 @@ fun RelatedSection(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = stringResource(R.string.details_related),
-                style = MaterialTheme.typography.titleMedium
+            TextWithDivider(
+                text = stringResource(R.string.details_related)
             )
 
             Box(
@@ -109,11 +109,12 @@ fun RelatedItem(
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RoundedImage(
+        BaseImage(
             model = relatedMedia.coverImageUrl,
-            clip = RoundedCornerShape(8.dp),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(48.dp)
+            imageType = ImageType.Square(
+                width = 48.dp,
+                clip = RoundedCornerShape(8.dp)
+            )
         )
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)

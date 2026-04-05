@@ -493,3 +493,39 @@ fragment ALThreadCommentWithHeader on ThreadComment {
     childComments
     likeCount
 }
+
+fragment ALReviewShort on Review {
+    id
+    summary
+    score
+    rating
+    ratingAmount
+    user {
+        ...ALUserShort
+    }
+}
+
+fragment ALReview on Review {
+    id
+    summary
+    body(asHtml: true)
+    score
+    rating
+    ratingAmount
+    user {
+        ...ALUserShort
+    }
+    media {
+        ...ALReviewMedia
+    }
+    createdAt
+    updatedAt
+}
+
+fragment ALReviewMedia on Media {
+    id
+    title {
+        romaji
+    }
+    bannerImage
+}

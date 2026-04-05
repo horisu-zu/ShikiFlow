@@ -75,7 +75,8 @@ import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
-import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterMediaSection
 import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
@@ -315,8 +316,9 @@ private fun StaffTitleSection(
         verticalAlignment = Alignment.CenterVertically,
         //horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
-        RoundedImage(
+        BaseImage(
             model = avatarUrl,
+            imageType = ImageType.Poster(),
             modifier = Modifier.fillMaxHeight(0.8f)
         )
 

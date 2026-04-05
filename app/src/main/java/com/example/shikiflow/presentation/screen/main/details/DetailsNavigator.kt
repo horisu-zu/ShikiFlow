@@ -28,6 +28,8 @@ import com.example.shikiflow.presentation.screen.main.details.character.MediaCha
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.review.MediaReviewsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.read.MangaReadNavigator
 import com.example.shikiflow.presentation.screen.main.details.staff.MediaStaffScreen
@@ -111,6 +113,17 @@ fun DetailsNavigator(
             roleTypes: List<RoleType>
         ) {
             detailsBackstack.add(DetailsNavRoute.MediaRoles(id, mediaRolesType, roleTypes))
+        }
+
+        override fun navigateToMediaReviews(
+            id: Int,
+            mediaType: MediaType
+        ) {
+            detailsBackstack.add(DetailsNavRoute.MediaReviews(id, mediaType))
+        }
+
+        override fun navigateToReview(id: Int) {
+            detailsBackstack.add(DetailsNavRoute.Review(id))
         }
 
         override fun navigateToUserProfile(user: User) {
@@ -246,6 +259,19 @@ fun DetailsNavigator(
                     id = route.id,
                     mediaRolesType = route.mediaRolesType,
                     roleTypes = route.roleTypes,
+                    navOptions = options
+                )
+            }
+            entry<DetailsNavRoute.MediaReviews> { route ->
+                MediaReviewsScreen(
+                    mediaId = route.mediaId,
+                    mediaType = route.mediaType,
+                    navOptions = options
+                )
+            }
+            entry<DetailsNavRoute.Review> { route ->
+                ReviewScreen(
+                    reviewId = route.id,
                     navOptions = options
                 )
             }

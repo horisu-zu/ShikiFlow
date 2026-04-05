@@ -35,8 +35,8 @@ import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.ic
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
@@ -157,8 +157,8 @@ fun BrowseCoverItem(
             model = posterUrl,
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
-                defaultWidth = coverWidth,
-                defaultClip = RoundedCornerShape(cornerShape)
+                width = coverWidth,
+                clip = RoundedCornerShape(cornerShape)
             ),
             onClick = onClick
         )

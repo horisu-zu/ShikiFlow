@@ -207,11 +207,11 @@ private fun FavoriteItem(
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val imageType = ImageType.Poster(defaultWidth = Int.MAX_VALUE.dp)
+    val imageType = ImageType.Poster(width = Int.MAX_VALUE.dp)
 
     Column(
         modifier = modifier
-            .clip(imageType.defaultClip)
+            .clip(imageType.clip)
             .clickable { onItemClick(userFavorite.id) },
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {

@@ -65,7 +65,6 @@ import com.example.shikiflow.domain.model.comment.DescriptionElement
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.utils.parser.AnilistDialect
 import com.example.shikiflow.utils.parser.HTMLParser
@@ -426,10 +425,12 @@ private fun QuoteItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RoundedImage(
+                    BaseImage(
                         model = quoteElement.senderAvatarUrl,
-                        modifier = Modifier.size(24.dp),
-                        clip = RoundedCornerShape(8.dp)
+                        imageType = ImageType.Square(
+                            width = 24.dp,
+                            clip = RoundedCornerShape(8.dp)
+                        )
                     )
                     Text(
                         text = nickname,
@@ -452,12 +453,12 @@ private fun VideoItem(
     modifier: Modifier = Modifier
 ) {
     val imageType = ImageType.Screenshot(
-        defaultWidth = Int.MAX_VALUE.dp
+        width = Int.MAX_VALUE.dp
     )
 
     Box(
         modifier = modifier.fillMaxWidth()
-            .clip(imageType.defaultClip)
+            .clip(imageType.clip)
             .clickable { onVideoClick() },
         contentAlignment = Alignment.Center
     ) {

@@ -42,10 +42,10 @@ import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.presentation.screen.main.details.anime.ScoreItem
 import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoItem
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
@@ -71,8 +71,8 @@ fun MangaDetailsHeader(
             model = mangaDetails.coverImageUrl,
             gradientFraction = 0.8f,
             imageType = ImageType.Poster(
-                defaultClip = RoundedCornerShape(0.dp),
-                defaultAspectRatio = if(orientation == Configuration.ORIENTATION_PORTRAIT)
+                clip = RoundedCornerShape(0.dp),
+                aspectRatio = if(orientation == Configuration.ORIENTATION_PORTRAIT)
                     2f / 2.85f else 1.5f
             ),
             modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
@@ -85,7 +85,7 @@ fun MangaDetailsHeader(
             BaseImage(
                 model = mangaDetails.coverImageUrl,
                 imageType = ImageType.Poster(
-                    defaultWidth = 216.dp
+                    width = 216.dp
                 ),
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             )

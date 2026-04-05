@@ -45,7 +45,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -62,8 +61,9 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
-import com.example.shikiflow.presentation.common.image.RoundedImage
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -216,11 +216,12 @@ private fun SheetHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        RoundedImage(
+        BaseImage(
             model = posterUrl,
-            clip = RoundedCornerShape(8.dp),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.size(48.dp)
+            imageType = ImageType.Square(
+                width = 48.dp,
+                clip = RoundedCornerShape(8.dp)
+            )
         )
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,

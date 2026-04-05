@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -76,9 +75,9 @@ fun BaseImage(
         contentDescription = contentDescription,
         contentScale = contentScale,
         modifier = modifier
-            .width(imageType.defaultWidth)
-            .aspectRatio(imageType.defaultAspectRatio)
-            .clip(imageType.defaultClip)
+            .width(imageType.width)
+            .aspectRatio(imageType.aspectRatio)
+            .clip(imageType.clip)
             .then(
                 if(onClick != null) {
                     Modifier.clickable { onClick() }
@@ -110,7 +109,7 @@ fun GradientImage(
 ) {
     Box(
         modifier = modifier
-            .clip(imageType.defaultClip)
+            .clip(imageType.clip)
     ) {
         BaseImage(
             model = model,
@@ -170,22 +169,6 @@ fun CoverImage(
         }
     }
 }*/
-
-@Composable
-fun RoundedImage(
-    model: String?,
-    modifier: Modifier = Modifier,
-    clip: RoundedCornerShape = CircleShape,
-    contentScale: ContentScale = ContentScale.Crop,
-    contentDescription: String? = null
-) {
-    BaseImage(
-        model = model,
-        modifier = modifier.clip(clip),
-        contentScale = contentScale,
-        contentDescription = contentDescription
-    )
-}
 
 @Composable
 fun ChapterItem(

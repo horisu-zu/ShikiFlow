@@ -419,7 +419,7 @@ private fun MediaPersonItem(
         BaseImage(
             model = mediaPerson.imageUrl,
             imageType = ImageType.Poster(
-                defaultWidth = Int.MAX_VALUE.dp
+                width = Int.MAX_VALUE.dp
             )
         )
 

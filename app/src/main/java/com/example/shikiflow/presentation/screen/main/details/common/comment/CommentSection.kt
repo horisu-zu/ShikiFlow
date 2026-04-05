@@ -11,8 +11,6 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,6 +24,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.viewmodel.comment.section.CommentSectionViewModel
 
 @Composable
@@ -73,14 +72,13 @@ fun CommentSection(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column {
-                        Text(
+                        TextWithDivider(
                             text = buildString {
                                 append(stringResource(id = R.string.details_comments))
                                 commentsCount?.let { count ->
                                     append(stringResource(id = R.string.details_comments_count, count))
                                 }
-                            },
-                            style = MaterialTheme.typography.titleMedium
+                            }
                         )
                     }
                     IconButton(

@@ -283,8 +283,8 @@ private fun VoiceActorMediaRoleItem(
             BaseImage(
                 model = vaRole.characterShort.imageUrl,
                 imageType = ImageType.Poster(
-                    defaultWidth = imageWidth,
-                    defaultClip = RoundedCornerShape(cornerShape)
+                    width = imageWidth,
+                    clip = RoundedCornerShape(cornerShape)
                 )
             )
             Text(

@@ -185,9 +185,9 @@ private fun LinkItem(
                 BaseImage(
                     model = siteIcon,
                     imageType = ImageType.Custom(
-                        defaultAspectRatio = 1f,
-                        defaultWidth = 24.dp,
-                        defaultClip = RoundedCornerShape(0.dp)
+                        aspectRatio = 1f,
+                        width = 24.dp,
+                        clip = RoundedCornerShape(0.dp)
                     )
                 )
             } ?: Icon(

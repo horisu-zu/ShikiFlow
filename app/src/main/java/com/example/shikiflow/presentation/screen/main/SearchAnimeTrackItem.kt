@@ -23,7 +23,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus.Companion.isWatch
 import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.materialkolor.ktx.harmonize
 

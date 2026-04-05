@@ -22,7 +22,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -52,12 +51,14 @@ import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiMode
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.RelatedBottomSheet
 import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
+import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewsSection
 import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
@@ -150,9 +151,8 @@ fun AnimeDetailsContent(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = stringResource(R.string.details_characters),
-                            style = MaterialTheme.typography.titleMedium
+                        TextWithDivider(
+                            text = stringResource(R.string.details_characters)
                         )
                         IconButton(
                             onClick = {
@@ -183,7 +183,8 @@ fun AnimeDetailsContent(
                                 characterPoster = characterItem.imageUrl,
                                 characterName = characterItem.fullName,
                                 onClick = { mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id) },
-                                modifier = Modifier.width(characterCardWidth)
+                                modifier = Modifier
+                                    .width(characterCardWidth)
                                     .onSizeChanged { size ->
                                         maxCardHeight = size.height
                                     }
@@ -284,6 +285,20 @@ fun AnimeDetailsContent(
         }
         item {
             HorizontalDivider()
+        }
+        if(animeDetails.reviews.entries.isNotEmpty()) {
+            item {
+                ReviewsSection(
+                    reviewsList = animeDetails.reviews,
+                    onMoreClick = {
+                        mediaNavOptions.navigateToMediaReviews(animeDetails.id, MediaType.ANIME)
+                    },
+                    onReviewClick = { reviewId ->
+                        mediaNavOptions.navigateToReview(reviewId)
+                    },
+                    horizontalPadding = horizontalPadding
+                )
+            }
         }
         item {
             MediaStatsComponent(

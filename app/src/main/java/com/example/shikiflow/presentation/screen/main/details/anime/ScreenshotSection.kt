@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
@@ -39,9 +40,8 @@ fun ScreenshotSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
-            text = stringResource(R.string.anime_details_screenshots),
-            style = MaterialTheme.typography.titleMedium
+        TextWithDivider(
+            text = stringResource(R.string.anime_details_screenshots)
         )
         SnapFlingLazyRow(
             modifier = Modifier

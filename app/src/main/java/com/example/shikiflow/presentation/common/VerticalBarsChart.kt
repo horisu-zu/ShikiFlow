@@ -1,24 +1,28 @@
 package com.example.shikiflow.presentation.common
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,7 +53,7 @@ fun VerticalBarsChart(
     barData: List<Stat<String>>,
     modifier: Modifier = Modifier,
     chartMode: BarsChartMode = BarsChartMode.FillWidth(),
-    maxBarHeight: Dp = 120.dp,
+    maxBarHeight: Dp = 156.dp,
     barColor: Color = MaterialTheme.colorScheme.primary,
     mapToInt: Boolean = true
 ) {
@@ -97,26 +101,30 @@ fun ScrollableVerticalBarsChart(
         stepSize = 1.sp
     )
 
-    Row(
+    SnapFlingLazyRow(
         modifier = Modifier
             .ignoreHorizontalParentPadding(horizontalPadding)
             .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
             .then(modifier),
+        contentPadding = PaddingValues(horizontal = horizontalPadding),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.spacedBy(barSpacing, Alignment.Start)
     ) {
-        //Imitating LazyRow's Content Padding
-        Spacer(modifier = Modifier.width(horizontalPadding - barSpacing))
-
-        barData.forEach { (key, value) ->
+        items(barData) { (key, value) ->
             Column(
-                modifier = Modifier,
+                modifier = Modifier.height(maxBarHeight),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                //verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.Bottom
             ) {
-                val barHeight = (value / maxValue * maxBarHeight.value)
-                val textValue = if(mapToInt) value.toInt() else value
+                val textValue = if (mapToInt) value.toInt() else value
+                val barRatio = value / maxValue
+                val animatedRatio by animateFloatAsState(
+                    targetValue = barRatio,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
 
                 AutoSizedText(
                     text = textValue.toString(),
@@ -125,15 +133,25 @@ fun ScrollableVerticalBarsChart(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
-                Canvas(
-                    modifier = Modifier.size(barWidth, barHeight.dp)
+
+                Box(
+                    modifier = Modifier
+                        .width(barWidth)
+                        .weight(1f, fill = false)
                 ) {
-                    drawRoundRect(
-                        color = barColor,
-                        size = size,
-                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
-                    )
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(animatedRatio)
+                    ) {
+                        drawRoundRect(
+                            color = barColor,
+                            size = size,
+                            cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
+                        )
+                    }
                 }
+
                 AutoSizedText(
                     text = key.ifBlank { stringResource(R.string.common_unknown) },
                     autoSize = autoSize,
@@ -143,8 +161,6 @@ fun ScrollableVerticalBarsChart(
                 )
             }
         }
-
-        Spacer(modifier = Modifier.width(horizontalPadding - barSpacing))
     }
 }
 
@@ -171,12 +187,21 @@ private fun FixedWidthVerticalBarsChart(
     ) {
         barData.forEach { (key, value) ->
             Column(
-                modifier = Modifier.weight(1f),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(maxBarHeight),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                //verticalArrangement = Arrangement.spacedBy(4.dp)
+                verticalArrangement = Arrangement.Bottom
             ) {
-                val barHeight = (value / maxValue * maxBarHeight.value).dp
                 val textValue = if(mapToInt) value.toInt() else value
+                val barRatio = value / maxValue
+                val animatedRatio by animateFloatAsState(
+                    targetValue = barRatio,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
 
                 AutoSizedText(
                     text = textValue.toString(),
@@ -185,17 +210,25 @@ private fun FixedWidthVerticalBarsChart(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                 )
-                Canvas(
+
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth(fraction = barFraction)
-                        .height(barHeight)
+                        .fillMaxWidth(barFraction)
+                        .weight(1f, fill = false)
                 ) {
-                    drawRoundRect(
-                        color = barColor,
-                        size = size,
-                        cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
-                    )
+                    Canvas(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(animatedRatio)
+                    ) {
+                        drawRoundRect(
+                            color = barColor,
+                            size = size,
+                            cornerRadius = CornerRadius(8.dp.toPx(), 8.dp.toPx())
+                        )
+                    }
                 }
+
                 AutoSizedText(
                     text = key.ifBlank { stringResource(R.string.common_unknown) },
                     autoSize = autoSize,

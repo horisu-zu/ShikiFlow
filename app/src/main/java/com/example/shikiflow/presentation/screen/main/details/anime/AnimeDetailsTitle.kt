@@ -62,8 +62,8 @@ fun AnimeDetailsTitle(
             model = animeDetails.coverImageUrl,
             gradientFraction = 0.9f,
             imageType = ImageType.Poster(
-                defaultClip = RoundedCornerShape(0.dp),
-                defaultAspectRatio = if(!isLandscape) 2f / 2.85f
+                clip = RoundedCornerShape(0.dp),
+                aspectRatio = if(!isLandscape) 2f / 2.85f
                     else 2.25f
             ),
             //contentScale = if(isLandscape) ContentScale.FillWidth else ContentScale.Crop,
@@ -79,7 +79,7 @@ fun AnimeDetailsTitle(
                 BaseImage(
                     model = animeDetails.coverImageUrl,
                     imageType = ImageType.Poster(
-                        defaultWidth = 120.dp
+                        width = 120.dp
                     )
                 )
             }

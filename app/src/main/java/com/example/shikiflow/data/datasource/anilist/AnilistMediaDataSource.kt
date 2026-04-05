@@ -12,14 +12,18 @@ import com.example.graphql.anilist.MediaBrowseQuery
 import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.MediaExternalLinksQuery
 import com.example.graphql.anilist.MediaRecommendationsQuery
+import com.example.graphql.anilist.MediaReviewQuery
+import com.example.graphql.anilist.MediaReviewsQuery
 import com.example.graphql.anilist.StudioBrowseQuery
 import com.example.graphql.anilist.type.MediaSort as ALMediaSort
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.local.source.MediaRecommendationsPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toAnilistFormat
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatus
@@ -30,6 +34,8 @@ import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.review.Review
+import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -228,6 +234,58 @@ class AnilistMediaDataSource @Inject constructor(
                     node?.mediaBrowse?.toBrowse(mediaType = MediaType.ANIME)
                 } ?: throw NoSuchElementException("Empty Response")
         }
+    }
+
+    override fun getMediaReviews(
+        mediaId: Int,
+        mediaType: MediaType
+    ): Flow<PagingData<ReviewShort>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 15
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource<ReviewShort>(
+                    method = { page, pageSize ->
+                        paginatedMediaReviews(mediaId, page, pageSize)
+                    }
+                )
+            }
+        ).flow
+    }
+
+    suspend fun paginatedMediaReviews(
+        mediaId: Int,
+        page: Int,
+        limit: Int
+    ): Result<List<ReviewShort>> {
+        val reviewsQuery = MediaReviewsQuery(mediaId, page, limit)
+
+        val response = apolloClient.query(reviewsQuery).execute()
+
+        return response.toResult().map { data ->
+            data.Media
+                ?.reviews
+                ?.nodes
+                ?.mapNotNull { reviewNode ->
+                    reviewNode?.aLReviewShort?.toDomain()
+                } ?: emptyList()
+        }
+    }
+
+    override fun getReview(reviewId: Int): Flow<DataResult<Review>> {
+        val reviewQuery = MediaReviewQuery(reviewId)
+
+        val response = apolloClient.query(reviewQuery)
+            .toFlow()
+            .asDataResult { data ->
+                data.Review?.aLReview?.toDomain() ?: throw NoSuchElementException("Empty Response")
+            }
+
+        return response
     }
 
     override suspend fun getExternalLinks(

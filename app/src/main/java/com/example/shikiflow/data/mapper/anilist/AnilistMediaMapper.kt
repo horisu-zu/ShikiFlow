@@ -5,6 +5,7 @@ import com.example.graphql.anilist.fragment.ALAiringAnimeShort
 import com.example.graphql.anilist.fragment.MediaBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
@@ -20,6 +21,7 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -30,36 +32,40 @@ import kotlin.time.Instant
 object AnilistMediaMapper {
     fun MediaDetailsQuery.Media.toDomain(): MediaDetails {
         return MediaDetails(
-            id = this.id,
-            malId = this.idMal ?: 0,
-            mediaType = this.type?.toDomain() ?: MediaType.ANIME,
-            title = this.title?.romaji ?: "",
-            descriptionHtml = this.description,
-            native = this.title?.native ?: "",
-            synonyms = this.synonyms?.mapNotNull { it } ?: emptyList(),
-            coverImageUrl = this.coverImage?.extraLarge ?: "",
-            score = (this.averageScore ?: 0) / 10f,
-            totalCount = this.episodes ?: this.chapters,
-            currentProgress = this.nextAiringEpisode?.aLAiringEpisodeShort?.episode?.minus(1),
-            volumes = this.volumes,
-            format = this.format?.toDomain() ?: MediaFormat.UNKNOWN,
-            status = this.status?.toDomain() ?: MediaStatus.UNKNOWN,
-            genres = this.genres?.mapNotNull { it } ?: emptyList(),
+            id = id,
+            malId = idMal ?: 0,
+            mediaType = type?.toDomain() ?: MediaType.ANIME,
+            title = title?.romaji ?: "",
+            descriptionHtml = description,
+            native = title?.native ?: "",
+            synonyms = synonyms?.mapNotNull { it } ?: emptyList(),
+            coverImageUrl = coverImage?.extraLarge ?: "",
+            score = (averageScore ?: 0) / 10f,
+            totalCount = episodes ?: chapters,
+            currentProgress = nextAiringEpisode?.aLAiringEpisodeShort?.episode?.minus(1),
+            volumes = volumes,
+            format = format?.toDomain() ?: MediaFormat.UNKNOWN,
+            status = status?.toDomain() ?: MediaStatus.UNKNOWN,
+            genres = genres?.mapNotNull { it } ?: emptyList(),
             characters = PaginatedList(
-                hasNextPage = this.characters?.pageInfo?.hasNextPage == true,
-                entries = this.characters?.nodes?.mapNotNull { it?.aLCharacterShort?.toDomain() }.orEmpty()
+                hasNextPage = characters?.pageInfo?.hasNextPage == true,
+                entries = characters?.nodes?.mapNotNull { it?.aLCharacterShort?.toDomain() }.orEmpty()
             ),
-            airedOn = this.startDate?.date?.toDomain(),
-            releasedOn = this.endDate?.date?.toDomain(),
-            nextEpisodeAt = this.nextAiringEpisode?.let {
+            airedOn = startDate?.date?.toDomain(),
+            releasedOn = endDate?.date?.toDomain(),
+            nextEpisodeAt = nextAiringEpisode?.let {
                 Instant.fromEpochSeconds(it.aLAiringEpisodeShort.airingAt.toLong())
             },
-            origin = this.source?.toDomain() ?: MediaOrigin.UNKNOWN,
-            userRate = this.mediaListEntry?.aLRateEntry?.toDomain(),
-            studios = this.studios?.nodes?.mapNotNull { it?.aLStudioShort?.toDomain() } ?: emptyList(),
-            staffList = this.staff?.edges?.mapNotNull { it?.aLStaffEdgeShort?.toDomain() } ?: emptyList(),
-            durationMins = this.duration,
-            relatedMedia = this.relations?.edges?.mapNotNull { it?.aLRelatedMediaShort?.toDomain() } ?: emptyList(),
+            origin = source?.toDomain() ?: MediaOrigin.UNKNOWN,
+            userRate = mediaListEntry?.aLRateEntry?.toDomain(),
+            studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.toDomain() } ?: emptyList(),
+            staffList = staff?.edges?.mapNotNull { it?.aLStaffEdgeShort?.toDomain() } ?: emptyList(),
+            durationMins = duration,
+            relatedMedia = relations?.edges?.mapNotNull { it?.aLRelatedMediaShort?.toDomain() } ?: emptyList(),
+            reviews = PaginatedList<ReviewShort>(
+                hasNextPage = reviews?.pageInfo?.hasNextPage == true,
+                entries = reviews?.nodes?.mapNotNull { it?.aLReviewShort?.toDomain() }.orEmpty()
+            ),
             scoreStats = stats?.aLMediaStats?.scoreDistribution?.mapNotNull { scoreItem ->
                 Stat<Int>(
                     type = scoreItem?.score ?: 0,

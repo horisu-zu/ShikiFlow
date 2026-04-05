@@ -57,4 +57,13 @@ sealed interface DetailsNavRoute : NavKey {
         val mediaRolesType: MediaRolesType,
         val roleTypes: List<RoleType>
     ): DetailsNavRoute
+
+    @Serializable
+    data class MediaReviews(
+        val mediaId: Int,
+        val mediaType: MediaType
+    ): DetailsNavRoute
+
+    @Serializable
+    data class Review(val id: Int) : DetailsNavRoute
 }

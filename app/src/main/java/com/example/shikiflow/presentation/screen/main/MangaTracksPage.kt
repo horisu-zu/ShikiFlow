@@ -177,8 +177,8 @@ private fun MangaTrackItem(
             model = trackItem.manga.poster?.originalUrl,
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
-                defaultWidth = Int.MAX_VALUE.dp,
-                defaultClip = RoundedCornerShape(cornerShape)
+                width = Int.MAX_VALUE.dp,
+                clip = RoundedCornerShape(cornerShape)
             )
         )
 

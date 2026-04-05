@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
@@ -51,9 +52,8 @@ fun StaffSection(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                text = stringResource(R.string.staff_title),
-                style = MaterialTheme.typography.titleMedium
+            TextWithDivider(
+                text = stringResource(R.string.staff_title)
             )
             IconButton(
                 onClick = { onMediaStaffClick() },
@@ -65,6 +65,7 @@ fun StaffSection(
                 )
             }
         }
+
         SnapFlingLazyRow(
             modifier = Modifier
                 .ignoreHorizontalParentPadding(horizontalPadding)

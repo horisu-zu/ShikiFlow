@@ -214,8 +214,8 @@ private fun AnimeTracksGridComponent(
                 BaseImage(
                     model = trackItem.anime.poster?.originalUrl,
                     imageType = ImageType.Poster(
-                        defaultWidth = Int.MAX_VALUE.dp,
-                        defaultAspectRatio = 2f / 2.6f
+                        width = Int.MAX_VALUE.dp,
+                        aspectRatio = 2f / 2.6f
                     ),
                     contentDescription = "Poster"
                 )

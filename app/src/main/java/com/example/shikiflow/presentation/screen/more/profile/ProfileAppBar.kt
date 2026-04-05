@@ -58,9 +58,9 @@ fun ProfileAppBar(
         val progress = (offsetDp / maxOffsetDp).coerceIn(0f, 1f)
 
         val avatarImageType = ImageType.Custom(
-            defaultWidth = lerp(108.dp, 60.dp, progress),
-            defaultAspectRatio = 1f,
-            defaultClip = RoundedCornerShape(percent = 16)
+            width = lerp(108.dp, 60.dp, progress),
+            aspectRatio = 1f,
+            clip = RoundedCornerShape(percent = 16)
         )
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -69,8 +69,8 @@ fun ProfileAppBar(
                     model = profileBanner,
                     contentScale = ContentScale.FillWidth,
                     imageType = ImageType.Screenshot(
-                        defaultWidth = 0.dp,
-                        defaultClip = RoundedCornerShape(0.dp)
+                        width = 0.dp,
+                        clip = RoundedCornerShape(0.dp)
                     ),
                     gradientFraction = 1f,
                     gradientColors = listOf(

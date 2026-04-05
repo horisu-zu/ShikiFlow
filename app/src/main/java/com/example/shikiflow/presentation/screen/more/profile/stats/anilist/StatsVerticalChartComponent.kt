@@ -3,7 +3,6 @@ package com.example.shikiflow.presentation.screen.more.profile.stats.anilist
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -12,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.presentation.common.BarsChartMode
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.VerticalBarsChart
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 
@@ -31,10 +31,11 @@ fun <T> StatsVerticalChartComponent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
+        TextWithDivider(
             text = stringResource(label),
             style = MaterialTheme.typography.titleLarge
         )
+
         TypeSelector(
             types = statsMap.keys.toList(),
             mediaType = mediaType,
@@ -43,6 +44,7 @@ fun <T> StatsVerticalChartComponent(
                 onBarTypeChange(statsBarType)
             }
         )
+
         VerticalBarsChart(
             barData = statsMap[currentBarType]?.map { stat ->
                 Stat(
@@ -55,7 +57,7 @@ fun <T> StatsVerticalChartComponent(
                 barSpacing = 8.dp,
                 horizontalPadding = horizontalPadding
             ) else BarsChartMode.FillWidth(),
-            maxBarHeight = 156.dp,
+            maxBarHeight = 204.dp,
             mapToInt = when(currentBarType) {
                 StatsBarType.MEAN_SCORE -> false
                 else -> true

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -26,21 +25,18 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
+import com.example.shikiflow.presentation.WindowSize
 import com.example.shikiflow.presentation.common.BarsChartMode
 import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.SegmentedProgressBarType
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.VerticalBarsChart
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
-
-enum class WindowSize {
-    COMPACT, MEDIUM, EXPANDED
-}
 
 @Composable
 fun MediaStatsComponent(
@@ -56,17 +52,7 @@ fun MediaStatsComponent(
 
     val windowSize by remember(windowSizeClass) {
         derivedStateOf {
-            when {
-                windowSizeClass.isWidthAtLeastBreakpoint(
-                    WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND
-                ) && windowSizeClass.isHeightAtLeastBreakpoint(
-                    WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND
-                ) -> WindowSize.EXPANDED
-                windowSizeClass.isWidthAtLeastBreakpoint(
-                    WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND
-                ) -> WindowSize.MEDIUM
-                else -> WindowSize.COMPACT
-            }
+            WindowSize.from(windowSizeClass)
         }
     }
 
@@ -190,14 +176,13 @@ private fun ScoreStatsComponent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(
+        TextWithDivider(
             text = buildString {
                 append(stringResource(R.string.details_info_score_stats))
                 append(" ∙ ")
                 append(titleScore)
                 append("★")
-            },
-            style = MaterialTheme.typography.titleMedium
+            }
         )
         VerticalBarsChart(
             barData = scoreStats.map {
@@ -213,7 +198,7 @@ private fun ScoreStatsComponent(
             ) else BarsChartMode.FillWidth(
                 barFraction = 0.8f
             ),
-            maxBarHeight = if(windowSize == WindowSize.EXPANDED) 96.dp else 144.dp
+            maxBarHeight = if(windowSize == WindowSize.EXPANDED) 120.dp else 168.dp
         )
     }
 }
@@ -230,9 +215,8 @@ private fun StatusesStatsComponent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Text(
-            text = stringResource(R.string.details_info_statuses_stats),
-            style = MaterialTheme.typography.titleMedium
+        TextWithDivider(
+            text = stringResource(R.string.details_info_statuses_stats)
         )
         Box(
             modifier = Modifier

@@ -57,6 +57,14 @@ query MediaDetails(
         endDate {
             ...Date
         }
+        reviews(perPage: 4, sort: [RATING_DESC]) {
+            nodes {
+                ...ALReviewShort
+            }
+            pageInfo {
+                hasNextPage
+            }
+        }
         studios(isMain: true) {
             nodes {
                 ...ALStudioShort
@@ -140,6 +148,29 @@ query MediaExternalLinks(
             icon
             site
             url
+        }
+    }
+}
+
+query MediaReview(
+    $reviewId: Int!
+) {
+    Review(id: $reviewId) {
+        ...ALReview
+    }
+}
+
+query MediaReviews(
+    $mediaId: Int!,
+    $page: Int!,
+    $perPage: Int!,
+    $sort: ReviewSort = RATING_DESC
+) {
+    Media(id: $mediaId) {
+        reviews(page: $page, perPage: $perPage, sort: [$sort]) {
+            nodes {
+                ...ALReviewShort
+            }
         }
     }
 }

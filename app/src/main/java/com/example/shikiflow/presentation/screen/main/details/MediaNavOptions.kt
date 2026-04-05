@@ -38,5 +38,9 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToMediaRoles(id: Int, mediaRolesType: MediaRolesType, roleTypes: List<RoleType>)
 
+    fun navigateToMediaReviews(id: Int, mediaType: MediaType)
+
+    fun navigateToReview(id: Int)
+
     fun navigateToUserProfile(user: User)
 }

@@ -5,6 +5,8 @@ import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.review.Review
+import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -55,6 +57,10 @@ interface MediaDataSource {
         order: SortType?,
         onList: Boolean?
     ): Result<List<BrowseMedia>>
+
+    fun getMediaReviews(mediaId: Int, mediaType: MediaType): Flow<PagingData<ReviewShort>>
+
+    fun getReview(reviewId: Int): Flow<DataResult<Review>>
 
     suspend fun getExternalLinks(mediaType: MediaType, mediaId: Int): Result<List<ExternalLinkData>>
 }

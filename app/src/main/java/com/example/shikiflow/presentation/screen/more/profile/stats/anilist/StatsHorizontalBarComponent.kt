@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,6 +13,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.SegmentedProgressBarType
+import com.example.shikiflow.presentation.common.TextWithDivider
 
 @Composable
 fun <T> StatsHorizontalBarComponent(
@@ -28,7 +28,7 @@ fun <T> StatsHorizontalBarComponent(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Text(
+        TextWithDivider(
             text = stringResource(label),
             style = MaterialTheme.typography.titleLarge
         )

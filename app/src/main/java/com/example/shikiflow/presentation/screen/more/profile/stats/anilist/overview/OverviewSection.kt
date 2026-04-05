@@ -26,12 +26,12 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.OverviewStatType
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.CountryOfOriginMapper.color
 import com.example.shikiflow.presentation.common.mappers.CountryOfOriginMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.color
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.ShortStatsOverview

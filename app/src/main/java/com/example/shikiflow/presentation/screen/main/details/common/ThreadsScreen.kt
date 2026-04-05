@@ -254,8 +254,8 @@ private fun ShortUserItem(
         BaseImage(
             model = userData.avatarUrl,
             imageType = ImageType.Square(
-                defaultWidth = 24.dp,
-                defaultClip = RoundedCornerShape(4.dp)
+                width = 24.dp,
+                clip = RoundedCornerShape(4.dp)
             )
         )
         Text(

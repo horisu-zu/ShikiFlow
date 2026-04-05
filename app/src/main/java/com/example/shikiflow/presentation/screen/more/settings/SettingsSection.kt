@@ -21,7 +21,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.presentation.common.image.RoundedImage
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -146,10 +147,12 @@ private fun ImageItem(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RoundedImage(
+        BaseImage(
             model = imageUrl,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            imageType = ImageType.Square(
+                width = 32.dp,
+                clip = RoundedCornerShape(12.dp)
+            )
         )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             Text(

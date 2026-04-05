@@ -26,7 +26,7 @@ import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.presentation.common.BarsChartMode
 import com.example.shikiflow.presentation.common.HorizontalStatsBar
 import com.example.shikiflow.presentation.common.VerticalBarsChart
-import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.color
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
@@ -93,7 +93,7 @@ fun ShikimoriTrackItem(
                 }.filter { it.value > 0 },
                 chartMode = if(isScrollable) BarsChartMode.Scrollable(barWidth = 32.dp, barSpacing = 8.dp)
                     else BarsChartMode.FillWidth(),
-                maxBarHeight = 156.dp
+                maxBarHeight = 204.dp
             )
         }
     }
