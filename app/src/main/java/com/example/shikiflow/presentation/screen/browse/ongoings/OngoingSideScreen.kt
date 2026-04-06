@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -86,7 +87,9 @@ fun OngoingSideScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(id = browseType.displayValue())
+                        text = stringResource(id = browseType.displayValue()),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 actions = {
@@ -204,6 +207,7 @@ private fun OngoingSideScreenContent(
                 )
             }
         }
+
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize()

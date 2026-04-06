@@ -26,7 +26,7 @@ class ShikimoriCommentsDataSource @Inject constructor(
                 limit = limit
             ).map {
                 it.toDomain()
-            }
+            }.take(limit) //Shikimori API returns loadSize + 1
 
             Result.success(response)
         } catch (e: IOException) {

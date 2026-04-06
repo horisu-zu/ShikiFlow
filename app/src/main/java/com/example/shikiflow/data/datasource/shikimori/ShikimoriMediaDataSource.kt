@@ -242,20 +242,20 @@ class ShikimoriMediaDataSource @Inject constructor(
         return Pager(config = PagingConfig(pageSize = Int.MAX_VALUE)) {
             object : PagingSource<Int, BrowseMedia>() {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BrowseMedia> {
-                    return try {
-                        val response = when(mediaType) {
-                            MediaType.ANIME -> animeApi.getSimilarAnime(mediaId.toString()).map { it.toBrowseAnime() }
-                            MediaType.MANGA -> mangaApi.getSimilarManga(mediaId.toString()).map { it.toBrowseManga() }
-                        }
+                    val result = loadMediaRecommendations(mediaType, mediaId, 1, 1)
 
-                        return LoadResult.Page(
-                            data = response,
-                            prevKey = null,
-                            nextKey = null
-                        )
-                    } catch (e: Exception) {
-                        LoadResult.Error(e)
-                    }
+                    return result.fold(
+                        onSuccess = { response ->
+                             LoadResult.Page(
+                                data = response,
+                                prevKey = null,
+                                nextKey = null
+                            )
+                        },
+                        onFailure = { e ->
+                            LoadResult.Error(e)
+                        }
+                    )
                 }
                 override fun getRefreshKey(state: PagingState<Int, BrowseMedia>): Int? = null
             }

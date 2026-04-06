@@ -76,6 +76,7 @@ fun ReleaseNotesBottomSheet(
                     releaseDate = release.publishedAt,
                     latestSize = latestSize
                 )
+
                 if(!release.body.isNullOrBlank()) {
                     Column(
                         modifier = Modifier
@@ -100,7 +101,7 @@ fun ReleaseNotesBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.secondary,
-                        contentColor = MaterialTheme.colorScheme.onSurface
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     ),
                 ) {
                     Row(

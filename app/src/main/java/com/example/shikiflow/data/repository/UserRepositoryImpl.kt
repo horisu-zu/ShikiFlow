@@ -1,7 +1,10 @@
 package com.example.shikiflow.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.UserDataSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -49,7 +52,23 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserHistory(
         userId: Int,
-    ): Flow<PagingData<UserActivity>> = getSource().getUserHistory(userId)
+    ): Flow<PagingData<UserActivity>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                enablePlaceholders = true,
+                prefetchDistance = 5,
+                initialLoadSize = 20
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource<UserActivity>(
+                    method = { page, limit ->
+                        getSource().getPaginatedHistory(userId, page, limit)
+                    }
+                )
+            }
+        ).flow
+    }
 
     override fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>> =
         getSource().getUserRates(userId)
@@ -93,7 +112,23 @@ class UserRepositoryImpl @Inject constructor(
         mediaType: MediaType
     ): List<ShortUserMediaRate> = getSource().getMediaRates(userId, mediaType)
 
-    override fun getUsers(nickname: String): Flow<PagingData<Browse.User>> = getSource().getUsers(nickname)
+    override fun getUsers(nickname: String): Flow<PagingData<Browse.User>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 30,
+                enablePlaceholders = true,
+                prefetchDistance = 10,
+                initialLoadSize = 30
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource<Browse.User>(
+                    method = { page, limit ->
+                        getSource().getUsersByNickname(page, limit, nickname)
+                    }
+                )
+            }
+        ).flow
+    }
 
     override suspend fun saveUserRate(
         userId: Int?,

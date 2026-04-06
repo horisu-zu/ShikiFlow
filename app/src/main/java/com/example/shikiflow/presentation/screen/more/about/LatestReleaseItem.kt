@@ -39,7 +39,7 @@ fun LatestReleaseItem(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
-            .background(MaterialTheme.colorScheme.surface)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalAlignment = Alignment.Start,
         verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
@@ -79,12 +79,13 @@ fun LatestReleaseItem(
                     style = MaterialTheme.typography.labelMedium,
                 )
             }
+
             Button(
                 onClick = { onDownloadClick(latestRelease.assets.first().downloadUrl) },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                ),
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                )
             ) {
                 Text(
                     text = stringResource(R.string.update_download),

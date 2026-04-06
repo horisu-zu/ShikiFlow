@@ -25,9 +25,7 @@ import com.example.graphql.anilist.UserThreadsQuery
 import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.FavoritesPagingSource
-import com.example.shikiflow.data.local.source.HistoryPagingSource
-import com.example.shikiflow.data.local.source.SocialPagingSource
-import com.example.shikiflow.data.local.source.UserPagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
@@ -76,23 +74,11 @@ class AnilistUserDataSource(
             }
     }
 
-    override fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 20
-            ),
-            pagingSourceFactory = { HistoryPagingSource(this, userId) }
-        ).flow
-    }
-
     override suspend fun getPaginatedHistory(
         userId: Int,
         page: Int?,
         limit: Int?
-    ): List<UserActivity> {
+    ): Result<List<UserActivity>> {
         val historyQuery = UserActivitiesQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
@@ -103,13 +89,15 @@ class AnilistUserDataSource(
             .fetchPolicy(FetchPolicy.NetworkFirst)
             .execute()
 
-        return response.data?.Page?.activities?.let { activities ->
-            activities.mapNotNull { activity ->
-                activity?.onListActivity?.aLListActivity?.toDomain() ?:
-                activity?.onMessageActivity?.aLMessageActivity?.toDomain() ?:
-                activity?.onTextActivity?.aLTextActivity?.toDomain()
-            }
-        } ?: emptyList()
+        return response.toResult().map { data ->
+            data.Page?.activities?.let { activities ->
+                activities.mapNotNull { activity ->
+                    activity?.onListActivity?.aLListActivity?.toDomain() ?:
+                    activity?.onMessageActivity?.aLMessageActivity?.toDomain() ?:
+                    activity?.onTextActivity?.aLTextActivity?.toDomain()
+                }
+            } ?: emptyList()
+        }
     }
 
     override fun getUserStatsCategories(
@@ -265,10 +253,15 @@ class AnilistUserDataSource(
                 initialLoadSize = 18
             ),
             pagingSourceFactory = {
-                SocialPagingSource(
-                    dataSource = this,
-                    userId = userId,
-                    socialCategory = socialCategory
+                GenericPagingSource<UserSocial>(
+                    method = { page, limit ->
+                        when(socialCategory) {
+                            SocialCategory.FOLLOWINGS -> getUserFollowings(userId, page, limit)
+                            SocialCategory.FOLLOWERS -> getUserFollowers(userId, page, limit)
+                            SocialCategory.THREADS -> getUserThreads(userId, page, limit)
+                            SocialCategory.COMMENTS -> getUserThreadComments(userId, page, limit)
+                        }
+                    }
                 )
             }
         ).flow
@@ -385,28 +378,13 @@ class AnilistUserDataSource(
         return result
     }
 
-    override fun getUsers(query: String): Flow<PagingData<Browse.User>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 30,
-                enablePlaceholders = true,
-                prefetchDistance = 10,
-                initialLoadSize = 30
-            ),
-            pagingSourceFactory = {
-                UserPagingSource(
-                    userDataSource = this,
-                    query = query
-                )
-            }
-        ).flow
-    }
-
     override suspend fun getUsersByNickname(
         page: Int,
         limit: Int,
         nickname: String
     ): Result<List<Browse.User>> {
+        if(nickname.isBlank()) return Result.success(emptyList())
+
         val query = UserSearchQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),

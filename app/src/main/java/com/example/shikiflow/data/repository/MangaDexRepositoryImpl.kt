@@ -3,7 +3,7 @@ package com.example.shikiflow.data.repository
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.shikiflow.data.local.source.ChaptersPagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.MangaDexMapper.toDomain
 import com.example.shikiflow.data.remote.MangaDexApi
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapterMetadata
@@ -35,24 +35,50 @@ class MangaDexRepositoryImpl @Inject constructor(
 
     override fun getGroupMangaChapters(
         mangaId: String,
-        groupIds: List<String>,
+        scanlationGroups: List<String>,
         uploader: String?
     ): Flow<PagingData<MangaChapterMetadata>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 50,
+                pageSize = 30,
                 enablePlaceholders = true,
-                prefetchDistance = 15,
-                initialLoadSize = 50
+                prefetchDistance = 12,
+                initialLoadSize = 30
             ),
             pagingSourceFactory = {
-                ChaptersPagingSource(
-                    mangaDexApi = mangaDexApi,
-                    mangaId = mangaId,
-                    groupIds = groupIds,
-                    uploader = uploader
+                GenericPagingSource<MangaChapterMetadata>(
+                    method = { page, limit ->
+                        paginatedGroupMangaChapters(page - 1, limit, mangaId, scanlationGroups, uploader)
+                    }
                 )
             }
         ).flow
+    }
+
+    suspend fun paginatedGroupMangaChapters(
+        page: Int,
+        limit: Int,
+        mangaId: String,
+        scanlationGroups: List<String>,
+        uploader: String?
+    ): Result<List<MangaChapterMetadata>> {
+
+        return try {
+            val response = mangaDexApi.getGroupChaptersList(
+                limit = limit,
+                offset = limit * page,
+                mangaId = mangaId,
+                scanlationGroups = scanlationGroups,
+                uploader = uploader
+            )
+
+            val result = response
+                .chaptersData
+                .map { it.toDomain() }
+
+            Result.success(result)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 }

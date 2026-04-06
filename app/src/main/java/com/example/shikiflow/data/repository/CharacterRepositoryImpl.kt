@@ -4,7 +4,6 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.CharactersDataSource
-import com.example.shikiflow.data.local.source.CharactersPagingSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.browse.Browse
@@ -59,10 +58,10 @@ class CharacterRepositoryImpl @Inject constructor(
                 initialLoadSize = 15
             ),
             pagingSourceFactory = {
-                CharactersPagingSource(
-                    charactersDataSource = getSource(),
-                    mediaId = mediaId,
-                    mediaType = mediaType
+                GenericPagingSource(
+                    method = { page, limit ->
+                        getSource().loadMediaCharacters(page, limit, mediaId, mediaType)
+                    }
                 )
             }
         ).flow

@@ -28,7 +28,7 @@ import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.FeatureItem
 import com.example.shikiflow.presentation.common.FeaturesGroup
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.WebIntent
+import com.example.shikiflow.utils.WebIntent.openActionView
 
 @Composable
 fun AuthScreen(
@@ -103,7 +103,8 @@ fun AuthScreen(
                     ),
                     onClick = {
                         val authUrl = onAuth(authType)
-                        WebIntent.openActionView(context, authUrl)
+
+                        context.openActionView(authUrl)
                     },
                     modifier = Modifier.fillMaxWidth()
                 )

@@ -4,7 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.MediaDataSource
-import com.example.shikiflow.data.local.source.StudioMediaPagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -62,9 +62,7 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getSimilarMedia(
         mediaType: MediaType,
         mediaId: Int
-    ): Flow<PagingData<BrowseMedia>> {
-        return getSource().getSimilarMedia(mediaType, mediaId)
-    }
+    ): Flow<PagingData<BrowseMedia>> = getSource().getSimilarMedia(mediaType, mediaId)
 
     override fun getStudioMedia(
         studioId: Int,
@@ -74,18 +72,16 @@ class MediaRepositoryImpl @Inject constructor(
     ): Flow<PagingData<BrowseMedia>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 15,
+                pageSize = 18,
                 enablePlaceholders = true,
                 prefetchDistance = 9,
-                initialLoadSize = 15
+                initialLoadSize = 18
             ),
             pagingSourceFactory = {
-                StudioMediaPagingSource(
-                    mediaDetailsDataSource = getSource(),
-                    studioId = studioId,
-                    search = search,
-                    order = order,
-                    onList = onList
+                GenericPagingSource(
+                    method = { page, limit ->
+                        getSource().loadStudioMedia(studioId, page, limit, search, order, onList)
+                    }
                 )
             }
         ).flow

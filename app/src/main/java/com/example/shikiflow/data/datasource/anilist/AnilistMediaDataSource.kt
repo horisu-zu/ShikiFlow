@@ -20,7 +20,6 @@ import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
-import com.example.shikiflow.data.local.source.MediaRecommendationsPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
@@ -179,10 +178,10 @@ class AnilistMediaDataSource @Inject constructor(
                 initialLoadSize = 15
             ),
             pagingSourceFactory = {
-                MediaRecommendationsPagingSource(
-                    mediaDataSource = this,
-                    mediaType = mediaType,
-                    mediaId = mediaId
+                GenericPagingSource<BrowseMedia>(
+                    method = { page, limit ->
+                        loadMediaRecommendations(mediaType, mediaId, page, limit)
+                    }
                 )
             }
         ).flow

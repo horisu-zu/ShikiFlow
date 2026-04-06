@@ -22,6 +22,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.review.ReviewShort
+import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -59,7 +60,22 @@ object AnilistMediaMapper {
             origin = source?.toDomain() ?: MediaOrigin.UNKNOWN,
             userRate = mediaListEntry?.aLRateEntry?.toDomain(),
             studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.toDomain() } ?: emptyList(),
-            staffList = staff?.edges?.mapNotNull { it?.aLStaffEdgeShort?.toDomain() } ?: emptyList(),
+            staffList = staff?.edges?.mapNotNull { staffEdge ->
+                staffEdge?.aLStaffEdgeShort?.toDomain()
+            }
+                ?.groupBy { it.id }
+                ?.mapValues { (_, staffRoles) ->
+                    val staffData = staffRoles.first()
+
+                    StaffShort(
+                        id = staffData.id,
+                        fullName = staffData.fullName,
+                        imageUrl = staffData.imageUrl,
+                        roles = staffRoles.flatMap { it.roles },
+                    )
+                }
+                ?.values
+                ?.toList() ?: emptyList(),
             durationMins = duration,
             relatedMedia = relations?.edges?.mapNotNull { it?.aLRelatedMediaShort?.toDomain() } ?: emptyList(),
             reviews = PaginatedList<ReviewShort>(

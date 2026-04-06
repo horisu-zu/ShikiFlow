@@ -122,7 +122,7 @@
     <string name="update_release_notes">Release Notes</string>
     <string name="update_download">Download</string>
     <string name="release_notes_whats_new">What\'s New</string>
-    <string name="release_notes_current_version">Current Version: %1$s</string>
+    <string name="release_notes_current_version">Current Version: v%1$s</string>
     <string name="release_notes_latest_version">Latest Version: %1$s</string>
     <string name="release_notes_release_date">Release Date: %1$s</string>
     <string name="release_notes_update_size">Size</string>

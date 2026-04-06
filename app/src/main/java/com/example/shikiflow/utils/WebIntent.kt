@@ -20,12 +20,12 @@ object WebIntent {
         }
     }
 
-    fun openActionView(context: Context, url: String) {
+    fun Context.openActionView(url: String) {
         try {
             val uri = url.toUri()
 
             Intent(Intent.ACTION_VIEW, uri).apply {
-                context.startActivity(this)
+                startActivity(this)
             }
         } catch (e: Exception) {
             Log.d("WebIntent", "Error opening $url: ${e.message}")

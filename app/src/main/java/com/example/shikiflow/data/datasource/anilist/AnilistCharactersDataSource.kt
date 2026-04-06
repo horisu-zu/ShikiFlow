@@ -9,7 +9,7 @@ import com.example.graphql.anilist.CharacterMediaAppearancesQuery
 import com.example.graphql.anilist.CharacterSearchQuery
 import com.example.graphql.anilist.CharactersQuery
 import com.example.shikiflow.data.datasource.CharactersDataSource
-import com.example.shikiflow.data.local.source.CharacterMediaPagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toCharacterMediaRole
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
@@ -17,7 +17,6 @@ import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
-import com.example.shikiflow.domain.model.common.CharacterMediaRole
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.Sort
@@ -56,11 +55,10 @@ class AnilistCharactersDataSource @Inject constructor(
                 initialLoadSize = 24
             ),
             pagingSourceFactory = {
-                CharacterMediaPagingSource(
-                    characterId = characterId,
-                    mediaType = mediaType,
-                    sort = sort,
-                    charactersDataSource = this
+                GenericPagingSource(
+                    method = { page, limit ->
+                        paginatedCharacterMediaAppearances(page, limit, characterId, mediaType, sort)
+                    }
                 )
             }
         ).flow
@@ -72,7 +70,7 @@ class AnilistCharactersDataSource @Inject constructor(
         characterId: Int,
         mediaType: MediaType,
         sort: Sort<MediaSort>
-    ): Result<List<CharacterMediaRole>> {
+    ): Result<List<MediaRole>> {
         val characterMediaAppearanceQuery = CharacterMediaAppearancesQuery(
             page = page,
             perPage = limit,

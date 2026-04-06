@@ -50,7 +50,12 @@ class NetworkModule {
     @Singleton
     @MainOkHttpClient
     fun provideMainOkHttpClient(): OkHttpClient {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
         return OkHttpClient.Builder()
+            .addInterceptor(logging)
             .build()
     }
 

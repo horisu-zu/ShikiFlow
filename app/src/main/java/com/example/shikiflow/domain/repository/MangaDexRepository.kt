@@ -27,7 +27,7 @@ interface MangaDexRepository {
 
     fun getGroupMangaChapters(
         mangaId: String,
-        groupIds: List<String>,
+        scanlationGroups: List<String>,
         uploader: String? = null
     ): Flow<PagingData<MangaChapterMetadata>>
 }

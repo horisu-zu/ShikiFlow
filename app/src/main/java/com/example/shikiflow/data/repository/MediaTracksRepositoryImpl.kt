@@ -1,5 +1,7 @@
 package com.example.shikiflow.data.repository
 
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.room.withTransaction
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
@@ -8,6 +10,7 @@ import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Compa
 import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity.Companion.toDto
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.anime.AnimeShortData
@@ -50,7 +53,23 @@ class MediaTracksRepositoryImpl @Inject constructor(
         userId: Int?,
         title: String,
         userRateStatus: UserRateStatus?
-    ): Flow<PagingData<AnimeTrack>> = getSource().getBrowseTracks(userId, title, userRateStatus)
+    ): Flow<PagingData<AnimeTrack>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = true,
+                prefetchDistance = 5,
+                initialLoadSize = 15
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource(
+                    method = { page, limit ->
+                        getSource().browseAnimeTracks(page, limit, userId, title, userRateStatus)
+                    }
+                )
+            }
+        ).flow
+    }
 
     override suspend fun updateAnimeTrack(
         animeTrack: AnimeUserTrack,

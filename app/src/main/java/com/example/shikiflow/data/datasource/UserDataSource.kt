@@ -24,13 +24,11 @@ import kotlinx.coroutines.flow.Flow
 interface UserDataSource {
     fun fetchCurrentUser(): Flow<DataResult<User>>
 
-    fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>>
-
     suspend fun getPaginatedHistory(
         userId: Int,
         page: Int?,
         limit: Int?
-    ): List<UserActivity>
+    ): Result<List<UserActivity>>
 
     fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
 
@@ -51,8 +49,6 @@ interface UserDataSource {
     fun getUserSocial(userId: Int, socialCategory: SocialCategory): Flow<PagingData<UserSocial>>
 
     suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>
-
-    fun getUsers(query: String): Flow<PagingData<Browse.User>>
 
     suspend fun getUsersByNickname(
         page: Int,

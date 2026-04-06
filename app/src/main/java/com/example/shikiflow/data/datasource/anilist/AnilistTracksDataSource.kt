@@ -17,7 +17,6 @@ import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackDto.Companion.toDomain
 import com.example.shikiflow.data.local.mediator.AnimeTracksMediator
 import com.example.shikiflow.data.local.mediator.MangaTracksMediator
-import com.example.shikiflow.data.local.source.TracksPagingSource
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
@@ -69,29 +68,6 @@ class AnilistTracksDataSource @Inject constructor(
         }
     }
 
-    override fun getBrowseTracks(
-        userId: Int?,
-        title: String,
-        userRateStatus: UserRateStatus?
-    ): Flow<PagingData<AnimeTrack>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 10,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 10
-            ),
-            pagingSourceFactory = {
-                TracksPagingSource(
-                    mediaTracksDataSource = this,
-                    userId = userId,
-                    userStatus = userRateStatus,
-                    title = title
-                )
-            }
-        ).flow
-    }
-
     override suspend fun getAnimeTracks(
         page: Int,
         limit: Int,
@@ -132,6 +108,10 @@ class AnilistTracksDataSource @Inject constructor(
         name: String?,
         userStatus: UserRateStatus?,
     ): Result<List<AnimeTrack>> {
+        if(name.isNullOrBlank()) {
+            return Result.success(emptyList())
+        }
+
         val idsQuery = MediaListIDsQuery(
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),

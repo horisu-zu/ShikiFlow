@@ -21,14 +21,14 @@ class BrowsePagingSource @Inject constructor(
     }
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, BrowseMedia> {
-        val page = params.key ?: 1
-        val pageSize = params.loadSize
-
         if(options.name?.isBlank() == true) return LoadResult.Page(
             data = emptyList(),
             prevKey = null,
             nextKey = null
         )
+
+        val page = params.key ?: 1
+        val pageSize = params.loadSize
 
         val response = mediaDataSource.browseMedia(
             page = page,

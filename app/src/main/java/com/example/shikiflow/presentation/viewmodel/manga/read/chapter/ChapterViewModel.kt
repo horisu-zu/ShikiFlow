@@ -121,7 +121,7 @@ class ChapterViewModel @Inject constructor(
         .flatMapLatest { state ->
             mangaDexRepository.getGroupMangaChapters(
                 mangaId = state.mangaId!!,
-                groupIds = state.scanlationGroupsIds!!,
+                scanlationGroups = state.scanlationGroupsIds!!,
                 uploader = if(state.scanlationGroupsIds.isEmpty()) state.uploader else null
             )
         }.cachedIn(viewModelScope)

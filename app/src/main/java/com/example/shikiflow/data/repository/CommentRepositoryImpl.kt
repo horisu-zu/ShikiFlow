@@ -4,8 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.CommentsDataSource
-import com.example.shikiflow.data.local.source.CommentPagingSource
-import com.example.shikiflow.data.local.source.ThreadPagingSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
@@ -48,9 +47,10 @@ class CommentRepositoryImpl @Inject constructor(
                 initialLoadSize = 15
             ),
             pagingSourceFactory = {
-                CommentPagingSource(
-                    commentsRepository = this,
-                    topicId = topicId
+                GenericPagingSource<Comment>(
+                    method = { page, limit ->
+                        getSource().getComments(topicId, page, limit)
+                    }
                 )
             }
         ).flow
@@ -68,10 +68,10 @@ class CommentRepositoryImpl @Inject constructor(
                 initialLoadSize = 15
             ),
             pagingSourceFactory = {
-                ThreadPagingSource(
-                    commentsDataSource = getSource(),
-                    mediaId = mediaId,
-                    threadSort = threadSort
+                GenericPagingSource<Thread>(
+                    method = { page, limit ->
+                        getSource().getMediaThreads(mediaId, page, limit, threadSort)
+                    }
                 )
             }
         ).flow

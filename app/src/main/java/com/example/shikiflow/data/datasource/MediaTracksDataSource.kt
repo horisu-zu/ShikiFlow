@@ -14,12 +14,6 @@ interface MediaTracksDataSource {
         userId: Int?
     ): Flow<PagingData<AnimeTrack>>
 
-    fun getBrowseTracks(
-        userId: Int?,
-        title: String,
-        userRateStatus: UserRateStatus?
-    ): Flow<PagingData<AnimeTrack>>
-
     suspend fun getAnimeTracks(
         page: Int = 1,
         limit: Int = 50,

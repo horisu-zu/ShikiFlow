@@ -12,9 +12,9 @@ import com.example.graphql.anilist.StaffMediaRolesQuery
 import com.example.graphql.anilist.StaffSearchQuery
 import com.example.graphql.anilist.VoiceActorRolesQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.local.source.MediaStaffPagingSource
 import com.example.shikiflow.data.local.source.StaffMediaPagingSource
-import com.example.shikiflow.data.local.source.VoiceActorRolesPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toStaffMediaRole
@@ -161,10 +161,10 @@ class AnilistStaffDataSource @Inject constructor(
                 initialLoadSize = 24
             ),
             pagingSourceFactory = {
-                VoiceActorRolesPagingSource(
-                    staffId = staffId,
-                    sort = sort,
-                    staffDataSource = this
+                GenericPagingSource<MediaRole>(
+                    method = { page, limit ->
+                        paginatedVoiceActorRoles(page, limit, staffId, sort)
+                    }
                 )
             }
         ).flow

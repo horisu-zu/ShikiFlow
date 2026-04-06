@@ -71,6 +71,8 @@ interface UserApi {
 
     @GET("/api/users/{id}/friends")
     suspend fun getUserFriends(
-        @Path("id") userId: Long
+        @Path("id") userId: Long,
+        @Query("page") page: Int = 1,
+        @Query("limit") limit: Int = 1
     ): List<ShikiUser>
 }

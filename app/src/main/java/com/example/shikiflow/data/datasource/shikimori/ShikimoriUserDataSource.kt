@@ -10,13 +10,12 @@ import com.apollographql.apollo.api.Optional
 import com.example.graphql.shikimori.CurrentUserQuery
 import com.example.graphql.shikimori.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
-import com.example.shikiflow.data.local.source.HistoryPagingSource
-import com.example.shikiflow.data.local.source.UserPagingSource
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.data.datasource.dto.ShikiCreateRateRequest
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.data.datasource.dto.ShikiUpdateRateRequest
+import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
@@ -59,29 +58,23 @@ class ShikimoriUserDataSource @Inject constructor(
             }
     }
 
-    override fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 20
-            ),
-            pagingSourceFactory = { HistoryPagingSource(this, userId) }
-        ).flow
-    }
-
     override suspend fun getPaginatedHistory(
         userId: Int,
         page: Int?,
         limit: Int?
-    ): List<UserActivity> {
-        return userApi.getUserHistory(
-            userId = userId.toLong(),
-            page = page,
-            limit = limit
-        ).map { response ->
-            response.toDomain()
+    ): Result<List<UserActivity>> {
+        return try {
+            val result = userApi.getUserHistory(
+                userId = userId.toLong(),
+                page = page,
+                limit = limit
+            ).map { response ->
+                response.toDomain()
+            }
+
+            Result.success(result)
+        } catch (e: Exception) {
+            Result.failure(e)
         }
     }
 
@@ -96,7 +89,11 @@ class ShikimoriUserDataSource @Inject constructor(
                         .toDomain()
                 }
                 val favorites = async { getShikiFavorites(userId) }
-                val friends = async { getUserFriends(userId) }
+                val friends = async {
+                    userApi.getUserFriends(userId.toLong()).map { shikiUser ->
+                        shikiUser.toDomain()
+                    }
+                }
 
                 Triple(userRates.await(), favorites.await(), friends.await())
             }
@@ -176,26 +173,21 @@ class ShikimoriUserDataSource @Inject constructor(
         userId: Int,
         socialCategory: SocialCategory
     ): Flow<PagingData<UserSocial>> {
-        return Pager(config = PagingConfig(pageSize = 100)) {
-            object : PagingSource<Int, UserSocial>() {
-                override suspend fun load(params: LoadParams<Int>): LoadResult<Int, UserSocial> {
-                    return try {
-                        val friends = getUserFriends(userId).map { user ->
-                            Follower(user)
-                        }
-
-                        LoadResult.Page(
-                            data = friends,
-                            prevKey = null,
-                            nextKey = null
-                        )
-                    } catch (e: Exception) {
-                        LoadResult.Error(e)
+        return Pager(
+            config = PagingConfig(
+                pageSize = 18,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 18
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource<UserSocial>(
+                    method = { page, limit ->
+                        getUserFriends(userId, page, limit)
                     }
-                }
-                override fun getRefreshKey(state: PagingState<Int, UserSocial>): Int? = null
+                )
             }
-        }.flow
+        ).flow
     }
 
     override suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate> {
@@ -210,28 +202,25 @@ class ShikimoriUserDataSource @Inject constructor(
     ): List<UserFavorite> = userApi.getUserFavorites(userId.toLong()).toDomain()
 
     private suspend fun getUserFriends(
-        userId: Int
-    ): List<User> {
-        return userApi.getUserFriends(userId.toLong()).map { shikiUser ->
-            shikiUser.toDomain()
-        }
-    }
-
-    override fun getUsers(query: String): Flow<PagingData<Browse.User>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 30,
-                enablePlaceholders = true,
-                prefetchDistance = 10,
-                initialLoadSize = 30
-            ),
-            pagingSourceFactory = {
-                UserPagingSource(
-                    userDataSource = this,
-                    query = query
+        userId: Int,
+        page: Int,
+        limit: Int
+    ): Result<List<UserSocial>> {
+        return try {
+            val response = userApi.getUserFriends(
+                userId = userId.toLong(),
+                page = page,
+                limit = limit
+            ).map { shikiUser ->
+                Follower(
+                    data = shikiUser.toDomain()
                 )
             }
-        ).flow
+
+            Result.success(response)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     override suspend fun getUsersByNickname(
@@ -239,6 +228,8 @@ class ShikimoriUserDataSource @Inject constructor(
         limit: Int,
         nickname: String
     ): Result<List<Browse.User>> {
+        if(nickname.isBlank()) return Result.success(emptyList())
+
         val query = UsersQuery(
             page = Optional.present(page),
             limit = Optional.present(limit),

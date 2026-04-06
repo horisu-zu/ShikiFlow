@@ -39,7 +39,8 @@ class MediaStaffPagingSource(
                             imageUrl = staffData.imageUrl,
                             roles = staffRoles.flatMap { it.roles },
                         )
-                    }.values
+                    }
+                    .values
                     .toList()
 
                 LoadResult.Page(
