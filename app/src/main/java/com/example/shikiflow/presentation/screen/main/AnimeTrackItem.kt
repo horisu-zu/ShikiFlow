@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
+import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -32,7 +32,7 @@ import com.example.shikiflow.presentation.common.mappers.SeasonMapper.determineS
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun AnimeTrackItem(
-    userRate: AnimeTrack,
+    userRate: MediaTrack,
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit,
     onLongClick: () -> Unit
@@ -42,13 +42,13 @@ fun AnimeTrackItem(
             .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .combinedClickable(
-                onClick = { onClick(userRate.anime.id) },
+                onClick = { onClick(userRate.shortData.id) },
                 onLongClick = { onLongClick() }
             ),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
         BaseImage(
-            model = userRate.anime.poster?.originalUrl,
+            model = userRate.shortData.poster?.originalUrl,
             contentDescription = "Poster",
             modifier = Modifier.width(96.dp)
         )
@@ -58,7 +58,7 @@ fun AnimeTrackItem(
             verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
         ) {
             Text(
-                text = userRate.anime.name,
+                text = userRate.shortData.name,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),
@@ -68,10 +68,10 @@ fun AnimeTrackItem(
 
             Text(
                 text = buildString {
-                    userRate.anime.status?.let { mediaStatus ->
+                    userRate.shortData.status?.let { mediaStatus ->
                         append(stringResource(id = mediaStatus.displayValue()))
                     }
-                    userRate.anime.kind?.displayValue()?.let { formatRes ->
+                    userRate.shortData.kind?.displayValue()?.let { formatRes ->
                         append(" • ")
                         append(stringResource(id = formatRes))
                     }
@@ -79,44 +79,46 @@ fun AnimeTrackItem(
                     append(
                         stringResource(
                             id = R.string.episodes,
-                            userRate.anime.episodes.takeIf { it > 0 } ?: "?"
+                            userRate.shortData.totalCount.takeIf { (it ?: 0) > 0 } ?: "?"
                         )
                     )
-                    userRate.anime.score?.takeIf { it != 0.0f }?.let { score ->
+                    userRate.shortData.score?.takeIf { it != 0.0f }?.let { score ->
                         append(" • ")
                         append("$score ★")
                     }
                 }, style = MaterialTheme.typography.labelMedium
             )
 
-            if (userRate.anime.status != MediaStatus.ANNOUNCED) {
+            if (userRate.shortData.status != MediaStatus.ANNOUNCED) {
                 ProgressBar(
-                    progress = userRate.anime.let { animeShort ->
+                    progress = userRate.shortData.let { animeShort ->
                         val totalEpisodes = when {
-                            animeShort.episodes > 0 -> animeShort.episodes
-                            animeShort.episodesAired > 0 -> animeShort.episodesAired
+                            (animeShort.totalCount ?: 0) > 0 -> animeShort.totalCount
+                            (animeShort.currentProgress ?: 0) > 0 -> animeShort.currentProgress
                             else -> null
                         }
-                        totalEpisodes?.let { userRate.track.episodes.toFloat() / it } ?: 0f
+                        totalEpisodes?.let { (userRate.track.progress.toFloat()) / it } ?: 0f
                     },
                     modifier = Modifier.fillMaxWidth().padding(end = 8.dp)
                 )
-                Text(
-                    text = stringResource(
-                        id = R.string.ongoing_episodes,
-                        userRate.track.episodes,
-                        userRate.anime.let { animeShort ->
-                            val totalEpisodes = when {
-                                animeShort.episodes > 0 -> animeShort.episodes
-                                animeShort.episodesAired > 0 -> animeShort.episodesAired
-                                else -> 0
-                            }
-                            totalEpisodes
-                        }
-                    ), style = MaterialTheme.typography.labelMedium
-                )
+                userRate.shortData.let { animeShort ->
+                    val totalEpisodes = when {
+                        (animeShort.totalCount ?: 0) > 0 -> animeShort.totalCount
+                        (animeShort.currentProgress ?: 0) > 0 -> animeShort.currentProgress
+                        else -> 0
+                    }
+                    totalEpisodes
+                }?.let {
+                    Text(
+                        text = stringResource(
+                            id = R.string.ongoing_episodes,
+                            userRate.track.progress,
+                            it
+                        ), style = MaterialTheme.typography.labelMedium
+                    )
+                }
             } else {
-                userRate.anime.airedOn?.let { date ->
+                userRate.shortData.airedOn?.let { date ->
                     StatusCard(
                         text = determineSeason(date.month)?.let { seasonRes ->
                             buildString {

@@ -30,6 +30,19 @@ query AnimeTrackBrowse(
     }
 }
 
+query MangaTracksBrowse(
+    $page: PositiveInt = 1
+    $limit: PositiveInt = 2
+    $mylist: MylistString
+    $search: String
+) {
+    mangas(page: $page, limit: $limit, mylist: $mylist, search: $search) {
+        userRate {
+            ...MangaUserRateWithModel
+        }
+    }
+}
+
 query ShortAnimeTracks(
     $page: PositiveInt = 1
     $limit: PositiveInt = 2

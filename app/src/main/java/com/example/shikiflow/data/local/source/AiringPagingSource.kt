@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.local.source
 
+import android.util.Log
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.example.shikiflow.data.datasource.MediaDataSource
@@ -12,7 +13,6 @@ class AiringPagingSource @Inject constructor(
     private val airingAtGreater: Long,
     private val airingAtLesser: Long
 ): PagingSource<Int, AiringAnime>() {
-    private val distinctIds = mutableSetOf<Int>()
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, AiringAnime> {
         val page = params.key ?: 1
@@ -21,28 +21,24 @@ class AiringPagingSource @Inject constructor(
         val response = mediaDataSource.getAiringSchedule(
             page = page,
             limit = pageSize,
+            onList = onList,
             airingAtGreater = airingAtGreater,
             airingAtLesser = airingAtLesser
         )
 
         return response.fold(
             onSuccess = { result ->
+                Log.d("AiringPagingSource", "Result Size: ${result.size}")
                 val prevKey = if (page > 1) page - 1 else null
-                val nextKey = if (result.size >= pageSize) page + 1 else null
+                val nextKey = if (result.size < pageSize) null else page + 1
 
                 val filteredResult = result
                     .filter { airingAnime ->
-                        distinctIds.add(airingAnime.data.id)
-                    }
-                    .filter { airingAnime ->
-                        if (onList) airingAnime.data.userRateStatus != null
-                            else true
-                    }
-                    //Filtering here because Shikimori API does not have the functionality
-                    //to return the data within the airingAt values
-                    .filter { airingAnime ->
                         airingAnime.airingAt?.epochSeconds in airingAtGreater..airingAtLesser ||
                         airingAnime.releasedOn?.epochSeconds in airingAtGreater..airingAtLesser
+                    }.filter { airingAnime ->
+                        if (onList) airingAnime.data.userRateStatus != null
+                            else true
                     }
 
                 LoadResult.Page(

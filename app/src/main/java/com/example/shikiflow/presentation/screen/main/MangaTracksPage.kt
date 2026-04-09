@@ -34,8 +34,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
-import com.example.shikiflow.data.mapper.MediaTracksMapper.toUserRateData
-import com.example.shikiflow.domain.model.track.manga.MangaTrack
+import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
+import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
@@ -57,7 +57,7 @@ fun MangaTracksPage(
     val mangaTrackItems = mangaTracksViewModel.mangaTracks[userStatus]?.collectAsLazyPagingItems()
         ?: return
 
-    var selectedItem by remember { mutableStateOf<MangaTrack?>(null) }
+    var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
 
     when(mangaTrackItems.loadState.refresh) {
         LoadState.Loading -> {
@@ -150,9 +150,9 @@ fun MangaTracksPage(
 
 @Composable
 private fun MangaTrackItem(
-    trackItem: MangaTrack,
+    trackItem: MediaTrack,
     onItemClick: (Int) -> Unit,
-    onLongItemClick: (MangaTrack) -> Unit,
+    onLongItemClick: (MediaTrack) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cornerShape = 12.dp
@@ -168,13 +168,13 @@ private fun MangaTrackItem(
             )
         )
             .combinedClickable(
-                onClick = { onItemClick(trackItem.manga.id) },
+                onClick = { onItemClick(trackItem.shortData.id) },
                 onLongClick = { onLongItemClick(trackItem) }
             ),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         BaseImage(
-            model = trackItem.manga.poster?.originalUrl,
+            model = trackItem.shortData.poster?.originalUrl,
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
                 width = Int.MAX_VALUE.dp,
@@ -183,7 +183,7 @@ private fun MangaTrackItem(
         )
 
         Text(
-            text = trackItem.manga.name,
+            text = trackItem.shortData.name,
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,
@@ -196,10 +196,10 @@ private fun MangaTrackItem(
 
         Text(
             text = listOfNotNull(
-                trackItem.manga.kind?.let {
+                trackItem.shortData.kind?.let {
                     stringResource(id = it.displayValue())
                 },
-                trackItem.manga.score?.let { score ->
+                trackItem.shortData.score?.let { score ->
                     stringResource(id = R.string.media_score, score)
                 }
             ).joinToString(" • "),

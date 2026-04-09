@@ -1,42 +1,41 @@
 package com.example.shikiflow.data.repository
 
+import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.map
 import androidx.room.withTransaction
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.entity.animetrack.AnimeShortEntity.Companion.toDto
-import com.example.shikiflow.data.local.entity.animetrack.AnimeTrackEntity.Companion.toDto
-import com.example.shikiflow.data.local.entity.mangatrack.MangaShortEntity.Companion.toDto
-import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackEntity.Companion.toDto
+import com.example.shikiflow.data.local.mediator.MediaTracksMediator
 import com.example.shikiflow.data.local.source.GenericPagingSource
+import com.example.shikiflow.data.mapper.local.MediaShortMapper.toEntity
+import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toEntity
+import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeShortData
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack
-import com.example.shikiflow.domain.model.track.manga.MangaShortData
-import com.example.shikiflow.domain.model.track.manga.MangaTrack
-import com.example.shikiflow.domain.model.track.manga.MangaUserTrack
+import com.example.shikiflow.domain.model.track.media.MediaShortData
+import com.example.shikiflow.domain.model.track.media.MediaTrack
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
 class MediaTracksRepositoryImpl @Inject constructor(
     private val shikimoriTracksDataSource: MediaTracksDataSource,
     private val anilistTracksDataSource: MediaTracksDataSource,
     private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase
 ): MediaTracksRepository {
-
-    val animeTracksDao = appRoomDatabase.animeTracksDao()
-    val mangaTracksDao = appRoomDatabase.mangaTracksDao()
+    val mediaTracksDao = appRoomDatabase.mediaTracksDao()
 
     private fun getSource() = runBlocking {
         when(settingsRepository.authTypeFlow.first()) {
@@ -45,66 +44,68 @@ class MediaTracksRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAnimeTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<AnimeTrack>> {
-        return getSource().getAnimeTracks(status, userId)
-    }
-
-    override fun getBrowseTracks(
+    override fun getMediaTracks(
+        status: UserRateStatus,
         userId: Int?,
-        title: String,
-        userRateStatus: UserRateStatus?
-    ): Flow<PagingData<AnimeTrack>> {
+        mediaType: MediaType
+    ): Flow<PagingData<MediaTrack>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 15,
+                pageSize = 24,
                 enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 15
+                prefetchDistance = 12,
+                initialLoadSize = 24
+            ),
+            remoteMediator = MediaTracksMediator(
+                mediaTracksDataSource = getSource(),
+                appRoomDatabase = appRoomDatabase,
+                userRateStatus = status,
+                userId = userId,
+                mediaType = mediaType
+            ),
+            pagingSourceFactory = { mediaTracksDao.getTracksByStatus(status.name, mediaType) }
+        ).flow.map { pagingData ->
+            pagingData.map { track ->
+                track.toDomain()
+            }
+        }
+    }
+
+    override fun browseMediaTracks(
+        userId: Int,
+        mediaType: MediaType,
+        title: String,
+        userRateStatus: UserRateStatus?
+    ): Flow<PagingData<MediaTrack>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 24
             ),
             pagingSourceFactory = {
                 GenericPagingSource(
                     method = { page, limit ->
-                        getSource().browseAnimeTracks(page, limit, userId, title, userRateStatus)
+                        getSource().browseMediaTracks(page, limit, mediaType, userId, title, userRateStatus)
                     }
                 )
             }
         ).flow
     }
 
-    override suspend fun updateAnimeTrack(
-        animeTrack: AnimeUserTrack,
-        animeShortData: AnimeShortData?
+    override suspend fun updateMediaTrack(
+        mediaTrack: MediaUserTrack,
+        mediaShortData: MediaShortData?
     ) {
-        val track = animeTrack.toDto()
+        val track = mediaTrack.toEntity()
 
         appRoomDatabase.withTransaction {
-            when(animeShortData) {
-                null -> animeTracksDao.updateTrack(track)
+            when(mediaShortData) {
+                null -> mediaTracksDao.updateTrack(track)
                 else -> {
-                    animeTracksDao.insertShortEntity(animeShortData.toDto())
-                    animeTracksDao.insertTrack(track)
-                }
-            }
-        }
-    }
-
-    override fun getMangaTracks(
-        status: UserRateStatus,
-        userId: Int?
-    ): Flow<PagingData<MangaTrack>> = getSource().getMangaTracks(status, userId = userId)
-
-    override suspend fun updateMangaTrack(
-        mangaTrack: MangaUserTrack,
-        mangaShortData: MangaShortData?
-    ) {
-        val track = mangaTrack.toDto()
-
-        appRoomDatabase.withTransaction {
-            when(mangaShortData) {
-                null -> mangaTracksDao.updateTrack(track)
-                else -> {
-                    mangaTracksDao.insertShortEntity(mangaShortData.toDto())
-                    mangaTracksDao.insertTrack(track)
+                    mediaTracksDao.insertShortEntity(mediaShortData.toEntity())
+                    mediaTracksDao.insertTrack(track)
                 }
             }
         }

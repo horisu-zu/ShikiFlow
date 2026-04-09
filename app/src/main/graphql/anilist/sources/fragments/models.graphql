@@ -19,6 +19,7 @@ fragment MediaShort on Media {
         romaji
         native
     }
+    synonyms
     type
     format
     averageScore

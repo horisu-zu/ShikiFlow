@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.Poster
 import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.manga.MangaShortData
+import com.example.shikiflow.domain.model.track.media.MediaShortData
 import kotlin.time.Instant
 
 data class AnimeShortData(

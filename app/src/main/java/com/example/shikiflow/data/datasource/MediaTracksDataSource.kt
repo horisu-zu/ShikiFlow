@@ -1,43 +1,28 @@
 package com.example.shikiflow.data.datasource
 
-import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.manga.MangaTrack
-import kotlinx.coroutines.flow.Flow
+import com.example.shikiflow.domain.model.track.media.MediaTrack
+import com.example.shikiflow.domain.model.tracks.MediaType
 
 interface MediaTracksDataSource {
-    fun getAnimeTracks(
-        status: UserRateStatus,
-        userId: Int?
-    ): Flow<PagingData<AnimeTrack>>
-
-    suspend fun getAnimeTracks(
+    suspend fun getMediaTracks(
         page: Int = 1,
         limit: Int = 50,
+        mediaType: MediaType,
         userId: Int? = null,
         status: UserRateStatus? = null,
         order: Sort<UserRateType>? = null,
         idsList: List<Int>? = null
-    ): Result<List<AnimeTrack>>
+    ): Result<List<MediaTrack>>
 
-    suspend fun browseAnimeTracks(
-        page: Int = 1,
-        limit: Int = 15,
-        userId: Int?,
-        name: String? = null,
-        userStatus: UserRateStatus? = null
-    ): Result<List<AnimeTrack>>
-
-    fun getMangaTracks(status: UserRateStatus, userId: Int?): Flow<PagingData<MangaTrack>>
-
-    suspend fun getMangaTracks(
-        page: Int = 1,
-        limit: Int = 50,
-        userId: Int? = null,
-        status: UserRateStatus? = null,
-        order: Sort<UserRateType>? = null
-    ): Result<List<MangaTrack>>
+    suspend fun browseMediaTracks(
+        page: Int,
+        limit: Int,
+        mediaType: MediaType,
+        userId: Int,
+        title: String,
+        userRateStatus: UserRateStatus? = null
+    ): Result<List<MediaTrack>>
 }

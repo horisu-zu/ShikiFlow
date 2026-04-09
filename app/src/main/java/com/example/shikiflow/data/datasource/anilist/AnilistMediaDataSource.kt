@@ -17,7 +17,6 @@ import com.example.graphql.anilist.MediaReviewsQuery
 import com.example.graphql.anilist.StudioBrowseQuery
 import com.example.graphql.anilist.type.MediaSort as ALMediaSort
 import com.example.shikiflow.data.datasource.MediaDataSource
-import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
@@ -113,32 +112,10 @@ class AnilistMediaDataSource @Inject constructor(
         }
     }
 
-    override fun getAiringAnimes(
-        onList: Boolean,
-        airingAtGreater: Long,
-        airingAtLesser: Long
-    ): Flow<PagingData<AiringAnime>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 9,
-                initialLoadSize = 15
-            ),
-            pagingSourceFactory = {
-                AiringPagingSource(
-                    mediaDataSource = this,
-                    onList = onList,
-                    airingAtGreater = airingAtGreater,
-                    airingAtLesser = airingAtLesser
-                )
-            }
-        ).flow
-    }
-
     override suspend fun getAiringSchedule(
         page: Int,
         limit: Int,
+        onList: Boolean,
         airingAtGreater: Long,
         airingAtLesser: Long
     ): Result<List<AiringAnime>> {

@@ -20,6 +20,26 @@ query MediaListTracksQuery(
     }
 }
 
+query MediaListCollection(
+    $userId: Int!,
+    $type: MediaType!,
+    $status: MediaListStatus
+    $sort: [MediaListSort] = [UPDATED_TIME_DESC]
+) {
+    MediaListCollection(
+        userId: $userId,
+        type: $type,
+        status: $status,
+        sort: $sort
+    ) {
+        lists {
+            entries {
+                ...MediaListShort
+            }
+        }
+    }
+}
+
 query MediaListIDsQuery(
     $page: Int = 0,
     $limit: Int = 15,

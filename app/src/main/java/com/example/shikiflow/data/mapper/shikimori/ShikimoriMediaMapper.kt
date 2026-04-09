@@ -7,6 +7,7 @@ import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.graphql.shikimori.type.AnimeKindEnum
 import com.example.graphql.shikimori.type.MangaKindEnum
 import com.example.shikiflow.BuildConfig
+import com.example.shikiflow.data.datasource.dto.CalendarAnime
 import com.example.shikiflow.data.datasource.dto.ShikiAnime
 import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
@@ -200,6 +201,21 @@ object ShikimoriMediaMapper {
             timeUntilAiring = episodeInstant?.timeDifference(),
             airingAt = episodeInstant,
             releasedOn = releasedOn?.dateShort?.toDomain()?.date
+        )
+    }
+
+    fun CalendarAnime.toAiringAnime(): AiringAnime {
+        return AiringAnime(
+            data = ShortMedia(
+                id = shikiAnime.id ?: 0,
+                title = shikiAnime.name ?: "",
+                mediaType = MediaType.ANIME,
+                coverImageUrl = BuildConfig.SHIKI_BASE_URL + shikiAnime.image?.original,
+                userRateStatus = null
+            ),
+            episode = nextEpisode,
+            airingAt = Instant.parse(nextEpisodeAt),
+            timeUntilAiring = Instant.parse(nextEpisodeAt).timeDifference()
         )
     }
 }

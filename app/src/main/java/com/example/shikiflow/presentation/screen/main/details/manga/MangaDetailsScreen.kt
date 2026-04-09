@@ -72,7 +72,7 @@ fun MangaDetailsScreen(
                                 mangaDetailsViewModel.saveUserRate(
                                     userId = id,
                                     saveUserRate = save,
-                                    mangaShortData = shortData
+                                    mediaShortData = shortData
                                 )
                             },
                             modifier = Modifier.padding(

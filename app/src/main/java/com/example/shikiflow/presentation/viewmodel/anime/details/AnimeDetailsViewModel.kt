@@ -2,9 +2,9 @@ package com.example.shikiflow.presentation.viewmodel.anime.details
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toAnimeEntity
+import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
-import com.example.shikiflow.domain.model.track.anime.AnimeShortData
+import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
@@ -109,7 +109,7 @@ class AnimeDetailsViewModel @Inject constructor(
     fun saveUserRate(
         userId: Int,
         saveUserRate: SaveUserRate,
-        animeShortData: AnimeShortData? = null
+        mediaShortData: MediaShortData? = null
     ) {
         viewModelScope.launch {
             try {
@@ -130,9 +130,9 @@ class AnimeDetailsViewModel @Inject constructor(
                     mediaType = MediaType.ANIME
                 )
 
-                mediaTracksRepository.updateAnimeTrack(
-                    animeTrack = result.toAnimeEntity(),
-                    animeShortData = if(saveUserRate.rateId != null ) null else animeShortData
+                mediaTracksRepository.updateMediaTrack(
+                    mediaTrack = result.toMediaEntity(),
+                    mediaShortData = if(saveUserRate.rateId != null ) null else mediaShortData
                 )
 
                 mutableUiState.update { state ->

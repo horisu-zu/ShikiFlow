@@ -1,83 +1,42 @@
 package com.example.shikiflow.data.datasource.anilist
 
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
-import com.example.graphql.anilist.MediaListIDsQuery
+import com.example.graphql.anilist.MediaListCollectionQuery
 import com.example.graphql.anilist.MediaListTracksQuery
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
-import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.entity.mangatrack.MangaTrackDto.Companion.toDomain
-import com.example.shikiflow.data.local.mediator.AnimeTracksMediator
-import com.example.shikiflow.data.local.mediator.MangaTracksMediator
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
-import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toAnimeDomain
-import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toDomain
-import com.example.shikiflow.data.mapper.local.MangaEntityMapper.toMangaDomain
-import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.manga.MangaTrack
+import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.utils.AnilistUtils.flatMap
 import com.example.shikiflow.utils.AnilistUtils.toResult
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import kotlin.Result
+import kotlin.collections.flatMap
 
 @OptIn(ExperimentalPagingApi::class)
 class AnilistTracksDataSource @Inject constructor(
-    private val apolloClient: ApolloClient,
-    private val appRoomDatabase: AppRoomDatabase,
+    private val apolloClient: ApolloClient
 ): MediaTracksDataSource {
-
-    override fun getAnimeTracks(
-        status: UserRateStatus,
-        userId: Int?
-    ): Flow<PagingData<AnimeTrack>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 30,
-                enablePlaceholders = true,
-                prefetchDistance = 15,
-                initialLoadSize = 30
-            ),
-            remoteMediator = AnimeTracksMediator(
-                mediaTracksDataSource = this,
-                appRoomDatabase = appRoomDatabase,
-                userRateStatus = status,
-                userId = userId
-            ),
-            pagingSourceFactory = { appRoomDatabase.animeTracksDao().getTracksByStatus(status.name) }
-        ).flow.map { pagingData ->
-            pagingData.map { track ->
-                track.toDomain()
-            }
-        }
-    }
-
-    override suspend fun getAnimeTracks(
+    override suspend fun getMediaTracks(
         page: Int,
         limit: Int,
+        mediaType: MediaType,
         userId: Int?,
         status: UserRateStatus?,
         order: Sort<UserRateType>?,
         idsList: List<Int>?
-    ): Result<List<AnimeTrack>> {
+    ): Result<List<MediaTrack>> {
         val query = MediaListTracksQuery(
-            type = Optional.present(MediaType.ANIME.toAnilistType()),
+            type = Optional.present(mediaType.toAnilistType()),
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
             userId = Optional.presentIfNotNull(userId),
@@ -95,97 +54,46 @@ class AnilistTracksDataSource @Inject constructor(
                 ?.mediaList
                 ?.let { list ->
                     list.mapNotNull { mediaList ->
-                        mediaList?.mediaListShort?.toAnimeDomain()
+                        mediaList?.mediaListShort?.toDomain()
                     }
                 } ?: emptyList()
         }
     }
 
-    override suspend fun browseAnimeTracks(
+    override suspend fun browseMediaTracks(
         page: Int,
         limit: Int,
-        userId: Int?,
-        name: String?,
-        userStatus: UserRateStatus?,
-    ): Result<List<AnimeTrack>> {
-        if(name.isNullOrBlank()) {
+        mediaType: MediaType,
+        userId: Int,
+        title: String,
+        userRateStatus: UserRateStatus?
+    ): Result<List<MediaTrack>> {
+        if(title.isBlank()) {
             return Result.success(emptyList())
         }
 
-        val idsQuery = MediaListIDsQuery(
-            page = Optional.presentIfNotNull(page),
-            limit = Optional.presentIfNotNull(limit),
-            type = Optional.presentIfNotNull(MediaType.ANIME.toAnilistType()),
-            search = Optional.presentIfNotNull(name),
+        val ratesQuery = MediaListCollectionQuery(
+            userId = userId,
+            type = mediaType.toAnilistType(),
+            status = Optional.presentIfNotNull(userRateStatus?.toAnilistRateStatus())
         )
+        val ratesResponse = apolloClient.query(ratesQuery).execute()
 
-        val response = apolloClient.query(idsQuery).execute()
-
-        return response.toResult().flatMap { data ->
-            val idsList = data.Page?.media?.mapNotNull { it?.id }
-            Log.d("AnilistTracksDataSource", "Ids: $idsList")
-            Log.d("AnilistTracksDataSource", "User ID: $userId")
-
-            getAnimeTracks(
-                page = 1, //No need to add page when I search by the IDs
-                limit = limit,
-                userId = userId,
-                idsList = idsList,
-                status = userStatus,
-                order = Sort(
-                    type = UserRateType.SCORE,
-                    direction = SortDirection.DESCENDING
-                )
-            )
-        }
-    }
-
-    override fun getMangaTracks(
-        status: UserRateStatus,
-        userId: Int?
-    ): Flow<PagingData<MangaTrack>> {
-        return Pager(
-            config = PagingConfig(pageSize = 30),
-            remoteMediator = MangaTracksMediator(
-                mediaTracksDataSource = this,
-                appRoomDatabase = appRoomDatabase,
-                userRateStatus = status,
-                userId = userId
-            ),
-            pagingSourceFactory = { appRoomDatabase.mangaTracksDao().getTracksByStatus(status.name) }
-        ).flow.map { pagingData ->
-            pagingData.map { track ->
-                track.toDomain()
-            }
-        }
-    }
-
-    override suspend fun getMangaTracks(
-        page: Int,
-        limit: Int,
-        userId: Int?,
-        status: UserRateStatus?,
-        order: Sort<UserRateType>?
-    ): Result<List<MangaTrack>> {
-        val query = MediaListTracksQuery(
-            type = Optional.present(MediaType.MANGA.toAnilistType()),
-            page = Optional.presentIfNotNull(page),
-            limit = Optional.presentIfNotNull(limit),
-            userId = Optional.presentIfNotNull(userId),
-            status = Optional.presentIfNotNull(status?.toAnilistRateStatus()),
-            order = Optional.presentIfNotNull(listOf(order?.toAnilistOrder()))
-        )
-
-        val response = apolloClient.query(query)
-            .fetchPolicy(FetchPolicy.NetworkFirst)
-            .execute()
-
-        return response.toResult().map { data ->
-            data.Page?.mediaList?.let { list ->
-                list.mapNotNull { mediaList ->
-                    mediaList?.mediaListShort?.toMangaDomain()
-                }
-            } ?: emptyList()
+        return ratesResponse.toResult().map { data ->
+            data.MediaListCollection
+                ?.lists
+                ?.let { list ->
+                    list.flatMap { mediaList ->
+                        mediaList?.entries?.mapNotNull { list ->
+                            list?.mediaListShort?.toDomain()
+                        } ?: emptyList()
+                    }
+                }?.filter { mediaTrack ->
+                    mediaTrack.shortData.name.contains(title, ignoreCase = true) ||
+                            mediaTrack.shortData.synonyms?.any { synonym ->
+                                synonym.contains(title, ignoreCase = true)
+                            } == true
+                } ?: emptyList()
         }
     }
 }

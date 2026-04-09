@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -68,10 +67,6 @@ fun SearchPage(
         tracksViewModel.setQuery(searchQuery)
     }
 
-    LaunchedEffect(trackItems) {
-        Log.d("SearchPage", "Track Items State: ${trackItems.loadState}")
-    }
-
     Column {
         LazyRow(
             modifier = Modifier
@@ -113,71 +108,51 @@ fun SearchPage(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(vertical = 12.dp),
+            contentPadding = PaddingValues(
+                horizontal = 12.dp,
+                vertical = 12.dp
+            ),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            when (trackItems.loadState.refresh) {
-                is LoadState.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
-                    }
-                }
-                is LoadState.Error -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = stringResource(R.string.atp_loading_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { trackItems.refresh() }
-                            )
+            items(
+                count = trackItems.itemCount,
+                key = trackItems.itemKey { it.shortData.id }
+            ) { index ->
+                val item = trackItems[index] ?: return@items
+
+                AnimeTrackItem(
+                    userRate = item,
+                    onClick = { id -> onAnimeClick(id) },
+                    onLongClick = { /**/ },
+                    modifier = Modifier.animateItem()
+                )
+            }
+            trackItems.apply {
+                when {
+                    loadState.append is LoadState.Error -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { trackItems.retry() }
+                                )
+                            }
                         }
                     }
-                }
-                else -> {
-                    items(
-                        count = trackItems.itemCount,
-                        key = trackItems.itemKey { it.anime.id }
-                    ) { index ->
-                        val item = trackItems[index] ?: return@items
-                        SearchAnimeTrackItem(
-                            animeItem = item,
-                            onItemClick = { id -> onAnimeClick(id) }
-                        )
-                    }
-                    trackItems.apply {
-                        when {
-                            loadState.append is LoadState.Error -> {
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 8.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        ErrorItem(
-                                            message = stringResource(R.string.common_error),
-                                            buttonLabel = stringResource(R.string.common_retry),
-                                            onButtonClick = { trackItems.retry() }
-                                        )
-                                    }
-                                }
-                            }
-                            loadState.append is LoadState.Loading -> {
-                                item {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 8.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) { CircularProgressIndicator() }
-                                }
-                            }
+                    loadState.append is LoadState.Loading -> {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
                         }
                     }
                 }

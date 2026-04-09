@@ -70,11 +70,12 @@ query AnimeBrowse(
     $franchise: String
     $censored: Boolean
     $mylist: MylistString
-    $search: String
+    $search: String,
+    $ids: String
 ) {
     animes(page: $page, limit: $limit, order: $order, kind: $kind, status: $status,
         season: $season, score: $score, duration: $duration, rating: $rating, genre: $genre,
-        studio: $studio, franchise: $franchise, censored: $censored, mylist: $mylist, search: $search) {
+        studio: $studio, franchise: $franchise, censored: $censored, mylist: $mylist, search: $search, ids: $ids) {
         id
         malId
         name

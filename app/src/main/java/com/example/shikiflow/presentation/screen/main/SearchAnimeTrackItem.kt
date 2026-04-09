@@ -30,10 +30,11 @@ import com.materialkolor.ktx.harmonize
 @Composable
 fun SearchAnimeTrackItem(
     animeItem: AnimeTrack,
-    onItemClick: (Int) -> Unit
+    onItemClick: (Int) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(start = 12.dp, end = 24.dp)
             .clip(RoundedCornerShape(12.dp))

@@ -35,13 +35,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.data.mapper.local.MediaShortMapper.toShortData
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeShortData.Companion.toShortMangaData
-import com.example.shikiflow.domain.model.track.manga.MangaShortData
+import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
@@ -73,7 +73,7 @@ fun MangaDetailsContent(
     rateUpdateState: RateUpdateState,
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
-    onSaveUserRate: (Int, SaveUserRate, MangaShortData) -> Unit,
+    onSaveUserRate: (Int, SaveUserRate, MediaShortData) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var rateBottomSheet by remember { mutableStateOf(false) }
@@ -308,7 +308,7 @@ fun MangaDetailsContent(
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
-                onSaveUserRate(userId, save, mangaDetails.toShortMangaData())
+                onSaveUserRate(userId, save, mangaDetails.toShortData())
             }
         )
     }

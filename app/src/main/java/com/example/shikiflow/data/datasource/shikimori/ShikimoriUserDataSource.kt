@@ -192,8 +192,8 @@ class ShikimoriUserDataSource @Inject constructor(
 
     override suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate> {
         return when(mediaType) {
-            MediaType.ANIME -> userApi.getUserAnimeRates(userId.toLong())
-            MediaType.MANGA -> userApi.getUserMangaRates(userId.toLong())
+            MediaType.ANIME -> userApi.getShortUserAnimeRates(userId.toLong())
+            MediaType.MANGA -> userApi.getShortUserMangaRates(userId.toLong())
         }.map { it.toDomain() }
     }
 

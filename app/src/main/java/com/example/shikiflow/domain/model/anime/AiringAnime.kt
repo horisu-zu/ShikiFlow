@@ -9,6 +9,5 @@ data class AiringAnime(
     val episode: Int,
     val timeUntilAiring: Duration?,
     val airingAt: Instant?,
-    val releasedOn: Instant? = null,
-    val hasTime: Boolean = true
+    val releasedOn: Instant? = null
 )

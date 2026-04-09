@@ -37,13 +37,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.data.mapper.local.MediaShortMapper.toShortData
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeShortData
-import com.example.shikiflow.domain.model.track.anime.AnimeShortData.Companion.toShortAnimeData
+import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
@@ -74,7 +74,7 @@ fun AnimeDetailsContent(
     sharedTransitionScope: SharedTransitionScope,
     selectedScreenshotIndex: Int?,
     onScreenshotClick: (Int) -> Unit,
-    onSaveUserRate: (Int, SaveUserRate, AnimeShortData) -> Unit,
+    onSaveUserRate: (Int, SaveUserRate, MediaShortData) -> Unit,
     mediaNavOptions: MediaNavOptions,
     modifier: Modifier = Modifier
 ) {
@@ -339,7 +339,7 @@ fun AnimeDetailsContent(
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
-                onSaveUserRate(userId, save, animeDetails.toShortAnimeData())
+                onSaveUserRate(userId, save, animeDetails.toShortData())
             }
         )
     }

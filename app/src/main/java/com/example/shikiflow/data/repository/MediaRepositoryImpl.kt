@@ -4,6 +4,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.MediaDataSource
+import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
@@ -57,7 +58,24 @@ class MediaRepositoryImpl @Inject constructor(
         onList: Boolean,
         airingAtGreater: Long,
         airingAtLesser: Long
-    ): Flow<PagingData<AiringAnime>> = getSource().getAiringAnimes(onList, airingAtGreater, airingAtLesser)
+    ): Flow<PagingData<AiringAnime>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 45,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 45
+            ),
+            pagingSourceFactory = {
+                AiringPagingSource(
+                    mediaDataSource = getSource(),
+                    onList = onList,
+                    airingAtGreater = airingAtGreater,
+                    airingAtLesser = airingAtLesser
+                )
+            }
+        ).flow
+    }
 
     override fun getSimilarMedia(
         mediaType: MediaType,

@@ -1,6 +1,7 @@
 fragment AnimeShort on Anime {
     id
     name
+    synonyms
     japanese
     kind
     score
@@ -20,6 +21,7 @@ fragment AnimeShort on Anime {
 fragment MangaShort on Manga {
     id
     name
+    synonyms
     japanese
     kind
     score
@@ -29,7 +31,7 @@ fragment MangaShort on Manga {
     airedOn { ...DateShort }
     releasedOn { ...DateShort }
     poster { ...PosterShort}
-    url
+    genres { id name kind }
 }
 
 fragment CharacterShort on Character {

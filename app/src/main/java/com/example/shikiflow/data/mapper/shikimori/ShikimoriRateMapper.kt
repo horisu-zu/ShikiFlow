@@ -2,12 +2,9 @@ package com.example.shikiflow.data.mapper.shikimori
 
 import com.example.graphql.shikimori.fragment.UserRateShort
 import com.example.graphql.shikimori.type.UserRateStatusEnum
+import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
-import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate
-import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate.Companion.getImageUrl
-import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate.Companion.getMediaId
-import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate.Companion.getMediaTitle
-import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate.Companion.getProgress
+import com.example.shikiflow.data.datasource.dto.media.ShikiShortUserRate
 import com.example.shikiflow.data.datasource.dto.ShikiShortUserRateResponse
 import com.example.shikiflow.data.datasource.dto.ShikiTargetType.Companion.toMediaType
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
@@ -52,14 +49,30 @@ object ShikimoriRateMapper {
     }
 
     fun ShikiShortUserRate.toDomain(): ShortUserMediaRate {
-        return ShortUserMediaRate(
-            id = this.getMediaId().toInt(),
-            title = this.getMediaTitle(),
-            imageUrl = this.getImageUrl() ?: "",
-            score = this.score,
-            status = this.status.toDomain(),
-            progress = this.getProgress()
-        )
+        return when(this) {
+            is ShikiShortUserRate.ShikiShortAnimeRate -> {
+                ShortUserMediaRate(
+                    id = anime.id.toInt(),
+                    title = anime.name,
+                    ruTitle = anime.russian,
+                    imageUrl = "${BuildConfig.SHIKI_BASE_URL}${anime.image.x96}",
+                    score = score,
+                    status = status.toDomain(),
+                    progress = anime.episodes
+                )
+            }
+            is ShikiShortUserRate.ShikiShortMangaRate -> {
+                ShortUserMediaRate(
+                    id = manga.id.toInt(),
+                    title = manga.name,
+                    ruTitle = manga.russian,
+                    imageUrl = "${BuildConfig.SHIKI_BASE_URL}${manga.image.x96}",
+                    score = score,
+                    status = status.toDomain(),
+                    progress = manga.chapters
+                )
+            }
+        }
     }
 
     fun List<UserRate>.toDomain(): MediaTypeStats<OverviewStats> {

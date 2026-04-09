@@ -6,7 +6,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiHistoryResponse
 import com.example.shikiflow.data.datasource.dto.ShikiUpdateRateRequest
 import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
 import com.example.shikiflow.data.datasource.dto.ShikiUserFavoritesResponse
-import com.example.shikiflow.data.datasource.dto.ShikiShortUserRate
+import com.example.shikiflow.data.datasource.dto.media.ShikiShortUserRate
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -26,7 +26,7 @@ interface UserApi {
     ): List<ShikiHistoryResponse>
 
     @GET("/api/users/{userId}/anime_rates")
-    suspend fun getUserAnimeRates(
+    suspend fun getShortUserAnimeRates(
         @Path("userId") userId: Long,
         @Query("page") page: Int? = null,
         @Query("limit") limit: Int = 5000,
@@ -35,7 +35,7 @@ interface UserApi {
     ): List<ShikiShortUserRate.ShikiShortAnimeRate>
 
     @GET("/api/users/{userId}/manga_rates")
-    suspend fun getUserMangaRates(
+    suspend fun getShortUserMangaRates(
         @Path("userId") userId: Long,
         @Query("page") page: Int? = null,
         @Query("limit") limit: Int = 5000,

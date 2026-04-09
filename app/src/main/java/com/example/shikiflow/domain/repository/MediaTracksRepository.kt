@@ -2,36 +2,28 @@ package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeShortData
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
-import com.example.shikiflow.domain.model.track.anime.AnimeUserTrack
-import com.example.shikiflow.domain.model.track.manga.MangaShortData
-import com.example.shikiflow.domain.model.track.manga.MangaTrack
-import com.example.shikiflow.domain.model.track.manga.MangaUserTrack
+import com.example.shikiflow.domain.model.track.media.MediaShortData
+import com.example.shikiflow.domain.model.track.media.MediaTrack
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
+import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.coroutines.flow.Flow
 
 interface MediaTracksRepository {
-
-    fun getAnimeTracks(
+    fun getMediaTracks(
         status: UserRateStatus,
-        userId: Int?
-    ): Flow<PagingData<AnimeTrack>>
-
-    fun getBrowseTracks(
         userId: Int?,
+        mediaType: MediaType
+    ): Flow<PagingData<MediaTrack>>
+
+    fun browseMediaTracks(
+        userId: Int,
+        mediaType: MediaType,
         title: String,
-        userRateStatus: UserRateStatus?
-    ): Flow<PagingData<AnimeTrack>>
+        userRateStatus: UserRateStatus? = null
+    ): Flow<PagingData<MediaTrack>>
 
-    fun getMangaTracks(
-        status: UserRateStatus,
-        userId: Int?
-    ): Flow<PagingData<MangaTrack>>
-
-    suspend fun updateAnimeTrack(
-        animeTrack: AnimeUserTrack,
-        animeShortData: AnimeShortData? = null
+    suspend fun updateMediaTrack(
+        mediaTrack: MediaUserTrack,
+        mediaShortData: MediaShortData? = null
     )
-
-    suspend fun updateMangaTrack(mangaTrack: MangaUserTrack, mangaShortData: MangaShortData? = null)
 }

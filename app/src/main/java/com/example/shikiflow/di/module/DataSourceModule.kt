@@ -22,7 +22,6 @@ import com.example.shikiflow.data.datasource.shikimori.ShikimoriMediaDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriStaffDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriTracksDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriUserDataSource
-import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.data.remote.CommentApi
@@ -61,17 +60,15 @@ object DataSourceModule {
     @Provides
     @Singleton
     fun provideShikimoriAnimeTracksDataSource(
-        @ShikimoriApollo apolloClient: ApolloClient,
-        appRoomDatabase: AppRoomDatabase
-    ): MediaTracksDataSource = ShikimoriTracksDataSource(apolloClient, appRoomDatabase)
+        @ShikimoriApollo apolloClient: ApolloClient
+    ): MediaTracksDataSource = ShikimoriTracksDataSource(apolloClient)
 
     @AniList
     @Provides
     @Singleton
     fun provideAnilistAnimeTracksDataSource(
-        @AnilistApollo apolloClient: ApolloClient,
-        appRoomDatabase: AppRoomDatabase
-    ): MediaTracksDataSource = AnilistTracksDataSource(apolloClient, appRoomDatabase)
+        @AnilistApollo apolloClient: ApolloClient
+    ): MediaTracksDataSource = AnilistTracksDataSource(apolloClient)
 
     @Shikimori
     @Provides

@@ -189,4 +189,9 @@ dependencies {
 
     //Material Kolor
     implementation(libs.material.kolor)
+
+    //Work Manager
+    //implementation(libs.androidx.work.runtime.ktx)
+    //implementation(libs.androidx.hilt.work)
+    //ksp(libs.androidx.hilt.compiler)
 }

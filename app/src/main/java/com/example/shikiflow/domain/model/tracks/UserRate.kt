@@ -12,6 +12,8 @@ data class UserRate(
 data class ShortUserMediaRate(
     val id: Int,
     val title: String,
+    val enTitle: String? = null,
+    val ruTitle: String? = null,
     val imageUrl: String,
     val score: Int,
     val status: UserRateStatus,

@@ -37,10 +37,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
-import com.example.shikiflow.data.mapper.MediaTracksMapper.toUserRateData
+import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.track.anime.AnimeTrack
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
@@ -48,6 +47,7 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.track.media.MediaTrack
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +63,7 @@ fun AnimeTracksPage(
         ?: return
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
 
-    var selectedItem by remember { mutableStateOf<AnimeTrack?>(null) }
+    var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
 
     when (animeTrackItems.loadState.refresh) {
         is LoadState.Loading -> {
@@ -97,17 +97,18 @@ fun AnimeTracksPage(
                             onAnimeClick = onAnimeClick,
                             onLongClick = { item ->
                                 selectedItem = item
-                            }, modifier = modifier
+                            },
+                            modifier = modifier
                         )
                     }
-
                     AppUiMode.GRID -> {
                         AnimeTracksGridComponent(
                             trackItems = animeTrackItems,
                             onAnimeClick = onAnimeClick,
                             onLongClick = { item ->
                                 selectedItem = item
-                            }, modifier = modifier
+                            },
+                            modifier = modifier
                         )
                     }
                 }
@@ -133,9 +134,9 @@ fun AnimeTracksPage(
 
 @Composable
 private fun AnimeTracksListComponent(
-    trackItems: LazyPagingItems<AnimeTrack>,
+    trackItems: LazyPagingItems<MediaTrack>,
     onAnimeClick: (Int) -> Unit,
-    onLongClick: (AnimeTrack) -> Unit,
+    onLongClick: (MediaTrack) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -184,9 +185,9 @@ private fun AnimeTracksListComponent(
 
 @Composable
 private fun AnimeTracksGridComponent(
-    trackItems: LazyPagingItems<AnimeTrack>,
+    trackItems: LazyPagingItems<MediaTrack>,
     onAnimeClick: (Int) -> Unit,
-    onLongClick: (AnimeTrack) -> Unit,
+    onLongClick: (MediaTrack) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
@@ -205,14 +206,14 @@ private fun AnimeTracksGridComponent(
             Column(
                 modifier = Modifier.clip(RoundedCornerShape(12.dp))
                     .combinedClickable(
-                        onClick = { onAnimeClick(trackItem.anime.id) },
+                        onClick = { onAnimeClick(trackItem.shortData.id) },
                         onLongClick = { onLongClick(trackItem) }
                     )
                     .animateItem(),
                 verticalArrangement = Arrangement.spacedBy(2.dp)
             ) {
                 BaseImage(
-                    model = trackItem.anime.poster?.originalUrl,
+                    model = trackItem.shortData.poster?.originalUrl,
                     imageType = ImageType.Poster(
                         width = Int.MAX_VALUE.dp,
                         aspectRatio = 2f / 2.6f
@@ -220,7 +221,7 @@ private fun AnimeTracksGridComponent(
                     contentDescription = "Poster"
                 )
                 Text(
-                    text = trackItem.anime.name,
+                    text = trackItem.shortData.name,
                     style = MaterialTheme.typography.labelMedium.copy(
                         fontWeight = FontWeight.Medium
                     ),
@@ -230,10 +231,10 @@ private fun AnimeTracksGridComponent(
                 )
                 Text(
                     text = buildString {
-                        if(trackItem.anime.status == MediaStatus.ONGOING)
-                            append("${trackItem.track.episodes} / ${trackItem.anime.episodesAired}")
-                        else append(trackItem.track.episodes)
-                        append(" of ${trackItem.anime.episodes.takeIf { it > 0 } ?: "?"} ep.")
+                        if(trackItem.shortData.status == MediaStatus.ONGOING)
+                            append("${trackItem.track.progress} / ${trackItem.shortData.currentProgress}")
+                        else append(trackItem.track.progress)
+                        append(" of ${trackItem.shortData.totalCount.takeIf { (it ?: 0) > 0 } ?: "?"} ep.")
                     }, style = MaterialTheme.typography.labelSmall.copy(
                         fontWeight = FontWeight.Light,
                         fontSize = 10.sp

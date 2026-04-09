@@ -14,10 +14,7 @@ import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
 import com.example.graphql.shikimori.MangaDetailsQuery
-import com.example.graphql.shikimori.type.AnimeStatusEnum
-import com.example.graphql.shikimori.type.OrderEnum
 import com.example.shikiflow.data.datasource.MediaDataSource
-import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiAnimeKind
@@ -26,7 +23,6 @@ import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriAni
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriMangaStatus
 import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriBrowseOrder
 import com.example.shikiflow.data.mapper.common.RatingMapper.toShikiRating
-import com.example.shikiflow.data.mapper.common.SeasonMapper
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toShikiSeason
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toAiringAnime
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toBrowseAnime
@@ -165,74 +161,46 @@ class ShikimoriMediaDataSource @Inject constructor(
         }
     }
 
-    override fun getAiringAnimes(
-        onList: Boolean,
-        airingAtGreater: Long,
-        airingAtLesser: Long
-    ): Flow<PagingData<AiringAnime>> {
-        val seenIds = mutableSetOf<Int>()
-
-        return Pager(
-            config = PagingConfig(
-                pageSize = 45,
-                enablePlaceholders = true,
-                prefetchDistance = 9,
-                initialLoadSize = 45
-            ),
-            pagingSourceFactory = {
-                seenIds.clear()
-                AiringPagingSource(
-                    mediaDataSource = this,
-                    onList = onList,
-                    airingAtGreater = airingAtGreater,
-                    airingAtLesser = airingAtLesser
-                )
-            }
-        ).flow
-    }
-
+    /**
+     * Main problems with the API Calendar method are:
+     * 1. once the episode was released it updates the nextEpisodeAt value
+     * which doesn't suite the weekly calendar I'm going for
+     * 2. the absence of media cover images and user rate statuses
+     */
     override suspend fun getAiringSchedule(
         page: Int,
         limit: Int,
+        onList: Boolean,
         airingAtGreater: Long,
         airingAtLesser: Long
-    ): Result<List<AiringAnime>> = runCatching {
-        val ongoingsQuery = AnimeBrowseQuery(
-            page = Optional.present(page),
-            limit = Optional.present(limit),
-            status = Optional.present(AnimeStatusEnum.ongoing.name),
-            order = Optional.present(OrderEnum.ranked),
-            score = Optional.present(1)
-        )
+    ): Result<List<AiringAnime>> {
+        val ongoingsIds = animeApi.getOngoingsCalendar().mapNotNull { calendarAnime ->
+            calendarAnime.shikiAnime.id
+        }
 
-        //Covers released on the same week titles within a season
-        val seasonQuery = AnimeBrowseQuery(
-            page = Optional.present(page),
+        if((page - 1) * limit > ongoingsIds.size) return Result.success(emptyList())
+
+        val pagedIds = ongoingsIds
+            .subList(
+                fromIndex = (page - 1) * limit,
+                toIndex = minOf((page - 1) * limit + limit, ongoingsIds.size)
+            ).joinToString(",")
+
+        val ongoingsQuery = AnimeBrowseQuery(
             limit = Optional.present(limit),
-            order = Optional.present(OrderEnum.ranked),
-            season = Optional.present(SeasonMapper.currentShikiSeason()),
-            score = Optional.present(1)
+            ids = Optional.present(pagedIds)
         )
 
         val ongoingsResult = apolloClient.query(ongoingsQuery).execute()
             .toResult()
             .map { data ->
-                Log.d("ShikimoriMediaDataSource", "Ongoings Size: ${data.animes.size}")
-                data.animes.map { anime ->
-                    anime.toAiringAnime()
-                }
-            }.getOrThrow()
+                data.animes
+                    .map { anime ->
+                        anime.toAiringAnime()
+                    }
+            }
 
-        val seasonResult = apolloClient.query(seasonQuery).execute()
-            .toResult()
-            .map { data ->
-                Log.d("ShikimoriMediaDataSource", "Season Size: ${data.animes.size}")
-                data.animes.map { anime ->
-                    anime.toAiringAnime()
-                }
-            }.getOrThrow()
-
-        (ongoingsResult + seasonResult).distinctBy { it.data.id }
+        return ongoingsResult
     }
 
     override fun getSimilarMedia(

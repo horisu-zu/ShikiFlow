@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.cachedIn
-import com.example.shikiflow.data.mapper.local.AnimeEntityMapper.toAnimeEntity
+import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -75,7 +75,7 @@ class AnimeTracksViewModel @Inject constructor(
                 params.userId
             }
             .flatMapLatest { params ->
-                mediaTracksRepository.getAnimeTracks(userRateStatus, params.userId)
+                mediaTracksRepository.getMediaTracks(userRateStatus, params.userId, MediaType.ANIME)
             }.cachedIn(viewModelScope)
     }
 
@@ -95,7 +95,7 @@ class AnimeTracksViewModel @Inject constructor(
                 repeat = saveUserRate.repeat
             )
 
-            mediaTracksRepository.updateAnimeTrack(result.toAnimeEntity())
+            mediaTracksRepository.updateMediaTrack(result.toMediaEntity())
         } catch (e: Exception) {
             Log.e("AnimeTracksViewModel", "Error updating user rate", e)
         } finally {

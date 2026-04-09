@@ -102,7 +102,7 @@ fun AnimeDetailsScreen(
                                     animeDetailsViewModel.saveUserRate(
                                         userId = id,
                                         saveUserRate = save,
-                                        animeShortData = shortData
+                                        mediaShortData = shortData
                                     )
                                 },
                                 mediaNavOptions = navOptions,
