@@ -21,13 +21,14 @@ fun MainPage(
     mediaType: MediaType,
     isAtTop: Boolean,
     isAppBarVisible: Boolean,
-    onMediaClick: (Int, MediaType) -> Unit
+    onMediaClick: (Int, MediaType) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val coroutineScope = rememberCoroutineScope()
     val tabs = UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
     val pagerState = rememberPagerState { tabs.size }
 
-    Column {
+    Column(modifier = modifier) {
         MainTabRow(
             tabs = tabs,
             mediaType = mediaType,

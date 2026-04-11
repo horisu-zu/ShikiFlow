@@ -180,13 +180,13 @@ object ShikimoriMediaMapper {
 
     fun AnimeBrowseQuery.Anime.toAiringAnime(): AiringAnime {
         val airedOnDate = airedOn?.dateShort?.toDomain()?.date
-        val airedThisWeek = airedOnDate?.isInCurrentWeek() ?: false
 
-        val episodeInstant = nextEpisodeAt?.let { instant ->
-            Instant.parse(input = instant.toString())
-                .let { nextEpInstant ->
-                    if(airedThisWeek) nextEpInstant.minus(7.days) else nextEpInstant
-                }
+        val nextEpInstant = nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) }
+        val airedThisWeek = airedOnDate?.isInCurrentWeek() == true ||
+            nextEpInstant?.isInCurrentWeek() != true
+
+        val episodeInstant = nextEpInstant?.let {
+            if(airedThisWeek) nextEpInstant.minus(7.days) else nextEpInstant
         } ?: airedOnDate
 
         return AiringAnime(

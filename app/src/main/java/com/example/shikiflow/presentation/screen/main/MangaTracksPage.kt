@@ -100,10 +100,10 @@ fun MangaTracksPage(
 
                         MangaTrackItem(
                             trackItem = trackItem,
-                            onItemClick = { id ->
+                            onClick = { id ->
                                 onMangaClick(id)
                             },
-                            onLongItemClick = { item ->
+                            onLongClick = { item ->
                                 selectedItem = item
                             },
                             modifier = Modifier.animateItem()
@@ -149,10 +149,10 @@ fun MangaTracksPage(
 }
 
 @Composable
-private fun MangaTrackItem(
+fun MangaTrackItem(
     trackItem: MediaTrack,
-    onItemClick: (Int) -> Unit,
-    onLongItemClick: (MediaTrack) -> Unit,
+    onClick: (Int) -> Unit,
+    onLongClick: (MediaTrack) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val cornerShape = 12.dp
@@ -168,8 +168,8 @@ private fun MangaTrackItem(
             )
         )
             .combinedClickable(
-                onClick = { onItemClick(trackItem.shortData.id) },
-                onLongClick = { onLongItemClick(trackItem) }
+                onClick = { onClick(trackItem.shortData.id) },
+                onLongClick = { onLongClick(trackItem) }
             ),
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {

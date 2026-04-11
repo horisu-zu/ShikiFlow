@@ -3,9 +3,7 @@ package com.example.shikiflow.domain.repository
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
@@ -49,16 +47,4 @@ interface UserRepository {
     fun getUsers(
         nickname: String
     ): Flow<PagingData<Browse.User>>
-
-    suspend fun saveUserRate(
-        userId: Int? = null,
-        entryId: Int? = null,
-        mediaType: MediaType,
-        mediaId: Int,
-        status: UserRateStatus,
-        progress: Int? = null,
-        progressVolumes: Int? = null,
-        repeat: Int? = null,
-        score: Int? = null
-    ): UserMediaRate
 }

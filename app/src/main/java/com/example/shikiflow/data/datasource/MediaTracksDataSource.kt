@@ -5,6 +5,7 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserMediaRate
 
 interface MediaTracksDataSource {
     suspend fun getMediaTracks(
@@ -25,4 +26,16 @@ interface MediaTracksDataSource {
         title: String,
         userRateStatus: UserRateStatus? = null
     ): Result<List<MediaTrack>>
+
+    suspend fun saveUserRate(
+        userId: Int? = null,
+        entryId: Int? = null,
+        mediaType: MediaType,
+        mediaId: Int,
+        status: UserRateStatus,
+        progress: Int? = null,
+        progressVolumes: Int? = null,
+        repeat: Int? = null,
+        score: Int? = null
+    ): UserMediaRate
 }

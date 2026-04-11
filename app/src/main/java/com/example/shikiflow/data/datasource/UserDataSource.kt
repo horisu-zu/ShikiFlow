@@ -3,10 +3,8 @@ package com.example.shikiflow.data.datasource
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.User
@@ -55,16 +53,4 @@ interface UserDataSource {
         limit: Int,
         nickname: String
     ): Result<List<Browse.User>>
-
-    suspend fun saveUserRate(
-        userId: Int? = null,
-        entryId: Int? = null,
-        mediaType: MediaType,
-        mediaId: Int,
-        status: UserRateStatus,
-        progress: Int? = null,
-        progressVolumes: Int? = null,
-        repeat: Int? = null,
-        score: Int? = null
-    ): UserMediaRate
 }

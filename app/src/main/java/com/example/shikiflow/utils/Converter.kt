@@ -95,19 +95,17 @@ object Converter {
         val diffMillis = duration.inWholeMilliseconds
 
         return when {
+            diffMillis < 60000 -> {
+                val seconds = duration.inWholeSeconds
+                resources.getQuantityString(R.plurals.seconds_ago, seconds.toInt(), seconds)
+            }
             diffMillis < 3600000 -> {
                 val minutes = duration.inWholeMinutes
-                if (minutes == 1L) {
-                    resources.getString(R.string.status_minute_ago, minutes)
-                } else {
-                    resources.getString(R.string.status_minutes_ago, minutes)
-                }
+                resources.getQuantityString(R.plurals.minutes_ago, minutes.toInt(), minutes)
             }
             diffMillis < 86400000 -> {
-                when (val hours = duration.inWholeHours) {
-                    1L -> resources.getString(R.string.status_hour_ago, hours)
-                    else -> resources.getString(R.string.status_hours_ago, hours)
-                }
+                val hours = duration.inWholeHours
+                resources.getQuantityString(R.plurals.hours_ago, hours.toInt(), hours)
             }
             else -> {
                 val date = Date(instant.toEpochMilliseconds())

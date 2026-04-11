@@ -14,7 +14,7 @@ import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
         MediaTrackEntity::class,
         MediaShortEntity::class
     ],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(

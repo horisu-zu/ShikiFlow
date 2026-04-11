@@ -16,13 +16,18 @@
         Customize the app\'s appearance and reading preferences
     </string>
 
-    <string name="online_status">Online — %1s</string>
-    <string name="status_online">Online</string>
-    <string name="status_minute_ago">%1$d minute ago</string>
-    <string name="status_minutes_ago">%1$d minutes ago</string>
-    <string name="status_hour_ago">%1$d hour ago</string>
-    <string name="status_hours_ago">%1$d hours ago</string>
-    <string name="status_days">%1$s days ago</string>
+    <plurals name="seconds_ago">
+        <item quantity="one">%1$d second ago</item>
+        <item quantity="other">%1$d seconds ago</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
 
     <string name="mtp_loading_error">Error loading tracked manga</string>
     <string name="atp_loading_error">Error Loading Anime Tracks</string>

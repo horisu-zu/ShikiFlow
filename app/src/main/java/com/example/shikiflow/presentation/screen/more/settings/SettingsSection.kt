@@ -136,7 +136,7 @@ private fun TextItem(
 private fun ImageItem(
     title: String,
     displayValue: String,
-    imageUrl: String,
+    imageUrl: String?,
     onClick: () -> Unit
 ) {
     Row(
@@ -151,7 +151,7 @@ private fun ImageItem(
             model = imageUrl,
             imageType = ImageType.Square(
                 width = 32.dp,
-                clip = RoundedCornerShape(12.dp)
+                clip = RoundedCornerShape(percent = 24)
             )
         )
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {

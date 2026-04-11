@@ -16,12 +16,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.domain.model.user.MessageActivity
 import com.example.shikiflow.domain.model.user.TextActivity
@@ -30,11 +32,12 @@ import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.utils.Converter.formatInstant
+import com.example.shikiflow.utils.Converter.convertInstantToString
 
 @Composable
 fun ActivityItem(
     userActivity: UserActivity,
+    onListActivityClick: (MediaType, Int) -> Unit,
     onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
     onLinkClick: (String) -> Unit,
@@ -44,6 +47,7 @@ fun ActivityItem(
         is ListActivity -> {
             ListActivityItem(
                 listActivity = userActivity,
+                onListActivityClick = onListActivityClick,
                 modifier = modifier
             )
         }
@@ -71,10 +75,21 @@ fun ActivityItem(
 @Composable
 fun ListActivityItem(
     listActivity: ListActivity,
+    onListActivityClick: (MediaType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val imageType = ImageType.Poster()
+
     Row(
-        modifier = modifier,
+        modifier = modifier
+            .clip(imageType.clip)
+            .then(
+                if(listActivity.mediaType != null) {
+                    Modifier.clickable {
+                        onListActivityClick(listActivity.mediaType, listActivity.mediaId)
+                    }
+                } else Modifier
+            ),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
         BaseImage(
@@ -87,20 +102,20 @@ fun ListActivityItem(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
+                text = convertInstantToString(LocalResources.current, listActivity.createdAt),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+            )
+            Text(
                 text = listActivity.title,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )
             Text(
                 text = listActivity.description,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
-            )
-            Text(
-                text = formatInstant(listActivity.createdAt, includeTime = true),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             )
         }
     }
@@ -149,7 +164,7 @@ fun TextActivityItem(
                     .padding(start = 8.dp)
             )
             Text(
-                text = " · ${formatInstant(textActivity.createdAt, includeTime = true)}",
+                text = " · ${convertInstantToString(LocalResources.current, textActivity.createdAt)}",
                 style = MaterialTheme.typography.labelMedium.copy(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                 ),
@@ -213,7 +228,7 @@ fun MessageActivityItem(
                         .padding(start = 8.dp)
                 )
                 Text(
-                    text = " · ${formatInstant(messageActivity.createdAt, includeTime = true)}",
+                    text = " · ${convertInstantToString(LocalResources.current, messageActivity.createdAt)}",
                     style = MaterialTheme.typography.labelMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
                     ),

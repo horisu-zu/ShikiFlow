@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusEvent
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
@@ -38,9 +37,7 @@ fun CustomSearchField(
     onActiveChange: (Boolean) -> Unit,
     onExitSearch: () -> Unit,
     modifier: Modifier = Modifier,
-    isActive: Boolean = true,
-    activeContainerColor: Color = MaterialTheme.colorScheme.background,
-    inactiveContainerColor: Color = MaterialTheme.colorScheme.surfaceContainer
+    isActive: Boolean = true
 ) {
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
@@ -53,10 +50,7 @@ fun CustomSearchField(
     Box(
         modifier = modifier
             .clip(RoundedCornerShape(16.dp))
-            .background(
-                color = if (isActive) activeContainerColor
-                    else inactiveContainerColor
-            )
+            .background(color = MaterialTheme.colorScheme.surfaceContainer)
     ) {
         Row(
             modifier = Modifier

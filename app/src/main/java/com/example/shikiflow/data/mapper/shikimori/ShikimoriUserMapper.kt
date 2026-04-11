@@ -1,6 +1,8 @@
 package com.example.shikiflow.data.mapper.shikimori
 
 import com.example.graphql.shikimori.fragment.UserShort
+import com.example.graphql.shikimori.type.AnimeKindEnum
+import com.example.graphql.shikimori.type.MangaKindEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.dto.ShikiHistoryResponse
 import com.example.shikiflow.data.datasource.dto.ShikiUserFavoritesResponse
@@ -41,13 +43,20 @@ object ShikimoriUserMapper {
     }
 
     fun ShikiHistoryResponse.toDomain(): ListActivity {
+        val mediaType = when {
+            AnimeKindEnum.entries.any { it.name == target?.kind } -> MediaType.ANIME
+            MangaKindEnum.entries.any { it.name == target?.kind } -> MediaType.MANGA
+            else -> null
+        }
+
         return ListActivity(
-            id = this.id.toInt(),
-            mediaId = this.target?.id?.toInt() ?: 0,
-            title = this.target?.name ?: "",
-            coverImage = "${BuildConfig.SHIKI_BASE_URL}${this.target?.image?.original}",
-            description = Ksoup.parse(this.description).text(),
-            createdAt = Instant.parse(this.createdAt)
+            id = id.toInt(),
+            mediaId = target?.id?.toInt() ?: 0,
+            mediaType = mediaType,
+            title = target?.name ?: "",
+            coverImage = "${BuildConfig.SHIKI_BASE_URL}${target?.image?.original}",
+            description = Ksoup.parse(description).text(),
+            createdAt = Instant.parse(createdAt)
         )
     }
 

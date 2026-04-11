@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.user
 
+import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlin.time.Instant
 
 sealed interface UserActivity
@@ -7,6 +8,7 @@ sealed interface UserActivity
 data class ListActivity(
     val id: Int,
     val mediaId: Int,
+    val mediaType: MediaType?,
     val title: String,
     val coverImage: String,
     val description: String,

@@ -7,7 +7,9 @@ import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaListCollectionQuery
 import com.example.graphql.anilist.MediaListTracksQuery
+import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
+import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
@@ -17,6 +19,7 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import javax.inject.Inject
 import kotlin.Result
@@ -95,5 +98,36 @@ class AnilistTracksDataSource @Inject constructor(
                             } == true
                 } ?: emptyList()
         }
+    }
+
+    override suspend fun saveUserRate(
+        userId: Int?,
+        entryId: Int?,
+        mediaType: MediaType,
+        mediaId: Int,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?
+    ): UserMediaRate {
+        val userRateQuery = SaveUserRateMutation(
+            rateEntryId = Optional.presentIfNotNull(entryId),
+            mediaId = mediaId,
+            mediaStatus = status.toAnilistRateStatus(),
+            progress = Optional.presentIfNotNull(progress),
+            progressVolumes = Optional.presentIfNotNull(progressVolumes),
+            repeat = Optional.presentIfNotNull(repeat),
+            scoreRaw = Optional.presentIfNotNull(score?.times(10))
+        )
+
+        val response = apolloClient.mutation(userRateQuery).execute()
+
+        val userRate = response.data
+            ?.SaveMediaListEntry
+            ?.aLRateEntry
+            ?: throw IllegalStateException("No data returned from SaveMediaListEntry")
+
+        return userRate.toDomain()
     }
 }

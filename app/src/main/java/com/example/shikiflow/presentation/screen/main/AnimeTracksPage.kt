@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -203,45 +202,12 @@ private fun AnimeTracksGridComponent(
         ) { index ->
             val trackItem = trackItems[index] ?: return@items
 
-            Column(
-                modifier = Modifier.clip(RoundedCornerShape(12.dp))
-                    .combinedClickable(
-                        onClick = { onAnimeClick(trackItem.shortData.id) },
-                        onLongClick = { onLongClick(trackItem) }
-                    )
-                    .animateItem(),
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                BaseImage(
-                    model = trackItem.shortData.poster?.originalUrl,
-                    imageType = ImageType.Poster(
-                        width = Int.MAX_VALUE.dp,
-                        aspectRatio = 2f / 2.6f
-                    ),
-                    contentDescription = "Poster"
-                )
-                Text(
-                    text = trackItem.shortData.name,
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontWeight = FontWeight.Medium
-                    ),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
-                Text(
-                    text = buildString {
-                        if(trackItem.shortData.status == MediaStatus.ONGOING)
-                            append("${trackItem.track.progress} / ${trackItem.shortData.currentProgress}")
-                        else append(trackItem.track.progress)
-                        append(" of ${trackItem.shortData.totalCount.takeIf { (it ?: 0) > 0 } ?: "?"} ep.")
-                    }, style = MaterialTheme.typography.labelSmall.copy(
-                        fontWeight = FontWeight.Light,
-                        fontSize = 10.sp
-                    ),
-                    modifier = Modifier.padding(bottom = 4.dp)
-                )
-            }
+            AnimeTrackGridItem(
+                trackItem = trackItem,
+                onClick = onAnimeClick,
+                onLongClick = onLongClick,
+                modifier = Modifier.animateItem()
+            )
         }
         trackItems.apply {
             if(loadState.append is LoadState.Loading) {
@@ -262,5 +228,56 @@ private fun AnimeTracksGridComponent(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AnimeTrackGridItem(
+    trackItem: MediaTrack,
+    onClick: (Int) -> Unit,
+    onLongClick: (MediaTrack) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val imageType = ImageType.Poster(
+        width = Int.MAX_VALUE.dp,
+        aspectRatio = 2f / 2.6f
+    )
+
+    Column(
+        modifier = Modifier
+            .clip(imageType.clip)
+            .combinedClickable(
+                onClick = { onClick(trackItem.shortData.id) },
+                onLongClick = { onLongClick(trackItem) }
+            )
+            .then(modifier),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        BaseImage(
+            model = trackItem.shortData.poster?.originalUrl,
+            imageType = imageType,
+            contentDescription = "Poster"
+        )
+        Text(
+            text = trackItem.shortData.name,
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontWeight = FontWeight.Medium
+            ),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 2.dp)
+        )
+        Text(
+            text = buildString {
+                if(trackItem.shortData.status == MediaStatus.ONGOING)
+                    append("${trackItem.track.progress} / ${trackItem.shortData.currentProgress}")
+                else append(trackItem.track.progress)
+                append(" of ${trackItem.shortData.totalCount.takeIf { (it ?: 0) > 0 } ?: "?"} ep.")
+            }, style = MaterialTheme.typography.labelSmall.copy(
+                fontWeight = FontWeight.Light,
+                fontSize = 10.sp
+            ),
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
     }
 }

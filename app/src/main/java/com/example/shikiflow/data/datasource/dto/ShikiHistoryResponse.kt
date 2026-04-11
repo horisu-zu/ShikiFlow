@@ -16,7 +16,7 @@ data class Target(
     val id: Long,
     val name: String,
     val russian: String,
-    val image: ShikiImageUrls,
+    val image: ShikiImage,
     val url: String,
     val kind: String?,
     val score: String,

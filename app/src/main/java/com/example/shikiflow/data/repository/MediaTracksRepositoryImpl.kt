@@ -12,6 +12,7 @@ import com.example.shikiflow.data.local.mediator.MediaTracksMediator
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.local.MediaShortMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toEntity
+import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -19,11 +20,14 @@ import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -92,6 +96,44 @@ class MediaTracksRepositoryImpl @Inject constructor(
                 )
             }
         ).flow
+    }
+
+    override fun saveUserRate(
+        userId: Int?,
+        entryId: Int?,
+        mediaType: MediaType,
+        mediaId: Int,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?,
+        mediaShortData: MediaShortData?
+    ): Flow<DataResult<UserMediaRate>> = flow {
+        emit(DataResult.Loading)
+
+        try {
+            val result = getSource().saveUserRate(
+                userId = userId,
+                entryId = entryId,
+                mediaType = mediaType,
+                mediaId = mediaId,
+                status = status,
+                progress = progress,
+                progressVolumes = progressVolumes,
+                repeat = repeat,
+                score = score
+            )
+
+            updateMediaTrack(
+                mediaTrack = result.toMediaEntity(),
+                mediaShortData = if(entryId != null) null else mediaShortData
+            )
+
+            emit(DataResult.Success(result))
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Unknown Error"))
+        }
     }
 
     override suspend fun updateMediaTrack(

@@ -1,23 +1,17 @@
 package com.example.shikiflow.presentation.screen.main
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -25,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
@@ -35,84 +30,74 @@ import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainAppBar(
+fun TracksSearchBar(
     scrollBehavior: TopAppBarScrollBehavior,
     currentTrackMode: MediaType,
     query: String,
     isSearchActive: Boolean,
-    onQueryChange: (String) -> Unit,
     onModeChange: (MediaType) -> Unit,
+    onQueryChange: (String) -> Unit,
     onSearchToggle: (Boolean) -> Unit,
     onExitSearch: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val containerColor = if (scrollBehavior.state.collapsedFraction >= 1f) {
+    val containerColor = if(scrollBehavior.state.collapsedFraction >= 1f || isSearchActive) {
         MaterialTheme.colorScheme.surfaceContainer
     } else { MaterialTheme.colorScheme.background }
 
-    TopAppBar(
-        modifier = modifier,
-        scrollBehavior = scrollBehavior,
-        title = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AnimatedContent(
-                    targetState = currentTrackMode,
-                    transitionSpec = {
-                        fadeIn() + slideInVertically() togetherWith fadeOut() using SizeTransform(clip = false)
-                    },
-                    modifier = Modifier.weight(1f)
-                ) { trackMode ->
-                    when(trackMode) {
-                        MediaType.ANIME -> {
-                            CustomSearchField(
-                                query = query,
-                                label = stringResource(R.string.tracks_page_search),
-                                onQueryChange = onQueryChange,
-                                isActive = isSearchActive,
-                                onActiveChange = onSearchToggle,
-                                onExitSearch = onExitSearch
-                            )
-                        }
-                        MediaType.MANGA -> {
-                            Text(
-                                text = stringResource(R.string.media_type_manga),
-                                style = MaterialTheme.typography.titleMedium
-                            )
-                        }
-                    }
-                }
+    val selectorBackgroundColor = when(isSearchActive) {
+        true -> MaterialTheme.colorScheme.background
+        false -> MaterialTheme.colorScheme.surfaceContainer
+    }
 
-                AnimatedVisibility(
-                    visible = !isSearchActive,
-                    enter = fadeIn(),
-                    exit = fadeOut()
+    Column {
+        TopAppBar(
+            modifier = modifier,
+            scrollBehavior = scrollBehavior,
+            title = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
+                    CustomSearchField(
+                        query = query,
+                        label = stringResource(R.string.tracks_page_search),
+                        onQueryChange = onQueryChange,
+                        isActive = isSearchActive,
+                        onActiveChange = onSearchToggle,
+                        onExitSearch = onExitSearch,
+                        modifier = Modifier.weight(1f)
+                    )
+
                     TracksTypeSelector(
                         currentType = currentTrackMode,
                         onModeChange = onModeChange,
+                        backgroundColor = selectorBackgroundColor,
                         modifier = Modifier
                             .clip(RoundedCornerShape(12.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .background(selectorBackgroundColor)
                             .padding(all = 8.dp)
                     )
                 }
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = containerColor,
-            scrolledContainerColor = containerColor
+            },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = containerColor,
+                scrolledContainerColor = containerColor
+            )
         )
-    )
+
+        if(isSearchActive && scrollBehavior.state.collapsedFraction < 1f) {
+            HorizontalDivider()
+        }
+    }
 }
 
 @Composable
 private fun TracksTypeSelector(
     currentType: MediaType,
     onModeChange: (MediaType) -> Unit,
+    backgroundColor: Color,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -134,7 +119,7 @@ private fun TracksTypeSelector(
                     .background(
                         color = when(isCurrent) {
                             true -> MaterialTheme.colorScheme.primary
-                            false -> MaterialTheme.colorScheme.surfaceContainer
+                            false -> backgroundColor
                         }
                     )
                     .padding(all = 6.dp)

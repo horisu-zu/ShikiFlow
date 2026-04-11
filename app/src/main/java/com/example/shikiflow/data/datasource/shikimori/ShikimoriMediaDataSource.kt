@@ -15,6 +15,7 @@ import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
 import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.shikiflow.data.datasource.MediaDataSource
+import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiAnimeKind
@@ -161,11 +162,32 @@ class ShikimoriMediaDataSource @Inject constructor(
         }
     }
 
+    override fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 30,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 30
+            ),
+            pagingSourceFactory = {
+                AiringPagingSource(
+                    mediaDataSource = this,
+                    onList = onList,
+                    airingAtGreater = airingAtGreater,
+                    airingAtLesser = airingAtLesser
+                )
+            }
+        ).flow
+    }
+
     /**
-     * Main problems with the API Calendar method are:
-     * 1. once the episode was released it updates the nextEpisodeAt value
-     * which doesn't suite the weekly calendar I'm going for
-     * 2. the absence of media cover images and user rate statuses
+     * Main problem with the API Calendar method is
+     * the absence of media cover images and user rate statuses
      */
     override suspend fun getAiringSchedule(
         page: Int,

@@ -8,9 +8,7 @@ import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
@@ -129,26 +127,4 @@ class UserRepositoryImpl @Inject constructor(
             }
         ).flow
     }
-
-    override suspend fun saveUserRate(
-        userId: Int?,
-        entryId: Int?,
-        mediaType: MediaType,
-        mediaId: Int,
-        status: UserRateStatus,
-        progress: Int?,
-        progressVolumes: Int?,
-        repeat: Int?,
-        score: Int?
-    ): UserMediaRate = getSource().saveUserRate(
-        userId = userId,
-        entryId = entryId,
-        mediaType = mediaType,
-        mediaId = mediaId,
-        status = status,
-        progress = progress,
-        progressVolumes = progressVolumes,
-        repeat = repeat,
-        score = score
-    )
 }

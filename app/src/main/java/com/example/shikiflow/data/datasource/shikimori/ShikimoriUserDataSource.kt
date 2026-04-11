@@ -11,13 +11,8 @@ import com.example.graphql.shikimori.CurrentUserQuery
 import com.example.graphql.shikimori.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.remote.UserApi
-import com.example.shikiflow.domain.model.track.UserRateStatus
-import com.example.shikiflow.data.datasource.dto.ShikiCreateRateRequest
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.data.datasource.dto.ShikiUpdateRateRequest
 import com.example.shikiflow.data.local.source.GenericPagingSource
-import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
-import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
@@ -245,48 +240,5 @@ class ShikimoriUserDataSource @Inject constructor(
                 )
             }
         }
-    }
-
-    override suspend fun saveUserRate(
-        userId: Int?,
-        entryId: Int?,
-        mediaType: MediaType,
-        mediaId: Int,
-        status: UserRateStatus,
-        progress: Int?,
-        progressVolumes: Int?,
-        repeat: Int?,
-        score: Int?
-    ): UserMediaRate {
-        return when(entryId) {
-            null -> {
-                userApi.createUserRate(
-                    createRequest = ShikiCreateRateRequest(
-                        userId = userId?.toLong()!!,
-                        targetId = mediaId.toLong(),
-                        status = status.toShikimoriRateStatus().name,
-                        targetType = mediaType.name.lowercase().replaceFirstChar { it.uppercase() },
-                        episodes = if(mediaType == MediaType.ANIME) progress else null,
-                        chapters = if(mediaType == MediaType.MANGA) progress else null,
-                        volumes = progressVolumes,
-                        rewatches = repeat,
-                        score = score
-                    )
-                )
-            }
-            else -> {
-                userApi.updateUserRate(
-                    id = entryId.toLong(),
-                    request = ShikiUpdateRateRequest(
-                        chapters = if(mediaType == MediaType.MANGA) progress else null,
-                        episodes = if(mediaType == MediaType.ANIME) progress else null,
-                        volumes = progressVolumes,
-                        rewatches = repeat,
-                        score = score,
-                        status = status.toShikimoriRateStatus().name
-                    )
-                )
-            }
-        }.toDomain(mediaType)
     }
 }

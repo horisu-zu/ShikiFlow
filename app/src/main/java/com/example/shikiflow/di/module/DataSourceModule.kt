@@ -60,8 +60,9 @@ object DataSourceModule {
     @Provides
     @Singleton
     fun provideShikimoriAnimeTracksDataSource(
-        @ShikimoriApollo apolloClient: ApolloClient
-    ): MediaTracksDataSource = ShikimoriTracksDataSource(apolloClient)
+        @ShikimoriApollo apolloClient: ApolloClient,
+        userApi: UserApi
+    ): MediaTracksDataSource = ShikimoriTracksDataSource(apolloClient, userApi)
 
     @AniList
     @Provides

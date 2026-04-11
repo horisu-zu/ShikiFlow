@@ -27,6 +27,12 @@ interface MediaDataSource {
         browseOptions: MediaBrowseOptions
     ): Result<List<BrowseMedia>>
 
+    fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>>
+
     suspend fun getAiringSchedule(
         page: Int,
         limit: Int,

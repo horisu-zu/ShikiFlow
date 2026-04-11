@@ -2,7 +2,6 @@ package com.example.shikiflow.presentation.viewmodel.anime.details
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
@@ -10,7 +9,6 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,14 +20,12 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AnimeDetailsViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
-    private val userRepository: UserRepository,
     private val mediaTracksRepository: MediaTracksRepository,
     settingsRepository: SettingsRepository
 ) : UiStateViewModel<AnimeDetailsUiState>() {
@@ -111,46 +107,46 @@ class AnimeDetailsViewModel @Inject constructor(
         saveUserRate: SaveUserRate,
         mediaShortData: MediaShortData? = null
     ) {
-        viewModelScope.launch {
-            try {
-                mutableUiState.update { state ->
-                    state.copy(
-                        rateUpdateState = RateUpdateState.LOADING
-                    )
-                }
-
-                val result = userRepository.saveUserRate(
-                    userId = userId,
-                    entryId = saveUserRate.rateId,
-                    mediaId = saveUserRate.mediaId,
-                    score = saveUserRate.score,
-                    progress = saveUserRate.progress,
-                    repeat = saveUserRate.repeat,
-                    status = saveUserRate.userStatus,
-                    mediaType = MediaType.ANIME
-                )
-
-                mediaTracksRepository.updateMediaTrack(
-                    mediaTrack = result.toMediaEntity(),
-                    mediaShortData = if(saveUserRate.rateId != null ) null else mediaShortData
-                )
-
-                mutableUiState.update { state ->
-                    state.copy(
-                        details = state.details?.copy(
-                            userRate = result
+        mediaTracksRepository.saveUserRate(
+            userId = userId,
+            entryId = saveUserRate.rateId,
+            mediaId = saveUserRate.mediaId,
+            score = saveUserRate.score,
+            progress = saveUserRate.progress,
+            repeat = saveUserRate.repeat,
+            status = saveUserRate.userStatus,
+            mediaType = MediaType.ANIME,
+            mediaShortData = mediaShortData
+        ).onEach { result ->
+            when (result) {
+                DataResult.Loading -> {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            rateUpdateState = RateUpdateState.LOADING
                         )
-                    )
+                    }
                 }
-            } catch (e: Exception) {
-                Log.e("AnimeDetailsViewModel", "Error saving user rate: ${e.message}")
-            } finally {
-                mutableUiState.update { state ->
-                    state.copy(
-                        rateUpdateState = RateUpdateState.FINISHED
-                    )
+
+                is DataResult.Error -> {
+                    Log.e("AnimeDetailsViewModel", "Error saving user rate: ${result.message}")
+                    mutableUiState.update { state ->
+                        state.copy(
+                            rateUpdateState = RateUpdateState.FINISHED
+                        )
+                    }
+                }
+
+                is DataResult.Success -> {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            rateUpdateState = RateUpdateState.FINISHED,
+                            details = state.details?.copy(
+                                userRate = result.data
+                            )
+                        )
+                    }
                 }
             }
-        }
+        }.launchIn(viewModelScope)
     }
 }

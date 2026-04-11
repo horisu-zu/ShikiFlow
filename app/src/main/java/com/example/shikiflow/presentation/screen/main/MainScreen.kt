@@ -38,7 +38,7 @@ fun MainScreen(
         Scaffold(
             modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
-                MainAppBar(
+                TracksSearchBar(
                     currentTrackMode = trackMode,
                     scrollBehavior = scrollBehavior,
                     query = screenState.query,
@@ -60,8 +60,14 @@ fun MainScreen(
                         SearchPage(
                             searchQuery = searchQuery,
                             isAtTop = scrollBehavior.state.collapsedFraction < 1f,
-                            onAnimeClick = { animeId ->
-                                mainNavOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(animeId))
+                            mediaType = trackMode,
+                            onMediaClick = { mediaType, id ->
+                                val detailsNavRoute = when(mediaType) {
+                                    MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                                    MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                                }
+
+                                mainNavOptions.navigateToDetails(detailsNavRoute)
                             }
                         )
                     } else {

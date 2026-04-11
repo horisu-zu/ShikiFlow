@@ -27,6 +27,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
@@ -108,6 +109,14 @@ fun UserActivitySection(
                         userActivityItems[index]?.let { activityItem ->
                             ActivityItem(
                                 userActivity = activityItem,
+                                onListActivityClick = { mediaType, id ->
+                                    val detailsNavRoute = when(mediaType) {
+                                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                                    }
+
+                                    navOptions.navigateToDetails(detailsNavRoute)
+                                },
                                 onUserClick = { user ->
                                     navOptions.navigateToProfile(user)
                                 },

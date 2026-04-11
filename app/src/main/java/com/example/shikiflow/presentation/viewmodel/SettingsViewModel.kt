@@ -21,6 +21,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -48,18 +50,27 @@ class SettingsViewModel @Inject constructor(
             combine(
                 settingsRepository.settingsFlow.distinctUntilChanged(),
                 settingsRepository.themeSettingsFlow.distinctUntilChanged(),
-                settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
-                settingsRepository.userFlow.distinctUntilChanged()
-            ) { settings, themeSettings, mangaSettings, user ->
+                settingsRepository.mangaSettingsFlow.distinctUntilChanged()
+            ) { settings, themeSettings, mangaSettings ->
                 _settingsState.update { state ->
                     state.copy(
-                        user = user,
                         settings = settings,
                         themeSettings = themeSettings,
                         mangaSettings = mangaSettings
                     )
                 }
             }.collect()
+        }
+
+        viewModelScope.launch {
+            settingsRepository.userFlow
+                .filterNotNull()
+                .first()
+                .let { user ->
+                    _settingsState.update { state ->
+                        state.copy(user = user)
+                    }
+                }
         }
     }
 

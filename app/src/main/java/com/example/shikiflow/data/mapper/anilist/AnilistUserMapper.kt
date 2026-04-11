@@ -20,6 +20,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
 import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
 import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
@@ -55,19 +56,20 @@ object AnilistUserMapper {
 
     fun ALListActivity.toDomain(): ListActivity {
         return ListActivity(
-            id = this.id,
-            mediaId = this.id,
-            title = this.media?.title?.romaji ?: "",
-            coverImage = this.media?.coverImage?.extraLarge ?: "",
+            id = id,
+            mediaId = media?.id ?: 0,
+            mediaType = media?.type?.toDomain(),
+            title = media?.title?.romaji ?: "",
+            coverImage = media?.coverImage?.extraLarge ?: "",
             description = buildString {
-                this@toDomain.status?.let { status ->
+                status?.let { status ->
                     append(status.replaceFirstChar { it.uppercase() })
                 }
-                this@toDomain.progress?.let { progress ->
+                progress?.let { progress ->
                     append(" $progress")
                 }
             },
-            createdAt = Instant.fromEpochSeconds(this.createdAt.toLong())
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
         )
     }
 

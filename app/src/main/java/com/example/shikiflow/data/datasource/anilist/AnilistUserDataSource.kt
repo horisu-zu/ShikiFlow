@@ -8,7 +8,6 @@ import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.CurrentUserQuery
-import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.UserActivitiesQuery
 import com.example.graphql.anilist.UserFollowersQuery
@@ -35,12 +34,9 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStaffStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStudiosStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toTagsStats
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
-import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
@@ -403,36 +399,5 @@ class AnilistUserDataSource(
                     }
                 } ?: emptyList()
         }
-    }
-
-    override suspend fun saveUserRate(
-        userId: Int?,
-        entryId: Int?,
-        mediaType: MediaType,
-        mediaId: Int,
-        status: UserRateStatus,
-        progress: Int?,
-        progressVolumes: Int?,
-        repeat: Int?,
-        score: Int?
-    ): UserMediaRate {
-        val userRateQuery = SaveUserRateMutation(
-            rateEntryId = Optional.presentIfNotNull(entryId),
-            mediaId = mediaId,
-            mediaStatus = status.toAnilistRateStatus(),
-            progress = Optional.presentIfNotNull(progress),
-            progressVolumes = Optional.presentIfNotNull(progressVolumes),
-            repeat = Optional.presentIfNotNull(repeat),
-            scoreRaw = Optional.presentIfNotNull(score?.times(10))
-        )
-
-        val response = apolloClient.mutation(userRateQuery).execute()
-
-        val userRate = response.data
-            ?.SaveMediaListEntry
-            ?.aLRateEntry
-            ?: throw IllegalStateException("No data returned from SaveMediaListEntry")
-
-        return userRate.toDomain()
     }
 }

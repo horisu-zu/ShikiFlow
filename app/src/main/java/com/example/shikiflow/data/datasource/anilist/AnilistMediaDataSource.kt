@@ -3,6 +3,7 @@ package com.example.shikiflow.data.datasource.anilist
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.filter
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
@@ -41,6 +42,7 @@ import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AnilistMediaDataSource @Inject constructor(
@@ -109,6 +111,34 @@ class AnilistMediaDataSource @Inject constructor(
                 ?.mapNotNull { media ->
                     media?.mediaBrowse?.toBrowse(browseOptions.mediaType)
                 } ?: throw NoSuchElementException("Empty Response")
+        }
+    }
+
+    override fun getAiringAnimes(
+        onList: Boolean,
+        airingAtGreater: Long,
+        airingAtLesser: Long
+    ): Flow<PagingData<AiringAnime>> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 9,
+                initialLoadSize = 24
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource(
+                    method = { page, limit ->
+                        getAiringSchedule(page, limit, onList, airingAtGreater, airingAtLesser)
+                    }
+                )
+            }
+        ).flow.map { pagingData ->
+            pagingData.filter { airingAnime ->
+                if(onList) {
+                    airingAnime.data.userRateStatus != null
+                } else true
+            }
         }
     }
 

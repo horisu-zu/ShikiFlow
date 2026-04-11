@@ -134,6 +134,7 @@ fragment ALListActivity on ListActivity {
     id
     media {
         id
+        type
         title {
             romaji
         }
