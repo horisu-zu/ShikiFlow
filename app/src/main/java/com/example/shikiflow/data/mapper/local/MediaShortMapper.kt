@@ -23,6 +23,7 @@ object MediaShortMapper {
     fun MediaDetails.toShortData(): MediaShortData {
         return MediaShortData(
             id = id,
+            malId = malId,
             name = title,
             synonyms = listOfNotNull(native),
             mediaType = mediaType,
@@ -45,6 +46,7 @@ object MediaShortMapper {
     fun MediaShortEntity.toDomain(): MediaShortData {
         return MediaShortData(
             id = id,
+            malId = malId,
             name = name,
             synonyms = synonyms,
             mediaType = mediaType,
@@ -67,6 +69,7 @@ object MediaShortMapper {
     fun MediaShortData.toEntity(): MediaShortEntity {
         return MediaShortEntity(
             id = id,
+            malId = malId,
             name = name,
             synonyms = synonyms,
             mediaType = mediaType,
@@ -86,9 +89,13 @@ object MediaShortMapper {
         )
     }
 
+    /** In Shikimori API, Anime/Manga ID is the same as MAL ID,
+     *  even though there's separate MAL ID field I can't use because of the query complexity limit
+     */
     fun AnimeShort.toShortData(): MediaShortData {
         return MediaShortData(
             id = id.toInt(),
+            malId = id.toInt(),
             name = name,
             synonyms = synonyms,
             mediaType = MediaType.ANIME,
@@ -111,6 +118,7 @@ object MediaShortMapper {
     fun MangaShort.toShortData(): MediaShortData {
         return MediaShortData(
             id = id.toInt(),
+            malId = id.toInt(),
             name = name,
             synonyms = synonyms,
             mediaType = MediaType.MANGA,
@@ -132,6 +140,7 @@ object MediaShortMapper {
 
     fun MediaShort.toShortData() = MediaShortData(
         id = id,
+        malId = idMal,
         name = title?.romaji ?: "No Title",
         synonyms = buildList {
             title?.english?.let { add(it) }

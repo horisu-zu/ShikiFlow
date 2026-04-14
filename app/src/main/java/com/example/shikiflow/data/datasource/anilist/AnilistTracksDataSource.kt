@@ -6,6 +6,7 @@ import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaListCollectionQuery
+import com.example.graphql.anilist.MediaListEntryShortQuery
 import com.example.graphql.anilist.MediaListTracksQuery
 import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
@@ -129,5 +130,42 @@ class AnilistTracksDataSource @Inject constructor(
             ?: throw IllegalStateException("No data returned from SaveMediaListEntry")
 
         return userRate.toDomain()
+    }
+
+    override suspend fun saveServiceUserRate(
+        userId: Int?,
+        mediaType: MediaType,
+        malId: Int,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?
+    ) {
+        val mediaListQuery = MediaListEntryShortQuery(
+            malId = malId,
+            type = mediaType.toAnilistType()
+        )
+
+        val response = apolloClient.query(mediaListQuery).execute()
+
+        val (mediaId, entryId) = response.data
+            ?.Media
+            ?.mediaListEntryShort
+            ?.let { media ->
+                media.id to media.mediaListEntry?.id
+            } ?: throw IllegalStateException("No data returned from MediaListEntryShort")
+
+        saveUserRate(
+            userId = userId,
+            entryId = entryId,
+            mediaType = mediaType,
+            mediaId = mediaId,
+            status = status,
+            progress = progress,
+            progressVolumes = progressVolumes,
+            repeat = repeat,
+            score = score
+        )
     }
 }

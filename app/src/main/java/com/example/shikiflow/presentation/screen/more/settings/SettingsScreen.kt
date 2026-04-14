@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,7 +28,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
-import com.example.shikiflow.presentation.viewmodel.SettingsViewModel
+import com.example.shikiflow.presentation.viewmodel.settings.SettingsViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
@@ -36,6 +37,7 @@ import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconReso
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.ThemeMode
 import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
+import com.example.shikiflow.utils.WebIntent.openActionView
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.launch
 
@@ -44,6 +46,7 @@ import kotlinx.coroutines.launch
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     val resources = LocalResources.current
 
     val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
@@ -84,13 +87,28 @@ fun SettingsScreen(
                     title = stringResource(R.string.settings_account_section_title),
                     items = listOfNotNull(
                         settingsState.user?.let { userData ->
-                            SectionItem.Image(
+                            SectionItem.User(
                                 title = userData.nickname,
                                 displayValue = stringResource(R.string.settings_sign_out),
+                                authType = settingsState.authType,
                                 imageUrl = userData.avatarUrl,
                                 onClick = { settingsViewModel.logout() }
                             )
-                        }
+                        },
+                        SectionItem.TrackerServices(
+                            title = stringResource(R.string.settings_tracker_services_title),
+                            currentAuthType = settingsState.authType,
+                            serviceUpdateState = settingsState.settings.serviceUpdateState,
+                            connectedServicesMap = settingsState.connectedServices,
+                            onServiceClick = { authType ->
+                                val authUrl = settingsViewModel.getAuthorizationUrl(authType)
+
+                                context.openActionView(authUrl)
+                            },
+                            onServiceUpdateToggle = {
+                                settingsViewModel.setTrackerServiceUpdate(!settingsState.settings.serviceUpdateState)
+                            }
+                        )
                     )
                 )
                 SettingsSection(

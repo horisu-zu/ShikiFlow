@@ -17,7 +17,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface SettingsRepository {
     val userFlow: Flow<User?>
-    val authTypeFlow: Flow<AuthType>
+    val authTypeFlow: Flow<AuthType?>
+    val connectedServicesFlow: Flow<Map<AuthType, User>>
     val settingsFlow: Flow<Settings>
     val themeSettingsFlow: Flow<ThemeSettings>
     val browseUiSettingsFlow: Flow<BrowseUiSettings>
@@ -25,7 +26,8 @@ interface SettingsRepository {
     val localeFlow: Flow<String>
 
     suspend fun saveAuthType(authType: AuthType)
-    suspend fun saveUserData(user: User)
+    suspend fun saveUserData(user: User, authType: AuthType)
+    suspend fun saveServiceUpdatePreference(shouldUpdate: Boolean)
     suspend fun saveAppUiMode(appUiMode: AppUiMode)
     suspend fun saveBrowseUiMode(browseUiMode: BrowseUiMode)
     suspend fun saveBrowseOngoingOrder(ongoingOrder: MediaSort)

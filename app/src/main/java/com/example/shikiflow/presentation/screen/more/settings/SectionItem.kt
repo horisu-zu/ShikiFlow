@@ -1,10 +1,12 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.user.User as DomainUser
 import com.example.shikiflow.utils.IconResource
 
 sealed interface SectionItem {
     val title: String
-    val displayValue: String
+    val displayValue: String?
 
     data class Default(
         override val title: String,
@@ -21,11 +23,22 @@ sealed interface SectionItem {
         val isVisible: Boolean = true
     ): SectionItem
 
-    data class Image(
+    data class User(
         override val title: String,
         override val displayValue: String,
+        val authType: AuthType?,
         val onClick: () -> Unit,
         val imageUrl: String
+    ): SectionItem
+
+    data class TrackerServices(
+        override val title: String,
+        override val displayValue: String? = null,
+        val currentAuthType: AuthType?,
+        val serviceUpdateState: Boolean,
+        val connectedServicesMap: Map<AuthType, DomainUser>,
+        val onServiceClick: (AuthType) -> Unit,
+        val onServiceUpdateToggle: () -> Unit
     ): SectionItem
 
     /*data class Theme(

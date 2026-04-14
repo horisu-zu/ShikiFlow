@@ -13,8 +13,8 @@ object DateMapper {
         return year?.let {
             Date(
                 year = this.year,
-                month = this.month ?: 0,
-                day = this.day ?: 0,
+                month = this.month,
+                day = this.day,
                 date = this.date?.let { LocalDate.parse(it.toString())
                     .atStartOfDayIn(TimeZone.currentSystemDefault()) }
             )
@@ -41,7 +41,6 @@ object DateMapper {
             LocalDate(year, month, day)
         } else null
     }
-
 
     fun Int.minutesToDays(): Float = this / 60.0f / 24.0f
 }

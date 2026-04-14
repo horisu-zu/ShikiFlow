@@ -22,7 +22,7 @@ query MediaDetails(
         status
         genres
         source
-        characters(sort: [RELEVANCE, ROLE]) {
+        characters(sort: [RELEVANCE, ROLE, FAVOURITES_DESC]) {
             pageInfo {
                 hasNextPage
             }
@@ -70,7 +70,7 @@ query MediaDetails(
                 ...ALStudioShort
             }
         }
-        staff(perPage: 4, sort: [RELEVANCE]) {
+        staff(perPage: 4, sort: [RELEVANCE, ROLE]) {
             edges {
                 ...ALStaffEdgeShort
             }

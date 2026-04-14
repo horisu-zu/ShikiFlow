@@ -20,6 +20,7 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -32,7 +33,7 @@ class StaffRepositoryImpl @Inject constructor(
 ) : StaffRepository {
 
     private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.first()) {
+        when(settingsRepository.authTypeFlow.filterNotNull().first()) {
             AuthType.SHIKIMORI -> shikimoriDataSource
             AuthType.ANILIST -> anilistDataSource
         }

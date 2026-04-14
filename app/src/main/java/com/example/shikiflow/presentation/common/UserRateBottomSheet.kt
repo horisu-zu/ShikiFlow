@@ -166,6 +166,7 @@ fun UserRateBottomSheet(
                             SaveUserRate(
                                 rateId = userRate.id,
                                 mediaId = userRate.mediaId,
+                                malId = userRate.malId,
                                 userStatus = UserRateStatus.entries[selectedStatus],
                                 score = selectedScore,
                                 progress  = progress,
@@ -189,6 +190,7 @@ fun UserRateBottomSheet(
                         onSave(
                             SaveUserRate(
                                 mediaId = userRate.mediaId,
+                                malId = userRate.malId,
                                 userStatus = UserRateStatus.entries[selectedStatus],
                                 score = selectedScore,
                                 progress  = progress,

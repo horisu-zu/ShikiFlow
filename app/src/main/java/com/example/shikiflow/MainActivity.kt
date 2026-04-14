@@ -50,9 +50,6 @@ class MainActivity : ComponentActivity() {
                 if(authState != AuthState.Loading) {
                     AppNavigator(
                         authState = authState,
-                        onAuthorize = { authType ->
-                            mainViewModel.getAuthorizationUrl(authType)
-                        },
                         onFinishActivity = { this.moveTaskToBack(true) }
                     )
                 }
@@ -69,23 +66,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-/*fun Window.fitSystemWindowsWithAdjustResize() {
-    setFlags(
-        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
-        WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
-    )
-
-    WindowCompat.setDecorFitsSystemWindows(this, true)
-
-    ViewCompat.setOnApplyWindowInsetsListener(decorView) { view, insets ->
-        WindowInsetsCompat
-            .Builder()
-            .setInsets(
-                WindowInsetsCompat.Type.systemBars(),
-                Insets.of(0, 0, 0, 0)
-            )
-            .build()
-            .apply { ViewCompat.onApplyWindowInsets(view, this) }
-    }
-}*/

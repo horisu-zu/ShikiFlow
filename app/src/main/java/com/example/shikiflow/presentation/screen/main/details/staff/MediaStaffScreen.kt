@@ -67,7 +67,7 @@ fun MediaStaffScreen(
                 if(authType == AuthType.ANILIST) {
                     FloatingActionButton(
                         onClick = { showBottomSheet = true },
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         contentColor = MaterialTheme.colorScheme.onSurface
                     ) {
                         Icon(

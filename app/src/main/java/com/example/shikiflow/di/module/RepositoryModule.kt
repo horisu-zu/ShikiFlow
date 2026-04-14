@@ -1,6 +1,5 @@
 package com.example.shikiflow.di.module
 
-import android.content.Context
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
@@ -21,7 +20,6 @@ import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MediaRepositoryImpl
 import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
-import com.example.shikiflow.data.repository.TokenRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
@@ -40,8 +38,8 @@ import com.example.shikiflow.domain.repository.UserRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -60,18 +58,13 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideTokenRepository(
-        @ApplicationContext context: Context
-    ): TokenRepository = TokenRepositoryImpl(context)
-
-    @Provides
-    @Singleton
     fun provideMediaTracksRepository(
         @Shikimori shikimoriTracksDataSource: MediaTracksDataSource,
         @AniList anilistTracksDataSource: MediaTracksDataSource,
         settingsRepository: SettingsRepository,
-        appRoomDatabase: AppRoomDatabase
-    ): MediaTracksRepository = MediaTracksRepositoryImpl(shikimoriTracksDataSource, anilistTracksDataSource, settingsRepository, appRoomDatabase)
+        appRoomDatabase: AppRoomDatabase,
+        scope: CoroutineScope
+    ): MediaTracksRepository = MediaTracksRepositoryImpl(shikimoriTracksDataSource, anilistTracksDataSource, settingsRepository, appRoomDatabase, scope)
 
     @Provides
     @Singleton
@@ -100,8 +93,9 @@ object RepositoryModule {
     fun provideCharacterRepository(
         @Shikimori shikimoriDataSource: CharactersDataSource,
         @AniList anilistDataSource: CharactersDataSource,
-        settingsRepository: SettingsRepository
-    ): CharacterRepository = CharacterRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository)
+        settingsRepository: SettingsRepository,
+        scope: CoroutineScope
+    ): CharacterRepository = CharacterRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository, scope)
 
     @Provides
     @Singleton

@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.repository
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -24,12 +25,17 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
@@ -37,42 +43,53 @@ class MediaTracksRepositoryImpl @Inject constructor(
     private val shikimoriTracksDataSource: MediaTracksDataSource,
     private val anilistTracksDataSource: MediaTracksDataSource,
     private val settingsRepository: SettingsRepository,
-    private val appRoomDatabase: AppRoomDatabase
+    private val appRoomDatabase: AppRoomDatabase,
+    private val scope: CoroutineScope
 ): MediaTracksRepository {
     val mediaTracksDao = appRoomDatabase.mediaTracksDao()
 
-    private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.first()) {
-            AuthType.SHIKIMORI -> shikimoriTracksDataSource
-            AuthType.ANILIST -> anilistTracksDataSource
+    val dataSource = settingsRepository.authTypeFlow.filterNotNull()
+        .map { authType ->
+            when(authType) {
+                AuthType.SHIKIMORI -> shikimoriTracksDataSource
+                AuthType.ANILIST -> anilistTracksDataSource
+            }
         }
-    }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Lazily,
+            initialValue = null
+        )
 
     override fun getMediaTracks(
         status: UserRateStatus,
         userId: Int?,
         mediaType: MediaType
     ): Flow<PagingData<MediaTrack>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 24,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 24
-            ),
-            remoteMediator = MediaTracksMediator(
-                mediaTracksDataSource = getSource(),
-                appRoomDatabase = appRoomDatabase,
-                userRateStatus = status,
-                userId = userId,
-                mediaType = mediaType
-            ),
-            pagingSourceFactory = { mediaTracksDao.getTracksByStatus(status.name, mediaType) }
-        ).flow.map { pagingData ->
-            pagingData.map { track ->
-                track.toDomain()
+        return dataSource
+            .filterNotNull()
+            .flatMapLatest { tracksDataSource ->
+                 Pager(
+                    config = PagingConfig(
+                        pageSize = 24,
+                        enablePlaceholders = true,
+                        prefetchDistance = 12,
+                        initialLoadSize = 24
+                    ),
+                    remoteMediator = MediaTracksMediator(
+                        mediaTracksDataSource = tracksDataSource,
+                        appRoomDatabase = appRoomDatabase,
+                        userRateStatus = status,
+                        userId = userId,
+                        mediaType = mediaType
+                    ),
+                    pagingSourceFactory = { mediaTracksDao.getTracksByStatus(status.name, mediaType) }
+                ).flow.map { pagingData ->
+                    pagingData.map { track ->
+                        track.toDomain()
+                    }
+                }
             }
-        }
     }
 
     override fun browseMediaTracks(
@@ -81,21 +98,25 @@ class MediaTracksRepositoryImpl @Inject constructor(
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<MediaTrack>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 24,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 24
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource(
-                    method = { page, limit ->
-                        getSource().browseMediaTracks(page, limit, mediaType, userId, title, userRateStatus)
+        return dataSource
+            .filterNotNull()
+            .flatMapLatest { dataSource ->
+                Pager(
+                    config = PagingConfig(
+                        pageSize = 24,
+                        enablePlaceholders = true,
+                        prefetchDistance = 12,
+                        initialLoadSize = 24
+                    ),
+                    pagingSourceFactory = {
+                        GenericPagingSource(
+                            method = { page, limit ->
+                                dataSource.browseMediaTracks(page, limit, mediaType, userId, title, userRateStatus)
+                            }
+                        )
                     }
-                )
+                ).flow
             }
-        ).flow
     }
 
     override fun saveUserRate(
@@ -103,6 +124,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
         entryId: Int?,
         mediaType: MediaType,
         mediaId: Int,
+        malId: Int?,
         status: UserRateStatus,
         progress: Int?,
         progressVolumes: Int?,
@@ -113,7 +135,28 @@ class MediaTracksRepositoryImpl @Inject constructor(
         emit(DataResult.Loading)
 
         try {
-            val result = getSource().saveUserRate(
+            val dataSource = dataSource.value ?: dataSource.filterNotNull().first()
+
+            settingsRepository.settingsFlow
+                .map { settings -> settings.serviceUpdateState }
+                .first()
+                .let { serviceUpdateState ->
+                    if(serviceUpdateState) {
+                        scope.launch {
+                            saveServiceUserRate(
+                                mediaType,
+                                malId,
+                                status,
+                                progress,
+                                progressVolumes,
+                                repeat,
+                                score
+                            )
+                        }
+                    }
+                }
+
+            val result = dataSource.saveUserRate(
                 userId = userId,
                 entryId = entryId,
                 mediaType = mediaType,
@@ -133,6 +176,39 @@ class MediaTracksRepositoryImpl @Inject constructor(
             emit(DataResult.Success(result))
         } catch (e: Exception) {
             emit(DataResult.Error(e.message ?: "Unknown Error"))
+        }
+    }
+
+    suspend fun saveServiceUserRate(
+        mediaType: MediaType,
+        malId: Int?,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?
+    ) {
+        try {
+            settingsRepository.connectedServicesFlow.first()
+                .forEach { (type, user) ->
+                    malId?.let {
+                        when(type) {
+                            AuthType.SHIKIMORI -> shikimoriTracksDataSource
+                            AuthType.ANILIST -> anilistTracksDataSource
+                        }.saveServiceUserRate(
+                            userId = user.id,
+                            mediaType = mediaType,
+                            malId = malId,
+                            status = status,
+                            progress = progress,
+                            progressVolumes = progressVolumes,
+                            repeat = repeat,
+                            score = score
+                        )
+                    }
+                }
+        } catch (e: Exception) {
+            Log.e("MediaTracksRepository", "Error: ${e.message}")
         }
     }
 

@@ -22,7 +22,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
@@ -64,6 +63,7 @@ class TracksSearchViewModel @Inject constructor(
         mediaTracksRepository.saveUserRate(
             entryId = saveUserRate.rateId,
             mediaId = saveUserRate.mediaId,
+            malId = saveUserRate.malId,
             mediaType = MediaType.MANGA,
             status = saveUserRate.userStatus,
             score = saveUserRate.score,

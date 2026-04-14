@@ -1,18 +1,14 @@
-package com.example.shikiflow.presentation.viewmodel
+package com.example.shikiflow.presentation.viewmodel.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.common.FileSize
-import com.example.shikiflow.domain.model.settings.MangaChapterSettings
-import com.example.shikiflow.domain.model.settings.Settings
-import com.example.shikiflow.domain.model.settings.ThemeSettings
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,14 +22,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-data class SettingsUiState(
-    val user: User? = null,
-    val settings: Settings = Settings(),
-    val themeSettings: ThemeSettings? = null,
-    val mangaSettings: MangaChapterSettings = MangaChapterSettings(),
-    val cacheSize: FileSize? = null
-)
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -50,13 +38,17 @@ class SettingsViewModel @Inject constructor(
             combine(
                 settingsRepository.settingsFlow.distinctUntilChanged(),
                 settingsRepository.themeSettingsFlow.distinctUntilChanged(),
-                settingsRepository.mangaSettingsFlow.distinctUntilChanged()
-            ) { settings, themeSettings, mangaSettings ->
+                settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
+                settingsRepository.connectedServicesFlow.distinctUntilChanged { old, new ->
+                    !new.any { (key, value) -> old[key] != value }
+                } //to prevent the data from disappearing from the UI during logout animation
+            ) { settings, themeSettings, mangaSettings, connectedServices ->
                 _settingsState.update { state ->
                     state.copy(
                         settings = settings,
                         themeSettings = themeSettings,
-                        mangaSettings = mangaSettings
+                        mangaSettings = mangaSettings,
+                        connectedServices = connectedServices
                     )
                 }
             }.collect()
@@ -72,6 +64,21 @@ class SettingsViewModel @Inject constructor(
                     }
                 }
         }
+
+        viewModelScope.launch {
+            settingsRepository.authTypeFlow
+                .filterNotNull()
+                .first()
+                .let { authType ->
+                    _settingsState.update { state ->
+                        state.copy(authType = authType)
+                    }
+                }
+        }
+    }
+
+    fun getAuthorizationUrl(authType: AuthType): String {
+        return authRepository.getAuthorizationUrl(authType)
     }
 
     fun loadCacheSize() {
@@ -88,6 +95,12 @@ class SettingsViewModel @Inject constructor(
             if (isSuccess) {
                 loadCacheSize()
             }
+        }
+    }
+
+    fun setTrackerServiceUpdate(shouldUpdate: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.saveServiceUpdatePreference(shouldUpdate)
         }
     }
 
@@ -142,7 +155,6 @@ class SettingsViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             authRepository.logout()
-            settingsRepository.clearUserData()
         }
     }
 }

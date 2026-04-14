@@ -38,4 +38,15 @@ interface MediaTracksDataSource {
         repeat: Int? = null,
         score: Int? = null
     ): UserMediaRate
+
+    suspend fun saveServiceUserRate(
+        userId: Int?,
+        mediaType: MediaType,
+        malId: Int,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?
+    )
 }

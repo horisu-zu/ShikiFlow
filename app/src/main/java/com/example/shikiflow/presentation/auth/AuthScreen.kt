@@ -22,22 +22,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.FeatureItem
 import com.example.shikiflow.presentation.common.FeaturesGroup
+import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.iconResource
+import com.example.shikiflow.presentation.viewmodel.auth.AuthViewModel
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.WebIntent.openActionView
 
 @Composable
 fun AuthScreen(
-    onAuth: (AuthType) -> String
+    authViewModel: AuthViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .background(MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -81,7 +86,8 @@ fun AuthScreen(
         Spacer(modifier = Modifier.weight(1f))
 
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .height(IntrinsicSize.Min)
                 .clip(RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
                 .background(color = MaterialTheme.colorScheme.surfaceContainer)
@@ -91,18 +97,14 @@ fun AuthScreen(
         ) {
             AuthType.entries.forEach { authType ->
                 Button(
-                    icon = when(authType) {
-                        AuthType.SHIKIMORI -> IconResource.Drawable(R.drawable.shiki_logo)
-                        AuthType.ANILIST -> IconResource.Drawable(R.drawable.anilist_logo)
+                    icon = authType.iconResource(),
+                    label = buildString {
+                        append(stringResource(R.string.auth_sign_in))
+                        append(" ")
+                        append(stringResource(id = authType.displayValue()))
                     },
-                    label = stringResource(
-                        id = when(authType) {
-                            AuthType.SHIKIMORI -> R.string.auth_shiki_sign_in
-                            AuthType.ANILIST -> R.string.auth_anilist_sign_in
-                        }
-                    ),
                     onClick = {
-                        val authUrl = onAuth(authType)
+                        val authUrl = authViewModel.getAuthorizationUrl(authType)
 
                         context.openActionView(authUrl)
                     },

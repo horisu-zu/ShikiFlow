@@ -50,12 +50,13 @@ object TracksMapper {
         rewatches = track.repeat,
         score = track.score,
         mediaId = shortData.id,
+        malId = shortData.malId,
         title = shortData.name,
         posterUrl = shortData.poster?.previewUrl,
         createDate = track.createdAt,
         updateDate = track.updatedAt,
         totalCount = if (shortData.status == MediaStatus.RELEASED) shortData.totalCount ?: 0
-        else shortData.currentProgress ?: Int.MAX_VALUE,
+            else shortData.currentProgress ?: Int.MAX_VALUE,
         volumesCount = 0
     )
 }

@@ -1,5 +1,8 @@
 package com.example.shikiflow.presentation.screen.main
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,7 +49,8 @@ fun AnimeTrackItem(
             .combinedClickable(
                 onClick = { onClick(userRate.shortData.id) },
                 onLongClick = { onLongClick() }
-            ),
+            )
+            .padding(end = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
         BaseImage(
@@ -86,29 +92,45 @@ fun AnimeTrackItem(
                         append(" • ")
                         append("$score ★")
                     }
-                }, style = MaterialTheme.typography.labelMedium
+                },
+                style = MaterialTheme.typography.labelMedium
             )
 
             if (userRate.shortData.status != MediaStatus.ANNOUNCED) {
-                ProgressBar(
-                    progress = userRate.shortData.let { animeShort ->
-                        val totalEpisodes = when {
-                            (animeShort.totalCount ?: 0) > 0 -> animeShort.totalCount
-                            (animeShort.currentProgress ?: 0) > 0 -> animeShort.currentProgress
-                            else -> null
-                        }
-                        totalEpisodes?.let { (userRate.track.progress.toFloat()) / it } ?: 0f
-                    },
-                    modifier = Modifier.fillMaxWidth().padding(end = 8.dp)
-                )
-                userRate.shortData.let { animeShort ->
+                val animeShort = userRate.shortData
+                val totalEpisodes = when {
+                    (animeShort.totalCount ?: 0) > 0 -> animeShort.totalCount
+                    (animeShort.currentProgress ?: 0) > 0 -> animeShort.currentProgress
+                    else -> null
+                }
+
+                val progress = remember(
+                    animeShort.totalCount,
+                    animeShort.currentProgress,
+                    userRate.track.progress
+                ) {
                     val totalEpisodes = when {
                         (animeShort.totalCount ?: 0) > 0 -> animeShort.totalCount
                         (animeShort.currentProgress ?: 0) > 0 -> animeShort.currentProgress
-                        else -> 0
+                        else -> null
                     }
-                    totalEpisodes
-                }?.let {
+                    totalEpisodes?.let { (userRate.track.progress.toFloat()) / it } ?: 0f
+                }
+
+                val animatedRatio by animateFloatAsState(
+                    targetValue = progress,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+
+                ProgressBar(
+                    progress = animatedRatio,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                totalEpisodes?.let {
                     Text(
                         text = stringResource(
                             id = R.string.ongoing_episodes,

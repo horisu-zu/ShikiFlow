@@ -1,6 +1,7 @@
 package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -20,7 +21,7 @@ import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    fun fetchCurrentUser(): Flow<DataResult<User>>
+    fun fetchCurrentUser(authType: AuthType): Flow<DataResult<User>>
 
     fun getUserHistory(userId: Int): Flow<PagingData<UserActivity>>
 

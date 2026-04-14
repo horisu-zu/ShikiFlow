@@ -29,6 +29,7 @@ interface MediaTracksRepository {
         entryId: Int? = null,
         mediaType: MediaType,
         mediaId: Int,
+        malId: Int?,
         status: UserRateStatus,
         progress: Int? = null,
         progressVolumes: Int? = null,

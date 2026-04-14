@@ -14,7 +14,6 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthState
@@ -22,7 +21,6 @@ import com.example.shikiflow.presentation.viewmodel.AuthState
 @Composable
 fun AppNavigator(
     authState: AuthState,
-    onAuthorize: (AuthType) -> String,
     onFinishActivity: () -> Unit
 ) {
     val startKey = remember {
@@ -61,11 +59,7 @@ fun AppNavigator(
         onBack = { if(appBackstack.size > 1) appBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<AppNavRoute.Auth> {
-                AuthScreen(
-                    onAuth = { authType ->
-                        onAuthorize(authType)
-                    }
-                )
+                AuthScreen()
             }
             entry<AppNavRoute.Main> {
                 MainNavigator(

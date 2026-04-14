@@ -26,6 +26,7 @@ import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -38,14 +39,17 @@ class UserRepositoryImpl @Inject constructor(
 ): UserRepository {
 
     private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.first()) {
+        when(settingsRepository.authTypeFlow.filterNotNull().first()) {
             AuthType.SHIKIMORI -> shikimoriUserDataSource
             AuthType.ANILIST -> anilistUserDataSource
         }
     }
 
-    override fun fetchCurrentUser(): Flow<DataResult<User>> {
-        return getSource().fetchCurrentUser()
+    override fun fetchCurrentUser(authType: AuthType): Flow<DataResult<User>> {
+        return when(authType) {
+            AuthType.SHIKIMORI -> shikimoriUserDataSource
+            AuthType.ANILIST -> anilistUserDataSource
+        }.fetchCurrentUser()
     }
 
     override fun getUserHistory(

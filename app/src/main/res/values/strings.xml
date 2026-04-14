@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">ShikiFlow</string>
 
-    <string name="auth_shiki_sign_in">Sign In via Shikimori</string>
-    <string name="auth_anilist_sign_in">Sign in via AniList</string>
+    <string name="auth_sign_in">Sign In via</string>
+    <string name="auth_type_shikimori">Shikimori</string>
+    <string name="auth_type_anilist">AniList</string>
     <string name="auth_features_shiki_integration_label">Shikimori and AniList Integration</string>
     <string name="auth_features_shiki_integration_desc">
         Connect your existing account to search, track, and manage anime and manga
@@ -45,6 +46,13 @@
     <string name="common_error">Error Loading Data</string>
     <string name="common_retry">Retry</string>
     <string name="common_unknown">Unknown</string>
+    <string name="common_note">Note</string>
+
+    <string name="tracker_services_update_title">Update Tracks on All Connected Services</string>
+    <string name="tracker_services_update_note">
+        due to the nature of syncing tracks updates via the MAL ID,
+        some requests might not be completed or could cause a mismatch
+    </string>
 
     <string name="settings_app_ui_mode">Display Mode</string>
     <string name="settings_clear_cache">Clear Image Cache</string>
@@ -75,6 +83,8 @@
     <string name="settings_track_mode">Track Mode by default</string>
     <string name="settings_track_mode_select">Select Track Mode when opening the app</string>
     <string name="settings_sign_out">Sign Out</string>
+    <string name="settings_tracker_services_title">Tracker Services</string>
+    <string name="settings_tracker_services_display">Connect your existing account to update tracks on all services at once</string>
 
     <string name="next_episode">"Next episode on "</string>
 

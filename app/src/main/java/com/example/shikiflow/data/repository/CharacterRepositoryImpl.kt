@@ -16,35 +16,51 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CharacterRepositoryImpl @Inject constructor(
     private val shikimoriDataSource: CharactersDataSource,
     private val anilistDataSource: CharactersDataSource,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val scope: CoroutineScope
 ): CharacterRepository {
 
-    private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.first()) {
-            AuthType.SHIKIMORI -> shikimoriDataSource
-            AuthType.ANILIST -> anilistDataSource
+    val dataSource = settingsRepository.authTypeFlow.filterNotNull()
+        .map { authType ->
+            when(authType) {
+                AuthType.SHIKIMORI -> shikimoriDataSource
+                AuthType.ANILIST -> anilistDataSource
+            }
         }
-    }
+        .stateIn(
+            scope = scope,
+            started = SharingStarted.Lazily,
+            initialValue = null
+        )
 
     override suspend fun getCharacterDetails(
         characterId: Int
-    ): Flow<DataResult<MediaCharacter>> = getSource().getCharacterDetails(characterId)
+    ): Flow<DataResult<MediaCharacter>> = dataSource.filterNotNull().flatMapLatest { dataSource ->
+        dataSource.getCharacterDetails(characterId)
+    }
 
     override fun getCharacterMediaRoles(
         characterId: Int,
         mediaType: MediaType,
         sort: Sort<MediaSort>
-    ): Flow<PagingData<MediaRole>> = getSource().getCharacterMediaRoles(characterId, mediaType, sort)
+    ): Flow<PagingData<MediaRole>> = dataSource.filterNotNull().flatMapLatest { dataSource ->
+        dataSource.getCharacterMediaRoles(characterId, mediaType, sort)
+    }
 
     override fun getMediaCharacters(
         mediaId: Int,
@@ -60,7 +76,10 @@ class CharacterRepositoryImpl @Inject constructor(
             pagingSourceFactory = {
                 GenericPagingSource(
                     method = { page, limit ->
-                        getSource().loadMediaCharacters(page, limit, mediaId, mediaType)
+                        dataSource
+                            .filterNotNull()
+                            .first()
+                            .loadMediaCharacters(page, limit, mediaId, mediaType)
                     }
                 )
             }
@@ -76,9 +95,12 @@ class CharacterRepositoryImpl @Inject constructor(
                 initialLoadSize = 24
             ),
             pagingSourceFactory = {
-                GenericPagingSource<Browse.Character>(
+                GenericPagingSource(
                     method = { page, limit ->
-                        getSource().searchCharacters(page, limit, search)
+                        dataSource
+                            .filterNotNull()
+                            .first()
+                            .searchCharacters(page, limit, search)
                     }
                 )
             }

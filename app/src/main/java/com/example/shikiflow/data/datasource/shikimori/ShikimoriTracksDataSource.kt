@@ -6,8 +6,10 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeTrackBrowseQuery
 import com.example.graphql.shikimori.AnimeTracksQuery
+import com.example.graphql.shikimori.MangaBrowseQuery
 import com.example.graphql.shikimori.MangaTracksBrowseQuery
 import com.example.graphql.shikimori.MangaTracksQuery
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
@@ -159,33 +161,89 @@ class ShikimoriTracksDataSource @Inject constructor(
     ): UserMediaRate {
         return when(entryId) {
             null -> {
-                userApi.createUserRate(
-                    createRequest = ShikiCreateRateRequest(
-                        userId = userId?.toLong()!!,
-                        targetId = mediaId.toLong(),
-                        status = status.toShikimoriRateStatus().name,
-                        targetType = mediaType.name.lowercase().replaceFirstChar { it.uppercase() },
-                        episodes = if(mediaType == MediaType.ANIME) progress else null,
-                        chapters = if(mediaType == MediaType.MANGA) progress else null,
-                        volumes = progressVolumes,
-                        rewatches = repeat,
-                        score = score
-                    )
+                val createRequest = ShikiCreateRateRequest(
+                    userId = userId?.toLong()!!,
+                    targetId = mediaId.toLong(),
+                    status = status.toShikimoriRateStatus().name,
+                    targetType = mediaType.name.lowercase().replaceFirstChar { it.uppercase() },
+                    episodes = if(mediaType == MediaType.ANIME) progress else null,
+                    chapters = if(mediaType == MediaType.MANGA) progress else null,
+                    volumes = progressVolumes,
+                    rewatches = repeat,
+                    score = score
                 )
+
+                Log.d("ShikimoriTracksDataSource", "Create Request: $createRequest")
+
+                userApi.createUserRate(createRequest = createRequest)
             }
             else -> {
+                val updateRequest = ShikiUpdateRateRequest(
+                    chapters = if(mediaType == MediaType.MANGA) progress else null,
+                    episodes = if(mediaType == MediaType.ANIME) progress else null,
+                    volumes = progressVolumes,
+                    rewatches = repeat,
+                    score = score,
+                    status = status.toShikimoriRateStatus().name
+                )
+
+                Log.d("ShikimoriTracksDataSource", "Update Request: $updateRequest")
+
                 userApi.updateUserRate(
                     id = entryId.toLong(),
-                    request = ShikiUpdateRateRequest(
-                        chapters = if(mediaType == MediaType.MANGA) progress else null,
-                        episodes = if(mediaType == MediaType.ANIME) progress else null,
-                        volumes = progressVolumes,
-                        rewatches = repeat,
-                        score = score,
-                        status = status.toShikimoriRateStatus().name
-                    )
+                    request = updateRequest
                 )
             }
         }.toDomain(mediaType)
+    }
+
+    override suspend fun saveServiceUserRate(
+        userId: Int?,
+        mediaType: MediaType,
+        malId: Int,
+        status: UserRateStatus,
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Int?
+    ) {
+        val entryId = when(mediaType) {
+            MediaType.ANIME -> {
+                val query = AnimeBrowseQuery(
+                    ids = Optional.present(malId.toString())
+                )
+
+                val response = apolloClient.query(query).execute()
+
+                response.data
+                    ?.animes
+                    ?.firstOrNull()
+                    ?.userRate?.animeUserRate?.id
+            }
+            MediaType.MANGA -> {
+                val query = MangaBrowseQuery(
+                    ids = Optional.present(malId.toString())
+                )
+
+                val response = apolloClient.query(query).execute()
+
+                response.data
+                    ?.mangas
+                    ?.firstOrNull()
+                    ?.userRate?.mangaUserRate?.id
+            }
+        }
+
+        saveUserRate(
+            userId = userId,
+            entryId = entryId?.toInt(),
+            mediaType = mediaType,
+            mediaId = malId,
+            status = status,
+            progress = progress,
+            progressVolumes = progressVolumes,
+            repeat = repeat,
+            score = score
+        )
     }
 }

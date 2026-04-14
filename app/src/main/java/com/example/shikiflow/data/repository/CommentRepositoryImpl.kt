@@ -13,6 +13,7 @@ import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
@@ -24,7 +25,7 @@ class CommentRepositoryImpl @Inject constructor(
 ): CommentRepository {
 
     private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.first()) {
+        when(settingsRepository.authTypeFlow.filterNotNull().first()) {
             AuthType.SHIKIMORI -> shikimoriDataSource
             AuthType.ANILIST -> anilistDataSource
         }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -68,19 +69,28 @@ fun CommentSection(
             if(uiState.comments.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Column {
-                        TextWithDivider(
-                            text = buildString {
-                                append(stringResource(id = R.string.details_comments))
-                                commentsCount?.let { count ->
-                                    append(stringResource(id = R.string.details_comments_count, count))
-                                }
+                    TextWithDivider(
+                        text = buildString {
+                            append(stringResource(id = R.string.details_comments))
+                            commentsCount?.let { count ->
+                                append(stringResource(id = R.string.details_comments_count, count))
                             }
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    IconButton(
+                        onClick = { commentSectionViewModel.onRefresh() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = "Refresh the comments"
                         )
                     }
+
                     IconButton(
                         onClick = { onTopicNavigate(topicId) }
                     ) {

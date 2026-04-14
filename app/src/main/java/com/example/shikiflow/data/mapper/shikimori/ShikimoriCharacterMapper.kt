@@ -63,7 +63,7 @@ object ShikimoriCharacterMapper {
     fun ShikiManga.toDomain(): ShortMedia {
         return ShortMedia(
             id = this.id ?: 0,
-            mediaType = MediaType.ANIME,
+            mediaType = MediaType.MANGA,
             title = this.name ?: "",
             coverImageUrl = BuildConfig.SHIKI_BASE_URL + this.image?.original,
             userRateStatus = null

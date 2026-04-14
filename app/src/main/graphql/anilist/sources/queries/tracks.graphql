@@ -40,29 +40,21 @@ query MediaListCollection(
     }
 }
 
-query MediaListIDsQuery(
-    $page: Int = 0,
-    $limit: Int = 15,
-    $type: MediaType,
-    $search: String,
-    $order: [MediaSort] = [SCORE_DESC]
+query MediaListEntryShort(
+    $malId: Int!,
+    $type: MediaType!
 ) {
-    Page(page: $page, perPage: $limit) {
-        pageInfo {
-            total
-            perPage
-            currentPage
-            lastPage
-        }
-        media(search: $search, type: $type, onList: true, sort: $order) {
-            id
-            title {
-                romaji
-                english
-            }
-            mediaListEntry {
-                id
-            }
-        }
+    Media(
+        idMal: $malId,
+        type: $type
+    ) {
+        ...MediaListEntryShort
+    }
+}
+
+fragment MediaListEntryShort on Media {
+    id
+    mediaListEntry {
+        id
     }
 }

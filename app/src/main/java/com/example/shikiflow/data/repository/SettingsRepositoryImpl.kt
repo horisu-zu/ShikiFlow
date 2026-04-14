@@ -30,12 +30,14 @@ class SettingsRepositoryImpl @Inject constructor(
 ): SettingsRepository {
 
     companion object {
-        private val USER_AVATAR_URL = stringPreferencesKey("user_avatar_url")
-        private val USER_ID = stringPreferencesKey("user_id")
-        private val USER_NICKNAME = stringPreferencesKey("user_nickname")
-        private val USER_BANNER_URL = stringPreferencesKey("user_banner")
         private val AUTH_TYPE = stringPreferencesKey("auth_type")
 
+        private fun userId(authType: AuthType) = stringPreferencesKey("${authType}user_id")
+        private fun userAvatar(authType: AuthType) = stringPreferencesKey("${authType}_user_avatar_url")
+        private fun userNickname(authType: AuthType) = stringPreferencesKey("${authType}user_nickname")
+        private fun userBanner(authType: AuthType) = stringPreferencesKey("${authType}user_banner")
+
+        private val TRACKER_SERVICE_UPDATE = booleanPreferencesKey("tracker_update")
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
         private val BROWSE_UI_MODE = stringPreferencesKey("browse_ui_mode")
         private val AL_BROWSE_ONGOING_ORDER = stringPreferencesKey("al_browse_ongoing_order")
@@ -54,13 +56,19 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override val userFlow: Flow<User?> = dataStore.data
         .map { preferences ->
-            preferences[USER_ID]?.let { userId ->
-                User(
-                    id = userId.toInt(),
-                    nickname = preferences[USER_NICKNAME] ?: "",
-                    avatarUrl = preferences[USER_AVATAR_URL] ?: "",
-                    profileBannerUrl = preferences[USER_BANNER_URL]
-                )
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            }
+
+            currentAuthType?.let { authType ->
+                preferences[userId(authType)]?.let { userId ->
+                    User(
+                        id = userId.toInt(),
+                        nickname = preferences[userNickname(authType)] ?: "",
+                        avatarUrl = preferences[userAvatar(authType)] ?: "",
+                        profileBannerUrl = preferences[userBanner(authType)]
+                    )
+                }
             }
     }
 
@@ -68,12 +76,34 @@ class SettingsRepositoryImpl @Inject constructor(
         .map { preferences ->
             preferences[AUTH_TYPE]?.let { authType ->
                 AuthType.valueOf(authType)
-            } ?: AuthType.SHIKIMORI
+            }
+        }
+
+    override val connectedServicesFlow: Flow<Map<AuthType, User>> = dataStore.data
+        .map { preferences ->
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            }
+
+            AuthType.entries
+                .filter { it != currentAuthType }
+                .mapNotNull { authType ->
+                    preferences[userId(authType)]?.let { userId ->
+                        authType to User(
+                            id = userId.toInt(),
+                            nickname = preferences[userNickname(authType)] ?: "",
+                            avatarUrl = preferences[userAvatar(authType)] ?: "",
+                            profileBannerUrl = preferences[userBanner(authType)]
+                        )
+                    }
+                }
+                .toMap()
         }
 
     override val settingsFlow: Flow<Settings> = dataStore.data
         .map { preferences ->
             Settings(
+                serviceUpdateState = preferences[TRACKER_SERVICE_UPDATE] ?: true,
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
                 browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
                 trackMode = preferences[TRACK_MODE]?.let { MediaType.valueOf(it) }
@@ -108,6 +138,7 @@ class SettingsRepositoryImpl @Inject constructor(
             AuthType.ANILIST -> MediaSort.Anilist.from(
                 name = preferences[AL_BROWSE_ONGOING_ORDER] ?: MediaSort.Common.POPULARITY.name
             )
+            else -> MediaSort.Common.POPULARITY
         }
     }
 
@@ -131,14 +162,20 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveUserData(user: User) {
+    override suspend fun saveUserData(user: User, authType: AuthType) {
         dataStore.edit { preferences ->
-            preferences[USER_ID] = user.id.toString()
-            preferences[USER_NICKNAME] = user.nickname
-            preferences[USER_AVATAR_URL] = user.avatarUrl
+            preferences[userId(authType)] = user.id.toString()
+            preferences[userNickname(authType)] = user.nickname
+            preferences[userAvatar(authType)] = user.avatarUrl
             user.profileBannerUrl?.let { profileBannerUrl ->
-                preferences[USER_BANNER_URL] = profileBannerUrl
+                preferences[userBanner(authType)] = profileBannerUrl
             }
+        }
+    }
+
+    override suspend fun saveServiceUpdatePreference(shouldUpdate: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[TRACKER_SERVICE_UPDATE] = shouldUpdate
         }
     }
 
@@ -155,9 +192,10 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveBrowseOngoingOrder(ongoingOrder: MediaSort) {
-        val key = when (authTypeFlow.first()) {
+        val key = when(authTypeFlow.first()) {
             AuthType.SHIKIMORI -> SHIKI_BROWSE_ONGOING_ORDER
             AuthType.ANILIST -> AL_BROWSE_ONGOING_ORDER
+            else -> SHIKI_BROWSE_ONGOING_ORDER
         }
 
         dataStore.edit { preferences ->
@@ -222,10 +260,14 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun clearUserData() {
         dataStore.edit { preferences ->
-            preferences.remove(USER_ID)
-            preferences.remove(USER_NICKNAME)
-            preferences.remove(USER_AVATAR_URL)
-            preferences.remove(USER_BANNER_URL)
+            AuthType.entries.forEach { authType ->
+                preferences.remove(userId(authType))
+                preferences.remove(userNickname(authType))
+                preferences.remove(userAvatar(authType))
+                preferences.remove(userBanner(authType))
+            }
+
+            preferences.remove(AUTH_TYPE)
         }
     }
 }

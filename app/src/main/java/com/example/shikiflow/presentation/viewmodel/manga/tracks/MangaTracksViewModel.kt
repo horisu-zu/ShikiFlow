@@ -66,6 +66,7 @@ class MangaTracksViewModel @Inject constructor(
         mediaTracksRepository.saveUserRate(
             entryId = saveUserRate.rateId,
             mediaId = saveUserRate.mediaId,
+            malId = saveUserRate.malId,
             mediaType = MediaType.MANGA,
             status = saveUserRate.userStatus,
             score = saveUserRate.score,

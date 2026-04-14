@@ -13,6 +13,7 @@ import kotlin.time.Instant
 @Entity(tableName = "media_short")
 data class MediaShortEntity(
     @PrimaryKey val id: Int,
+    val malId: Int?,
     val name: String,
     val synonyms: List<String>?,
     val mediaType: MediaType,

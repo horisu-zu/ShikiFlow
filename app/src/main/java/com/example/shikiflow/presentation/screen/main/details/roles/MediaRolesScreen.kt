@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,7 +69,9 @@ fun MediaRolesScreen(
 
     val sortMap by mediaRolesViewModel.sortMap.collectAsStateWithLifecycle()
     val authType by mediaRolesViewModel.authType.collectAsStateWithLifecycle()
-    val mediaRolesFlows = remember(typesList) {
+
+    //Temporarily, until I find a better way to handle this
+    val mediaRolesFlows = rememberSaveable(typesList) {
         typesList.associateWith { roleType ->
             mediaRolesViewModel.getMediaRoles(
                 id = id,
@@ -133,7 +136,7 @@ fun MediaRolesScreen(
                 if(authType == AuthType.ANILIST) {
                     FloatingActionButton(
                         onClick = { showBottomSheet = true },
-                        containerColor = MaterialTheme.colorScheme.surface,
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer,
                         contentColor = MaterialTheme.colorScheme.onSurface
                     ) {
                         Icon(
@@ -163,7 +166,7 @@ fun MediaRolesScreen(
         if(showBottomSheet) {
             val sortConfig = when(val roleSort = sortMap[currentType]) {
                 is RoleSort.Media -> SortConfig(
-                    options = MediaSort.Anilist.entries,
+                    options = MediaSort.Common.entries + MediaSort.Anilist.entries,
                     selected = roleSort.sort,
                     onSortChange = { sort ->
                         mediaRolesViewModel.setSort(currentType, RoleSort.Media(sort))

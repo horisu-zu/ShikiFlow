@@ -20,6 +20,7 @@ data class UserRateData(
     val rewatches: Int,
     val score: Int,
     val mediaId: Int,
+    val malId: Int?,
     val title: String,
     val posterUrl: String?,
     val createDate: Instant,
@@ -39,6 +40,7 @@ data class UserRateData(
                     rewatches = userRate.repeat,
                     score = userRate.score,
                     mediaId = id,
+                    malId = malId,
                     title = title,
                     posterUrl = coverImageUrl,
                     createDate = userRate.createdAt,
@@ -48,6 +50,7 @@ data class UserRateData(
                 )
             } ?: createEmpty(
                 mediaId = id,
+                malId = malId,
                 mediaTitle = title,
                 mediaPosterUrl = coverImageUrl,
                 mediaType = mediaType,
@@ -58,6 +61,7 @@ data class UserRateData(
 
         fun createEmpty(
             mediaId: Int,
+            malId: Int?,
             mediaTitle: String,
             mediaPosterUrl: String,
             totalCount: Int,
@@ -73,6 +77,7 @@ data class UserRateData(
             rewatches = 0,
             score = 0,
             mediaId = mediaId,
+            malId = malId,
             title = mediaTitle,
             posterUrl = mediaPosterUrl,
             createDate = Clock.System.now(),
@@ -84,6 +89,7 @@ data class UserRateData(
 data class SaveUserRate(
     val rateId: Int? = null,
     val mediaId: Int,
+    val malId: Int?,
     val userStatus: UserRateStatus,
     val score: Int = 0,
     val progress: Int = 0,

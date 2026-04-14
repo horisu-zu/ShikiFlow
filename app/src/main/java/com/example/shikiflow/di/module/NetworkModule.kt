@@ -28,6 +28,7 @@ import com.example.shikiflow.di.annotations.ShikimoriOkHttpClient
 import com.example.shikiflow.di.interceptor.AuthInterceptor
 import com.example.shikiflow.di.interceptor.KodikInterceptor
 import com.example.shikiflow.di.interceptor.TokenAuthenticator
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.TokenRepository
 import dagger.Module
 import dagger.Provides
@@ -67,7 +68,7 @@ class NetworkModule {
         tokenAuthenticator: TokenAuthenticator
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(tokenRepository))
+            .addInterceptor(AuthInterceptor(tokenRepository, AuthType.SHIKIMORI))
             .authenticator(tokenAuthenticator)
             .build()
     }
@@ -83,7 +84,7 @@ class NetworkModule {
         }
 
         return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(tokenRepository))
+            .addInterceptor(AuthInterceptor(tokenRepository, AuthType.ANILIST))
             .addInterceptor(logging)
             .build()
     }

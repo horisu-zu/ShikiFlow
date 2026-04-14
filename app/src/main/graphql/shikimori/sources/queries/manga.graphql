@@ -58,11 +58,12 @@ query MangaBrowse(
     $publisher: String
     $franchise: String
     $censored: Boolean
-    $mylist: MylistString
+    $mylist: MylistString,
+    $ids: String
 ) {
     mangas(
         page: $page, limit: $limit, order: $order, search: $search, kind: $kind, status: $status, score: $score,
-        genre: $genre, publisher: $publisher, franchise: $franchise,censored: $censored, mylist: $mylist
+        genre: $genre, publisher: $publisher, franchise: $franchise,censored: $censored, mylist: $mylist, ids: $ids
     ) {
         id
         malId

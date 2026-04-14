@@ -170,6 +170,7 @@ class MangaDetailsViewModel @Inject constructor(
             userId = userId,
             entryId = saveUserRate.rateId,
             mediaId = saveUserRate.mediaId,
+            malId = saveUserRate.malId,
             score = saveUserRate.score,
             progress = saveUserRate.progress,
             repeat = saveUserRate.repeat,

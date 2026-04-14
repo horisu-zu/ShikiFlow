@@ -80,7 +80,8 @@ class AnimeTracksViewModel @Inject constructor(
         mediaTracksRepository.saveUserRate(
             entryId = saveUserRate.rateId,
             mediaId = saveUserRate.mediaId,
-            mediaType = MediaType.MANGA,
+            malId = saveUserRate.malId,
+            mediaType = MediaType.ANIME,
             status = saveUserRate.userStatus,
             score = saveUserRate.score,
             progress = saveUserRate.progress,

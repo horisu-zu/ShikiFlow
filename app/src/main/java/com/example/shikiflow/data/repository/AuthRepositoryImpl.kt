@@ -38,15 +38,15 @@ class AuthRepositoryImpl @Inject constructor(
         try {
             val tokenResponse = getSource(authType).handleAuthorizationResponse(uriResponse)
 
-            tokenRepository.saveTokens(tokenResponse)
+            tokenRepository.saveTokens(tokenResponse, authType)
         } catch (e: Exception) {
             Log.e("AuthRepository", "Error retrieving tokens", e)
         }
     }
 
     override suspend fun logout() {
-        tokenRepository.clearTokens()
         withContext(Dispatchers.IO) {
+            tokenRepository.clearTokens()
             settingsRepository.clearUserData()
             appRoomDatabase.clearAllTables()
         }

@@ -12,9 +12,9 @@ import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -27,9 +27,6 @@ class MainViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val userRepository: UserRepository
 ): ViewModel() {
-
-    val _authType = MutableStateFlow<AuthType?>(null)
-
     val themeSettings = settingsRepository.themeSettingsFlow
         .stateIn(
             scope = viewModelScope,
@@ -50,18 +47,21 @@ class MainViewModel @Inject constructor(
             initialValue = AuthState.Loading
         )
 
-    fun getAuthorizationUrl(authType: AuthType): String {
-        _authType.value = authType
-        return authRepository.getAuthorizationUrl(authType)
-    }
-
     fun handleAuthCode(uriResponse: Uri) {
         viewModelScope.launch {
-            _authType.value?.let { type ->
-                authRepository.handleAuthResponse(uriResponse, type)
-                settingsRepository.saveAuthType(type)
+            val type = AuthType.getAuthType(
+                path = uriResponse.toString().substringBefore("#")
+            )
 
-                userRepository.fetchCurrentUser()
+            type?.let {
+                val currentAuthType = settingsRepository.authTypeFlow.first()
+                authRepository.handleAuthResponse(uriResponse, type)
+
+                if(currentAuthType == null) {
+                    settingsRepository.saveAuthType(type)
+                }
+
+                userRepository.fetchCurrentUser(type)
                     .collect { result ->
                         when(result) {
                             is DataResult.Loading -> {
@@ -71,7 +71,7 @@ class MainViewModel @Inject constructor(
                                 Log.d("MainViewModel", "Error: ${result.message}")
                             }
                             is DataResult.Success -> {
-                                settingsRepository.saveUserData(result.data)
+                                settingsRepository.saveUserData(result.data, type)
                             }
                         }
                     }
