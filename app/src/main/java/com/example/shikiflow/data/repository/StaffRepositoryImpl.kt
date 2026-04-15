@@ -15,68 +15,95 @@ import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class StaffRepositoryImpl @Inject constructor(
     private val anilistDataSource: StaffDataSource,
     private val shikimoriDataSource: StaffDataSource,
-    private val settingsRepository: SettingsRepository
-) : StaffRepository {
+    private val settingsRepository: SettingsRepository,
+    private val scope: CoroutineScope
+) : StaffRepository, BaseNetworkRepository() {
 
-    private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.filterNotNull().first()) {
-            AuthType.SHIKIMORI -> shikimoriDataSource
-            AuthType.ANILIST -> anilistDataSource
+    private val dataSource = settingsRepository.authTypeFlow
+        .filterNotNull()
+        .map { authType ->
+            when(authType) {
+                AuthType.SHIKIMORI -> shikimoriDataSource
+                AuthType.ANILIST -> anilistDataSource
+            }
         }
-    }
+        .distinctUntilChanged()
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            replay = 1
+        )
 
     override fun getStaffDetails(id: Int): Flow<DataResult<StaffDetails>> {
-        return getSource().getStaffDetails(id)
+        return withSource(dataSource) { dataSource ->
+            dataSource.getStaffDetails(id)
+        }
     }
 
     override fun getMediaStaff(
         mediaId: Int,
         mediaType: MediaType,
         sort: Sort<StaffType>
-    ): Flow<PagingData<StaffShort>> = getSource().getMediaStaff(mediaId, mediaType, sort)
+    ): Flow<PagingData<StaffShort>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getMediaStaff(mediaId, mediaType, sort)
+        }
+    }
 
     override fun getStaffMediaRoles(
         staffId: Int,
         mediaType: MediaType,
         sort: Sort<MediaSort>
-    ): Flow<PagingData<MediaRole>> = getSource().getStaffMediaRoles(staffId, mediaType, sort)
+    ): Flow<PagingData<MediaRole>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getStaffMediaRoles(staffId, mediaType, sort)
+        }
+    }
 
     override fun getVoiceActorRoles(
         staffId: Int,
         sort: Sort<CharacterType>
-    ): Flow<PagingData<MediaRole>> = getSource().getVoiceActorRoles(staffId, sort)
+    ): Flow<PagingData<MediaRole>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getVoiceActorRoles(staffId, sort)
+        }
+    }
 
     override fun searchStaff(
         search: String
     ): Flow<PagingData<Browse.Staff>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 24,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 24
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource<Browse.Staff>(
-                    method = { page, limit ->
-                        getSource().searchStaff(page, limit, search)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 24,
+                    enablePlaceholders = true,
+                    prefetchDistance = 12,
+                    initialLoadSize = 24
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.searchStaff(page, limit, search)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 }

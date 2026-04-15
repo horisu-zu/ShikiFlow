@@ -13,44 +13,44 @@ import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class CharacterRepositoryImpl @Inject constructor(
     private val shikimoriDataSource: CharactersDataSource,
     private val anilistDataSource: CharactersDataSource,
     private val settingsRepository: SettingsRepository,
     private val scope: CoroutineScope
-): CharacterRepository {
+): CharacterRepository, BaseNetworkRepository() {
 
-    val dataSource = settingsRepository.authTypeFlow.filterNotNull()
+    private val dataSource = settingsRepository.authTypeFlow
+        .filterNotNull()
         .map { authType ->
             when(authType) {
                 AuthType.SHIKIMORI -> shikimoriDataSource
                 AuthType.ANILIST -> anilistDataSource
             }
         }
-        .stateIn(
+        .distinctUntilChanged()
+        .shareIn(
             scope = scope,
-            started = SharingStarted.Lazily,
-            initialValue = null
+            started = SharingStarted.WhileSubscribed(5000L),
+            replay = 1
         )
 
     override suspend fun getCharacterDetails(
         characterId: Int
-    ): Flow<DataResult<MediaCharacter>> = dataSource.filterNotNull().flatMapLatest { dataSource ->
+    ): Flow<DataResult<MediaCharacter>> = withSourceSuspend(dataSource) { dataSource ->
         dataSource.getCharacterDetails(characterId)
     }
 
@@ -58,7 +58,7 @@ class CharacterRepositoryImpl @Inject constructor(
         characterId: Int,
         mediaType: MediaType,
         sort: Sort<MediaSort>
-    ): Flow<PagingData<MediaRole>> = dataSource.filterNotNull().flatMapLatest { dataSource ->
+    ): Flow<PagingData<MediaRole>> = withSource(dataSource) { dataSource ->
         dataSource.getCharacterMediaRoles(characterId, mediaType, sort)
     }
 
@@ -66,44 +66,42 @@ class CharacterRepositoryImpl @Inject constructor(
         mediaId: Int,
         mediaType: MediaType
     ): Flow<PagingData<MediaCharacterShort>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 9,
-                initialLoadSize = 15
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource(
-                    method = { page, limit ->
-                        dataSource
-                            .filterNotNull()
-                            .first()
-                            .loadMediaCharacters(page, limit, mediaId, mediaType)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 15,
+                    enablePlaceholders = true,
+                    prefetchDistance = 9,
+                    initialLoadSize = 15
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.loadMediaCharacters(page, limit, mediaId, mediaType)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 
     override fun searchCharacters(search: String): Flow<PagingData<Browse.Character>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 24,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 24
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource(
-                    method = { page, limit ->
-                        dataSource
-                            .filterNotNull()
-                            .first()
-                            .searchCharacters(page, limit, search)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 24,
+                    enablePlaceholders = true,
+                    prefetchDistance = 12,
+                    initialLoadSize = 24
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.searchCharacters(page, limit, search)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 }

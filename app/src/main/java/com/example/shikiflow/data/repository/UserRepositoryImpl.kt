@@ -21,29 +21,40 @@ import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class UserRepositoryImpl @Inject constructor(
     private val shikimoriUserDataSource: UserDataSource,
     private val anilistUserDataSource: UserDataSource,
-    private val settingsRepository: SettingsRepository
-): UserRepository {
+    private val settingsRepository: SettingsRepository,
+    private val scope: CoroutineScope
+): UserRepository, BaseNetworkRepository() {
 
-    private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.filterNotNull().first()) {
-            AuthType.SHIKIMORI -> shikimoriUserDataSource
-            AuthType.ANILIST -> anilistUserDataSource
+    private val dataSource = settingsRepository.authTypeFlow
+        .filterNotNull()
+        .map { authType ->
+            when(authType) {
+                AuthType.SHIKIMORI -> shikimoriUserDataSource
+                AuthType.ANILIST -> anilistUserDataSource
+            }
         }
-    }
+        .distinctUntilChanged()
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            replay = 1
+        )
 
     override fun fetchCurrentUser(authType: AuthType): Flow<DataResult<User>> {
         return when(authType) {
@@ -55,80 +66,123 @@ class UserRepositoryImpl @Inject constructor(
     override fun getUserHistory(
         userId: Int,
     ): Flow<PagingData<UserActivity>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 20,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 20
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource<UserActivity>(
-                    method = { page, limit ->
-                        getSource().getPaginatedHistory(userId, page, limit)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 20,
+                    enablePlaceholders = true,
+                    prefetchDistance = 5,
+                    initialLoadSize = 20
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.getPaginatedHistory(userId, page, limit)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 
-    override fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>> =
-        getSource().getUserRates(userId)
+    override fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserRates(userId)
+        }
+    }
 
     override fun getUserGenres(
         userId: Int
-    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> = getSource().getUserGenres(userId)
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserGenres(userId)
+        }
+    }
 
     override fun getUserTags(
         userId: Int
-    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> = getSource().getUserTags(userId)
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserTags(userId)
+        }
+    }
 
     override fun getUserStaff(
         userId: Int
-    ): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> = getSource().getUserStaff(userId)
+    ): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserStaff(userId)
+        }
+    }
 
     override fun getUserVoiceActors(
         userId: Int
-    ): Flow<DataResult<List<StaffStat>>> = getSource().getUserVoiceActors(userId)
+    ): Flow<DataResult<List<StaffStat>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserVoiceActors(userId)
+        }
+    }
 
     override fun getUserStudios(
         userId: Int
-    ): Flow<DataResult<List<StudioStat>>> = getSource().getUserStudios(userId)
+    ): Flow<DataResult<List<StudioStat>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserStudios(userId)
+        }
+    }
 
     override fun getUserStatsCategories(
         userId: Int
-    ): Flow<DataResult<UserStatsCategories>> = getSource().getUserStatsCategories(userId)
+    ): Flow<DataResult<UserStatsCategories>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserStatsCategories(userId)
+        }
+    }
 
     override fun getUserSocial(
         userId: Int,
         socialCategory: SocialCategory
-    ): Flow<PagingData<UserSocial>> = getSource().getUserSocial(userId, socialCategory)
+    ): Flow<PagingData<UserSocial>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserSocial(userId, socialCategory)
+        }
+    }
 
     override fun getUserFavorites(
         userId: Int,
         favoriteCategory: FavoriteCategory
-    ): Flow<PagingData<UserFavorite>> = getSource().getUserFavorites(userId, favoriteCategory)
+    ): Flow<PagingData<UserFavorite>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getUserFavorites(userId, favoriteCategory)
+        }
+    }
 
     override suspend fun getMediaRates(
         userId: Int,
         mediaType: MediaType
-    ): List<ShortUserMediaRate> = getSource().getMediaRates(userId, mediaType)
+    ): List<ShortUserMediaRate> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.getMediaRates(userId, mediaType)
+        }
+    }
 
     override fun getUsers(nickname: String): Flow<PagingData<Browse.User>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 30,
-                enablePlaceholders = true,
-                prefetchDistance = 10,
-                initialLoadSize = 30
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource<Browse.User>(
-                    method = { page, limit ->
-                        getSource().getUsersByNickname(page, limit, nickname)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 30,
+                    enablePlaceholders = true,
+                    prefetchDistance = 10,
+                    initialLoadSize = 30
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.getUsersByNickname(page, limit, nickname)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 }

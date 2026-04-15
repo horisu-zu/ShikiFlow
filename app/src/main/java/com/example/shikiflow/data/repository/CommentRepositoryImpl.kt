@@ -10,71 +10,96 @@ import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor(
     private val shikimoriDataSource: CommentsDataSource,
     private val anilistDataSource: CommentsDataSource,
-    private val settingsRepository: SettingsRepository
-): CommentRepository {
+    private val settingsRepository: SettingsRepository,
+    private val scope: CoroutineScope
+): CommentRepository, BaseNetworkRepository() {
 
-    private fun getSource() = runBlocking {
-        when(settingsRepository.authTypeFlow.filterNotNull().first()) {
-            AuthType.SHIKIMORI -> shikimoriDataSource
-            AuthType.ANILIST -> anilistDataSource
+    private val dataSource = settingsRepository.authTypeFlow
+        .filterNotNull()
+        .map { authType ->
+            when(authType) {
+                AuthType.SHIKIMORI -> shikimoriDataSource
+                AuthType.ANILIST -> anilistDataSource
+            }
         }
-    }
+        .distinctUntilChanged()
+        .shareIn(
+            scope = scope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            replay = 1
+        )
 
     override suspend fun getComments(
         topicId: Int,
         page: Int,
         limit: Int,
-    ): Result<List<Comment>> = getSource().getComments(topicId, page, limit)
+    ): Result<List<Comment>> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.getComments(topicId, page, limit)
+        }
+    }
 
-    override suspend fun getCommentById(commentId: Int): Comment = getSource().getCommentById(commentId)
+    override suspend fun getCommentById(commentId: Int): Comment {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.getCommentById(commentId)
+        }
+    }
 
     override fun getPaginatedComments(topicId: Int): Flow<PagingData<Comment>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 15
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource<Comment>(
-                    method = { page, limit ->
-                        getSource().getComments(topicId, page, limit)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 15,
+                    enablePlaceholders = true,
+                    prefetchDistance = 5,
+                    initialLoadSize = 15
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.getComments(topicId, page, limit)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 
     override fun getPaginatedThreads(
         mediaId: Int,
         threadSort: Sort<ThreadType>
     ): Flow<PagingData<Thread>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 15
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource<Thread>(
-                    method = { page, limit ->
-                        getSource().getMediaThreads(mediaId, page, limit, threadSort)
-                    }
-                )
-            }
-        ).flow
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 15,
+                    enablePlaceholders = true,
+                    prefetchDistance = 5,
+                    initialLoadSize = 15
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.getMediaThreads(mediaId, page, limit, threadSort)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 }

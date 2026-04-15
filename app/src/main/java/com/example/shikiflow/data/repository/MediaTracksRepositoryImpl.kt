@@ -22,43 +22,44 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class, ExperimentalPagingApi::class)
+@OptIn(ExperimentalPagingApi::class)
 class MediaTracksRepositoryImpl @Inject constructor(
     private val shikimoriTracksDataSource: MediaTracksDataSource,
     private val anilistTracksDataSource: MediaTracksDataSource,
     private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase,
     private val scope: CoroutineScope
-): MediaTracksRepository {
+): MediaTracksRepository, BaseNetworkRepository() {
     val mediaTracksDao = appRoomDatabase.mediaTracksDao()
 
-    val dataSource = settingsRepository.authTypeFlow.filterNotNull()
+    private val dataSource = settingsRepository.authTypeFlow
+        .filterNotNull()
         .map { authType ->
             when(authType) {
                 AuthType.SHIKIMORI -> shikimoriTracksDataSource
                 AuthType.ANILIST -> anilistTracksDataSource
             }
         }
-        .stateIn(
+        .distinctUntilChanged()
+        .shareIn(
             scope = scope,
-            started = SharingStarted.Lazily,
-            initialValue = null
+            started = SharingStarted.WhileSubscribed(5000L),
+            replay = 1
         )
 
     override fun getMediaTracks(
@@ -66,30 +67,28 @@ class MediaTracksRepositoryImpl @Inject constructor(
         userId: Int?,
         mediaType: MediaType
     ): Flow<PagingData<MediaTrack>> {
-        return dataSource
-            .filterNotNull()
-            .flatMapLatest { tracksDataSource ->
-                 Pager(
-                    config = PagingConfig(
-                        pageSize = 24,
-                        enablePlaceholders = true,
-                        prefetchDistance = 12,
-                        initialLoadSize = 24
-                    ),
-                    remoteMediator = MediaTracksMediator(
-                        mediaTracksDataSource = tracksDataSource,
-                        appRoomDatabase = appRoomDatabase,
-                        userRateStatus = status,
-                        userId = userId,
-                        mediaType = mediaType
-                    ),
-                    pagingSourceFactory = { mediaTracksDao.getTracksByStatus(status.name, mediaType) }
-                ).flow.map { pagingData ->
-                    pagingData.map { track ->
-                        track.toDomain()
-                    }
+        return withSource(dataSource) { tracksDataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 24,
+                    enablePlaceholders = true,
+                    prefetchDistance = 12,
+                    initialLoadSize = 24
+                ),
+                remoteMediator = MediaTracksMediator(
+                    mediaTracksDataSource = tracksDataSource,
+                    appRoomDatabase = appRoomDatabase,
+                    userRateStatus = status,
+                    userId = userId,
+                    mediaType = mediaType
+                ),
+                pagingSourceFactory = { mediaTracksDao.getTracksByStatus(status.name, mediaType) }
+            ).flow.map { pagingData ->
+                pagingData.map { track ->
+                    track.toDomain()
                 }
             }
+        }
     }
 
     override fun browseMediaTracks(
@@ -98,25 +97,23 @@ class MediaTracksRepositoryImpl @Inject constructor(
         title: String,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<MediaTrack>> {
-        return dataSource
-            .filterNotNull()
-            .flatMapLatest { dataSource ->
-                Pager(
-                    config = PagingConfig(
-                        pageSize = 24,
-                        enablePlaceholders = true,
-                        prefetchDistance = 12,
-                        initialLoadSize = 24
-                    ),
-                    pagingSourceFactory = {
-                        GenericPagingSource(
-                            method = { page, limit ->
-                                dataSource.browseMediaTracks(page, limit, mediaType, userId, title, userRateStatus)
-                            }
-                        )
-                    }
-                ).flow
-            }
+        return withSource(dataSource) { dataSource ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 24,
+                    enablePlaceholders = true,
+                    prefetchDistance = 12,
+                    initialLoadSize = 24
+                ),
+                pagingSourceFactory = {
+                    GenericPagingSource(
+                        method = { page, limit ->
+                            dataSource.browseMediaTracks(page, limit, mediaType, userId, title, userRateStatus)
+                        }
+                    )
+                }
+            ).flow
+        }
     }
 
     override fun saveUserRate(
@@ -135,38 +132,38 @@ class MediaTracksRepositoryImpl @Inject constructor(
         emit(DataResult.Loading)
 
         try {
-            val dataSource = dataSource.value ?: dataSource.filterNotNull().first()
-
-            settingsRepository.settingsFlow
-                .map { settings -> settings.serviceUpdateState }
-                .first()
-                .let { serviceUpdateState ->
-                    if(serviceUpdateState) {
-                        scope.launch {
-                            saveServiceUserRate(
-                                mediaType,
-                                malId,
-                                status,
-                                progress,
-                                progressVolumes,
-                                repeat,
-                                score
-                            )
-                        }
+            withSourceSuspend(
+                flow = settingsRepository.settingsFlow
+                    .map { settings -> settings.serviceUpdateState }
+            ) { serviceUpdateState ->
+                if(serviceUpdateState) {
+                    scope.launch {
+                        saveServiceUserRate(
+                            mediaType,
+                            malId,
+                            status,
+                            progress,
+                            progressVolumes,
+                            repeat,
+                            score
+                        )
                     }
                 }
+            }
 
-            val result = dataSource.saveUserRate(
-                userId = userId,
-                entryId = entryId,
-                mediaType = mediaType,
-                mediaId = mediaId,
-                status = status,
-                progress = progress,
-                progressVolumes = progressVolumes,
-                repeat = repeat,
-                score = score
-            )
+            val result = withSourceSuspend(dataSource) { dataSource ->
+                dataSource.saveUserRate(
+                    userId = userId,
+                    entryId = entryId,
+                    mediaType = mediaType,
+                    mediaId = mediaId,
+                    status = status,
+                    progress = progress,
+                    progressVolumes = progressVolumes,
+                    repeat = repeat,
+                    score = score
+                )
+            }
 
             updateMediaTrack(
                 mediaTrack = result.toMediaEntity(),
@@ -189,8 +186,10 @@ class MediaTracksRepositoryImpl @Inject constructor(
         score: Int?
     ) {
         try {
-            settingsRepository.connectedServicesFlow.first()
-                .forEach { (type, user) ->
+            withSourceSuspend(
+                flow = settingsRepository.connectedServicesFlow
+            ) { connectedServices ->
+                connectedServices.forEach { (type, user) ->
                     malId?.let {
                         when(type) {
                             AuthType.SHIKIMORI -> shikimoriTracksDataSource
@@ -207,6 +206,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
                         )
                     }
                 }
+            }
         } catch (e: Exception) {
             Log.e("MediaTracksRepository", "Error: ${e.message}")
         }
