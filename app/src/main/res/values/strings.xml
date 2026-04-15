@@ -142,16 +142,48 @@
     <string name="release_notes_release_date">Release Date: %1$s</string>
     <string name="release_notes_update_size">Size</string>
 
-    <string name="profile_screen_track_lists_label">Lists</string>
-    <string name="profile_screen_favorites">Favorites</string>
     <string name="profile_screen_empty">%1$s\'s Profile is empty</string>
-    <string name="more_screen_profile">My Profile</string>
-    <string name="more_screen_clubs">Clubs</string>
-    <string name="more_screen_history">Activity History</string>
-    <string name="more_screen_settings">Settings</string>
-    <string name="more_screen_about_app">About App</string>
-    <string name="more_search_users">Search Users…</string>
     <string name="more_profile_compare">Compare</string>
+    <string name="activity_planned">Plans to watch</string>
+    <string name="activity_watching">Watching</string>
+    <plurals name="activity_watching_with_progress">
+        <item quantity="one">Watched episode %1$s</item>
+        <item quantity="other">Watched episodes %1$s</item>
+    </plurals>
+    <string name="activity_reading">Reading</string>
+    <plurals name="activity_reading_with_progress">
+        <item quantity="one">Read chapter %1$s</item>
+        <item quantity="other">Read chapters %1$s</item>
+    </plurals>
+    <plurals name="activity_reading_volumes">
+        <item quantity="one">Read volume %1$s</item>
+        <item quantity="other">Read volumes %1$s</item>
+    </plurals>
+    <string name="activity_completed">Completed</string>
+    <string name="activity_rated">Rated %1$d</string>
+    <string name="activity_completed_with_score">Completed and rated %1$d</string>
+    <string name="activity_changed_score">Changed Score from %1$d to %2$d</string>
+    <string name="activity_rewatching">Rewatching</string>
+    <string name="activity_rereading">Rereading</string>
+    <string name="activity_paused_watching">Paused watching</string>
+    <plurals name="activity_paused_watching_with_progress">
+        <item quantity="one">Paused watching after completing episode %1$s</item>
+        <item quantity="other">Paused watching after completing episodes %1$s</item>
+    </plurals>
+    <string name="activity_paused_reading">Paused reading</string>
+    <plurals name="activity_paused_reading_with_progress">
+        <item quantity="one">Paused reading after completing chapter %1$s</item>
+        <item quantity="other">Paused reading after completing chapters %1$s</item>
+    </plurals>
+    <string name="activity_dropped">Dropped</string>
+    <plurals name="activity_dropped_watching">
+        <item quantity="one">Dropped watching after completing episode %1$s</item>
+        <item quantity="other">Dropped watching after completing episodes %1$s</item>
+    </plurals>
+    <plurals name="activity_dropped_reading">
+        <item quantity="one">Dropped reading after completing chapter %1$s</item>
+        <item quantity="other">Dropped reading after completing chapters %1$s</item>
+    </plurals>
 
     <string name="translation_updated_at">Updated %1$s</string>
     <string name="episodes">%1s ep.</string>

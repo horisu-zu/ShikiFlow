@@ -72,7 +72,8 @@ object RepositoryModule {
         @Shikimori shikimoriDataSource: MediaDataSource,
         @AniList anilistDataSource: MediaDataSource,
         settingsRepository: SettingsRepository,
-    ): MediaRepository = MediaRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
+        scope: CoroutineScope
+    ): MediaRepository = MediaRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository, scope)
 
     @Provides
     @Singleton
@@ -85,8 +86,9 @@ object RepositoryModule {
     fun provideUserRepository(
         @Shikimori shikimoriUserDataSource: UserDataSource,
         @AniList anilistUserDataSource: UserDataSource,
-        settingsRepository: SettingsRepository
-    ): UserRepository = UserRepositoryImpl(shikimoriUserDataSource, anilistUserDataSource, settingsRepository)
+        settingsRepository: SettingsRepository,
+        scope: CoroutineScope
+    ): UserRepository = UserRepositoryImpl(shikimoriUserDataSource, anilistUserDataSource, settingsRepository, scope)
 
     @Provides
     @Singleton
@@ -99,19 +101,21 @@ object RepositoryModule {
 
     @Provides
     @Singleton
-    fun providePersonRepository(
+    fun provideStaffRepository(
         @Shikimori shikimoriDataSource: StaffDataSource,
         @AniList anilistDataSource: StaffDataSource,
-        settingsRepository: SettingsRepository
-    ): StaffRepository = StaffRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository)
+        settingsRepository: SettingsRepository,
+        scope: CoroutineScope
+    ): StaffRepository = StaffRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository, scope)
 
     @Provides
     @Singleton
     fun provideCommentRepository(
         @Shikimori shikimoriDataSource: CommentsDataSource,
         @AniList anilistDataSource: CommentsDataSource,
-        settingsRepository: SettingsRepository
-    ): CommentRepository = CommentRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository)
+        settingsRepository: SettingsRepository,
+        scope: CoroutineScope
+    ): CommentRepository = CommentRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository, scope)
 
     @Provides
     @Singleton

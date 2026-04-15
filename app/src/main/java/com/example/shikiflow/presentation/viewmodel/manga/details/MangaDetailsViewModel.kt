@@ -173,6 +173,7 @@ class MangaDetailsViewModel @Inject constructor(
             malId = saveUserRate.malId,
             score = saveUserRate.score,
             progress = saveUserRate.progress,
+            progressVolumes = saveUserRate.progressVolumes,
             repeat = saveUserRate.repeat,
             status = saveUserRate.userStatus,
             mediaType = MediaType.MANGA,

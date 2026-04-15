@@ -85,7 +85,6 @@ class AnimeTracksViewModel @Inject constructor(
             status = saveUserRate.userStatus,
             score = saveUserRate.score,
             progress = saveUserRate.progress,
-            progressVolumes = saveUserRate.progressVolumes,
             repeat = saveUserRate.repeat
         ).onEach { result ->
             _params.update { params ->

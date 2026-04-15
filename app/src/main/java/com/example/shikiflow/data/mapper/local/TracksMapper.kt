@@ -46,7 +46,7 @@ object TracksMapper {
         mediaType = shortData.mediaType,
         status = track.status,
         progress = track.progress,
-        progressVolumes = 0,
+        progressVolumes = track.progressVolumes ?: 0,
         rewatches = track.repeat,
         score = track.score,
         mediaId = shortData.id,
@@ -57,6 +57,6 @@ object TracksMapper {
         updateDate = track.updatedAt,
         totalCount = if (shortData.status == MediaStatus.RELEASED) shortData.totalCount ?: 0
             else shortData.currentProgress ?: Int.MAX_VALUE,
-        volumesCount = 0
+        volumesCount = shortData.volumes ?: 0
     )
 }

@@ -32,6 +32,7 @@ import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.description
 import com.example.shikiflow.utils.Converter.convertInstantToString
 
 @Composable
@@ -90,7 +91,7 @@ fun ListActivityItem(
                     }
                 } else Modifier
             ),
-        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
     ) {
         BaseImage(
             model = listActivity.coverImage,
@@ -112,7 +113,7 @@ fun ListActivityItem(
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = listActivity.description,
+                text = listActivity.description(),
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)

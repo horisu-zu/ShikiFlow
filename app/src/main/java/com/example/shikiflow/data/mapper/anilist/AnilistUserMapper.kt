@@ -61,16 +61,29 @@ object AnilistUserMapper {
             mediaType = media?.type?.toDomain(),
             title = media?.title?.romaji ?: "",
             coverImage = media?.coverImage?.extraLarge ?: "",
-            description = buildString {
-                status?.let { status ->
-                    append(status.replaceFirstChar { it.uppercase() })
-                }
-                progress?.let { progress ->
-                    append(" $progress")
-                }
-            },
+            status = status.toUserRateStatus(),
+            progress = progress?.toProgress() ?: emptyList(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong())
         )
+    }
+
+    private fun String?.toUserRateStatus(): UserRateStatus {
+        return when(this) {
+            "plans to watch", "plans to read" -> UserRateStatus.PLANNED
+            "watched episode", "read chapter" -> UserRateStatus.WATCHING
+            "completed" -> UserRateStatus.COMPLETED
+            "rewatched episode", "reread chapter" -> UserRateStatus.REWATCHING
+            "paused watching", "paused reading" -> UserRateStatus.PAUSED
+            "dropped" -> UserRateStatus.DROPPED
+            else -> UserRateStatus.UNKNOWN
+        }
+    }
+
+    private fun String.toProgress(): List<Int> {
+        return this.split("-")
+            .mapNotNull { number ->
+                number.trim().toIntOrNull()
+            }
     }
 
     fun ALTextActivity.toDomain(): TextActivity {
