@@ -3,6 +3,6 @@
     <style name="Theme.ShikiFlow" parent="Theme.SplashScreen">
         <item name="windowSplashScreenBackground">#FF101417</item>
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_shikilogo_splash</item>
-        <item name="postSplashScreenTheme">@android:style/Theme.Material.Light.NoActionBar</item>
+        <item name="postSplashScreenTheme">@style/Theme.AppCompat.DayNight.NoActionBar</item>
     </style>
 </resources>

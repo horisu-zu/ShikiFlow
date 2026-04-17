@@ -1,9 +1,9 @@
 <resources>
-    <string name="app_name">ShikiFlow</string>
+    <string name="app_name" translatable="false">ShikiFlow</string>
 
     <string name="auth_sign_in">Sign In via</string>
-    <string name="auth_type_shikimori">Shikimori</string>
-    <string name="auth_type_anilist">AniList</string>
+    <string name="auth_type_shikimori" translatable="false">Shikimori</string>
+    <string name="auth_type_anilist" translatable="false">AniList</string>
     <string name="auth_features_shiki_integration_label">Shikimori and AniList Integration</string>
     <string name="auth_features_shiki_integration_desc">
         Connect your existing account to search, track, and manage anime and manga
@@ -32,7 +32,7 @@
 
     <string name="mtp_loading_error">Error loading tracked manga</string>
     <string name="atp_loading_error">Error Loading Anime Tracks</string>
-    <string name="tracks_empty">There\'re no tracks in this category</string>
+    <string name="tracks_empty" translatable="false">There\'re no tracks in this category</string>
 
     <string name="b_oss_error">Error Loading Ongoings</string>
     <string name="b_mss_error">Error Loading Browse Data</string>
@@ -123,13 +123,13 @@
     <string name="browse_ui_mode_list">List</string>
     <string name="browse_ui_mode_grid">Grid</string>
 
-    <string name="about_app_github_label">Github</string>
+    <string name="about_app_github_label" translatable="false">Github</string>
     <string name="about_app_github_desc">Project Repository</string>
-    <string name="about_app_shikimori_label">Shikimori</string>
+    <string name="about_app_shikimori_label" translatable="false">Shikimori</string>
     <string name="about_app_shikimori_desc">Encyclopedia of Anime and Manga</string>
-    <string name="about_app_anilist_label">AniList</string>
+    <string name="about_app_anilist_label" translatable="false">AniList</string>
     <string name="about_app_anilist_desc">Anime and Manga Tracking Platform</string>
-    <string name="about_app_mangadex_label">MangaDex</string>
+    <string name="about_app_mangadex_label" translatable="false">MangaDex</string>
     <string name="about_app_mangadex_desc">Online Manga Reading Platform</string>
     <string name="version_from">from: %1$s</string>
     <string name="update_available">Update Available</string>
@@ -261,7 +261,7 @@
     <string name="character_title">Character</string>
     <string name="staff_title">Staff</string>
     <string name="works_title">Works</string>
-    <string name="person_stats_expand">Stats</string>
+    <string name="person_stats_expand" translatable="false">Stats</string>
     <string name="details_comments_count">— %1s total</string>
 
     <string name="thread_item_user_replied">" replied "</string>
@@ -279,11 +279,11 @@
     <string name="media_user_status_unknown">Add to List</string>
     <string name="media_user_status_dropped">Dropped</string>
 
-    <string name="progress_suffix">" ∙ %1$d/%2$d"</string>
-    <string name="score_suffix">" ∙ %1$s ★"</string>
+    <string name="progress_suffix" translatable="false">" ∙ %1$d/%2$d"</string>
+    <string name="score_suffix" translatable="false">" ∙ %1$s ★"</string>
 
-    <string name="media_user_progress">%1$d/%2$d</string>
-    <string name="media_score">%1$s ★</string>
+    <string name="media_user_progress" translatable="false">%1$d/%2$d</string>
+    <string name="media_score" translatable="false">%1$s ★</string>
 
     <string name="media_status_announced">Announced</string>
     <string name="media_status_ongoing">Ongoing</string>
@@ -291,11 +291,11 @@
     <string name="media_status_manga_cancelled">Cancelled</string>
     <string name="media_status_manga_hiatus">Hiatus</string>
 
-    <string name="anime_kind_tv">TV</string>
-    <string name="anime_kind_ona">ONA</string>
-    <string name="anime_kind_ova">OVA</string>
-    <string name="anime_kind_cm">CM</string>
-    <string name="anime_kind_pv">PV</string>
+    <string name="anime_kind_tv" translatable="false">TV</string>
+    <string name="anime_kind_ona" translatable="false">ONA</string>
+    <string name="anime_kind_ova" translatable="false">OVA</string>
+    <string name="anime_kind_cm" translatable="false">CM</string>
+    <string name="anime_kind_pv" translatable="false">PV</string>
     <string name="anime_kind_movie">Movie</string>
     <string name="anime_kind_music">Music</string>
     <string name="anime_kind_special">Special</string>
@@ -330,12 +330,12 @@
     <string name="season_winter">Winter</string>
 
     <string name="rating_none">None</string>
-    <string name="rating_g">G</string>
-    <string name="rating_pg">PG</string>
-    <string name="rating_pg_13">PG-13</string>
-    <string name="rating_r_17">R-17</string>
-    <string name="rating_r_plus">R+</string>
-    <string name="rating_rx">Rx</string>
+    <string name="rating_g" translatable="false">G</string>
+    <string name="rating_pg" translatable="false">PG</string>
+    <string name="rating_pg_13" translatable="false">PG-13</string>
+    <string name="rating_r_17" translatable="false">R-17</string>
+    <string name="rating_r_plus" translatable="false">R+</string>
+    <string name="rating_rx" translatable="false">Rx</string>
 
     <string name="anime_origin_original">Original</string>
     <string name="anime_origin_manga">Manga</string>
@@ -354,8 +354,8 @@
     <string name="anime_origin_mixed_media">Mixed Media</string>
     <string name="anime_origin_other">Other</string>
 
-    <string name="profile">Profile</string>
-    <string name="user_label">User</string>
+    <string name="profile" translatable="false">Profile</string>
+    <string name="user_label" translatable="false">User</string>
 
     <string name="about_check_updates">Check for Updates</string>
     <string name="about_checking_updates">Checking for updates…</string>
@@ -412,7 +412,7 @@
     <string name="sort_type_title">Title</string>
     <string name="sort_type_relevance">Relevance</string>
     <string name="sort_type_role">Role</string>
-    <string name="sort_type_id">ID</string>
+    <string name="sort_type_id" translatable="false">ID</string>
     <string name="sort_type_created_at">Created At</string>
     <string name="sort_type_replied_at">Replied At</string>
     <string name="sort_type_reply_count">Reply Count</string>

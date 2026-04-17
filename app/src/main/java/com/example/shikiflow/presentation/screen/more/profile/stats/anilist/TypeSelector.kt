@@ -7,9 +7,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,39 +22,42 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
-import kotlin.collections.forEach
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun TypeSelector(
     types: List<StatsBarType>,
     mediaType: MediaType,
     currentType: StatsBarType,
+    horizontalPadding: Dp,
     onTypeSelect: (StatsBarType) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    SnapFlingLazyRow(
         modifier = modifier
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(all = 6.dp),
+            .ignoreHorizontalParentPadding(horizontalPadding)
+            .fillMaxWidth(),
+        contentPadding = PaddingValues(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        types.forEach { statsBarType ->
+        items(types) { statsBarType ->
             val isSelected = statsBarType == currentType
             val backgroundAlpha by animateFloatAsState(
-                targetValue = if(isSelected) 1f else 0f,
+                targetValue = if (isSelected) 1f else 0.1f,
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
                     stiffness = Spring.StiffnessLow
                 )
             )
             val textColor by animateColorAsState(
-                targetValue = if(isSelected) MaterialTheme.colorScheme.onPrimary
+                targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
                     else MaterialTheme.colorScheme.onSurface,
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
@@ -69,7 +74,7 @@ fun TypeSelector(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .clip(CircleShape)
+                    .clip(shape = RoundedCornerShape(percent = 32))
                     .clickable {
                         if (!isSelected) {
                             onTypeSelect(statsBarType)

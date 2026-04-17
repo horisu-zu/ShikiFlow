@@ -111,6 +111,7 @@ fun TypeStatSection(
                         onTypeSelect = { typeBarType ->
                             onBarTypeChange(typeBarType)
                         },
+                        horizontalPadding = horizontalPadding,
                         modifier = Modifier.wrapContentWidth(Alignment.Start)
                     )
                 }

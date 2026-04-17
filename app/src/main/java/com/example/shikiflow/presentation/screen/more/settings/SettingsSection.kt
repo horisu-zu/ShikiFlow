@@ -31,6 +31,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -41,6 +42,7 @@ import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.colors
 import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.iconResource
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 
@@ -50,6 +52,8 @@ fun SettingsSection(
     title: String,
     items: List<SectionItem>
 ) {
+    val horizontalPadding = 16.dp
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -62,13 +66,13 @@ fun SettingsSection(
     ) {
         val itemModifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .padding(horizontal = horizontalPadding, vertical = 6.dp)
 
         Text(
             text = title,
             modifier = Modifier.padding(
-                start = 16.dp,
-                end = 16.dp,
+                start = horizontalPadding,
+                end = horizontalPadding,
                 top = 8.dp,
                 bottom = 4.dp
             ),
@@ -136,7 +140,14 @@ fun SettingsSection(
                         connectedServicesMap = item.connectedServicesMap,
                         onServiceClick = item.onServiceClick,
                         onServiceUpdateToggle = item.onServiceUpdateToggle,
-                        modifier = itemModifier
+                        horizontalPadding = horizontalPadding,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = horizontalPadding,
+                                end = horizontalPadding,
+                                top = 6.dp
+                            )
                     )
                 }
             }
@@ -263,7 +274,7 @@ private fun <T> ModeItem(
     title: String,
     entries: List<T>,
     mode: T,
-    onClick: (T) -> Unit,
+    onClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     iconResources: List<IconResource> = emptyList(),
     weights: List<Float> = emptyList()
@@ -289,7 +300,7 @@ private fun <T> ModeItem(
                 ModeRowItem(
                     entry = entry.toString(),
                     isCurrentMode = mode == entry,
-                    onClick = { onClick(entry) },
+                    onClick = { onClick(index) },
                     modifier = Modifier.weight(entryWeight),
                     iconResource = iconResources.getOrNull(entries.indexOf(entry))
                 )
@@ -354,6 +365,7 @@ private fun ServicesItem(
     connectedServicesMap: Map<AuthType, User>,
     onServiceClick: (AuthType) -> Unit,
     onServiceUpdateToggle: () -> Unit,
+    horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
     val servicesMap = remember(connectedServicesMap) {
@@ -375,7 +387,8 @@ private fun ServicesItem(
                 TrackerServiceItem(
                     authType = authType,
                     user = servicesMap[authType],
-                    onServiceClick = onServiceClick
+                    onServiceClick = onServiceClick,
+                    horizontalPadding = horizontalPadding
                 )
             }
 
@@ -461,24 +474,24 @@ private fun TrackerServiceItem(
     authType: AuthType,
     user: User?,
     onServiceClick: (AuthType) -> Unit,
+    horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
-    val rowHeight = 36.dp
-    val rowShape = RoundedCornerShape(percent = 24)
     val colors = authType.colors()
 
     Row(
         modifier = modifier
-            .height(rowHeight)
-            .clip(rowShape)
-            .clickable { onServiceClick(authType) },
+            .ignoreHorizontalParentPadding(horizontalPadding)
+            .clickable { onServiceClick(authType) }
+            .padding(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
         authType.iconResource().toIcon(
             modifier = Modifier
-                .size(rowHeight)
-                .clip(rowShape)
+                .padding(vertical = 8.dp)
+                .size(30.dp)
+                .clip(RoundedCornerShape(percent = 24))
                 .background(colors.first.harmonize(MaterialTheme.colorScheme.onBackground))
                 .padding(4.dp),
             tint = colors.second.harmonize(MaterialTheme.colorScheme.onBackground)
@@ -486,7 +499,7 @@ private fun TrackerServiceItem(
 
         Text(
             text = stringResource(authType.displayValue()),
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelLarge,
             modifier = Modifier.weight(1f)
         )
 

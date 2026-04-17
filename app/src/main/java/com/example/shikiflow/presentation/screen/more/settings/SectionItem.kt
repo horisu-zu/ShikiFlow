@@ -55,7 +55,7 @@ sealed interface SectionItem {
         val entries: List<String>,
         val iconResources: List<IconResource> = emptyList(),
         val weights: List<Float> = emptyList(),
-        val onClick: (String) -> Unit,
+        val onClick: (Int) -> Unit,
         val mode: String,
         val isVisible: Boolean = true
     ): SectionItem {

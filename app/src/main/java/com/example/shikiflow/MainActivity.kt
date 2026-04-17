@@ -3,12 +3,16 @@ package com.example.shikiflow
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.presentation.navigation.AppNavigator
@@ -19,7 +23,7 @@ import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private val mainViewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,11 +51,16 @@ class MainActivity : ComponentActivity() {
                 dynamicColor = themeSettings.isDynamicThemeEnabled,
                 paletteStyle = themeSettings.paletteStyle
             ) {
-                if(authState != AuthState.Loading) {
-                    AppNavigator(
-                        authState = authState,
-                        onFinishActivity = { this.moveTaskToBack(true) }
-                    )
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    if(authState != AuthState.Loading) {
+                        AppNavigator(
+                            authState = authState,
+                            onFinishActivity = { this.moveTaskToBack(true) }
+                        )
+                    }
                 }
             }
         }

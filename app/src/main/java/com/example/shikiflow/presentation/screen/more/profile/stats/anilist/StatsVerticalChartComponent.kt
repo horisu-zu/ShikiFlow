@@ -40,6 +40,7 @@ fun <T> StatsVerticalChartComponent(
             types = statsMap.keys.toList(),
             mediaType = mediaType,
             currentType = currentBarType,
+            horizontalPadding = horizontalPadding,
             onTypeSelect = { statsBarType ->
                 onBarTypeChange(statsBarType)
             }

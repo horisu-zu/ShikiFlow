@@ -112,6 +112,7 @@ fun StaffSection(
                         onTypeSelect = { staffBarType ->
                             onStaffBarTypeChange(staffBarType)
                         },
+                        horizontalPadding = horizontalPadding,
                         modifier = Modifier.wrapContentWidth(Alignment.Start)
                     )
                 }

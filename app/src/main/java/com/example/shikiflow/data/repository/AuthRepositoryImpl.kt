@@ -4,6 +4,8 @@ import android.net.Uri
 import android.util.Log
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
+import com.example.shikiflow.di.annotations.AniList
+import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -13,8 +15,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    private val shikiAuthDataSource: AuthDataSource,
-    private val anilistAuthDataSource: AuthDataSource,
+    @Shikimori private val shikiAuthDataSource: AuthDataSource,
+    @AniList private val anilistAuthDataSource: AuthDataSource,
     private val tokenRepository: TokenRepository,
     private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase

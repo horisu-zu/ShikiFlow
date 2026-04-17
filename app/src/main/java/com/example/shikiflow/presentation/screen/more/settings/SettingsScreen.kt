@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -35,6 +36,8 @@ import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.display
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.LocaleUtils
+import com.example.shikiflow.utils.LocaleUtils.getAvailableLocales
 import com.example.shikiflow.utils.ThemeMode
 import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
 import com.example.shikiflow.utils.WebIntent.openActionView
@@ -55,6 +58,9 @@ fun SettingsScreen(
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
     val bottomSheetConfig = remember { mutableStateOf<BottomSheetConfig?>(null) }
+
+    val availableLocales = remember { context.getAvailableLocales() }
+    var currentLocale by remember { mutableStateOf(LocaleUtils.getDefaultLocale()) }
 
     if(openCacheDialog.value) {
         CustomDialog(
@@ -128,8 +134,13 @@ fun SettingsScreen(
                                 IconResource.Drawable(resId = R.drawable.ic_palette),
                                 IconResource.Drawable(resId = R.drawable.ic_format_paint)
                             ),
-                            onClick = { newMode ->
-                                settingsViewModel.setDynamicTheme(newMode == resources.getString(R.string.settings_enabled))
+                            onClick = { index ->
+                                settingsViewModel.setDynamicTheme(
+                                    when(index) {
+                                        0 -> true
+                                        else -> false
+                                    }
+                                )
                             }
                         ),
                         SectionItem.Default(
@@ -156,8 +167,8 @@ fun SettingsScreen(
                             entries = ThemeMode.entries.map { stringResource(it.displayValue()) },
                             iconResources = ThemeMode.entries.map { it.iconResource() },
                             weights = listOf(3f, 2f, 2f),
-                            onClick = { newTheme ->
-                                settingsViewModel.setTheme(ThemeMode.valueOf(newTheme.uppercase()))
+                            onClick = { index ->
+                                settingsViewModel.setTheme(ThemeMode.entries[index])
                             }
                         ),
                         SectionItem.Switch(
@@ -174,6 +185,25 @@ fun SettingsScreen(
                 SettingsSection(
                     title = stringResource(R.string.seetings_interface_section_title),
                     items = listOf(
+                        SectionItem.Default(
+                            title = "Language",
+                            displayValue = availableLocales[currentLocale] ?: stringResource(R.string.theme_mode_system),
+                            onClick = {
+                                bottomSheetConfig.value = BottomSheetConfig(
+                                    title = "Select Locale",
+                                    options = availableLocales.values.toList(),
+                                    currentValue = availableLocales[currentLocale] ?: resources.getString(R.string.theme_mode_system),
+                                    onOptionClick = { selectedIndex ->
+                                        currentLocale = availableLocales.keys.toList()[selectedIndex]
+                                        LocaleUtils.setDefaultLocale(currentLocale)
+
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            bottomSheetConfig.value = null
+                                        }
+                                    }
+                                )
+                            }
+                        ),
                         SectionItem.Default(
                             title = stringResource(R.string.settings_track_mode),
                             displayValue = stringResource(settingsState.settings.trackMode.displayValue()),
@@ -244,8 +274,8 @@ fun SettingsScreen(
                             mode = stringResource(settingsState.mangaSettings.chapterUIMode.displayValue()),
                             entries = ChapterUIMode.entries.map { stringResource(it.displayValue()) },
                             iconResources = ChapterUIMode.entries.map { it.iconResource() },
-                            onClick = { newMode ->
-                                settingsViewModel.setChapterUIMode(ChapterUIMode.valueOf(newMode.uppercase()))
+                            onClick = { index ->
+                                settingsViewModel.setChapterUIMode(ChapterUIMode.entries[index])
                             }
                         ),
                         SectionItem.Switch(

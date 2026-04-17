@@ -2,6 +2,7 @@
 
 import com.google.devtools.ksp.KspExperimental
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import kotlin.collections.listOf
 
 plugins {
     alias(libs.plugins.android.application)
@@ -16,6 +17,15 @@ plugins {
 android {
     namespace = "com.example.shikiflow"
     compileSdk = 36
+
+
+    androidResources {
+        localeFilters += listOf(
+            "en",
+            "ru",
+            "uk"
+        )
+    }
 
     defaultConfig {
         applicationId = "com.example.shikiflow"
@@ -101,7 +111,6 @@ secrets {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -189,6 +198,9 @@ dependencies {
 
     //Material Kolor
     implementation(libs.material.kolor)
+
+    //AppCompat
+    implementation(libs.androidx.appcompat)
 
     //Work Manager
     //implementation(libs.androidx.work.runtime.ktx)

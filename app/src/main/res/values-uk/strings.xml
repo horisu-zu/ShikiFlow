@@ -1,0 +1,451 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="auth_sign_in">Ввійти через</string>
+    <string name="auth_features_shiki_integration_label">Інтеграція Shikimori та AniList</string>
+    <string name="auth_features_shiki_integration_desc">
+        Під\'єднайте Ваш наявний акаунт для пошуку, трекінгу та управління аніме та мангою
+    </string>
+    <string name="auth_features_mangadex_integration_label">Інтеграція MangaDex</string>
+    <string name="auth_features_mangadex_integration_desc">
+        Отримайте доступ до широкої бібліотеки манги з багатомовною підтримкою
+    </string>
+    <string name="auth_features_customization_label">Кастомізація застосунку</string>
+    <string name="auth_features_customization_desc">
+        Кастомізуйте вигляд застосунку та читацькі налаштування
+    </string>
+
+    <plurals name="seconds_ago">
+        <item quantity="one">%1$d секунду дому</item>
+        <item quantity="few">%1$d секунди тому</item>
+        <item quantity="many">%1$d секунд тому</item>
+    </plurals>
+    <plurals name="minutes_ago">
+        <item quantity="one">%1$d хвилину тому</item>
+        <item quantity="few">%1$d хвилину тому</item>
+        <item quantity="many">%1$d хвилин тому</item>
+    </plurals>
+    <plurals name="hours_ago">
+        <item quantity="one">%1$d годину тому</item>
+        <item quantity="few">%1$d години тому</item>
+        <item quantity="many">%1$d годин тому</item>
+    </plurals>
+
+    <string name="mtp_loading_error">Помилка завантаження манґи</string>
+    <string name="atp_loading_error">Помилка завантаження аніме</string>
+
+    <string name="b_oss_error">Помилка завантаження онґоінґів</string>
+    <string name="b_mss_error">Помилка завантаження даних категорії "Огляд"</string>
+
+    <string name="media_type_anime">Аніме</string>
+    <string name="media_type_manga">Манґа</string>
+
+    <string name="details_error">Помилка завантаження %1s деталей</string>
+
+    <string name="error_image">Помилка завантаження зображення</string>
+    <string name="common_error">Помилка завантаження даних</string>
+    <string name="common_retry">Повторити</string>
+    <string name="common_unknown">Невідомо</string>
+    <string name="common_note">Нотатка</string>
+
+    <string name="tracker_services_update_title">Оновити відстежуване на всіх під\'єднаних сервісах</string>
+    <string name="tracker_services_update_note">
+        оскільки синхронізація оновлень відстежуваного відбувається за ідентифікатором MAL,
+        деякі запити можуть не виконатися чи викликати невідповідність
+    </string>
+
+    <string name="settings_app_ui_mode">Режим відображення</string>
+    <string name="settings_clear_cache">Очистити кеш зображень</string>
+    <string name="settings_chapter_ui_mode">Режим відображення розділів</string>
+
+    <string name="settings_data_saver_mode">Режим економії трафіку</string>
+    <string name="settings_data_saver_desc">Зменшіть споживання трафіку завантажуючи розділи у нижчій якості</string>
+    <string name="settings_enabled">Увімкнено</string>
+    <string name="settings_disabled">Вимкнено</string>
+
+    <string name="settings_dynamic_theme_label">Динамічна тема</string>
+    <string name="settings_app_theme_label">Тема додатку</string>
+    <string name="settings_app_theme">Тема</string>
+    <string name="settings_oled_theme">OLED тема</string>
+    <string name="settings_oled_desc">Увімкніть OLED режим для темнішого фону</string>
+    <string name="settings_palette_style_label">Стиль палітри</string>
+    <string name="settings_palette_style_desc">Оберіть стиль палітри для динамічної теми</string>
+    <string name="settings_palette_style_bottom_title">Оберіть стиль палітри</string>
+
+    <string name="settings_cache_confirmation">Ви впевнені, що хочете очистити кеш зображень?</string>
+    <string name="settings_cache_size">Розмір кешу</string>
+    <string name="settings_cache_button_label">Очистити</string>
+
+    <string name="settings_account_section_title">Аккаунт</string>
+    <string name="settings_app_mode_select">Оберіть режим UI для відстежуваного</string>
+    <string name="settings_theme_section_title">Тема</string>
+    <string name="seetings_interface_section_title">Інтерфейс</string>
+    <string name="settings_data_section_title">Дані</string>
+    <string name="settings_track_mode">Режим відстежуваного за замовчуванням</string>
+    <string name="settings_track_mode_select">Оберіть режим відстежуваного при відкритті додатку</string>
+    <string name="settings_sign_out">Вийти з акаунту</string>
+    <string name="settings_tracker_services_title">Трекер-сервіси</string>
+    <string name="settings_tracker_services_display">
+        Під\'єднайте Ваш наявний акаунт для оновлення відстежуваного на всіх сервісах за раз
+    </string>
+
+    <string name="next_episode">"Наступний епізод в "</string>
+
+    <string name="browse_on_my_list">В моєму списку</string>
+    <string name="browse_ongoings">Онґоінґи</string>
+    <string name="browse_mode_select">Режим відображення та сортування</string>
+    <string name="ongoing_browse_mode_score">Рейтинг</string>
+    <string name="ongoing_browse_mode_popularity">Популярність</string>
+    <string name="ongoing_browse_mode_aired_on">Дата початку</string>
+    <string name="ongoing_browse_mode_score_shiki">Рейтинг Шикіморі</string>
+    <string name="ongoing_browse_mode_trending">Популярне зараз</string>
+
+    <string name="browse_search_label_media">Медіа</string>
+    <string name="browse_search_label_kind">Тип</string>
+    <string name="browse_search_label_status">Статус</string>
+    <string name="browse_search_label_sort_by">Сортувати за</string>
+    <string name="browse_search_label_age_rating">Рейтинг</string>
+
+    <string name="chapter_ui_mode_page">Сторінка</string>
+    <string name="chapter_ui_mode_scroll">Листання</string>
+
+    <string name="app_ui_mode_list">Список</string>
+    <string name="app_ui_mode_grid">Таблиця</string>
+
+    <string name="theme_mode_system">Системна</string>
+    <string name="theme_mode_light">Світла</string>
+    <string name="theme_mode_dark">Темна</string>
+
+    <string name="cache_size_bytes">%1$d Б</string>
+    <string name="cache_size_kbytes">%.2f КБ</string>
+    <string name="cache_size_mbytes">%.2f МБ</string>
+    <string name="cache_size_gbytes">%.2f ГБ</string>
+    <string name="cache_size_zero_bytes">0 Б</string>
+    <string name="browse_ui_mode_auto">Автоматично</string>
+    <string name="browse_ui_mode_list">Список</string>
+    <string name="browse_ui_mode_grid">Таблиця</string>
+
+    <string name="about_app_github_desc">Репозиторій проєкту</string>
+    <string name="about_app_shikimori_desc">Енциклопедія аніме та манги</string>
+    <string name="about_app_anilist_desc">Платформа трекінгу аніме та манги</string>
+    <string name="about_app_mangadex_desc">Онлайн-платформа для читання манги</string>
+    <string name="version_from">від: %1$s</string>
+    <string name="update_available">Доступне оновлення</string>
+    <string name="update_version">"Версія: "</string>
+    <string name="update_release_notes">Замітки релізу</string>
+    <string name="update_download">Завантажити</string>
+    <string name="release_notes_whats_new">Що нове</string>
+    <string name="release_notes_current_version">Поточна версія: v%1$s</string>
+    <string name="release_notes_latest_version">Остання версія: %1$s</string>
+    <string name="release_notes_release_date">Дата випуску: %1$s</string>
+    <string name="release_notes_update_size">Розмір</string>
+
+    <string name="profile_screen_empty">Профіль %1$s пустий</string>
+    <string name="more_profile_compare">Порівняти</string>
+    <string name="activity_planned">Заплановано</string>
+    <string name="activity_watching">Переглядаю</string>
+    <plurals name="activity_watching_with_progress">
+        <item quantity="one">Переглянуто епізод %1$s</item>
+        <item quantity="few">Переглянуто епізоди %1$s</item>
+        <item quantity="many">Переглянуто епізоди %1$s</item>
+    </plurals>
+    <string name="activity_reading">Читаю</string>
+    <plurals name="activity_reading_with_progress">
+        <item quantity="one">Прочитано розділ %1$s</item>
+        <item quantity="few">Прочитано розділи %1$s</item>
+        <item quantity="many">Прочитано розділи %1$s</item>
+    </plurals>
+    <plurals name="activity_reading_volumes">
+        <item quantity="one">Прочитано том %1$s</item>
+        <item quantity="few">Прочитано томи %1$s</item>
+        <item quantity="many">Прочитано томи %1$s</item>
+    </plurals>
+    <string name="activity_completed">Завершено</string>
+    <string name="activity_rated">Оцінено на %1$d</string>
+    <string name="activity_completed_with_score">Завершено та оцінено на %1$d</string>
+    <string name="activity_changed_score">Змінено оцінку з %1$d на %2$d</string>
+    <string name="activity_rewatching">Переглядаю</string>
+    <string name="activity_rereading">Перечитую</string>
+    <string name="activity_paused_watching">Відкладено перегляд</string>
+    <plurals name="activity_paused_watching_with_progress">
+        <item quantity="one">Відкладено після епізоду %1$s</item>
+        <item quantity="few">Кинуто після перегляду епізодів %1$s</item>
+        <item quantity="many">Кинуто після перегляду епізодів %1$s</item>
+    </plurals>
+    <string name="activity_paused_reading">Відкладено</string>
+    <plurals name="activity_paused_reading_with_progress">
+        <item quantity="one">Відкладено після розділу %1$s</item>
+        <item quantity="few">Відкладено після прочитання розділів %1$s</item>
+        <item quantity="many">Відкладено після прочитання розділів %1$s</item>
+    </plurals>
+    <string name="activity_dropped">Кинуто</string>
+    <plurals name="activity_dropped_watching">
+        <item quantity="one">Кинуто після перегляду епізоду %1$s</item>
+        <item quantity="few">Кинуто після перегляду епізодів %1$s</item>
+        <item quantity="many">Кинуто після перегляду епізодів %1$s</item>
+    </plurals>
+    <plurals name="activity_dropped_reading">
+        <item quantity="one">Кинуто після розділу %1$s</item>
+        <item quantity="few">Кинуто після прочитання розділів %1$s</item>
+        <item quantity="many">Кинуто після прочитання розділів %1$s</item>
+    </plurals>
+
+    <string name="translation_updated_at">Оновлено %1$s</string>
+    <string name="episodes">%1s еп.</string>
+    <string name="episodes_watched">Епізоди: %1s</string>
+    <string name="ongoing_episodes">%1$s з %2$s еп.</string>
+    <string name="translation_filter_all">Усі</string>
+    <string name="translation_filter_voice">Дубляж</string>
+    <string name="translation_filter_subtitles">Субтитри</string>
+    <string name="translation_empty_response">Наразі трансляції недоступні</string>
+
+    <string name ="media_item_episode">Епізод %1s</string>
+    <string name ="media_item_chapter">Розділ %1s</string>
+    <string name="chapters">%1$d р.</string>
+    <string name="volumes">%1$d том.</string>
+
+    <string name="details_info_studio">Студія</string>
+    <string name="details_info_duration">Тривалість</string>
+    <string name="details_info_origin">Джерело</string>
+    <string name="details_info_duration_min">%1$d хв.</string>
+    <string name="details_info_aired_on">Дата початку</string>
+    <string name="details_info_next_episode_at">Наступний епізод в</string>
+    <string name="details_info_released_on">Дата закінчення</string>
+    <string name="details_info_title_romaji">Ромаджі</string>
+    <string name="details_info_title_japanese">Японська</string>
+    <string name="details_info_title_synonyms">Альтернативні назви</string>
+    <string name="details_info_recommendations">Рекомендації</string>
+    <string name="details_info_links">Посилання</string>
+    <string name="details_info_score_stats">Рейтинг</string>
+    <string name="details_info_statuses_stats">Розподіл статусів</string>
+    <string name="details_characters">Персонажі</string>
+    <string name="details_comments">Коментарі</string>
+    <string name="details_short_info_type">Тип</string>
+    <string name="details_short_info_episodes">Епізоди</string>
+    <string name="details_short_info_age_rating">Рейтинг</string>
+    <string name="anime_details_screenshots">Скріншоти</string>
+    <string name="details_short_info_manga_type">Тип</string>
+    <string name="details_short_info_manga_published">Опубліковано</string>
+
+    <!-- Замінити на plurals -->
+    <string name="details_short_info_manga_volumes">Томи</string>
+    <string name="details_short_info_manga_chapters">Розділи</string>
+    <string name="details_short_info_manga_started">Розпочато випуск</string>
+    <string name="details_related">Пов\'язане</string>
+    <string name="details_reviews_section_label">Огляди</string>
+
+    <string name="rate_decrement">-</string>
+    <string name="rate_increment">+</string>
+    <string name="rewatches">Повторні перегляди</string>
+    <string name="rereads">Повторні прочитання</string>
+    <string name="user_rate_add_to_list">Додати до списку</string>
+    <string name="rate_progress">Прогрес</string>
+
+    <string name="tracks_page_search">Пошук…</string>
+    <string name="browse_page_search">Пошук…</string>
+
+    <string name="browse_type_anime_ongoing">Календар онґоінґів</string>
+    <string name="browse_type_search">Пошук</string>
+    <string name="browse_type_top_score">Найкращі</string>
+    <string name="browse_type_popular">Найбільш популярні</string>
+    <string name="day_of_week_monday">Понеділок</string>
+    <string name="day_of_week_tuesday">Вівторок</string>
+    <string name="day_of_week_wednesday">Середа</string>
+    <string name="day_of_week_thursday">Четвер</string>
+    <string name="day_of_week_friday">П\'ятниця</string>
+    <string name="day_of_week_saturday">Субота</string>
+    <string name="day_of_week_sunday">Неділя</string>
+
+    <string name="airing_released">Випущено фінальний епізод</string>
+    <string name="airing_at">"Епізод %1$d транслюється о "</string>
+
+    <string name="bottom_nav_item_main">Головна</string>
+    <string name="bottom_nav_item_browse">Огляд</string>
+    <string name="bottom_nav_item_profile">Профіль</string>
+
+    <string name="chapter_short_title">Розділ %1$s</string>
+
+    <string name="character_title">Персонаж</string>
+    <string name="staff_title">Персонал</string>
+    <string name="works_title">Роботи</string>
+    <string name="details_comments_count">— %1s</string>
+
+    <string name="thread_item_user_replied">" відповів(-ла) "</string>
+    <string name="comment_offtopic">Оффтоп</string>
+    <string name="comment_tree_show_more">Переглянути більше</string>
+
+    <string name="media_user_status_all">Усі</string>
+    <string name="media_user_status_anime_watching">Дивлюся</string>
+    <string name="media_user_status_manga_reading">Читаю</string>
+    <string name="media_user_status_anime_rewatching">Переглядаю</string>
+    <string name="media_user_status_manga_rereading">Перечитую</string>
+    <string name="media_user_status_planned">Заплановано</string>
+    <string name="media_user_status_completed">Завершено</string>
+    <string name="media_user_status_paused">Відкладено</string>
+    <string name="media_user_status_dropped">Кинуто</string>
+    <string name="media_user_status_unknown">Додати до списку</string>
+
+    <string name="media_status_announced">Анонсовано</string>
+    <string name="media_status_ongoing">Онґоінґ</string>
+    <string name="media_status_released">Випущено</string>
+    <string name="media_status_manga_cancelled">Скасовано</string>
+    <string name="media_status_manga_hiatus">Хіатус</string>
+
+    <string name="anime_kind_movie">Фільм</string>
+    <string name="anime_kind_music">Музикальний кліп</string>
+    <string name="anime_kind_special">Спецвипуск</string>
+    <string name="anime_kind_tv_special">TV Спецвипуск</string>
+    <string name="anime_kind_tv_short">Короткий TV епізод</string>
+    <string name="manga_kind_manga">Манґа</string>
+    <string name="manga_kind_manhwa">Манхва</string>
+    <string name="manga_kind_manhua">Маньхуа</string>
+    <string name="manga_kind_light_novel">Ранобе</string>
+    <string name="manga_kind_novel">Новелла</string>
+    <string name="manga_kind_one_shot">Ваншот</string>
+    <string name="manga_kind_doujin">Доджінші</string>
+
+    <string name="relation_kind_adaptation">Адаптація</string>
+    <string name="relation_kind_alternative_setting">Альтернативний сеттінґ</string>
+    <string name="relation_kind_alternative_version">Альтернативна версія</string>
+    <string name="relation_kind_character">Персонаж</string>
+    <string name="relation_kind_full_story">Повна історія</string>
+    <string name="relation_kind_other">Інше</string>
+    <string name="relation_kind_prequel">Приквел</string>
+    <string name="relation_kind_sequel">Сіквел</string>
+    <string name="relation_kind_side_story">Побічна історія</string>
+    <string name="relation_kind_spin_off">Спін-оф</string>
+    <string name="relation_kind_summary">Переказ</string>
+    <string name="relation_kind_source">Джерело</string>
+    <string name="relation_kind_contains">Містить</string>
+    <string name="relation_kind_compilation">Компіляція</string>
+
+    <string name="season_spring">Весна</string>
+    <string name="season_summer">Літо</string>
+    <string name="season_fall">Осінь</string>
+    <string name="season_winter">Зима</string>
+
+    <string name="rating_none">Відсутній</string>
+
+    <string name="anime_origin_original">Оригінал</string>
+    <string name="anime_origin_manga">Манга</string>
+    <string name="anime_origin_web_manga">Веб-манга</string>
+    <string name="anime_origin_4_koma_manga">Йонкома</string>
+    <string name="anime_origin_novel">Новелла</string>
+    <string name="anime_origin_web_novel">Веб-новела</string>
+    <string name="anime_origin_visual_novel">Візуальна новела</string>
+    <string name="anime_origin_light_novel">Ранобе</string>
+    <string name="anime_origin_game">Відеогра</string>
+    <string name="anime_origin_card_game">Карткова гра</string>
+    <string name="anime_origin_music">Кліп</string>
+    <string name="anime_origin_radio">Радіо</string>
+    <string name="anime_origin_book">Книга</string>
+    <string name="anime_origin_picture_book">Книга з картинками</string>
+    <string name="anime_origin_mixed_media">Змішане медіа</string>
+    <string name="anime_origin_other">Інше</string>
+
+    <string name="about_check_updates">Перевірити наявність оновлень</string>
+    <string name="about_checking_updates">Перевірка наявності оновлень…</string>
+    <string name="about_latest_version">Ви використовуєте останню версію</string>
+    <string name="about_latest_error">Помилка перевірки наявності оновлень, спробуйте знову</string>
+
+    <string name="compare_label">Порівняння оцінок користувачів</string>
+    <string name="compare_unique_rates">Унікальні оцінки %1$s\ </string>f
+    <string name="compare_shared_rates">Спільні оцінки</string>
+
+    <string name="translation_chapter_label">Розділ %1$s — %2$s</string>
+
+    <string name="shiki_person_type_seyu">Сейю</string>
+    <string name="shiki_person_type_mangaka">Мангаки</string>
+    <string name="shiki_person_type_producer">Продюсери</string>
+    <string name="shiki_person_type_other">Інші</string>
+
+    <string name="expandable_text_expand">Розгорнути</string>
+    <string name="expandable_text_collapse">Згорнути</string>
+    <string name="track_average_score">Середня оцінка — %1$s</string>
+    <string name="player_skip_opening_label">Пропустити опенінґ</string>
+
+    <string name="similar_media_app_bar_label">Схоже / Рекомендації</string>
+    <string name="similar_media_error">Помилка при завантаженні схожих тайтлів</string>
+
+    <string name="profile_favorites">Обране</string>
+    <string name="favorite_staff">Персонал</string>
+    <string name="favorite_studios">Студії</string>
+
+    <string name="external_links_label">Посилання</string>
+    <string name="browse_order_title">Назва</string>
+    <string name="browse_order_favorites">За обраним</string>
+    <string name="browse_order_date_added">Дата додавання</string>
+    <string name="browse_order_release_date">Дата випуску</string>
+    <string name="browse_order_status">Статус</string>
+    <string name="browse_order_updated_at">Дата оновлення</string>
+    <string name="browse_order_episodes_count">Кількість епізодів</string>
+    <string name="character_role_main">Головний</string>
+    <string name="character_role_supporting">Другорядний</string>
+    <string name="character_role_background">Фоновий</string>
+    <string name="media_character_voice_actor">Сейю</string>
+
+    <string name="role_voice_actor">Сейю</string>
+    <string name="staff_va_roles_label">Ролі сейю</string>
+
+    <string name="details_volumes">Томи</string>
+    <string name="details_info_threads">Обговорення</string>
+
+    <string name="spoiler_label">Спойлер</string>
+    <string name="error_imgur_image">Відкрити зображення Imgur</string>
+    <string name="chapter_list_label">Розділи від того ж локалізатора</string>
+
+    <string name="sort_type_title">Назва</string>
+    <string name="sort_type_relevance">Релевантність</string>
+    <string name="sort_type_role">Роль</string>
+    <string name="sort_type_created_at">Дата створення</string>
+    <string name="sort_type_replied_at">Дата відповіді</string>
+    <string name="sort_type_reply_count">Кількість відповідей</string>
+    <string name="sort_type_view_count">Кількість переглядів</string>
+    <string name="sort_type_updated_at">Дата оновлення</string>
+    <string name="sort_type_progress">Прогрес</string>
+    <string name="sort_direction_ascending">За зростанням</string>
+    <string name="sort_direction_descending">За спаданням</string>
+
+    <string name="user_stats_section_overview">Огляд</string>
+    <string name="user_stats_section_genres">Жанри</string>
+    <string name="user_stats_section_tags">Теги</string>
+    <string name="user_stats_section_voice_actors">Сейю</string>
+    <string name="user_stats_section_studios">Студії</string>
+
+    <string name="stats_bar_type_titles_watched">Переглянуто тайтлів</string>
+    <string name="stats_bar_type_titles_read">Прочитано тайтлів</string>
+    <string name="stats_bar_type_hours_watched">Годин переглянуто</string>
+    <string name="stats_bar_type_chapters_read">Розділів прочитано</string>
+    <string name="stats_bar_type_mean_score">Середня оцінка</string>
+    <string name="overview_stat_title_anime">Тайтлів загалом</string>
+    <string name="overview_stat_title_manga">Тайтлів загалом</string>
+    <string name="overview_stat_episodes_anime">Епізодів переглянуто</string>
+    <string name="overview_stat_chapters_manga">Розділів прочитано</string>
+    <string name="overview_stat_time_anime">Днів переглянуто</string>
+    <string name="overview_stat_volumes_manga">Томів прочитано</string>
+    <string name="overview_stat_planned_anime">Днів заплановано</string>
+    <string name="overview_stat_planned_manga">Розділів заплановано</string>
+    <string name="overview_stat_mean_score">Середня оцінка</string>
+    <string name="overview_stat_standard_deviation">Стандартна девіація</string>
+    <string name="user_stats_length_episode_count">Кількість епізодів</string>
+    <string name="user_stats_length_chapter_count">Кількість розділів</string>
+    <string name="country_japan">Японія</string>
+    <string name="country_south_korea">Південна Корея</string>
+    <string name="country_china">Китай</string>
+    <string name="country_taiwan">Тайвань</string>
+    <string name="user_stats_country">Розподіл за країнами</string>
+    <string name="user_stats_format">Розподіл за форматами</string>
+    <string name="user_stats_release_year">Рік випуску</string>
+    <string name="user_stats_watch_year">Рік перегляду</string>
+    <string name="user_stats_read_year">Рік прочитання</string>
+    <string name="stat_type_count">Кількість</string>
+    <string name="genre_stats_time_anime">Переглянуто часу</string>
+    <string name="stats_empty_label">Недостатньо даних для генерації статистики</string>
+
+    <string name="days_hours">%1$dд %2$dг</string>
+    <string name="social_category_followings">Підписки</string>
+    <string name="social_category_followers">Підписники</string>
+    <string name="social_category_threads">Обговорення</string>
+    <string name="social_category_thread_comments">Коментарі в обговореннях</string>
+
+    <string name="review_author_prefix">"Огляд від "</string>
+</resources>
