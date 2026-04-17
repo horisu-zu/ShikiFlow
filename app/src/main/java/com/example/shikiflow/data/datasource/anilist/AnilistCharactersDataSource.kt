@@ -14,6 +14,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toCharacterMediaRole
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
+import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
@@ -28,7 +29,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistCharactersDataSource @Inject constructor(
-    private val apolloClient: ApolloClient
+    @AnilistApollo private val apolloClient: ApolloClient
 ): CharactersDataSource, BaseNetworkRepository() {
     override suspend fun getCharacterDetails(characterId: Int): Flow<DataResult<MediaCharacter>> {
         val characterQuery = CharacterDetailsQuery(characterId)

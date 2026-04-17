@@ -1,6 +1,5 @@
 package com.example.shikiflow.di.module
 
-import com.apollographql.apollo.ApolloClient
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
@@ -22,127 +21,114 @@ import com.example.shikiflow.data.datasource.shikimori.ShikimoriMediaDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriStaffDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriTracksDataSource
 import com.example.shikiflow.data.datasource.shikimori.ShikimoriUserDataSource
-import com.example.shikiflow.data.remote.AnimeApi
-import com.example.shikiflow.data.remote.CharacterApi
-import com.example.shikiflow.data.remote.CommentApi
-import com.example.shikiflow.data.remote.MangaApi
-import com.example.shikiflow.data.remote.PersonApi
-import com.example.shikiflow.data.remote.UserApi
-import com.example.shikiflow.data.remote.auth.ShikimoriAuthApi
 import com.example.shikiflow.di.annotations.AniList
-import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.di.annotations.Shikimori
-import com.example.shikiflow.di.annotations.ShikimoriApollo
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object DataSourceModule {
+interface DataSourceModule {
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriAuthDataSource(
-        shikiAuthApi: ShikimoriAuthApi
-    ): AuthDataSource = ShikimoriAuthDataSource(shikiAuthApi)
+    fun bindShikimoriAuthDataSource(
+        impl: ShikimoriAuthDataSource
+    ): AuthDataSource
 
     //No need for Auth API cuz I implemented implicit grant
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistAuthDataSource(): AuthDataSource = AnilistAuthDataSource()
+    fun bindAnilistAuthDataSource(
+        impl: AnilistAuthDataSource
+    ): AuthDataSource
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriAnimeTracksDataSource(
-        @ShikimoriApollo apolloClient: ApolloClient,
-        userApi: UserApi
-    ): MediaTracksDataSource = ShikimoriTracksDataSource(apolloClient, userApi)
+    fun bindShikimoriAnimeTracksDataSource(
+        impl: ShikimoriTracksDataSource
+    ): MediaTracksDataSource
 
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistAnimeTracksDataSource(
-        @AnilistApollo apolloClient: ApolloClient
-    ): MediaTracksDataSource = AnilistTracksDataSource(apolloClient)
+    fun bindAnilistAnimeTracksDataSource(
+        impl: AnilistTracksDataSource
+    ): MediaTracksDataSource
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriUserDataSource(
-        @ShikimoriApollo apolloClient: ApolloClient,
-        userApi: UserApi
-    ): UserDataSource = ShikimoriUserDataSource(apolloClient, userApi)
+    fun bindShikimoriUserDataSource(
+        impl: ShikimoriUserDataSource
+    ): UserDataSource
 
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistUserDataSource(
-        @AnilistApollo apolloClient: ApolloClient
-    ): UserDataSource = AnilistUserDataSource(apolloClient)
+    fun bindAnilistUserDataSource(
+        impl: AnilistUserDataSource
+    ): UserDataSource
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriMediaDetailsDataSource(
-        @ShikimoriApollo apolloClient: ApolloClient,
-        animeApi: AnimeApi,
-        mangaApi: MangaApi
-    ): MediaDataSource = ShikimoriMediaDataSource(apolloClient, animeApi, mangaApi)
+    fun bindShikimoriMediaDetailsDataSource(
+        impl: ShikimoriMediaDataSource
+    ): MediaDataSource
 
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistMediaDetailsDataSource(
-        @AnilistApollo apolloClient: ApolloClient
-    ): MediaDataSource = AnilistMediaDataSource(apolloClient)
+    fun bindAnilistMediaDetailsDataSource(
+        impl: AnilistMediaDataSource
+    ): MediaDataSource
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriCharactersDataSource(
-        characterApi: CharacterApi,
-        @ShikimoriApollo apolloClient: ApolloClient
-    ): CharactersDataSource = ShikimoriCharactersDataSource(characterApi, apolloClient)
+    fun bindShikimoriCharactersDataSource(
+        impl: ShikimoriCharactersDataSource
+    ): CharactersDataSource
 
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistCharactersDataSource(
-        @AnilistApollo apolloClient: ApolloClient
-    ): CharactersDataSource = AnilistCharactersDataSource(apolloClient)
+    fun bindAnilistCharactersDataSource(
+        impl: AnilistCharactersDataSource
+    ): CharactersDataSource
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriStaffDataSource(
-        personApi: PersonApi,
-        @ShikimoriApollo apolloClient: ApolloClient
-    ): StaffDataSource = ShikimoriStaffDataSource(personApi, apolloClient)
+    fun bindShikimoriStaffDataSource(
+        impl: ShikimoriStaffDataSource
+    ): StaffDataSource
 
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistStaffDataSource(
-        @AnilistApollo apolloClient: ApolloClient
-    ): StaffDataSource = AnilistStaffDataSource(apolloClient)
+    fun bindAnilistStaffDataSource(
+        impl: AnilistStaffDataSource
+    ): StaffDataSource
 
     @Shikimori
-    @Provides
+    @Binds
     @Singleton
-    fun provideShikimoriCommentsDataSource(
-        commentApi: CommentApi
-    ): CommentsDataSource = ShikimoriCommentsDataSource(commentApi)
+    fun bindShikimoriCommentsDataSource(
+        impl: ShikimoriCommentsDataSource
+    ): CommentsDataSource
 
     @AniList
-    @Provides
+    @Binds
     @Singleton
-    fun provideAnilistCommentsDataSource(
-        @AnilistApollo apolloClient: ApolloClient
-    ): CommentsDataSource = AnilistThreadsDataSource(apolloClient)
+    fun bindAnilistCommentsDataSource(
+        impl: AnilistThreadsDataSource
+    ): CommentsDataSource
 }

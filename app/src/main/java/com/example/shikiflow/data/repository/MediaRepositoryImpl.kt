@@ -5,6 +5,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
+import com.example.shikiflow.di.annotations.AniList
+import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -19,20 +21,16 @@ import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 class MediaRepositoryImpl @Inject constructor(
-    private val anilistDataSource: MediaDataSource,
-    private val shikimoriDataSource: MediaDataSource,
-    private val settingsRepository: SettingsRepository,
-    private val scope: CoroutineScope
+    @AniList private val anilistDataSource: MediaDataSource,
+    @Shikimori private val shikimoriDataSource: MediaDataSource,
+    private val settingsRepository: SettingsRepository
 ): MediaRepository, BaseNetworkRepository() {
 
     private val dataSource = settingsRepository.authTypeFlow
@@ -44,11 +42,6 @@ class MediaRepositoryImpl @Inject constructor(
             }
         }
         .distinctUntilChanged()
-        .shareIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            replay = 1
-        )
 
     override fun getMediaDetails(
         id: Int,

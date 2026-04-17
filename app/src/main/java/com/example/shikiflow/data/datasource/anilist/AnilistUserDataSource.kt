@@ -34,6 +34,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStaffStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStudiosStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toTagsStats
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
+import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -55,10 +56,11 @@ import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
+import javax.inject.Inject
 import kotlin.let
 
-class AnilistUserDataSource(
-    private val apolloClient: ApolloClient
+class AnilistUserDataSource @Inject constructor(
+    @AnilistApollo private val apolloClient: ApolloClient
 ): UserDataSource, BaseNetworkRepository() {
 
     override fun fetchCurrentUser(): Flow<DataResult<User>> {

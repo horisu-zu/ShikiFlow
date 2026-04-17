@@ -13,6 +13,7 @@ import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toCharacterRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.remote.CharacterApi
+import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
 import com.example.shikiflow.domain.model.character.MediaCharacter
@@ -28,7 +29,7 @@ import javax.inject.Inject
 
 class ShikimoriCharactersDataSource @Inject constructor(
     private val characterApi: CharacterApi,
-    private val apolloClient: ApolloClient
+    @ShikimoriApollo private val apolloClient: ApolloClient
 ): CharactersDataSource {
     override suspend fun getCharacterDetails(
         characterId: Int

@@ -1,16 +1,5 @@
 package com.example.shikiflow.di.module
 
-import com.example.shikiflow.data.datasource.AuthDataSource
-import com.example.shikiflow.data.datasource.CharactersDataSource
-import com.example.shikiflow.data.datasource.CommentsDataSource
-import com.example.shikiflow.data.datasource.MediaDataSource
-import com.example.shikiflow.data.datasource.MediaTracksDataSource
-import com.example.shikiflow.data.datasource.StaffDataSource
-import com.example.shikiflow.data.datasource.UserDataSource
-import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.remote.GithubApi
-import com.example.shikiflow.data.remote.KodikApi
-import com.example.shikiflow.data.remote.MangaDexApi
 import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
@@ -21,8 +10,6 @@ import com.example.shikiflow.data.repository.MediaRepositoryImpl
 import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
-import com.example.shikiflow.di.annotations.AniList
-import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
@@ -32,100 +19,74 @@ import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.StaffRepository
-import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.repository.TokenRepository
 import com.example.shikiflow.domain.repository.UserRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object RepositoryModule {
+interface RepositoryModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideAuthRepository(
-        @Shikimori shikiAuthDataSource: AuthDataSource,
-        @AniList anilistAuthDataSource: AuthDataSource,
-        tokenRepository: TokenRepository,
-        settingsRepository: SettingsRepository,
-        appRoomDatabase: AppRoomDatabase
-    ): AuthRepository = AuthRepositoryImpl(shikiAuthDataSource, anilistAuthDataSource, tokenRepository, settingsRepository, appRoomDatabase)
+    fun bindAuthRepository(
+        impl: AuthRepositoryImpl
+    ): AuthRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideMediaTracksRepository(
-        @Shikimori shikimoriTracksDataSource: MediaTracksDataSource,
-        @AniList anilistTracksDataSource: MediaTracksDataSource,
-        settingsRepository: SettingsRepository,
-        appRoomDatabase: AppRoomDatabase,
-        scope: CoroutineScope
-    ): MediaTracksRepository = MediaTracksRepositoryImpl(shikimoriTracksDataSource, anilistTracksDataSource, settingsRepository, appRoomDatabase, scope)
+    fun bindMediaTracksRepository(
+        impl: MediaTracksRepositoryImpl
+    ): MediaTracksRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideMediaDetailsRepository(
-        @Shikimori shikimoriDataSource: MediaDataSource,
-        @AniList anilistDataSource: MediaDataSource,
-        settingsRepository: SettingsRepository,
-        scope: CoroutineScope
-    ): MediaRepository = MediaRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository, scope)
+    fun bindMediaDetailsRepository(
+        impl: MediaRepositoryImpl
+    ): MediaRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideMangaDexRepository(
-        mangaDexApi: MangaDexApi
-    ): MangaDexRepository = MangaDexRepositoryImpl(mangaDexApi)
+    fun bindMangaDexRepository(
+        impl: MangaDexRepositoryImpl
+    ): MangaDexRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideUserRepository(
-        @Shikimori shikimoriUserDataSource: UserDataSource,
-        @AniList anilistUserDataSource: UserDataSource,
-        settingsRepository: SettingsRepository,
-        scope: CoroutineScope
-    ): UserRepository = UserRepositoryImpl(shikimoriUserDataSource, anilistUserDataSource, settingsRepository, scope)
+    fun bindUserRepository(
+        impl: UserRepositoryImpl
+    ): UserRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideCharacterRepository(
-        @Shikimori shikimoriDataSource: CharactersDataSource,
-        @AniList anilistDataSource: CharactersDataSource,
-        settingsRepository: SettingsRepository,
-        scope: CoroutineScope
-    ): CharacterRepository = CharacterRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository, scope)
+    fun bindCharacterRepository(
+        impl: CharacterRepositoryImpl
+    ): CharacterRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideStaffRepository(
-        @Shikimori shikimoriDataSource: StaffDataSource,
-        @AniList anilistDataSource: StaffDataSource,
-        settingsRepository: SettingsRepository,
-        scope: CoroutineScope
-    ): StaffRepository = StaffRepositoryImpl(anilistDataSource, shikimoriDataSource, settingsRepository, scope)
+    fun bindStaffRepository(
+        impl: StaffRepositoryImpl
+    ): StaffRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideCommentRepository(
-        @Shikimori shikimoriDataSource: CommentsDataSource,
-        @AniList anilistDataSource: CommentsDataSource,
-        settingsRepository: SettingsRepository,
-        scope: CoroutineScope
-    ): CommentRepository = CommentRepositoryImpl(shikimoriDataSource, anilistDataSource, settingsRepository, scope)
+    fun bindCommentRepository(
+        impl: CommentRepositoryImpl
+    ): CommentRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideGithubRepository(
-        githubApi: GithubApi
-    ): GithubRepository = GithubRepositoryImpl(githubApi)
+    fun bindGithubRepository(
+        impl: GithubRepositoryImpl
+    ): GithubRepository
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideKodikRepository(
-        kodikApi: KodikApi
-    ): KodikRepository = KodikRepositoryImpl(kodikApi)
+    fun bindKodikRepository(
+        impl: KodikRepositoryImpl
+    ): KodikRepository
 }

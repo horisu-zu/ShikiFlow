@@ -5,8 +5,9 @@ import android.util.Log
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.domain.model.auth.AuthCredentials
+import javax.inject.Inject
 
-class AnilistAuthDataSource: AuthDataSource  {
+class AnilistAuthDataSource @Inject constructor(): AuthDataSource  {
     override fun getAuthorizationUrl(): String {
         return "${BuildConfig.ANILIST_BASE_URL}/api/v2/oauth/authorize" +
                 "?client_id=${BuildConfig.ANILIST_CLIENT_ID}" +

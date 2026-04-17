@@ -20,6 +20,7 @@ import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
+import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
@@ -41,7 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class ShikimoriUserDataSource @Inject constructor(
-    private val apolloClient: ApolloClient,
+    @ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): UserDataSource, BaseNetworkRepository() {
     override fun fetchCurrentUser(): Flow<DataResult<User>> {

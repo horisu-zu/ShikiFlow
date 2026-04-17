@@ -5,6 +5,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
+import com.example.shikiflow.di.annotations.AniList
+import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -25,20 +27,16 @@ import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val shikimoriUserDataSource: UserDataSource,
-    private val anilistUserDataSource: UserDataSource,
-    private val settingsRepository: SettingsRepository,
-    private val scope: CoroutineScope
+    @Shikimori private val shikimoriUserDataSource: UserDataSource,
+    @AniList private val anilistUserDataSource: UserDataSource,
+    private val settingsRepository: SettingsRepository
 ): UserRepository, BaseNetworkRepository() {
 
     private val dataSource = settingsRepository.authTypeFlow
@@ -50,11 +48,6 @@ class UserRepositoryImpl @Inject constructor(
             }
         }
         .distinctUntilChanged()
-        .shareIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            replay = 1
-        )
 
     override fun fetchCurrentUser(authType: AuthType): Flow<DataResult<User>> {
         return when(authType) {

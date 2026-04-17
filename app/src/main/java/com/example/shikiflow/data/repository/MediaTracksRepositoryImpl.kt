@@ -15,6 +15,8 @@ import com.example.shikiflow.data.mapper.local.MediaShortMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
+import com.example.shikiflow.di.annotations.AniList
+import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaShortData
@@ -28,19 +30,17 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class MediaTracksRepositoryImpl @Inject constructor(
-    private val shikimoriTracksDataSource: MediaTracksDataSource,
-    private val anilistTracksDataSource: MediaTracksDataSource,
+    @Shikimori private val shikimoriTracksDataSource: MediaTracksDataSource,
+    @AniList private val anilistTracksDataSource: MediaTracksDataSource,
     private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase,
     private val scope: CoroutineScope
@@ -56,11 +56,6 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
         }
         .distinctUntilChanged()
-        .shareIn(
-            scope = scope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            replay = 1
-        )
 
     override fun getMediaTracks(
         status: UserRateStatus,

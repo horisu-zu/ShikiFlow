@@ -29,6 +29,7 @@ import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatu
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
+import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
@@ -46,7 +47,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AnilistMediaDataSource @Inject constructor(
-    private val apolloClient: ApolloClient
+    @AnilistApollo private val apolloClient: ApolloClient
 ): MediaDataSource, BaseNetworkRepository() {
 
     override fun getMediaDetails(

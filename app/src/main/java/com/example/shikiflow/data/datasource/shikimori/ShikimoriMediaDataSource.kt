@@ -31,6 +31,7 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toBrowse
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toDomain
 import com.example.shikiflow.data.remote.AnimeApi
 import com.example.shikiflow.data.remote.MangaApi
+import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
@@ -47,7 +48,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ShikimoriMediaDataSource @Inject constructor(
-    private val apolloClient: ApolloClient,
+    @ShikimoriApollo private val apolloClient: ApolloClient,
     private val animeApi: AnimeApi,
     private val mangaApi: MangaApi
 ): MediaDataSource, BaseNetworkRepository() {
@@ -125,7 +126,8 @@ class ShikimoriMediaDataSource @Inject constructor(
                     season = Optional.presentIfNotNull(browseOptions.season?.toShikiSeason()),
                     score = Optional.presentIfNotNull(browseOptions.score),
                     genre = Optional.presentIfNotNull(browseOptions.genre),
-                    rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name)
+                    rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name),
+                    censored = Optional.present(true)
                 )
 
                 val response = apolloClient.query(query).execute()
@@ -149,6 +151,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                     status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriMangaStatus()?.name),
                     genre = Optional.presentIfNotNull(browseOptions.genre),
                     score = Optional.presentIfNotNull(browseOptions.score),
+                    censored = Optional.present(true)
                 )
 
                 val response = apolloClient.query(query).execute()

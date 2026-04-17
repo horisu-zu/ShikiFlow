@@ -10,6 +10,7 @@ import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
+import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
@@ -18,7 +19,7 @@ import com.example.shikiflow.utils.AnilistUtils.toResult
 import javax.inject.Inject
 
 class AnilistThreadsDataSource @Inject constructor(
-    private val apolloClient: ApolloClient
+    @AnilistApollo private val apolloClient: ApolloClient
 ): CommentsDataSource {
     override suspend fun getComments(
         topicId: Int,

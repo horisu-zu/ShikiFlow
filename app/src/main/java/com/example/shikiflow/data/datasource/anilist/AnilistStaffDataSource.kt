@@ -22,6 +22,7 @@ import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistCharacterSort
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistStaffSort
+import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.common.StaffMediaRole
@@ -40,7 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistStaffDataSource @Inject constructor(
-    private val apolloClient: ApolloClient
+    @AnilistApollo private val apolloClient: ApolloClient
 ): StaffDataSource, BaseNetworkRepository() {
     override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> {
         return apolloClient

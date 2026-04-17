@@ -15,6 +15,7 @@ import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
+import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -28,7 +29,7 @@ import kotlin.collections.flatMap
 
 @OptIn(ExperimentalPagingApi::class)
 class AnilistTracksDataSource @Inject constructor(
-    private val apolloClient: ApolloClient
+    @AnilistApollo private val apolloClient: ApolloClient
 ): MediaTracksDataSource {
     override suspend fun getMediaTracks(
         page: Int,

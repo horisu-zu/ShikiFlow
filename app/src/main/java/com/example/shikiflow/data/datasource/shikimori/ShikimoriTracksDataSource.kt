@@ -19,6 +19,7 @@ import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.remote.UserApi
+import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain as toMediaDomain
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -32,7 +33,7 @@ import kotlin.collections.map
 
 @OptIn(ExperimentalPagingApi::class)
 class ShikimoriTracksDataSource @Inject constructor(
-    private val apolloClient: ApolloClient,
+    @ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): MediaTracksDataSource {
     override suspend fun getMediaTracks(

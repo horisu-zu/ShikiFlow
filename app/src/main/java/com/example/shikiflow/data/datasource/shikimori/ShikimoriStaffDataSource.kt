@@ -15,6 +15,7 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaff
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toVoiceActorRole
 import com.example.shikiflow.data.remote.PersonApi
+import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.CharacterType
@@ -32,7 +33,7 @@ import javax.inject.Inject
 
 class ShikimoriStaffDataSource @Inject constructor(
     private val staffApi: PersonApi,
-    private val apolloClient: ApolloClient
+    @ShikimoriApollo private val apolloClient: ApolloClient
 ): StaffDataSource {
     override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> = flow {
         emit(DataResult.Loading)
