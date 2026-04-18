@@ -270,4 +270,13 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences.remove(AUTH_TYPE)
         }
     }
+
+    override suspend fun clearUserData(authType: AuthType) {
+        dataStore.edit { preferences ->
+            preferences.remove(userId(authType))
+            preferences.remove(userNickname(authType))
+            preferences.remove(userAvatar(authType))
+            preferences.remove(userBanner(authType))
+        }
+    }
 }

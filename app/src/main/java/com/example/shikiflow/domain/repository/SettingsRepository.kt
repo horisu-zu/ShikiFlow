@@ -42,4 +42,5 @@ interface SettingsRepository {
     suspend fun updateMangaSettings(settings: MangaChapterSettings)
 
     suspend fun clearUserData()
+    suspend fun clearUserData(authType: AuthType)
 }

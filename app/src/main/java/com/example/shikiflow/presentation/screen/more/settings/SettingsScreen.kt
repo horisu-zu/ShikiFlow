@@ -106,10 +106,17 @@ fun SettingsScreen(
                             currentAuthType = settingsState.authType,
                             serviceUpdateState = settingsState.settings.serviceUpdateState,
                             connectedServicesMap = settingsState.connectedServices,
-                            onServiceClick = { authType ->
-                                val authUrl = settingsViewModel.getAuthorizationUrl(authType)
+                            onServiceClick = { authType, connectedUser ->
+                                when(connectedUser) {
+                                    true -> {
+                                        settingsViewModel.clearUserData(authType)
+                                    }
+                                    false -> {
+                                        val authUrl = settingsViewModel.getAuthorizationUrl(authType)
 
-                                context.openActionView(authUrl)
+                                        context.openActionView(authUrl)
+                                    }
+                                }
                             },
                             onServiceUpdateToggle = {
                                 settingsViewModel.setTrackerServiceUpdate(!settingsState.settings.serviceUpdateState)
@@ -186,13 +193,13 @@ fun SettingsScreen(
                     title = stringResource(R.string.seetings_interface_section_title),
                     items = listOf(
                         SectionItem.Default(
-                            title = "Language",
-                            displayValue = availableLocales[currentLocale] ?: stringResource(R.string.theme_mode_system),
+                            title = stringResource(R.string.settings_language_label),
+                            displayValue = availableLocales[currentLocale] ?: stringResource(R.string.settings_language_system),
                             onClick = {
                                 bottomSheetConfig.value = BottomSheetConfig(
-                                    title = "Select Locale",
+                                    title = resources.getString(R.string.settings_language_select),
                                     options = availableLocales.values.toList(),
-                                    currentValue = availableLocales[currentLocale] ?: resources.getString(R.string.theme_mode_system),
+                                    currentValue = availableLocales[currentLocale] ?: resources.getString(R.string.settings_language_system),
                                     onOptionClick = { selectedIndex ->
                                         currentLocale = availableLocales.keys.toList()[selectedIndex]
                                         LocaleUtils.setDefaultLocale(currentLocale)

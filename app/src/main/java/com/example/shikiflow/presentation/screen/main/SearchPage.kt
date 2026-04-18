@@ -59,7 +59,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksSe
 @Composable
 fun SearchPage(
     searchQuery: String,
-    isAtTop: Boolean,
+    isAppBarVisible: Boolean,
     mediaType: MediaType,
     onMediaClick: (MediaType, Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -149,7 +149,7 @@ fun SearchPage(
             PullToRefreshCustomBox(
                 isRefreshing = trackItems.loadState.refresh is LoadState.Loading,
                 onRefresh = { trackItems.refresh() },
-                enabled = isAtTop,
+                enabled = isAppBarVisible,
                 modifier = modifier
             ) {
                 LazyVerticalGrid(

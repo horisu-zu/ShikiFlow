@@ -2,6 +2,7 @@
 
 import com.google.devtools.ksp.KspExperimental
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 import kotlin.collections.listOf
 
 plugins {
@@ -12,6 +13,10 @@ plugins {
     id("com.google.devtools.ksp")
     alias(libs.plugins.compose.compiler)
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
+}
+
+val versionProps = Properties().also {
+    it.load(project.rootProject.file("version.properties").reader())
 }
 
 android {
@@ -31,8 +36,8 @@ android {
         applicationId = "com.example.shikiflow"
         minSdk = 26
         targetSdk = 36
-        versionCode = 19
-        versionName = "0.4.3"
+        versionCode = versionProps.getProperty("code").toInt()
+        versionName = versionProps.getProperty("name")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -43,8 +48,22 @@ android {
     }
 
     buildTypes {
-        release {
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            isDebuggable = true
             isMinifyEnabled = false
+            isShrinkResources = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = false
+            isCrunchPngs = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -59,11 +78,25 @@ android {
         compose = true
         buildConfig = true
     }
+
+    splits {
+        abi {
+            isEnable = true
+            reset()
+            include("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            isUniversalApk = true
+        }
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+base {
+    archivesName = "shikiflow_${versionProps.getProperty("name")}"
 }
 
 kotlin {

@@ -1,11 +1,16 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,7 +18,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -334,7 +338,7 @@ private fun ModeRowItem(
                     )
                 } else Modifier
             )
-            .padding(16.dp),
+            .padding(12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -363,7 +367,7 @@ private fun ServicesItem(
     currentAuthType: AuthType?,
     serviceUpdateState: Boolean,
     connectedServicesMap: Map<AuthType, User>,
-    onServiceClick: (AuthType) -> Unit,
+    onServiceClick: (AuthType, Boolean) -> Unit,
     onServiceUpdateToggle: () -> Unit,
     horizontalPadding: Dp,
     modifier: Modifier = Modifier
@@ -372,10 +376,7 @@ private fun ServicesItem(
         connectedServicesMap.filter { it.key != currentAuthType }
     }
 
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
-    ) {
+    Column(modifier = modifier) {
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium
@@ -388,7 +389,8 @@ private fun ServicesItem(
                     authType = authType,
                     user = servicesMap[authType],
                     onServiceClick = onServiceClick,
-                    horizontalPadding = horizontalPadding
+                    horizontalPadding = horizontalPadding,
+                    modifier = Modifier.padding(top = 8.dp)
                 )
             }
 
@@ -414,7 +416,8 @@ private fun ServicesItem(
         ) {
             TrackerSwitch(
                 serviceUpdateState = serviceUpdateState,
-                onServiceUpdateToggle = onServiceUpdateToggle
+                onServiceUpdateToggle = onServiceUpdateToggle,
+                modifier = Modifier.padding(vertical = 8.dp)
             )
         }
     }
@@ -458,7 +461,7 @@ private fun TrackerSwitch(
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
                 ),
-                maxLines = 4,
+                maxLines = 5,
                 overflow = TextOverflow.Ellipsis
             )
         }
@@ -473,7 +476,7 @@ private fun TrackerSwitch(
 private fun TrackerServiceItem(
     authType: AuthType,
     user: User?,
-    onServiceClick: (AuthType) -> Unit,
+    onServiceClick: (AuthType, Boolean) -> Unit,
     horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
@@ -482,7 +485,7 @@ private fun TrackerServiceItem(
     Row(
         modifier = modifier
             .ignoreHorizontalParentPadding(horizontalPadding)
-            .clickable { onServiceClick(authType) }
+            .clickable { onServiceClick(authType, user != null) }
             .padding(horizontal = horizontalPadding),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
@@ -500,11 +503,31 @@ private fun TrackerServiceItem(
         Text(
             text = stringResource(authType.displayValue()),
             style = MaterialTheme.typography.labelLarge,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
 
-        user?.let {
-            TrackerUserItem(user)
+        AnimatedContent(
+            targetState = user,
+            transitionSpec = {
+                slideInVertically(
+                    initialOffsetY = { height -> -height },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                ) togetherWith fadeOut(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                ) using SizeTransform(clip = false)
+            }
+        ) { targetUser ->
+            if(targetUser != null) {
+                TrackerUserItem(targetUser)
+            }
         }
     }
 }

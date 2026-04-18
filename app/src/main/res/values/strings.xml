@@ -54,6 +54,10 @@
         some requests might not be completed or could cause a mismatch
     </string>
 
+    <string name="settings_language_label">Language</string>
+    <string name="settings_language_system">System</string>
+    <string name="settings_language_select">Select Locale</string>
+
     <string name="settings_app_ui_mode">Display Mode</string>
     <string name="settings_clear_cache">Clear Image Cache</string>
     <string name="settings_chapter_ui_mode">Chapter UI Mode</string>
@@ -100,7 +104,6 @@
     <string name="browse_search_label_media">Media</string>
     <string name="browse_search_label_kind">Kind</string>
     <string name="browse_search_label_status">Status</string>
-    <!--<string name="browse_search_label_in_my_list">In my list</string>-->
     <string name="browse_search_label_sort_by">Sort by</string>
     <string name="browse_search_label_age_rating">Age Rating</string>
 

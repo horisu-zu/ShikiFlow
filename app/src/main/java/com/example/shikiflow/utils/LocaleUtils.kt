@@ -30,7 +30,7 @@ object LocaleUtils {
         }
 
         langs.sortBy { it.second }
-        langs.add(0, Pair("", getString(R.string.theme_mode_system)))
+        langs.add(0, Pair("", getString(R.string.settings_language_system)))
 
         return langs.toMap()
     }

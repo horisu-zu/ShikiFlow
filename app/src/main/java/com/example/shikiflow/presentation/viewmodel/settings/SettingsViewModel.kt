@@ -39,9 +39,7 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.settingsFlow.distinctUntilChanged(),
                 settingsRepository.themeSettingsFlow.distinctUntilChanged(),
                 settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
-                settingsRepository.connectedServicesFlow.distinctUntilChanged { old, new ->
-                    !new.any { (key, value) -> old[key] != value }
-                } //to prevent the data from disappearing from the UI during logout animation
+                settingsRepository.connectedServicesFlow.distinctUntilChanged()
             ) { settings, themeSettings, mangaSettings, connectedServices ->
                 _settingsState.update { state ->
                     state.copy(
@@ -95,6 +93,12 @@ class SettingsViewModel @Inject constructor(
             if (isSuccess) {
                 loadCacheSize()
             }
+        }
+    }
+
+    fun clearUserData(authType: AuthType) {
+        viewModelScope.launch {
+            settingsRepository.clearUserData(authType)
         }
     }
 

@@ -34,7 +34,7 @@
     <string name="atp_loading_error">Ошибка загрузки аниме</string>
 
     <string name="b_oss_error">Ошибка загрузки онгоингов</string>
-    <string name="b_mss_error">Ошибка загрузки данных раздела «Обзор»</string>
+    <string name="b_mss_error">Ошибка загрузки данных</string>
 
     <string name="media_type_anime">Аниме</string>
     <string name="media_type_manga">Манга</string>
@@ -47,11 +47,15 @@
     <string name="common_unknown">Неизвестно</string>
     <string name="common_note">Заметка</string>
 
-    <string name="tracker_services_update_title">Обновить отслеживаемое на всех подключённых сервисах</string>
+    <string name="tracker_services_update_title">Обновлять отслеживаемое на всех подключённых сервисах</string>
     <string name="tracker_services_update_note">
-        из-за особенностей синхронизации обновлений отслеживаемого через MAL ID
-        некоторые запросы могут не выполниться или привести к несоответствию
+        из-за особенностей синхронизации обновлений через MAL ID
+        некоторые запросы могут не выполниться и/или привести к несоответствию
     </string>
+
+    <string name="settings_language_select">Выберите язык</string>
+    <string name="settings_language_label">Язык</string>
+    <string name="settings_language_system">Системный</string>
 
     <string name="settings_app_ui_mode">Режим отображения</string>
     <string name="settings_clear_cache">Очистить кэш изображений</string>
@@ -102,12 +106,11 @@
     <string name="browse_search_label_media">Медиа</string>
     <string name="browse_search_label_kind">Тип</string>
     <string name="browse_search_label_status">Статус</string>
-    <!--<string name="browse_search_label_in_my_list">In my list</string>-->
     <string name="browse_search_label_sort_by">Сортировать по</string>
     <string name="browse_search_label_age_rating">Рейтинг</string>
 
-    <string name="chapter_ui_mode_page">Страница</string>
-    <string name="chapter_ui_mode_scroll">Прокрутка</string>
+    <string name="chapter_ui_mode_page">Постраничный</string>
+    <string name="chapter_ui_mode_scroll">Лента</string>
 
     <string name="app_ui_mode_list">Список</string>
     <string name="app_ui_mode_grid">Сетка</string>
@@ -285,7 +288,7 @@
 
     <string name="media_status_announced">Анонсировано</string>
     <string name="media_status_ongoing">Онгоинг</string>
-    <string name="media_status_released">Выпущено</string>
+    <string name="media_status_released">Вышло</string>
     <string name="media_status_manga_cancelled">Отменено</string>
     <string name="media_status_manga_hiatus">Хиатус</string>
 

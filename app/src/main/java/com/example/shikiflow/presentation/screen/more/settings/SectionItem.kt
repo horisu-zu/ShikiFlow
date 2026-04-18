@@ -37,7 +37,7 @@ sealed interface SectionItem {
         val currentAuthType: AuthType?,
         val serviceUpdateState: Boolean,
         val connectedServicesMap: Map<AuthType, DomainUser>,
-        val onServiceClick: (AuthType) -> Unit,
+        val onServiceClick: (AuthType, Boolean) -> Unit,
         val onServiceUpdateToggle: () -> Unit
     ): SectionItem
 

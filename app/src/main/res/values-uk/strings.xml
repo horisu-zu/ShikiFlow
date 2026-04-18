@@ -9,9 +9,9 @@
     <string name="auth_features_mangadex_integration_desc">
         Отримайте доступ до широкої бібліотеки манги з багатомовною підтримкою
     </string>
-    <string name="auth_features_customization_label">Кастомізація застосунку</string>
+    <string name="auth_features_customization_label">Кастомізація додатку</string>
     <string name="auth_features_customization_desc">
-        Кастомізуйте вигляд застосунку та читацькі налаштування
+        Кастомізуйте вигляд додатку та читацькі налаштування
     </string>
 
     <plurals name="seconds_ago">
@@ -34,7 +34,7 @@
     <string name="atp_loading_error">Помилка завантаження аніме</string>
 
     <string name="b_oss_error">Помилка завантаження онґоінґів</string>
-    <string name="b_mss_error">Помилка завантаження даних категорії "Огляд"</string>
+    <string name="b_mss_error">Помилка завантаження даних</string>
 
     <string name="media_type_anime">Аніме</string>
     <string name="media_type_manga">Манґа</string>
@@ -47,11 +47,15 @@
     <string name="common_unknown">Невідомо</string>
     <string name="common_note">Нотатка</string>
 
-    <string name="tracker_services_update_title">Оновити відстежуване на всіх під\'єднаних сервісах</string>
+    <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
-        оскільки синхронізація оновлень відстежуваного відбувається за ідентифікатором MAL,
+        оскільки синхронізація оновлень відбувається за ідентифікатором MAL,
         деякі запити можуть не виконатися чи викликати невідповідність
     </string>
+
+    <string name="settings_language_label">Мова</string>
+    <string name="settings_language_system">Системна</string>
+    <string name="settings_language_select">Оберіть мову</string>
 
     <string name="settings_app_ui_mode">Режим відображення</string>
     <string name="settings_clear_cache">Очистити кеш зображень</string>
@@ -83,7 +87,7 @@
     <string name="settings_track_mode">Режим відстежуваного за замовчуванням</string>
     <string name="settings_track_mode_select">Оберіть режим відстежуваного при відкритті додатку</string>
     <string name="settings_sign_out">Вийти з акаунту</string>
-    <string name="settings_tracker_services_title">Трекер-сервіси</string>
+    <string name="settings_tracker_services_title">Сервіси трекінгу</string>
     <string name="settings_tracker_services_display">
         Під\'єднайте Ваш наявний акаунт для оновлення відстежуваного на всіх сервісах за раз
     </string>
@@ -105,8 +109,8 @@
     <string name="browse_search_label_sort_by">Сортувати за</string>
     <string name="browse_search_label_age_rating">Рейтинг</string>
 
-    <string name="chapter_ui_mode_page">Сторінка</string>
-    <string name="chapter_ui_mode_scroll">Листання</string>
+    <string name="chapter_ui_mode_page">Посторінковий</string>
+    <string name="chapter_ui_mode_scroll">Стрічка</string>
 
     <string name="app_ui_mode_list">Список</string>
     <string name="app_ui_mode_grid">Таблиця</string>
@@ -226,7 +230,6 @@
     <string name="details_short_info_manga_type">Тип</string>
     <string name="details_short_info_manga_published">Опубліковано</string>
 
-    <!-- Замінити на plurals -->
     <string name="details_short_info_manga_volumes">Томи</string>
     <string name="details_short_info_manga_chapters">Розділи</string>
     <string name="details_short_info_manga_started">Розпочато випуск</string>

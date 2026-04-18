@@ -59,7 +59,7 @@ fun MainScreen(
                     if(isSearchActive) {
                         SearchPage(
                             searchQuery = searchQuery,
-                            isAtTop = scrollBehavior.state.collapsedFraction < 1f,
+                            isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
                             mediaType = trackMode,
                             onMediaClick = { mediaType, id ->
                                 val detailsNavRoute = when(mediaType) {
