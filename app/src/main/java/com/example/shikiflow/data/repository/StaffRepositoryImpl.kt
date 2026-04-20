@@ -28,8 +28,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class StaffRepositoryImpl @Inject constructor(
-    @AniList private val anilistDataSource: StaffDataSource,
-    @Shikimori private val shikimoriDataSource: StaffDataSource,
+    @param:AniList private val anilistDataSource: StaffDataSource,
+    @param:Shikimori private val shikimoriDataSource: StaffDataSource,
     private val settingsRepository: SettingsRepository
 ) : StaffRepository, BaseNetworkRepository() {
 

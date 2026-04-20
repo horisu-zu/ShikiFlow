@@ -9,6 +9,7 @@ import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.ShortUserRateQuery
+import com.example.graphql.anilist.ToggleFavoriteMutation
 import com.example.graphql.anilist.UserActivitiesQuery
 import com.example.graphql.anilist.UserFollowersQuery
 import com.example.graphql.anilist.UserFollowingsQuery
@@ -60,7 +61,7 @@ import javax.inject.Inject
 import kotlin.let
 
 class AnilistUserDataSource @Inject constructor(
-    @AnilistApollo private val apolloClient: ApolloClient
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): UserDataSource, BaseNetworkRepository() {
 
     override fun fetchCurrentUser(): Flow<DataResult<User>> {
@@ -401,5 +402,27 @@ class AnilistUserDataSource @Inject constructor(
                     }
                 } ?: emptyList()
         }
+    }
+
+    override suspend fun toggleFavorite(
+        animeId: Int?,
+        mangaId: Int?,
+        characterId: Int?,
+        staffId: Int?,
+        studioId: Int?
+    ): DataResult<Unit> {
+        val toggleFavoriteMutation = ToggleFavoriteMutation(
+            animeId = Optional.presentIfNotNull(animeId),
+            mangaId = Optional.presentIfNotNull(mangaId),
+            characterId = Optional.presentIfNotNull(characterId),
+            staffId = Optional.presentIfNotNull(staffId),
+            studioId = Optional.presentIfNotNull(studioId)
+        )
+
+        val response = apolloClient.mutation(toggleFavoriteMutation)
+            .execute()
+            .asDataResult { Unit }
+
+        return response
     }
 }

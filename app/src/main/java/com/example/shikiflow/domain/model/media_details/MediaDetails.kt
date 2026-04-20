@@ -36,12 +36,13 @@ data class MediaDetails(
     val origin: MediaOrigin? = null,
     val screenshots: List<String> = emptyList(),
     val userRate: UserMediaRate?,
-    val studios: List<Studio>? = null,
+    val studios: List<StudioShort>? = null,
     val staffList: List<StaffShort> = emptyList(),
     val durationMins: Int? = null,
     val relatedMedia: List<RelatedMedia>,
     val reviews: PaginatedList<ReviewShort> = emptyPaginatedList(),
     val scoreStats: List<Stat<Int>>,
     val statusesStats: List<Stat<UserRateStatus>>,
-    val threadId: Int? = null
+    val threadId: Int? = null,
+    val isFavorite: Boolean? = null
 )

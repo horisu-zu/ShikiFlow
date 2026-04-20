@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.character.details
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,12 +15,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CharacterDetailsViewModel @Inject constructor(
     private val characterRepository: CharacterRepository,
+    private val userRepository: UserRepository,
     settingsRepository: SettingsRepository
 ): UiStateViewModel<CharacterDetailsUiState>() {
 
@@ -34,6 +37,26 @@ class CharacterDetailsViewModel @Inject constructor(
     fun onRefresh() {
         mutableUiState.update { state ->
             state.copy(isRefreshing = true)
+        }
+    }
+
+    fun toggleFavorite(id: Int) {
+        viewModelScope.launch {
+            userRepository.toggleFavorite(characterId = id).let { result ->
+                if(result is DataResult.Success) {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            details = state.details?.copy(
+                                isFavorite = !state.details.isFavorite!!,
+                                favorites = when(state.details.isFavorite) {
+                                    true -> state.details.favorites?.minus(1)
+                                    false -> state.details.favorites?.plus(1)
+                                }
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

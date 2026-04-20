@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.anime.studio
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -8,6 +7,9 @@ import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.presentation.UiStateViewModel
+import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -24,18 +26,21 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class StudioViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
+    private val userRepository: UserRepository,
     settingsRepository: SettingsRepository
-): ViewModel() {
+): UiStateViewModel<StudioUiState>() {
 
     private val _query = MutableStateFlow("")
-    private val _studioParams = MutableStateFlow(StudioParams())
-    val studioParams = _studioParams.asStateFlow()
+    val query = _query.asStateFlow()
+
+    override val initialState: StudioUiState = StudioUiState()
 
     val authType = settingsRepository.authTypeFlow
         .stateIn(
@@ -55,17 +60,56 @@ class StudioViewModel @Inject constructor(
                     }
                 )
             }.launchIn(viewModelScope)
+
+        mutableUiState
+            .filter { state ->
+                state.studioId != null
+            }
+            .distinctUntilChanged { old, new ->
+                old.studioId == new.studioId && !new.isRefreshing
+            }
+            .flatMapLatest { state ->
+                mediaRepository.getStudio(state.studioId!!)
+            }
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    when(result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isLoading = true,
+                                errorMessage = null,
+                                isRefreshing = false
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                studio = result.data,
+                                isLoading = false
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                errorMessage = result.message,
+                                isLoading = false
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 
     val studioTitles = combine(
-        _studioParams.filter { state ->
+        mutableUiState.filter { state ->
             state.studioId != null && state.sortType != null
         },
         _query.debounce(300L)
-    ) { params, query ->
-        params.copy(query = query)
+    ) { state, query ->
+        state.copy(query = query)
     }
-        .distinctUntilChanged()
+        .distinctUntilChanged { old, new ->
+            old.studioId == new.studioId && old.sortType == new.sortType &&
+            old.query == new.query && old.onUserList == new.onUserList
+        }
         .flatMapLatest { state ->
             mediaRepository.getStudioMedia(
                 studioId = state.studioId!!,
@@ -75,16 +119,42 @@ class StudioViewModel @Inject constructor(
             )
         }.cachedIn(viewModelScope)
 
+    fun toggleFavorite(id: Int) {
+        viewModelScope.launch {
+            userRepository.toggleFavorite(studioId = id).let { result ->
+                if(result is DataResult.Success) {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            studio = state.studio?.copy(
+                                isFavorite = !state.studio.isFavorite!!,
+                                favorites = when(state.studio.isFavorite) {
+                                    true -> state.studio.favorites?.minus(1)
+                                    false -> state.studio.favorites?.plus(1)
+                                }
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun onRefresh() {
+        mutableUiState.update { state ->
+            state.copy(isRefreshing = true)
+        }
+    }
+
     fun setStudioId(studioId: Int) {
-        _studioParams.update { state ->
+        mutableUiState.update { state ->
             state.copy(
                 studioId = studioId
             )
         }
     }
 
-    fun onUserListSearchChange(value: Boolean) {
-        _studioParams.update { state ->
+    fun onUserListSearchChange(value: Boolean?) {
+        mutableUiState.update { state ->
             state.copy(
                 onUserList = value
             )
@@ -96,7 +166,7 @@ class StudioViewModel @Inject constructor(
     }
 
     fun setSortType(sortType: SortType) {
-        _studioParams.update { state ->
+        mutableUiState.update { state ->
             state.copy(
                 sortType = sortType
             )

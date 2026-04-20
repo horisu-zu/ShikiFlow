@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.about
 
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -95,7 +96,11 @@ fun AboutAppScreen(
             onDownloadReleaseClick = {
                 WebIntent.openUrlCustomTab(
                     context = context,
-                    url = release.assets.first().downloadUrl
+                    url = (
+                        release.assets.firstOrNull { asset ->
+                            asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
+                        } ?: release.assets.first()
+                    ).downloadUrl
                 )
             },
             showBottomSheet = showBottomSheet.value

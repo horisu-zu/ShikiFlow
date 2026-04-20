@@ -29,13 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
 import coil3.request.ImageRequest
@@ -75,7 +73,10 @@ fun BaseImage(
         contentDescription = contentDescription,
         contentScale = contentScale,
         modifier = modifier
-            .width(imageType.width)
+            .then(
+                if(imageType.width == Dp.Unspecified) Modifier.fillMaxWidth()
+                    else Modifier.width(imageType.width)
+            )
             .aspectRatio(imageType.aspectRatio)
             .clip(imageType.clip)
             .then(
@@ -92,48 +93,6 @@ fun BaseImage(
         },
         error = { error() }
     )
-}
-
-@Composable
-fun GradientImage(
-    model: String?,
-    modifier: Modifier = Modifier,
-    imageType: ImageType = ImageType.Poster(),
-    gradientFraction: Float = 0.3f,
-    gradientColors: List<Color> = listOf(
-        Color.Transparent,
-        MaterialTheme.colorScheme.background
-    ),
-    contentScale: ContentScale = ContentScale.Crop,
-    contentDescription: String? = null
-) {
-    Box(
-        modifier = modifier
-            .clip(imageType.clip)
-    ) {
-        BaseImage(
-            model = model,
-            contentScale = contentScale,
-            contentDescription = contentDescription,
-            imageType = imageType,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Box(
-            modifier = Modifier
-                .matchParentSize()
-                .drawWithCache {
-                    val brush = Brush.verticalGradient(
-                        colors = gradientColors,
-                        startY = 0f,
-                        endY = size.height * gradientFraction
-                    )
-                    onDrawBehind {
-                        drawRect(brush)
-                    }
-                }
-        )
-    }
 }
 
 /*@Composable

@@ -17,13 +17,15 @@ import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.model.staff.StaffShort
 
 object ShikimoriStaffMapper {
-    fun ShikiPerson.toDomain(): StaffDetails {
+    fun ShikiPerson.toStaffDetails(imageUrl: String?): StaffDetails {
         return StaffDetails(
             id = id,
             fullName = name,
             nativeName = japanese,
             description = null,
-            imageUrl = "${BuildConfig.SHIKI_BASE_URL}${image.original}",
+            imageUrl = imageUrl ?: "${BuildConfig.SHIKI_BASE_URL}${image.original}",
+            isFavorite = null,
+            favorites = null,
             birthDate = birthDate?.toLocalDate(),
             shortRoles = groupedRoles?.associateBy { it.role }
                 ?.mapValues { it.value.count } ?: emptyMap(),

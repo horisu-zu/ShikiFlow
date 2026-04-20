@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistStaffDataSource @Inject constructor(
-    @AnilistApollo private val apolloClient: ApolloClient
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): StaffDataSource, BaseNetworkRepository() {
     override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> {
         return apolloClient

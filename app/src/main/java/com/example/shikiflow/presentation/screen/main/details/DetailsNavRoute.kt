@@ -49,7 +49,7 @@ sealed interface DetailsNavRoute : NavKey {
     data class AnimeWatch(val title: String, val shikimoriId: Int, val completedEpisodes: Int) : DetailsNavRoute
 
     @Serializable
-    data class Studio(val id: Int, val studioName: String? = null) : DetailsNavRoute
+    data class Studio(val id: Int, val studioName: String) : DetailsNavRoute
 
     @Serializable
     data class MediaRoles(

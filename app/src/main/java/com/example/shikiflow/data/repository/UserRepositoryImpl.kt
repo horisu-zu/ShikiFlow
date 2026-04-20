@@ -34,8 +34,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    @Shikimori private val shikimoriUserDataSource: UserDataSource,
-    @AniList private val anilistUserDataSource: UserDataSource,
+    @param:Shikimori private val shikimoriUserDataSource: UserDataSource,
+    @param:AniList private val anilistUserDataSource: UserDataSource,
     private val settingsRepository: SettingsRepository
 ): UserRepository, BaseNetworkRepository() {
 
@@ -177,5 +177,15 @@ class UserRepositoryImpl @Inject constructor(
                 }
             ).flow
         }
+    }
+
+    override suspend fun toggleFavorite(
+        animeId: Int?,
+        mangaId: Int?,
+        characterId: Int?,
+        staffId: Int?,
+        studioId: Int?
+    ): DataResult<Unit> = withSourceSuspend(dataSource) { dataSource ->
+        dataSource.toggleFavorite(animeId, mangaId, characterId, staffId, studioId)
     }
 }

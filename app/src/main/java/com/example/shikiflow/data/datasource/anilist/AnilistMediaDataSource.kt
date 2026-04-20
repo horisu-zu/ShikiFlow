@@ -16,6 +16,7 @@ import com.example.graphql.anilist.MediaRecommendationsQuery
 import com.example.graphql.anilist.MediaReviewQuery
 import com.example.graphql.anilist.MediaReviewsQuery
 import com.example.graphql.anilist.StudioBrowseQuery
+import com.example.graphql.anilist.StudioQuery
 import com.example.graphql.anilist.type.MediaSort as ALMediaSort
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.BrowsePagingSource
@@ -28,7 +29,9 @@ import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toAnilistForma
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatus
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistReviewSort
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
+import com.example.shikiflow.data.mapper.common.StudioMapper.toStudio
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
@@ -37,7 +40,10 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.sort.ReviewType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
@@ -47,7 +53,7 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class AnilistMediaDataSource @Inject constructor(
-    @AnilistApollo private val apolloClient: ApolloClient
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): MediaDataSource, BaseNetworkRepository() {
 
     override fun getMediaDetails(
@@ -245,7 +251,8 @@ class AnilistMediaDataSource @Inject constructor(
 
     override fun getMediaReviews(
         mediaId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: Sort<ReviewType>
     ): Flow<PagingData<ReviewShort>> {
         return Pager(
             config = PagingConfig(
@@ -257,7 +264,7 @@ class AnilistMediaDataSource @Inject constructor(
             pagingSourceFactory = {
                 GenericPagingSource<ReviewShort>(
                     method = { page, pageSize ->
-                        paginatedMediaReviews(mediaId, page, pageSize)
+                        paginatedMediaReviews(mediaId, sort, page, pageSize)
                     }
                 )
             }
@@ -266,10 +273,16 @@ class AnilistMediaDataSource @Inject constructor(
 
     suspend fun paginatedMediaReviews(
         mediaId: Int,
+        sort: Sort<ReviewType>,
         page: Int,
         limit: Int
     ): Result<List<ReviewShort>> {
-        val reviewsQuery = MediaReviewsQuery(mediaId, page, limit)
+        val reviewsQuery = MediaReviewsQuery(
+            mediaId = mediaId,
+            sort = sort.toAnilistReviewSort(),
+            page = page,
+            perPage = limit
+        )
 
         val response = apolloClient.query(reviewsQuery).execute()
 
@@ -290,6 +303,18 @@ class AnilistMediaDataSource @Inject constructor(
             .toFlow()
             .asDataResult { data ->
                 data.Review?.aLReview?.toDomain() ?: throw NoSuchElementException("Empty Response")
+            }
+
+        return response
+    }
+
+    override fun getStudio(studioId: Int): Flow<DataResult<Studio>> {
+        val studioQuery = StudioQuery(studioId)
+
+        val response = apolloClient.query(studioQuery)
+            .toFlow()
+            .asDataResult { data ->
+                data.Studio?.aLStudio?.toStudio() ?: throw NoSuchElementException("Empty Response")
             }
 
         return response

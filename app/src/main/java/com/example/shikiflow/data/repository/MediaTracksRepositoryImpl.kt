@@ -39,8 +39,8 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class MediaTracksRepositoryImpl @Inject constructor(
-    @Shikimori private val shikimoriTracksDataSource: MediaTracksDataSource,
-    @AniList private val anilistTracksDataSource: MediaTracksDataSource,
+    @param:Shikimori private val shikimoriTracksDataSource: MediaTracksDataSource,
+    @param:AniList private val anilistTracksDataSource: MediaTracksDataSource,
     private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase,
     private val scope: CoroutineScope

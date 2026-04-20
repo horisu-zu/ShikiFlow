@@ -14,7 +14,7 @@ import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
-import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.common.PaginatedList
@@ -59,7 +59,7 @@ object AnilistMediaMapper {
             },
             origin = source?.toDomain() ?: MediaOrigin.UNKNOWN,
             userRate = mediaListEntry?.aLRateEntry?.toDomain(),
-            studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.toDomain() } ?: emptyList(),
+            studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.toStudioShort() } ?: emptyList(),
             staffList = staff?.edges?.mapNotNull { staffEdge ->
                 staffEdge?.aLStaffEdgeShort?.toDomain()
             }
@@ -95,7 +95,8 @@ object AnilistMediaMapper {
                 )
             }
                 ?.filter { it.value != 0f }
-                .orEmpty()
+                .orEmpty(),
+            isFavorite = isFavourite
         )
     }
 

@@ -57,10 +57,7 @@ fun AnimeDetailsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(
-                        id = R.string.details_error,
-                        R.string.media_type_anime
-                    ),
+                    message = stringResource(id = R.string.details_error),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { animeDetailsViewModel.onRefresh() }
                 )
@@ -104,6 +101,9 @@ fun AnimeDetailsScreen(
                                         saveUserRate = save,
                                         mediaShortData = shortData
                                     )
+                                },
+                                onToggleFavorite = {
+                                    animeDetailsViewModel.toggleFavorite(details.id)
                                 },
                                 mediaNavOptions = navOptions,
                                 modifier = Modifier.padding(

@@ -14,6 +14,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -74,6 +75,8 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -136,6 +139,17 @@ fun StaffScreen(
                             )
                         }
                     },
+                    actions = {
+                        staffUiState.staffDetails?.let { details ->
+                            if(details.favorites != null && details.isFavorite != null) {
+                                ToggleFavoriteButton(
+                                    favoritesCount = details.favorites,
+                                    isFavorite = details.isFavorite,
+                                    onToggle = { staffViewModel.toggleFavorite(details.id) }
+                                )
+                            }
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = if(isAtTop) MaterialTheme.colorScheme.background
                             else MaterialTheme.colorScheme.surfaceContainer
@@ -183,9 +197,24 @@ fun StaffScreen(
                             avatarUrl = details.imageUrl,
                             name = details.fullName,
                             japaneseName = details.nativeName,
-                            staffRoles = details.shortRoles,
-                            modifier = Modifier.height(148.dp)
+                            staffRoles = details.shortRoles
                         )
+                    }
+                    details.description?.let { description ->
+                        item {
+                            ExpandableText(
+                                htmlText = description,
+                                authType = staffUiState.authType,
+                                style = MaterialTheme.typography.bodySmall,
+                                collapsedMaxLines = 4,
+                                onEntityClick = { entityType, id ->
+                                    navOptions.navigateByEntity(entityType, id)
+                                },
+                                onLinkClick = { url ->
+                                    WebIntent.openUrlCustomTab(context, url)
+                                }
+                            )
+                        }
                     }
                     if(details.staffCharacterRoles.entries.isNotEmpty()) {
                         item {
@@ -312,14 +341,13 @@ private fun StaffTitleSection(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
+            .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         //horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
     ) {
         BaseImage(
             model = avatarUrl,
-            imageType = ImageType.Poster(),
-            modifier = Modifier.fillMaxHeight(0.8f)
+            imageType = ImageType.Poster()
         )
 
         Spacer(Modifier.width(16.dp))

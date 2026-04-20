@@ -14,6 +14,24 @@ import kotlinx.coroutines.flow.onStart
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseNetworkRepository {
+    fun <D: Operation.Data, R> ApolloResponse<D>.asDataResult(
+        transform: (D) -> R
+    ) = when {
+        data != null -> DataResult.Success(transform(data!!))
+
+        hasErrors() -> {
+            val errorString = errors?.joinToString { it.message } ?: "Unknown Error"
+            DataResult.Error(message = errorString)
+        }
+
+        exception != null -> {
+            val errorMessage = exception?.message ?: "Unknown Error"
+            DataResult.Error(message = errorMessage)
+        }
+
+        else -> DataResult.Loading
+    }
+
     fun <D : Operation.Data, R> Flow<ApolloResponse<D>>.asDataResult(
         transform: (D) -> R
     ): Flow<DataResult<R>> = this

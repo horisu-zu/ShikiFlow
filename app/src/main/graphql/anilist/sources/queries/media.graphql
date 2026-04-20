@@ -75,6 +75,7 @@ query MediaDetails(
                 ...ALStaffEdgeShort
             }
         }
+        isFavourite
     }
 }
 
@@ -164,7 +165,7 @@ query MediaReviews(
     $mediaId: Int!,
     $page: Int!,
     $perPage: Int!,
-    $sort: ReviewSort = RATING_DESC
+    $sort: ReviewSort!
 ) {
     Media(id: $mediaId) {
         reviews(page: $page, perPage: $perPage, sort: [$sort]) {
@@ -190,5 +191,13 @@ query AiringSchedule(
         ) {
             ...ALAiringAnimeShort
         }
+    }
+}
+
+query Studio(
+    $studioId: Int!
+) {
+    Studio(id: $studioId) {
+        ...ALStudio
     }
 }

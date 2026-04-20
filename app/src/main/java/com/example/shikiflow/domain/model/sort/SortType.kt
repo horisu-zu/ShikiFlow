@@ -88,3 +88,11 @@ enum class CharacterType : SortType {
     override val supportsDirection: Boolean
         get() = this != RELEVANCE
 }
+
+enum class ReviewType : SortType {
+    ID,
+    SCORE,
+    RATING,
+    CREATED_AT,
+    UPDATED_AT
+}

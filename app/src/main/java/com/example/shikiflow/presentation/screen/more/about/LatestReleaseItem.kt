@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.about
 
+import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -81,7 +82,15 @@ fun LatestReleaseItem(
             }
 
             Button(
-                onClick = { onDownloadClick(latestRelease.assets.first().downloadUrl) },
+                onClick = {
+                    onDownloadClick(
+                        (
+                            latestRelease.assets.firstOrNull { asset ->
+                                asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
+                            } ?: latestRelease.assets.first()
+                        ).downloadUrl
+                    )
+                },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary

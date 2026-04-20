@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,9 +69,9 @@ fun CharacterMediaSection(
                 )
             }
         }
+
         SnapFlingLazyRow(
             modifier = Modifier
-                .height(210.dp)
                 .ignoreHorizontalParentPadding(horizontalPadding)
                 .fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = horizontalPadding),
@@ -129,7 +128,7 @@ private fun MediaRoleItem(
             text = mediaItem.title,
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
-            maxLines = 2
+            maxLines = 1
         )
     }
 }

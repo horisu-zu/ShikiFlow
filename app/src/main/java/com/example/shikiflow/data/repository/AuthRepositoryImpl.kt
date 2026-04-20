@@ -15,8 +15,8 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(
-    @Shikimori private val shikiAuthDataSource: AuthDataSource,
-    @AniList private val anilistAuthDataSource: AuthDataSource,
+    @param:Shikimori private val shikiAuthDataSource: AuthDataSource,
+    @param:AniList private val anilistAuthDataSource: AuthDataSource,
     private val tokenRepository: TokenRepository,
     private val settingsRepository: SettingsRepository,
     private val appRoomDatabase: AppRoomDatabase

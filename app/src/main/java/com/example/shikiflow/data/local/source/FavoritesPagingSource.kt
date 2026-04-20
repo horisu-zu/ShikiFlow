@@ -130,7 +130,7 @@ class FavoritesPagingSource(
                 ?.studios
                 ?.nodes
                 ?.mapNotNull { favoriteStudio ->
-                    favoriteStudio?.aLFavoriteStudioShort?.toUserFavorite()
+                    favoriteStudio?.aLStudioShort?.toUserFavorite()
                 } ?: emptyList()
         }
     }

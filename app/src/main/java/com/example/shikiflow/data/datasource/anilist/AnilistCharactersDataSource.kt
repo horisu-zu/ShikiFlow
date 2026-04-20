@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class AnilistCharactersDataSource @Inject constructor(
-    @AnilistApollo private val apolloClient: ApolloClient
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): CharactersDataSource, BaseNetworkRepository() {
     override suspend fun getCharacterDetails(characterId: Int): Flow<DataResult<MediaCharacter>> {
         val characterQuery = CharacterDetailsQuery(characterId)

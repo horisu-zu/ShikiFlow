@@ -61,7 +61,8 @@ fun SharedTransitionScope.FullScreenImageDialog(
                 BaseImage(
                     model = imageUrls[pageIndex],
                     contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxWidth(0.8f)
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
                         .zoomable(rememberZoomState())
                         .then(
                             if(isSelected && !pagerState.isScrollInProgress) {

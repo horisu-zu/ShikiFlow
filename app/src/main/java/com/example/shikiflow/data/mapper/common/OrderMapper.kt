@@ -2,6 +2,7 @@ package com.example.shikiflow.data.mapper.common
 
 import com.example.graphql.anilist.type.CharacterSort
 import com.example.graphql.anilist.type.MediaListSort
+import com.example.graphql.anilist.type.ReviewSort
 import com.example.graphql.anilist.type.StaffSort
 import com.example.graphql.anilist.type.MediaSort as ALMediaSort
 import com.example.graphql.shikimori.type.OrderEnum
@@ -11,6 +12,7 @@ import com.example.graphql.shikimori.type.UserRateOrderInputType
 import com.example.shikiflow.domain.model.sort.CharacterType
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
@@ -104,6 +106,31 @@ object OrderMapper {
             CharacterType.ID -> when(direction) {
                 SortDirection.ASCENDING -> CharacterSort.ID
                 SortDirection.DESCENDING -> CharacterSort.ID_DESC
+            }
+        }
+    }
+
+    fun Sort<ReviewType>.toAnilistReviewSort(): ReviewSort {
+        return when(type) {
+            ReviewType.ID -> when(direction) {
+                SortDirection.ASCENDING -> ReviewSort.ID
+                SortDirection.DESCENDING -> ReviewSort.ID_DESC
+            }
+            ReviewType.SCORE -> when(direction) {
+                SortDirection.ASCENDING -> ReviewSort.SCORE
+                SortDirection.DESCENDING -> ReviewSort.SCORE_DESC
+            }
+            ReviewType.RATING -> when(direction) {
+                SortDirection.ASCENDING -> ReviewSort.RATING
+                SortDirection.DESCENDING -> ReviewSort.RATING_DESC
+            }
+            ReviewType.CREATED_AT -> when(direction) {
+                SortDirection.ASCENDING -> ReviewSort.CREATED_AT
+                SortDirection.DESCENDING -> ReviewSort.CREATED_AT_DESC
+            }
+            ReviewType.UPDATED_AT -> when(direction) {
+                SortDirection.ASCENDING -> ReviewSort.UPDATED_AT
+                SortDirection.DESCENDING -> ReviewSort.UPDATED_AT_DESC
             }
         }
     }

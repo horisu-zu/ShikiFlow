@@ -1,6 +1,9 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,15 +15,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,12 +42,12 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.StarScore
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.AgeRatingMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
+import com.example.shikiflow.utils.foregroundGradient
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 
@@ -52,22 +58,30 @@ fun AnimeDetailsTitle(
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onPlayClick: (String, Int, Int) -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val orientation = LocalConfiguration.current.orientation
     val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
 
     Box(modifier = modifier.fillMaxWidth()) {
-        GradientImage(
+        BaseImage(
             model = animeDetails.coverImageUrl,
-            gradientFraction = 0.9f,
             imageType = ImageType.Poster(
+                width = Int.MAX_VALUE.dp,
                 clip = RoundedCornerShape(0.dp),
                 aspectRatio = if(!isLandscape) 2f / 2.85f
                     else 2.25f
             ),
-            //contentScale = if(isLandscape) ContentScale.FillWidth else ContentScale.Crop,
-            modifier = Modifier.ignoreHorizontalParentPadding(horizontalPadding)
+            modifier = Modifier
+                .ignoreHorizontalParentPadding(horizontalPadding)
+                .foregroundGradient(
+                    gradientColors = listOf(
+                        Color.Transparent,
+                        MaterialTheme.colorScheme.background
+                    ),
+                    gradientFraction = 0.9f
+                )
         )
 
         Row(
@@ -135,12 +149,14 @@ fun AnimeDetailsTitle(
 
                 UserStatusItem(
                     authType = authType,
+                    isFavorite = animeDetails.isFavorite,
                     onStatusClick = onStatusClick,
                     onPlayClick = { onPlayClick(
                         animeDetails.title,
                         animeDetails.id,
                         animeDetails.userRate?.progress ?: 0
                     ) },
+                    onToggleFavorite = onToggleFavorite,
                     status = animeDetails.userRate?.rateStatus,
                     allEpisodes = (
                         if(animeDetails.status == MediaStatus.RELEASED) animeDetails.totalCount
@@ -199,8 +215,10 @@ private fun UserStatusItem(
     allEpisodes: Int,
     watchedEpisodes: Int?,
     score: Int?,
+    isFavorite: Boolean?,
     onStatusClick: () -> Unit,
     onPlayClick: () -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -243,12 +261,8 @@ private fun UserStatusItem(
             )
         }
         if(authType == AuthType.SHIKIMORI) {
-            Box(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
-                    .clickable { onPlayClick() }
-                    .background(MaterialTheme.colorScheme.primaryContainer)
-                    .padding(12.dp)
+            HeaderButton(
+                onClick = onPlayClick
             ) {
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
@@ -257,6 +271,49 @@ private fun UserStatusItem(
                     modifier = Modifier.size(24.dp)
                 )
             }
+        } else if(isFavorite != null) {
+            val iconTint by animateColorAsState(
+                targetValue = when(isFavorite) {
+                    true -> MaterialTheme.colorScheme.error
+                    false -> MaterialTheme.colorScheme.onSurface
+                },
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMediumLow
+                )
+            )
+
+            HeaderButton(
+                onClick = onToggleFavorite
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    tint = iconTint,
+                    contentDescription = "Favorite Icon"
+                )
+            }
         }
+    }
+}
+
+@Composable
+fun HeaderButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(
+                enabled = enabled,
+                onClick = onClick
+            )
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        content()
     }
 }

@@ -19,7 +19,7 @@ import com.example.shikiflow.utils.AnilistUtils.toResult
 import javax.inject.Inject
 
 class AnilistThreadsDataSource @Inject constructor(
-    @AnilistApollo private val apolloClient: ApolloClient
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): CommentsDataSource {
     override suspend fun getComments(
         topicId: Int,

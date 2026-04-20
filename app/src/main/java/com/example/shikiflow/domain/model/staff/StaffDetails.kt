@@ -11,6 +11,8 @@ data class StaffDetails(
     val nativeName: String?,
     val description: String?,
     val imageUrl: String?,
+    val isFavorite: Boolean?,
+    val favorites: Int?,
     val birthDate: LocalDate?,
     val shortRoles: Map<String, Int?>,
     val staffCharacterRoles: PaginatedList<MediaPersonShort>,

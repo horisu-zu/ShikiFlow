@@ -26,8 +26,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CharacterRepositoryImpl @Inject constructor(
-    @Shikimori private val shikimoriDataSource: CharactersDataSource,
-    @AniList private val anilistDataSource: CharactersDataSource,
+    @param:Shikimori private val shikimoriDataSource: CharactersDataSource,
+    @param:AniList private val anilistDataSource: CharactersDataSource,
     private val settingsRepository: SettingsRepository
 ): CharacterRepository, BaseNetworkRepository() {
 

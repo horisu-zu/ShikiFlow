@@ -22,8 +22,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class CommentRepositoryImpl @Inject constructor(
-    @Shikimori private val shikimoriDataSource: CommentsDataSource,
-    @AniList private val anilistDataSource: CommentsDataSource,
+    @param:Shikimori private val shikimoriDataSource: CommentsDataSource,
+    @param:AniList private val anilistDataSource: CommentsDataSource,
     private val settingsRepository: SettingsRepository
 ): CommentRepository, BaseNetworkRepository() {
 

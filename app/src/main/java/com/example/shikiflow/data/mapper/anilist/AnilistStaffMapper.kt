@@ -97,6 +97,8 @@ object AnilistStaffMapper {
             nativeName = name?.native,
             description = description,
             imageUrl = image?.large,
+            isFavorite = isFavourite,
+            favorites = favourites,
             birthDate = dateOfBirth?.date?.toLocalDate(),
             shortRoles = primaryOccupations?.filterNotNull()
                 ?.associateWith { null }

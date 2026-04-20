@@ -14,7 +14,9 @@ query StaffDetails(
         dateOfBirth {
             ...Date
         }
-        description
+        description(asHtml: true)
+        isFavourite
+        favourites
         characters(sort: [FAVOURITES_DESC]) {
             pageInfo {
                 hasNextPage

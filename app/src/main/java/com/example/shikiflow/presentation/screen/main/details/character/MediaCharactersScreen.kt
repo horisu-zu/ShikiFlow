@@ -142,7 +142,8 @@ fun MediaCharactersScreen(
                         val mediaCharacterShort = mediaCharacterItems[index] ?: return@items
 
                         Row(
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             MediaCharacterItem(
                                 mediaPerson = mediaCharacterShort.mediaCharacter,

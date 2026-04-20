@@ -75,6 +75,7 @@ fun AnimeDetailsContent(
     selectedScreenshotIndex: Int?,
     onScreenshotClick: (Int) -> Unit,
     onSaveUserRate: (Int, SaveUserRate, MediaShortData) -> Unit,
+    onToggleFavorite: () -> Unit,
     mediaNavOptions: MediaNavOptions,
     modifier: Modifier = Modifier
 ) {
@@ -101,7 +102,8 @@ fun AnimeDetailsContent(
                 onStatusClick = { rateBottomSheet = true },
                 onPlayClick = { title, id, completedEpisodes ->
                     mediaNavOptions.navigateToAnimeWatch(title, id, completedEpisodes)
-                }
+                },
+                onToggleFavorite = onToggleFavorite
             )
         }
         if(animeDetails.descriptionHtml?.isHTMLStringBlank() != true) {

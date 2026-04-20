@@ -716,7 +716,7 @@ type Query {
 
         # Maximum 50
         limit: PositiveInt = 2
-        ids: [ID!]
+        ids: String
         search: String
     ): [Character!]!
     contests(

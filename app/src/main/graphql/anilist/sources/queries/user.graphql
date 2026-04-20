@@ -255,7 +255,7 @@ query UserFavoriteStudios(
         favourites {
             studios(page: $page, perPage: $limit) {
                 nodes {
-                    ...ALFavoriteStudioShort
+                    ...ALStudioShort
                 }
             }
         }
@@ -320,27 +320,5 @@ query ShortUserRate(
                 ...ALRateEntryShort
             }
         }
-    }
-}
-
-mutation SaveUserRate(
-    $rateEntryId: Int,
-    $mediaId: Int!,
-    $mediaStatus: MediaListStatus!,
-    $progress: Int,
-    $progressVolumes: Int,
-    $repeat: Int,
-    $scoreRaw: Int
-) {
-    SaveMediaListEntry(
-        id: $rateEntryId,
-        mediaId: $mediaId,
-        status: $mediaStatus,
-        progress: $progress,
-        progressVolumes: $progressVolumes,
-        repeat: $repeat,
-        scoreRaw: $scoreRaw
-    ) {
-        ...ALRateEntry
     }
 }

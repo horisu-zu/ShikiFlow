@@ -325,11 +325,6 @@ fragment ALFavoriteStaffShort on Staff {
     }
 }
 
-fragment ALFavoriteStudioShort on Studio {
-    id
-    name
-}
-
 fragment ALPageInfoShort on PageInfo {
     total
 }
@@ -368,6 +363,13 @@ fragment ALAiringEpisodeShort on AiringSchedule {
 fragment ALStudioShort on Studio {
     id
     name
+}
+
+fragment ALStudio on Studio {
+    id
+    name
+    isFavourite
+    favourites
 }
 
 fragment ALRelatedMediaShort on MediaEdge {

@@ -48,7 +48,7 @@ fun MangaDetailsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(id = R.string.details_error, R.string.media_type_manga),
+                    message = stringResource(id = R.string.details_error),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { mangaDetailsViewModel.onRefresh() }
                 )
@@ -74,6 +74,9 @@ fun MangaDetailsScreen(
                                     saveUserRate = save,
                                     mediaShortData = shortData
                                 )
+                            },
+                            onToggleFavorite = {
+                                mangaDetailsViewModel.toggleFavorite(details.id)
                             },
                             modifier = Modifier.padding(
                                 start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),

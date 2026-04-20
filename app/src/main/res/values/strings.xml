@@ -40,7 +40,7 @@
     <string name="media_type_anime">Anime</string>
     <string name="media_type_manga">Manga</string>
 
-    <string name="details_error">Error Loading %1s Details</string>
+    <string name="details_error">Error Loading Media Details</string>
 
     <string name="error_image">Error Loading Image</string>
     <string name="common_error">Error Loading Data</string>
@@ -422,6 +422,7 @@
     <string name="sort_type_view_count">View Count</string>
     <string name="sort_type_updated_at">Updated At</string>
     <string name="sort_type_progress">Progress</string>
+    <string name="review_type_rating">Rating</string>
     <string name="sort_direction_ascending">Ascending</string>
     <string name="sort_direction_descending">Descending</string>
 

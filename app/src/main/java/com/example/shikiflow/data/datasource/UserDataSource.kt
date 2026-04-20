@@ -53,4 +53,12 @@ interface UserDataSource {
         limit: Int,
         nickname: String
     ): Result<List<Browse.User>>
+
+    suspend fun toggleFavorite(
+        animeId: Int? = null,
+        mangaId: Int? = null,
+        characterId: Int? = null,
+        staffId: Int? = null,
+        studioId: Int? = null,
+    ): DataResult<Unit>
 }

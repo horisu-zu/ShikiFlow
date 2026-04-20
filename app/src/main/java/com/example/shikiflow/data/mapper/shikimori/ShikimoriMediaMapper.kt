@@ -17,7 +17,7 @@ import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RatingMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
-import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
@@ -66,7 +66,7 @@ object ShikimoriMediaMapper {
             origin = origin?.toDomain() ?: MediaOrigin.UNKNOWN,
             screenshots = screenshots.map { it.originalUrl },
             userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.ANIME),
-            studios = studios.map { it.toDomain() },
+            studios = studios.map { it.toStudioShort() },
             durationMins = duration,
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             scoreStats = scoresStats?.map { (score, count) ->

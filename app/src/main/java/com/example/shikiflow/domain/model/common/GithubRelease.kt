@@ -15,6 +15,7 @@ data class GithubRelease(
 
 @Serializable
 data class Asset(
+    @SerialName("name") val releaseName: String,
     @SerialName("browser_download_url") val downloadUrl: String,
     @SerialName("size") val size: Long
 )

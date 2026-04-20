@@ -78,24 +78,26 @@ object ShikimoriCharacterMapper {
         )
     }
 
-    fun ShikiCharacter.toDomain(): MediaCharacter {
+    fun ShikiCharacter.toMediaCharacter(imageUrl: String? = null): MediaCharacter {
         return MediaCharacter(
-            id = this.id,
-            fullName = this.name,
-            nativeName = this.japanese,
-            alternativeNames = listOfNotNull(this.altName),
-            imageUrl = BuildConfig.SHIKI_BASE_URL + this.image.original,
-            description = this.descriptionHtml,
-            voiceActors = this.seyu?.map { it.toDomain() } ?: emptyList(),
+            id = id,
+            fullName = name,
+            nativeName = japanese,
+            alternativeNames = listOfNotNull(altName),
+            imageUrl = imageUrl ?: (BuildConfig.SHIKI_BASE_URL + image.original),
+            description = descriptionHtml,
+            isFavorite = favoured,
+            favorites = null,
+            voiceActors = seyu?.map { it.toDomain() } ?: emptyList(),
             animeRoles = PaginatedList(
-                hasNextPage = (this.animes?.size ?: 0) > 24,
-                entries = this.animes?.map { it.toDomain() }.orEmpty()
+                hasNextPage = (animes?.size ?: 0) > 24,
+                entries = animes?.map { it.toDomain() }.orEmpty()
             ),
             mangaRoles = PaginatedList(
-                hasNextPage = (this.mangas?.size ?: 0) > 24,
-                entries = this.mangas?.map { it.toDomain() }.orEmpty()
+                hasNextPage = (mangas?.size ?: 0) > 24,
+                entries = mangas?.map { it.toDomain() }.orEmpty()
             ),
-            topicId = this.topicId
+            topicId = topicId
         )
     }
 

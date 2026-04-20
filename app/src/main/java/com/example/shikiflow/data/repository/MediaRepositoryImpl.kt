@@ -15,7 +15,10 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.sort.ReviewType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.MediaRepository
@@ -28,8 +31,8 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class MediaRepositoryImpl @Inject constructor(
-    @AniList private val anilistDataSource: MediaDataSource,
-    @Shikimori private val shikimoriDataSource: MediaDataSource,
+    @param:AniList private val anilistDataSource: MediaDataSource,
+    @param:Shikimori private val shikimoriDataSource: MediaDataSource,
     private val settingsRepository: SettingsRepository
 ): MediaRepository, BaseNetworkRepository() {
 
@@ -116,10 +119,11 @@ class MediaRepositoryImpl @Inject constructor(
 
     override fun getMediaReviews(
         mediaId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: Sort<ReviewType>
     ): Flow<PagingData<ReviewShort>> {
         return withSource(dataSource) { dataSource ->
-            dataSource.getMediaReviews(mediaId, mediaType)
+            dataSource.getMediaReviews(mediaId, mediaType, sort)
         }
     }
 
@@ -129,6 +133,12 @@ class MediaRepositoryImpl @Inject constructor(
         return withSource(dataSource) { dataSource ->
             dataSource.getReview(reviewId)
         }
+    }
+
+    override fun getStudio(
+        studioId: Int
+    ): Flow<DataResult<Studio>> = withSource(dataSource) { dataSource ->
+        dataSource.getStudio(studioId)
     }
 
     override suspend fun getExternalLinks(

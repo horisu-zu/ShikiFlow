@@ -44,6 +44,7 @@ import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
@@ -92,6 +93,17 @@ fun CharacterDetailsScreen(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back to Main"
                             )
+                        }
+                    },
+                    actions = {
+                        uiState.details?.let { details ->
+                            if(details.favorites != null && details.isFavorite != null) {
+                                ToggleFavoriteButton(
+                                    favoritesCount = details.favorites,
+                                    isFavorite = details.isFavorite,
+                                    onToggle = { characterDetailsViewModel.toggleFavorite(details.id) }
+                                )
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

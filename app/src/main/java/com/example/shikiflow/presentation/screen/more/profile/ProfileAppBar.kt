@@ -28,13 +28,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.DynamicTopAppBar
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.GradientImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.utils.foregroundGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,27 +58,23 @@ fun ProfileAppBar(
         val maxOffsetDp = 52.dp
         val progress = (offsetDp / maxOffsetDp).coerceIn(0f, 1f)
 
-        val avatarImageType = ImageType.Custom(
-            width = lerp(108.dp, 60.dp, progress),
-            aspectRatio = 1f,
-            clip = RoundedCornerShape(percent = 16)
-        )
-
         Box(modifier = Modifier.fillMaxSize()) {
             userData?.profileBannerUrl?.let { profileBanner ->
-                GradientImage(
+                BaseImage(
                     model = profileBanner,
                     contentScale = ContentScale.FillWidth,
                     imageType = ImageType.Screenshot(
-                        width = 0.dp,
+                        width = Dp.Unspecified,
                         clip = RoundedCornerShape(0.dp)
                     ),
-                    gradientFraction = 1f,
-                    gradientColors = listOf(
-                        Color.Transparent,
-                        backgroundColor
-                    ),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .foregroundGradient(
+                            gradientColors = listOf(
+                                Color.Transparent,
+                                backgroundColor
+                            ),
+                            gradientFraction = 1f
+                        )
                 )
             }
             userData?.let {
@@ -93,7 +90,11 @@ fun ProfileAppBar(
                 ) {
                     UserComponent(
                         userData = userData,
-                        imageType = avatarImageType,
+                        imageType = ImageType.Custom(
+                            width = lerp(108.dp, 60.dp, progress),
+                            aspectRatio = 1f,
+                            clip = RoundedCornerShape(percent = 16)
+                        ),
                         backgroundColor = backgroundColor,
                         modifier = Modifier
                             .fillMaxHeight()

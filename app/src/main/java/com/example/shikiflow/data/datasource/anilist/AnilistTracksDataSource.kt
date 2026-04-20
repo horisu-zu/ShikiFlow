@@ -29,7 +29,7 @@ import kotlin.collections.flatMap
 
 @OptIn(ExperimentalPagingApi::class)
 class AnilistTracksDataSource @Inject constructor(
-    @AnilistApollo private val apolloClient: ApolloClient
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): MediaTracksDataSource {
     override suspend fun getMediaTracks(
         page: Int,

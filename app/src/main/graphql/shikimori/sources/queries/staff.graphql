@@ -27,3 +27,13 @@ query StaffSearch(
         ...ShikiStaffShort
     }
 }
+
+query StaffDetails(
+    $ids: [ID!]
+) {
+    people(ids: $ids) {
+        poster {
+            ...PosterShort
+        }
+    }
+}

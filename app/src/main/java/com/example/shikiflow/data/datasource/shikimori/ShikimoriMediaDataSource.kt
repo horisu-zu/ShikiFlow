@@ -23,6 +23,7 @@ import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiMangaKi
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriAnimeStatus
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriMangaStatus
 import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriBrowseOrder
+import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
 import com.example.shikiflow.data.mapper.common.RatingMapper.toShikiRating
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toShikiSeason
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toAiringAnime
@@ -39,16 +40,21 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.sort.ReviewType
+import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.studio.Studio
+import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import javax.inject.Inject
 
 class ShikimoriMediaDataSource @Inject constructor(
-    @ShikimoriApollo private val apolloClient: ApolloClient,
+    @param:ShikimoriApollo private val apolloClient: ApolloClient,
     private val animeApi: AnimeApi,
     private val mangaApi: MangaApi
 ): MediaDataSource, BaseNetworkRepository() {
@@ -302,7 +308,14 @@ class ShikimoriMediaDataSource @Inject constructor(
             limit = Optional.presentIfNotNull(limit),
             search = Optional.presentIfNotNull(search),
             order = Optional.presentIfNotNull(order?.toShikimoriBrowseOrder()),
-            mylist = Optional.presentIfNotNull(onList),
+            mylist = when(onList) {
+                true -> Optional.present(
+                    value = UserRateStatus.entries
+                        .filter { it != UserRateStatus.UNKNOWN }
+                        .joinToString(",") { it.toShikimoriRateStatus().name }
+                )
+                else -> Optional.absent()
+            },
             studio = Optional.presentIfNotNull(studioId.toString())
         )
 
@@ -318,12 +331,17 @@ class ShikimoriMediaDataSource @Inject constructor(
 
     override fun getMediaReviews(
         mediaId: Int,
-        mediaType: MediaType
+        mediaType: MediaType,
+        sort: Sort<ReviewType>
     ): Flow<PagingData<ReviewShort>> {
         TODO("API doesn't provide such a method (not yet, at least)")
     }
 
     override fun getReview(reviewId: Int): Flow<DataResult<Review>> {
         TODO("API doesn't provide such a method (not yet, at least)")
+    }
+
+    override fun getStudio(studioId: Int): Flow<DataResult<Studio>> {
+        return emptyFlow() //No method in the API
     }
 }

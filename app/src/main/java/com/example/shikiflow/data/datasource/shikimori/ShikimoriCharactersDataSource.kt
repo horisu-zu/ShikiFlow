@@ -6,12 +6,15 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
 import com.example.graphql.shikimori.AnimeCharactersQuery
+import com.example.graphql.shikimori.CharacterDetailsQuery
 import com.example.graphql.shikimori.CharacterSearchQuery
 import com.example.graphql.shikimori.MangaCharactersQuery
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toCharacterRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toMediaCharacter
 import com.example.shikiflow.data.remote.CharacterApi
 import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
@@ -23,13 +26,15 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ShikimoriCharactersDataSource @Inject constructor(
     private val characterApi: CharacterApi,
-    @ShikimoriApollo private val apolloClient: ApolloClient
+    @param:ShikimoriApollo private val apolloClient: ApolloClient
 ): CharactersDataSource {
     override suspend fun getCharacterDetails(
         characterId: Int
@@ -37,9 +42,24 @@ class ShikimoriCharactersDataSource @Inject constructor(
         emit(DataResult.Loading)
 
         try{
-            val response = characterApi.getCharacterDetails(characterId.toString()).toDomain()
+            val (apolloCharacter, character) = coroutineScope {
+                val query = CharacterDetailsQuery(ids = Optional.present(characterId.toString()))
+                val apolloResponse = async { apolloClient.query(query).execute() }
 
-            emit(DataResult.Success(response))
+                val response = async { characterApi.getCharacterDetails(characterId.toString()) }
+
+                Pair(apolloResponse.await(), response.await())
+            }
+
+            val mediaCharacter = character.toMediaCharacter(
+                imageUrl = apolloCharacter.data?.characters
+                    ?.firstOrNull()
+                    ?.poster
+                    ?.posterShort
+                    ?.mainUrl
+            )
+
+            emit(DataResult.Success(mediaCharacter))
         } catch (e: Exception) {
             emit(DataResult.Error(e.message ?: "Unknown Error"))
         }
@@ -54,7 +74,8 @@ class ShikimoriCharactersDataSource @Inject constructor(
             object : PagingSource<Int, MediaRole>() {
                 override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaRole> {
                     return try {
-                        val details = characterApi.getCharacterDetails(characterId.toString()).toDomain()
+                        val details = characterApi.getCharacterDetails(characterId.toString())
+                            .toMediaCharacter()
 
                         val mediaRoles = when(mediaType) {
                             MediaType.ANIME -> details.animeRoles.entries

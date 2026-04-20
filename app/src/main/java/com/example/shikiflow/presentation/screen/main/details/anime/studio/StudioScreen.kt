@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -19,10 +20,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -42,6 +47,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -51,7 +57,9 @@ import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.TextWithIcon
+import com.example.shikiflow.presentation.common.TriFilterChip
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.viewmodel.anime.studio.StudioViewModel
 import com.example.shikiflow.utils.IconResource
@@ -60,12 +68,13 @@ import com.example.shikiflow.utils.IconResource
 @Composable
 fun StudioScreen(
     id: Int,
-    studioName: String?,
+    studioName: String,
     onNavigateBack: () -> Unit,
     onMediaNavigate: (Int) -> Unit,
     studioViewModel: StudioViewModel = hiltViewModel()
 ) {
-    val studioState by studioViewModel.studioParams.collectAsStateWithLifecycle()
+    val uiState by studioViewModel.uiState.collectAsStateWithLifecycle()
+    val query by studioViewModel.query.collectAsStateWithLifecycle()
     val authType by studioViewModel.authType.collectAsStateWithLifecycle()
 
     LaunchedEffect(id) {
@@ -91,12 +100,12 @@ fun StudioScreen(
             Column {
                 TopAppBar(
                     title = {
-                        studioName?.let {
-                            Text(
-                                text = studioName,
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
+                        Text(
+                            text = studioName,
+                            style = MaterialTheme.typography.titleLarge,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
                     },
                     //expandedHeight = 48.dp, //IconButton Size
                     navigationIcon = {
@@ -105,6 +114,72 @@ fun StudioScreen(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back"
                             )
+                        }
+                    },
+                    actions = {
+                        uiState.studio?.let { studio ->
+                            if(studio.isFavorite != null && studio.favorites != null) {
+                                ToggleFavoriteButton(
+                                    favoritesCount = studio.favorites,
+                                    isFavorite = studio.isFavorite,
+                                    onToggle = { studioViewModel.toggleFavorite(studio.id) }
+                                )
+                            }
+                        }
+
+                        if(uiState.errorMessage != null) {
+                            IconButton(
+                                onClick = {
+                                    studioViewModel.onRefresh()
+
+                                    if(studioAnimeData.loadState.hasError) {
+                                        studioAnimeData.retry()
+                                    }
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Refresh,
+                                    contentDescription = "Retry Studio"
+                                )
+                            }
+                        }
+
+                        authType?.let { authType ->
+                            when(authType) {
+                                AuthType.SHIKIMORI -> {
+                                    FilterChip(
+                                        selected = uiState.onUserList ?: false,
+                                        label = {
+                                            Text(
+                                                text = stringResource(R.string.browse_on_my_list)
+                                            )
+                                        },
+                                        onClick = {
+                                            studioViewModel.onUserListSearchChange(
+                                                value = !(uiState.onUserList ?: false)
+                                            )
+                                        },
+                                        leadingIcon = if(uiState.onUserList ?: false) {
+                                            {
+                                                Icon(
+                                                    imageVector = Icons.Filled.Done,
+                                                    contentDescription = "Done icon",
+                                                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                                                )
+                                            }
+                                        } else { null }
+                                    )
+                                }
+                                AuthType.ANILIST -> {
+                                    TriFilterChip(
+                                        text = stringResource(R.string.browse_on_my_list),
+                                        value = uiState.onUserList,
+                                        onValueChanged = { onList ->
+                                            studioViewModel.onUserListSearchChange(onList)
+                                        }
+                                    )
+                                }
+                            }
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -117,7 +192,7 @@ fun StudioScreen(
                 authType?.let {
                     if(authType == AuthType.SHIKIMORI) {
                         SearchPanel(
-                            query = studioState.query,
+                            query = query,
                             label = stringResource(R.string.browse_page_search),
                             onQueryChange = studioViewModel::setQuery,
                             modifier = Modifier
@@ -148,7 +223,13 @@ fun StudioScreen(
                     ErrorItem(
                         message = stringResource(id = R.string.common_error),
                         buttonLabel = stringResource(id = R.string.common_retry),
-                        onButtonClick = { studioAnimeData.retry() }
+                        onButtonClick = {
+                            studioAnimeData.retry()
+
+                            if(uiState.errorMessage != null) {
+                                studioViewModel.onRefresh()
+                            }
+                        }
                     )
                 }
             }

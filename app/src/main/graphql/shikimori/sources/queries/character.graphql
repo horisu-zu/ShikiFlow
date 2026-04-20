@@ -1,26 +1,25 @@
 query CharacterDetails(
-    $ids: [ID!]
+    $ids: String
 ) {
     characters(ids: $ids) {
-        id
-        malId
-        name
-        russian
-        japanese
-        synonyms
-        url
-        createdAt
-        updatedAt
-        isAnime
-        isManga
-        isRanobe
+        #id
+        #malId
+        #name
+        #ussian
+        #japanese
+        #synonyms
+        #url
+        #createdAt
+        #updatedAt
+        #isAnime
+        #isManga
+        #isRanobe
 
         poster { ...PosterShort }
 
-        description
-        descriptionHtml
-        descriptionSource
-
+        #description
+        #descriptionHtml
+        #escriptionSource
     }
 }
 

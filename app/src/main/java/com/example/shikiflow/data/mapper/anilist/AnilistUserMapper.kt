@@ -4,9 +4,9 @@ import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.fragment.ALFavoriteCharacterShort
 import com.example.graphql.anilist.fragment.ALFavoriteMediaShort
 import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
-import com.example.graphql.anilist.fragment.ALFavoriteStudioShort
 import com.example.graphql.anilist.fragment.ALListActivity
 import com.example.graphql.anilist.fragment.ALMessageActivity
+import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
 import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
@@ -22,7 +22,7 @@ import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
-import com.example.shikiflow.data.mapper.common.StudioMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -126,7 +126,7 @@ object AnilistUserMapper {
         favoriteCategory = FavoriteCategory.STAFF
     )
 
-    fun ALFavoriteStudioShort.toUserFavorite() = UserFavorite(
+    fun ALStudioShort.toUserFavorite() = UserFavorite(
         id = id,
         name = name,
         favoriteCategory = FavoriteCategory.STUDIO
@@ -455,7 +455,7 @@ object AnilistUserMapper {
         return studios?.mapNotNull { studioStat ->
             studioStat?.studio?.aLStudioShort?.let { studio ->
                 StudioStat(
-                    studioShort = studio.toDomain(),
+                    studioShort = studio.toStudioShort(),
                     count = studioStat.count,
                     meanScore = studioStat.meanScore.toFloat(),
                     timeWatched = studioStat.minutesWatched.minutesToDays(),

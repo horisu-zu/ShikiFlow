@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 class ShikimoriUserDataSource @Inject constructor(
-    @ShikimoriApollo private val apolloClient: ApolloClient,
+    @param:ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): UserDataSource, BaseNetworkRepository() {
     override fun fetchCurrentUser(): Flow<DataResult<User>> {
@@ -241,5 +241,15 @@ class ShikimoriUserDataSource @Inject constructor(
                 )
             }
         }
+    }
+
+    override suspend fun toggleFavorite(
+        animeId: Int?,
+        mangaId: Int?,
+        characterId: Int?,
+        staffId: Int?,
+        studioId: Int?
+    ): DataResult<Unit> {
+        TODO("Not available in the API")
     }
 }

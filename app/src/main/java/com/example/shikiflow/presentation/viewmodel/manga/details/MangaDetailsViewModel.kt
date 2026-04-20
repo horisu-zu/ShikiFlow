@@ -9,6 +9,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.domain.usecase.GetMangaDexUseCase
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
@@ -21,12 +22,14 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MangaDetailsViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
+    private val userRepository: UserRepository,
     private val mediaTracksRepository: MediaTracksRepository,
     private val getMangaDexUseCase: GetMangaDexUseCase,
     settingsRepository: SettingsRepository
@@ -159,6 +162,22 @@ class MangaDetailsViewModel @Inject constructor(
                     state.copy(authType = authType)
                 }
             }.launchIn(viewModelScope)
+    }
+
+    fun toggleFavorite(id: Int) {
+        viewModelScope.launch {
+            userRepository.toggleFavorite(mangaId = id).let { result ->
+                if(result is DataResult.Success) {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            details = state.details?.copy(
+                                isFavorite = !state.details.isFavorite!!
+                            )
+                        )
+                    }
+                }
+            }
+        }
     }
 
     fun saveUserRate(

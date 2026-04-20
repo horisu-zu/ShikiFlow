@@ -33,7 +33,7 @@ import kotlin.collections.map
 
 @OptIn(ExperimentalPagingApi::class)
 class ShikimoriTracksDataSource @Inject constructor(
-    @ShikimoriApollo private val apolloClient: ApolloClient,
+    @param:ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): MediaTracksDataSource {
     override suspend fun getMediaTracks(

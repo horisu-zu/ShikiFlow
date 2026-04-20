@@ -39,7 +39,7 @@
     <string name="media_type_anime">Аниме</string>
     <string name="media_type_manga">Манга</string>
 
-    <string name="details_error">Ошибка загрузки %1s</string>
+    <string name="details_error">Ошибка загрузки данных</string>
 
     <string name="error_image">Ошибка загрузки изображения</string>
     <string name="common_error">Ошибка загрузки данных</string>
@@ -404,6 +404,7 @@
     <string name="sort_type_view_count">Количество просмотров</string>
     <string name="sort_type_updated_at">Дата обновления</string>
     <string name="sort_type_progress">Прогресс</string>
+    <string name="review_type_rating">Рейтинг</string>
     <string name="sort_direction_ascending">По возрастанию</string>
     <string name="sort_direction_descending">По убыванию</string>
 

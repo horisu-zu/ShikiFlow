@@ -43,6 +43,8 @@ query CharacterDetails(
         image {
             large
         }
+        isFavourite
+        favourites
         anime: media(sort: [POPULARITY_DESC], type: ANIME) {
             ...ALCharacterMediaRoles
         }

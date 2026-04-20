@@ -6,12 +6,15 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
 import com.example.graphql.shikimori.AnimeStaffQuery
 import com.example.graphql.shikimori.MangaStaffQuery
+import com.example.graphql.shikimori.StaffDetailsQuery
 import com.example.graphql.shikimori.StaffSearchQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaff
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffDetails
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toVoiceActorRole
 import com.example.shikiflow.data.remote.PersonApi
@@ -27,19 +30,38 @@ import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class ShikimoriStaffDataSource @Inject constructor(
     private val staffApi: PersonApi,
-    @ShikimoriApollo private val apolloClient: ApolloClient
+    @param:ShikimoriApollo private val apolloClient: ApolloClient
 ): StaffDataSource {
     override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> = flow {
         emit(DataResult.Loading)
+
         try {
-            val response = staffApi.getPersonDetails(staffId.toString())
-            emit(DataResult.Success(response.toDomain()))
+            val (apolloStaff, staff) = coroutineScope {
+                val query = StaffDetailsQuery(ids = Optional.present(listOf(staffId.toString())))
+                val apolloResponse = async { apolloClient.query(query).execute() }
+
+                val response = async { staffApi.getPersonDetails(staffId.toString()) }
+
+                Pair(apolloResponse.await(), response.await())
+            }
+
+            val staffDetails = staff.toStaffDetails(
+                imageUrl = apolloStaff.data?.people
+                    ?.firstOrNull()
+                    ?.poster
+                    ?.posterShort
+                    ?.mainUrl
+            )
+
+            emit(DataResult.Success(staffDetails))
         } catch (e: Exception) {
             emit(DataResult.Error(e.message ?: ""))
         }

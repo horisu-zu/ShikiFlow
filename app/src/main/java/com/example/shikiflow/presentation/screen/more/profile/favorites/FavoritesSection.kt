@@ -45,6 +45,7 @@ import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.toTabRowItem
@@ -56,6 +57,7 @@ import kotlinx.coroutines.launch
 fun FavoritesSection(
     userId: Int,
     favoriteCategories: List<FavoriteCategory>,
+    isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
     onFavoriteClick: (FavoriteCategory, Int) -> Unit,
     onStudioClick: (Int, String) -> Unit,
@@ -137,60 +139,67 @@ fun FavoritesSection(
                     }
                 }
                 else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(108.dp),
-                        verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
-                        contentPadding = PaddingValues(
-                            horizontal = horizontalPadding,
-                            vertical = 8.dp
-                        ),
+                    PullToRefreshCustomBox(
+                        isRefreshing = userFavoriteItems.loadState.refresh is LoadState.Loading,
+                        enabled = isRefreshEnabled,
+                        onRefresh = { userFavoriteItems.refresh() },
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = paddingValues.calculateTopPadding())
                     ) {
-                        items(
-                            count = userFavoriteItems.itemCount,
-                            key = { index -> userFavoriteItems[index]?.id ?: index }
-                        ) { index ->
-                            userFavoriteItems[index]?.let { item ->
-                                if(item.favoriteCategory == FavoriteCategory.STUDIO) {
-                                    FavoriteStudioItem(
-                                        id = item.id,
-                                        name = item.name,
-                                        onStudioClick = onStudioClick,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .aspectRatio(1.5f)
-                                    )
-                                } else {
-                                    FavoriteItem(
-                                        userFavorite = item,
-                                        onItemClick = { id ->
-                                            onFavoriteClick(favoriteCategories[page], id)
-                                        },
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
+                        LazyVerticalGrid(
+                            columns = GridCells.Adaptive(108.dp),
+                            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                            contentPadding = PaddingValues(
+                                horizontal = horizontalPadding,
+                                vertical = 8.dp
+                            ),
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            items(
+                                count = userFavoriteItems.itemCount,
+                                key = { index -> userFavoriteItems[index]?.id ?: index }
+                            ) { index ->
+                                userFavoriteItems[index]?.let { item ->
+                                    if(item.favoriteCategory == FavoriteCategory.STUDIO) {
+                                        FavoriteStudioItem(
+                                            id = item.id,
+                                            name = item.name,
+                                            onStudioClick = onStudioClick,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .aspectRatio(1.5f)
+                                        )
+                                    } else {
+                                        FavoriteItem(
+                                            userFavorite = item,
+                                            onItemClick = { id ->
+                                                onFavoriteClick(favoriteCategories[page], id)
+                                            },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
                                 }
                             }
-                        }
 
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            if (userFavoriteItems.loadState.append is LoadState.Loading) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
-                            } else if (userFavoriteItems.loadState.append is LoadState.Error) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    ErrorItem(
-                                        message = stringResource(R.string.common_error),
-                                        buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { userFavoriteItems.retry() }
-                                    )
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                if (userFavoriteItems.loadState.append is LoadState.Loading) {
+                                    Box(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                } else if (userFavoriteItems.loadState.append is LoadState.Error) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { userFavoriteItems.retry() }
+                                        )
+                                    }
                                 }
                             }
                         }

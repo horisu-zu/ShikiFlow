@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiModel
+import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -74,6 +76,7 @@ fun MangaDetailsContent(
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
     onSaveUserRate: (Int, SaveUserRate, MediaShortData) -> Unit,
+    onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var rateBottomSheet by remember { mutableStateOf(false) }
@@ -107,7 +110,8 @@ fun MangaDetailsContent(
                     } else if(mangaDexUiState.errorMessage != null) {
                         onMangaDexRefreshClick()
                     }
-                }
+                },
+                onToggleFavorite = onToggleFavorite
             )
         }
         item {
@@ -128,6 +132,21 @@ fun MangaDetailsContent(
                 )
             }
         }
+
+        item {
+            LazyRow(
+                modifier = Modifier
+                    .ignoreHorizontalParentPadding(horizontalPadding)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(mangaDetails.genres) { genreItem ->
+                    CardItem(genreItem)
+                }
+            }
+        }
+
         if(mangaDetails.characters.entries.isNotEmpty()) {
             item {
                 var maxCardHeight by remember { mutableIntStateOf(0) }
@@ -174,7 +193,8 @@ fun MangaDetailsContent(
                                 onClick = {
                                     mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id)
                                 },
-                                modifier = Modifier.width(characterCardWidth)
+                                modifier = Modifier
+                                    .width(characterCardWidth)
                                     .onSizeChanged { size ->
                                         maxCardHeight = size.height
                                     }

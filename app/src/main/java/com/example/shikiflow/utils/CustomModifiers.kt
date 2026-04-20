@@ -13,7 +13,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -98,6 +101,23 @@ fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
         layout(placeable.width, placeable.height) {
             placeable.place(0, 0)
         }
+    }
+}
+
+fun Modifier.foregroundGradient(
+    gradientColors: List<Color>,
+    startY: Float = 0f,
+    gradientFraction: Float = 0.3f
+) = this.drawWithCache {
+    onDrawWithContent {
+        drawContent()
+        drawRect(
+            brush = Brush.verticalGradient(
+                colors = gradientColors,
+                startY = startY,
+                endY = size.height * gradientFraction
+            )
+        )
     }
 }
 

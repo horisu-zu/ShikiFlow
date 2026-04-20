@@ -11,6 +11,8 @@ data class MediaCharacter(
     val alternativeNames: List<String>,
     val imageUrl: String,
     val description: String?,
+    val favorites: Int?,
+    val isFavorite: Boolean?,
     val voiceActors: List<MediaPersonShort>,
     val animeRoles: PaginatedList<ShortMedia>,
     val mangaRoles: PaginatedList<ShortMedia>,

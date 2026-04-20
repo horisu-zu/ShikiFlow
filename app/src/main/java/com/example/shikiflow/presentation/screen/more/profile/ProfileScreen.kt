@@ -164,6 +164,7 @@ fun ProfileScreenContent(
                             FavoritesSection(
                                 userId = userData.id,
                                 favoriteCategories = uiState.userStatsCategories.favoriteCategories,
+                                isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                 horizontalPadding = horizontalPadding,
                                 onFavoriteClick = { category, id ->
                                     val detailsNavRoute = when(category) {

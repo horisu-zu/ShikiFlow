@@ -55,6 +55,8 @@ object AnilistCharacterMapper {
             alternativeNames = name?.alternativeSpoiler?.mapNotNull { it }.orEmpty(),
             imageUrl = image?.large ?: "",
             description = description,
+            isFavorite = isFavourite,
+            favorites = favourites,
             voiceActors = emptyList(),
             animeRoles = PaginatedList(
                 hasNextPage = anime?.aLCharacterMediaRoles?.pageInfo?.hasNextPage == true,
