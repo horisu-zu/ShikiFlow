@@ -275,7 +275,7 @@ private fun UserStatusItem(
             val iconTint by animateColorAsState(
                 targetValue = when(isFavorite) {
                     true -> MaterialTheme.colorScheme.error
-                    false -> MaterialTheme.colorScheme.onSurface
+                    false -> MaterialTheme.colorScheme.onPrimaryContainer
                 },
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,

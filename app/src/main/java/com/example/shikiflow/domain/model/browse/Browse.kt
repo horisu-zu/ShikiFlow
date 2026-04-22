@@ -2,7 +2,10 @@ package com.example.shikiflow.domain.model.browse
 
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
+import com.example.shikiflow.domain.model.media_details.MediaSeason
+import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.MediaFormat
@@ -17,10 +20,17 @@ import kotlin.time.Instant
 sealed interface BrowseType {
     val mediaType: MediaType
     val sort: MediaSort
+    val status: MediaStatus?
+    val season: MediaSeason?
+    val countryOfOrigin: CountryOfOrigin?
 
     enum class AnimeBrowseType: BrowseType {
         ANIME_TOP,
         ANIME_POPULARITY,
+        TRENDING_NOW,
+        POPULAR_THIS_SEASON,
+        UPCOMING_NEXT_SEASON,
+        NEWLY_ADDED,
         ONGOING;
 
         override val mediaType: MediaType
@@ -28,23 +38,95 @@ sealed interface BrowseType {
 
         override val sort: MediaSort
             get() = when(this) {
-                ONGOING, ANIME_TOP-> MediaSort.Common.SCORE
-                ANIME_POPULARITY -> MediaSort.Common.POPULARITY
+                ONGOING, ANIME_TOP -> MediaSort.Common.SCORE
+                ANIME_POPULARITY,
+                POPULAR_THIS_SEASON,
+                UPCOMING_NEXT_SEASON-> MediaSort.Common.POPULARITY
+                TRENDING_NOW -> MediaSort.Anilist.TRENDING
+                NEWLY_ADDED -> MediaSort.Anilist.DATE_ADDED
             }
+
+        //Added Announced for Newly Added titles cuz API isn't consistent and older titles may have higher ID
+        override val status: MediaStatus?
+            get() = when(this) {
+                POPULAR_THIS_SEASON,
+                ONGOING -> MediaStatus.ONGOING
+                UPCOMING_NEXT_SEASON,
+                NEWLY_ADDED -> MediaStatus.ANNOUNCED
+                else -> null
+            }
+
+        override val season: MediaSeason?
+            get() = when(this) {
+                POPULAR_THIS_SEASON -> MediaSeason.currentSeason()
+                UPCOMING_NEXT_SEASON -> MediaSeason.nextSeason()
+                else -> null
+            }
+
+        override val countryOfOrigin: CountryOfOrigin?
+            get() = null
+
+        companion object {
+            val navEntries: List<AnimeBrowseType> = listOf(
+                ANIME_TOP,
+                ANIME_POPULARITY,
+                ONGOING
+            )
+
+            val alSections: List<AnimeBrowseType> = listOf(
+                TRENDING_NOW,
+                POPULAR_THIS_SEASON,
+                UPCOMING_NEXT_SEASON,
+                NEWLY_ADDED
+            )
+        }
     }
 
     enum class MangaBrowseType: BrowseType {
         MANGA_TOP,
-        MANGA_POPULARITY;
+        MANGA_POPULARITY,
+        TRENDING_NOW,
+        POPULAR_MANHWA,
+        NEWLY_ADDED;
 
         override val mediaType: MediaType
             get() = MediaType.MANGA
 
         override val sort: MediaSort
             get() = when(this) {
-                MANGA_TOP-> MediaSort.Common.SCORE
-                MANGA_POPULARITY -> MediaSort.Common.POPULARITY
+                MANGA_TOP -> MediaSort.Common.SCORE
+                MANGA_POPULARITY, POPULAR_MANHWA -> MediaSort.Common.POPULARITY
+                TRENDING_NOW -> MediaSort.Anilist.TRENDING
+                NEWLY_ADDED -> MediaSort.Anilist.DATE_ADDED
             }
+
+        override val status: MediaStatus?
+            get() = when(this) {
+                NEWLY_ADDED -> MediaStatus.ANNOUNCED
+                else -> null
+            }
+
+        override val season: MediaSeason?
+            get() = null
+
+        override val countryOfOrigin: CountryOfOrigin?
+            get() = when(this) {
+                POPULAR_MANHWA -> CountryOfOrigin.SOUTH_KOREA
+                else -> null
+            }
+
+        companion object {
+            val navEntries: List<MangaBrowseType> = listOf(
+                MANGA_TOP,
+                MANGA_POPULARITY
+            )
+
+            val alSections: List<MangaBrowseType> = listOf(
+                TRENDING_NOW,
+                POPULAR_MANHWA,
+                NEWLY_ADDED
+            )
+        }
     }
 }
 

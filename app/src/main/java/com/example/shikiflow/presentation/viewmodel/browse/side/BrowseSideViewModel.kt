@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BrowseSideViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
-    private val settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _params = MutableStateFlow(BrowseSideParams())
@@ -46,7 +46,9 @@ class BrowseSideViewModel @Inject constructor(
             mediaRepository.paginatedBrowseMedia(
                 browseOptions = MediaBrowseOptions(
                     mediaType = params.browseType?.mediaType!!,
-                    order = params.browseType.sort
+                    order = params.browseType.sort,
+                    status = params.browseType.status,
+                    season = params.browseType.season
                 )
             )
         }.cachedIn(viewModelScope)

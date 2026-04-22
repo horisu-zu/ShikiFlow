@@ -107,7 +107,7 @@ fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
 fun Modifier.foregroundGradient(
     gradientColors: List<Color>,
     startY: Float = 0f,
-    gradientFraction: Float = 0.3f
+    gradientFraction: Float = 1f
 ) = this.drawWithCache {
     onDrawWithContent {
         drawContent()

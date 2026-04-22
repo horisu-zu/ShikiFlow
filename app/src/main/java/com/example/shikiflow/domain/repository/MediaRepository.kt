@@ -25,8 +25,8 @@ interface MediaRepository {
     ): Flow<PagingData<BrowseMedia>>
 
     suspend fun browseMedia(
-        page: Int,
-        size: Int,
+        page: Int = 1,
+        size: Int = 24,
         browseOptions: MediaBrowseOptions
     ): Result<List<BrowseMedia>>
 

@@ -244,6 +244,12 @@
     <string name="browse_type_search">Search</string>
     <string name="browse_type_top_score">Top Score</string>
     <string name="browse_type_popular">Top Popular</string>
+    <string name="browse_type_trending_now">Trending Now</string>
+    <string name="browse_type_popular_this_season">Popular This Season</string>
+    <string name="browse_type_upcoming_next_season">Upcoming Next Season</string>
+    <string name="browse_type_popular_manhwa">Popular Manhwa</string>
+    <string name="browse_type_newly_added">Newly Added</string>
+
     <string name="day_of_week_monday">Monday</string>
     <string name="day_of_week_tuesday">Tuesday</string>
     <string name="day_of_week_wednesday">Wednesday</string>

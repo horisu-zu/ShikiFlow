@@ -1,15 +1,11 @@
 package com.example.shikiflow.presentation.screen.browse
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,29 +13,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.BrowseMedia
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
+import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.CardItem
-import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.mappers.ColorMapper.color
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.utils.Converter
-import com.example.shikiflow.utils.toIcon
-import com.materialkolor.ktx.harmonize
 
 @Composable
 fun BrowseListItem(
@@ -134,55 +121,6 @@ fun BrowseListItem(
                         }
                     },
                     style = MaterialTheme.typography.labelMedium
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun BrowseCoverItem(
-    posterUrl: String?,
-    mediaType: MediaType,
-    userRateStatus: UserRateStatus?,
-    coverWidth: Dp,
-    cornerShape: Dp,
-    modifier: Modifier = Modifier,
-    onClick: (() -> Unit)? = null,
-) {
-    Box(
-        modifier = modifier
-    ) {
-        BaseImage(
-            model = posterUrl,
-            contentScale = ContentScale.Crop,
-            imageType = ImageType.Poster(
-                width = coverWidth,
-                clip = RoundedCornerShape(cornerShape)
-            ),
-            onClick = onClick
-        )
-        userRateStatus ?.let { status ->
-            Box(
-                modifier = Modifier.align(Alignment.BottomEnd)
-                    .clip(
-                        shape = RoundedCornerShape(
-                            bottomEnd = cornerShape,
-                            bottomStart = 0.dp,
-                            topEnd = 0.dp,
-                            topStart = 18.dp
-                        )
-                    )
-                    .background(
-                        color = status.color().harmonize(MaterialTheme.colorScheme.background)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                userRateStatus.icon(mediaType).toIcon(
-                    modifier = Modifier
-                        .padding(all = 6.dp)
-                        .size(24.dp),
-                    tint = Color.White
                 )
             }
         }

@@ -50,9 +50,6 @@ fun BrowseScreenNavigator(
                 BrowseScreen(
                     browseNavOptions = browseNavOptions
                 )
-                /*BrowseScreen(
-                    browseNavOptions = browseNavOptions
-                )*/
             }
             entry<BrowseNavRoute.SideScreen> { route ->
                 BrowseSideScreen(
@@ -80,10 +77,10 @@ fun BrowseScreenNavigator(
                     stiffness = Spring.StiffnessLow
                 )
             ) togetherWith fadeOut(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioNoBouncy,
-                        stiffness = Spring.StiffnessLow
-                    )
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
             )
         },
         popTransitionSpec = {

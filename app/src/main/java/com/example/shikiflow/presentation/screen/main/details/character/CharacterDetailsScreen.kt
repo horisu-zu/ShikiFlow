@@ -46,6 +46,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
@@ -148,7 +149,7 @@ fun CharacterDetailsScreen(
                         top = 8.dp,
                         bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
                     ),
-                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                 ) {
                     item {
                         CharacterTitleSection(
@@ -175,20 +176,29 @@ fun CharacterDetailsScreen(
                     }
                     if(!characterDetails.voiceActors.isEmpty()) {
                         item {
-                            SnapFlingLazyRow(
-                                modifier = Modifier
-                                    .ignoreHorizontalParentPadding(horizontalPadding)
-                                    .fillMaxWidth(),
-                                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                             ) {
-                                items(items = characterDetails.voiceActors) { vaItem ->
-                                    CharacterCard(
-                                        characterPoster = vaItem.imageUrl,
-                                        characterName = vaItem.fullName,
-                                        onClick = { navOptions.navigateToStaff(vaItem.id) },
-                                        modifier = Modifier.width(96.dp)
-                                    )
+                                TextWithDivider(
+                                    text = stringResource(R.string.user_stats_section_voice_actors),
+                                    style = MaterialTheme.typography.titleMedium
+                                )
+
+                                SnapFlingLazyRow(
+                                    modifier = Modifier
+                                        .ignoreHorizontalParentPadding(horizontalPadding)
+                                        .fillMaxWidth(),
+                                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    items(items = characterDetails.voiceActors) { vaItem ->
+                                        CharacterCard(
+                                            characterPoster = vaItem.imageUrl,
+                                            characterName = vaItem.fullName,
+                                            onClick = { navOptions.navigateToStaff(vaItem.id) },
+                                            modifier = Modifier.width(96.dp)
+                                        )
+                                    }
                                 }
                             }
                         }

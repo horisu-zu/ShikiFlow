@@ -38,8 +38,8 @@ object OrderMapper {
                 SortDirection.DESCENDING -> ALMediaSort.FAVOURITES_DESC
             }
             MediaSort.Anilist.DATE_ADDED -> when(direction) {
-                SortDirection.ASCENDING -> ALMediaSort.START_DATE
-                SortDirection.DESCENDING -> ALMediaSort.START_DATE_DESC
+                SortDirection.ASCENDING -> ALMediaSort.ID
+                SortDirection.DESCENDING -> ALMediaSort.ID_DESC
             }
             MediaSort.Anilist.RELEASE_DATE -> when(direction) {
                 SortDirection.ASCENDING -> ALMediaSort.END_DATE
@@ -182,7 +182,7 @@ object OrderMapper {
             MediaSort.Common.SCORE -> ALMediaSort.SCORE_DESC
             MediaSort.Anilist.TRENDING -> ALMediaSort.TRENDING_DESC
             MediaSort.Anilist.FAVORITES -> ALMediaSort.FAVOURITES_DESC
-            MediaSort.Anilist.DATE_ADDED -> ALMediaSort.START_DATE_DESC
+            MediaSort.Anilist.DATE_ADDED -> ALMediaSort.ID_DESC
             MediaSort.Anilist.RELEASE_DATE -> ALMediaSort.END_DATE_DESC
             else -> ALMediaSort.UNKNOWN__
         }

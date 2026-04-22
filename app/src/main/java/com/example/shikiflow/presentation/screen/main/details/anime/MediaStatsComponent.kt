@@ -99,7 +99,7 @@ private fun ColumnMediaStats(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        if(!isAnnounced && titleScore != null) {
+        if(!isAnnounced && (titleScore != null && titleScore != 0.0f)) {
             ScoreStatsComponent(
                 titleScore = titleScore,
                 scoreStats = scoreStats,
@@ -138,7 +138,7 @@ private fun RowMediaStats(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        if(!isAnnounced && titleScore != null) {
+        if(!isAnnounced && (titleScore != null && titleScore != 0.0f)) {
             ScoreStatsComponent(
                 titleScore = titleScore,
                 scoreStats = scoreStats,

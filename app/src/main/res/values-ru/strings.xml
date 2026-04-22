@@ -249,6 +249,9 @@
     <string name="browse_type_search">Поиск</string>
     <string name="browse_type_top_score">Лучшие</string>
     <string name="browse_type_popular">Самые популярные</string>
+    <string name="browse_type_upcoming_next_season">В следующем сезоне</string>
+    <string name="browse_type_popular_manhwa">Популярная манхва</string>
+    <string name="browse_type_newly_added">Недавно добавленные</string>
     <string name="day_of_week_monday">Понедельник</string>
     <string name="day_of_week_tuesday">Вторник</string>
     <string name="day_of_week_wednesday">Среда</string>
@@ -451,4 +454,6 @@
     <string name="social_category_thread_comments">Комментарии в обсуждениях</string>
 
     <string name="review_author_prefix">"Обзор от "</string>
+    <string name="browse_type_trending_now">В тренде</string>
+    <string name="browse_type_popular_this_season">Популярное в этом сзоне</string>
 </resources>

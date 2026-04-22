@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,9 +30,11 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -52,11 +55,13 @@ import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithDivider
+import com.example.shikiflow.presentation.screen.browse.main.anilist.AnilistBrowseMainPage
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.screen.browse.BrowseListItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.browse.main.BrowseViewModel
+import com.example.shikiflow.presentation.viewmodel.browse.main.ShikiBrowseViewModel
 
 @Composable
 fun BrowseScreen(
@@ -65,17 +70,7 @@ fun BrowseScreen(
 ) {
     val horizontalPadding = 12.dp
     var isAtTop by remember { mutableStateOf(false) }
-
     val authType by browseViewModel.authType.collectAsStateWithLifecycle()
-    val browseUiSettings by browseViewModel.browseUiSettings.collectAsStateWithLifecycle()
-    val ongoingBrowseState = browseViewModel.browseMainOngoingsState.collectAsLazyPagingItems()
-    val showBottomSheet = remember { mutableStateOf(false) }
-
-    val uiMode = when(browseUiSettings.browseUiMode) {
-        BrowseUiMode.AUTO -> browseUiSettings.appUiMode
-        BrowseUiMode.LIST -> AppUiMode.LIST
-        BrowseUiMode.GRID -> AppUiMode.GRID
-    }
 
     Scaffold(
         topBar = {
@@ -87,67 +82,118 @@ fun BrowseScreen(
             )
         }
     ) { paddingValues ->
-        when (uiMode) {
-            AppUiMode.LIST -> {
-                BrowseListComponent(
-                    browseState = ongoingBrowseState,
-                    horizontalPadding = horizontalPadding,
-                    onSideScreenNavigate = { browseType ->
-                        browseNavOptions.navigateToSideScreen(browseType)
-                    },
-                    onNavigate = { id, mediaType ->
-                        browseNavOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(id))
-                    },
-                    onSettingClick = { showBottomSheet.value = true },
-                    onIsAtTopChange = { isAtTop = it },
-                    modifier = Modifier
-                        .padding(top = paddingValues.calculateTopPadding())
-                )
-            }
-            AppUiMode.GRID -> {
-                BrowseGridComponent(
-                    browseState = ongoingBrowseState,
-                    horizontalPadding = horizontalPadding,
-                    onSideScreenNavigate = { browseType ->
-                        browseNavOptions.navigateToSideScreen(browseType)
-                    },
-                    onNavigate = { id, mediaType ->
-                        browseNavOptions.navigateToDetails(DetailsNavRoute.AnimeDetails(id))
-                    },
-                    onSettingClick = { showBottomSheet.value = true },
-                    onIsAtTopChange = { isAtTop = it },
-                    modifier = Modifier
-                        .padding(top = paddingValues.calculateTopPadding())
-                )
-            }
-        }
-        if(showBottomSheet.value) {
-            authType?.let { currentAuthType ->
-                BrowseMainBottomSheet(
-                    currentBrowseMode = browseUiSettings.browseUiMode,
-                    ongoingOrder = when(currentAuthType) {
-                        AuthType.ANILIST -> MediaSort.Anilist.ongoingOptions
-                        AuthType.SHIKIMORI -> MediaSort.Shikimori.ongoingOptions
-                    },
-                    currentOngoingMode = browseUiSettings.browseOngoingOrder,
-                    onDismiss = { showBottomSheet.value = false },
-                    onModeSelect = { newMode ->
-                        browseViewModel.setBrowseUiMode(newMode)
-                    },
-                    onSortSelect = { newOrder ->
-                        browseViewModel.setBrowseOngoingOrder(newOrder)
-                    }
-                )
+        authType?.let { authType ->
+            when(authType) {
+                AuthType.SHIKIMORI -> {
+                    ShikimoriBrowseMainPage(
+                        paddingValues = paddingValues,
+                        horizontalPadding = horizontalPadding,
+                        browseNavOptions = browseNavOptions,
+                        onIsAtTopChange = { isAtTop = it }
+                    )
+                }
+                AuthType.ANILIST -> {
+                    AnilistBrowseMainPage(
+                        paddingValues = paddingValues,
+                        horizontalPadding = horizontalPadding,
+                        browseNavOptions = browseNavOptions,
+                        onIsAtTopChange = { isAtTop = it }
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
+fun ShikimoriBrowseMainPage(
+    paddingValues: PaddingValues,
+    horizontalPadding: Dp,
+    browseNavOptions: BrowseNavOptions,
+    onIsAtTopChange: (Boolean) -> Unit,
+    browseViewModel: ShikiBrowseViewModel = hiltViewModel()
+) {
+    val browseUiSettings by browseViewModel.browseUiSettings.collectAsStateWithLifecycle()
+    val ongoingBrowseState = browseViewModel.browseMainOngoingsState.collectAsLazyPagingItems()
+    val showBottomSheet = remember { mutableStateOf(false) }
+
+    var currentType by rememberSaveable { mutableStateOf(MediaType.ANIME) }
+    val uiMode = when(browseUiSettings.browseUiMode) {
+        BrowseUiMode.AUTO -> browseUiSettings.appUiMode
+        BrowseUiMode.LIST -> AppUiMode.LIST
+        BrowseUiMode.GRID -> AppUiMode.GRID
+    }
+
+    when (uiMode) {
+        AppUiMode.LIST -> {
+            BrowseListComponent(
+                browseState = ongoingBrowseState,
+                currentType = currentType,
+                horizontalPadding = horizontalPadding,
+                onSideScreenNavigate = { browseType ->
+                    browseNavOptions.navigateToSideScreen(browseType)
+                },
+                onMediaTypeChange = { currentType = it },
+                onNavigate = { id, mediaType ->
+                    val detailsNavRoute = when(mediaType) {
+                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                    }
+
+                    browseNavOptions.navigateToDetails(detailsNavRoute)
+                },
+                onSettingClick = { showBottomSheet.value = true },
+                onIsAtTopChange = onIsAtTopChange,
+                modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+            )
+        }
+        AppUiMode.GRID -> {
+            BrowseGridComponent(
+                browseState = ongoingBrowseState,
+                currentType = currentType,
+                horizontalPadding = horizontalPadding,
+                onSideScreenNavigate = { browseType ->
+                    browseNavOptions.navigateToSideScreen(browseType)
+                },
+                onMediaTypeChange = { currentType = it },
+                onNavigate = { id, mediaType ->
+                    val detailsNavRoute = when(mediaType) {
+                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                    }
+
+                    browseNavOptions.navigateToDetails(detailsNavRoute)
+                },
+                onSettingClick = { showBottomSheet.value = true },
+                onIsAtTopChange = onIsAtTopChange,
+                modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+            )
+        }
+    }
+
+    if(showBottomSheet.value) {
+        BrowseMainBottomSheet(
+            currentBrowseMode = browseUiSettings.browseUiMode,
+            ongoingOrder = MediaSort.Shikimori.ongoingOptions,
+            currentOngoingMode = browseUiSettings.browseOngoingOrder,
+            onDismiss = { showBottomSheet.value = false },
+            onModeSelect = { newMode ->
+                browseViewModel.setBrowseUiMode(newMode)
+            },
+            onSortSelect = { newOrder ->
+                browseViewModel.setBrowseOngoingOrder(newOrder)
+            }
+        )
+    }
+}
+
+@Composable
 fun BrowseListComponent(
     browseState: LazyPagingItems<BrowseMedia>,
+    currentType: MediaType,
     horizontalPadding: Dp,
     onSideScreenNavigate: (BrowseType) -> Unit,
+    onMediaTypeChange: (MediaType) -> Unit,
     onNavigate: (Int, MediaType) -> Unit,
     onSettingClick: () -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
@@ -174,10 +220,12 @@ fun BrowseListComponent(
             bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding(),
             top = 8.dp
         ),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
             NavigationSection(
+                currentType = currentType,
+                onMediaTypeChange = onMediaTypeChange,
                 onNavigateSideScreen = { sideScreen -> onSideScreenNavigate(sideScreen) }
             )
         }
@@ -241,14 +289,18 @@ fun BrowseListComponent(
 @Composable
 fun BrowseGridComponent(
     browseState: LazyPagingItems<BrowseMedia>,
+    currentType: MediaType,
     horizontalPadding: Dp,
     onSideScreenNavigate: (BrowseType) -> Unit,
+    onMediaTypeChange: (MediaType) -> Unit,
     onNavigate: (Int, MediaType) -> Unit,
     onSettingClick: () -> Unit,
     onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lazyGridState = rememberLazyGridState()
+    val windowInfo = LocalWindowInfo.current
+
     val isAtTop by remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex == 0 &&
@@ -275,6 +327,8 @@ fun BrowseGridComponent(
     ) {
         item(span = { GridItemSpan(maxLineSpan) }) {
             NavigationSection(
+                currentType = currentType,
+                onMediaTypeChange = onMediaTypeChange,
                 onNavigateSideScreen = { sideScreen -> onSideScreenNavigate(sideScreen) }
             )
         }
@@ -289,7 +343,9 @@ fun BrowseGridComponent(
             is LoadState.Loading -> {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
-                        modifier = Modifier.padding(vertical = 24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(windowInfo.containerDpSize.height * 0.65f),
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
                 }
@@ -297,7 +353,9 @@ fun BrowseGridComponent(
             is LoadState.Error -> {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
-                        modifier = Modifier.padding(vertical = 24.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(windowInfo.containerDpSize.height * 0.65f),
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(

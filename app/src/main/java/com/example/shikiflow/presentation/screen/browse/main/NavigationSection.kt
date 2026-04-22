@@ -24,9 +24,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,11 +41,11 @@ import com.example.shikiflow.utils.toIcon
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NavigationSection(
-    modifier: Modifier = Modifier,
-    onNavigateSideScreen: (BrowseType) -> Unit
+    currentType: MediaType,
+    onMediaTypeChange: (MediaType) -> Unit,
+    onNavigateSideScreen: (BrowseType) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var currentType by rememberSaveable { mutableStateOf(MediaType.ANIME) }
-
     Column(
         modifier = modifier
     ) {
@@ -89,7 +86,7 @@ fun NavigationSection(
                         .clip(RoundedCornerShape(8.dp))
                         .clickable {
                             if (!isSelected) {
-                                currentType = mediaType
+                                onMediaTypeChange(mediaType)
                             }
                         }
                         .background(
@@ -133,8 +130,8 @@ fun NavigationSection(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 when(mediaType) {
-                    MediaType.ANIME -> BrowseType.AnimeBrowseType.entries
-                    MediaType.MANGA -> BrowseType.MangaBrowseType.entries
+                    MediaType.ANIME -> BrowseType.AnimeBrowseType.navEntries
+                    MediaType.MANGA -> BrowseType.MangaBrowseType.navEntries
                 }.forEach { browseType ->
                     NavigationCard(
                         icon = browseType.iconResource(),
@@ -165,7 +162,7 @@ private fun NavigationCard(
 ) {
     Row(
         modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .clickable { onClick() }
             .then(modifier),

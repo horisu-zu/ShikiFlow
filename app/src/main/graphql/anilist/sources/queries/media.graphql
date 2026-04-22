@@ -90,7 +90,8 @@ query MediaBrowse(
     $score: Int,
     $genre: String,
     $season: MediaSeason
-    $seasonYear: Int
+    $seasonYear: Int,
+    $countryOfOrigin: CountryCode
 ) {
     Page(page: $page, perPage: $perPage) {
         media(
@@ -102,7 +103,8 @@ query MediaBrowse(
             averageScore_greater: $score,
             genre: $genre,
             season: $season,
-            seasonYear: $seasonYear
+            seasonYear: $seasonYear,
+            countryOfOrigin: $countryOfOrigin
         ) {
             ...MediaBrowse
         }

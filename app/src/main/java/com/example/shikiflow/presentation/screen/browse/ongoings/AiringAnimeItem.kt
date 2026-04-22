@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.presentation.screen.browse.BrowseCoverItem
+import com.example.shikiflow.presentation.common.BrowseCoverItem
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 

@@ -24,6 +24,7 @@ import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
+import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toDto
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toAnilistFormat
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatus
@@ -107,7 +108,8 @@ class AnilistMediaDataSource @Inject constructor(
             score = Optional.presentIfNotNull(browseOptions.score),
             genre = Optional.presentIfNotNull(browseOptions.genre),
             season = Optional.presentIfNotNull(browseOptions.season?.season?.toAnilistSeason()),
-            seasonYear = Optional.presentIfNotNull(browseOptions.season?.year)
+            seasonYear = Optional.presentIfNotNull(browseOptions.season?.year),
+            countryOfOrigin = Optional.presentIfNotNull(browseOptions.countryOfOrigin?.toDto())
         )
 
         val response = apolloClient.query(browseQuery).execute()

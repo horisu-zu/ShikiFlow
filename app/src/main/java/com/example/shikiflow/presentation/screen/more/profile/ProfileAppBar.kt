@@ -72,8 +72,7 @@ fun ProfileAppBar(
                             gradientColors = listOf(
                                 Color.Transparent,
                                 backgroundColor
-                            ),
-                            gradientFraction = 1f
+                            )
                         )
                 )
             }

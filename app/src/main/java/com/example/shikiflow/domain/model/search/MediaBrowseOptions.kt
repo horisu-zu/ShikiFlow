@@ -1,6 +1,7 @@
 package com.example.shikiflow.domain.model.search
 
 import com.example.shikiflow.domain.model.media_details.AgeRating
+import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.media_details.MediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -16,5 +17,6 @@ data class MediaBrowseOptions(
     val season: MediaSeason? = null,
     val genre: String? = null,
     val score: Int? = null,
-    val ageRating: AgeRating? = null
+    val ageRating: AgeRating? = null,
+    val countryOfOrigin: CountryOfOrigin? = null
 )

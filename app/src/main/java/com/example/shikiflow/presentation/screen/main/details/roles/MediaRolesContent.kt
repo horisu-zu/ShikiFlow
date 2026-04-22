@@ -37,11 +37,11 @@ import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
-import com.example.shikiflow.presentation.screen.browse.BrowseCoverItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 
 @Composable

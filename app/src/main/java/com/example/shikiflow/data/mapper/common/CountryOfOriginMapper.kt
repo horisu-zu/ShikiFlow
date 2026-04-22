@@ -12,4 +12,13 @@ object CountryOfOriginMapper {
             CountryOfOriginDto.TAIWAN -> CountryOfOrigin.TAIWAN
         }
     }
+
+    fun CountryOfOrigin.toDto(): CountryOfOriginDto {
+        return when(this) {
+            CountryOfOrigin.JAPAN -> CountryOfOriginDto.JAPAN
+            CountryOfOrigin.SOUTH_KOREA -> CountryOfOriginDto.SOUTH_KOREA
+            CountryOfOrigin.CHINA -> CountryOfOriginDto.CHINA
+            CountryOfOrigin.TAIWAN -> CountryOfOriginDto.TAIWAN
+        }
+    }
 }
