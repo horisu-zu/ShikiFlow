@@ -1,16 +1,19 @@
 package com.example.shikiflow.presentation.screen.main
 
-import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -26,67 +29,53 @@ fun MainScreen(
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
     mainNavOptions: MainNavOptions
 ) {
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
+    val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
 
+    val isAppBarVisible by remember {
+        derivedStateOf {
+            scrollBehavior.scrollOffset > scrollBehavior.scrollOffsetLimit
+        }
+    }
+
+    val backgroundColor = if(isAppBarVisible) MaterialTheme.colorScheme.background
+        else MaterialTheme.colorScheme.surfaceContainer
     val currentTrackMode by mainScreenViewModel.currentTrackMode.collectAsStateWithLifecycle()
-    val screenState by mainScreenViewModel.screenState.collectAsStateWithLifecycle()
-    val searchQuery by mainScreenViewModel.searchQuery.collectAsStateWithLifecycle()
 
     currentTrackMode?.let { trackMode ->
         Scaffold(
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
             topBar = {
                 TracksSearchBar(
                     currentTrackMode = trackMode,
                     scrollBehavior = scrollBehavior,
-                    query = screenState.query,
-                    isSearchActive = screenState.isSearchActive,
                     onModeChange = { trackMode -> mainScreenViewModel.setCurrentTrackMode(trackMode) },
-                    onQueryChange = mainScreenViewModel::onQueryChange,
-                    onSearchToggle = mainScreenViewModel::onSearchActiveChange,
-                    onExitSearch = mainScreenViewModel::exitSearchState
+                    mainNavOptions = mainNavOptions
                 )
-            }
-        ) { innerPadding ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding())
-            ) {
-                Crossfade(targetState = screenState.isSearchActive) { isSearchActive ->
-                    if(isSearchActive) {
-                        SearchPage(
-                            searchQuery = searchQuery,
-                            isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
-                            mediaType = trackMode,
-                            onMediaClick = { mediaType, id ->
-                                val detailsNavRoute = when(mediaType) {
-                                    MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                                    MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                                }
-
-                                mainNavOptions.navigateToDetails(detailsNavRoute)
-                            }
-                        )
-                    } else {
-                        MainPage(
-                            mediaType = trackMode,
-                            isAtTop = scrollBehavior.state.collapsedFraction < 1f,
-                            isAppBarVisible = scrollBehavior.state.collapsedFraction == 0f,
-                            onMediaClick = { mediaId, mediaType ->
-                                val detailsNavRoute = when(mediaType) {
-                                    MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)
-                                    MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId)
-                                }
-
-                                mainNavOptions.navigateToDetails(detailsNavRoute)
-                            }
-                        )
+            },
+            containerColor = backgroundColor,
+            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+        ) { paddingValues ->
+            MainPage(
+                mediaType = trackMode,
+                isAppBarVisible = isAppBarVisible,
+                onMediaClick = { mediaId, mediaType ->
+                    val detailsNavRoute = when(mediaType) {
+                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)
+                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(mediaId)
                     }
-                }
-            }
+
+                    mainNavOptions.navigateToDetails(detailsNavRoute)
+                },
+                modifier = Modifier
+                    .padding(
+                        top = maxOf(
+                            paddingValues.calculateTopPadding(),
+                            WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+                        )
+                    )
+                    .background(MaterialTheme.colorScheme.background)
+            )
         }
     }
 }

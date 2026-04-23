@@ -85,8 +85,7 @@ fun Modifier.systemBarsVisibility(visible: Boolean): Modifier = composed {
             window?.let { w ->
                 val controller = WindowCompat.getInsetsController(w, w.decorView)
                 controller.show(WindowInsetsCompat.Type.systemBars())
-                controller.systemBarsBehavior =
-                    WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
+                controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_DEFAULT
             }
         }
     }

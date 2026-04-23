@@ -24,7 +24,7 @@ fun MainTabRow(
     mediaType: MediaType,
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
-    isAtTop: Boolean,
+    isAtTop: Boolean
 ) {
     PrimaryScrollableTabRow(
         selectedTabIndex = selectedTab,

@@ -16,17 +16,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExpandedFullScreenSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
@@ -39,14 +43,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -77,8 +86,15 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.social.UserSocialItem
 import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchViewModel
 import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class,
+    FlowPreview::class
+)
 @Composable
 fun BrowseSearchBar(
     isAtMainTop: Boolean,
@@ -87,85 +103,98 @@ fun BrowseSearchBar(
     modifier: Modifier = Modifier,
     searchViewModel: BrowseSearchViewModel = hiltViewModel()
 ) {
-    val searchState by searchViewModel.searchState.collectAsStateWithLifecycle()
+    val searchBarState = rememberSearchBarState()
+    val textFieldState = rememberTextFieldState()
+    val scope = rememberCoroutineScope()
+
+    val isSearchActive = remember(searchBarState.currentValue) {
+        searchBarState.currentValue == SearchBarValue.Expanded
+    }
+
+    LaunchedEffect(textFieldState) {
+        snapshotFlow { textFieldState.text.toString() }
+            .debounce(300)
+            .collect { searchViewModel.onQueryChange(it) }
+    }
 
     val animatedHorizontalPadding by animateDpAsState(
-        targetValue = if (!searchState.isSearchActive) horizontalPadding
+        targetValue = if (!isSearchActive) horizontalPadding
             else 0.dp
     )
 
-    Column(modifier = modifier) {
-        SearchBar(
-            inputField = {
-                when(searchState.isSearchActive) {
-                    true -> {
-                        SearchBarDefaults.InputField(
-                            query = searchState.query,
-                            onQueryChange = { query ->
-                                searchViewModel.onQueryChange(query)
-                            },
-                            onSearch = { /**/ },
-                            expanded = true,
-                            onExpandedChange = { isExpanded ->
-                                searchViewModel.onSearchStateChange(isExpanded)
-                            },
-                            placeholder = {
-                                Text(
-                                    text = stringResource(R.string.browse_page_search)
-                                )
-                            },
-                            leadingIcon = {
-                                IconButton(
-                                    onClick = { searchViewModel.onSearchStateChange(false) }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                                        contentDescription = "Exit Search"
-                                    )
-                                }
-                            },
-                            trailingIcon = {
-                                if(searchState.query.isNotEmpty()) {
-                                    IconButton(
-                                        onClick = { searchViewModel.onQueryChange("") }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Clear,
-                                            contentDescription = "Clear Query"
-                                        )
-                                    }
+    val inputField = @Composable {
+        when(isSearchActive) {
+            true -> {
+                SearchBarDefaults.InputField(
+                    searchBarState = searchBarState,
+                    textFieldState = textFieldState,
+                    onSearch = { /**/ },
+                    placeholder = {
+                        Text(
+                            text = stringResource(R.string.browse_page_search)
+                        )
+                    },
+                    leadingIcon = {
+                        IconButton(
+                            onClick = {
+                                scope.launch {
+                                    searchBarState.animateToCollapsed()
                                 }
                             }
-                        )
-                    }
-                    false -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = stringResource(R.string.bottom_nav_item_browse),
-                                style = MaterialTheme.typography.headlineSmall
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                                contentDescription = "Exit Search"
                             )
+                        }
+                    },
+                    trailingIcon = {
+                        if(textFieldState.text.isNotBlank()) {
                             IconButton(
-                                onClick = { searchViewModel.onSearchStateChange(true) }
+                                onClick = { searchViewModel.onQueryChange("") }
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Search,
-                                    contentDescription = "Search"
+                                    imageVector = Icons.Default.Clear,
+                                    contentDescription = "Clear Query"
                                 )
                             }
                         }
                     }
+                )
+            }
+            false -> {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.bottom_nav_item_browse),
+                        style = MaterialTheme.typography.headlineSmall
+                    )
+                    IconButton(
+                        onClick = {
+                            scope.launch {
+                                searchBarState.animateToExpanded()
+                            }
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    }
                 }
-            },
-            expanded = searchState.isSearchActive,
-            onExpandedChange = { isExpanded ->
-                searchViewModel.onSearchStateChange(isExpanded)
-            },
+            }
+        }
+    }
+
+    Column(modifier = modifier) {
+        SearchBar(
+            state = searchBarState,
+            inputField = inputField,
             colors = SearchBarDefaults.colors(
-                containerColor = if(!searchState.isSearchActive) Color.Transparent
+                containerColor = if(!isSearchActive) Color.Transparent
                     else MaterialTheme.colorScheme.surfaceContainer
             ),
             modifier = Modifier
@@ -174,16 +203,22 @@ fun BrowseSearchBar(
                         MaterialTheme.colorScheme.surfaceContainer
                     } else MaterialTheme.colorScheme.background
                 )
+                .windowInsetsPadding(WindowInsets.statusBars)
                 .padding(horizontal = animatedHorizontalPadding)
+        )
+
+        if(!isAtMainTop) {
+            HorizontalDivider()
+        }
+
+        ExpandedFullScreenSearchBar(
+            state = searchBarState,
+            inputField = inputField
         ) {
             SearchBarContent(
                 navOptions = navOptions,
                 horizontalPadding = horizontalPadding
             )
-        }
-
-        if(!isAtMainTop) {
-            HorizontalDivider()
         }
     }
 }

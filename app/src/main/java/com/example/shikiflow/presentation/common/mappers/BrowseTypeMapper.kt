@@ -5,11 +5,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.DateRange
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.BrowseType
-import com.example.shikiflow.domain.model.media_details.MediaSeason
 import com.example.shikiflow.utils.IconResource
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 
 object BrowseTypeMapper {
     fun BrowseType.displayValue(): Int {

@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.browse.Browse.Companion.asBrowse
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
-import com.example.shikiflow.domain.model.search.ScreenSearchState
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -17,10 +16,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -37,8 +34,7 @@ class BrowseSearchViewModel @Inject constructor(
     settingsRepository: SettingsRepository
 ): ViewModel(), BrowseSearchEvent {
 
-    private val _searchState = MutableStateFlow(ScreenSearchState())
-    val searchState: StateFlow<ScreenSearchState> = _searchState.asStateFlow()
+    private val _query = MutableStateFlow("")
 
     private val _params = MutableStateFlow(BrowseSearchParams())
     val params = _params.asStateFlow()
@@ -52,13 +48,11 @@ class BrowseSearchViewModel @Inject constructor(
 
     val browseItems = combine(
         _params,
-        _searchState.debounce { state ->
-            if(state.query.isNotBlank()) 500L else 0L
-        }
-    ) { params, screenState ->
+        _query
+    ) { params, query ->
         params.copy(
             mediaBrowseOptions = params.mediaBrowseOptions.copy(
-                name = screenState.query
+                name = query
             )
         )
     }
@@ -101,18 +95,6 @@ class BrowseSearchViewModel @Inject constructor(
     }
 
     override fun onQueryChange(query: String) {
-        _searchState.update { state ->
-            state.copy(
-                query = query
-            )
-        }
-    }
-
-    override fun onSearchStateChange(isActive: Boolean) {
-        _searchState.update { state ->
-            state.copy(
-                isSearchActive = isActive
-            )
-        }
+        _query.update { query }
     }
 }

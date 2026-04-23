@@ -16,6 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -30,8 +31,8 @@ class TracksSearchViewModel @Inject constructor(
     private val mediaTracksRepository: MediaTracksRepository,
     private val settingsRepository: SettingsRepository
 ): ViewModel() {
-
     private val _params = MutableStateFlow(TracksParams())
+    private val _query = MutableStateFlow("")
 
     private val _rateUpdateState = MutableStateFlow(RateUpdateState.INITIAL)
     val rateUpdateState = _rateUpdateState.asStateFlow()
@@ -46,7 +47,14 @@ class TracksSearchViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    val animeTracksItems = _params
+    val animeTracksItems = combine(
+        _params,
+        _query
+    ) { params, query ->
+        params.copy(
+            query = query
+        )
+    }
         .filter { params ->
             params.userId != null && params.mediaType != null
         }
@@ -100,9 +108,7 @@ class TracksSearchViewModel @Inject constructor(
         }
     }
 
-    fun setQuery(query: String) {
-        _params.update { state ->
-            state.copy(query = query)
-        }
+    fun onQueryChange(newQuery: String) {
+        _query.update { newQuery }
     }
 }

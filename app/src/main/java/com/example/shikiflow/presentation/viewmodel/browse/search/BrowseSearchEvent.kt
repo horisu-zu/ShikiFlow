@@ -9,6 +9,4 @@ interface BrowseSearchEvent {
     fun updateSearchOptions(browseOptions: MediaBrowseOptions)
 
     fun onQueryChange(query: String)
-
-    fun onSearchStateChange(isActive: Boolean)
 }

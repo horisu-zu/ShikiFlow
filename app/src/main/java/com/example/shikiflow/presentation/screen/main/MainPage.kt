@@ -19,7 +19,6 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPage(
     mediaType: MediaType,
-    isAtTop: Boolean,
     isAppBarVisible: Boolean,
     onMediaClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
@@ -44,7 +43,7 @@ fun MainPage(
                     )
                 }
             },
-            isAtTop = isAtTop
+            isAtTop = isAppBarVisible
         )
         HorizontalPager(
             state = pagerState,
