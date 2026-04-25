@@ -20,7 +20,12 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToLinksPage(id: Int, mediaType: MediaType)
 
-    fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int)
+    fun navigateToMangaRead(
+        mangaDexIds: List<String>,
+        malId: Int,
+        title: String,
+        completedChapters: Int
+    )
 
     fun navigateToThreads(mediaId: Int)
 

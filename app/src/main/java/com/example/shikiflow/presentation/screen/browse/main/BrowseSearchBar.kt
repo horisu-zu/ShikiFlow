@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.browse.main
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -60,6 +61,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -106,9 +108,14 @@ fun BrowseSearchBar(
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
 
     val isSearchActive = remember(searchBarState.currentValue) {
         searchBarState.currentValue == SearchBarValue.Expanded
+    }
+
+    BackHandler(isSearchActive) {
+        focusManager.clearFocus()
     }
 
     LaunchedEffect(textFieldState) {
@@ -128,7 +135,7 @@ fun BrowseSearchBar(
                 SearchBarDefaults.InputField(
                     searchBarState = searchBarState,
                     textFieldState = textFieldState,
-                    onSearch = { /**/ },
+                    onSearch = { focusManager.clearFocus() },
                     placeholder = {
                         Text(
                             text = stringResource(R.string.browse_page_search)
@@ -213,7 +220,10 @@ fun BrowseSearchBar(
 
         ExpandedFullScreenSearchBar(
             state = searchBarState,
-            inputField = inputField
+            inputField = inputField,
+            colors = SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
         ) {
             SearchBarContent(
                 navOptions = navOptions,

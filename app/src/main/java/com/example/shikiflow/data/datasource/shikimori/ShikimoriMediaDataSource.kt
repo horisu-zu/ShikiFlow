@@ -60,7 +60,8 @@ class ShikimoriMediaDataSource @Inject constructor(
 ): MediaDataSource, BaseNetworkRepository() {
 
     override fun getMediaDetails(
-        id: Int,
+        id: Int?,
+        idMal: Int?,
         mediaType: MediaType
     ): Flow<DataResult<MediaDetails>> {
         return when (mediaType) {
@@ -68,7 +69,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                 apolloClient
                     .query(
                         AnimeDetailsQuery(
-                            ids = Optional.presentIfNotNull(id.toString())
+                            ids = Optional.presentIfNotNull((id ?: idMal).toString())
                         )
                     )
                     .fetchPolicy(FetchPolicy.NetworkFirst)
@@ -83,7 +84,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                 apolloClient
                     .query(
                         MangaDetailsQuery(
-                            ids = Optional.presentIfNotNull(id.toString())
+                            ids = Optional.presentIfNotNull((id ?: idMal).toString())
                         )
                     )
                     .fetchPolicy(FetchPolicy.NetworkFirst)

@@ -35,7 +35,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -61,6 +60,7 @@ import com.example.shikiflow.presentation.viewmodel.manga.read.chapter.ChapterVi
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ChapterScreen(
+    malId: Int,
     chapterUiData: ChapterUiData,
     navOptions: MangaReadNavOptions,
     chapterViewModel: ChapterViewModel = hiltViewModel()
@@ -72,13 +72,14 @@ fun ChapterScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
-    var chapterPage by remember { mutableIntStateOf(1) }
     var isSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(chapterUiState.uiSettings.isDataSaverEnabled) {
         chapterViewModel.setChapterData(
             mangaId = chapterUiData.mangaId,
+            malId = malId,
             chapterId = chapterUiData.chapterId,
+            chapterNumber = chapterUiData.chapterNumber?.toDoubleOrNull() ?: 0.0,
             scanlationGroupsIds = chapterUiData.scanlationGroupIds,
             uploader = chapterUiData.uploader
         )
@@ -195,9 +196,10 @@ fun ChapterScreen(
                                             append(
                                                 stringResource(id = R.string.media_item_chapter, chapterNumber)
                                             )
+                                            append(" — ")
                                         }
                                         if(!chapterUiData.title.isNullOrEmpty()) {
-                                            append(" — ${chapterUiData.title}")
+                                            append(chapterUiData.title)
                                         }
                                     },
                                     maxLines = 1,
@@ -265,8 +267,10 @@ fun ChapterScreen(
                             ChapterUIMode.PAGE -> {
                                 ChapterPageModeComponent(
                                     chapterPageUrls = chapterUiState.chapterData,
-                                    chapterPage = chapterPage,
-                                    onPageChange = { pageNumber -> chapterPage = pageNumber },
+                                    chapterPageIndex = chapterUiState.currentPageIndex,
+                                    onPageChange = { pageIndex ->
+                                        chapterViewModel.updatePage(pageIndex)
+                                    },
                                     onScrollDetected = chapterViewModel::onInteractionStart,
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -278,8 +282,10 @@ fun ChapterScreen(
                             ChapterUIMode.SCROLL -> {
                                 ChapterScrollModeComponent(
                                     chapterPageUrls = chapterUiState.chapterData,
-                                    chapterPage = chapterPage,
-                                    onPageChange = { pageNumber -> chapterPage = pageNumber },
+                                    chapterPageIndex = chapterUiState.currentPageIndex,
+                                    onPageChange = { pageIndex ->
+                                        chapterViewModel.updatePage(pageIndex)
+                                    },
                                     onScrollDetected = chapterViewModel::onInteractionStart,
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -298,9 +304,12 @@ fun ChapterScreen(
                             when(isVisible) {
                                 true -> {
                                     ChapterNavigationComponent(
-                                        currentPage = chapterPage,
+                                        currentPage = chapterUiState.currentPageIndex + 1,
                                         pageCount = chapterUiState.chapterData.size,
-                                        onNavigateClick = { pageNumber -> chapterPage = pageNumber },
+                                        onNavigateClick = { pageNumber ->
+                                            chapterViewModel.onInteractionStart()
+                                            chapterViewModel.updatePage(pageNumber - 1)
+                                        },
                                         onFocusChange = { isFocused ->
                                             chapterViewModel.changeFocusedState(isFocused)
                                         },
@@ -313,9 +322,11 @@ fun ChapterScreen(
                                 false -> {
                                     if(chapterUiState.uiSettings.chapterUIMode == ChapterUIMode.PAGE) {
                                         ChapterProgressBarComponent(
-                                            currentPage = chapterPage,
+                                            currentPage = chapterUiState.currentPageIndex + 1,
                                             pageCount = chapterUiState.chapterData.size,
-                                            onSegmentClick = { pageNumber -> chapterPage = pageNumber },
+                                            onSegmentClick = { pageNumber ->
+                                                chapterViewModel.updatePage(pageNumber - 1)
+                                            },
                                             modifier = Modifier.navigationBarsPadding()
                                         )
                                     }

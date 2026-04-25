@@ -38,6 +38,7 @@ interface SettingsRepository {
     suspend fun saveLocale(locale: String)
     suspend fun saveTrackMode(mediaType: MediaType)
     suspend fun saveDataSaverMode(newMode: Boolean)
+    suspend fun saveTrackerChapterUpdate(isEnabled: Boolean)
     suspend fun saveChapterUiMode(newMode: ChapterUIMode)
     suspend fun updateMangaSettings(settings: MangaChapterSettings)
 

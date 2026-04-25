@@ -61,16 +61,14 @@ fun MangaDetailsScreen(
                 ) {
                     uiState.authType?.let { authType ->
                         MangaDetailsContent(
-                            userId = uiState.userId ?: 0,
                             authType = authType,
                             mangaDetails = details,
                             mangaDexUiState = uiState.mangaDexUiState,
                             rateUpdateState = uiState.rateUpdateState,
                             mediaNavOptions = navOptions,
                             onMangaDexRefreshClick = { mangaDetailsViewModel.onMangaDexRefresh() },
-                            onSaveUserRate = { id, save, shortData ->
+                            onSaveUserRate = { save, shortData ->
                                 mangaDetailsViewModel.saveUserRate(
-                                    userId = id,
                                     saveUserRate = save,
                                     mediaShortData = shortData
                                 )

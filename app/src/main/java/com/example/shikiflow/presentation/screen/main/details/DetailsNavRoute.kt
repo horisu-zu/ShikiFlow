@@ -27,7 +27,12 @@ sealed interface DetailsNavRoute : NavKey {
     data class ExternalLinks(val mediaId: Int, val mediaType: MediaType) : DetailsNavRoute
 
     @Serializable
-    data class MangaRead(val mangaDexIds: List<String>, val title: String, val completedChapters: Int) : DetailsNavRoute
+    data class MangaRead(
+        val mangaDexIds: List<String>,
+        val malId: Int,
+        val title: String,
+        val completedChapters: Int
+    ) : DetailsNavRoute
 
     @Serializable
     data class Threads(val mediaId: Int): DetailsNavRoute

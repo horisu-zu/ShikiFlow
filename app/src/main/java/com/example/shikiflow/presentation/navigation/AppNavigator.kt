@@ -5,6 +5,8 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,22 +60,38 @@ fun AppNavigator(
         backStack = appBackstack,
         onBack = { if(appBackstack.size > 1) appBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
-            entry<AppNavRoute.Auth> {
+            entry<AppNavRoute.Auth>(
+                metadata = NavDisplay.transitionSpec {
+                    slideInHorizontally(
+                        initialOffsetX = { -it },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    ) togetherWith  ExitTransition.None
+                }
+            ) {
                 AuthScreen()
             }
-            entry<AppNavRoute.Main> {
+            entry<AppNavRoute.Main>(
+                metadata = NavDisplay.transitionSpec {
+                    fadeIn(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    ) togetherWith fadeOut(
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )
+                }
+            ) {
                 MainNavigator(
                     onMoveToBack = onFinishActivity
                 )
             }
-        },
-        transitionSpec = {
-            fadeIn(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            ) togetherWith ExitTransition.None
         },
         entryDecorators = listOf(
             rememberSaveableStateHolderNavEntryDecorator(),

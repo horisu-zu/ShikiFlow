@@ -12,6 +12,7 @@ import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackDto
 import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
 import com.example.shikiflow.domain.model.tracks.MediaType
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MediaTracksDao {
@@ -47,6 +48,14 @@ interface MediaTracksDao {
 
     @Update
     suspend fun updateTrack(track: MediaTrackEntity)
+
+    @Query("""
+        SELECT * FROM media_track
+        INNER JOIN media_short ON media_track.mediaId = media_short.id
+        WHERE media_short.malId = :malId
+        AND media_short.mediaType = :mediaType
+    """)
+    fun getTrackByMalId(malId: Int, mediaType: MediaType): Flow<MediaTrackDto?>
 
     @Transaction
     @Query("""

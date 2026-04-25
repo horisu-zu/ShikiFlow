@@ -1,8 +1,11 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read.chapters
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.usecase.AggregateMangaUseCase
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +16,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -20,7 +24,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MangaChaptersViewModel @Inject constructor(
-    private val aggregateMangaUseCase: AggregateMangaUseCase
+    private val aggregateMangaUseCase: AggregateMangaUseCase,
+    private val mediaTracksRepository: MediaTracksRepository
 ): ViewModel() {
 
     private val _chaptersUiState = MutableStateFlow(MangaChaptersUiState())
@@ -65,11 +70,27 @@ class MangaChaptersViewModel @Inject constructor(
                     }
                 }
             }.launchIn(viewModelScope)
+
+        _chaptersUiState
+            .mapNotNull { state -> state.malId }
+            .distinctUntilChanged()
+            .flatMapLatest { malId ->
+                mediaTracksRepository.getLocalTrack(malId, MediaType.MANGA)
+            }
+            .onEach { track ->
+                Log.d("MangaChaptersViewModel", "Track: $track")
+                _chaptersUiState.update { state ->
+                    state.copy(completedChapters = track?.track?.progress ?: 0)
+                }
+            }.launchIn(viewModelScope)
     }
 
-    fun setId(mangaDexId: String) {
+    fun setIds(mangaDexId: String, malId: Int) {
         _chaptersUiState.update { state ->
-            state.copy(mangaDexId = mangaDexId)
+            state.copy(
+                mangaDexId = mangaDexId,
+                malId = malId
+            )
         }
     }
 

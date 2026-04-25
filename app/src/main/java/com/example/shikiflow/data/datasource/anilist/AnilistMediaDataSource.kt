@@ -58,10 +58,15 @@ class AnilistMediaDataSource @Inject constructor(
 ): MediaDataSource, BaseNetworkRepository() {
 
     override fun getMediaDetails(
-        id: Int,
+        id: Int?,
+        idMal: Int?,
         mediaType: MediaType
     ): Flow<DataResult<MediaDetails>> {
-        val detailsQuery = MediaDetailsQuery(mediaType.toAnilistType(), id)
+        val detailsQuery = MediaDetailsQuery(
+            type = mediaType.toAnilistType(),
+            id = Optional.presentIfNotNull(id),
+            malId = Optional.presentIfNotNull(idMal)
+        )
 
         val response = apolloClient.query(detailsQuery)
             .fetchPolicy(FetchPolicy.NetworkFirst)

@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read.chapter
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
@@ -7,6 +8,7 @@ import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.LoadChapterUseCase
+import com.example.shikiflow.domain.usecase.UpdateMangaProgressUseCase
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,12 +17,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -31,7 +36,8 @@ import javax.inject.Inject
 class ChapterViewModel @Inject constructor(
     private val loadChapterUseCase: LoadChapterUseCase,
     private val mangaDexRepository: MangaDexRepository,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val updateMangaProgressUseCase: UpdateMangaProgressUseCase
 ): ViewModel() {
 
     private val _interactionEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -55,9 +61,8 @@ class ChapterViewModel @Inject constructor(
                 state.chapterId != null
             }
             .distinctUntilChanged { old, new ->
-                old.chapterId == new.chapterId &&
-                    !new.isRefreshing &&
-                    old.uiSettings.isDataSaverEnabled == new.uiSettings.isDataSaverEnabled
+                old.chapterId == new.chapterId && !new.isRefreshing &&
+                old.uiSettings.isDataSaverEnabled == new.uiSettings.isDataSaverEnabled
             }
             .flatMapLatest { state ->
                 loadChapterUseCase(state.chapterId!!, state.uiSettings.isDataSaverEnabled)
@@ -109,6 +114,27 @@ class ChapterViewModel @Inject constructor(
                     state.copy(isNavigationVisible = isInteracting)
                 }
             }.launchIn(viewModelScope)
+
+        viewModelScope.launch {
+            _chapterUiState
+                .distinctUntilChangedBy { state ->
+                    state.currentPageIndex
+                }
+                .filter { state ->
+                    state.currentPageIndex == state.chapterData.lastIndex
+                }
+                .collectLatest { state ->
+                    val shouldUpdate = settingsRepository.mangaSettingsFlow
+                        .map { it.updateTrackProgress }
+                        .first()
+
+                    if (!shouldUpdate) return@collectLatest
+
+                    state.chapterNumber?.let { chapterNumber ->
+                        updateMangaProgressUseCase(state.malId!!, chapterNumber)
+                    }
+                }
+        }
     }
 
     val mangaChaptersItems = _chapterUiState
@@ -140,16 +166,28 @@ class ChapterViewModel @Inject constructor(
         _isFocused.value = newValue
     }
 
+    fun updatePage(pageIndex: Int) {
+        _chapterUiState.update { state ->
+            state.copy(
+                currentPageIndex = pageIndex
+            )
+        }
+    }
+
     fun setChapterData(
         mangaId: String,
+        malId: Int,
         chapterId: String,
+        chapterNumber: Double,
         scanlationGroupsIds: List<String>,
         uploader: String?
     ) {
         _chapterUiState.update { state ->
             state.copy(
                 mangaId = mangaId,
+                malId = malId,
                 chapterId = chapterId,
+                chapterNumber = chapterNumber,
                 scanlationGroupsIds = scanlationGroupsIds,
                 uploader = uploader
             )

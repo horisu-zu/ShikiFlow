@@ -47,11 +47,12 @@ class MediaRepositoryImpl @Inject constructor(
         .distinctUntilChanged()
 
     override fun getMediaDetails(
-        id: Int,
+        id: Int?,
+        idMal: Int?,
         mediaType: MediaType
     ): Flow<DataResult<MediaDetails>> {
         return withSource(dataSource) { dataSource ->
-            dataSource.getMediaDetails(id, mediaType)
+            dataSource.getMediaDetails(id, idMal, mediaType)
         }
     }
 

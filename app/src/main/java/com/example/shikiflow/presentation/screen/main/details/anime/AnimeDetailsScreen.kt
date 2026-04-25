@@ -86,7 +86,6 @@ fun AnimeDetailsScreen(
                     ) {
                         uiState.authType?.let { authType ->
                             AnimeDetailsContent(
-                                userId = uiState.userId ?: 0,
                                 currentAuthType = authType,
                                 animeDetails = details,
                                 rateUpdateState = uiState.rateUpdateState,
@@ -95,9 +94,8 @@ fun AnimeDetailsScreen(
                                 onScreenshotClick = { index ->
                                     selectedScreenshotIndex = index
                                 },
-                                onSaveUserRate = { id, save, shortData ->
+                                onSaveUserRate = { save, shortData ->
                                     animeDetailsViewModel.saveUserRate(
-                                        userId = id,
                                         saveUserRate = save,
                                         mediaShortData = shortData
                                     )

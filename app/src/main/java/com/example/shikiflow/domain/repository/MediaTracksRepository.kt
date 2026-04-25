@@ -11,6 +11,8 @@ import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface MediaTracksRepository {
+    fun getLocalTrack(malId: Int, mediaType: MediaType): Flow<MediaTrack?>
+
     fun getMediaTracks(
         status: UserRateStatus,
         userId: Int?,
@@ -25,7 +27,6 @@ interface MediaTracksRepository {
     ): Flow<PagingData<MediaTrack>>
 
     fun saveUserRate(
-        userId: Int? = null,
         entryId: Int? = null,
         mediaType: MediaType,
         mediaId: Int,

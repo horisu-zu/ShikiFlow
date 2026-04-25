@@ -1,29 +1,26 @@
 package com.example.shikiflow.presentation.common
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
+import androidx.compose.foundation.style.MutableStyleState
+import androidx.compose.foundation.style.styleable
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
+@OptIn(ExperimentalFoundationStyleApi::class)
 @Composable
 fun Button(
     modifier: Modifier = Modifier,
@@ -33,6 +30,8 @@ fun Button(
     onClick: () -> Unit,
     enabled: Boolean = true
 ) {
+    val styleState = remember { MutableStyleState(null) }
+
     Button(
         onClick = onClick,
         enabled = enabled,
@@ -49,40 +48,20 @@ fun Button(
     ) {
         icon?.let {
             icon.toIcon(
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.styleable(styleState) {
+                    size(24.dp)
+                }
             )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Spacer(
+                Modifier.styleable(styleState) {
+                    size(ButtonDefaults.IconSpacing)
+                }
+            )
         }
         Text(
             text = label,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
-fun CircleShapeButton(
-    modifier: Modifier = Modifier,
-    icon: IconResource,
-    label: String = "Label",
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = modifier
-            .clip(CircleShape)
-            .clickable { onClick() }
-            .padding(vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        icon.toIcon(
-            modifier = Modifier.size(24.dp),
-            tint = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = label,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp
         )
     }
 }

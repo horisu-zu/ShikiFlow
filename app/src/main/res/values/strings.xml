@@ -61,7 +61,8 @@
     <string name="settings_app_ui_mode">Display Mode</string>
     <string name="settings_clear_cache">Clear Image Cache</string>
     <string name="settings_chapter_ui_mode">Chapter UI Mode</string>
-
+    <string name="settings_update_progress_mode">Update Progress After Reading</string>
+    <string name="settings_update_progress_desc">Update tracks on all connected services after finishing the chapter</string>
     <string name="settings_data_saver_mode">Data Saver Mode</string>
     <string name="settings_data_saver_desc">Reduce data usage by loading lower quality versions of chapters</string>
     <string name="settings_enabled">Enabled</string>

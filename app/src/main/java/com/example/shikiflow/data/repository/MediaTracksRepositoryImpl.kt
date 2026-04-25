@@ -32,6 +32,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -56,6 +57,13 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
         }
         .distinctUntilChanged()
+
+    override fun getLocalTrack(malId: Int, mediaType: MediaType): Flow<MediaTrack?> {
+        return mediaTracksDao.getTrackByMalId(malId, mediaType)
+            .map { dto ->
+                dto?.toDomain()
+            }
+    }
 
     override fun getMediaTracks(
         status: UserRateStatus,
@@ -112,7 +120,6 @@ class MediaTracksRepositoryImpl @Inject constructor(
     }
 
     override fun saveUserRate(
-        userId: Int?,
         entryId: Int?,
         mediaType: MediaType,
         mediaId: Int,
@@ -147,17 +154,20 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
 
             val result = withSourceSuspend(dataSource) { dataSource ->
-                dataSource.saveUserRate(
-                    userId = userId,
-                    entryId = entryId,
-                    mediaType = mediaType,
-                    mediaId = mediaId,
-                    status = status,
-                    progress = progress,
-                    progressVolumes = progressVolumes,
-                    repeat = repeat,
-                    score = score
-                )
+                settingsRepository.userFlow.first()
+                    .let { user ->
+                        dataSource.saveUserRate(
+                            userId = user?.id,
+                            entryId = entryId,
+                            mediaType = mediaType,
+                            mediaId = mediaId,
+                            status = status,
+                            progress = progress,
+                            progressVolumes = progressVolumes,
+                            repeat = repeat,
+                            score = score
+                        )
+                    }
             }
 
             updateMediaTrack(

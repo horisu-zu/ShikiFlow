@@ -71,7 +71,7 @@ class MangaDetailsViewModel @Inject constructor(
                 old.mediaId == new.mediaId && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                mediaRepository.getMediaDetails(state.mediaId!!, MediaType.MANGA)
+                mediaRepository.getMediaDetails(state.mediaId!!, mediaType = MediaType.MANGA)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
@@ -145,15 +145,6 @@ class MangaDetailsViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-        settingsRepository.userFlow
-            .filterNotNull()
-            .distinctUntilChanged()
-            .onEach { user ->
-                mutableUiState.update { state ->
-                    state.copy(userId = user.id)
-                }
-            }.launchIn(viewModelScope)
-
         settingsRepository.authTypeFlow
             .filterNotNull()
             .distinctUntilChanged()
@@ -181,12 +172,10 @@ class MangaDetailsViewModel @Inject constructor(
     }
 
     fun saveUserRate(
-        userId: Int,
         saveUserRate: SaveUserRate,
         mediaShortData: MediaShortData? = null
     ) {
         mediaTracksRepository.saveUserRate(
-            userId = userId,
             entryId = saveUserRate.rateId,
             mediaId = saveUserRate.mediaId,
             malId = saveUserRate.malId,

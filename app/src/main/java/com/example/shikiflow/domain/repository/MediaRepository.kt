@@ -18,7 +18,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
 
-    fun getMediaDetails(id: Int, mediaType: MediaType): Flow<DataResult<MediaDetails>>
+    fun getMediaDetails(
+        id: Int? = null,
+        idMal: Int? = null,
+        mediaType: MediaType
+    ): Flow<DataResult<MediaDetails>>
 
     fun paginatedBrowseMedia(
         browseOptions: MediaBrowseOptions

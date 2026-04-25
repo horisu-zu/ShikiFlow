@@ -60,7 +60,8 @@
     <string name="settings_app_ui_mode">Режим отображения</string>
     <string name="settings_clear_cache">Очистить кэш изображений</string>
     <string name="settings_chapter_ui_mode">Режим отображения глав</string>
-
+    <string name="settings_update_progress_mode">Обновлять прогресс после прочтения</string>
+    <string name="settings_update_progress_desc">Обновлять отслеживаемое на всех подключенных сервисах после завершения прочтения главы</string>
     <string name="settings_data_saver_mode">Режим экономии трафика</string>
     <string name="settings_data_saver_desc">Уменьшите потребление трафика, загружая главы в более низком качестве</string>
     <string name="settings_enabled">Включено</string>

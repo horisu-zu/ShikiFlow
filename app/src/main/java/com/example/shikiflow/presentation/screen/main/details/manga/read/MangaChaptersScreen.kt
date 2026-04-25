@@ -70,8 +70,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MangaChaptersScreen(
     mangaDexId: String,
+    malId: Int,
     title: String,
-    completedChapters: Int,
     navOptions: MangaReadNavOptions,
     mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
 ) {
@@ -93,13 +93,13 @@ fun MangaChaptersScreen(
     val isOnCurrentChapter by remember {
         derivedStateOf {
             lazyListState.layoutInfo.visibleItemsInfo.any {
-                it.key == "${chaptersUiState.sortDirection}_${completedChapters}"
-            } || completedChapters == 0
+                it.key == "${chaptersUiState.sortDirection}_${chaptersUiState.completedChapters}"
+            } || chaptersUiState.completedChapters == 0
         }
     }
 
     LaunchedEffect(mangaDexId) {
-        mangaChaptersViewModel.setId(mangaDexId)
+        mangaChaptersViewModel.setIds(mangaDexId, malId)
     }
 
     Scaffold(
@@ -161,7 +161,7 @@ fun MangaChaptersScreen(
                 FloatingActionButton(
                     onClick = {
                         scope.launch {
-                            lazyListState.animateScrollToItem(index = completedChapters + 1)
+                            lazyListState.animateScrollToItem(index = chaptersUiState.completedChapters + 1)
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
@@ -231,8 +231,8 @@ fun MangaChaptersScreen(
                         },
                         mediaType = MediaType.MANGA,
                         isCompleted = when {
-                            completedChapters <= 0 -> false
-                            else -> chapterNum <= completedChapters
+                            chaptersUiState.completedChapters <= 0 -> false
+                            else -> chapterNum <= chaptersUiState.completedChapters
                         }
                     )
                 }

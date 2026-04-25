@@ -68,14 +68,13 @@ import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun MangaDetailsContent(
-    userId: Int,
     authType: AuthType,
     mangaDetails: MediaDetails,
     mangaDexUiState: MangaDexUiState,
     rateUpdateState: RateUpdateState,
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
-    onSaveUserRate: (Int, SaveUserRate, MediaShortData) -> Unit,
+    onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -104,6 +103,7 @@ fun MangaDetailsContent(
                     if(mangaDexUiState.mangaDexIds.isNotEmpty()) {
                         mediaNavOptions.navigateToMangaRead(
                             mangaDexIds = mangaDexUiState.mangaDexIds,
+                            malId = mangaDetails.malId,
                             title = mangaDetails.title,
                             completedChapters = mangaDetails.userRate?.progress ?: 0
                         )
@@ -328,7 +328,7 @@ fun MangaDetailsContent(
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
-                onSaveUserRate(userId, save, mangaDetails.toShortData())
+                onSaveUserRate(save, mangaDetails.toShortData())
             }
         )
     }

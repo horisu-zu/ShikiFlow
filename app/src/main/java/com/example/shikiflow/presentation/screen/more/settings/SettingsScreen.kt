@@ -292,6 +292,14 @@ fun SettingsScreen(
                                 settingsViewModel.setDataSaver(!settingsState.mangaSettings.isDataSaverEnabled)
                             },
                             isChecked = settingsState.mangaSettings.isDataSaverEnabled
+                        ),
+                        SectionItem.Switch(
+                            title = stringResource(R.string.settings_update_progress_mode),
+                            displayValue = stringResource(R.string.settings_update_progress_desc),
+                            onClick = {
+                                settingsViewModel.setTrackerChapterUpdate(!settingsState.mangaSettings.updateTrackProgress)
+                            },
+                            isChecked = settingsState.mangaSettings.updateTrackProgress
                         )
                     )
                 )

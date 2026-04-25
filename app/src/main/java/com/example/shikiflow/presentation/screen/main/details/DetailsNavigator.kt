@@ -72,8 +72,13 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.ExternalLinks(id, mediaType))
         }
 
-        override fun navigateToMangaRead(mangaDexIds: List<String>, title: String, completedChapters: Int) {
-            detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexIds, title, completedChapters))
+        override fun navigateToMangaRead(
+            mangaDexIds: List<String>,
+            malId: Int,
+            title: String,
+            completedChapters: Int
+        ) {
+            detailsBackstack.add(DetailsNavRoute.MangaRead(mangaDexIds, malId, title, completedChapters))
         }
 
         override fun navigateToThreads(mediaId: Int) {
@@ -196,8 +201,8 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.MangaRead> { route ->
                 MangaReadNavigator(
                     mangaDexIds = route.mangaDexIds,
+                    malId = route.malId,
                     title = route.title,
-                    completedChapters = route.completedChapters,
                     onNavigateBack = { options.navigateBack() }
                 )
             }

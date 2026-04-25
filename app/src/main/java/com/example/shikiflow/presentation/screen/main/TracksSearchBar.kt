@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -69,19 +70,20 @@ fun TracksSearchBar(
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
 
     val isSearchActive = remember(searchBarState.currentValue) {
         searchBarState.currentValue == SearchBarValue.Expanded
+    }
+
+    BackHandler(isSearchActive) {
+        focusManager.clearFocus()
     }
 
     LaunchedEffect(textFieldState) {
         snapshotFlow { textFieldState.text.toString() }
             .debounce(300)
             .collect { tracksSearchViewModel.onQueryChange(it) }
-    }
-
-    BackHandler(enabled = isSearchActive) {
-        scope.launch { searchBarState.animateToCollapsed() }
     }
 
     val animatedHorizontalPadding by animateDpAsState(
@@ -102,12 +104,12 @@ fun TracksSearchBar(
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            when(isSearchActive) {
+            when(searchBarState.targetValue == SearchBarValue.Expanded) {
                 true -> {
                     SearchBarDefaults.InputField(
                         searchBarState = searchBarState,
                         textFieldState = textFieldState,
-                        onSearch = { /**/ },
+                        onSearch = { focusManager.clearFocus(true) },
                         placeholder = {
                             Text(
                                 text = stringResource(R.string.tracks_page_search)
@@ -116,38 +118,20 @@ fun TracksSearchBar(
                         shape = RoundedCornerShape(16.dp),
                         colors = TextFieldDefaults.colors(
                             focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer
+                            unfocusedContainerColor = Color.Transparent
                         ),
                         leadingIcon = {
-                            when(searchBarState.currentValue) {
-                                SearchBarValue.Collapsed -> {
-                                    IconButton(
-                                        onClick = {
-                                            scope.launch {
-                                                searchBarState.animateToExpanded()
-                                            }
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Search,
-                                            contentDescription = "Search"
-                                        )
+                            IconButton(
+                                onClick = {
+                                    scope.launch {
+                                        searchBarState.animateToCollapsed()
                                     }
                                 }
-                                SearchBarValue.Expanded -> {
-                                    IconButton(
-                                        onClick = {
-                                            scope.launch {
-                                                searchBarState.animateToCollapsed()
-                                            }
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
-                                            contentDescription = "Exit Search"
-                                        )
-                                    }
-                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Default.KeyboardArrowLeft,
+                                    contentDescription = "Exit Search"
+                                )
                             }
                         },
                         trailingIcon = {
@@ -220,7 +204,8 @@ fun TracksSearchBar(
             colors = SearchBarDefaults.appBarWithSearchColors(
                 searchBarColors = SearchBarDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.background
-                )
+                ),
+                appBarContainerColor = MaterialTheme.colorScheme.background
             )
         )
 
@@ -230,7 +215,10 @@ fun TracksSearchBar(
 
         ExpandedFullScreenSearchBar(
             state = searchBarState,
-            inputField = inputField
+            inputField = inputField,
+            colors = SearchBarDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainer
+            )
         ) {
             TracksSearchBarComponent(
                 mediaType = currentTrackMode,

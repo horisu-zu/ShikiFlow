@@ -50,8 +50,10 @@ class SettingsRepositoryImpl @Inject constructor(
 
         private val LOCALE_KEY = stringPreferencesKey("locale")
         private val TRACK_MODE = stringPreferencesKey("track_theme")
+
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
+        private val TRACKER_CHAPTER_UPDATE = booleanPreferencesKey("chapter_update")
     }
 
     override val userFlow: Flow<User?> = dataStore.data
@@ -147,7 +149,8 @@ class SettingsRepositoryImpl @Inject constructor(
             MangaChapterSettings(
                 chapterUIMode = ChapterUIMode.entries.find { it.name == preferences[CHAPTER_UI_MODE] }
                     ?: ChapterUIMode.SCROLL,
-                isDataSaverEnabled = preferences[DATA_SAVER_MODE] ?: false
+                isDataSaverEnabled = preferences[DATA_SAVER_MODE] ?: false,
+                updateTrackProgress = preferences[TRACKER_CHAPTER_UPDATE] ?: false
             )
         }
 
@@ -245,6 +248,12 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun saveTrackerChapterUpdate(isEnabled: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[TRACKER_CHAPTER_UPDATE] = isEnabled
+        }
+    }
+
     override suspend fun saveChapterUiMode(newMode: ChapterUIMode) {
         dataStore.edit { preferences ->
             preferences[CHAPTER_UI_MODE] = newMode.name
@@ -255,6 +264,7 @@ class SettingsRepositoryImpl @Inject constructor(
         dataStore.edit { preferences ->
             preferences[CHAPTER_UI_MODE] = settings.chapterUIMode.name
             preferences[DATA_SAVER_MODE] = settings.isDataSaverEnabled
+            preferences[TRACKER_CHAPTER_UPDATE] = settings.updateTrackProgress
         }
     }
 

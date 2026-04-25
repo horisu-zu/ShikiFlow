@@ -26,7 +26,7 @@ import kotlin.math.abs
 @Composable
 fun ChapterPageModeComponent(
     chapterPageUrls: List<String>,
-    chapterPage: Int,
+    chapterPageIndex: Int,
     onPageChange: (Int) -> Unit,
     onScrollDetected: () -> Unit,
     modifier: Modifier = Modifier
@@ -35,22 +35,27 @@ fun ChapterPageModeComponent(
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
 
     val pagerState = rememberPagerState(
-        initialPage = chapterPage - 1,
+        initialPage = chapterPageIndex,
         pageCount = { pageCount }
     )
 
-    LaunchedEffect(chapterPage) {
-        val pageDifference = pagerState.currentPage - (chapterPage - 1)
+    LaunchedEffect(chapterPageIndex) {
+        val pageDifference = pagerState.currentPage - (chapterPageIndex)
 
         if (abs(pageDifference) == 1) {
-            pagerState.animateScrollToPage(chapterPage - 1)
+            pagerState.animateScrollToPage(chapterPageIndex)
         } else if(abs(pageDifference) > 1) {
-            pagerState.scrollToPage(chapterPage - 1)
+            pagerState.scrollToPage(chapterPageIndex)
         }
     }
 
-    LaunchedEffect(pagerState.currentPage) {
-        onPageChange(pagerState.currentPage + 1)
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.currentPage }
+            .distinctUntilChanged()
+            .filter { !pagerState.isScrollInProgress || pagerState.targetPage == pagerState.currentPage }
+            .collect { page ->
+                onPageChange(page)
+            }
     }
 
     HorizontalPager(
@@ -71,7 +76,7 @@ fun ChapterPageModeComponent(
 
         ChapterItem(
             pageUrl = chapterPageUrls[page],
-            pageNumber = chapterPage,
+            pageNumber = chapterPageIndex + 1,
             contentScale = ContentScale.FillWidth,
             modifier = Modifier
                 .fillMaxSize()
@@ -83,13 +88,13 @@ fun ChapterPageModeComponent(
                     zoomState = rememberZoomState(),
                     onTap = { offset ->
                         if(offset.x < containerSize.width * 0.35f) {
-                            if (chapterPage > 1) {
-                                onPageChange(chapterPage - 1)
+                            if (chapterPageIndex > 0) {
+                                onPageChange(chapterPageIndex - 1)
                             }
                         }
                         else if(offset.x > containerSize.width * 0.65f) {
-                            if (chapterPage < pageCount) {
-                                onPageChange(chapterPage + 1)
+                            if (chapterPageIndex < pageCount - 1) {
+                                onPageChange(chapterPageIndex + 1)
                             }
                         }
                         else {

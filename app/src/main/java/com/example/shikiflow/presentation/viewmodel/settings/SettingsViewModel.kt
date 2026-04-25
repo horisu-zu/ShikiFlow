@@ -150,6 +150,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setTrackerChapterUpdate(isEnabled: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.saveTrackerChapterUpdate(isEnabled)
+        }
+    }
+
     fun setChapterUIMode(chapterUIMode: ChapterUIMode) {
         viewModelScope.launch {
             settingsRepository.saveChapterUiMode(chapterUIMode)

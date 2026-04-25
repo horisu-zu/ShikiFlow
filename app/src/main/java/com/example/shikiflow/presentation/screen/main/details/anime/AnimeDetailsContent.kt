@@ -67,14 +67,13 @@ import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 
 @Composable
 fun AnimeDetailsContent(
-    userId: Int,
     currentAuthType: AuthType,
     animeDetails: MediaDetails,
     rateUpdateState: RateUpdateState,
     sharedTransitionScope: SharedTransitionScope,
     selectedScreenshotIndex: Int?,
     onScreenshotClick: (Int) -> Unit,
-    onSaveUserRate: (Int, SaveUserRate, MediaShortData) -> Unit,
+    onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
     onToggleFavorite: () -> Unit,
     mediaNavOptions: MediaNavOptions,
     modifier: Modifier = Modifier
@@ -341,7 +340,7 @@ fun AnimeDetailsContent(
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
-                onSaveUserRate(userId, save, animeDetails.toShortData())
+                onSaveUserRate(save, animeDetails.toShortData())
             }
         )
     }

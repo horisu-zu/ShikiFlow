@@ -21,20 +21,20 @@ import net.engawapg.lib.zoomable.zoomable
 @Composable
 fun ChapterScrollModeComponent(
     chapterPageUrls: List<String>,
-    chapterPage: Int,
+    chapterPageIndex: Int,
     onPageChange: (Int) -> Unit,
     onScrollDetected: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val lazyListState = rememberLazyListState(
-        initialFirstVisibleItemIndex = chapterPage - 1
+        initialFirstVisibleItemIndex = chapterPageIndex
     )
 
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
             .distinctUntilChanged()
             .collect { index ->
-                onPageChange(index + 1)
+                onPageChange(index)
             }
     }
 
@@ -49,11 +49,9 @@ fun ChapterScrollModeComponent(
             }
     }
 
-    LaunchedEffect(chapterPage) {
-        val pageIndex = chapterPage - 1
-
-        if(lazyListState.firstVisibleItemIndex != pageIndex) {
-            lazyListState.scrollToItem(index = pageIndex)
+    LaunchedEffect(chapterPageIndex) {
+        if(lazyListState.firstVisibleItemIndex != chapterPageIndex) {
+            lazyListState.scrollToItem(index = chapterPageIndex)
         }
     }
 

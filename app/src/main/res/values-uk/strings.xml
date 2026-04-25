@@ -60,7 +60,8 @@
     <string name="settings_app_ui_mode">Режим відображення</string>
     <string name="settings_clear_cache">Очистити кеш зображень</string>
     <string name="settings_chapter_ui_mode">Режим відображення розділів</string>
-
+    <string name="settings_update_progress_mode">Оновлювати прогресс після прочитання</string>
+    <string name="settings_update_progress_desc">Оновлювати відслідковуване на всіх під\'єднаних сервісах після завершення розділу</string>
     <string name="settings_data_saver_mode">Режим економії трафіку</string>
     <string name="settings_data_saver_desc">Зменшіть споживання трафіку завантажуючи розділи у нижчій якості</string>
     <string name="settings_enabled">Увімкнено</string>

@@ -20,8 +20,8 @@ import com.example.shikiflow.presentation.screen.LocalBottomBarController
 @Composable
 fun MangaReadNavigator(
     mangaDexIds: List<String>,
+    malId: Int,
     title: String,
-    completedChapters: Int,
     onNavigateBack: () -> Unit
 ) {
     val bottomBarController = LocalBottomBarController.current
@@ -92,8 +92,8 @@ fun MangaReadNavigator(
             entry<MangaReadNavRoute.ChaptersScreen> { route ->
                 MangaChaptersScreen(
                     mangaDexId = route.mangaDexId,
+                    malId = malId,
                     title = route.title,
-                    completedChapters = completedChapters,
                     navOptions = navOptions
                 )
             }
@@ -107,6 +107,7 @@ fun MangaReadNavigator(
             }
             entry<MangaReadNavRoute.ChapterScreen> { route ->
                 ChapterScreen(
+                    malId = malId,
                     chapterUiData = route.chapterUiData,
                     navOptions = navOptions
                 )
