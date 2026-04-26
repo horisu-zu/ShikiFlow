@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.manga.read.chapters
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.sort.SortDirection
@@ -78,7 +77,6 @@ class MangaChaptersViewModel @Inject constructor(
                 mediaTracksRepository.getLocalTrack(malId, MediaType.MANGA)
             }
             .onEach { track ->
-                Log.d("MangaChaptersViewModel", "Track: $track")
                 _chaptersUiState.update { state ->
                     state.copy(completedChapters = track?.track?.progress ?: 0)
                 }

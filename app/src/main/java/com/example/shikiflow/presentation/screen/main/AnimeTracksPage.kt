@@ -47,6 +47,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.media.MediaTrack
+import com.example.shikiflow.presentation.common.CustomDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +64,7 @@ fun AnimeTracksPage(
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
 
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
+    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     when (animeTrackItems.loadState.refresh) {
         is LoadState.Loading -> {
@@ -113,9 +115,9 @@ fun AnimeTracksPage(
                 }
             }
 
-            selectedItem?.let {
+            selectedItem?.let { item ->
                 UserRateBottomSheet(
-                    userRate = it.toUserRateData(),
+                    userRate = item.toUserRateData(),
                     rateUpdateState = params.rateUpdateState,
                     onDismiss = {
                         if (params.rateUpdateState != RateUpdateState.LOADING) {
@@ -124,8 +126,25 @@ fun AnimeTracksPage(
                     },
                     onSave = { saveUserRate ->
                         tracksViewModel.saveUserRate(saveUserRate)
-                    }
+                    },
+                    onDelete = { deleteEntryId = it }
                 )
+
+                deleteEntryId?.let { entryId ->
+                    CustomDialog(
+                        onDismissRequest = { deleteEntryId = null },
+                        text = stringResource(R.string.user_rate_delete),
+                        confirmButtonText = stringResource(R.string.common_ok),
+                        onConfirm = {
+                            tracksViewModel.deleteUserRate(
+                                entryId = entryId,
+                                mediaId = item.shortData.id,
+                                malId = item.shortData.malId,
+                                mediaType = item.shortData.mediaType
+                            )
+                        }
+                    )
+                }
             }
         }
     }

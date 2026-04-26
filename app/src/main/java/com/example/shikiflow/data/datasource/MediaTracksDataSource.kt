@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
+import com.example.shikiflow.utils.DataResult
 
 interface MediaTracksDataSource {
     suspend fun getMediaTracks(
@@ -40,7 +41,7 @@ interface MediaTracksDataSource {
     ): UserMediaRate
 
     suspend fun saveServiceUserRate(
-        userId: Int?,
+        userId: Int,
         mediaType: MediaType,
         malId: Int,
         status: UserRateStatus,
@@ -48,5 +49,15 @@ interface MediaTracksDataSource {
         progressVolumes: Int?,
         repeat: Int?,
         score: Int?
+    )
+
+    suspend fun deleteUserRate(
+        entryId: Int
+    ): DataResult<Boolean>
+
+    suspend fun deleteServiceUserRate(
+        userId: Int,
+        malId: Int,
+        mediaType: MediaType
     )
 }

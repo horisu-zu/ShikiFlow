@@ -5,6 +5,7 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.apollo.cache.normalized.FetchPolicy
 import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.example.graphql.anilist.DeleteUserRateMutation
 import com.example.graphql.anilist.MediaListCollectionQuery
 import com.example.graphql.anilist.MediaListEntryShortQuery
 import com.example.graphql.anilist.MediaListTracksQuery
@@ -22,7 +23,9 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.Result
 import kotlin.collections.flatMap
@@ -30,7 +33,7 @@ import kotlin.collections.flatMap
 @OptIn(ExperimentalPagingApi::class)
 class AnilistTracksDataSource @Inject constructor(
     @param:AnilistApollo private val apolloClient: ApolloClient
-): MediaTracksDataSource {
+): MediaTracksDataSource, BaseNetworkRepository() {
     override suspend fun getMediaTracks(
         page: Int,
         limit: Int,
@@ -134,7 +137,7 @@ class AnilistTracksDataSource @Inject constructor(
     }
 
     override suspend fun saveServiceUserRate(
-        userId: Int?,
+        userId: Int,
         mediaType: MediaType,
         malId: Int,
         status: UserRateStatus,
@@ -143,19 +146,7 @@ class AnilistTracksDataSource @Inject constructor(
         repeat: Int?,
         score: Int?
     ) {
-        val mediaListQuery = MediaListEntryShortQuery(
-            malId = malId,
-            type = mediaType.toAnilistType()
-        )
-
-        val response = apolloClient.query(mediaListQuery).execute()
-
-        val (mediaId, entryId) = response.data
-            ?.Media
-            ?.mediaListEntryShort
-            ?.let { media ->
-                media.id to media.mediaListEntry?.id
-            } ?: throw IllegalStateException("No data returned from MediaListEntryShort")
+        val (mediaId, entryId) = getServiceUserRate(malId, mediaType)
 
         saveUserRate(
             userId = userId,
@@ -168,5 +159,48 @@ class AnilistTracksDataSource @Inject constructor(
             repeat = repeat,
             score = score
         )
+    }
+
+    override suspend fun deleteUserRate(entryId: Int): DataResult<Boolean> {
+        val mutation = DeleteUserRateMutation(entryId)
+
+        return apolloClient.mutation(mutation)
+            .execute()
+            .asDataResult { data ->
+                data.DeleteMediaListEntry?.deleted == true
+            }
+    }
+
+    override suspend fun deleteServiceUserRate(
+        userId: Int,
+        malId: Int,
+        mediaType: MediaType
+    ) {
+        val (mediaId, entryId) = getServiceUserRate(malId, mediaType)
+
+        entryId?.let {
+            deleteUserRate(entryId)
+        }
+    }
+
+    suspend fun getServiceUserRate(
+        malId: Int,
+        mediaType: MediaType
+    ): Pair<Int, Int?> {
+        val mediaListQuery = MediaListEntryShortQuery(
+            malId = malId,
+            type = mediaType.toAnilistType()
+        )
+
+        val response = apolloClient.query(mediaListQuery)
+            .fetchPolicy(FetchPolicy.NetworkOnly)
+            .execute()
+
+        return response.data
+            ?.Media
+            ?.mediaListEntryShort
+            ?.let { media ->
+                media.id to media.mediaListEntry?.id
+            } ?: throw IllegalStateException("No data returned from MediaListEntryShort")
     }
 }

@@ -49,6 +49,7 @@ import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiModel
 import com.example.shikiflow.presentation.common.CardItem
+import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -74,12 +75,15 @@ fun AnimeDetailsContent(
     selectedScreenshotIndex: Int?,
     onScreenshotClick: (Int) -> Unit,
     onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
+    onDeleteUserRate: (Int) -> Unit,
     onToggleFavorite: () -> Unit,
     mediaNavOptions: MediaNavOptions,
     modifier: Modifier = Modifier
 ) {
     var rateBottomSheet by remember { mutableStateOf(false) }
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
+    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
+
     val horizontalPadding = 12.dp
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -341,7 +345,8 @@ fun AnimeDetailsContent(
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
                 onSaveUserRate(save, animeDetails.toShortData())
-            }
+            },
+            onDelete = { deleteEntryId = it }
         )
     }
     if(showRelatedBottomSheet) {
@@ -353,6 +358,15 @@ fun AnimeDetailsContent(
                 } else mediaNavOptions.navigateToMangaDetails(id)
             },
             onDismiss = { showRelatedBottomSheet = false }
+        )
+    }
+
+    deleteEntryId?.let { entryId ->
+        CustomDialog(
+            onDismissRequest = { deleteEntryId = null },
+            text = stringResource(R.string.user_rate_delete),
+            confirmButtonText = stringResource(R.string.common_ok),
+            onConfirm = { onDeleteUserRate(entryId) }
         )
     }
 }

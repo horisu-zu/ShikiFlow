@@ -28,6 +28,7 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.collections.map
 
@@ -74,7 +75,9 @@ class ShikimoriTracksDataSource @Inject constructor(
                     order = Optional.presentIfNotNull(order?.toShikimoriOrder())
                 )
 
-                val response = apolloClient.query(query).execute()
+                val response = apolloClient.query(query)
+                    .fetchPolicy(FetchPolicy.NetworkFirst)
+                    .execute()
 
                 return response.toResult().map { data ->
                     data.userRates.map { userRate ->
@@ -199,7 +202,7 @@ class ShikimoriTracksDataSource @Inject constructor(
     }
 
     override suspend fun saveServiceUserRate(
-        userId: Int?,
+        userId: Int,
         mediaType: MediaType,
         malId: Int,
         status: UserRateStatus,
@@ -208,13 +211,56 @@ class ShikimoriTracksDataSource @Inject constructor(
         repeat: Int?,
         score: Int?
     ) {
-        val entryId = when(mediaType) {
+        val entryId = getServiceUserRate(malId, mediaType)
+
+        saveUserRate(
+            userId = userId,
+            entryId = entryId,
+            mediaType = mediaType,
+            mediaId = malId,
+            status = status,
+            progress = progress,
+            progressVolumes = progressVolumes,
+            repeat = repeat,
+            score = score
+        )
+    }
+
+    override suspend fun deleteUserRate(entryId: Int): DataResult<Boolean> {
+        return try {
+            userApi.deleteUserRate(entryId.toLong())
+
+            DataResult.Success(true)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Unknown Error")
+        }
+    }
+
+    override suspend fun deleteServiceUserRate(
+        userId: Int,
+        malId: Int,
+        mediaType: MediaType
+    ) {
+        val entryId = getServiceUserRate(malId, mediaType)
+
+        entryId?.let {
+            deleteUserRate(entryId)
+        }
+    }
+
+    suspend fun getServiceUserRate(
+        malId: Int,
+        mediaType: MediaType
+    ): Int? {
+        return when(mediaType) {
             MediaType.ANIME -> {
                 val query = AnimeBrowseQuery(
                     ids = Optional.present(malId.toString())
                 )
 
-                val response = apolloClient.query(query).execute()
+                val response = apolloClient.query(query)
+                    .fetchPolicy(FetchPolicy.NetworkOnly)
+                    .execute()
 
                 response.data
                     ?.animes
@@ -226,25 +272,15 @@ class ShikimoriTracksDataSource @Inject constructor(
                     ids = Optional.present(malId.toString())
                 )
 
-                val response = apolloClient.query(query).execute()
+                val response = apolloClient.query(query)
+                    .fetchPolicy(FetchPolicy.NetworkOnly)
+                    .execute()
 
                 response.data
                     ?.mangas
                     ?.firstOrNull()
                     ?.userRate?.mangaUserRate?.id
             }
-        }
-
-        saveUserRate(
-            userId = userId,
-            entryId = entryId?.toInt(),
-            mediaType = mediaType,
-            mediaId = malId,
-            status = status,
-            progress = progress,
-            progressVolumes = progressVolumes,
-            repeat = repeat,
-            score = score
-        )
+        }?.toIntOrNull()
     }
 }

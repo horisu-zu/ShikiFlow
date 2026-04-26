@@ -103,4 +103,29 @@ class AnimeTracksViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+    fun deleteUserRate(
+        entryId: Int,
+        mediaId: Int,
+        malId: Int?,
+        mediaType: MediaType
+    ) {
+        mediaTracksRepository.deleteUserRate(entryId, mediaId, malId, mediaType)
+            .onEach { result ->
+                _params.update { params ->
+                    when(result) {
+                        is DataResult.Loading -> {
+                            params.copy(rateUpdateState = RateUpdateState.LOADING)
+                        }
+                        is DataResult.Error -> {
+                            Log.d("AnimeTracksViewModel", "Error: ${result.message}")
+                            params.copy(rateUpdateState = RateUpdateState.FINISHED)
+                        }
+                        is DataResult.Success -> {
+                            params.copy(rateUpdateState = RateUpdateState.FINISHED)
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
 }

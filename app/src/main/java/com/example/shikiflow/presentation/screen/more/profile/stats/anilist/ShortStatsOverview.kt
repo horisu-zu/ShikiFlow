@@ -19,7 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.iconResource

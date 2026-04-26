@@ -233,4 +233,61 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override fun deleteUserRate(
+        entryId: Int,
+        mediaId: Int,
+        malId: Int?,
+        mediaType: MediaType
+    ): Flow<DataResult<Boolean>> = flow {
+        emit(DataResult.Loading)
+
+        try {
+            withSourceSuspend(
+                flow = settingsRepository.settingsFlow
+                    .map { settings -> settings.serviceUpdateState }
+            ) { serviceUpdateState ->
+                if(serviceUpdateState) {
+                    scope.launch {
+                        deleteServiceUserRate(mediaId, mediaType)
+                    }
+                }
+            }
+
+            withSourceSuspend(dataSource) { dataSource ->
+                val result = dataSource.deleteUserRate(entryId)
+
+                emit(result)
+            }
+
+            appRoomDatabase.withTransaction {
+                mediaTracksDao.deleteTrack(entryId)
+                mediaTracksDao.deleteMedia(mediaId, mediaType)
+            }
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Unknown Error"))
+        }
+    }
+
+    suspend fun deleteServiceUserRate(
+        malId: Int?,
+        mediaType: MediaType
+    ) {
+        try {
+            withSourceSuspend(
+                flow = settingsRepository.connectedServicesFlow
+            ) { connectedServices ->
+                connectedServices.forEach { (type, user) ->
+                    malId?.let {
+                        when(type) {
+                            AuthType.SHIKIMORI -> shikimoriTracksDataSource
+                            AuthType.ANILIST -> anilistTracksDataSource
+                        }.deleteServiceUserRate(user.id, malId, mediaType)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("MediaTracksRepository", "Error: ${e.message}")
+        }
+    }
 }

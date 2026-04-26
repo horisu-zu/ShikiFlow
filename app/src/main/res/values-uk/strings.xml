@@ -242,6 +242,7 @@
     <string name="rewatches">Повторні перегляди</string>
     <string name="rereads">Повторні прочитання</string>
     <string name="user_rate_add_to_list">Додати до списку</string>
+    <string name="user_rate_delete">Ви впевнені, що хочете видалити цей запис?</string>
     <string name="rate_progress">Прогрес</string>
 
     <string name="tracks_page_search">Пошук…</string>

@@ -102,7 +102,7 @@ class MangaDetailsViewModel @Inject constructor(
         //Manga Dex Ids
         mutableUiState
             .filter { state ->
-                state.details != null
+                state.details?.malId != null
             }
             .distinctUntilChanged { old, new ->
                 old.mediaId == new.mediaId && !new.mangaDexUiState.isRefreshing
@@ -111,7 +111,7 @@ class MangaDetailsViewModel @Inject constructor(
                 getMangaDexUseCase(
                     title = state.details!!.title,
                     nativeTitle = state.details.native,
-                    malId = state.details.malId
+                    malId = state.details.malId!!
                 )
             }.onEach { result ->
                 mutableUiState.update { state ->
@@ -195,7 +195,6 @@ class MangaDetailsViewModel @Inject constructor(
                         )
                     }
                 }
-
                 is DataResult.Error -> {
                     Log.e("MangaDetailsViewModel", "Error saving user rate: ${result.message}")
                     mutableUiState.update { state ->
@@ -204,7 +203,6 @@ class MangaDetailsViewModel @Inject constructor(
                         )
                     }
                 }
-
                 is DataResult.Success -> {
                     mutableUiState.update { state ->
                         state.copy(
@@ -217,5 +215,43 @@ class MangaDetailsViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun deleteUserRate(
+        entryId: Int,
+        mediaId: Int,
+        malId: Int?,
+        mediaType: MediaType
+    ) {
+        mediaTracksRepository.deleteUserRate(entryId, mediaId, malId, mediaType)
+            .onEach { result ->
+                when (result) {
+                    DataResult.Loading -> {
+                        mutableUiState.update { state ->
+                            state.copy(
+                                rateUpdateState = RateUpdateState.LOADING
+                            )
+                        }
+                    }
+                    is DataResult.Error -> {
+                        Log.e("MangaDetailsViewModel", "Error saving user rate: ${result.message}")
+                        mutableUiState.update { state ->
+                            state.copy(
+                                rateUpdateState = RateUpdateState.FINISHED
+                            )
+                        }
+                    }
+                    is DataResult.Success -> {
+                        mutableUiState.update { state ->
+                            state.copy(
+                                rateUpdateState = RateUpdateState.FINISHED,
+                                details = state.details?.copy(
+                                    userRate = null
+                                )
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 }

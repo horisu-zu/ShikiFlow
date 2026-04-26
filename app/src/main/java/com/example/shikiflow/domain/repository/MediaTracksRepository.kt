@@ -43,4 +43,11 @@ interface MediaTracksRepository {
         mediaTrack: MediaUserTrack,
         mediaShortData: MediaShortData? = null
     )
+
+    fun deleteUserRate(
+        entryId: Int,
+        mediaId: Int,
+        malId: Int?,
+        mediaType: MediaType
+    ): Flow<DataResult<Boolean>>
 }

@@ -2,7 +2,6 @@ package com.example.shikiflow.data.local.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -43,8 +42,11 @@ interface MediaTracksDao {
     @Query("DELETE FROM media_short WHERE status = :status AND mediaType = :mediaType")
     fun clearItemsByStatus(status: String, mediaType: MediaType)
 
-    @Delete
-    suspend fun deleteTrack(track: MediaTrackEntity)
+    @Query("DELETE FROM media_track WHERE id = :entryId")
+    suspend fun deleteTrack(entryId: Int)
+
+    @Query("DELETE FROM media_short WHERE id = :mediaId AND mediaType = :mediaType")
+    suspend fun deleteMedia(mediaId: Int, mediaType: MediaType)
 
     @Update
     suspend fun updateTrack(track: MediaTrackEntity)

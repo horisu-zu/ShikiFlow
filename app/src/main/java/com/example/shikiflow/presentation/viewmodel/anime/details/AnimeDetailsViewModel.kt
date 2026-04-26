@@ -158,4 +158,42 @@ class AnimeDetailsViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
     }
+
+    fun deleteUserRate(
+        entryId: Int,
+        mediaId: Int,
+        malId: Int?,
+        mediaType: MediaType
+    ) {
+        mediaTracksRepository.deleteUserRate(entryId, mediaId, malId, mediaType)
+            .onEach { result ->
+                when (result) {
+                    DataResult.Loading -> {
+                        mutableUiState.update { state ->
+                            state.copy(
+                                rateUpdateState = RateUpdateState.LOADING
+                            )
+                        }
+                    }
+                    is DataResult.Error -> {
+                        Log.e("AnimeDetailsViewModel", "Error saving user rate: ${result.message}")
+                        mutableUiState.update { state ->
+                            state.copy(
+                                rateUpdateState = RateUpdateState.FINISHED
+                            )
+                        }
+                    }
+                    is DataResult.Success -> {
+                        mutableUiState.update { state ->
+                            state.copy(
+                                rateUpdateState = RateUpdateState.FINISHED,
+                                details = state.details?.copy(
+                                    userRate = null
+                                )
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+    }
 }

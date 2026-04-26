@@ -14,7 +14,7 @@ import kotlin.time.Instant
 
 data class MediaDetails(
     val id: Int,
-    val malId: Int,
+    val malId: Int?,
     val mediaType: MediaType,
     val title: String,
     val descriptionHtml: String?,

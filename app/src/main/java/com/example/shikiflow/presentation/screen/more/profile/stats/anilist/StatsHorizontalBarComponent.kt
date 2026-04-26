@@ -3,7 +3,6 @@ package com.example.shikiflow.presentation.screen.more.profile.stats.anilist
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,8 +28,7 @@ fun <T> StatsHorizontalBarComponent(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TextWithDivider(
-            text = stringResource(label),
-            style = MaterialTheme.typography.titleLarge
+            text = stringResource(label)
         )
         HorizontalStatsBar(
             stats = stats,

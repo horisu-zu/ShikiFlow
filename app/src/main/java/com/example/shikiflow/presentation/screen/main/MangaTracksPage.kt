@@ -37,6 +37,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
+import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
@@ -58,6 +59,7 @@ fun MangaTracksPage(
         ?: return
 
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
+    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     when(mangaTrackItems.loadState.refresh) {
         LoadState.Loading -> {
@@ -130,9 +132,10 @@ fun MangaTracksPage(
                     }
                 }
             }
-            selectedItem?.let {
+
+            selectedItem?.let { item ->
                 UserRateBottomSheet(
-                    userRate = it.toUserRateData(),
+                    userRate = item.toUserRateData(),
                     rateUpdateState = params.rateUpdateState,
                     onDismiss = {
                         if (params.rateUpdateState != RateUpdateState.LOADING) {
@@ -141,8 +144,25 @@ fun MangaTracksPage(
                     },
                     onSave = { saveUserRate ->
                         mangaTracksViewModel.saveUserRate(saveUserRate)
-                    }
+                    },
+                    onDelete = { deleteEntryId = it }
                 )
+
+                deleteEntryId?.let { entryId ->
+                    CustomDialog(
+                        onDismissRequest = { deleteEntryId = null },
+                        text = stringResource(R.string.user_rate_delete),
+                        confirmButtonText = stringResource(R.string.common_ok),
+                        onConfirm = {
+                            mangaTracksViewModel.deleteUserRate(
+                                entryId = entryId,
+                                mediaId = item.shortData.id,
+                                malId = item.shortData.malId,
+                                mediaType = item.shortData.mediaType
+                            )
+                        }
+                    )
+                }
             }
         }
     }

@@ -34,7 +34,7 @@ object AnilistMediaMapper {
     fun MediaDetailsQuery.Media.toDomain(): MediaDetails {
         return MediaDetails(
             id = id,
-            malId = idMal ?: 0,
+            malId = idMal,
             mediaType = type?.toDomain() ?: MediaType.ANIME,
             title = title?.romaji ?: "",
             descriptionHtml = description,

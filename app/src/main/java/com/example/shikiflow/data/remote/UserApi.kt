@@ -9,6 +9,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiUserFavoritesResponse
 import com.example.shikiflow.data.datasource.dto.media.ShikiShortUserRate
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -63,6 +64,11 @@ interface UserApi {
     suspend fun createUserRate(
         @Body createRequest: ShikiCreateRateRequest
     ): ShikiUserRateResponse
+
+    @DELETE("api/v2/user_rates/{id}")
+    suspend fun deleteUserRate(
+        @Path("id") id: Long
+    )
 
     @GET("/api/users/{id}/favourites")
     suspend fun getUserFavorites(

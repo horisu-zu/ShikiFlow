@@ -48,6 +48,7 @@ import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiModel
 import com.example.shikiflow.presentation.common.CardItem
+import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -75,11 +76,14 @@ fun MangaDetailsContent(
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
     onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
+    onDeleteUserRate: (Int) -> Unit,
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var rateBottomSheet by remember { mutableStateOf(false) }
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
+    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
+
     val horizontalPadding = 12.dp
     val context = LocalContext.current
     val density = LocalDensity.current
@@ -103,7 +107,7 @@ fun MangaDetailsContent(
                     if(mangaDexUiState.mangaDexIds.isNotEmpty()) {
                         mediaNavOptions.navigateToMangaRead(
                             mangaDexIds = mangaDexUiState.mangaDexIds,
-                            malId = mangaDetails.malId,
+                            malId = mangaDetails.malId!!,
                             title = mangaDetails.title,
                             completedChapters = mangaDetails.userRate?.progress ?: 0
                         )
@@ -329,9 +333,11 @@ fun MangaDetailsContent(
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
                 onSaveUserRate(save, mangaDetails.toShortData())
-            }
+            },
+            onDelete = { deleteEntryId = it }
         )
     }
+
     if(showRelatedBottomSheet) {
         RelatedBottomSheet(
             relatedItems = mangaDetails.relatedMedia,
@@ -341,6 +347,15 @@ fun MangaDetailsContent(
                 } else mediaNavOptions.navigateToMangaDetails(id)
             },
             onDismiss = { showRelatedBottomSheet = false }
+        )
+    }
+
+    deleteEntryId?.let { entryId ->
+        CustomDialog(
+            onDismissRequest = { deleteEntryId = null },
+            text = stringResource(R.string.user_rate_delete),
+            confirmButtonText = stringResource(R.string.common_ok),
+            onConfirm = { onDeleteUserRate(entryId) }
         )
     }
 }

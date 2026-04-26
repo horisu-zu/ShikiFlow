@@ -100,6 +100,14 @@ fun AnimeDetailsScreen(
                                         mediaShortData = shortData
                                     )
                                 },
+                                onDeleteUserRate = { entryId ->
+                                    animeDetailsViewModel.deleteUserRate(
+                                        entryId = entryId,
+                                        mediaId = details.id,
+                                        malId = details.malId,
+                                        mediaType = details.mediaType
+                                    )
+                                },
                                 onToggleFavorite = {
                                     animeDetailsViewModel.toggleFavorite(details.id)
                                 },

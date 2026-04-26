@@ -1,0 +1,7 @@
+mutation DeleteUserRate(
+    $id: Int!
+) {
+    DeleteMediaListEntry(id: $id) {
+        deleted
+    }
+}

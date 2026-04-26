@@ -21,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material3.CircularProgressIndicator
@@ -78,6 +79,7 @@ fun UserRateBottomSheet(
     rateUpdateState: RateUpdateState,
     onDismiss: () -> Unit,
     onSave: (SaveUserRate) -> Unit,
+    onDelete: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val sheetState = rememberModalBottomSheetState(
@@ -175,6 +177,7 @@ fun UserRateBottomSheet(
                             )
                         )
                     },
+                    onDelete = { onDelete(userRate.id) },
                     createDate = userRate.createDate,
                     updateDate = userRate.updateDate,
                     isLoading = rateUpdateState == RateUpdateState.LOADING,
@@ -450,6 +453,7 @@ private fun RoundBox(
 @Composable
 private fun ChangeRow(
     onSave: () -> Unit,
+    onDelete: () -> Unit,
     createDate: Instant,
     updateDate: Instant,
     modifier: Modifier = Modifier,
@@ -462,10 +466,10 @@ private fun ChangeRow(
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(horizontal = 12.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
+        Column(modifier = Modifier.weight(1f)) {
             DateItem(
                 iconVector = Icons.Default.Add,
                 date = createDate
@@ -473,6 +477,16 @@ private fun ChangeRow(
             DateItem(
                 iconVector = Icons.Default.Edit,
                 date = updateDate
+            )
+        }
+
+        IconButton(
+            onClick = onDelete
+        ) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                tint = MaterialTheme.colorScheme.error,
+                contentDescription = "Delete User Rate"
             )
         }
 

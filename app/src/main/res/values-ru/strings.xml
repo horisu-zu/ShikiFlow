@@ -241,6 +241,7 @@
     <string name="rewatches">Повторные просмотры</string>
     <string name="rereads">Повторные прочтения</string>
     <string name="user_rate_add_to_list">Добавить в список</string>
+    <string name="user_rate_delete">Вы уверены в том, что хотите удалить эту запись?</string>
     <string name="rate_progress">Прогресс</string>
 
     <string name="tracks_page_search">Поиск…</string>

@@ -73,6 +73,14 @@ fun MangaDetailsScreen(
                                     mediaShortData = shortData
                                 )
                             },
+                            onDeleteUserRate = { entryId ->
+                                mangaDetailsViewModel.deleteUserRate(
+                                    entryId = entryId,
+                                    mediaId = details.id,
+                                    malId = details.malId,
+                                    mediaType = details.mediaType
+                                )
+                            },
                             onToggleFavorite = {
                                 mangaDetailsViewModel.toggleFavorite(details.id)
                             },

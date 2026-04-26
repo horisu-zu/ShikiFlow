@@ -85,7 +85,7 @@ class TracksSearchViewModel @Inject constructor(
                         RateUpdateState.LOADING
                     }
                     is DataResult.Error -> {
-                        Log.d("AnimeTracksViewModel", "Error: ${result.message}")
+                        Log.d("TracksSearchViewModel", "Error: ${result.message}")
                         RateUpdateState.FINISHED
                     }
                     is DataResult.Success -> {
@@ -94,6 +94,31 @@ class TracksSearchViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
+
+    fun deleteUserRate(
+        entryId: Int,
+        mediaId: Int,
+        malId: Int?,
+        mediaType: MediaType
+    ) {
+        mediaTracksRepository.deleteUserRate(entryId, mediaId, malId, mediaType)
+            .onEach { result ->
+                _rateUpdateState.update {
+                    when(result) {
+                        is DataResult.Loading -> {
+                            RateUpdateState.LOADING
+                        }
+                        is DataResult.Error -> {
+                            Log.d("TracksSearchViewModel", "Error: ${result.message}")
+                            RateUpdateState.FINISHED
+                        }
+                        is DataResult.Success -> {
+                            RateUpdateState.FINISHED
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun setRateStatus(userRateStatus: UserRateStatus?) {

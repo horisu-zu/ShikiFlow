@@ -90,10 +90,23 @@ fun MangaChaptersScreen(
         }
     }
 
-    val isOnCurrentChapter by remember {
+    val lastCompletedIndex = remember(chaptersUiState) {
+        val index = chaptersUiState.chaptersMap.keys.indexOf(
+            element = chaptersUiState.completedChapters.toString()
+        )
+
+        if(index == -1) return@remember -1
+
+        when(chaptersUiState.sortDirection) {
+            SortDirection.ASCENDING -> index
+            SortDirection.DESCENDING -> chaptersUiState.chaptersMap.size - index - 1
+        }
+    }
+
+    val isOnCurrentChapter by remember(lastCompletedIndex) {
         derivedStateOf {
             lazyListState.layoutInfo.visibleItemsInfo.any {
-                it.key == "${chaptersUiState.sortDirection}_${chaptersUiState.completedChapters}"
+                it.index == lastCompletedIndex
             } || chaptersUiState.completedChapters == 0
         }
     }
@@ -150,7 +163,7 @@ fun MangaChaptersScreen(
         },
         floatingActionButton = {
             AnimatedVisibility(
-                visible = !isOnCurrentChapter,
+                visible = !isOnCurrentChapter && lastCompletedIndex != -1,
                 enter = fadeIn() + slideInVertically(
                     initialOffsetY = { it / 2 }
                 ),
@@ -161,7 +174,7 @@ fun MangaChaptersScreen(
                 FloatingActionButton(
                     onClick = {
                         scope.launch {
-                            lazyListState.animateScrollToItem(index = chaptersUiState.completedChapters + 1)
+                            lazyListState.animateScrollToItem(lastCompletedIndex)
                         }
                     },
                     containerColor = MaterialTheme.colorScheme.surfaceContainer
