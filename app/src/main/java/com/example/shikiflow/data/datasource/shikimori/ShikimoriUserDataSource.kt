@@ -24,6 +24,7 @@ import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -177,7 +178,7 @@ class ShikimoriUserDataSource @Inject constructor(
                 initialLoadSize = 18
             ),
             pagingSourceFactory = {
-                GenericPagingSource<UserSocial>(
+                GenericPagingSource(
                     method = { page, limit ->
                         getUserFriends(userId, page, limit)
                     }
@@ -243,6 +244,16 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun getFollow(userId: Int): DataResult<UserFollow> {
+        return try {
+            val response = userApi.getUserFollow(userId.toLong())
+
+            DataResult.Success(UserFollow(isFollowing = response.isFollowing))
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Unknown Error")
+        }
+    }
+
     override suspend fun toggleFavorite(
         animeId: Int?,
         mangaId: Int?,
@@ -251,5 +262,27 @@ class ShikimoriUserDataSource @Inject constructor(
         studioId: Int?
     ): DataResult<Unit> {
         TODO("Not available in the API")
+    }
+
+    override suspend fun toggleFollow(
+        userId: Int,
+        isFollowing: Boolean
+    ): DataResult<Boolean> {
+        return try {
+            when(isFollowing) {
+                true -> {
+                    userApi.addFriend(userId.toLong())
+
+                    DataResult.Success(true)
+                }
+                false -> {
+                    userApi.deleteFriend(userId.toLong())
+
+                    DataResult.Success(false)
+                }
+            }
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Unknown Error")
+        }
     }
 }

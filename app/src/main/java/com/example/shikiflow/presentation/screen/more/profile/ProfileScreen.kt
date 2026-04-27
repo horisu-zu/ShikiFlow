@@ -51,19 +51,24 @@ fun ProfileScreen(
     val user = userData ?: uiState.currentUser
 
     LaunchedEffect(user) {
-        user?.id?.let { userId ->
-            profileViewModel.setUserId(userId)
+        user?.let {
+            profileViewModel.setUser(user)
+
+            if(user.isFollowing == null && user.id != uiState.currentUser?.id) {
+                profileViewModel.getFollow(user.id)
+            }
         }
     }
 
     user?.let {
         ProfileScreenContent(
-            userData = user,
             uiState = uiState,
             isCurrentUser = uiState.currentUser?.id == user.id,
             navOptions = navOptions,
             onRefresh = { profileViewModel.onRefresh() },
-            modifier = Modifier
+            onToggleFollow = { isFollowing ->
+                profileViewModel.toggleFollow(user.id, isFollowing)
+            }
         )
     }
 }
@@ -71,11 +76,11 @@ fun ProfileScreen(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProfileScreenContent(
-    userData: User,
     uiState: ProfileUiState,
     isCurrentUser: Boolean,
     navOptions: ProfileNavOptions,
     onRefresh: () -> Unit,
+    onToggleFollow: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
@@ -87,12 +92,14 @@ fun ProfileScreenContent(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ProfileAppBar(
-                userData = userData,
+                userData = uiState.user,
+                authType = uiState.authType,
                 isCurrentUser = isCurrentUser,
                 scrollBehavior = scrollBehavior,
                 statusBarsPadding = WindowInsets.statusBars.asPaddingValues(),
                 backgroundColor = backgroundColor,
-                navOptions = navOptions
+                navOptions = navOptions,
+                onToggleFollow = onToggleFollow
             )
         }
     ) { paddingValues ->
@@ -133,53 +140,57 @@ fun ProfileScreenContent(
                             .background(backgroundColor)
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     )
-                    when(sectionsList[selectedTabIndex].value) {
-                        ProfileSectionType.USER_STATS -> {
-                            UserStatsSection(
-                                userData = userData,
-                                typesList = uiState.userStatsCategories.scoreMediaTypes,
-                                isCurrentUser = isCurrentUser,
-                                isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
-                                horizontalPadding = horizontalPadding,
-                                navOptions = navOptions
-                            )
-                        }
-                        ProfileSectionType.ACTIVITY -> {
-                            UserActivitySection(
-                                userId = userData.id,
-                                isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
-                                horizontalPadding = horizontalPadding,
-                                navOptions = navOptions
-                            )
-                        }
-                        ProfileSectionType.SOCIAL -> {
-                            SocialSection(
-                                userId = userData.id,
-                                socialCategories = uiState.userStatsCategories.socialCategories,
-                                horizontalPadding = horizontalPadding,
-                                navOptions = navOptions
-                            )
-                        }
-                        ProfileSectionType.FAVORITES -> {
-                            FavoritesSection(
-                                userId = userData.id,
-                                favoriteCategories = uiState.userStatsCategories.favoriteCategories,
-                                isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
-                                horizontalPadding = horizontalPadding,
-                                onFavoriteClick = { category, id ->
-                                    val detailsNavRoute = when(category) {
-                                        FavoriteCategory.ANIME -> AnimeDetails(id)
-                                        FavoriteCategory.MANGA -> MangaDetails(id)
-                                        FavoriteCategory.CHARACTER -> CharacterDetails(id)
-                                        else -> Staff(id)
-                                    }
 
-                                    navOptions.navigateToDetails(detailsNavRoute)
-                                },
-                                onStudioClick = { id, name ->
-                                    navOptions.navigateToDetails(Studio(id, name))
-                                }
-                            )
+                    uiState.user?.let { userData ->
+                        when(sectionsList[selectedTabIndex].value) {
+                            ProfileSectionType.USER_STATS -> {
+                                UserStatsSection(
+                                    userData = userData,
+                                    typesList = uiState.userStatsCategories.scoreMediaTypes,
+                                    isCurrentUser = isCurrentUser,
+                                    isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
+                                    horizontalPadding = horizontalPadding,
+                                    navOptions = navOptions
+                                )
+                            }
+                            ProfileSectionType.ACTIVITY -> {
+                                UserActivitySection(
+                                    userId = userData.id,
+                                    isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
+                                    horizontalPadding = horizontalPadding,
+                                    navOptions = navOptions
+                                )
+                            }
+                            ProfileSectionType.SOCIAL -> {
+                                SocialSection(
+                                    userId = userData.id,
+                                    socialCategories = uiState.userStatsCategories.socialCategories,
+                                    isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
+                                    horizontalPadding = horizontalPadding,
+                                    navOptions = navOptions
+                                )
+                            }
+                            ProfileSectionType.FAVORITES -> {
+                                FavoritesSection(
+                                    userId = userData.id,
+                                    favoriteCategories = uiState.userStatsCategories.favoriteCategories,
+                                    isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
+                                    horizontalPadding = horizontalPadding,
+                                    onFavoriteClick = { category, id ->
+                                        val detailsNavRoute = when(category) {
+                                            FavoriteCategory.ANIME -> AnimeDetails(id)
+                                            FavoriteCategory.MANGA -> MangaDetails(id)
+                                            FavoriteCategory.CHARACTER -> CharacterDetails(id)
+                                            else -> Staff(id)
+                                        }
+
+                                        navOptions.navigateToDetails(detailsNavRoute)
+                                    },
+                                    onStudioClick = { id, name ->
+                                        navOptions.navigateToDetails(Studio(id, name))
+                                    }
+                                )
+                            }
                         }
                     }
                 } else {
@@ -195,7 +206,10 @@ fun ProfileScreenContent(
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(
-                            message = stringResource(R.string.profile_screen_empty, userData.nickname),
+                            message = stringResource(
+                                id = R.string.profile_screen_empty,
+                                uiState.user?.nickname ?: ""
+                            ),
                             showFace = true
                         )
                     }

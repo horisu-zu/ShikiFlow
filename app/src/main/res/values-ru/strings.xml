@@ -349,6 +349,7 @@
     <string name="anime_origin_mixed_media">Смешанные медиа</string>
     <string name="anime_origin_other">Другое</string>
 
+    <string name="user_label">Пользователи</string>
     <string name="about_check_updates">Проверить наличие обновлений</string>
     <string name="about_checking_updates">Проверка обновлений…</string>
     <string name="about_latest_version">У вас установлена последняя версия</string>
@@ -374,6 +375,8 @@
     <string name="similar_media_error">Ошибка загрузки рекомендаций</string>
 
     <string name="profile_favorites">Избранное</string>
+    <string name="profile_follow">Подписаться</string>
+    <string name="profile_follows_you">Ваш подписчик</string>
     <string name="favorite_staff">Персонал</string>
     <string name="favorite_studios">Студии</string>
 
@@ -458,4 +461,5 @@
     <string name="review_author_prefix">"Обзор от "</string>
     <string name="browse_type_trending_now">В тренде</string>
     <string name="browse_type_popular_this_season">Популярное в этом сзоне</string>
+    <string name="profile_unfollow">Отписаться</string>
 </resources>

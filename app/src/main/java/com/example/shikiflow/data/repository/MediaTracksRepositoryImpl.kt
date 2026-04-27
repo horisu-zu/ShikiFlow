@@ -249,7 +249,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
             ) { serviceUpdateState ->
                 if(serviceUpdateState) {
                     scope.launch {
-                        deleteServiceUserRate(mediaId, mediaType)
+                        deleteServiceUserRate(malId, mediaType)
                     }
                 }
             }

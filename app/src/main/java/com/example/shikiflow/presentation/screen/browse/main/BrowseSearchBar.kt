@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
@@ -158,7 +159,7 @@ fun BrowseSearchBar(
                     trailingIcon = {
                         if(textFieldState.text.isNotBlank()) {
                             IconButton(
-                                onClick = { searchViewModel.onQueryChange("") }
+                                onClick = { textFieldState.clearText() }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Clear,

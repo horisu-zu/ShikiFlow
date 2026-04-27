@@ -322,3 +322,12 @@ query ShortUserRate(
         }
     }
 }
+
+query UserFollow(
+    $userId: Int!
+) {
+    User(id: $userId) {
+        isFollowing
+        isFollower
+    }
+}

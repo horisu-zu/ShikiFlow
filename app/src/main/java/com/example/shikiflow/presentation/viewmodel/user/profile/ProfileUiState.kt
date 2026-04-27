@@ -1,13 +1,15 @@
 package com.example.shikiflow.presentation.viewmodel.user.profile
 
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.presentation.UiState
 
 data class ProfileUiState(
-    val userId: Int? = null,
+    val user: User? = null,
     val currentUser: User? = null,
     val userStatsCategories: UserStatsCategories = UserStatsCategories(),
+    val authType: AuthType? = null,
 
     override val errorMessage: String? = null,
     override val isLoading: Boolean = true,

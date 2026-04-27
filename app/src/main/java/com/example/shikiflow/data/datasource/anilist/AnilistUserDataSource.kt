@@ -10,7 +10,9 @@ import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
+import com.example.graphql.anilist.ToggleFollowMutation
 import com.example.graphql.anilist.UserActivitiesQuery
+import com.example.graphql.anilist.UserFollowQuery
 import com.example.graphql.anilist.UserFollowersQuery
 import com.example.graphql.anilist.UserFollowingsQuery
 import com.example.graphql.anilist.UserGenresQuery
@@ -44,6 +46,7 @@ import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -404,6 +407,26 @@ class AnilistUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun getFollow(userId: Int): DataResult<UserFollow> {
+        return try {
+            val query = UserFollowQuery(userId)
+
+            val response = apolloClient.query(query)
+                .fetchPolicy(FetchPolicy.NetworkFirst)
+                .execute()
+                .asDataResult { data ->
+                    UserFollow(
+                        isFollowing = data.User?.isFollowing ?: false,
+                        isFollower = data.User?.isFollower
+                    )
+                }
+
+            return response
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Unknown Error")
+        }
+    }
+
     override suspend fun toggleFavorite(
         animeId: Int?,
         mangaId: Int?,
@@ -422,6 +445,21 @@ class AnilistUserDataSource @Inject constructor(
         val response = apolloClient.mutation(toggleFavoriteMutation)
             .execute()
             .asDataResult { Unit }
+
+        return response
+    }
+
+    override suspend fun toggleFollow(
+        userId: Int,
+        isFollowing: Boolean
+    ): DataResult<Boolean> {
+        val toggleFollowMutation = ToggleFollowMutation(userId = userId)
+
+        val response = apolloClient.mutation(toggleFollowMutation)
+            .execute()
+            .asDataResult { data ->
+                data.ToggleFollow?.isFollowing == true
+            }
 
         return response
     }

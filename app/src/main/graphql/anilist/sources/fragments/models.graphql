@@ -12,6 +12,17 @@ fragment MediaListShort on MediaList {
     }
 }
 
+fragment MediaFollowingShort on MediaList {
+    id
+    status
+    score
+    progress
+    progressVolumes
+    user {
+        ...ALMediaFollowingUser
+    }
+}
+
 fragment MediaShort on Media {
     id
     idMal
@@ -129,6 +140,19 @@ fragment ALUserShort on User {
         medium
     }
     bannerImage
+    isFollowing
+}
+
+fragment ALMediaFollowingUser on User {
+    id
+    name
+    avatar {
+        large
+        medium
+    }
+    mediaListOptions {
+        scoreFormat
+    }
 }
 
 fragment ALListActivity on ListActivity {

@@ -11,6 +11,7 @@ import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -56,4 +57,11 @@ interface UserRepository {
         staffId: Int? = null,
         studioId: Int? = null,
     ): DataResult<Unit>
+
+    suspend fun getFollow(userId: Int): DataResult<UserFollow>
+
+    suspend fun toggleFollow(
+        userId: Int,
+        isFollowing: Boolean
+    ): DataResult<Boolean>
 }

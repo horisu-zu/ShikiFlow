@@ -367,7 +367,7 @@
     <string name="anime_origin_other">Other</string>
 
     <string name="profile" translatable="false">Profile</string>
-    <string name="user_label" translatable="false">User</string>
+    <string name="user_label">Users</string>
 
     <string name="about_check_updates">Check for Updates</string>
     <string name="about_checking_updates">Checking for updates…</string>
@@ -394,6 +394,10 @@
     <string name="similar_media_error">Error Loading Media Recommendations Data</string>
 
     <string name="profile_favorites">Favorites</string>
+    <string name="profile_unfollow">Unfollow</string>
+    <string name="profile_follow">Follow</string>
+    <string name="profile_follows_you">Follows You</string>
+
     <string name="favorite_staff">Staff</string>
     <string name="favorite_studios">Studios</string>
 

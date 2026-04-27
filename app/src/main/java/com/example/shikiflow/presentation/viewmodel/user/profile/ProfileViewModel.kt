@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.user.profile
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.UiStateViewModel
@@ -29,13 +30,13 @@ class ProfileViewModel @Inject constructor(
     init {
         mutableUiState
             .filter { state ->
-                state.userId != null
+                state.user != null
             }
             .distinctUntilChanged { old, new ->
-                old.userId == new.userId && !new.isRefreshing
+                old.user?.id == new.user?.id && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                userRepository.getUserStatsCategories(state.userId!!)
+                userRepository.getUserStatsCategories(state.user?.id!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
@@ -63,22 +64,30 @@ class ProfileViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            settingsRepository.userFlow
-                .filterNotNull()
-                .collect { user ->
-                    mutableUiState.update { state ->
-                        state.copy(
-                            currentUser = user
-                        )
-                    }
+        settingsRepository.userFlow
+            .filterNotNull()
+            .onEach { user ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        currentUser = user
+                    )
                 }
-        }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .onEach { authType ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        authType = authType
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
-    fun setUserId(userId: Int) {
+    fun setUser(user: User) {
         mutableUiState.update { state ->
-            state.copy(userId = userId)
+            state.copy(user = user)
         }
     }
 
@@ -87,6 +96,39 @@ class ProfileViewModel @Inject constructor(
             state.copy(
                 isRefreshing = true
             )
+        }
+    }
+
+    fun toggleFollow(userId: Int, isFollowing: Boolean) {
+        viewModelScope.launch {
+            userRepository.toggleFollow(userId, isFollowing).let { result ->
+                if(result is DataResult.Success) {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            user = state.user?.copy(
+                                isFollowing = result.data
+                            )
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    fun getFollow(userId: Int) {
+        viewModelScope.launch {
+            userRepository.getFollow(userId).let { result ->
+                if(result is DataResult.Success) {
+                    mutableUiState.update { state ->
+                        state.copy(
+                            user = state.user?.copy(
+                                isFollowing = result.data.isFollowing,
+                                isFollower = result.data.isFollower
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 

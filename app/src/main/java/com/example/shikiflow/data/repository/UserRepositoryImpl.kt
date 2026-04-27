@@ -16,6 +16,7 @@ import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -36,7 +37,7 @@ import javax.inject.Inject
 class UserRepositoryImpl @Inject constructor(
     @param:Shikimori private val shikimoriUserDataSource: UserDataSource,
     @param:AniList private val anilistUserDataSource: UserDataSource,
-    private val settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository
 ): UserRepository, BaseNetworkRepository() {
 
     private val dataSource = settingsRepository.authTypeFlow
@@ -187,5 +188,18 @@ class UserRepositoryImpl @Inject constructor(
         studioId: Int?
     ): DataResult<Unit> = withSourceSuspend(dataSource) { dataSource ->
         dataSource.toggleFavorite(animeId, mangaId, characterId, staffId, studioId)
+    }
+
+    override suspend fun getFollow(
+        userId: Int
+    ): DataResult<UserFollow> = withSourceSuspend(dataSource) { dataSource ->
+        dataSource.getFollow(userId)
+    }
+
+    override suspend fun toggleFollow(
+        userId: Int,
+        isFollowing: Boolean
+    ): DataResult<Boolean> = withSourceSuspend(dataSource) { dataSource ->
+        dataSource.toggleFollow(userId, isFollowing)
     }
 }

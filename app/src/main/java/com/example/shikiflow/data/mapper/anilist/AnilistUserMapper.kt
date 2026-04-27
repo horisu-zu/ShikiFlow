@@ -47,10 +47,10 @@ import kotlin.time.Instant
 object AnilistUserMapper {
     fun ALUserShort.toDomain(): User {
         return User(
-            id = this.id,
-            nickname = this.name,
-            avatarUrl = this.avatar?.large ?: "",
-            profileBannerUrl = this.bannerImage
+            id = id,
+            nickname = name,
+            avatarUrl = avatar?.large ?: "",
+            profileBannerUrl = bannerImage
         )
     }
 
@@ -80,7 +80,7 @@ object AnilistUserMapper {
     }
 
     private fun String.toProgress(): List<Int> {
-        return this.split("-")
+        return split("-")
             .mapNotNull { number ->
                 number.trim().toIntOrNull()
             }

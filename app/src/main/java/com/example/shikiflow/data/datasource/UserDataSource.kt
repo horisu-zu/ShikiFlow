@@ -10,6 +10,7 @@ import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
@@ -54,6 +55,10 @@ interface UserDataSource {
         nickname: String
     ): Result<List<Browse.User>>
 
+    suspend fun getFollow(
+        userId: Int
+    ): DataResult<UserFollow>
+
     suspend fun toggleFavorite(
         animeId: Int? = null,
         mangaId: Int? = null,
@@ -61,4 +66,9 @@ interface UserDataSource {
         staffId: Int? = null,
         studioId: Int? = null,
     ): DataResult<Unit>
+
+    suspend fun toggleFollow(
+        userId: Int,
+        isFollowing: Boolean
+    ): DataResult<Boolean>
 }

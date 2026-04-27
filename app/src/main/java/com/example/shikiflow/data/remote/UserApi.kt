@@ -8,6 +8,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
 import com.example.shikiflow.data.datasource.dto.ShikiUserFavoritesResponse
 import com.example.shikiflow.data.datasource.dto.media.ShikiShortUserRate
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
+import com.example.shikiflow.data.datasource.dto.user.ShikiUserShort
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -81,4 +82,19 @@ interface UserApi {
         @Query("page") page: Int = 1,
         @Query("limit") limit: Int = 1
     ): List<ShikiUser>
+
+    @GET("api/users/{id}")
+    suspend fun getUserFollow(
+        @Path("id") userId: Long
+    ): ShikiUserShort
+
+    @POST("/api/friends/{id}")
+    suspend fun addFriend(
+        @Path("id") userId: Long
+    )
+
+    @DELETE("/api/friends/{id}")
+    suspend fun deleteFriend(
+        @Path("id") userId: Long
+    )
 }
