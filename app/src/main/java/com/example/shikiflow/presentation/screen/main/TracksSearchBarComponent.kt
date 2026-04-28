@@ -182,9 +182,7 @@ fun TracksSearchBarComponent(
                                     AnimeTrackGridItem(
                                         trackItem = item,
                                         onClick = { id -> onMediaClick(mediaType, id) },
-                                        onLongClick = { trackItem ->
-                                            selectedItem = trackItem
-                                        },
+                                        onLongClick = { selectedItem = item },
                                         modifier = Modifier.animateItem()
                                     )
                                 }
@@ -192,9 +190,7 @@ fun TracksSearchBarComponent(
                                     MangaTrackItem(
                                         trackItem = item,
                                         onClick = { id -> onMediaClick(mediaType, id) },
-                                        onLongClick = { trackItem ->
-                                            selectedItem = trackItem
-                                        },
+                                        onLongClick = { selectedItem = item },
                                         modifier = Modifier.animateItem()
                                     )
                                 }

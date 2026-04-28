@@ -1,20 +1,15 @@
 package com.example.shikiflow.presentation.screen.main
 
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,12 +17,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -38,12 +29,9 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
-import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
-import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.media.MediaTrack
@@ -209,11 +197,11 @@ private fun AnimeTracksGridComponent(
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(120.dp),
+        columns = GridCells.Adaptive(160.dp),
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(12.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(
             count = trackItems.itemCount,
@@ -224,7 +212,7 @@ private fun AnimeTracksGridComponent(
             AnimeTrackGridItem(
                 trackItem = trackItem,
                 onClick = onAnimeClick,
-                onLongClick = onLongClick,
+                onLongClick = { onLongClick(trackItem) },
                 modifier = Modifier.animateItem()
             )
         }
@@ -247,56 +235,5 @@ private fun AnimeTracksGridComponent(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun AnimeTrackGridItem(
-    trackItem: MediaTrack,
-    onClick: (Int) -> Unit,
-    onLongClick: (MediaTrack) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val imageType = ImageType.Poster(
-        width = Int.MAX_VALUE.dp,
-        aspectRatio = 2f / 2.6f
-    )
-
-    Column(
-        modifier = Modifier
-            .clip(imageType.clip)
-            .combinedClickable(
-                onClick = { onClick(trackItem.shortData.id) },
-                onLongClick = { onLongClick(trackItem) }
-            )
-            .then(modifier),
-        verticalArrangement = Arrangement.spacedBy(2.dp)
-    ) {
-        BaseImage(
-            model = trackItem.shortData.poster?.originalUrl,
-            imageType = imageType,
-            contentDescription = "Poster"
-        )
-        Text(
-            text = trackItem.shortData.name,
-            style = MaterialTheme.typography.labelMedium.copy(
-                fontWeight = FontWeight.Medium
-            ),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.padding(top = 2.dp)
-        )
-        Text(
-            text = buildString {
-                if(trackItem.shortData.status == MediaStatus.ONGOING)
-                    append("${trackItem.track.progress} / ${trackItem.shortData.currentProgress}")
-                else append(trackItem.track.progress)
-                append(" of ${trackItem.shortData.totalCount.takeIf { (it ?: 0) > 0 } ?: "?"} ep.")
-            }, style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Light,
-                fontSize = 10.sp
-            ),
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
     }
 }

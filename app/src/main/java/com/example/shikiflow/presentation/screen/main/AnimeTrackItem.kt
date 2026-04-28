@@ -109,11 +109,6 @@ fun AnimeTrackItem(
                     animeShort.currentProgress,
                     userRate.track.progress
                 ) {
-                    val totalEpisodes = when {
-                        (animeShort.totalCount ?: 0) > 0 -> animeShort.totalCount
-                        (animeShort.currentProgress ?: 0) > 0 -> animeShort.currentProgress
-                        else -> null
-                    }
                     totalEpisodes?.let { (userRate.track.progress.toFloat()) / it } ?: 0f
                 }
 

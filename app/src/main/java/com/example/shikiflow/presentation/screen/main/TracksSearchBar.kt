@@ -189,7 +189,7 @@ fun TracksSearchBar(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
                     .background(selectorBackgroundColor)
-                    .padding(all =  8.dp)
+                    .padding(all = 8.dp)
             )
         }
     }
