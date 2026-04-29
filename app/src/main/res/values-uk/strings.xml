@@ -237,6 +237,7 @@
     <string name="details_related">Пов\'язане</string>
     <string name="details_reviews_section_label">Огляди</string>
 
+    <string name="media_details_following">Відслідковують</string>
     <string name="rate_decrement">-</string>
     <string name="rate_increment">+</string>
     <string name="rewatches">Повторні перегляди</string>
@@ -254,7 +255,7 @@
     <string name="browse_type_popular">Найбільш популярні</string>
     <string name="browse_type_upcoming_next_season">У наступному сезоні</string>
     <string name="browse_type_popular_manhwa">Популярна манхва</string>
-    <string name="browse_type_newly_added">Нещодавно додані</string>
+    <string name="browse_type_newly_announced">Нещодавно анонсовані</string>
     <string name="day_of_week_monday">Понеділок</string>
     <string name="day_of_week_tuesday">Вівторок</string>
     <string name="day_of_week_wednesday">Середа</string>

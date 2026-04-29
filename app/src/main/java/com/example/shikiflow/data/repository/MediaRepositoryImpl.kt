@@ -12,12 +12,14 @@ import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaFollowing
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -33,7 +35,7 @@ import javax.inject.Inject
 class MediaRepositoryImpl @Inject constructor(
     @param:AniList private val anilistDataSource: MediaDataSource,
     @param:Shikimori private val shikimoriDataSource: MediaDataSource,
-    private val settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository
 ): MediaRepository, BaseNetworkRepository() {
 
     private val dataSource = settingsRepository.authTypeFlow
@@ -54,6 +56,27 @@ class MediaRepositoryImpl @Inject constructor(
         return withSource(dataSource) { dataSource ->
             dataSource.getMediaDetails(id, idMal, mediaType)
         }
+    }
+
+    override fun getMediaFollowings(
+        mediaId: Int,
+        sort: Sort<UserRateType>
+    ): Flow<PagingData<MediaFollowing>> = withSource(dataSource) { dataSource ->
+        Pager(
+            config = PagingConfig(
+                pageSize = 15,
+                enablePlaceholders = true,
+                prefetchDistance = 5,
+                initialLoadSize = 15
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource(
+                    method = { page, limit ->
+                        dataSource.getMediaFollowings(page, limit, mediaId, sort)
+                    }
+                )
+            }
+        ).flow
     }
 
     override fun paginatedBrowseMedia(

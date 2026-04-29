@@ -174,9 +174,10 @@ fun ThreadsScreen(
                 }
             }
         }
+
         if(showBottomSheet) {
             SortBottomSheet(
-                config = SortConfig<ThreadType>(
+                config = SortConfig(
                     options = ThreadType.entries,
                     selected = threadParams.sort,
                     onSortChange = { threadSort ->

@@ -20,8 +20,8 @@ object BrowseTypeMapper {
             BrowseType.AnimeBrowseType.POPULAR_THIS_SEASON -> R.string.browse_type_popular_this_season
             BrowseType.AnimeBrowseType.UPCOMING_NEXT_SEASON -> R.string.browse_type_upcoming_next_season
             BrowseType.MangaBrowseType.POPULAR_MANHWA -> R.string.browse_type_popular_manhwa
-            BrowseType.AnimeBrowseType.NEWLY_ADDED,
-            BrowseType.MangaBrowseType.NEWLY_ADDED -> R.string.browse_type_newly_added
+            BrowseType.AnimeBrowseType.NEWLY_ANNOUNCED,
+            BrowseType.MangaBrowseType.NEWLY_ANNOUNCED -> R.string.browse_type_newly_announced
         }
     }
 

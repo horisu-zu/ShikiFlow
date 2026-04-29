@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.repository
 
 import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.api.Operation
+import com.apollographql.apollo.exception.ApolloHttpException
 import com.apollographql.apollo.exception.CacheMissException
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
+import org.json.JSONObject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 abstract class BaseNetworkRepository {
@@ -20,12 +22,24 @@ abstract class BaseNetworkRepository {
         data != null -> DataResult.Success(transform(data!!))
 
         hasErrors() -> {
-            val errorString = errors?.joinToString { it.message } ?: "Unknown Error"
-            DataResult.Error(message = errorString)
+            val errorMessage = errors?.joinToString { it.message } ?: "Unknown Error"
+
+            DataResult.Error(message = errorMessage)
         }
 
         exception != null -> {
-            val errorMessage = exception?.message ?: "Unknown Error"
+            val errorMessage = when (val ex = exception) {
+                is ApolloHttpException -> {
+                    val body = ex.body?.readUtf8() ?: ""
+
+                    JSONObject(body)
+                        .getJSONArray("errors")
+                        .getJSONObject(0)
+                        .getString("message")
+                }
+                else -> ex?.message ?: "Unknown Error"
+            }
+
             DataResult.Error(message = errorMessage)
         }
 
@@ -41,12 +55,24 @@ abstract class BaseNetworkRepository {
                 response.data != null -> DataResult.Success(transform(response.data!!))
 
                 response.hasErrors() -> {
-                    val errorString = response.errors?.joinToString { it.message } ?: "Unknown Error"
-                    DataResult.Error(message = errorString)
+                    val errorMessage = response.errors?.joinToString { it.message } ?: "Unknown Error"
+
+                    DataResult.Error(message = errorMessage)
                 }
 
                 response.exception != null -> {
-                    val errorMessage = response.exception?.message ?: "Unknown Error"
+                    val errorMessage = when (val ex = response.exception) {
+                        is ApolloHttpException -> {
+                            val body = ex.body?.readUtf8() ?: ""
+
+                            JSONObject(body)
+                                .getJSONArray("errors")
+                                .getJSONObject(0)
+                                .getString("message")
+                        }
+                        else -> ex?.message ?: "Unknown Error"
+                    }
+
                     DataResult.Error(message = errorMessage)
                 }
 

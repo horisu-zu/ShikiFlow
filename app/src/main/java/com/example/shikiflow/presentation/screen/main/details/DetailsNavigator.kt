@@ -28,6 +28,7 @@ import com.example.shikiflow.presentation.screen.main.details.character.MediaCha
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.followings.MediaFollowingsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.review.MediaReviewsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewScreen
 import com.example.shikiflow.presentation.screen.main.details.manga.MangaDetailsScreen
@@ -43,7 +44,6 @@ fun DetailsNavigator(
     val detailsBackstack = rememberNavBackStack(detailsNavRoute)
 
     val options = object : MediaNavOptions {
-        //Removed two pane scene strategy due to the changes in the Material Adaptive API
         override fun navigateToCharacterDetails(characterId: Int) {
             detailsBackstack.add(DetailsNavRoute.CharacterDetails(characterId))
         }
@@ -129,6 +129,10 @@ fun DetailsNavigator(
 
         override fun navigateToReview(id: Int) {
             detailsBackstack.add(DetailsNavRoute.Review(id))
+        }
+
+        override fun navigateToMediaFollowings(mediaId: Int, totalCount: Int?) {
+            detailsBackstack.add(DetailsNavRoute.MediaFollowings(mediaId, totalCount))
         }
 
         override fun navigateToUserProfile(user: User) {
@@ -277,6 +281,13 @@ fun DetailsNavigator(
             entry<DetailsNavRoute.Review> { route ->
                 ReviewScreen(
                     reviewId = route.id,
+                    navOptions = options
+                )
+            }
+            entry<DetailsNavRoute.MediaFollowings> { route ->
+                MediaFollowingsScreen(
+                    mediaId = route.mediaId,
+                    totalCount = route.totalCount,
                     navOptions = options
                 )
             }

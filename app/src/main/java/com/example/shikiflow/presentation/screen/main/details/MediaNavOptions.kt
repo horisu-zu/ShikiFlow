@@ -47,5 +47,7 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToReview(id: Int)
 
+    fun navigateToMediaFollowings(mediaId: Int, totalCount: Int?)
+
     fun navigateToUserProfile(user: User)
 }

@@ -5,7 +5,6 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,9 +19,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.AppBarWithSearch
-import androidx.compose.material3.ExpandedFullScreenSearchBar
+import androidx.compose.material3.ExpandedFullScreenContainedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarScrollBehavior
 import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,11 +56,17 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, FlowPreview::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    FlowPreview::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun TracksSearchBar(
     currentTrackMode: MediaType,
     scrollBehavior: SearchBarScrollBehavior,
+    containerColor: Color,
+    itemColor: Color,
     onModeChange: (MediaType) -> Unit,
     mainNavOptions: MainNavOptions,
     tracksSearchViewModel: TracksSearchViewModel = hiltViewModel()
@@ -91,9 +95,9 @@ fun TracksSearchBar(
             else 0.dp
     )
 
-    val selectorBackgroundColor = when(isSearchActive) {
+    val itemsBackgroundColor = when(isSearchActive) {
         true -> MaterialTheme.colorScheme.background
-        false -> MaterialTheme.colorScheme.surfaceContainer
+        false -> itemColor
     }
 
     val inputField = @Composable {
@@ -116,10 +120,6 @@ fun TracksSearchBar(
                             )
                         },
                         shape = RoundedCornerShape(16.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent
-                        ),
                         leadingIcon = {
                             IconButton(
                                 onClick = {
@@ -154,7 +154,7 @@ fun TracksSearchBar(
                         modifier = Modifier
                             .weight(1f)
                             .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .background(itemsBackgroundColor)
                             .clickable {
                                 scope.launch {
                                     searchBarState.animateToExpanded()
@@ -185,54 +185,49 @@ fun TracksSearchBar(
             TracksTypeSelector(
                 currentType = currentTrackMode,
                 onModeChange = onModeChange,
-                backgroundColor = selectorBackgroundColor,
+                backgroundColor = itemsBackgroundColor,
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .background(selectorBackgroundColor)
+                    .background(itemsBackgroundColor)
                     .padding(all = 8.dp)
             )
         }
     }
 
-    Column {
-        AppBarWithSearch(
-            state = searchBarState,
-            inputField = inputField,
-            scrollBehavior = scrollBehavior,
-            windowInsets = WindowInsets.statusBars,
-            shape = RectangleShape,
-            colors = SearchBarDefaults.appBarWithSearchColors(
-                searchBarColors = SearchBarDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.background
-                ),
-                appBarContainerColor = MaterialTheme.colorScheme.background
-            )
+    AppBarWithSearch(
+        state = searchBarState,
+        inputField = inputField,
+        scrollBehavior = scrollBehavior,
+        windowInsets = WindowInsets.statusBars,
+        shape = RectangleShape,
+        colors = SearchBarDefaults.appBarWithSearchColors(
+            searchBarColors = SearchBarDefaults.colors(
+                containerColor = containerColor
+            ),
+            scrolledSearchBarContainerColor = containerColor
+        ),
+        modifier = Modifier.background(containerColor)
+    )
+
+    ExpandedFullScreenContainedSearchBar(
+        state = searchBarState,
+        inputField = inputField,
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainer
         )
-
-        if(isSearchActive) {
-            HorizontalDivider()
-        }
-
-        ExpandedFullScreenSearchBar(
-            state = searchBarState,
-            inputField = inputField,
-            colors = SearchBarDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            )
-        ) {
-            TracksSearchBarComponent(
-                mediaType = currentTrackMode,
-                isAppBarVisible = true,
-                onMediaClick = { mediaType, id ->
-                    val detailsNavRoute = when(mediaType) {
-                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                    }
-
-                    mainNavOptions.navigateToDetails(detailsNavRoute)
+    ) {
+        TracksSearchBarComponent(
+            mediaType = currentTrackMode,
+            isAppBarVisible = true,
+            onMediaClick = { mediaType, id ->
+                val detailsNavRoute = when(mediaType) {
+                    MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                    MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
                 }
-            )
-        }
+
+                mainNavOptions.navigateToDetails(detailsNavRoute)
+            }
+        )
     }
 }
 

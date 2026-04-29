@@ -3,10 +3,12 @@ package com.example.shikiflow.data.mapper.anilist
 import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.fragment.ALAiringAnimeShort
 import com.example.graphql.anilist.fragment.MediaBrowse
+import com.example.graphql.anilist.fragment.MediaFollowingShort
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaOriginMapper.toDomain
@@ -14,11 +16,14 @@ import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
+import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.toDomainFormat
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.common.PaginatedList
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaFollowing
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.review.ReviewShort
@@ -31,7 +36,7 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 object AnilistMediaMapper {
-    fun MediaDetailsQuery.Media.toDomain(): MediaDetails {
+    fun MediaDetailsQuery.Media.toDomain(mediaFollowings: PaginatedList<MediaFollowing>): MediaDetails {
         return MediaDetails(
             id = id,
             malId = idMal,
@@ -78,26 +83,41 @@ object AnilistMediaMapper {
                 ?.toList() ?: emptyList(),
             durationMins = duration,
             relatedMedia = relations?.edges?.mapNotNull { it?.aLRelatedMediaShort?.toDomain() } ?: emptyList(),
-            reviews = PaginatedList<ReviewShort>(
+            reviews = PaginatedList(
                 hasNextPage = reviews?.pageInfo?.hasNextPage == true,
                 entries = reviews?.nodes?.mapNotNull { it?.aLReviewShort?.toDomain() }.orEmpty()
             ),
             scoreStats = stats?.aLMediaStats?.scoreDistribution?.mapNotNull { scoreItem ->
-                Stat<Int>(
+                Stat(
                     type = scoreItem?.score ?: 0,
                     value = scoreItem?.amount?.toFloat() ?: 0f
                 )
             }.orEmpty(),
             statusesStats = stats?.aLMediaStats?.statusDistribution?.mapNotNull { statusItem ->
-                Stat<UserRateStatus>(
+                Stat(
                     type = statusItem?.status?.toDomain() ?: UserRateStatus.UNKNOWN,
                     value = statusItem?.amount?.toFloat() ?: 0f
                 )
             }
                 ?.filter { it.value != 0f }
                 .orEmpty(),
-            isFavorite = isFavourite
+            isFavorite = isFavourite,
+            mediaFollowings = mediaFollowings
         )
+    }
+
+    fun MediaFollowingShort.toDomain(): MediaFollowing? {
+        return user?.aLMediaFollowingUser?.let { user ->
+             MediaFollowing(
+                 user = user.toDomain(),
+                 mediaType = media?.type?.toDomain() ?: MediaType.ANIME,
+                 status = status?.toDomain() ?: UserRateStatus.UNKNOWN,
+                 progress = progress,
+                 progressVolumes = progressVolumes,
+                 score = score?.toFloat(),
+                 scoreFormat = user.mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
+            )
+        }
     }
 
     fun MediaBrowse.toBrowse(mediaType: MediaType): BrowseMedia {

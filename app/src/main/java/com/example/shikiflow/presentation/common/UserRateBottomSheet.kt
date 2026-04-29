@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -92,6 +93,8 @@ fun UserRateBottomSheet(
         chip == userRate.status
     }
 
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
     var selectedScore by remember { mutableIntStateOf(userRate.score) }
     var progress by remember { mutableIntStateOf(userRate.progress) }
@@ -104,6 +107,15 @@ fun UserRateBottomSheet(
                 onDismiss()
             }
         }
+    }
+
+    if(showDeleteDialog) {
+        CustomDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            text = stringResource(R.string.user_rate_delete),
+            confirmButtonText = stringResource(R.string.common_ok),
+            onConfirm = { onDelete(userRate.id ?: 0) }
+        )
     }
 
     ModalBottomSheet(
@@ -177,7 +189,7 @@ fun UserRateBottomSheet(
                             )
                         )
                     },
-                    onDelete = { onDelete(userRate.id) },
+                    onDelete = { showDeleteDialog = true },
                     createDate = userRate.createDate,
                     updateDate = userRate.updateDate,
                     isLoading = rateUpdateState == RateUpdateState.LOADING,

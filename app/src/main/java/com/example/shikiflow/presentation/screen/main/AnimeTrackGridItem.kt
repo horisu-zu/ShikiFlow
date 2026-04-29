@@ -60,7 +60,7 @@ fun AnimeTrackGridItem(
                 onLongClick = { onLongClick() }
             )
             .then(modifier),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Box {
             BaseImage(

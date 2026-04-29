@@ -71,4 +71,10 @@ sealed interface DetailsNavRoute : NavKey {
 
     @Serializable
     data class Review(val id: Int) : DetailsNavRoute
+
+    @Serializable
+    data class MediaFollowings(
+        val mediaId: Int,
+        val totalCount: Int?
+    ) : DetailsNavRoute
 }

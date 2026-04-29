@@ -231,6 +231,7 @@
     <string name="details_short_info_manga_started">Started</string>
     <string name="details_related">Related</string>
     <string name="details_reviews_section_label">Reviews</string>
+    <string name="media_details_following">Following</string>
 
     <string name="rate_decrement">-</string>
     <string name="rate_increment">+</string>
@@ -251,7 +252,7 @@
     <string name="browse_type_popular_this_season">Popular This Season</string>
     <string name="browse_type_upcoming_next_season">Upcoming Next Season</string>
     <string name="browse_type_popular_manhwa">Popular Manhwa</string>
-    <string name="browse_type_newly_added">Newly Added</string>
+    <string name="browse_type_newly_announced">Newly Announced</string>
 
     <string name="day_of_week_monday">Monday</string>
     <string name="day_of_week_tuesday">Tuesday</string>

@@ -48,7 +48,6 @@ import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.UserRateData.Companion.toUiModel
 import com.example.shikiflow.presentation.common.CardItem
-import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -62,6 +61,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CharacterCa
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedSection
 import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
+import com.example.shikiflow.presentation.screen.main.details.common.followings.MediaFollowingsSection
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewsSection
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.utils.WebIntent
@@ -82,7 +82,6 @@ fun MangaDetailsContent(
 ) {
     var rateBottomSheet by remember { mutableStateOf(false) }
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
-    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     val horizontalPadding = 12.dp
     val context = LocalContext.current
@@ -292,6 +291,20 @@ fun MangaDetailsContent(
                 )
             }
         }
+        if(mangaDetails.mediaFollowings.entries.isNotEmpty()) {
+            item {
+                MediaFollowingsSection(
+                    mediaFollowings = mangaDetails.mediaFollowings,
+                    episodesCount = mangaDetails.totalCount,
+                    onUserClick = { user ->
+                        mediaNavOptions.navigateToUserProfile(user)
+                    },
+                    onMoreClick = {
+                        mediaNavOptions.navigateToMediaFollowings(mangaDetails.id, mangaDetails.totalCount)
+                    }
+                )
+            }
+        }
         item {
             MediaStatsComponent(
                 mediaType = mangaDetails.mediaType,
@@ -334,7 +347,7 @@ fun MangaDetailsContent(
             onSave = { save ->
                 onSaveUserRate(save, mangaDetails.toShortData())
             },
-            onDelete = { deleteEntryId = it }
+            onDelete = { entryId -> onDeleteUserRate(entryId) }
         )
     }
 
@@ -347,15 +360,6 @@ fun MangaDetailsContent(
                 } else mediaNavOptions.navigateToMangaDetails(id)
             },
             onDismiss = { showRelatedBottomSheet = false }
-        )
-    }
-
-    deleteEntryId?.let { entryId ->
-        CustomDialog(
-            onDismissRequest = { deleteEntryId = null },
-            text = stringResource(R.string.user_rate_delete),
-            confirmButtonText = stringResource(R.string.common_ok),
-            onConfirm = { onDeleteUserRate(entryId) }
         )
     }
 }

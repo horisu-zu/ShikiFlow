@@ -44,5 +44,6 @@ data class MediaDetails(
     val scoreStats: List<Stat<Int>>,
     val statusesStats: List<Stat<UserRateStatus>>,
     val threadId: Int? = null,
-    val isFavorite: Boolean? = null
+    val isFavorite: Boolean? = null,
+    val mediaFollowings: PaginatedList<MediaFollowing> = PaginatedList(false, emptyList())
 )

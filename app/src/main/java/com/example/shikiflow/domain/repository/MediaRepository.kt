@@ -5,24 +5,30 @@ import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaFollowing
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
-
     fun getMediaDetails(
         id: Int? = null,
         idMal: Int? = null,
         mediaType: MediaType
     ): Flow<DataResult<MediaDetails>>
+
+    fun getMediaFollowings(
+        mediaId: Int,
+        sort: Sort<UserRateType>
+    ): Flow<PagingData<MediaFollowing>>
 
     fun paginatedBrowseMedia(
         browseOptions: MediaBrowseOptions

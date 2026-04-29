@@ -12,6 +12,7 @@ import com.example.graphql.anilist.AiringScheduleQuery
 import com.example.graphql.anilist.MediaBrowseQuery
 import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.MediaExternalLinksQuery
+import com.example.graphql.anilist.MediaFollowingQuery
 import com.example.graphql.anilist.MediaRecommendationsQuery
 import com.example.graphql.anilist.MediaReviewQuery
 import com.example.graphql.anilist.MediaReviewsQuery
@@ -30,20 +31,24 @@ import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toAnilistForma
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatus
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistReviewSort
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudio
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
+import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.media_details.MediaFollowing
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -72,10 +77,46 @@ class AnilistMediaDataSource @Inject constructor(
             .fetchPolicy(FetchPolicy.NetworkFirst)
             .toFlow()
             .asDataResult { data ->
-                data.Media?.toDomain() ?: throw NoSuchElementException("Empty Response")
+                val mediaFollowings = PaginatedList(
+                    hasNextPage = data.Page?.pageInfo?.hasNextPage == true,
+                    entries = data.Page?.mediaList
+                        //Filter Current User Media List Entry (API returns it for some reason)
+                        ?.filter { it?.mediaFollowingShort?.id != data.Media?.mediaListEntry?.aLRateEntry?.id }
+                        ?.mapNotNull { mediaList ->
+                            mediaList?.mediaFollowingShort?.toDomain()
+                        } ?: emptyList()
+                )
+
+                data.Media?.toDomain(mediaFollowings) ?: throw NoSuchElementException("Empty Response")
             }
 
         return response
+    }
+
+    override suspend fun getMediaFollowings(
+        page: Int,
+        limit: Int,
+        mediaId: Int,
+        sort: Sort<UserRateType>
+    ): Result<List<MediaFollowing>> {
+        val mediaFollowingsQuery = MediaFollowingQuery(
+            page = page,
+            perPage = limit,
+            mediaId = mediaId,
+            sort = sort.toAnilistOrder()
+        )
+
+        val response = apolloClient.query(mediaFollowingsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.Page
+                ?.mediaList
+                ?.mapNotNull { mediaList ->
+                    mediaList?.mediaFollowingShort?.toDomain()
+                } ?: throw NoSuchElementException("Empty Response")
+        }
     }
 
     override fun paginatedBrowseMedia(
@@ -199,7 +240,7 @@ class AnilistMediaDataSource @Inject constructor(
                 initialLoadSize = 15
             ),
             pagingSourceFactory = {
-                GenericPagingSource<BrowseMedia>(
+                GenericPagingSource(
                     method = { page, limit ->
                         loadMediaRecommendations(mediaType, mediaId, page, limit)
                     }
@@ -269,7 +310,7 @@ class AnilistMediaDataSource @Inject constructor(
                 initialLoadSize = 15
             ),
             pagingSourceFactory = {
-                GenericPagingSource<ReviewShort>(
+                GenericPagingSource(
                     method = { page, pageSize ->
                         paginatedMediaReviews(mediaId, sort, page, pageSize)
                     }

@@ -61,7 +61,7 @@ fun MediaRolesContent(
         }
         is LoadState.Error -> {
             val errorMessage = (mediaRoles.loadState.refresh as LoadState.Error)
-                .error.localizedMessage
+                .error.message
 
             Box(
                 modifier = modifier.fillMaxSize(),

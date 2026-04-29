@@ -224,7 +224,7 @@ private fun OngoingSideScreenContent(
                 }
                 is LoadState.Error -> {
                     val errorMessage = (calendarItems.loadState.refresh as LoadState.Error)
-                        .error.localizedMessage
+                        .error.message
 
                     Box(
                         modifier = modifier.fillMaxSize(),

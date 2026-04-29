@@ -5,6 +5,7 @@ import com.example.graphql.anilist.fragment.ALFavoriteCharacterShort
 import com.example.graphql.anilist.fragment.ALFavoriteMediaShort
 import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
 import com.example.graphql.anilist.fragment.ALListActivity
+import com.example.graphql.anilist.fragment.ALMediaFollowingUser
 import com.example.graphql.anilist.fragment.ALMessageActivity
 import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
@@ -46,6 +47,15 @@ import kotlin.time.Instant
 
 object AnilistUserMapper {
     fun ALUserShort.toDomain(): User {
+        return User(
+            id = id,
+            nickname = name,
+            avatarUrl = avatar?.large ?: "",
+            profileBannerUrl = bannerImage
+        )
+    }
+
+    fun ALMediaFollowingUser.toDomain(): User {
         return User(
             id = id,
             nickname = name,
@@ -241,7 +251,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toScoreStatsTitles(): List<Stat<Int>> {
         return scores?.mapNotNull { score ->
-            Stat<Int>(
+            Stat(
                 type = score?.score ?: 0,
                 value = score?.count?.toFloat() ?: 0f
             )
@@ -250,7 +260,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toScoreStatsTime(mediaType: MediaType): List<Stat<Int>> {
         return scores?.mapNotNull { score ->
-            Stat<Int>(
+            Stat(
                 type = score?.score ?: 0,
                 value = when(mediaType) {
                     MediaType.ANIME -> score?.minutesWatched?.div(60)
@@ -262,7 +272,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toStatusesStats(): List<Stat<UserRateStatus>> {
         return statuses?.mapNotNull { status ->
-            Stat<UserRateStatus>(
+            Stat(
                 type = status?.status?.toDomain() ?: UserRateStatus.UNKNOWN,
                 value = status?.count?.toFloat() ?: 0f
             )
@@ -271,7 +281,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toLengthStatsTitles(): List<Stat<String>> {
         return lengths?.mapNotNull { length ->
-            Stat<String>(
+            Stat(
                 type = length?.length ?: "",
                 value = length?.count?.toFloat() ?: 0f
             )
@@ -282,7 +292,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toLengthStatsTime(mediaType: MediaType): List<Stat<String>> {
         return lengths?.mapNotNull { length ->
-            Stat<String>(
+            Stat(
                 type = length?.length ?: "",
                 value = when(mediaType) {
                     MediaType.ANIME -> length?.minutesWatched?.div(60)
@@ -296,7 +306,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toLengthStatsScore(): List<Stat<String>> {
         return lengths?.mapNotNull { length ->
-            Stat<String>(
+            Stat(
                 type = length?.length ?: "",
                 value = length?.meanScore?.toFloat() ?: 0f
             )
@@ -307,7 +317,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toFormatStats(): List<Stat<MediaFormat>> {
         return formats?.mapNotNull { format ->
-            Stat<MediaFormat>(
+            Stat(
                 type = format?.format?.toDomain() ?: MediaFormat.UNKNOWN,
                 value = format?.count?.toFloat() ?: 0f
             )
@@ -318,7 +328,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toCountryStats(): List<Stat<CountryOfOrigin>> {
         return countries?.mapNotNull { country ->
-            Stat<CountryOfOrigin>(
+            Stat(
                 type = country?.country?.toCountryOfOrigin() ?: CountryOfOrigin.JAPAN,
                 value = country?.count?.toFloat() ?: 0f
             )
@@ -329,7 +339,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toReleaseYearStatsCount(): List<Stat<Int>> {
         return releaseYears?.mapNotNull { releaseYear ->
-            Stat<Int>(
+            Stat(
                 type = releaseYear?.releaseYear ?: 0,
                 value = releaseYear?.count?.toFloat() ?: 0f
             )
@@ -340,7 +350,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toReleaseYearStatsTime(mediaType: MediaType): List<Stat<Int>> {
         return releaseYears?.mapNotNull { releaseYear ->
-            Stat<Int>(
+            Stat(
                 type = releaseYear?.releaseYear ?: 0,
                 value = when(mediaType) {
                     MediaType.ANIME -> releaseYear?.minutesWatched?.div(60)
@@ -354,7 +364,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toReleaseYearStatsScore(): List<Stat<Int>> {
         return releaseYears?.mapNotNull { releaseYear ->
-            Stat<Int>(
+            Stat(
                 type = releaseYear?.releaseYear ?: 0,
                 value = releaseYear?.meanScore?.toFloat() ?: 0f
             )
@@ -365,7 +375,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toStartYearStatsCount(): List<Stat<Int>> {
         return startYears?.mapNotNull { startYear ->
-            Stat<Int>(
+            Stat(
                 type = startYear?.startYear ?: 0,
                 value = startYear?.count?.toFloat() ?: 0f
             )
@@ -376,7 +386,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toStartYearStatsTime(mediaType: MediaType): List<Stat<Int>> {
         return startYears?.mapNotNull { startYear ->
-            Stat<Int>(
+            Stat(
                 type = startYear?.startYear ?: 0,
                 value = when(mediaType) {
                     MediaType.ANIME -> startYear?.minutesWatched?.div(60)
@@ -390,7 +400,7 @@ object AnilistUserMapper {
 
     fun ALUserListStats.toStartYearStatsScore(): List<Stat<Int>> {
         return startYears?.mapNotNull { startYear ->
-            Stat<Int>(
+            Stat(
                 type = startYear?.startYear ?: 0,
                 value = startYear?.meanScore?.toFloat() ?: 0f
             )

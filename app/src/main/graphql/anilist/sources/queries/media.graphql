@@ -82,6 +82,15 @@ query MediaDetails(
         }
         isFavourite
     }
+
+    Page(page: 1, perPage: 9) {
+        mediaList(mediaId: $id, isFollowing: true, sort: [UPDATED_TIME_DESC]) {
+            ...MediaFollowingShort
+        }
+        pageInfo {
+            hasNextPage
+        }
+    }
 }
 
 query MediaBrowse(
@@ -112,6 +121,19 @@ query MediaBrowse(
             countryOfOrigin: $countryOfOrigin
         ) {
             ...MediaBrowse
+        }
+    }
+}
+
+query MediaFollowing(
+    $page: Int!,
+    $perPage: Int!,
+    $mediaId: Int!,
+    $sort: MediaListSort!
+) {
+    Page(page: $page, perPage: $perPage) {
+        mediaList(mediaId: $mediaId, isFollowing: true, sort: [$sort]) {
+            ...MediaFollowingShort
         }
     }
 }

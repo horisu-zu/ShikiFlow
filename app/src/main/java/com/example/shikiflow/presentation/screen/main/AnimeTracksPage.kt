@@ -35,7 +35,6 @@ import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.media.MediaTrack
-import com.example.shikiflow.presentation.common.CustomDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +51,6 @@ fun AnimeTracksPage(
     val appUiMode by tracksViewModel.appUiMode.collectAsStateWithLifecycle()
 
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
-    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     when (animeTrackItems.loadState.refresh) {
         is LoadState.Loading -> {
@@ -67,7 +65,8 @@ fun AnimeTracksPage(
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(R.string.atp_loading_error),
+                    message = (animeTrackItems.loadState.refresh as LoadState.Error)
+                        .error.message ?: stringResource(R.string.atp_loading_error),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { animeTrackItems.refresh() }
                 )
@@ -115,24 +114,15 @@ fun AnimeTracksPage(
                     onSave = { saveUserRate ->
                         tracksViewModel.saveUserRate(saveUserRate)
                     },
-                    onDelete = { deleteEntryId = it }
+                    onDelete = { entryId ->
+                        tracksViewModel.deleteUserRate(
+                            entryId = entryId,
+                            mediaId = item.shortData.id,
+                            malId = item.shortData.malId,
+                            mediaType = item.shortData.mediaType
+                        )
+                    }
                 )
-
-                deleteEntryId?.let { entryId ->
-                    CustomDialog(
-                        onDismissRequest = { deleteEntryId = null },
-                        text = stringResource(R.string.user_rate_delete),
-                        confirmButtonText = stringResource(R.string.common_ok),
-                        onConfirm = {
-                            tracksViewModel.deleteUserRate(
-                                entryId = entryId,
-                                mediaId = item.shortData.id,
-                                malId = item.shortData.malId,
-                                mediaType = item.shortData.mediaType
-                            )
-                        }
-                    )
-                }
             }
         }
     }
@@ -197,7 +187,7 @@ private fun AnimeTracksGridComponent(
     modifier: Modifier = Modifier
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(160.dp),
+        columns = GridCells.Adaptive(180.dp),
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),

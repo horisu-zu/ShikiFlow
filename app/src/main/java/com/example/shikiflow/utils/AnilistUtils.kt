@@ -5,13 +5,13 @@ import com.apollographql.apollo.api.Operation
 
 object AnilistUtils {
     fun <T : Operation.Data> ApolloResponse<T>.toResult(): Result<T> {
-        if(hasErrors()) {
+        if (hasErrors()) {
             return Result.failure(Exception("Errors: $errors"))
         }
 
         return data?.let {
             Result.success(it)
-        } ?: Result.failure(Exception(exception))
+        } ?: Result.failure(exception ?: Exception("Unknown Error"))
     }
 
     inline fun <T, R> Result<T>.flatMap(transform: (T) -> Result<R>): Result<R> {

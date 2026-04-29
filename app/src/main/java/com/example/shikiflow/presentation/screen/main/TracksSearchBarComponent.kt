@@ -50,7 +50,6 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
-import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
@@ -70,7 +69,6 @@ fun TracksSearchBarComponent(
     val chips = listOf(null) + UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
     var selectedTabSearch by rememberSaveable { mutableIntStateOf(0) }
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
-    var deleteEntryId by remember { mutableStateOf<Int?>(null) }
 
     val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
     val rateUpdateState by tracksViewModel.rateUpdateState.collectAsStateWithLifecycle()
@@ -240,24 +238,15 @@ fun TracksSearchBarComponent(
                             onSave = { saveUserRate ->
                                 tracksViewModel.saveUserRate(saveUserRate)
                             },
-                            onDelete = { deleteEntryId = it }
+                            onDelete = { entryId ->
+                                tracksViewModel.deleteUserRate(
+                                    entryId = entryId,
+                                    mediaId = item.shortData.id,
+                                    malId = item.shortData.malId,
+                                    mediaType = item.shortData.mediaType
+                                )
+                            }
                         )
-
-                        deleteEntryId?.let { entryId ->
-                            CustomDialog(
-                                onDismissRequest = { deleteEntryId = null },
-                                text = stringResource(R.string.user_rate_delete),
-                                confirmButtonText = stringResource(R.string.common_ok),
-                                onConfirm = {
-                                    tracksViewModel.deleteUserRate(
-                                        entryId = entryId,
-                                        mediaId = item.shortData.id,
-                                        malId = item.shortData.malId,
-                                        mediaType = item.shortData.mediaType
-                                    )
-                                }
-                            )
-                        }
                     }
                 }
             }

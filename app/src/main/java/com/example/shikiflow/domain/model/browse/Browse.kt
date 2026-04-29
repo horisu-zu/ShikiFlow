@@ -30,7 +30,7 @@ sealed interface BrowseType {
         TRENDING_NOW,
         POPULAR_THIS_SEASON,
         UPCOMING_NEXT_SEASON,
-        NEWLY_ADDED,
+        NEWLY_ANNOUNCED,
         ONGOING;
 
         override val mediaType: MediaType
@@ -43,7 +43,7 @@ sealed interface BrowseType {
                 POPULAR_THIS_SEASON,
                 UPCOMING_NEXT_SEASON-> MediaSort.Common.POPULARITY
                 TRENDING_NOW -> MediaSort.Anilist.TRENDING
-                NEWLY_ADDED -> MediaSort.Anilist.DATE_ADDED
+                NEWLY_ANNOUNCED -> MediaSort.Anilist.DATE_ADDED
             }
 
         //Added Announced for Newly Added titles cuz API isn't consistent and older titles may have higher ID
@@ -52,7 +52,7 @@ sealed interface BrowseType {
                 POPULAR_THIS_SEASON,
                 ONGOING -> MediaStatus.ONGOING
                 UPCOMING_NEXT_SEASON,
-                NEWLY_ADDED -> MediaStatus.ANNOUNCED
+                NEWLY_ANNOUNCED -> MediaStatus.ANNOUNCED
                 else -> null
             }
 
@@ -77,7 +77,7 @@ sealed interface BrowseType {
                 TRENDING_NOW,
                 POPULAR_THIS_SEASON,
                 UPCOMING_NEXT_SEASON,
-                NEWLY_ADDED
+                NEWLY_ANNOUNCED
             )
         }
     }
@@ -87,7 +87,7 @@ sealed interface BrowseType {
         MANGA_POPULARITY,
         TRENDING_NOW,
         POPULAR_MANHWA,
-        NEWLY_ADDED;
+        NEWLY_ANNOUNCED;
 
         override val mediaType: MediaType
             get() = MediaType.MANGA
@@ -97,12 +97,12 @@ sealed interface BrowseType {
                 MANGA_TOP -> MediaSort.Common.SCORE
                 MANGA_POPULARITY, POPULAR_MANHWA -> MediaSort.Common.POPULARITY
                 TRENDING_NOW -> MediaSort.Anilist.TRENDING
-                NEWLY_ADDED -> MediaSort.Anilist.DATE_ADDED
+                NEWLY_ANNOUNCED -> MediaSort.Anilist.DATE_ADDED
             }
 
         override val status: MediaStatus?
             get() = when(this) {
-                NEWLY_ADDED -> MediaStatus.ANNOUNCED
+                NEWLY_ANNOUNCED -> MediaStatus.ANNOUNCED
                 else -> null
             }
 
@@ -124,7 +124,7 @@ sealed interface BrowseType {
             val alSections: List<MangaBrowseType> = listOf(
                 TRENDING_NOW,
                 POPULAR_MANHWA,
-                NEWLY_ADDED
+                NEWLY_ANNOUNCED
             )
         }
     }

@@ -29,19 +29,19 @@ fun MainScreen(
     mainScreenViewModel: MainScreenViewModel = hiltViewModel(),
     mainNavOptions: MainNavOptions
 ) {
+    val currentTrackMode by mainScreenViewModel.currentTrackMode.collectAsStateWithLifecycle()
     val scrollBehavior = SearchBarDefaults.enterAlwaysSearchBarScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
 
-    val isAppBarVisible by remember {
+    val isScrolling by remember {
         derivedStateOf {
-            scrollBehavior.scrollOffset > scrollBehavior.scrollOffsetLimit
+            scrollBehavior.contentOffset < 0f || scrollBehavior.scrollOffset <= scrollBehavior.scrollOffsetLimit
         }
     }
 
-    val backgroundColor = if(isAppBarVisible) MaterialTheme.colorScheme.background
-        else MaterialTheme.colorScheme.surfaceContainer
-    val currentTrackMode by mainScreenViewModel.currentTrackMode.collectAsStateWithLifecycle()
+    val backgroundColor = if(isScrolling) MaterialTheme.colorScheme.surfaceContainer
+        else MaterialTheme.colorScheme.background
 
     currentTrackMode?.let { trackMode ->
         Scaffold(
@@ -49,6 +49,9 @@ fun MainScreen(
                 TracksSearchBar(
                     currentTrackMode = trackMode,
                     scrollBehavior = scrollBehavior,
+                    containerColor = backgroundColor,
+                    itemColor = if(isScrolling) MaterialTheme.colorScheme.background
+                        else MaterialTheme.colorScheme.surfaceContainer,
                     onModeChange = { trackMode -> mainScreenViewModel.setCurrentTrackMode(trackMode) },
                     mainNavOptions = mainNavOptions
                 )
@@ -58,7 +61,7 @@ fun MainScreen(
         ) { paddingValues ->
             MainPage(
                 mediaType = trackMode,
-                isAppBarVisible = isAppBarVisible,
+                isAtTop = !isScrolling,
                 onMediaClick = { mediaId, mediaType ->
                     val detailsNavRoute = when(mediaType) {
                         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)

@@ -197,6 +197,7 @@ class NetworkModule {
             .serverUrl(BuildConfig.ANILIST_GRAPHQL_URL)
             .okHttpClient(okHttpClient)
             .normalizedCache(cacheFactory)
+            .httpExposeErrorBody(true)
             .build()
     }
 
