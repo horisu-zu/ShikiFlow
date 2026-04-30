@@ -4,12 +4,22 @@ import android.icu.text.ListFormatter
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ListActivity
 
 object ListActivityMapper {
+    fun String.withStyledDigits(style: SpanStyle): AnnotatedString = buildAnnotatedString {
+        append(this@withStyledDigits)
+        Regex("\\d+").findAll(this@withStyledDigits).forEach { match ->
+            addStyle(style, match.range.first, match.range.last + 1)
+        }
+    }
+
     @Composable
     fun ListActivity.description(): String {
         val progressText = if(progress.size > 2) {

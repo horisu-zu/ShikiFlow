@@ -13,7 +13,8 @@ class BrowseUseCase @Inject constructor(
     private val mediaRepository: MediaRepository
 ) {
     operator fun invoke(
-        browseType: BrowseType
+        browseType: BrowseType,
+        isRefreshing: Boolean
     ): Flow<DataResult<List<BrowseMedia>>> = flow {
         emit(DataResult.Loading)
 
@@ -24,7 +25,8 @@ class BrowseUseCase @Inject constructor(
                 status = browseType.status,
                 season = browseType.season,
                 countryOfOrigin = browseType.countryOfOrigin
-            )
+            ),
+            isRefreshing = isRefreshing
         )
 
         result.fold(

@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
@@ -36,12 +37,18 @@ fun MainScreen(
 
     val isScrolling by remember {
         derivedStateOf {
-            scrollBehavior.contentOffset < 0f || scrollBehavior.scrollOffset <= scrollBehavior.scrollOffsetLimit
+            scrollBehavior.scrollOffset <= scrollBehavior.scrollOffsetLimit
         }
     }
 
-    val backgroundColor = if(isScrolling) MaterialTheme.colorScheme.surfaceContainer
-        else MaterialTheme.colorScheme.background
+    val backgroundColor by animateColorAsState(
+        targetValue = if(isScrolling) MaterialTheme.colorScheme.surfaceContainer
+            else MaterialTheme.colorScheme.background
+    )
+    val itemColor by animateColorAsState(
+        targetValue = if(isScrolling) MaterialTheme.colorScheme.background
+            else MaterialTheme.colorScheme.surfaceContainer
+    )
 
     currentTrackMode?.let { trackMode ->
         Scaffold(
@@ -50,8 +57,7 @@ fun MainScreen(
                     currentTrackMode = trackMode,
                     scrollBehavior = scrollBehavior,
                     containerColor = backgroundColor,
-                    itemColor = if(isScrolling) MaterialTheme.colorScheme.background
-                        else MaterialTheme.colorScheme.surfaceContainer,
+                    itemColor = itemColor,
                     onModeChange = { trackMode -> mainScreenViewModel.setCurrentTrackMode(trackMode) },
                     mainNavOptions = mainNavOptions
                 )

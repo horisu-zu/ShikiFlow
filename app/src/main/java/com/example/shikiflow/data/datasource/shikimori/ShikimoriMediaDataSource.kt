@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.datasource.shikimori
 
-import android.util.Log
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -16,7 +15,6 @@ import com.example.graphql.shikimori.MangaBrowseQuery
 import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.AiringPagingSource
-import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiAnimeKind
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiMangaKind
@@ -74,14 +72,13 @@ class ShikimoriMediaDataSource @Inject constructor(
                             ids = Optional.presentIfNotNull((id ?: idMal).toString())
                         )
                     )
-                    .fetchPolicy(FetchPolicy.NetworkFirst)
+                    .fetchPolicy(FetchPolicy.CacheAndNetwork)
                     .toFlow()
                     .asDataResult { data ->
                         data.animes.firstOrNull()?.toDomain()
                             ?: throw IllegalStateException("No Anime Details data returned")
                     }
             }
-
             MediaType.MANGA -> {
                 apolloClient
                     .query(
@@ -89,7 +86,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                             ids = Optional.presentIfNotNull((id ?: idMal).toString())
                         )
                     )
-                    .fetchPolicy(FetchPolicy.NetworkFirst)
+                    .fetchPolicy(FetchPolicy.CacheAndNetwork)
                     .toFlow()
                     .asDataResult { data ->
                         data.mangas.firstOrNull()?.toDomain()
@@ -108,29 +105,11 @@ class ShikimoriMediaDataSource @Inject constructor(
         TODO("Not available in the API")
     }
 
-    override fun paginatedBrowseMedia(
-        browseOptions: MediaBrowseOptions
-    ): Flow<PagingData<BrowseMedia>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 24,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 24
-            ),
-            pagingSourceFactory = {
-                BrowsePagingSource(
-                    mediaDataSource = this,
-                    options = browseOptions
-                )
-            }
-        ).flow
-    }
-
     override suspend fun browseMedia(
         page: Int,
         limit: Int,
-        browseOptions: MediaBrowseOptions
+        browseOptions: MediaBrowseOptions,
+        isRefresh: Boolean
     ): Result<List<BrowseMedia>> {
         return  when(browseOptions.mediaType) {
             MediaType.ANIME -> {
@@ -148,10 +127,14 @@ class ShikimoriMediaDataSource @Inject constructor(
                     censored = Optional.present(true)
                 )
 
-                val response = apolloClient.query(query).execute()
-
-                Log.d("ShikimoriMediaDataSource", "Query: $query")
-                Log.d("ShikimoriMediaDataSource", "Response: $response")
+                val response = apolloClient.query(query)
+                    .fetchPolicy(
+                        fetchPolicy = when(isRefresh) {
+                            true -> FetchPolicy.NetworkFirst
+                            false -> FetchPolicy.CacheFirst
+                        }
+                    )
+                    .execute()
 
                 response.toResult().map { data ->
                     data.animes.map { anime ->
@@ -172,7 +155,14 @@ class ShikimoriMediaDataSource @Inject constructor(
                     censored = Optional.present(true)
                 )
 
-                val response = apolloClient.query(query).execute()
+                val response = apolloClient.query(query)
+                    .fetchPolicy(
+                        fetchPolicy = when(isRefresh) {
+                            true -> FetchPolicy.NetworkFirst
+                            false -> FetchPolicy.CacheFirst
+                        }
+                    )
+                    .execute()
 
                 response.toResult().map { data ->
                     data.mangas.map { manga ->

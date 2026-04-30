@@ -56,7 +56,9 @@ class AnilistBrowseViewModel @Inject constructor(
             .distinctUntilChanged { old, new ->
                 new.sections[browseType]?.isRefreshing == false
             }
-            .flatMapLatest { browseUseCase(browseType) }
+            .flatMapLatest { state ->
+                browseUseCase(browseType, state.sections[browseType]?.isRefreshing == true)
+            }
             .onEach { result ->
                 _uiState.update { state ->
                     when(result) {

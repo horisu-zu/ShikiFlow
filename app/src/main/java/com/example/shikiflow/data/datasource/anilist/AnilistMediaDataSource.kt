@@ -20,7 +20,6 @@ import com.example.graphql.anilist.StudioBrowseQuery
 import com.example.graphql.anilist.StudioQuery
 import com.example.graphql.anilist.type.MediaSort as ALMediaSort
 import com.example.shikiflow.data.datasource.MediaDataSource
-import com.example.shikiflow.data.local.source.BrowsePagingSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
@@ -119,30 +118,14 @@ class AnilistMediaDataSource @Inject constructor(
         }
     }
 
-    override fun paginatedBrowseMedia(
-        browseOptions: MediaBrowseOptions
-    ): Flow<PagingData<BrowseMedia>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 24,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 24
-            ),
-            pagingSourceFactory = {
-                BrowsePagingSource(
-                    mediaDataSource = this,
-                    options = browseOptions
-                )
-            }
-        ).flow
-    }
-
     override suspend fun browseMedia(
         page: Int,
         limit: Int,
-        browseOptions: MediaBrowseOptions
+        browseOptions: MediaBrowseOptions,
+        isRefresh: Boolean
     ): Result<List<BrowseMedia>> {
+        if(browseOptions.name?.isBlank() == true) return Result.success(emptyList())
+
         val browseQuery = MediaBrowseQuery(
             page = page,
             perPage = limit,
@@ -158,7 +141,14 @@ class AnilistMediaDataSource @Inject constructor(
             countryOfOrigin = Optional.presentIfNotNull(browseOptions.countryOfOrigin?.toDto())
         )
 
-        val response = apolloClient.query(browseQuery).execute()
+        val response = apolloClient.query(browseQuery)
+            .fetchPolicy(
+                fetchPolicy = when(isRefresh) {
+                    true -> FetchPolicy.NetworkFirst
+                    false -> FetchPolicy.CacheFirst
+                }
+            )
+            .execute()
 
         return response.toResult().map { data ->
             data.Page

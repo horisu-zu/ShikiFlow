@@ -10,7 +10,8 @@ import javax.inject.Inject
 
 class BrowsePagingSource @Inject constructor(
     private val mediaDataSource: MediaDataSource,
-    private val options: MediaBrowseOptions
+    private val options: MediaBrowseOptions,
+    private val isRefreshing: Boolean
 ): PagingSource<Int, BrowseMedia>() {
 
     override fun getRefreshKey(state: PagingState<Int, BrowseMedia>): Int? {
@@ -33,7 +34,8 @@ class BrowsePagingSource @Inject constructor(
         val response = mediaDataSource.browseMedia(
             page = page,
             limit = pageSize,
-            browseOptions = options
+            browseOptions = options,
+            isRefresh = isRefreshing
         )
 
         return response.fold(

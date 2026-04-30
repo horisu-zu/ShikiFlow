@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.browse.main
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -227,8 +228,39 @@ fun BrowseSearchBar(
             )
         ) {
             SearchBarContent(
-                navOptions = navOptions,
-                horizontalPadding = horizontalPadding
+                horizontalPadding = horizontalPadding,
+                onNavigate = { browseItem ->
+                    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        scope.launch {
+                            searchBarState.animateToCollapsed()
+                        }
+                    }
+                    when(browseItem) {
+                        is BrowseMedia -> {
+                            val detailsNavRoute = when(browseItem.mediaType) {
+                                MediaType.ANIME -> DetailsNavRoute.AnimeDetails(browseItem.id)
+                                MediaType.MANGA -> DetailsNavRoute.MangaDetails(browseItem.id)
+                            }
+
+                            navOptions.navigateToDetails(detailsNavRoute)
+                        }
+                        is Browse.Character -> {
+                            navOptions.navigateToDetails(
+                                DetailsNavRoute.CharacterDetails(browseItem.data.id)
+                            )
+                        }
+                        is Browse.Staff -> {
+                            navOptions.navigateToDetails(
+                                DetailsNavRoute.Staff(browseItem.data.id)
+                            )
+                        }
+                        is Browse.User -> {
+                            navOptions.navigateToProfile(
+                                user = browseItem.data
+                            )
+                        }
+                    }
+                }
             )
         }
     }
@@ -237,8 +269,8 @@ fun BrowseSearchBar(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun SearchBarContent(
-    navOptions: BrowseNavOptions,
     horizontalPadding: Dp,
+    onNavigate: (Browse) -> Unit,
     modifier: Modifier = Modifier,
     searchViewModel: BrowseSearchViewModel = hiltViewModel()
 ) {
@@ -363,33 +395,24 @@ private fun SearchBarContent(
                                 is BrowseMedia -> {
                                     BrowseGridItem(
                                         browseItem = browseItem,
-                                        onItemClick = { id, mediaType ->
-                                            val detailsNavRoute = when(mediaType) {
-                                                MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                                                MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                                            }
-
-                                            navOptions.navigateToDetails(detailsNavRoute)
+                                        onItemClick = { _, _ ->
+                                            onNavigate(browseItem)
                                         }
                                     )
                                 }
                                 is Browse.Character -> {
                                     MediaPersonItem(
                                         mediaPerson = browseItem.data,
-                                        onItemClick = { id ->
-                                            navOptions.navigateToDetails(
-                                                DetailsNavRoute.CharacterDetails(id)
-                                            )
+                                        onItemClick = { _ ->
+                                            onNavigate(browseItem)
                                         }
                                     )
                                 }
                                 is Browse.Staff -> {
                                     MediaPersonItem(
                                         mediaPerson = browseItem.data,
-                                        onItemClick = { id ->
-                                            navOptions.navigateToDetails(
-                                                DetailsNavRoute.Staff(id)
-                                            )
+                                        onItemClick = { _ ->
+                                            onNavigate(browseItem)
                                         }
                                     )
                                 }
@@ -398,11 +421,7 @@ private fun SearchBarContent(
                                         user = browseItem.data,
                                         modifier = Modifier
                                             .clip(RoundedCornerShape(12.dp))
-                                            .clickable {
-                                                navOptions.navigateToProfile(
-                                                    user = browseItem.data
-                                                )
-                                            }
+                                            .clickable { onNavigate(browseItem) }
                                             .padding(horizontal = 8.dp, vertical = 6.dp)
                                     )
                                 }

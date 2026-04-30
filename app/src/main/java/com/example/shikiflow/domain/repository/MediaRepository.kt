@@ -31,13 +31,15 @@ interface MediaRepository {
     ): Flow<PagingData<MediaFollowing>>
 
     fun paginatedBrowseMedia(
-        browseOptions: MediaBrowseOptions
+        browseOptions: MediaBrowseOptions,
+        isRefreshing: Boolean = false
     ): Flow<PagingData<BrowseMedia>>
 
     suspend fun browseMedia(
         page: Int = 1,
         size: Int = 24,
-        browseOptions: MediaBrowseOptions
+        browseOptions: MediaBrowseOptions,
+        isRefreshing: Boolean = false
     ): Result<List<BrowseMedia>>
 
     fun getAiringAnimes(

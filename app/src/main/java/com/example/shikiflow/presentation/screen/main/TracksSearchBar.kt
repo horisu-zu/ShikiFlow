@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -204,6 +205,8 @@ fun TracksSearchBar(
             searchBarColors = SearchBarDefaults.colors(
                 containerColor = containerColor
             ),
+            appBarContainerColor = containerColor,
+            scrolledAppBarContainerColor = containerColor,
             scrolledSearchBarContainerColor = containerColor
         ),
         modifier = Modifier.background(containerColor)
@@ -223,6 +226,12 @@ fun TracksSearchBar(
                 val detailsNavRoute = when(mediaType) {
                     MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
                     MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                }
+
+                if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    scope.launch {
+                        searchBarState.animateToCollapsed()
+                    }
                 }
 
                 mainNavOptions.navigateToDetails(detailsNavRoute)

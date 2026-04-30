@@ -80,20 +80,34 @@ class MediaRepositoryImpl @Inject constructor(
     }
 
     override fun paginatedBrowseMedia(
-        browseOptions: MediaBrowseOptions
-    ): Flow<PagingData<BrowseMedia>> {
-        return withSource(dataSource) { dataSource ->
-            dataSource.paginatedBrowseMedia(browseOptions)
-        }
+        browseOptions: MediaBrowseOptions,
+        isRefreshing: Boolean
+    ): Flow<PagingData<BrowseMedia>> = withSource(dataSource) { dataSource ->
+        Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 24
+            ),
+            pagingSourceFactory = {
+                GenericPagingSource(
+                    method = { page, limit ->
+                        dataSource.browseMedia(page, limit, browseOptions, isRefreshing)
+                    }
+                )
+            }
+        ).flow
     }
 
     override suspend fun browseMedia(
         page: Int,
         size: Int,
-        browseOptions: MediaBrowseOptions
+        browseOptions: MediaBrowseOptions,
+        isRefreshing: Boolean
     ): Result<List<BrowseMedia>> {
         return withSourceSuspend(dataSource) { dataSource ->
-            dataSource.browseMedia(page, size, browseOptions)
+            dataSource.browseMedia(page, size, browseOptions, isRefreshing)
         }
     }
 

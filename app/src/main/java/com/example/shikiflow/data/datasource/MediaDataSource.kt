@@ -32,14 +32,11 @@ interface MediaDataSource {
         sort: Sort<UserRateType>
     ): Result<List<MediaFollowing>>
 
-    fun paginatedBrowseMedia(
-        browseOptions: MediaBrowseOptions
-    ): Flow<PagingData<BrowseMedia>>
-
     suspend fun browseMedia(
         page: Int,
         limit: Int,
-        browseOptions: MediaBrowseOptions
+        browseOptions: MediaBrowseOptions,
+        isRefresh: Boolean
     ): Result<List<BrowseMedia>>
 
     fun getAiringAnimes(

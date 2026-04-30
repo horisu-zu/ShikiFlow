@@ -26,7 +26,6 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
-import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus

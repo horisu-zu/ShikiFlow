@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,6 +34,7 @@ import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.description
+import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import com.example.shikiflow.utils.Converter.convertInstantToString
 
 @Composable
@@ -113,7 +115,13 @@ fun ListActivityItem(
                 fontWeight = FontWeight.SemiBold
             )
             Text(
-                text = listActivity.description(),
+                text = listActivity.description()
+                    .withStyledDigits(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
