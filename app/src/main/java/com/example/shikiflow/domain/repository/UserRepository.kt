@@ -38,7 +38,10 @@ interface UserRepository {
 
     fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>>
 
-    fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
+    fun getUserStatsCategories(
+        userId: Int,
+        isRefresh: Boolean
+    ): Flow<DataResult<UserStatsCategories>>
 
     fun getUserSocial(userId: Int, socialCategory: SocialCategory): Flow<PagingData<UserSocial>>
 

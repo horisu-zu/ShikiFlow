@@ -103,11 +103,18 @@ class AnilistUserDataSource @Inject constructor(
     }
 
     override fun getUserStatsCategories(
-        userId: Int
+        userId: Int,
+        isRefresh: Boolean
     ): Flow<DataResult<UserStatsCategories>> {
         val userStatsCategoriesQuery = UserStatsCategoriesQuery(userId)
 
         val response = apolloClient.query(userStatsCategoriesQuery)
+            .fetchPolicy(
+                fetchPolicy = when(isRefresh) {
+                    true -> FetchPolicy.NetworkFirst
+                    false -> FetchPolicy.CacheFirst
+                }
+            )
             .toFlow()
             .asDataResult { response ->
                 response.toDomain()
@@ -127,7 +134,7 @@ class AnilistUserDataSource @Inject constructor(
                 val userStats = data.User?.statistics ?:
                     throw IllegalStateException("No user statistics data returned")
 
-                MediaTypeStats<OverviewStats>(
+                MediaTypeStats(
                     animeStats = userStats.anime?.aLUserListStats?.toOverviewStats(MediaType.ANIME),
                     mangaStats = userStats.manga?.aLUserListStats?.toOverviewStats(MediaType.MANGA)
                 )
@@ -147,7 +154,7 @@ class AnilistUserDataSource @Inject constructor(
                 val userGenres = data.User?.statistics ?:
                     throw IllegalStateException("No user statistics data returned")
 
-                MediaTypeStats<List<TypeStat>>(
+                MediaTypeStats(
                     animeStats = userGenres.anime?.aLUserGenres?.toGenreStats(),
                     mangaStats = userGenres.manga?.aLUserGenres?.toGenreStats()
                 )
@@ -165,7 +172,7 @@ class AnilistUserDataSource @Inject constructor(
                 val userGenres = data.User?.statistics ?:
                     throw IllegalStateException("No user statistics data returned")
 
-                MediaTypeStats<List<TypeStat>>(
+                MediaTypeStats(
                     animeStats = userGenres.anime?.aLUserTags?.toTagsStats(),
                     mangaStats = userGenres.manga?.aLUserTags?.toTagsStats()
                 )
@@ -183,7 +190,7 @@ class AnilistUserDataSource @Inject constructor(
                 val userGenres = data.User?.statistics ?:
                     throw IllegalStateException("No user statistics data returned")
 
-                MediaTypeStats<List<StaffStat>>(
+                MediaTypeStats(
                     animeStats = userGenres.anime?.aLUserStaff?.toStaffStats(),
                     mangaStats = userGenres.manga?.aLUserStaff?.toStaffStats()
                 )
@@ -255,7 +262,7 @@ class AnilistUserDataSource @Inject constructor(
                 initialLoadSize = 18
             ),
             pagingSourceFactory = {
-                GenericPagingSource<UserSocial>(
+                GenericPagingSource(
                     method = { page, limit ->
                         when(socialCategory) {
                             SocialCategory.FOLLOWINGS -> getUserFollowings(userId, page, limit)

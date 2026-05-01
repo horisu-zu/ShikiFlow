@@ -41,6 +41,7 @@ fun UserActivitySection(
     userId: Int,
     isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
+    onRefresh: () -> Unit,
     navOptions: ProfileNavOptions,
     modifier: Modifier = Modifier,
     userActivityViewModel: UserActivityViewModel = hiltViewModel()
@@ -62,7 +63,10 @@ fun UserActivitySection(
         isRefreshing = isRefreshing,
         modifier = modifier.fillMaxSize(),
         enabled = isRefreshEnabled,
-        onRefresh = { userActivityItems.refresh() }
+        onRefresh = {
+            onRefresh()
+            userActivityItems.refresh()
+        }
     ) {
         when(userActivityItems.loadState.refresh) {
             is LoadState.Loading -> {

@@ -38,7 +38,6 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStatType
-import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.iconResource
@@ -60,7 +59,6 @@ fun UserStatsSection(
     userData: User,
     typesList: List<MediaType>,
     isCurrentUser: Boolean,
-    isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
     navOptions: ProfileNavOptions,
     userStatsViewModel: UserStatsViewModel = hiltViewModel()
@@ -71,44 +69,38 @@ fun UserStatsSection(
         userStatsViewModel.setInitialParams(userData.id, typesList)
     }
 
-    PullToRefreshCustomBox(
-        isRefreshing = uiState.isLoading,
-        enabled = isRefreshEnabled,
-        onRefresh = { userStatsViewModel.onRefresh() },
-        modifier = Modifier.fillMaxSize()
-    ) {
-        uiState.authType?.let { authType ->
-            when(authType) {
-                AuthType.SHIKIMORI -> {
-                    ShikimoriTrackSection(
-                        userRateData = uiState.overviewStats,
-                        typesList = uiState.typesList,
-                        currentType = uiState.mediaType,
-                        isCurrentUser = isCurrentUser,
-                        onTypeSelect = { mediaType ->
-                            userStatsViewModel.setMediaType(mediaType)
-                        },
-                        onCompareClick = {
-                            navOptions.navigateToCompare(userData)
-                        },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = horizontalPadding)
-                    )
-                }
-                AuthType.ANILIST -> {
-                    AnilistStatsSection(
-                        uiState = uiState,
-                        isCurrentUser = isCurrentUser,
-                        onCompareClick = {
-                            navOptions.navigateToCompare(userData)
-                        },
-                        horizontalPadding = horizontalPadding,
-                        event = userStatsViewModel,
-                        navOptions = navOptions
-                    )
-                }
+    uiState.authType?.let { authType ->
+        when(authType) {
+            AuthType.SHIKIMORI -> {
+                ShikimoriTrackSection(
+                    userRateData = uiState.overviewStats,
+                    typesList = uiState.typesList,
+                    currentType = uiState.mediaType,
+                    isCurrentUser = isCurrentUser,
+                    onTypeSelect = { mediaType ->
+                        userStatsViewModel.setMediaType(mediaType)
+                    },
+                    onCompareClick = {
+                        navOptions.navigateToCompare(userData)
+                    },
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = horizontalPadding)
+                )
+            }
+            AuthType.ANILIST -> {
+                AnilistStatsSection(
+                    uiState = uiState,
+                    isCurrentUser = isCurrentUser,
+                    onCompareClick = {
+                        navOptions.navigateToCompare(userData)
+                    },
+                    horizontalPadding = horizontalPadding,
+                    event = userStatsViewModel,
+                    navOptions = navOptions,
+                    modifier = Modifier.fillMaxSize()
+                )
             }
         }
     }

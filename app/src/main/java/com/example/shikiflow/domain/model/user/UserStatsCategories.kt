@@ -7,4 +7,10 @@ data class UserStatsCategories(
     val scoreMediaTypes: List<MediaType> = emptyList(),
     val favoriteCategories: List<FavoriteCategory> = emptyList(),
     val socialCategories: List<SocialCategory> = emptyList()
-)
+) {
+    companion object {
+        fun UserStatsCategories.isEmpty(): Boolean {
+            return scoreMediaTypes.isEmpty() && favoriteCategories.isEmpty() && socialCategories.isEmpty()
+        }
+    }
+}

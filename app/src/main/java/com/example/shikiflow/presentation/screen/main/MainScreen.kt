@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,7 +15,9 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -35,9 +38,10 @@ fun MainScreen(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
 
+    var isAtTop by remember { mutableStateOf(true) }
     val isScrolling by remember {
         derivedStateOf {
-            scrollBehavior.scrollOffset <= scrollBehavior.scrollOffsetLimit
+            !isAtTop || scrollBehavior.scrollOffset <= scrollBehavior.scrollOffsetLimit
         }
     }
 
@@ -67,7 +71,11 @@ fun MainScreen(
         ) { paddingValues ->
             MainPage(
                 mediaType = trackMode,
-                isAtTop = !isScrolling,
+                isScrolling = !isScrolling,
+                onIsAtTopChange = {
+                    Log.d("MainScreen", "Is At Top: $it")
+                    isAtTop = it
+                },
                 onMediaClick = { mediaId, mediaType ->
                     val detailsNavRoute = when(mediaType) {
                         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)

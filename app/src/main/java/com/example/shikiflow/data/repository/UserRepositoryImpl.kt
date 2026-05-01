@@ -126,10 +126,11 @@ class UserRepositoryImpl @Inject constructor(
     }
 
     override fun getUserStatsCategories(
-        userId: Int
+        userId: Int,
+        isRefresh: Boolean
     ): Flow<DataResult<UserStatsCategories>> {
         return withSource(dataSource) { dataSource ->
-            dataSource.getUserStatsCategories(userId)
+            dataSource.getUserStatsCategories(userId, isRefresh)
         }
     }
 

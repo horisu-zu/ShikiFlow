@@ -59,6 +59,7 @@ fun FavoritesSection(
     favoriteCategories: List<FavoriteCategory>,
     isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
+    onRefresh: () -> Unit,
     onFavoriteClick: (FavoriteCategory, Int) -> Unit,
     onStudioClick: (Int, String) -> Unit,
     favoritesViewModel: FavoritesViewModel = hiltViewModel()
@@ -67,7 +68,9 @@ fun FavoritesSection(
 
     val pagerState = rememberPagerState(
         initialPage = params.currentCategory?.let { favoriteCategory ->
-            favoriteCategories.indexOf(favoriteCategory)
+            favoriteCategories.indexOf(favoriteCategory).let { index ->
+                if(index != -1) index else 0
+            }
         } ?: 0,
         pageCount = { favoriteCategories.size }
     )
@@ -142,7 +145,10 @@ fun FavoritesSection(
                     PullToRefreshCustomBox(
                         isRefreshing = userFavoriteItems.loadState.refresh is LoadState.Loading,
                         enabled = isRefreshEnabled,
-                        onRefresh = { userFavoriteItems.refresh() },
+                        onRefresh = {
+                            onRefresh()
+                            userFavoriteItems.refresh()
+                        },
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(top = paddingValues.calculateTopPadding())

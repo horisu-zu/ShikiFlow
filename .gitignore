@@ -15,3 +15,7 @@
 local.properties
 secret.properties
 local.defaults.properties
+
+# Release
+/app/release
+*.dm

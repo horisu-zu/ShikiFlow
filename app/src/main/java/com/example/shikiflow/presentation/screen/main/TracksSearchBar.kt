@@ -41,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -200,7 +199,12 @@ fun TracksSearchBar(
         inputField = inputField,
         scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets.statusBars,
-        shape = RectangleShape,
+        shape = RoundedCornerShape(
+            topStart = 16.dp,
+            bottomStart = 16.dp,
+            topEnd = 12.dp,
+            bottomEnd = 12.dp
+        ),
         colors = SearchBarDefaults.appBarWithSearchColors(
             searchBarColors = SearchBarDefaults.colors(
                 containerColor = containerColor

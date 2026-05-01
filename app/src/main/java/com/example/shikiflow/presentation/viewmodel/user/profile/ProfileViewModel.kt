@@ -22,7 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val settingsRepository: SettingsRepository
+    settingsRepository: SettingsRepository
 ) : UiStateViewModel<ProfileUiState>() {
 
     override val initialState: ProfileUiState = ProfileUiState()
@@ -36,7 +36,7 @@ class ProfileViewModel @Inject constructor(
                 old.user?.id == new.user?.id && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                userRepository.getUserStatsCategories(state.user?.id!!)
+                userRepository.getUserStatsCategories(state.user?.id!!, state.isRefreshing)
             }
             .onEach { result ->
                 mutableUiState.update { state ->

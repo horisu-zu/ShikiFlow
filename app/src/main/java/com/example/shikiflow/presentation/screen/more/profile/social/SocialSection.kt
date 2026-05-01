@@ -63,6 +63,7 @@ fun SocialSection(
     socialCategories: List<SocialCategory>,
     isRefreshEnabled: Boolean,
     horizontalPadding: Dp,
+    onRefresh: () -> Unit,
     navOptions: ProfileNavOptions,
     userSocialViewModel: UserSocialViewModel = hiltViewModel()
 ) {
@@ -70,7 +71,9 @@ fun SocialSection(
 
     val pagerState = rememberPagerState(
         initialPage = params.currentCategory?.let { socialCategory ->
-            socialCategories.indexOf(socialCategory)
+            socialCategories.indexOf(socialCategory).let { index ->
+                if(index != -1) index else 0
+            }
         } ?: 0,
         pageCount = { socialCategories.size }
     )
@@ -159,7 +162,10 @@ fun SocialSection(
                     PullToRefreshCustomBox(
                         enabled = isRefreshEnabled,
                         isRefreshing = socialItems.loadState.refresh is LoadState.Loading,
-                        onRefresh = { socialItems.refresh() }
+                        onRefresh = {
+                            onRefresh()
+                            socialItems.refresh()
+                        }
                     ) {
                         LazyVerticalGrid(
                             columns = when(category) {

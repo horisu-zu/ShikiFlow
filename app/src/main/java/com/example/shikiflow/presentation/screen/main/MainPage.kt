@@ -19,7 +19,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainPage(
     mediaType: MediaType,
-    isAtTop: Boolean,
+    isScrolling: Boolean,
+    onIsAtTopChange: (Boolean) -> Unit,
     onMediaClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -43,7 +44,7 @@ fun MainPage(
                     )
                 }
             },
-            isAtTop = isAtTop
+            isAtTop = isScrolling
         )
         HorizontalPager(
             state = pagerState,
@@ -56,7 +57,9 @@ fun MainPage(
                     MediaType.ANIME -> {
                         AnimeTracksPage(
                             userStatus = UserRateStatus.entries[page],
-                            isAppBarVisible = isAtTop,
+                            isCurrentPage = page == pagerState.currentPage,
+                            isAppBarVisible = isScrolling,
+                            onIsAtTopChange = onIsAtTopChange,
                             onAnimeClick = { animeId ->
                                 onMediaClick(animeId, mediaType)
                             }
@@ -65,7 +68,9 @@ fun MainPage(
                     MediaType.MANGA -> {
                         MangaTracksPage(
                             userStatus = UserRateStatus.entries[page],
-                            isAppBarVisible = isAtTop,
+                            isCurrentPage = page == pagerState.currentPage,
+                            isAppBarVisible = isScrolling,
+                            onIsAtTopChange = onIsAtTopChange,
                             onMangaClick = { mangaId ->
                                 onMediaClick(mangaId, mediaType)
                             }

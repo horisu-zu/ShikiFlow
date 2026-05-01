@@ -8,9 +8,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +44,9 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 @Composable
 fun AnimeTracksPage(
     userStatus: UserRateStatus,
+    isCurrentPage: Boolean,
     isAppBarVisible: Boolean,
+    onIsAtTopChange: (Boolean) -> Unit,
     onAnimeClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     tracksViewModel: AnimeTracksViewModel = hiltViewModel(),
@@ -82,20 +88,24 @@ fun AnimeTracksPage(
                     AppUiMode.LIST -> {
                         AnimeTracksListComponent(
                             trackItems = animeTrackItems,
+                            isCurrentPage = isCurrentPage,
                             onAnimeClick = onAnimeClick,
                             onLongClick = { item ->
                                 selectedItem = item
                             },
+                            onIsAtTopChange = onIsAtTopChange,
                             modifier = modifier
                         )
                     }
                     AppUiMode.GRID -> {
                         AnimeTracksGridComponent(
                             trackItems = animeTrackItems,
+                            isCurrentPage = isCurrentPage,
                             onAnimeClick = onAnimeClick,
                             onLongClick = { item ->
                                 selectedItem = item
                             },
+                            onIsAtTopChange = onIsAtTopChange,
                             modifier = modifier
                         )
                     }
@@ -131,11 +141,28 @@ fun AnimeTracksPage(
 @Composable
 private fun AnimeTracksListComponent(
     trackItems: LazyPagingItems<MediaTrack>,
+    isCurrentPage: Boolean,
     onAnimeClick: (Int) -> Unit,
     onLongClick: (MediaTrack) -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lazyListState = rememberLazyListState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyListState.firstVisibleItemIndex == 0 &&
+            lazyListState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isCurrentPage,isAtTop) {
+        if(isCurrentPage) {
+            onIsAtTopChange(isAtTop)
+        }
+    }
+
     LazyColumn(
+        state = lazyListState,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             horizontal = 12.dp,
@@ -182,11 +209,28 @@ private fun AnimeTracksListComponent(
 @Composable
 private fun AnimeTracksGridComponent(
     trackItems: LazyPagingItems<MediaTrack>,
+    isCurrentPage: Boolean,
     onAnimeClick: (Int) -> Unit,
     onLongClick: (MediaTrack) -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val lazyGridState = rememberLazyGridState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex == 0 &&
+            lazyGridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isCurrentPage, isAtTop) {
+        if(isCurrentPage) {
+            onIsAtTopChange(isAtTop)
+        }
+    }
+
     LazyVerticalGrid(
+        state = lazyGridState,
         columns = GridCells.Adaptive(180.dp),
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(12.dp),

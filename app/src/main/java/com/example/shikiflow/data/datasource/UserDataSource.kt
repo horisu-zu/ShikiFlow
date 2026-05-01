@@ -29,7 +29,10 @@ interface UserDataSource {
         limit: Int?
     ): Result<List<UserActivity>>
 
-    fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>>
+    fun getUserStatsCategories(
+        userId: Int,
+        isRefresh: Boolean
+    ): Flow<DataResult<UserStatsCategories>>
 
     fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>>
 

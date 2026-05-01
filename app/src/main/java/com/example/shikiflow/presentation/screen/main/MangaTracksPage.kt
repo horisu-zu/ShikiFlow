@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,14 +51,30 @@ import com.example.shikiflow.presentation.viewmodel.manga.tracks.MangaTracksView
 @Composable
 fun MangaTracksPage(
     userStatus: UserRateStatus,
+    isCurrentPage: Boolean,
     isAppBarVisible: Boolean,
     onMangaClick: (Int) -> Unit,
+    onIsAtTopChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     mangaTracksViewModel: MangaTracksViewModel = hiltViewModel()
 ) {
     val params by mangaTracksViewModel.params.collectAsStateWithLifecycle()
     val mangaTrackItems = mangaTracksViewModel.mangaTracks[userStatus]?.collectAsLazyPagingItems()
         ?: return
+
+    val lazyGridState = rememberLazyGridState()
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex == 0 &&
+                    lazyGridState.firstVisibleItemScrollOffset == 0
+        }
+    }
+
+    LaunchedEffect(isCurrentPage, isAtTop) {
+        if(isCurrentPage) {
+            onIsAtTopChange(isAtTop)
+        }
+    }
 
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
 
@@ -72,7 +91,8 @@ fun MangaTracksPage(
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(R.string.mtp_loading_error),
+                    message = (mangaTrackItems.loadState.refresh as LoadState.Error)
+                        .error.message ?: stringResource(R.string.mtp_loading_error),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { mangaTrackItems.refresh() }
                 )
@@ -86,6 +106,7 @@ fun MangaTracksPage(
                 modifier = Modifier.fillMaxSize()
             ) {
                 LazyVerticalGrid(
+                    state = lazyGridState,
                     columns = GridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),

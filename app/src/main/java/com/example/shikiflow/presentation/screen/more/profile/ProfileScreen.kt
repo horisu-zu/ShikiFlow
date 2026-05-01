@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -19,11 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +31,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserStatsCategories.Companion.isEmpty
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute.*
@@ -65,7 +65,7 @@ fun ProfileScreen(
             uiState = uiState,
             isCurrentUser = uiState.currentUser?.id == user.id,
             navOptions = navOptions,
-            onRefresh = { profileViewModel.onRefresh() },
+            onProfileRefresh = { profileViewModel.onRefresh() },
             onToggleFollow = { isFollowing ->
                 profileViewModel.toggleFollow(user.id, isFollowing)
             }
@@ -79,7 +79,7 @@ fun ProfileScreenContent(
     uiState: ProfileUiState,
     isCurrentUser: Boolean,
     navOptions: ProfileNavOptions,
-    onRefresh: () -> Unit,
+    onProfileRefresh: () -> Unit,
     onToggleFollow: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -103,7 +103,7 @@ fun ProfileScreenContent(
             )
         }
     ) { paddingValues ->
-        if(uiState.isLoading) {
+        if(uiState.isLoading && uiState.userStatsCategories.isEmpty()) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -116,13 +116,15 @@ fun ProfileScreenContent(
                 ErrorItem(
                     message = uiState.errorMessage,
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { onRefresh() }
+                    onButtonClick = { onProfileRefresh() }
                 )
             }
         } else {
             val horizontalPadding = 12.dp
             var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-            val sectionsList = ProfileSectionType.getTabRows(uiState.userStatsCategories)
+            val sectionsList = remember(uiState.userStatsCategories) {
+                ProfileSectionType.getTabRows(uiState.userStatsCategories)
+            }
 
             Column(
                 modifier = modifier
@@ -148,7 +150,6 @@ fun ProfileScreenContent(
                                     userData = userData,
                                     typesList = uiState.userStatsCategories.scoreMediaTypes,
                                     isCurrentUser = isCurrentUser,
-                                    isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                     horizontalPadding = horizontalPadding,
                                     navOptions = navOptions
                                 )
@@ -158,6 +159,7 @@ fun ProfileScreenContent(
                                     userId = userData.id,
                                     isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                     horizontalPadding = horizontalPadding,
+                                    onRefresh = onProfileRefresh,
                                     navOptions = navOptions
                                 )
                             }
@@ -167,6 +169,7 @@ fun ProfileScreenContent(
                                     socialCategories = uiState.userStatsCategories.socialCategories,
                                     isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                     horizontalPadding = horizontalPadding,
+                                    onRefresh = onProfileRefresh,
                                     navOptions = navOptions
                                 )
                             }
@@ -176,6 +179,7 @@ fun ProfileScreenContent(
                                     favoriteCategories = uiState.userStatsCategories.favoriteCategories,
                                     isRefreshEnabled = scrollBehavior.state.collapsedFraction == 0f,
                                     horizontalPadding = horizontalPadding,
+                                    onRefresh = onProfileRefresh,
                                     onFavoriteClick = { category, id ->
                                         val detailsNavRoute = when(category) {
                                             FavoriteCategory.ANIME -> AnimeDetails(id)
@@ -195,14 +199,7 @@ fun ProfileScreenContent(
                     }
                 } else {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    topEnd = 24.dp,
-                                    topStart = 24.dp
-                                )
-                            ),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         ErrorItem(

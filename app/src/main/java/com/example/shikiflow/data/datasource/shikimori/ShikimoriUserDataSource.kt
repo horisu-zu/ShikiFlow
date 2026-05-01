@@ -75,7 +75,10 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
-    override fun getUserStatsCategories(userId: Int): Flow<DataResult<UserStatsCategories>> = flow {
+    override fun getUserStatsCategories(
+        userId: Int,
+        isRefresh: Boolean
+    ): Flow<DataResult<UserStatsCategories>> = flow {
         emit(DataResult.Loading)
 
         try {
