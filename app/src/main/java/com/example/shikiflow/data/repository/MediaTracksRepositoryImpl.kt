@@ -10,7 +10,6 @@ import androidx.room.withTransaction
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.mediator.MediaTracksMediator
-import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.local.MediaShortMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
@@ -29,6 +28,8 @@ import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -65,6 +66,34 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
     }
 
+    override suspend fun syncTracks() {
+        val userId = settingsRepository.userFlow
+            .filterNotNull()
+            .first()
+            .id
+
+        withSourceSuspend(dataSource) { dataSource ->
+            val allTracks = coroutineScope {
+                val animeTracks = async { dataSource.getTracksLibrary(userId, MediaType.ANIME) }
+                val mangaTracks = async { dataSource.getTracksLibrary(userId, MediaType.MANGA) }
+
+                animeTracks.await() + mangaTracks.await()
+            }
+
+            val tracks = allTracks.map { mediaTrack ->
+                mediaTrack.track.toEntity()
+            }
+            val items = allTracks.map { mediaTrack ->
+                mediaTrack.shortData.toEntity()
+            }
+
+            appRoomDatabase.withTransaction {
+                mediaTracksDao.insertTracks(tracks)
+                mediaTracksDao.insertItems(items)
+            }
+        }
+    }
+
     override fun getMediaTracks(
         status: UserRateStatus,
         userId: Int?,
@@ -95,27 +124,24 @@ class MediaTracksRepositoryImpl @Inject constructor(
     }
 
     override fun browseMediaTracks(
-        userId: Int,
-        mediaType: MediaType,
         title: String,
+        mediaType: MediaType,
         userRateStatus: UserRateStatus?
     ): Flow<PagingData<MediaTrack>> {
-        return withSource(dataSource) { dataSource ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = 24,
-                    enablePlaceholders = true,
-                    prefetchDistance = 12,
-                    initialLoadSize = 24
-                ),
-                pagingSourceFactory = {
-                    GenericPagingSource(
-                        method = { page, limit ->
-                            dataSource.browseMediaTracks(page, limit, mediaType, userId, title, userRateStatus)
-                        }
-                    )
-                }
-            ).flow
+        return Pager(
+            config = PagingConfig(
+                pageSize = 24,
+                enablePlaceholders = true,
+                prefetchDistance = 12,
+                initialLoadSize = 24
+            ),
+            pagingSourceFactory = {
+                mediaTracksDao.browseMediaTracks(title, mediaType, userRateStatus?.name)
+            }
+        ).flow.map { pagingData ->
+            pagingData.map { track ->
+                track.toDomain()
+            }
         }
     }
 

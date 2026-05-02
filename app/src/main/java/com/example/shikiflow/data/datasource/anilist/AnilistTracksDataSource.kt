@@ -8,6 +8,7 @@ import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.DeleteUserRateMutation
 import com.example.graphql.anilist.MediaListCollectionQuery
 import com.example.graphql.anilist.MediaListEntryShortQuery
+import com.example.graphql.anilist.MediaListLibraryQuery
 import com.example.graphql.anilist.MediaListTracksQuery
 import com.example.graphql.anilist.SaveUserRateMutation
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
@@ -34,6 +35,25 @@ import kotlin.collections.flatMap
 class AnilistTracksDataSource @Inject constructor(
     @param:AnilistApollo private val apolloClient: ApolloClient
 ): MediaTracksDataSource, BaseNetworkRepository() {
+    override suspend fun getTracksLibrary(userId: Int, mediaType: MediaType): List<MediaTrack> {
+        val libraryQuery = MediaListLibraryQuery(userId, mediaType.toAnilistType())
+
+        val response = apolloClient.query(libraryQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.data
+            ?.MediaListCollection
+            ?.lists
+            ?.let { list ->
+                list.flatMap { mediaList ->
+                    mediaList?.entries?.mapNotNull { list ->
+                        list?.mediaListShort?.toDomain()
+                    } ?: emptyList()
+                }
+            } ?: throw IllegalStateException("No data returned from MediaListLibrary")
+    }
+
     override suspend fun getMediaTracks(
         page: Int,
         limit: Int,

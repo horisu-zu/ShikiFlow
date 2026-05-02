@@ -22,12 +22,12 @@ Kotlin - Jetpack Compose - MVVM - Hilt - Room - GraphQL (Apollo) - Coil - ExoPla
     <th width="33.3%">Manga Tracks</th>
   </tr>
   <tr>
-    <td><img src="screenshots/browse_main_page_shikiflow.jpg"></td>
+    <td><img src="screenshots/anilist_browse_main_page_shikiflow.jpg"></td>
     <td><img src="screenshots/ongoings_calendar_page_shikiflow.jpg"></td>
     <td><img src="screenshots/profile_page_shikiflow.jpg"></td>
   </tr>
   <tr>
-    <th>Browse Main</th>
+    <th>AniList Browse Main</th>
     <th>Ongoings Calendar</th>
     <th>AniList Profile</th>
   </tr>

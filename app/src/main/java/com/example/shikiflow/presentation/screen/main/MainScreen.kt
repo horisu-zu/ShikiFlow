@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main
 
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
@@ -72,10 +71,7 @@ fun MainScreen(
             MainPage(
                 mediaType = trackMode,
                 isScrolling = !isScrolling,
-                onIsAtTopChange = {
-                    Log.d("MainScreen", "Is At Top: $it")
-                    isAtTop = it
-                },
+                onIsAtTopChange = { isAtTop = it },
                 onMediaClick = { mediaId, mediaType ->
                     val detailsNavRoute = when(mediaType) {
                         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(mediaId)

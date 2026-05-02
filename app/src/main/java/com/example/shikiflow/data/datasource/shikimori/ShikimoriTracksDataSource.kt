@@ -31,12 +31,65 @@ import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.collections.map
+import kotlin.toString
 
 @OptIn(ExperimentalPagingApi::class)
 class ShikimoriTracksDataSource @Inject constructor(
     @param:ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): MediaTracksDataSource {
+
+    override suspend fun getTracksLibrary(
+        userId: Int,
+        mediaType: MediaType
+    ): List<MediaTrack> {
+        val pageSize = 50
+        var currentPage = 1
+        val responseList = mutableListOf<MediaTrack>()
+
+        while (true) {
+            val pageResponse = when(mediaType) {
+                MediaType.ANIME -> {
+                    val query = AnimeTracksQuery(
+                        page = Optional.presentIfNotNull(currentPage),
+                        limit = Optional.presentIfNotNull(pageSize),
+                        userId = Optional.presentIfNotNull(userId.toString())
+                    )
+
+                    val response = apolloClient.query(query)
+                        .fetchPolicy(FetchPolicy.NetworkFirst)
+                        .execute()
+
+                    response.data?.userRates?.map { userRate ->
+                        userRate.animeUserRateWithModel.toMediaDomain()
+                    } ?: emptyList()
+                }
+                MediaType.MANGA -> {
+                    val query = MangaTracksQuery(
+                        page = Optional.presentIfNotNull(currentPage),
+                        limit = Optional.presentIfNotNull(pageSize),
+                        userId = Optional.presentIfNotNull(userId.toString())
+                    )
+
+                    val response = apolloClient.query(query)
+                        .fetchPolicy(FetchPolicy.NetworkFirst)
+                        .execute()
+
+                    response.data?.userRates?.map { userRate ->
+                        userRate.mangaUserRateWithModel.toMediaDomain()
+                    } ?: emptyList()
+                }
+            }
+
+            responseList.addAll(pageResponse)
+
+            if (pageResponse.size < pageSize) break
+            currentPage++
+        }
+
+        return responseList
+    }
+
     override suspend fun getMediaTracks(
         page: Int,
         limit: Int,

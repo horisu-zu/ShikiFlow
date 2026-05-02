@@ -20,6 +20,22 @@ query MediaListTracksQuery(
     }
 }
 
+query MediaListLibrary(
+    $userId: Int!,
+    $type: MediaType!
+) {
+    MediaListCollection(
+        userId: $userId,
+        type: $type
+    ) {
+        lists {
+            entries {
+                ...MediaListShort
+            }
+        }
+    }
+}
+
 query MediaListCollection(
     $userId: Int!,
     $type: MediaType!,

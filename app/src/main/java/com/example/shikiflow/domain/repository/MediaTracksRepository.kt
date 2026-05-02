@@ -13,6 +13,8 @@ import kotlinx.coroutines.flow.Flow
 interface MediaTracksRepository {
     fun getLocalTrack(malId: Int, mediaType: MediaType): Flow<MediaTrack?>
 
+    suspend fun syncTracks()
+
     fun getMediaTracks(
         status: UserRateStatus,
         userId: Int?,
@@ -20,9 +22,8 @@ interface MediaTracksRepository {
     ): Flow<PagingData<MediaTrack>>
 
     fun browseMediaTracks(
-        userId: Int,
-        mediaType: MediaType,
         title: String,
+        mediaType: MediaType,
         userRateStatus: UserRateStatus? = null
     ): Flow<PagingData<MediaTrack>>
 

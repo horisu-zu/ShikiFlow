@@ -19,6 +19,11 @@ import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import org.json.JSONObject
 
+private data class MediaTracksKey(
+    val mediaType: MediaType,
+    val userRateStatus: UserRateStatus
+)
+
 @OptIn(ExperimentalPagingApi::class)
 class MediaTracksMediator(
     private val mediaTracksDataSource: MediaTracksDataSource,
@@ -29,20 +34,28 @@ class MediaTracksMediator(
 ): RemoteMediator<Int, MediaTrackDto>() {
     private val mediaTracksDao = appRoomDatabase.mediaTracksDao()
 
+    companion object {
+        private val loadedPagesMap = mutableMapOf<MediaTracksKey, Int>()
+    }
+
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, MediaTrackDto>
     ): MediatorResult {
         val page = when(loadType) {
-            LoadType.REFRESH -> 1
+            LoadType.REFRESH -> {
+                loadedPagesMap[MediaTracksKey(mediaType, userRateStatus)] = 1
+                1
+            }
             LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
             LoadType.APPEND -> {
-                state.lastItemOrNull() ?: return MediatorResult.Success(
-                    endOfPaginationReached = true
-                )
+                val currentPage = loadedPagesMap[MediaTracksKey(mediaType, userRateStatus)] ?: 1
+                if (state.lastItemOrNull() == null) {
+                    return MediatorResult.Success(endOfPaginationReached = true)
+                }
 
-                val loadedItemsCount = state.pages.sumOf { it.data.size }
-                val nextPage = (loadedItemsCount / state.config.pageSize) + 1
+                val nextPage = currentPage + 1
+                loadedPagesMap[MediaTracksKey(mediaType, userRateStatus)] = nextPage
 
                 nextPage
             }
@@ -71,8 +84,8 @@ class MediaTracksMediator(
 
                 appRoomDatabase.withTransaction {
                     if(loadType == LoadType.REFRESH) {
-                        mediaTracksDao.clearTracksByStatus(userRateStatus.name, mediaType)
-                        mediaTracksDao.clearItemsByStatus(userRateStatus.name, mediaType)
+                        mediaTracksDao.clearItemsByStatus(userRateStatus.name, mediaType, state.config.pageSize)
+                        mediaTracksDao.clearTracksByStatus(userRateStatus.name, mediaType, state.config.pageSize)
                     }
 
                     mediaTracksDao.insertTracks(tracks)

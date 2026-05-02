@@ -35,7 +35,7 @@ android {
     defaultConfig {
         applicationId = "com.example.shikiflow"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = versionProps.getProperty("code").toInt()
         versionName = versionProps.getProperty("name")
 
@@ -236,7 +236,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
 
     //Work Manager
-    //implementation(libs.androidx.work.runtime.ktx)
-    //implementation(libs.androidx.hilt.work)
-    //ksp(libs.androidx.hilt.compiler)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    ksp(libs.androidx.hilt.compiler)
 }

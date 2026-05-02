@@ -10,6 +10,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
+import com.example.shikiflow.worker.MediaTracksScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -19,7 +20,8 @@ class AuthRepositoryImpl @Inject constructor(
     @param:AniList private val anilistAuthDataSource: AuthDataSource,
     private val tokenRepository: TokenRepository,
     private val settingsRepository: SettingsRepository,
-    private val appRoomDatabase: AppRoomDatabase
+    private val appRoomDatabase: AppRoomDatabase,
+    private val mediaTracksScheduler: MediaTracksScheduler
 ) : AuthRepository {
 
     private fun getSource(authType: AuthType): AuthDataSource {
@@ -51,6 +53,7 @@ class AuthRepositoryImpl @Inject constructor(
             tokenRepository.clearTokens()
             settingsRepository.clearUserData()
             appRoomDatabase.clearAllTables()
+            mediaTracksScheduler.cancelAll()
         }
     }
 }

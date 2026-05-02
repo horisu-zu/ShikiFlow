@@ -229,6 +229,7 @@ private fun AnilistStatsSection(
                 )
             }
         }
+
         when(uiState.statsSectionType) {
             UserStatsSectionType.OVERVIEW -> {
                 OverviewSection(

@@ -27,19 +27,19 @@ import kotlin.time.Instant
 object ShikimoriUserMapper {
     fun UserShort.toDomain(): User {
         return User(
-            id = this.id.toInt(),
-            nickname = this.nickname,
-            avatarUrl = this.avatarUrl,
-            lastOnlineAt = Instant.parse(this.lastOnlineAt.toString())
+            id = id.toInt(),
+            nickname = nickname,
+            avatarUrl = avatarUrl,
+            lastOnlineAt = Instant.parse(lastOnlineAt.toString())
         )
     }
 
     fun ShikiUser.toDomain(): User {
         return User(
-            id = this.id,
-            nickname = this.nickname,
-            avatarUrl = this.avatar.replace("/x48/", "/x160/"),
-            lastOnlineAt = Instant.parse(this.lastOnlineAt.toString())
+            id = id,
+            nickname = nickname,
+            avatarUrl = shikiCommentImage.x160,
+            lastOnlineAt = Instant.parse(lastOnlineAt.toString())
         )
     }
 

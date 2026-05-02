@@ -10,27 +10,23 @@ class GenericPagingSource<T : Any>(
         val page = params.key ?: 1
         val pageSize = params.loadSize
 
-        return try {
-            val response = method(page, pageSize)
+        val response = method(page, pageSize)
 
-            response.fold(
-                onSuccess = { data ->
-                    val prevKey = if (page > 1) page - 1 else null
-                    val nextKey = if (data.size >= pageSize) page + 1 else null
+        return response.fold(
+            onSuccess = { data ->
+                val prevKey = if (page > 1) page - 1 else null
+                val nextKey = if (data.size >= pageSize) page + 1 else null
 
-                    LoadResult.Page(
-                        data = data,
-                        prevKey = prevKey,
-                        nextKey = nextKey
-                    )
-                },
-                onFailure = { throwable ->
-                    LoadResult.Error(throwable)
-                }
-            )
-        } catch (e: Exception) {
-            LoadResult.Error(e)
-        }
+                LoadResult.Page(
+                    data = data,
+                    prevKey = prevKey,
+                    nextKey = nextKey
+                )
+            },
+            onFailure = { throwable ->
+                LoadResult.Error(throwable)
+            }
+        )
     }
 
     override fun getRefreshKey(state: PagingState<Int, T>): Int? {

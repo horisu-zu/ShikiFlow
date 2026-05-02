@@ -10,6 +10,7 @@ import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.worker.MediaTracksScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val authRepository: AuthRepository,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val mediaTracksScheduler: MediaTracksScheduler
 ): ViewModel() {
     val themeSettings = settingsRepository.themeSettingsFlow
         .stateIn(
@@ -72,6 +74,8 @@ class MainViewModel @Inject constructor(
                             }
                             is DataResult.Success -> {
                                 settingsRepository.saveUserData(result.data, type)
+
+                                mediaTracksScheduler.scheduleSyncs()
                             }
                         }
                     }

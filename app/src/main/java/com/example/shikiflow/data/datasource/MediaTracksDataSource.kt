@@ -9,6 +9,11 @@ import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.utils.DataResult
 
 interface MediaTracksDataSource {
+    suspend fun getTracksLibrary(
+        userId: Int,
+        mediaType: MediaType
+    ): List<MediaTrack>
+
     suspend fun getMediaTracks(
         page: Int = 1,
         limit: Int = 50,

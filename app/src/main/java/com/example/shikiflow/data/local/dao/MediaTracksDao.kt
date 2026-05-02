@@ -29,18 +29,30 @@ interface MediaTracksDao {
     suspend fun insertShortEntity(anime: MediaShortEntity)
 
     @Query("""
-        DELETE FROM media_track 
-        WHERE status = :status 
-        AND EXISTS (
-            SELECT 1 FROM media_short 
-            WHERE media_short.id = media_track.mediaId 
+        DELETE FROM media_track
+        WHERE id IN (
+            SELECT media_track.id FROM media_track
+            INNER JOIN media_short ON media_short.id = media_track.mediaId
+            WHERE media_track.status = :status
             AND media_short.mediaType = :mediaType
+            ORDER BY media_track.updatedAt DESC
+            LIMIT :limit
         )
     """)
-    fun clearTracksByStatus(status: String, mediaType: MediaType)
+    suspend fun clearTracksByStatus(status: String, mediaType: MediaType, limit: Int)
 
-    @Query("DELETE FROM media_short WHERE status = :status AND mediaType = :mediaType")
-    fun clearItemsByStatus(status: String, mediaType: MediaType)
+    @Query("""
+        DELETE FROM media_short
+        WHERE id IN (
+            SELECT media_short.id FROM media_short
+            INNER JOIN media_track ON media_track.mediaId = media_short.id
+            WHERE media_short.status = :status
+            AND media_short.mediaType = :mediaType
+            ORDER BY media_track.updatedAt DESC
+            LIMIT :limit
+        )
+    """)
+    suspend fun clearItemsByStatus(status: String, mediaType: MediaType, limit: Int)
 
     @Query("DELETE FROM media_track WHERE id = :entryId")
     suspend fun deleteTrack(entryId: Int)
@@ -72,18 +84,25 @@ interface MediaTracksDao {
         mediaType: MediaType
     ): PagingSource<Int, MediaTrackDto>
 
-    /*@Transaction
+    @Transaction
     @Query("""
         SELECT * FROM media_track 
         INNER JOIN media_short ON media_track.mediaId = media_short.id
         WHERE (:status IS NULL OR media_track.status = :status) 
-        AND (trim(:title) = '' OR name LIKE '%' || :title || '%')
+        AND (trim(:title) = '' OR name LIKE '%' || :title || '%' OR synonyms LIKE '%' || :title || '%')
         AND media_short.mediaType = :mediaType
         ORDER BY updatedAt DESC
     """)
-    fun browseTracks(
+    fun browseMediaTracks(
         title: String,
-        status: String?,
-        mediaType: MediaType
-    ): PagingSource<Int, MediaTrackDto>*/
+        mediaType: MediaType,
+        status: String?
+    ): PagingSource<Int, MediaTrackDto>
+
+    @Query("""
+        SELECT COUNT(*) == 0 FROM media_track
+        INNER JOIN media_short ON media_track.mediaId = media_short.id
+        WHERE mediaType = :mediaType
+    """)
+    suspend fun isEmpty(mediaType: MediaType): Boolean
 }
