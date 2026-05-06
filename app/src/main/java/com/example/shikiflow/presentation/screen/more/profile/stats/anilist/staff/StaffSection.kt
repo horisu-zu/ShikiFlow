@@ -34,10 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.StaffStat
-import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
@@ -50,11 +48,10 @@ import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.Type
 
 @Composable
 fun StaffSection(
-    staffStats: List<StaffStat>?,
+    staffStats: List<StaffStat>,
     staffBarType: StatsBarType,
     typesList: List<MediaType>,
     currentMediaType: MediaType,
-    isLoading: Boolean,
     horizontalPadding: Dp,
     onMediaTypeChange: (MediaType) -> Unit,
     onStaffBarTypeChange: (StatsBarType) -> Unit,
@@ -102,45 +99,35 @@ fun StaffSection(
             }
         }
 
-        staffStats?.let { stats ->
-            if(stats.isNotEmpty()) {
-                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    TypeSelector(
-                        types = StatsBarType.entries,
-                        mediaType = currentMediaType,
-                        currentType = staffBarType,
-                        onTypeSelect = { staffBarType ->
-                            onStaffBarTypeChange(staffBarType)
-                        },
-                        horizontalPadding = horizontalPadding,
-                        modifier = Modifier.wrapContentWidth(Alignment.Start)
-                    )
-                }
+        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+            TypeSelector(
+                types = StatsBarType.entries,
+                mediaType = currentMediaType,
+                currentType = staffBarType,
+                onTypeSelect = { staffBarType ->
+                    onStaffBarTypeChange(staffBarType)
+                },
+                horizontalPadding = horizontalPadding,
+                modifier = Modifier.wrapContentWidth(Alignment.Start)
+            )
+        }
 
-                stats.sortedBy(
-                    type = staffBarType,
-                    mediaType = currentMediaType
-                ).forEachIndexed { index, staffStat ->
-                    item(key = staffStat.staffShort.id) {
-                        StaffStatItem(
-                            staffStat = staffStat,
-                            positionNumber = index + 1,
-                            mediaType = currentMediaType,
-                            onStaffClick = { staffId ->
-                                onStaffClick(staffId)
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateItem()
-                        )
-                    }
-                }
-            } else if(!isLoading) {
-                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    ErrorItem(
-                        message = stringResource(R.string.stats_empty_label)
-                    )
-                }
+        staffStats.sortedBy(
+            type = staffBarType,
+            mediaType = currentMediaType
+        ).forEachIndexed { index, staffStat ->
+            item(key = staffStat.staffShort.id) {
+                StaffStatItem(
+                    staffStat = staffStat,
+                    positionNumber = index + 1,
+                    mediaType = currentMediaType,
+                    onStaffClick = { staffId ->
+                        onStaffClick(staffId)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateItem()
+                )
             }
         }
     }

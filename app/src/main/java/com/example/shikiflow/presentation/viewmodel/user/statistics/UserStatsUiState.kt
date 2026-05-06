@@ -19,11 +19,11 @@ data class UserStatsUiState(
 
     val statsSectionType: UserStatsSectionType = UserStatsSectionType.OVERVIEW,
     val overviewStats: MediaTypeStats<OverviewStats> = MediaTypeStats(),
-    val genreStats: MediaTypeStats<List<TypeStat>> = MediaTypeStats(),
-    val tagsStats: MediaTypeStats<List<TypeStat>> = MediaTypeStats(),
-    val staffStats: MediaTypeStats<List<StaffStat>> = MediaTypeStats(),
-    val voiceActorsStats: List<StaffStat> = emptyList(),
-    val studiosStats: List<StudioStat> = emptyList(),
+    val genreStats: UserStatsSectionUiState<MediaTypeStats<List<TypeStat>>> = UserStatsSectionUiState(),
+    val tagsStats: UserStatsSectionUiState<MediaTypeStats<List<TypeStat>>> = UserStatsSectionUiState(),
+    val staffStats: UserStatsSectionUiState<MediaTypeStats<List<StaffStat>>> = UserStatsSectionUiState(),
+    val voiceActorsStats: UserStatsSectionUiState<List<StaffStat>> = UserStatsSectionUiState(),
+    val studiosStats: UserStatsSectionUiState<List<StudioStat>> = UserStatsSectionUiState(),
 
     val scoreBarType: Map<MediaType, StatsBarType> = emptyMap(),
     val lengthBarType: Map<MediaType, StatsBarType> = emptyMap(),
@@ -42,3 +42,10 @@ data class UserStatsUiState(
     override fun setError(value: String?) = copy(errorMessage = value)
     override fun setLoading(value: Boolean) = copy(isLoading = value)
 }
+
+data class UserStatsSectionUiState <T>(
+    val stats: T? = null,
+    val errorMessage: String? = null,
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false
+)

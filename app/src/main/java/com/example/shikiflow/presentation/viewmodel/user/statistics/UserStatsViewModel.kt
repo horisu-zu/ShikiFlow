@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.user.statistics
 
-import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -77,34 +76,36 @@ class UserStatsViewModel @Inject constructor(
                         uiState.userId != null
             }
             .distinctUntilChanged { old, new ->
-                old.userId == new.userId && !new.isRefreshing
+                old.userId == new.userId && !new.genreStats.isRefreshing
             }
             .flatMapLatest { state ->
                 userRepository.getUserGenres(state.userId!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    when(result) {
-                        is DataResult.Loading -> {
-                            state.copy(
-                                isLoading = true,
-                                errorMessage = null,
-                                isRefreshing = false
-                            )
+                    state.copy(
+                        genreStats = when(result) {
+                            is DataResult.Loading -> {
+                                state.genreStats.copy(
+                                    isLoading = true,
+                                    errorMessage = null,
+                                    isRefreshing = false
+                                )
+                            }
+                            is DataResult.Success -> {
+                                state.genreStats.copy(
+                                    stats = result.data,
+                                    isLoading = false
+                                )
+                            }
+                            is DataResult.Error -> {
+                                state.genreStats.copy(
+                                    errorMessage = result.message,
+                                    isLoading = false
+                                )
+                            }
                         }
-                        is DataResult.Success -> {
-                            state.copy(
-                                genreStats = result.data,
-                                isLoading = false
-                            )
-                        }
-                        is DataResult.Error -> {
-                            state.copy(
-                                errorMessage = result.message,
-                                isLoading = false
-                            )
-                        }
-                    }
+                    )
                 }
             }.launchIn(viewModelScope)
 
@@ -115,35 +116,36 @@ class UserStatsViewModel @Inject constructor(
                         uiState.userId != null
             }
             .distinctUntilChanged { old, new ->
-                old.userId == new.userId && !new.isRefreshing
+                old.userId == new.userId && !new.tagsStats.isRefreshing
             }
             .flatMapLatest { state ->
                 userRepository.getUserTags(state.userId!!)
             }
             .onEach { result ->
-                Log.d("UserStatsVM", "Result: $result")
                 mutableUiState.update { state ->
-                    when(result) {
-                        is DataResult.Loading -> {
-                            state.copy(
-                                isLoading = true,
-                                errorMessage = null,
-                                isRefreshing = false
-                            )
+                    state.copy(
+                        tagsStats = when(result) {
+                            is DataResult.Loading -> {
+                                state.tagsStats.copy(
+                                    isLoading = true,
+                                    errorMessage = null,
+                                    isRefreshing = false
+                                )
+                            }
+                            is DataResult.Success -> {
+                                state.tagsStats.copy(
+                                    stats = result.data,
+                                    isLoading = false
+                                )
+                            }
+                            is DataResult.Error -> {
+                                state.tagsStats.copy(
+                                    errorMessage = result.message,
+                                    isLoading = false
+                                )
+                            }
                         }
-                        is DataResult.Success -> {
-                            state.copy(
-                                tagsStats = result.data,
-                                isLoading = false
-                            )
-                        }
-                        is DataResult.Error -> {
-                            state.copy(
-                                errorMessage = result.message,
-                                isLoading = false
-                            )
-                        }
-                    }
+                    )
                 }
             }.launchIn(viewModelScope)
 
@@ -154,34 +156,36 @@ class UserStatsViewModel @Inject constructor(
                         uiState.userId != null
             }
             .distinctUntilChanged { old, new ->
-                old.userId == new.userId && !new.isRefreshing
+                old.userId == new.userId && !new.staffStats.isRefreshing
             }
             .flatMapLatest { state ->
                 userRepository.getUserStaff(state.userId!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    when(result) {
-                        is DataResult.Loading -> {
-                            state.copy(
-                                isLoading = true,
-                                errorMessage = null,
-                                isRefreshing = false
-                            )
+                    state.copy(
+                        staffStats = when(result) {
+                            is DataResult.Loading -> {
+                                state.staffStats.copy(
+                                    isLoading = true,
+                                    errorMessage = null,
+                                    isRefreshing = false
+                                )
+                            }
+                            is DataResult.Success -> {
+                                state.staffStats.copy(
+                                    stats = result.data,
+                                    isLoading = false
+                                )
+                            }
+                            is DataResult.Error -> {
+                                state.staffStats.copy(
+                                    errorMessage = result.message,
+                                    isLoading = false
+                                )
+                            }
                         }
-                        is DataResult.Success -> {
-                            state.copy(
-                                staffStats = result.data,
-                                isLoading = false
-                            )
-                        }
-                        is DataResult.Error -> {
-                            state.copy(
-                                errorMessage = result.message,
-                                isLoading = false
-                            )
-                        }
-                    }
+                    )
                 }
             }.launchIn(viewModelScope)
 
@@ -192,34 +196,36 @@ class UserStatsViewModel @Inject constructor(
                         uiState.userId != null
             }
             .distinctUntilChanged { old, new ->
-                old.userId == new.userId && !new.isRefreshing
+                old.userId == new.userId && !new.voiceActorsStats.isRefreshing
             }
             .flatMapLatest { state ->
                 userRepository.getUserVoiceActors(state.userId!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    when(result) {
-                        is DataResult.Loading -> {
-                            state.copy(
-                                isLoading = true,
-                                errorMessage = null,
-                                isRefreshing = false
-                            )
+                    state.copy(
+                        voiceActorsStats = when(result) {
+                            is DataResult.Loading -> {
+                                state.voiceActorsStats.copy(
+                                    isLoading = true,
+                                    errorMessage = null,
+                                    isRefreshing = false
+                                )
+                            }
+                            is DataResult.Success -> {
+                                state.voiceActorsStats.copy(
+                                    stats = result.data,
+                                    isLoading = false
+                                )
+                            }
+                            is DataResult.Error -> {
+                                state.voiceActorsStats.copy(
+                                    errorMessage = result.message,
+                                    isLoading = false
+                                )
+                            }
                         }
-                        is DataResult.Success -> {
-                            state.copy(
-                                voiceActorsStats = result.data,
-                                isLoading = false
-                            )
-                        }
-                        is DataResult.Error -> {
-                            state.copy(
-                                errorMessage = result.message,
-                                isLoading = false
-                            )
-                        }
-                    }
+                    )
                 }
             }.launchIn(viewModelScope)
 
@@ -230,34 +236,36 @@ class UserStatsViewModel @Inject constructor(
                         uiState.userId != null
             }
             .distinctUntilChanged { old, new ->
-                old.userId == new.userId && !new.isRefreshing
+                old.userId == new.userId && !new.studiosStats.isRefreshing
             }
             .flatMapLatest { state ->
                 userRepository.getUserStudios(state.userId!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    when(result) {
-                        is DataResult.Loading -> {
-                            state.copy(
-                                isLoading = true,
-                                errorMessage = null,
-                                isRefreshing = false
-                            )
+                    state.copy(
+                        studiosStats = when(result) {
+                            is DataResult.Loading -> {
+                                state.studiosStats.copy(
+                                    isLoading = true,
+                                    errorMessage = null,
+                                    isRefreshing = false
+                                )
+                            }
+                            is DataResult.Success -> {
+                                state.studiosStats.copy(
+                                    stats = result.data,
+                                    isLoading = false
+                                )
+                            }
+                            is DataResult.Error -> {
+                                state.studiosStats.copy(
+                                    errorMessage = result.message,
+                                    isLoading = false
+                                )
+                            }
                         }
-                        is DataResult.Success -> {
-                            state.copy(
-                                studiosStats = result.data,
-                                isLoading = false
-                            )
-                        }
-                        is DataResult.Error -> {
-                            state.copy(
-                                errorMessage = result.message,
-                                isLoading = false
-                            )
-                        }
-                    }
+                    )
                 }
             }.launchIn(viewModelScope)
 
@@ -393,12 +401,26 @@ class UserStatsViewModel @Inject constructor(
         }
     }
 
-    override fun onRefresh() {
+    override fun onRefresh(sectionType: UserStatsSectionType) {
         mutableUiState.update { state ->
-            state.copy(
-                isRefreshing = true,
-                isLoading = true
-            )
+            when (sectionType) {
+                UserStatsSectionType.OVERVIEW -> state.copy(isRefreshing = true)
+                UserStatsSectionType.GENRES -> state.copy(
+                    genreStats = state.genreStats.copy(isRefreshing = true)
+                )
+                UserStatsSectionType.TAGS -> state.copy(
+                    tagsStats = state.tagsStats.copy(isRefreshing = true)
+                )
+                UserStatsSectionType.STAFF -> state.copy(
+                    staffStats = state.staffStats.copy(isRefreshing = true)
+                )
+                UserStatsSectionType.VOICE_ACTORS -> state.copy(
+                    voiceActorsStats = state.voiceActorsStats.copy(isRefreshing = true)
+                )
+                UserStatsSectionType.STUDIOS -> state.copy(
+                    studiosStats = state.studiosStats.copy(isRefreshing = true)
+                )
+            }
         }
     }
 }

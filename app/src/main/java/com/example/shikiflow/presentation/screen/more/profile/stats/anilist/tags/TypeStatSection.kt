@@ -31,12 +31,10 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.CombinedStat
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.model.user.stats.TypeStat
-import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.formatDaysHours
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.sortedBy
@@ -51,7 +49,7 @@ import kotlin.collections.component2
 
 @Composable
 fun TypeStatSection(
-    typeStats: List<TypeStat>?,
+    typeStats: List<TypeStat>,
     statsBarType: StatsBarType,
     typesList: List<MediaType>,
     currentMediaType: MediaType,
@@ -101,42 +99,32 @@ fun TypeStatSection(
             }
         }
 
-        typeStats?.let { typeStats ->
-            if(typeStats.isNotEmpty()) {
-                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    TypeSelector(
-                        types = StatsBarType.entries,
-                        mediaType = currentMediaType,
-                        currentType = statsBarType,
-                        onTypeSelect = { typeBarType ->
-                            onBarTypeChange(typeBarType)
-                        },
-                        horizontalPadding = horizontalPadding,
-                        modifier = Modifier.wrapContentWidth(Alignment.Start)
-                    )
-                }
+        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+            TypeSelector(
+                types = StatsBarType.entries,
+                mediaType = currentMediaType,
+                currentType = statsBarType,
+                onTypeSelect = { typeBarType ->
+                    onBarTypeChange(typeBarType)
+                },
+                horizontalPadding = horizontalPadding,
+                modifier = Modifier.wrapContentWidth(Alignment.Start)
+            )
+        }
 
-                typeStats.sortedBy(
-                    type = statsBarType,
-                    mediaType = currentMediaType
-                ).forEachIndexed { index, typeStat ->
-                    item(key = typeStat.type) {
-                        StatItem(
-                            stat = typeStat,
-                            positionNumber = index + 1,
-                            mediaType = currentMediaType,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateItem()
-                        )
-                    }
-                }
-            } else {
-                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                    ErrorItem(
-                        message = stringResource(R.string.stats_empty_label)
-                    )
-                }
+        typeStats.sortedBy(
+            type = statsBarType,
+            mediaType = currentMediaType
+        ).forEachIndexed { index, typeStat ->
+            item(key = typeStat.type) {
+                StatItem(
+                    stat = typeStat,
+                    positionNumber = index + 1,
+                    mediaType = currentMediaType,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateItem()
+                )
             }
         }
     }

@@ -46,7 +46,6 @@ sealed interface BrowseType {
                 NEWLY_ANNOUNCED -> MediaSort.Anilist.DATE_ADDED
             }
 
-        //Added Announced for Newly Added titles cuz API isn't consistent and older titles may have higher ID
         override val status: MediaStatus?
             get() = when(this) {
                 POPULAR_THIS_SEASON,

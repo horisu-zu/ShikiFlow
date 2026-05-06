@@ -3,13 +3,11 @@ package com.example.shikiflow.presentation.screen.more.profile
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -38,20 +36,10 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStatType
-import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.iconResource
-import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
-import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
-import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
-import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.overview.OverviewSection
-import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSectionType
-import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.staff.StaffSection
-import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.studios.StudiosSection
-import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.tags.TypeStatSection
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.AnilistUserStatsSection
 import com.example.shikiflow.presentation.screen.more.profile.stats.shikimori.ShikimoriTrackItem
-import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsEvent
-import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsUiState
 import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsViewModel
 
 @Composable
@@ -90,7 +78,7 @@ fun UserStatsSection(
                 )
             }
             AuthType.ANILIST -> {
-                AnilistStatsSection(
+                AnilistUserStatsSection(
                     uiState = uiState,
                     isCurrentUser = isCurrentUser,
                     onCompareClick = {
@@ -182,151 +170,6 @@ fun ShikimoriTrackSection(
                     ?.count?.toInt() ?: 0,
                 modifier = Modifier.fillMaxWidth()
             )
-        }
-    }
-}
-
-@Composable
-private fun AnilistStatsSection(
-    uiState: UserStatsUiState,
-    isCurrentUser: Boolean,
-    horizontalPadding: Dp,
-    event: UserStatsEvent,
-    navOptions: ProfileNavOptions,
-    onCompareClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
-    ) {
-        SnapFlingLazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = horizontalPadding),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            items(UserStatsSectionType.entries) { statsSectionType ->
-                val isSelected = uiState.statsSectionType == statsSectionType
-
-                FilterChip(
-                    selected = isSelected,
-                    onClick = {
-                        event.setStatsSectionType(statsSectionType)
-                    },
-                    label = {
-                        Text(
-                            text = stringResource(id = statsSectionType.displayValue())
-                        )
-                    },
-                    leadingIcon = if(isSelected) {
-                        {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = null
-                            )
-                        }
-                    } else { null }
-                )
-            }
-        }
-
-        when(uiState.statsSectionType) {
-            UserStatsSectionType.OVERVIEW -> {
-                OverviewSection(
-                    uiState = uiState,
-                    isCurrentUser = isCurrentUser,
-                    event = event,
-                    horizontalPadding = horizontalPadding,
-                    onCompareClick = onCompareClick
-                )
-            }
-            UserStatsSectionType.GENRES -> {
-                TypeStatSection(
-                    typeStats = uiState.genreStats[uiState.mediaType],
-                    statsBarType = uiState.genresBarType[uiState.mediaType] ?: StatsBarType.TITLES,
-                    typesList =  uiState.typesList,
-                    currentMediaType = uiState.mediaType,
-                    onMediaTypeChange = { mediaType ->
-                        event.setMediaType(mediaType)
-                    },
-                    onBarTypeChange = { statsBarType ->
-                        event.setGenresBarType(statsBarType)
-                    },
-                    horizontalPadding = horizontalPadding,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            UserStatsSectionType.TAGS -> {
-                TypeStatSection(
-                    typeStats = uiState.tagsStats[uiState.mediaType],
-                    statsBarType = uiState.tagsBarType[uiState.mediaType] ?: StatsBarType.TITLES,
-                    typesList =  uiState.typesList,
-                    currentMediaType = uiState.mediaType,
-                    onMediaTypeChange = { mediaType ->
-                        event.setMediaType(mediaType)
-                    },
-                    onBarTypeChange = { statsBarType ->
-                        event.setTagsBarType(statsBarType)
-                    },
-                    horizontalPadding = horizontalPadding,
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            UserStatsSectionType.STAFF -> {
-                StaffSection(
-                    staffStats = uiState.staffStats[uiState.mediaType],
-                    staffBarType = uiState.staffBarType[uiState.mediaType] ?: StatsBarType.TITLES,
-                    typesList = uiState.typesList,
-                    currentMediaType = uiState.mediaType,
-                    isLoading = uiState.isLoading,
-                    horizontalPadding = horizontalPadding,
-                    onMediaTypeChange = { mediaType ->
-                        event.setMediaType(mediaType)
-                    },
-                    onStaffBarTypeChange = { staffBarType ->
-                        event.setStaffBarType(staffBarType)
-                    },
-                    onStaffClick = { staffId ->
-                        navOptions.navigateToDetails(DetailsNavRoute.Staff(staffId))
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            UserStatsSectionType.VOICE_ACTORS -> {
-                StaffSection(
-                    staffStats = uiState.voiceActorsStats,
-                    staffBarType = uiState.voiceActorsBarType,
-                    typesList = listOf(MediaType.ANIME),
-                    currentMediaType = MediaType.ANIME,
-                    isLoading = uiState.isLoading,
-                    horizontalPadding = horizontalPadding,
-                    onMediaTypeChange = { mediaType ->
-                        event.setMediaType(mediaType)
-                    },
-                    onStaffBarTypeChange = { voiceActorsBarType ->
-                        event.setVoiceActorsBarType(voiceActorsBarType)
-                    },
-                    onStaffClick = { staffId ->
-                        navOptions.navigateToDetails(DetailsNavRoute.Staff(staffId))
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
-            UserStatsSectionType.STUDIOS -> {
-                StudiosSection(
-                    typeStats = uiState.studiosStats,
-                    statsBarType = uiState.studiosBarType,
-                    isLoading = uiState.isLoading,
-                    horizontalPadding = horizontalPadding,
-                    onBarTypeChange = { studiosBarType ->
-                        event.setStudiosBarType(studiosBarType)
-                    },
-                    onStudioClick = { studio ->
-                        navOptions.navigateToDetails(DetailsNavRoute.Studio(studio.id, studio.name))
-                    },
-                    modifier = Modifier.fillMaxSize()
-                )
-            }
         }
     }
 }

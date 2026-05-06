@@ -20,5 +20,5 @@ interface UserStatsEvent {
     fun setVoiceActorsBarType(voiceActorsBarType: StatsBarType)
     fun setStudiosBarType(studiosBarType: StatsBarType)
 
-    fun onRefresh()
+    fun onRefresh(sectionType: UserStatsSectionType)
 }
