@@ -139,7 +139,7 @@ private fun SortDirectionItem(
                     .clickable {
                         onDirectionToggle(direction)
                     }
-                    .padding(horizontal = 12.dp, vertical = 16.dp)
+                    .padding(all = 12.dp)
             )
         }
     }

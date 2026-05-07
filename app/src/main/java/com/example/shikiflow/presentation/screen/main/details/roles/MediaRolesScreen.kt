@@ -24,7 +24,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -67,22 +66,15 @@ fun MediaRolesScreen(
     ) { typesList.size }
     val currentType = typesList[pagerState.currentPage]
 
-    val sortMap by mediaRolesViewModel.sortMap.collectAsStateWithLifecycle()
+    val params by mediaRolesViewModel.params.collectAsStateWithLifecycle()
     val authType by mediaRolesViewModel.authType.collectAsStateWithLifecycle()
 
-    //Temporarily, until I find a better way to handle this
-    val mediaRolesFlows = rememberSaveable(typesList) {
-        typesList.associateWith { roleType ->
-            mediaRolesViewModel.getMediaRoles(
-                id = id,
-                mediaRolesType = mediaRolesType,
-                roleType = roleType
-            )
-        }
-    }
-
     LaunchedEffect(id) {
-        mediaRolesViewModel.setRoleTypes(roleTypes)
+        mediaRolesViewModel.setInitialData(
+            id = id,
+            roleTypes = roleTypes,
+            mediaRolesType = mediaRolesType
+        )
     }
 
     Scaffold(
@@ -152,7 +144,7 @@ fun MediaRolesScreen(
             state = pagerState
         ) { page ->
             val roleType = typesList[page]
-            val mediaRoles = mediaRolesFlows[roleType]?.collectAsLazyPagingItems()
+            val mediaRoles = mediaRolesViewModel.mediaRoles[roleType]?.collectAsLazyPagingItems()
                 ?: return@HorizontalPager
 
             MediaRolesContent(
@@ -164,7 +156,7 @@ fun MediaRolesScreen(
         }
 
         if(showBottomSheet) {
-            val sortConfig = when(val roleSort = sortMap[currentType]) {
+            val sortConfig = when(val roleSort = params.typeSortMap?.get(currentType)) {
                 is RoleSort.Media -> SortConfig(
                     options = MediaSort.Common.entries + MediaSort.Anilist.entries,
                     selected = roleSort.sort,

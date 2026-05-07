@@ -22,13 +22,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -42,9 +38,7 @@ class MediaRolesViewModel @Inject constructor(
 ): ViewModel() {
 
     private val _rolesParams = MutableStateFlow(MediaRolesParams())
-
-    private val _sortMap = MutableStateFlow<Map<RoleType, RoleSort>>(emptyMap())
-    val sortMap = _sortMap.asStateFlow()
+    val params = _rolesParams.asStateFlow()
 
     val authType = settingsRepository.authTypeFlow
         .stateIn(
@@ -53,9 +47,29 @@ class MediaRolesViewModel @Inject constructor(
             initialValue = null
         )
 
-    fun setRoleTypes(roleTypes: List<RoleType>) {
+    fun setInitialData(
+        id: Int,
+        roleTypes: List<RoleType>,
+        mediaRolesType: MediaRolesType
+    ) {
         _rolesParams.update { params ->
-            params.copy(roleTypes = roleTypes)
+            params.copy(
+                id = id,
+                mediaRolesType = mediaRolesType,
+                typeSortMap = params.typeSortMap ?: roleTypes.associateWith { roleType ->
+                    when (roleType) {
+                        RoleType.VA -> RoleSort.VA(
+                            Sort(type = CharacterType.FAVORITES, direction = SortDirection.DESCENDING)
+                        )
+                        else -> RoleSort.Media(
+                            sort = Sort(
+                                type = MediaSort.Common.POPULARITY,
+                                direction = SortDirection.DESCENDING
+                            )
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -63,69 +77,44 @@ class MediaRolesViewModel @Inject constructor(
         roleType: RoleType,
         roleSort: RoleSort
     ) {
-        _sortMap.update { currentMap ->
-            currentMap.toMutableMap().apply {
-                this[roleType] = roleSort
-            }
+        _rolesParams.update { params ->
+            params.copy(
+                typeSortMap = params.typeSortMap?.toMutableMap().apply {
+                    this?.set(roleType, roleSort)
+                }
+            )
         }
     }
 
-    init {
-        _rolesParams
-            .filter { params ->
-                params.roleTypes != null
-            }
-            .distinctUntilChangedBy { params ->
-                params.roleTypes
-            }
-            .onEach { params ->
-                _sortMap.update {
-                    params.roleTypes!!.associateWith { roleType ->
-                        when(roleType) {
-                            RoleType.VA -> RoleSort.VA(
-                                Sort(type = CharacterType.FAVORITES, direction = SortDirection.DESCENDING)
+    val mediaRoles: Map<RoleType, Flow<PagingData<MediaRole>>> = RoleType.entries
+        .associateWith { roleType ->
+            _rolesParams
+                .filter { params ->
+                    params.id != null && params.mediaRolesType != null &&
+                            params.typeSortMap?.get(roleType) != null
+                }
+                .distinctUntilChangedBy { params ->
+                    params.typeSortMap?.get(roleType)
+                }
+                .flatMapLatest { params ->
+                    when(val currentSort = params.typeSortMap?.get(roleType)!!) {
+                        is RoleSort.VA -> staffRepository.getVoiceActorRoles(
+                            staffId = params.id!!,
+                            sort = currentSort.sort
+                        )
+                        is RoleSort.Media -> when(params.mediaRolesType!!) {
+                            MediaRolesType.CHARACTER -> characterRepository.getCharacterMediaRoles(
+                                characterId = params.id!!,
+                                mediaType = roleType.toMediaType(),
+                                sort = currentSort.sort
                             )
-                            else -> RoleSort.Media(
-                                sort = Sort(
-                                    type = MediaSort.Common.POPULARITY,
-                                    direction = SortDirection.DESCENDING
-                                )
+                            MediaRolesType.STAFF -> staffRepository.getStaffMediaRoles(
+                                staffId = params.id!!,
+                                mediaType = roleType.toMediaType(),
+                                sort = currentSort.sort
                             )
                         }
                     }
-                }
-            }.launchIn(viewModelScope)
-    }
-
-    fun getMediaRoles(
-        id: Int,
-        roleType: RoleType,
-        mediaRolesType: MediaRolesType
-    ): Flow<PagingData<MediaRole>> {
-        return _sortMap
-            .mapNotNull { typeSortMap ->
-                typeSortMap[roleType]
-            }
-            .distinctUntilChanged()
-            .flatMapLatest { currentSort ->
-                when(currentSort) {
-                    is RoleSort.VA -> staffRepository.getVoiceActorRoles(
-                        staffId = id,
-                        sort = currentSort.sort
-                    )
-                    is RoleSort.Media -> when(mediaRolesType) {
-                        MediaRolesType.CHARACTER -> characterRepository.getCharacterMediaRoles(
-                            characterId = id,
-                            mediaType = roleType.toMediaType(),
-                            sort = currentSort.sort
-                        )
-                        MediaRolesType.STAFF -> staffRepository.getStaffMediaRoles(
-                            staffId = id,
-                            mediaType = roleType.toMediaType(),
-                            sort = currentSort.sort
-                        )
-                    }
-                }
-            }.cachedIn(viewModelScope)
-    }
+                }.cachedIn(viewModelScope)
+        }
 }
