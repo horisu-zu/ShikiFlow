@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.repository
 
+import androidx.compose.ui.graphics.Color
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
@@ -35,6 +36,7 @@ interface SettingsRepository {
     suspend fun saveOLEDMode(isEnabled: Boolean)
     suspend fun saveDynamicMode(isDynamicTheme: Boolean)
     suspend fun savePaletteStyle(paletteStyle: PaletteStyle)
+    suspend fun savePrimaryColorPreferences(color: Color, useSystemWallpaperColor: Boolean)
     suspend fun saveLocale(locale: String)
     suspend fun saveTrackMode(mediaType: MediaType)
     suspend fun saveDataSaverMode(newMode: Boolean)

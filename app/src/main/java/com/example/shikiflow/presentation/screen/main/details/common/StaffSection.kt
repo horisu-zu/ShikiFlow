@@ -34,7 +34,7 @@ import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 
 @Composable
 fun StaffSection(

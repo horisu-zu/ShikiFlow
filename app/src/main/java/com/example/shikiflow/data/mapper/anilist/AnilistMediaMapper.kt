@@ -162,6 +162,7 @@ object AnilistMediaMapper {
             AiringAnime(
                 data = browseShort.toDomain(),
                 episode = episode,
+                totalEpisodes = browseShort.episodes,
                 timeUntilAiring = timeUntilAiring.toLong().seconds,
                 airingAt = Instant.fromEpochSeconds(airingAt.toLong())
             )

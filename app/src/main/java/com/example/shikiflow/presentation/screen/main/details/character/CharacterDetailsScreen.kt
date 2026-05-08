@@ -52,7 +52,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.CharacterCa
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.presentation.viewmodel.character.details.CharacterDetailsViewModel
 import com.example.shikiflow.utils.WebIntent
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

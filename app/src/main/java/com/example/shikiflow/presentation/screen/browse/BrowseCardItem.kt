@@ -22,7 +22,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
-import com.example.shikiflow.utils.foregroundGradient
+import com.example.shikiflow.presentation.common.foregroundGradient
 
 @Composable
 fun BrowseCardItem(

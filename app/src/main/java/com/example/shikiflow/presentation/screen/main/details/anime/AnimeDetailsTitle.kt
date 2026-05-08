@@ -47,8 +47,8 @@ import com.example.shikiflow.presentation.common.mappers.AgeRatingMapper.display
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
-import com.example.shikiflow.utils.foregroundGradient
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.foregroundGradient
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 
 @Composable

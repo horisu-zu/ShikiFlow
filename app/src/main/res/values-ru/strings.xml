@@ -70,10 +70,10 @@
     <string name="settings_dynamic_theme_label">Динамическая тема</string>
     <string name="settings_app_theme_label">Тема приложения</string>
     <string name="settings_app_theme">Тема</string>
+    <string name="settings_theme_primary_color_desc">Выберите основной цвет для генерации динамической темы</string>
     <string name="settings_oled_theme">OLED тема</string>
     <string name="settings_oled_desc">Включите OLED режим для более тёмного фона</string>
     <string name="settings_palette_style_label">Стиль палитры</string>
-    <string name="settings_palette_style_desc">Выберите стиль палитры для динамической темы</string>
     <string name="settings_palette_style_bottom_title">Выберите стиль палитры</string>
 
     <string name="settings_cache_confirmation">Вы уверены, что хотите очистить кэш изображений?</string>
@@ -93,6 +93,8 @@
         Подключите существующий аккаунт для обновления отслеживаемого на всех сервисах сразу
     </string>
 
+    <string name="color_picker_bottom_sheet_system_label">Использовать цвет заставки системы</string>
+    <string name="color_picker_bottom_sheet_save">Применить</string>
     <string name="next_episode">"Следующий эпизод в "</string>
 
     <string name="browse_on_my_list">В моём списке</string>
@@ -198,6 +200,7 @@
     <string name="episodes">%1s эп.</string>
     <string name="episodes_watched">Эпизоды: %1s</string>
     <string name="ongoing_episodes">%1$s из %2$s эп.</string>
+    <string name="airing_episodes">Эпизод %1$s из %2$s</string>
     <string name="translation_filter_all">Все</string>
     <string name="translation_filter_voice">Дубляж</string>
     <string name="translation_filter_subtitles">Субтитры</string>
@@ -463,4 +466,6 @@
     <string name="browse_type_trending_now">В тренде</string>
     <string name="browse_type_popular_this_season">Популярное в этом сзоне</string>
     <string name="profile_unfollow">Отписаться</string>
+    <string name="airing_episode">Эпизод</string>
+    <string name="settings_theme_primary_color">Основной цвет</string>
 </resources>

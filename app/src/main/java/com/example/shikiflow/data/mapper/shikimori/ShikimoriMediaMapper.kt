@@ -7,7 +7,6 @@ import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.graphql.shikimori.type.AnimeKindEnum
 import com.example.graphql.shikimori.type.MangaKindEnum
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.data.datasource.dto.CalendarAnime
 import com.example.shikiflow.data.datasource.dto.ShikiAnime
 import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
@@ -29,7 +28,6 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.track.MediaFormat
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.utils.DateUtils.isInCurrentWeek
@@ -70,13 +68,13 @@ object ShikimoriMediaMapper {
             durationMins = duration,
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             scoreStats = scoresStats?.map { (score, count) ->
-                Stat<Int>(
+                Stat(
                     type = score,
                     value = count.toFloat()
                 )
             }?.sortedBy { it.type }.orEmpty(),
             statusesStats = statusesStats?.map { (status, count) ->
-                Stat<UserRateStatus>(
+                Stat(
                     type = status.toDomain(),
                     value = count.toFloat()
                 )
@@ -111,13 +109,13 @@ object ShikimoriMediaMapper {
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             staffList = personRoles?.map { it.personRoleShort.toDomain() } ?: emptyList(),
             scoreStats = scoresStats?.map { (score, count) ->
-                Stat<Int>(
+                Stat(
                     type = score,
                     value = count.toFloat()
                 )
             }?.sortedBy { it.type }.orEmpty(),
             statusesStats = statusesStats?.map { (status, count) ->
-                Stat<UserRateStatus>(
+                Stat(
                     type = status.toDomain(),
                     value = count.toFloat()
                 )
@@ -198,13 +196,14 @@ object ShikimoriMediaMapper {
                 userRateStatus = userRate?.animeUserRate?.status?.toDomain()
             ),
             episode = if(airedThisWeek) episodesAired else episodesAired + 1,
+            totalEpisodes = if(episodes != 0) episodes else null,
             timeUntilAiring = episodeInstant?.timeDifference(),
             airingAt = episodeInstant,
             releasedOn = releasedOn?.dateShort?.toDomain()?.date
         )
     }
 
-    fun CalendarAnime.toAiringAnime(): AiringAnime {
+    /*fun CalendarAnime.toAiringAnime(): AiringAnime {
         return AiringAnime(
             data = ShortMedia(
                 id = shikiAnime.id ?: 0,
@@ -217,5 +216,5 @@ object ShikimoriMediaMapper {
             airingAt = Instant.parse(nextEpisodeAt),
             timeUntilAiring = Instant.parse(nextEpisodeAt).timeDifference()
         )
-    }
+    }*/
 }

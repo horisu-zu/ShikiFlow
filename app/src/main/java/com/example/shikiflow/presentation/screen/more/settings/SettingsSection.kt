@@ -46,7 +46,7 @@ import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.colors
 import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.iconResource
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 
@@ -178,7 +178,7 @@ private fun TextItem(
             style = MaterialTheme.typography.labelSmall.copy(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             ),
-            maxLines = 1,
+            maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
     }
@@ -260,7 +260,7 @@ private fun SwitchItem(
             Text(
                 text = displayValue,
                 style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                 ),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis

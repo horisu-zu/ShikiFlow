@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.settings
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -141,6 +142,12 @@ class SettingsViewModel @Inject constructor(
     fun setPaletteStyle(paletteStyle: PaletteStyle) {
         viewModelScope.launch {
             settingsRepository.savePaletteStyle(paletteStyle)
+        }
+    }
+
+    fun setPrimaryColorPreferences(color: Color, useSystemWallpaperColor: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.savePrimaryColorPreferences(color, useSystemWallpaperColor)
         }
     }
 

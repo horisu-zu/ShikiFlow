@@ -89,7 +89,7 @@ import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.social.UserSocialItem
 import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchViewModel
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch

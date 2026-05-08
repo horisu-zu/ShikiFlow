@@ -53,7 +53,7 @@ import com.example.shikiflow.presentation.screen.browse.main.NavigationSection
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.browse.main.anilist.AnilistBrowseSectionUiState
 import com.example.shikiflow.presentation.viewmodel.browse.main.anilist.AnilistBrowseViewModel
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 
 @Composable
 fun AnilistBrowseMainPage(

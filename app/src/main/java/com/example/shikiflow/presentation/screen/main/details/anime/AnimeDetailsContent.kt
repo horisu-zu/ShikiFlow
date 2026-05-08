@@ -64,7 +64,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.StaffSectio
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 import com.example.shikiflow.utils.WebIntent
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 
 @Composable
 fun AnimeDetailsContent(

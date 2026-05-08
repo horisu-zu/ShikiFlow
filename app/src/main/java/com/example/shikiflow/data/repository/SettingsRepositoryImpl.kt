@@ -1,9 +1,13 @@
 package com.example.shikiflow.data.repository
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.fromColorLong
+import androidx.compose.ui.graphics.toColorLong
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
@@ -47,6 +51,8 @@ class SettingsRepositoryImpl @Inject constructor(
         private val OLED_KEY = booleanPreferencesKey("oled")
         private val DYNAMIC_THEME_KEY = booleanPreferencesKey("dynamic_mode")
         private val PALETTE_STYLE_KEY = stringPreferencesKey("palette_style")
+        private val PRIMARY_COLOR_KEY = longPreferencesKey("primary_color")
+        private val SYSTEM_WALLPAPER_COLOR = booleanPreferencesKey("system_wallpaper")
 
         private val LOCALE_KEY = stringPreferencesKey("locale")
         private val TRACK_MODE = stringPreferencesKey("track_theme")
@@ -120,6 +126,10 @@ class SettingsRepositoryImpl @Inject constructor(
                 isOledEnabled = preferences[OLED_KEY] ?: false,
                 isDynamicThemeEnabled = preferences[DYNAMIC_THEME_KEY] ?: false,
                 paletteStyle = PaletteStyle.valueOf(preferences[PALETTE_STYLE_KEY] ?: PaletteStyle.Expressive.name),
+                primaryColor = preferences[PRIMARY_COLOR_KEY]?.let { colorKey ->
+                    Color.fromColorLong(colorKey)
+                } ?: Color(0xFF526CFD),
+                useSystemWallpaperColor = preferences[SYSTEM_WALLPAPER_COLOR] ?: true
             )
         }
 
@@ -227,6 +237,16 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun savePaletteStyle(paletteStyle: PaletteStyle) {
         dataStore.edit { preferences ->
             preferences[PALETTE_STYLE_KEY] = paletteStyle.name
+        }
+    }
+
+    override suspend fun savePrimaryColorPreferences(
+        color: Color,
+        useSystemWallpaperColor: Boolean
+    ) {
+        dataStore.edit { preferences ->
+            preferences[PRIMARY_COLOR_KEY] = color.toColorLong()
+            preferences[SYSTEM_WALLPAPER_COLOR] = useSystemWallpaperColor
         }
     }
 

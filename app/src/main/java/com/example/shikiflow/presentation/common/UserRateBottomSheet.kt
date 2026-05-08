@@ -68,7 +68,6 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.Converter
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.launch
 import kotlin.time.Instant

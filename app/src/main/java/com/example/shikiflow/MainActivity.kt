@@ -46,6 +46,8 @@ class MainActivity : AppCompatActivity() {
             }
 
             ShikiFlowTheme(
+                primaryColor = themeSettings.primaryColor,
+                useSystemWallpaperColor = themeSettings.useSystemWallpaperColor,
                 darkTheme = themeSettings.themeMode.isDarkTheme(systemTheme),
                 oledTheme = themeSettings.isOledEnabled,
                 dynamicColor = themeSettings.isDynamicThemeEnabled,

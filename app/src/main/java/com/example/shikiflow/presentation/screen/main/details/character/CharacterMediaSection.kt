@@ -33,8 +33,8 @@ import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.utils.foregroundGradient
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.foregroundGradient
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 
 @Composable
 fun CharacterMediaSection(

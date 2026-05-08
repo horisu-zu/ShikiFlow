@@ -24,6 +24,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
+import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 
@@ -33,24 +34,25 @@ fun AiringAnimeItem(
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val clip = 12.dp
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
-            .clickable { onClick(airingAnime.data.id) },
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+            .clip(RoundedCornerShape(clip))
+            .clickable { onClick(airingAnime.data.id) }
     ) {
         BrowseCoverItem(
             posterUrl = airingAnime.data.coverImageUrl,
             mediaType = MediaType.ANIME,
             userRateStatus = airingAnime.data.userRateStatus,
-            coverWidth = 96.dp,
-            cornerShape = 12.dp
+            coverWidth = 108.dp,
+            cornerShape = clip
         )
 
         Column(
-            modifier = Modifier.padding(vertical = 2.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
         ) {
             Text(
                 text = airingAnime.data.title,
@@ -60,6 +62,21 @@ fun AiringAnimeItem(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
+            Text(
+                text = when(airingAnime.totalEpisodes) {
+                    null -> stringResource(R.string.airing_episode, airingAnime.episode)
+                    else -> stringResource(R.string.airing_episodes, airingAnime.episode, airingAnime.totalEpisodes)
+                }.withStyledDigits(
+                    style = SpanStyle(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                ),
+                style = MaterialTheme.typography.labelMedium,
+                modifier = Modifier.padding(top = 2.dp)
+            )
+
             Text(
                 text = buildAnnotatedString {
                     airingAnime.airingAt?.let { airingAt ->
@@ -68,7 +85,6 @@ fun AiringAnimeItem(
                         append(stringResource(R.string.airing_at, airingAnime.episode))
                         withStyle(
                             style = SpanStyle(
-                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         ) {

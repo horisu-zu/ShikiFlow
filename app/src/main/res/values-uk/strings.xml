@@ -70,10 +70,10 @@
     <string name="settings_dynamic_theme_label">Динамічна тема</string>
     <string name="settings_app_theme_label">Тема додатку</string>
     <string name="settings_app_theme">Тема</string>
+    <string name="settings_theme_primary_color_desc">Оберіть основний колір для генерації динамічної теми</string>
     <string name="settings_oled_theme">OLED тема</string>
     <string name="settings_oled_desc">Увімкніть OLED режим для темнішого фону</string>
     <string name="settings_palette_style_label">Стиль палітри</string>
-    <string name="settings_palette_style_desc">Оберіть стиль палітри для динамічної теми</string>
     <string name="settings_palette_style_bottom_title">Оберіть стиль палітри</string>
 
     <string name="settings_cache_confirmation">Ви впевнені, що хочете очистити кеш зображень?</string>
@@ -93,6 +93,8 @@
         Під\'єднайте Ваш наявний акаунт для оновлення відстежуваного на всіх сервісах за раз
     </string>
 
+    <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>
+    <string name="color_picker_bottom_sheet_save">Застосувати</string>
     <string name="next_episode">"Наступний епізод в "</string>
 
     <string name="browse_on_my_list">В моєму списку</string>
@@ -198,6 +200,7 @@
     <string name="episodes">%1s еп.</string>
     <string name="episodes_watched">Епізоди: %1s</string>
     <string name="ongoing_episodes">%1$s з %2$s еп.</string>
+    <string name="airing_episodes">Епізод %1$s з %2$s</string>
     <string name="translation_filter_all">Усі</string>
     <string name="translation_filter_voice">Дубляж</string>
     <string name="translation_filter_subtitles">Субтитри</string>
@@ -464,4 +467,6 @@
     <string name="browse_type_trending_now">В тренді</string>
     <string name="browse_type_popular_this_season">Популярное в \\</string>
     <string name="profile_unfollow">Відписатися</string>
+    <string name="airing_episode">Епізод %1$s</string>
+    <string name="settings_theme_primary_color">Основний колір</string>
 </resources>

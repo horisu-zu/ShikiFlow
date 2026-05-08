@@ -72,10 +72,11 @@
     <string name="settings_dynamic_theme_label">Dynamic Theme</string>
     <string name="settings_app_theme_label">App Theme</string>
     <string name="settings_app_theme">Theme</string>
+    <string name="settings_theme_primary_color">Primary Color</string>
+    <string name="settings_theme_primary_color_desc">Pick a seed color to generate dynamic theme</string>
     <string name="settings_oled_theme">OLED theme</string>
     <string name="settings_oled_desc">Enable OLED mode for darker backgrounds</string>
     <string name="settings_palette_style_label">Palette Style</string>
-    <string name="settings_palette_style_desc">Select Palette Style for Dynamic Theme</string>
 
     <string name="settings_cache_confirmation">Are you sure you want to clear the image cache?</string>
     <string name="settings_cache_size">Cache Size</string>
@@ -91,6 +92,9 @@
     <string name="settings_sign_out">Sign Out</string>
     <string name="settings_tracker_services_title">Tracker Services</string>
     <string name="settings_tracker_services_display">Connect your existing account to update tracks on all services at once</string>
+
+    <string name="color_picker_bottom_sheet_system_label">Use System Wallpaper Color</string>
+    <string name="color_picker_bottom_sheet_save">Apply</string>
 
     <string name="next_episode">"Next episode on "</string>
 
@@ -194,6 +198,8 @@
     <string name="episodes">%1s ep.</string>
     <string name="episodes_watched">Episodes: %1s</string>
     <string name="ongoing_episodes">%1$s of %2$s ep.</string>
+    <string name="airing_episode">Episode %1$s</string>
+    <string name="airing_episodes">Episode %1$s of %2$s</string>
     <string name="translation_filter_all">All</string>
     <string name="translation_filter_voice">Voice</string>
     <string name="translation_filter_subtitles">Subtitles</string>
@@ -263,7 +269,7 @@
     <string name="day_of_week_sunday">Sunday</string>
 
     <string name="airing_released">Released final episode</string>
-    <string name="airing_at">"Episode %1$d airing at "</string>
+    <string name="airing_at">"Airing at "</string>
 
     <string name="bottom_nav_item_main">Main</string>
     <string name="bottom_nav_item_browse">Browse</string>

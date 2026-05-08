@@ -33,4 +33,24 @@ object ColorMapper {
             else -> Color(0xFF62CF71)
         }
     }
+
+    fun getPickerQuickColors(): List<Color> {
+        return listOf(
+            Color(0xFFF44336),
+            Color(0xFFFF5722),
+            Color(0xFFFF9800),
+            Color(0xFFFFC107),
+            Color(0xFFFFEB3B),
+            Color(0xFFCDDC39),
+            Color(0xFF8BC34A),
+            Color(0xFF4CAF50),
+            Color(0xFF009688),
+            Color(0xFF00BCD4),
+            Color(0xFF2196F3),
+            Color(0xFF3F51B5),
+            Color(0xFF673AB7),
+            Color(0xFF9C27B0),
+            Color(0xFFE91E63),
+        )
+    }
 }

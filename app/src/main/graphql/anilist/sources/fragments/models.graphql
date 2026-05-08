@@ -103,6 +103,7 @@ fragment ALMediaBrowseShort on Media {
     coverImage {
         large
     }
+    episodes
     mediaListEntry {
         id
         status

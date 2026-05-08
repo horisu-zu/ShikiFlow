@@ -46,7 +46,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.getRatioColor
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.getScoreRatioIcon
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 

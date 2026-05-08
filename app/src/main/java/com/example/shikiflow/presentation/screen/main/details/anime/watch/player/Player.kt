@@ -42,7 +42,7 @@ import androidx.media3.ui.PlayerView
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.PlayerEvent
 import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.KodikEpisodeUiState
 import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.PlayerState
-import com.example.shikiflow.utils.systemBarsVisibility
+import com.example.shikiflow.presentation.common.systemBarsVisibility
 import kotlinx.coroutines.delay
 
 @OptIn(UnstableApi::class)

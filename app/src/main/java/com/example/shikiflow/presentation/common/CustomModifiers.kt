@@ -1,4 +1,4 @@
-package com.example.shikiflow.utils
+package com.example.shikiflow.presentation.common
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.core.Animatable

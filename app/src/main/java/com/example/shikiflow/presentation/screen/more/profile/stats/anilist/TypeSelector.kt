@@ -28,7 +28,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
-import com.example.shikiflow.utils.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 
 @Composable
 fun TypeSelector(

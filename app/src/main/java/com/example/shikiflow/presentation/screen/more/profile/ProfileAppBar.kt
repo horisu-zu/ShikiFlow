@@ -49,7 +49,7 @@ import com.example.shikiflow.presentation.common.DynamicTopAppBar
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.image.shimmerEffect
-import com.example.shikiflow.utils.foregroundGradient
+import com.example.shikiflow.presentation.common.foregroundGradient
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

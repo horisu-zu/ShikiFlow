@@ -54,6 +54,7 @@ fun SettingsScreen(
 
     val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
     val openCacheDialog = remember { mutableStateOf(false) }
+    var showColorPickerBottomSheet by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -152,7 +153,7 @@ fun SettingsScreen(
                         ),
                         SectionItem.Default(
                             title = stringResource(R.string.settings_palette_style_label),
-                            displayValue = stringResource(R.string.settings_palette_style_desc),
+                            displayValue = themeSettings.paletteStyle.name,
                             isVisible = themeSettings.isDynamicThemeEnabled,
                             onClick = {
                                 bottomSheetConfig.value = BottomSheetConfig(
@@ -177,6 +178,12 @@ fun SettingsScreen(
                             onClick = { index ->
                                 settingsViewModel.setTheme(ThemeMode.entries[index])
                             }
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_theme_primary_color),
+                            displayValue = stringResource(R.string.settings_theme_primary_color_desc),
+                            isVisible = themeSettings.isDynamicThemeEnabled,
+                            onClick = { showColorPickerBottomSheet = true }
                         ),
                         SectionItem.Switch(
                             title = stringResource(R.string.settings_oled_theme),
@@ -305,6 +312,7 @@ fun SettingsScreen(
                 )
             }
         }
+
         bottomSheetConfig.value?.let { config ->
             SettingsBottomSheet(
                 title = config.title,
@@ -313,6 +321,19 @@ fun SettingsScreen(
                 onOptionClick = config.onOptionClick,
                 onDismiss = { bottomSheetConfig.value = null }
             )
+        }
+
+        if(showColorPickerBottomSheet) {
+            settingsState.themeSettings?.let { themeSettings ->
+                ColorPickerBottomSheet(
+                    currentColor = themeSettings.primaryColor,
+                    useSystemWallpaperColor = themeSettings.useSystemWallpaperColor,
+                    onDismiss = { showColorPickerBottomSheet = false },
+                    onSave = { color, useSystemColor ->
+                        settingsViewModel.setPrimaryColorPreferences(color, useSystemColor)
+                    }
+                )
+            }
         }
     }
 }
