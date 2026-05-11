@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.common.mappers
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import com.example.shikiflow.domain.model.track.UserRateStatus
 
 object ColorMapper {
@@ -52,5 +53,12 @@ object ColorMapper {
             Color(0xFF9C27B0),
             Color(0xFFE91E63),
         )
+    }
+
+    fun Color.lerp(
+        startColor: Color,
+        fraction: Float = 0.3f
+    ): Color {
+        return lerp(startColor, this, fraction)
     }
 }

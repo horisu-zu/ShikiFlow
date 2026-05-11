@@ -27,7 +27,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
-import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.collections.map
@@ -37,7 +37,7 @@ import kotlin.toString
 class ShikimoriTracksDataSource @Inject constructor(
     @param:ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
-): MediaTracksDataSource {
+): MediaTracksDataSource, BaseNetworkRepository() {
 
     override suspend fun getTracksLibrary(
         userId: Int,

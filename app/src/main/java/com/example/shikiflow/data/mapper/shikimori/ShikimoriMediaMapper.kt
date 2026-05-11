@@ -21,9 +21,9 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDo
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.domain.model.anime.AiringAnime
+import com.example.shikiflow.domain.model.anime.AiringAnimeDataShort
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.common.PaginatedList
-import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
@@ -33,6 +33,7 @@ import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.utils.DateUtils.isInCurrentWeek
 import com.example.shikiflow.utils.DateUtils.timeDifference
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 object ShikimoriMediaMapper {
@@ -188,15 +189,16 @@ object ShikimoriMediaMapper {
         } ?: airedOnDate
 
         return AiringAnime(
-            data = ShortMedia(
+            data = AiringAnimeDataShort(
                 id = id.toInt(),
                 title = name,
                 mediaType = MediaType.ANIME,
                 coverImageUrl = poster?.posterShort?.originalUrl ?: "",
-                userRateStatus = userRate?.animeUserRate?.status?.toDomain()
+                userRateStatus = userRate?.animeUserRate?.status?.toDomain(),
+                totalEpisodes = if(episodes != 0) episodes else null,
+                duration = duration?.minutes
             ),
             episode = if(airedThisWeek) episodesAired else episodesAired + 1,
-            totalEpisodes = if(episodes != 0) episodes else null,
             timeUntilAiring = episodeInstant?.timeDifference(),
             airingAt = episodeInstant,
             releasedOn = releasedOn?.dateShort?.toDomain()?.date

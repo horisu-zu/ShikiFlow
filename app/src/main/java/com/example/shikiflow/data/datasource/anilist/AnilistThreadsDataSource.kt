@@ -15,12 +15,12 @@ import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import javax.inject.Inject
 
 class AnilistThreadsDataSource @Inject constructor(
     @param:AnilistApollo private val apolloClient: ApolloClient
-): CommentsDataSource {
+): CommentsDataSource, BaseNetworkRepository() {
     override suspend fun getComments(
         topicId: Int,
         page: Int,

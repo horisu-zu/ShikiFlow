@@ -53,6 +53,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.common.mappers.ColorMapper
+import kotlin.math.abs
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationStyleApi::class)
 @Composable
@@ -138,7 +139,7 @@ fun ColorPickerBottomSheet(
             ) {
                 items(ColorMapper.getPickerQuickColors()) { color ->
                     val isCurrent = remember(hue) {
-                        hue == color.extractHue()
+                        abs(hue - color.extractHue()) < 0.5f
                     }
                     val borderWidth = if(isCurrent) 3.dp else 1.dp
                     val borderColor = outlineColor(isCurrent)
@@ -181,7 +182,7 @@ fun ColorPickerBottomSheet(
                     .clip(RoundedCornerShape(percent = 24))
                     .background(
                         brush = Brush.horizontalGradient(
-                            colors = (0..360 step 15).map { hue ->
+                            colors = (0..360 step 8).map { hue ->
                                 Color.hsl(hue.toFloat(), saturation, lightness)
                             }
                         )

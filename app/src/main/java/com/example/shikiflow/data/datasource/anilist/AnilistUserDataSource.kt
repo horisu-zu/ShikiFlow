@@ -12,6 +12,11 @@ import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
 import com.example.graphql.anilist.ToggleFollowMutation
 import com.example.graphql.anilist.UserActivitiesQuery
+import com.example.graphql.anilist.UserFavoriteAnimeQuery
+import com.example.graphql.anilist.UserFavoriteCharactersQuery
+import com.example.graphql.anilist.UserFavoriteMangaQuery
+import com.example.graphql.anilist.UserFavoriteStaffQuery
+import com.example.graphql.anilist.UserFavoriteStudiosQuery
 import com.example.graphql.anilist.UserFollowQuery
 import com.example.graphql.anilist.UserFollowersQuery
 import com.example.graphql.anilist.UserFollowingsQuery
@@ -26,7 +31,6 @@ import com.example.graphql.anilist.UserThreadCommentsQuery
 import com.example.graphql.anilist.UserThreadsQuery
 import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.shikiflow.data.datasource.UserDataSource
-import com.example.shikiflow.data.local.source.FavoritesPagingSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
@@ -36,6 +40,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewSta
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStaffStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStudiosStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toTagsStats
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toUserFavorite
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
@@ -57,7 +62,6 @@ import com.example.shikiflow.domain.model.user.social.Thread
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -241,13 +245,119 @@ class AnilistUserDataSource @Inject constructor(
                 initialLoadSize = 21
             ),
             pagingSourceFactory = {
-                FavoritesPagingSource(
-                    apolloClient = apolloClient,
-                    userId = userId,
-                    favoriteCategory = favoriteCategory
+                GenericPagingSource(
+                    method = { page, limit ->
+                        when(favoriteCategory) {
+                            FavoriteCategory.ANIME -> loadFavoriteAnime(userId, page, limit)
+                            FavoriteCategory.MANGA -> loadFavoriteManga(userId, page, limit)
+                            FavoriteCategory.CHARACTER -> loadFavoriteCharacters(userId, page, limit)
+                            FavoriteCategory.STAFF -> loadFavoriteStaff(userId, page, limit)
+                            else -> loadFavoriteStudios(userId, page, limit)
+                        }
+                    }
                 )
             }
         ).flow
+    }
+
+    private suspend fun loadFavoriteAnime(
+        userId: Int,
+        page: Int,
+        size: Int
+    ): Result<List<UserFavorite>> {
+        val response = apolloClient.query(UserFavoriteAnimeQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.anime
+                ?.nodes
+                ?.mapNotNull { favoriteMedia ->
+                    favoriteMedia?.aLFavoriteMediaShort?.toUserFavorite(FavoriteCategory.ANIME)
+                } ?: emptyList()
+        }
+    }
+
+    private suspend fun loadFavoriteManga(
+        userId: Int,
+        page: Int,
+        size: Int
+    ): Result<List<UserFavorite>> {
+        val response = apolloClient.query(UserFavoriteMangaQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.manga
+                ?.nodes
+                ?.mapNotNull { favoriteMedia ->
+                    favoriteMedia?.aLFavoriteMediaShort?.toUserFavorite(FavoriteCategory.MANGA)
+                } ?: emptyList()
+        }
+    }
+
+    private suspend fun loadFavoriteCharacters(
+        userId: Int,
+        page: Int,
+        size: Int
+    ): Result<List<UserFavorite>> {
+        val response = apolloClient.query(UserFavoriteCharactersQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.characters
+                ?.nodes
+                ?.mapNotNull { favoriteCharacter ->
+                    favoriteCharacter?.aLFavoriteCharacterShort?.toUserFavorite()
+                } ?: emptyList()
+        }
+    }
+
+    private suspend fun loadFavoriteStaff(
+        userId: Int,
+        page: Int,
+        size: Int
+    ): Result<List<UserFavorite>> {
+        val response = apolloClient.query(UserFavoriteStaffQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.staff
+                ?.nodes
+                ?.mapNotNull { favoriteStaff ->
+                    favoriteStaff?.aLFavoriteStaffShort?.toUserFavorite()
+                } ?: emptyList()
+        }
+    }
+
+    private suspend fun loadFavoriteStudios(
+        userId: Int,
+        page: Int,
+        size: Int
+    ): Result<List<UserFavorite>> {
+        val response = apolloClient.query(UserFavoriteStudiosQuery(page, size, userId))
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.toResult().map { data ->
+            data.User
+                ?.favourites
+                ?.studios
+                ?.nodes
+                ?.mapNotNull { favoriteStudio ->
+                    favoriteStudio?.aLStudioShort?.toUserFavorite()
+                } ?: emptyList()
+        }
     }
 
     override fun getUserSocial(

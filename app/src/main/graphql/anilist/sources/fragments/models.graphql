@@ -110,10 +110,27 @@ fragment ALMediaBrowseShort on Media {
     }
 }
 
+fragment ALAiringAnime on Media {
+    id
+    type
+    title {
+        romaji
+    }
+    coverImage {
+        large
+    }
+    episodes
+    duration
+    mediaListEntry {
+        id
+        status
+    }
+    isAdult
+}
+
 fragment ALAiringAnimeShort on AiringSchedule {
     media {
-        ...ALMediaBrowseShort
-        isAdult
+        ...ALAiringAnime
     }
     episode
     timeUntilAiring

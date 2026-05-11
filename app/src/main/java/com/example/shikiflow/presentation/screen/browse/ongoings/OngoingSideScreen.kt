@@ -1,16 +1,13 @@
 package com.example.shikiflow.presentation.screen.browse.ongoings
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,12 +54,14 @@ import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.DateMapper.displayValue
+import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.status
 import com.example.shikiflow.presentation.viewmodel.browse.calendar.OngoingsCalendarViewModel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -238,20 +237,30 @@ private fun OngoingSideScreenContent(
                     }
                 }
                 else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(320.dp),
+                    LazyColumn(
                         contentPadding = PaddingValues(
-                            horizontal = 12.dp,
+                            horizontal = 16.dp,
                             vertical = 8.dp
                         ),
-                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(calendarItems.itemCount) { index ->
                             calendarItems[index]?.let { airingAnime ->
                                 AiringAnimeItem(
                                     airingAnime = airingAnime,
+                                    prevStatus = if(index > 0)
+                                        calendarItems.peek(index - 1)?.let { airingAnime ->
+                                            airingAnime.timeUntilAiring.status(
+                                                duration = airingAnime.data.duration ?: 30.minutes
+                                            )
+                                        } else null,
+                                    nextStatus = if(index < calendarItems.itemCount - 1)
+                                        calendarItems.peek(index + 1)
+                                            ?.let { airingAnime ->
+                                                airingAnime.timeUntilAiring.status(
+                                                    duration = airingAnime.data.duration ?: 30.minutes
+                                                )
+                                            } else null,
                                     onClick = onNavigate
                                 )
                             }
@@ -259,7 +268,7 @@ private fun OngoingSideScreenContent(
 
                         calendarItems.apply {
                             if (loadState.append is LoadState.Loading) {
-                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                item {
                                     Box(
                                         modifier = Modifier.fillMaxSize(),
                                         contentAlignment = Alignment.Center
@@ -267,7 +276,7 @@ private fun OngoingSideScreenContent(
                                 }
                             }
                             if (loadState.append is LoadState.Error) {
-                                item(span = { GridItemSpan(maxLineSpan) }) {
+                                item {
                                     ErrorItem(
                                         message = stringResource(R.string.common_error),
                                         showFace = false,

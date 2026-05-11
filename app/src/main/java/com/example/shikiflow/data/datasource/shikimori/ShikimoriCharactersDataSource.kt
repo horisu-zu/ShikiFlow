@@ -24,7 +24,7 @@ import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -35,7 +35,7 @@ import javax.inject.Inject
 class ShikimoriCharactersDataSource @Inject constructor(
     private val characterApi: CharacterApi,
     @param:ShikimoriApollo private val apolloClient: ApolloClient
-): CharactersDataSource {
+): CharactersDataSource, BaseNetworkRepository() {
     override suspend fun getCharacterDetails(
         characterId: Int
     ): Flow<DataResult<MediaCharacter>> = flow {

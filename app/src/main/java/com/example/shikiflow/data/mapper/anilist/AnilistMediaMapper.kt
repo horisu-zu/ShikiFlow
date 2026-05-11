@@ -1,6 +1,7 @@
 package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.MediaDetailsQuery
+import com.example.graphql.anilist.fragment.ALAiringAnime
 import com.example.graphql.anilist.fragment.ALAiringAnimeShort
 import com.example.graphql.anilist.fragment.MediaBrowse
 import com.example.graphql.anilist.fragment.MediaFollowingShort
@@ -19,6 +20,7 @@ import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.toDomainFormat
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.domain.model.anime.AiringAnime
+import com.example.shikiflow.domain.model.anime.AiringAnimeDataShort
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.ScoreFormat
@@ -31,6 +33,7 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
@@ -158,14 +161,26 @@ object AnilistMediaMapper {
     }
 
     fun ALAiringAnimeShort.toDomain(): AiringAnime? {
-        return media?.aLMediaBrowseShort?.let { browseShort ->
+        return media?.aLAiringAnime?.let { airingAnime ->
             AiringAnime(
-                data = browseShort.toDomain(),
+                data = airingAnime.toAiringData(),
                 episode = episode,
-                totalEpisodes = browseShort.episodes,
                 timeUntilAiring = timeUntilAiring.toLong().seconds,
                 airingAt = Instant.fromEpochSeconds(airingAt.toLong())
             )
         }
+    }
+
+    fun ALAiringAnime.toAiringData(): AiringAnimeDataShort {
+        return AiringAnimeDataShort(
+            id = id,
+            title = title?.romaji ?: "",
+            mediaType = type?.toDomain() ?: MediaType.ANIME,
+            coverImageUrl = coverImage?.large ?: "",
+            totalEpisodes = episodes,
+            userRateStatus = mediaListEntry?.status?.toDomain(),
+            duration = duration?.minutes,
+            isAdult = isAdult ?: false
+        )
     }
 }

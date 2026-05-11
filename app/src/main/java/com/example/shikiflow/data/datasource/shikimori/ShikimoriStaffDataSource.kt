@@ -28,7 +28,7 @@ import com.example.shikiflow.domain.model.staff.StaffDetails
 import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.utils.AnilistUtils.toResult
+import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -39,7 +39,7 @@ import javax.inject.Inject
 class ShikimoriStaffDataSource @Inject constructor(
     private val staffApi: PersonApi,
     @param:ShikimoriApollo private val apolloClient: ApolloClient
-): StaffDataSource {
+): StaffDataSource, BaseNetworkRepository() {
     override fun getStaffDetails(staffId: Int): Flow<DataResult<StaffDetails>> = flow {
         emit(DataResult.Loading)
 

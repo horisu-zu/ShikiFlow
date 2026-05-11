@@ -1,18 +1,27 @@
 package com.example.shikiflow.presentation.screen.browse.ongoings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -20,82 +29,178 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
+import com.example.shikiflow.presentation.common.DividerPosition
+import com.example.shikiflow.presentation.common.VerticalDivider
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.lerp
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
+import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.color
+import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.status
+import com.materialkolor.ktx.harmonize
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
+import kotlin.time.Duration.Companion.minutes
 
 @Composable
 fun AiringAnimeItem(
     airingAnime: AiringAnime,
+    prevStatus: AiringStatus?,
+    nextStatus: AiringStatus?,
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val coverWidth = 96.dp
     val clip = 12.dp
+    val dividerWidth = 4.dp
+    val airingStatus = airingAnime.timeUntilAiring.status(
+        duration = airingAnime.data.duration ?: 30.minutes
+    )
 
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(clip))
-            .clickable { onClick(airingAnime.data.id) }
+            .height(coverWidth * 3f / 2f),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
     ) {
-        BrowseCoverItem(
-            posterUrl = airingAnime.data.coverImageUrl,
-            mediaType = MediaType.ANIME,
-            userRateStatus = airingAnime.data.userRateStatus,
-            coverWidth = 108.dp,
-            cornerShape = clip
-        )
-
         Column(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
-            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+            modifier = Modifier.fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = airingAnime.data.title,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = FontWeight.SemiBold
-                ),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
+            val background = MaterialTheme.colorScheme.background
+
+            val color = airingStatus.color().harmonize(background)
+            val backgroundColor = color.lerp(background)
+            val prevColor = prevStatus?.color()?.harmonize(background)?.lerp(background)
+            val nextColor = nextStatus?.color()?.harmonize(background)?.lerp(background)
+
+            VerticalDivider(
+                thickness = dividerWidth,
+                colors = prevColor?.let {
+                    listOf(backgroundColor.lerp(prevColor, 0.5f), backgroundColor)
+                } ?: listOf(Color.Transparent, Color.Transparent),
+                dividerPosition = DividerPosition.TOP,
+                modifier = Modifier.weight(1f)
             )
 
-            Text(
-                text = when(airingAnime.totalEpisodes) {
-                    null -> stringResource(R.string.airing_episode, airingAnime.episode)
-                    else -> stringResource(R.string.airing_episodes, airingAnime.episode, airingAnime.totalEpisodes)
-                }.withStyledDigits(
-                    style = SpanStyle(
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                ),
-                style = MaterialTheme.typography.labelMedium,
-                modifier = Modifier.padding(top = 2.dp)
+            AiringStatusIcon(
+                airingStatus = airingStatus,
+                itemColor = color,
+                backgroundColor = backgroundColor,
+                modifier = Modifier.zIndex(1f)
             )
 
-            Text(
-                text = buildAnnotatedString {
-                    airingAnime.airingAt?.let { airingAt ->
-                        val time = airingAt.toLocalDateTime(TimeZone.currentSystemDefault()).time
-
-                        append(stringResource(R.string.airing_at, airingAnime.episode))
-                        withStyle(
-                            style = SpanStyle(
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        ) {
-                            append(time.toString())
-                        }
-                    } ?: airingAnime.releasedOn?.let {
-                        append(stringResource(R.string.airing_released))
-                    }
-                },
-                style = MaterialTheme.typography.labelMedium
+            VerticalDivider(
+                thickness = dividerWidth,
+                colors = nextColor?.let {
+                    listOf(backgroundColor, nextColor.lerp(backgroundColor, 0.5f))
+                } ?: listOf(Color.Transparent, Color.Transparent),
+                dividerPosition = DividerPosition.BOTTOM,
+                modifier = Modifier.weight(3f)
             )
         }
+
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .clip(RoundedCornerShape(clip))
+                .clickable { onClick(airingAnime.data.id) }
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+            ) {
+                Text(
+                    text = buildAnnotatedString {
+                        airingAnime.airingAt?.let { airingAt ->
+                            val time = airingAt.toLocalDateTime(TimeZone.currentSystemDefault()).time
+
+                            withStyle(
+                                style = SpanStyle(
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            ) {
+                                append(time.toString())
+                            }
+                        } ?: airingAnime.releasedOn?.let {
+                            stringResource(R.string.airing_released)
+                        }
+                    },
+                    style = MaterialTheme.typography.titleSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+
+                Text(
+                    text = airingAnime.data.title,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                Text(
+                    text = when(airingAnime.data.totalEpisodes) {
+                        null -> stringResource(R.string.airing_episode, airingAnime.episode)
+                        else -> stringResource(R.string.airing_episodes, airingAnime.episode, airingAnime.data.totalEpisodes)
+                    }.withStyledDigits(
+                        style = SpanStyle(
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    modifier = Modifier.padding(top = 2.dp)
+                )
+            }
+
+            BrowseCoverItem(
+                posterUrl = airingAnime.data.coverImageUrl,
+                mediaType = MediaType.ANIME,
+                userRateStatus = airingAnime.data.userRateStatus,
+                coverWidth = coverWidth,
+                cornerShape = clip
+            )
+        }
+    }
+}
+
+
+
+@Composable
+private fun AiringStatusIcon(
+    airingStatus: AiringStatus,
+    itemColor: Color,
+    backgroundColor: Color,
+    modifier: Modifier = Modifier
+) {
+    if(airingStatus == AiringStatus.AIRED) {
+        Icon(
+            painter = painterResource(R.drawable.ic_clock_check),
+            contentDescription = "Already Aired",
+            tint = itemColor,
+            modifier = modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(backgroundColor)
+                .padding(all = 4.dp)
+        )
+    } else {
+        Box(
+            modifier = modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(backgroundColor)
+                .padding(all = 8.dp)
+                .clip(CircleShape)
+                .background(itemColor)
+        )
     }
 }

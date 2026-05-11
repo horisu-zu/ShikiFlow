@@ -80,6 +80,16 @@ abstract class BaseNetworkRepository {
             }
         }.onStart { emit(DataResult.Loading) }
 
+    fun <T : Operation.Data> ApolloResponse<T>.toResult(): Result<T> {
+        if (hasErrors()) {
+            return Result.failure(Exception("Errors: $errors"))
+        }
+
+        return data?.let {
+            Result.success(it)
+        } ?: Result.failure(exception ?: Exception("Unknown Error"))
+    }
+
     fun <S, T> withSource(
         flow: Flow<S>,
         block: (S) -> Flow<T>

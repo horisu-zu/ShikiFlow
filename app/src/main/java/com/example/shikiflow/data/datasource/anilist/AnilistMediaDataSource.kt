@@ -51,7 +51,6 @@ import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.utils.AnilistUtils.toResult
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -179,11 +178,15 @@ class AnilistMediaDataSource @Inject constructor(
                 )
             }
         ).flow.map { pagingData ->
-            pagingData.filter { airingAnime ->
-                if(onList) {
-                    airingAnime.data.userRateStatus != null
-                } else true
-            }
+            pagingData
+                .filter { airingAnime ->
+                    if(onList) {
+                        airingAnime.data.userRateStatus != null
+                    } else true
+                }
+                .filter { airingAnime ->
+                    !airingAnime.data.isAdult
+                }
         }
     }
 
@@ -207,9 +210,6 @@ class AnilistMediaDataSource @Inject constructor(
                 data
                     .Page
                     ?.airingSchedules
-                    ?.filter { airing ->
-                        airing?.aLAiringAnimeShort?.media?.isAdult != true
-                    }
                     ?.mapNotNull { airing ->
                         airing?.aLAiringAnimeShort?.toDomain()
                     } ?: emptyList()
