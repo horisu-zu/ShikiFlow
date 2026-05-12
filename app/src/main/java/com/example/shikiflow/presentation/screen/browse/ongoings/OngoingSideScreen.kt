@@ -122,7 +122,8 @@ fun OngoingSideScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
+                    containerColor = if(isAtTop) MaterialTheme.colorScheme.background
+                        else MaterialTheme.colorScheme.surfaceContainer,
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
                 scrollBehavior = scrollBehavior
@@ -250,14 +251,14 @@ private fun OngoingSideScreenContent(
                                     airingAnime = airingAnime,
                                     prevStatus = if(index > 0)
                                         calendarItems.peek(index - 1)?.let { airingAnime ->
-                                            airingAnime.timeUntilAiring.status(
+                                            airingAnime.airingAt.status(
                                                 duration = airingAnime.data.duration ?: 30.minutes
                                             )
                                         } else null,
                                     nextStatus = if(index < calendarItems.itemCount - 1)
                                         calendarItems.peek(index + 1)
                                             ?.let { airingAnime ->
-                                                airingAnime.timeUntilAiring.status(
+                                                airingAnime.airingAt.status(
                                                     duration = airingAnime.data.duration ?: 30.minutes
                                                 )
                                             } else null,

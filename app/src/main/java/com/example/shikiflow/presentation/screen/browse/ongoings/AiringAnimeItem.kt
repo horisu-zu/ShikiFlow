@@ -34,8 +34,9 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
-import com.example.shikiflow.presentation.common.DividerPosition
-import com.example.shikiflow.presentation.common.VerticalDivider
+import com.example.shikiflow.presentation.common.FadeEdge
+import com.example.shikiflow.presentation.common.PulseIndicator
+import com.example.shikiflow.presentation.common.VerticalGradientDivider
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.lerp
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.color
@@ -56,7 +57,7 @@ fun AiringAnimeItem(
     val coverWidth = 96.dp
     val clip = 12.dp
     val dividerWidth = 4.dp
-    val airingStatus = airingAnime.timeUntilAiring.status(
+    val airingStatus = airingAnime.airingAt.status(
         duration = airingAnime.data.duration ?: 30.minutes
     )
 
@@ -78,29 +79,32 @@ fun AiringAnimeItem(
             val prevColor = prevStatus?.color()?.harmonize(background)?.lerp(background)
             val nextColor = nextStatus?.color()?.harmonize(background)?.lerp(background)
 
-            VerticalDivider(
+            VerticalGradientDivider(
                 thickness = dividerWidth,
                 colors = prevColor?.let {
                     listOf(backgroundColor.lerp(prevColor, 0.5f), backgroundColor)
-                } ?: listOf(Color.Transparent, Color.Transparent),
-                dividerPosition = DividerPosition.TOP,
-                modifier = Modifier.weight(1f)
+                },
+                fadeEdge = FadeEdge.TOP,
+                modifier = Modifier
+                    .weight(1f)
+                    .zIndex(-1f)
             )
 
             AiringStatusIcon(
                 airingStatus = airingStatus,
                 itemColor = color,
-                backgroundColor = backgroundColor,
-                modifier = Modifier.zIndex(1f)
+                backgroundColor = backgroundColor
             )
 
-            VerticalDivider(
+            VerticalGradientDivider(
                 thickness = dividerWidth,
                 colors = nextColor?.let {
                     listOf(backgroundColor, nextColor.lerp(backgroundColor, 0.5f))
-                } ?: listOf(Color.Transparent, Color.Transparent),
-                dividerPosition = DividerPosition.BOTTOM,
-                modifier = Modifier.weight(3f)
+                },
+                fadeEdge = FadeEdge.BOTTOM,
+                modifier = Modifier
+                    .weight(3f)
+                    .zIndex(-1f)
             )
         }
 
@@ -181,26 +185,36 @@ private fun AiringStatusIcon(
     backgroundColor: Color,
     modifier: Modifier = Modifier
 ) {
-    if(airingStatus == AiringStatus.AIRED) {
-        Icon(
-            painter = painterResource(R.drawable.ic_clock_check),
-            contentDescription = "Already Aired",
-            tint = itemColor,
-            modifier = modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(backgroundColor)
-                .padding(all = 4.dp)
-        )
-    } else {
-        Box(
-            modifier = modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(backgroundColor)
-                .padding(all = 8.dp)
-                .clip(CircleShape)
-                .background(itemColor)
-        )
+    val size = 32.dp
+
+    when(airingStatus) {
+        AiringStatus.AIRED -> {
+            Icon(
+                painter = painterResource(R.drawable.ic_clock_check),
+                contentDescription = "Already Aired",
+                tint = itemColor,
+                modifier = modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .background(backgroundColor)
+                    .padding(all = 4.dp)
+            )
+        }
+        AiringStatus.AIRING -> {
+            PulseIndicator(
+                backgroundColor = backgroundColor,
+                itemColor = itemColor,
+                modifier = Modifier.size(size)
+            )
+        }
+        AiringStatus.NOT_YET_AIRED -> {
+            Box(
+                modifier = modifier
+                    .size(size)
+                    .background(backgroundColor, CircleShape)
+                    .padding(all = 8.dp)
+                    .background(itemColor, CircleShape)
+            )
+        }
     }
 }

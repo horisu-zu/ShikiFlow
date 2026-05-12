@@ -10,17 +10,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 
-enum class DividerPosition {
+enum class FadeEdge {
     TOP,
     BOTTOM
 }
 
 @Composable
-fun VerticalDivider(
+fun VerticalGradientDivider(
     thickness: Dp,
-    colors: List<Color>,
+    colors: List<Color>?,
     modifier: Modifier = Modifier,
-    dividerPosition: DividerPosition? = null
+    fadeEdge: FadeEdge? = null
 ) {
     Canvas(
         modifier = modifier
@@ -31,20 +31,20 @@ fun VerticalDivider(
 
         drawLine(
             brush = Brush.verticalGradient(
-                colors = colors
+                colors = colors ?: listOf(Color.Transparent, Color.Transparent)
             ),
             strokeWidth = thickness.toPx(),
             start = Offset(
                 x = thickness.toPx() / 2,
-                y = when(dividerPosition) {
-                    DividerPosition.BOTTOM -> -extension
+                y = when(fadeEdge) {
+                    FadeEdge.BOTTOM -> -extension
                     else -> 0f
                 }
             ),
             end = Offset(
                 x = thickness.toPx() / 2,
-                y = when(dividerPosition) {
-                    DividerPosition.TOP -> size.height + extension
+                y = when(fadeEdge) {
+                    FadeEdge.TOP -> size.height + extension
                     else -> size.height
                 }
             )

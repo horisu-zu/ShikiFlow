@@ -1,7 +1,9 @@
 package com.example.shikiflow.presentation.screen.browse.ongoings
 
 import androidx.compose.ui.graphics.Color
+import com.example.shikiflow.utils.DateUtils.timeDifference
 import kotlin.time.Duration
+import kotlin.time.Instant
 
 enum class AiringStatus {
     AIRED,
@@ -13,16 +15,17 @@ enum class AiringStatus {
             return when(this) {
                 AIRED -> Color(0xFF62CF71)
                 AIRING -> Color(0xFFCF6562)
-                NOT_YET_AIRED -> Color(0xFF628ACF)
+                NOT_YET_AIRED -> Color(0xFF8C8C8C)
             }
         }
 
-        fun Duration?.status(duration: Duration): AiringStatus {
+        fun Instant?.status(duration: Duration): AiringStatus {
+            val timeDiff = this?.timeDifference() ?: return AIRED
+
             return when {
-                this == null -> AIRED
-                this in -duration..Duration.ZERO -> AIRING
-                this < Duration.ZERO -> AIRED
-                else -> NOT_YET_AIRED
+                timeDiff > Duration.ZERO -> NOT_YET_AIRED
+                timeDiff >= -duration -> AIRING
+                else -> AIRED
             }
         }
     }
