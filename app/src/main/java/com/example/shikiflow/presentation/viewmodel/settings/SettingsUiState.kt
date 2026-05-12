@@ -14,5 +14,6 @@ data class SettingsUiState(
     val settings: Settings = Settings(),
     val themeSettings: ThemeSettings? = null,
     val mangaSettings: MangaChapterSettings = MangaChapterSettings(),
+    val chapterLanguages: Set<String> = emptySet(),
     val cacheSize: FileSize? = null
 )

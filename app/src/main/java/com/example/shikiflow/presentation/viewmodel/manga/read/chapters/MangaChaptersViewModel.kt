@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.AggregateMangaUseCase
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MangaChaptersViewModel @Inject constructor(
     private val aggregateMangaUseCase: AggregateMangaUseCase,
-    private val mediaTracksRepository: MediaTracksRepository
+    private val mediaTracksRepository: MediaTracksRepository,
+    settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _chaptersUiState = MutableStateFlow(MangaChaptersUiState())
@@ -33,13 +35,17 @@ class MangaChaptersViewModel @Inject constructor(
     init {
         _chaptersUiState
             .filter { state ->
-                state.mangaDexId != null
+                state.mangaDexId != null && state.chapterLanguages != null
             }
             .distinctUntilChanged { old, new ->
-                old.mangaDexId == new.mangaDexId && !new.isRefreshing
+                old.mangaDexId == new.mangaDexId && old.chapterLanguages == new.chapterLanguages &&
+                        !new.isRefreshing
             }
             .flatMapLatest { state ->
-                aggregateMangaUseCase(state.mangaDexId!!)
+                aggregateMangaUseCase(
+                    mangaDexId = state.mangaDexId!!,
+                    chapterLanguages = state.chapterLanguages!!
+                )
             }.onEach { result ->
                 when(result) {
                     DataResult.Loading -> {
@@ -79,6 +85,14 @@ class MangaChaptersViewModel @Inject constructor(
             .onEach { track ->
                 _chaptersUiState.update { state ->
                     state.copy(completedChapters = track?.track?.progress ?: 0)
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository
+            .chapterLanguagesFlow
+            .onEach { languagesSet ->
+                _chaptersUiState.update { state ->
+                    state.copy(chapterLanguages = languagesSet)
                 }
             }.launchIn(viewModelScope)
     }

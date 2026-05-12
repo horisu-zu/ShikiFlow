@@ -10,10 +10,17 @@ import javax.inject.Inject
 class AggregateMangaUseCase @Inject constructor(
     private val mangaDexRepository: MangaDexRepository
 ) {
-    operator fun invoke(mangaDexId: String): Flow<DataResult<Map<String, List<String>>>> = flow {
+    operator fun invoke(
+        mangaDexId: String,
+        chapterLanguages: Set<String>
+    ): Flow<DataResult<Map<String, List<String>>>> = flow {
         try {
             emit(DataResult.Loading)
-            val mangaResponse = mangaDexRepository.aggregateManga(mangaDexId)
+
+            val mangaResponse = mangaDexRepository.aggregateManga(
+                mangaId = mangaDexId,
+                chapterLanguages = chapterLanguages
+            )
             /*val responseMap = mangaResponse.volumes.entries
                 .sortedBy { (volume, _) ->
                     volume.toFloatOrNull() ?: 0f

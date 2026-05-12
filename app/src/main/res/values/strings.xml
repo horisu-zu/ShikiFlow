@@ -68,6 +68,9 @@
     <string name="settings_data_saver_desc">Reduce data usage by loading lower quality versions of chapters</string>
     <string name="settings_enabled">Enabled</string>
     <string name="settings_disabled">Disabled</string>
+    <string name="settings_chapter_languages">Chapter Languages</string>
+    <string name="settings_chapter_languages_desc">Show chapters with translations in selected languages</string>
+    <string name="settings_chapter_languages_sheet_desc">If no language is selected, the app will load chapters for all available languages</string>
 
     <string name="settings_dynamic_theme_label">Dynamic Theme</string>
     <string name="settings_app_theme_label">App Theme</string>

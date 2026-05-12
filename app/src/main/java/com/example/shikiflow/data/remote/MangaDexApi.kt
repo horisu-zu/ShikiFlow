@@ -24,7 +24,8 @@ interface MangaDexApi {
 
     @GET("/manga/{id}/aggregate")
     suspend fun aggregateManga(
-        @Path("id") mangaId: String
+        @Path("id") mangaId: String,
+        @Query("translatedLanguage[]") chapterLanguages: Set<String>
     ): AggregateResponse
 
     @GET("/chapter/{id}")

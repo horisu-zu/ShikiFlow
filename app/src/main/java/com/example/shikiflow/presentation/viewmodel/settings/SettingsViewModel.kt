@@ -40,14 +40,16 @@ class SettingsViewModel @Inject constructor(
                 settingsRepository.settingsFlow.distinctUntilChanged(),
                 settingsRepository.themeSettingsFlow.distinctUntilChanged(),
                 settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
-                settingsRepository.connectedServicesFlow.distinctUntilChanged()
-            ) { settings, themeSettings, mangaSettings, connectedServices ->
+                settingsRepository.connectedServicesFlow.distinctUntilChanged(),
+                settingsRepository.chapterLanguagesFlow.distinctUntilChanged()
+            ) { settings, themeSettings, mangaSettings, connectedServices, chapterLanguages ->
                 _settingsState.update { state ->
                     state.copy(
                         settings = settings,
                         themeSettings = themeSettings,
                         mangaSettings = mangaSettings,
-                        connectedServices = connectedServices
+                        connectedServices = connectedServices,
+                        chapterLanguages = chapterLanguages
                     )
                 }
             }.collect()
@@ -154,6 +156,12 @@ class SettingsViewModel @Inject constructor(
     fun setDataSaver(isEnabled: Boolean) {
         viewModelScope.launch {
             settingsRepository.saveDataSaverMode(isEnabled)
+        }
+    }
+
+    fun setChapterLanguages(languagesSet: Set<String>) {
+        viewModelScope.launch {
+            settingsRepository.saveChapterLanguages(languagesSet)
         }
     }
 

@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
@@ -60,6 +61,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
         private val TRACKER_CHAPTER_UPDATE = booleanPreferencesKey("chapter_update")
+        private val TRANSLATED_LANGUAGES = stringSetPreferencesKey("translated_languages")
     }
 
     override val userFlow: Flow<User?> = dataStore.data
@@ -167,6 +169,11 @@ class SettingsRepositoryImpl @Inject constructor(
     override val localeFlow: Flow<String> = dataStore.data
         .map { preferences ->
             preferences[LOCALE_KEY] ?: Locale.getDefault().language
+        }
+
+    override val chapterLanguagesFlow: Flow<Set<String>> = dataStore.data
+        .map { preferences ->
+            preferences[TRANSLATED_LANGUAGES] ?: emptySet()
         }
 
     override suspend fun saveAuthType(authType: AuthType) {
@@ -285,6 +292,12 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences[CHAPTER_UI_MODE] = settings.chapterUIMode.name
             preferences[DATA_SAVER_MODE] = settings.isDataSaverEnabled
             preferences[TRACKER_CHAPTER_UPDATE] = settings.updateTrackProgress
+        }
+    }
+
+    override suspend fun saveChapterLanguages(chapterLanguages: Set<String>) {
+        dataStore.edit { preferences ->
+            preferences[TRANSLATED_LANGUAGES] = chapterLanguages
         }
     }
 

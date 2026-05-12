@@ -25,6 +25,7 @@ interface SettingsRepository {
     val browseUiSettingsFlow: Flow<BrowseUiSettings>
     val mangaSettingsFlow: Flow<MangaChapterSettings>
     val localeFlow: Flow<String>
+    val chapterLanguagesFlow: Flow<Set<String>>
 
     suspend fun saveAuthType(authType: AuthType)
     suspend fun saveUserData(user: User, authType: AuthType)
@@ -43,6 +44,7 @@ interface SettingsRepository {
     suspend fun saveTrackerChapterUpdate(isEnabled: Boolean)
     suspend fun saveChapterUiMode(newMode: ChapterUIMode)
     suspend fun updateMangaSettings(settings: MangaChapterSettings)
+    suspend fun saveChapterLanguages(chapterLanguages: Set<String>)
 
     suspend fun clearUserData()
     suspend fun clearUserData(authType: AuthType)

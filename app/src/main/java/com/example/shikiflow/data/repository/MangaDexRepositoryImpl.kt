@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.MangaDexMapper.toDomain
 import com.example.shikiflow.data.remote.MangaDexApi
+import com.example.shikiflow.domain.model.mangadex.aggregate.AggregatedManga
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapterMetadata
 import com.example.shikiflow.domain.model.mangadex.scanlation_group.ScanlationGroup
 import com.example.shikiflow.domain.model.mangadex.user.MangaDexUser
@@ -20,7 +21,10 @@ class MangaDexRepositoryImpl @Inject constructor(
     override suspend fun getMangaList(title: String?, ids: List<String>)
             = mangaDexApi.getMangaList(title, ids = ids).data.map { it.toDomain() }
 
-    override suspend fun aggregateManga(mangaId: String) = mangaDexApi.aggregateManga(mangaId).toDomain()
+    override suspend fun aggregateManga(
+        mangaId: String,
+        chapterLanguages: Set<String>
+    ): AggregatedManga = mangaDexApi.aggregateManga(mangaId, chapterLanguages).toDomain()
 
     override suspend fun getChapterMetadata(chapterId: String) = mangaDexApi.getChapterMetadata(chapterId).data.toDomain()
 

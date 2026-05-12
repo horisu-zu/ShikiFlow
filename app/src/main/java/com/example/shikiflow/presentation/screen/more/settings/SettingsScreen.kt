@@ -62,6 +62,7 @@ fun SettingsScreen(
 
     val availableLocales = remember { context.getAvailableLocales() }
     var currentLocale by remember { mutableStateOf(LocaleUtils.getDefaultLocale()) }
+    var showLanguagesBottomSheet by remember { mutableStateOf(false) }
 
     if(openCacheDialog.value) {
         CustomDialog(
@@ -307,6 +308,11 @@ fun SettingsScreen(
                                 settingsViewModel.setTrackerChapterUpdate(!settingsState.mangaSettings.updateTrackProgress)
                             },
                             isChecked = settingsState.mangaSettings.updateTrackProgress
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_chapter_languages),
+                            displayValue = stringResource(R.string.settings_chapter_languages_desc),
+                            onClick = { showLanguagesBottomSheet = true }
                         )
                     )
                 )
@@ -334,6 +340,16 @@ fun SettingsScreen(
                     }
                 )
             }
+        }
+
+        if(showLanguagesBottomSheet) {
+            LanguagesBottomSheet(
+                initialLanguages = settingsState.chapterLanguages,
+                onSave = { languagesSet ->
+                    settingsViewModel.setChapterLanguages(languagesSet)
+                },
+                onDismiss = { showLanguagesBottomSheet = false }
+            )
         }
     }
 }

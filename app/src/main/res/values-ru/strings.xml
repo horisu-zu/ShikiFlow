@@ -67,6 +67,7 @@
     <string name="settings_enabled">Включено</string>
     <string name="settings_disabled">Выключено</string>
 
+    <string name="settings_chapter_languages_sheet_desc">Если не выбрано ни одного языка, приложение будет загружать главы для всех доступных языков</string>
     <string name="settings_dynamic_theme_label">Динамическая тема</string>
     <string name="settings_app_theme_label">Тема приложения</string>
     <string name="settings_app_theme">Тема</string>
@@ -468,4 +469,6 @@
     <string name="profile_unfollow">Отписаться</string>
     <string name="airing_episode">Эпизод</string>
     <string name="settings_theme_primary_color">Основной цвет</string>
+    <string name="settings_chapter_languages">Языки глав</string>
+    <string name="settings_chapter_languages_desc">Отображение глав с переводами на выбранных языках</string>
 </resources>

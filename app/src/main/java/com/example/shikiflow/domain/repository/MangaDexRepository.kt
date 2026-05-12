@@ -13,7 +13,10 @@ import kotlinx.coroutines.flow.Flow
 interface MangaDexRepository {
     suspend fun getMangaList(title: String? = null, ids: List<String> = emptyList()): List<Manga>
 
-    suspend fun aggregateManga(mangaId: String): AggregatedManga
+    suspend fun aggregateManga(
+        mangaId: String,
+        chapterLanguages: Set<String> = emptySet()
+    ): AggregatedManga
 
     suspend fun getChapterMetadata(chapterId: String): MangaChapterMetadata
 

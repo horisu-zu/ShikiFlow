@@ -8,6 +8,7 @@ data class MangaChaptersUiState(
     val chaptersMap: Map<String, List<String>> = emptyMap(),
     val completedChapters: Int = 0,
     val sortDirection: SortDirection = SortDirection.ASCENDING,
+    val chapterLanguages: Set<String>? = null,
 
     val errorMessage: String? = null,
     val isLoading: Boolean = true,

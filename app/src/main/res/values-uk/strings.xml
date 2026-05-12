@@ -67,6 +67,7 @@
     <string name="settings_enabled">Увімкнено</string>
     <string name="settings_disabled">Вимкнено</string>
 
+    <string name="settings_chapter_languages_sheet_desc">Якщо не обрано жодну мову, додаток завантажуватиме розділи для всіх наявних мов</string>
     <string name="settings_dynamic_theme_label">Динамічна тема</string>
     <string name="settings_app_theme_label">Тема додатку</string>
     <string name="settings_app_theme">Тема</string>
@@ -469,4 +470,6 @@
     <string name="profile_unfollow">Відписатися</string>
     <string name="airing_episode">Епізод %1$s</string>
     <string name="settings_theme_primary_color">Основний колір</string>
+    <string name="settings_chapter_languages">Мови розділів</string>
+    <string name="settings_chapter_languages_desc">Відображення розділів з перекладами вибраними мовами</string>
 </resources>
