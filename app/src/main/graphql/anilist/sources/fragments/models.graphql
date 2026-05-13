@@ -30,9 +30,7 @@ fragment MediaShort on Media {
     id
     idMal
     title {
-        english
-        romaji
-        native
+        ...MediaTitle
     }
     synonyms
     type
@@ -62,7 +60,7 @@ fragment MediaShort on Media {
 fragment MediaBrowse on Media {
     id
     title {
-        romaji
+        ...MediaTitle
     }
     coverImage {
         extraLarge
@@ -98,7 +96,7 @@ fragment ALMediaBrowseShort on Media {
     id
     type
     title {
-        romaji
+        ...MediaTitle
     }
     coverImage {
         large
@@ -114,7 +112,7 @@ fragment ALAiringAnime on Media {
     id
     type
     title {
-        romaji
+        ...MediaTitle
     }
     coverImage {
         large
@@ -183,7 +181,7 @@ fragment ALListActivity on ListActivity {
         id
         type
         title {
-            romaji
+            ...MediaTitle
         }
         coverImage {
             extraLarge
@@ -342,9 +340,7 @@ fragment ALUserStudios on UserStatistics {
 fragment ALFavoriteMediaShort on Media {
     id
     title {
-        romaji
-        #english
-        #native
+        ...MediaTitle
     }
     coverImage {
         extraLarge
@@ -355,6 +351,7 @@ fragment ALFavoriteCharacterShort on Character {
     id
     name {
         full
+        native
     }
     image {
         large
@@ -365,6 +362,7 @@ fragment ALFavoriteStaffShort on Staff {
     id
     name {
         full
+        native
     }
     image {
         large
@@ -382,7 +380,7 @@ fragment ALRateEntryShort on MediaList {
     progress
     media {
         title {
-            romaji
+            ...MediaTitle
         }
         coverImage {
             large
@@ -423,7 +421,7 @@ fragment ALRelatedMediaShort on MediaEdge {
         id
         type
         title {
-            romaji
+            ...MediaTitle
         }
         coverImage {
             large
@@ -437,6 +435,7 @@ fragment ALCharacterShort on Character {
     id
     name {
         full
+        native
     }
     image {
         large
@@ -447,6 +446,7 @@ fragment ALStaffShort on Staff {
     id
     name {
         full
+        native
     }
     image {
         large
@@ -576,7 +576,13 @@ fragment ALReview on Review {
 fragment ALReviewMedia on Media {
     id
     title {
-        romaji
+        ...MediaTitle
     }
     bannerImage
+}
+
+fragment MediaTitle on MediaTitle {
+    english
+    romaji
+    native
 }

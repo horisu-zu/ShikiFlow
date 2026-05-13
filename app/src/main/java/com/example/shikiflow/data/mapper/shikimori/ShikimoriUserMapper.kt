@@ -12,6 +12,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiCharacter
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.data.datasource.dto.person.ShikiPerson
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
@@ -55,7 +56,7 @@ object ShikimoriUserMapper {
             id = id.toInt(),
             mediaId = target?.id?.toInt() ?: 0,
             mediaType = mediaType,
-            title = target?.name ?: "",
+            title = (target?.name ?: "").toDomainTitle(null, target?.russian, null),
             coverImage = "${BuildConfig.SHIKI_BASE_URL}${target?.image?.original}",
             status = descriptionText.toUserRateStatus(),
             progress = descriptionText.toProgress("глав", "эпизод"),
@@ -124,28 +125,28 @@ object ShikimoriUserMapper {
 
     fun ShikiAnime.toUserFavorite() = UserFavorite(
         id = id ?: 0,
-        name = name ?: "",
+        name = (name ?: "").toDomainTitle(name, russian, null),
         imageUrl = BuildConfig.SHIKI_BASE_URL + image?.original?.replace("/x64/", "/original/"),
         favoriteCategory = FavoriteCategory.ANIME
     )
 
     fun ShikiManga.toUserFavorite() = UserFavorite(
         id = id ?: 0,
-        name = name ?: "",
+        name = (name?: "").toDomainTitle(name, russian, native = null),
         imageUrl = BuildConfig.SHIKI_BASE_URL + image?.original?.replace("/x64/", "/original/"),
         favoriteCategory = FavoriteCategory.MANGA
     )
 
     fun ShikiCharacter.toUserFavorite() = UserFavorite(
         id = id,
-        name = name,
+        name = name.toDomainTitle(name, russian, native = null),
         imageUrl = BuildConfig.SHIKI_BASE_URL + image.original?.replace("/x64/", "/original/"),
         favoriteCategory = FavoriteCategory.CHARACTER
     )
 
     fun ShikiPerson.toUserFavorite(favoriteCategory: FavoriteCategory) = UserFavorite(
         id = id,
-        name = name,
+        name = name.toDomainTitle(name, russian, native = null),
         imageUrl = BuildConfig.SHIKI_BASE_URL + image.original?.replace("/x64/", "/original/"),
         favoriteCategory = favoriteCategory
     )

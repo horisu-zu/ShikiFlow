@@ -1,6 +1,8 @@
 fragment AnimeShort on Anime {
     id
     name
+    english
+    russian
     synonyms
     japanese
     kind
@@ -21,6 +23,8 @@ fragment AnimeShort on Anime {
 fragment MangaShort on Manga {
     id
     name
+    english
+    russian
     synonyms
     japanese
     kind
@@ -37,25 +41,27 @@ fragment MangaShort on Manga {
 fragment CharacterShort on Character {
     id
     name
+    russian
     japanese
     poster { ...PosterShort }
-    url
 }
 
 fragment PersonShort on Person {
     id
     name
+    russian
     japanese
     poster { ...PosterShort }
     url
 }
 
 fragment PersonRoleShort on PersonRole {
-    id
+    rolesRu
     rolesEn
     person {
         id
         name
+        russian
         poster {
             originalUrl
         }
@@ -162,6 +168,8 @@ fragment RelatedMediaShort on Related {
 fragment RelatedAnimeShort on Anime {
     id
     name
+    english
+    russian
     poster { mainUrl }
     kind
 }
@@ -169,6 +177,8 @@ fragment RelatedAnimeShort on Anime {
 fragment RelatedMangaShort on Manga {
     id
     name
+    english
+    russian
     poster { mainUrl }
     kind
 }
@@ -197,5 +207,6 @@ fragment ShikiCharacterRole on CharacterRole {
 fragment ShikiStaffShort on Person {
     id
     name
+    russian
     poster { ...PosterShort }
 }

@@ -2,12 +2,13 @@ package com.example.shikiflow.domain.model.common
 
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 
 data class ShortMedia(
     val id: Int,
-    val title: String,
+    val title: MediaTitle,
     val mediaType: MediaType,
     val coverImageUrl: String,
     val userRateStatus: UserRateStatus?

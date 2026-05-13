@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.user
 
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlin.time.Instant
@@ -10,7 +11,7 @@ data class ListActivity(
     val id: Int,
     val mediaId: Int,
     val mediaType: MediaType?,
-    val title: String,
+    val title: MediaTitle,
     val coverImage: String,
     val status: UserRateStatus,
     val progress: List<Int>,

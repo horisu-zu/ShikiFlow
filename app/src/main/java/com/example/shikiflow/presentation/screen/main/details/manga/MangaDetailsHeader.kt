@@ -38,6 +38,8 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -61,6 +63,7 @@ import com.materialkolor.ktx.harmonize
 fun MangaDetailsHeader(
     mangaDetails: MediaDetails,
     mangaDexUiState: MangaDexUiState,
+    titleType: PreferredTitleType,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onMangaDexIconClick: () -> Unit,
@@ -112,7 +115,7 @@ fun MangaDetailsHeader(
                 }
 
                 Text(
-                    text = mangaDetails.title,
+                    text = mangaDetails.title.preferred(titleType),
                     style = MaterialTheme.typography.headlineSmall
                 )
 

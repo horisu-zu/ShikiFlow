@@ -12,10 +12,10 @@ object DateMapper {
     fun DateShort.toDomain(): Date? {
         return year?.let {
             Date(
-                year = this.year,
-                month = this.month,
-                day = this.day,
-                date = this.date?.let { LocalDate.parse(it.toString())
+                year = year,
+                month = month,
+                day = day,
+                date = date?.let { LocalDate.parse(it.toString())
                     .atStartOfDayIn(TimeZone.currentSystemDefault()) }
             )
         }
@@ -29,9 +29,9 @@ object DateMapper {
 
     fun ALDate.toDomain(): Date {
         return Date(
-            year = this.year,
-            month = this.month,
-            day = this.day,
+            year = year,
+            month = month,
+            day = day,
             date = null
         )
     }

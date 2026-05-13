@@ -148,7 +148,7 @@ fun AnimeShortInfoSection(
             label = stringResource(R.string.details_info_title_romaji),
             content = {
                 Text(
-                    text = animeDetails.title,
+                    text = animeDetails.title.romaji,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
                     textAlign = TextAlign.End,
@@ -156,12 +156,12 @@ fun AnimeShortInfoSection(
                 )
             }
         )
-        if (animeDetails.native != null) {
+        if (animeDetails.title.native != null) {
             DetailRow(
-                label = stringResource(R.string.details_info_title_japanese),
+                label = stringResource(R.string.details_info_title_native),
                 content = {
                     Text(
-                        text = animeDetails.native,
+                        text = animeDetails.title.native,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
                         textAlign = TextAlign.End,

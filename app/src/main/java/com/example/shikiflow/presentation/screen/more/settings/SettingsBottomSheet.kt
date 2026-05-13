@@ -78,7 +78,7 @@ fun SettingsBottomSheet(
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
             options.forEachIndexed { index, value ->
                 Row(

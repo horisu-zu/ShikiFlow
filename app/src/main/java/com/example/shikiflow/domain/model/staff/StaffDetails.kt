@@ -7,8 +7,7 @@ import kotlinx.datetime.LocalDate
 
 data class StaffDetails(
     val id: Int,
-    val fullName: String?,
-    val nativeName: String?,
+    val fullName: StaffName,
     val description: String?,
     val imageUrl: String?,
     val isFavorite: Boolean?,

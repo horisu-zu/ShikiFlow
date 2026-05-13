@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.model.tracks
 
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import kotlin.time.Clock
 import kotlin.time.Instant
@@ -21,7 +22,7 @@ data class UserRateData(
     val score: Int,
     val mediaId: Int,
     val malId: Int?,
-    val title: String,
+    val title: MediaTitle,
     val posterUrl: String?,
     val createDate: Instant,
     val updateDate: Instant,
@@ -62,7 +63,7 @@ data class UserRateData(
         fun createEmpty(
             mediaId: Int,
             malId: Int?,
-            mediaTitle: String,
+            mediaTitle: MediaTitle,
             mediaPosterUrl: String,
             totalCount: Int,
             volumesCount: Int,

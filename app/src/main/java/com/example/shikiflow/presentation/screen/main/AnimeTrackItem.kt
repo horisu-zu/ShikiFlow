@@ -26,6 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
@@ -38,6 +40,7 @@ import com.example.shikiflow.presentation.common.mappers.SeasonMapper.determineS
 @Composable
 fun AnimeTrackItem(
     userRate: MediaTrack,
+    titleType: PreferredTitleType,
     modifier: Modifier = Modifier,
     onClick: (Int) -> Unit,
     onLongClick: () -> Unit
@@ -64,7 +67,7 @@ fun AnimeTrackItem(
             verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
         ) {
             Text(
-                text = userRate.shortData.name,
+                text = userRate.shortData.name.preferred(titleType),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),

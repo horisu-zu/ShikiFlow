@@ -49,6 +49,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.browse.BrowseType
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.sort.MediaSort
@@ -59,6 +60,7 @@ import com.example.shikiflow.presentation.screen.browse.main.anilist.AnilistBrow
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.screen.browse.BrowseListItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.browse.main.BrowseViewModel
 import com.example.shikiflow.presentation.viewmodel.browse.main.ShikiBrowseViewModel
@@ -113,6 +115,7 @@ fun ShikimoriBrowseMainPage(
     onIsAtTopChange: (Boolean) -> Unit,
     browseViewModel: ShikiBrowseViewModel = hiltViewModel()
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
     val browseUiSettings by browseViewModel.browseUiSettings.collectAsStateWithLifecycle()
     val ongoingBrowseState = browseViewModel.browseMainOngoingsState.collectAsLazyPagingItems()
     val showBottomSheet = remember { mutableStateOf(false) }
@@ -129,6 +132,7 @@ fun ShikimoriBrowseMainPage(
             BrowseListComponent(
                 browseState = ongoingBrowseState,
                 currentType = currentType,
+                preferredTitleType = preferredTitleType,
                 horizontalPadding = horizontalPadding,
                 onSideScreenNavigate = { browseType ->
                     browseNavOptions.navigateToSideScreen(browseType)
@@ -151,6 +155,7 @@ fun ShikimoriBrowseMainPage(
             BrowseGridComponent(
                 browseState = ongoingBrowseState,
                 currentType = currentType,
+                preferredTitleType = preferredTitleType,
                 horizontalPadding = horizontalPadding,
                 onSideScreenNavigate = { browseType ->
                     browseNavOptions.navigateToSideScreen(browseType)
@@ -191,6 +196,7 @@ fun ShikimoriBrowseMainPage(
 fun BrowseListComponent(
     browseState: LazyPagingItems<BrowseMedia>,
     currentType: MediaType,
+    preferredTitleType: PreferredTitleType,
     horizontalPadding: Dp,
     onSideScreenNavigate: (BrowseType) -> Unit,
     onMediaTypeChange: (MediaType) -> Unit,
@@ -260,6 +266,7 @@ fun BrowseListComponent(
                 browseState[index]?.let { browseItem ->
                     BrowseListItem(
                         browseItem = browseItem as BrowseMedia.Anime,
+                        titleType = preferredTitleType,
                         onItemClick = onNavigate
                     )
                 }
@@ -290,6 +297,7 @@ fun BrowseListComponent(
 fun BrowseGridComponent(
     browseState: LazyPagingItems<BrowseMedia>,
     currentType: MediaType,
+    preferredTitleType: PreferredTitleType,
     horizontalPadding: Dp,
     onSideScreenNavigate: (BrowseType) -> Unit,
     onMediaTypeChange: (MediaType) -> Unit,
@@ -374,6 +382,7 @@ fun BrowseGridComponent(
                     browseState[index]?.let { browseItem ->
                         BrowseGridItem(
                             browseItem = browseItem,
+                            titleType = preferredTitleType,
                             onItemClick = onNavigate
                         )
                     }

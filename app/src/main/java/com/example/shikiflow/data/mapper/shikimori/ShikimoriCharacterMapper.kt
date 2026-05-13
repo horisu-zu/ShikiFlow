@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.mapper.shikimori
 
+import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.graphql.shikimori.fragment.CharacterShort
 import com.example.graphql.shikimori.fragment.ShikiCharacterRole
 import com.example.shikiflow.BuildConfig
@@ -8,6 +9,8 @@ import com.example.shikiflow.data.datasource.dto.ShikiCharacter
 import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.datasource.dto.ShikiSeyu
 import com.example.shikiflow.data.datasource.dto.person.Character
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
+import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
 import com.example.shikiflow.domain.model.character.MediaCharacter
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacterShort
@@ -29,7 +32,7 @@ object ShikimoriCharacterMapper {
     fun CharacterShort.toDomain(): MediaPersonShort {
         return MediaPersonShort(
             id = id.toInt(),
-            fullName = name,
+            fullName = name.toStaffName(russian, japanese),
             imageUrl = poster?.posterShort?.mainUrl ?: ""
         )
     }
@@ -45,44 +48,43 @@ object ShikimoriCharacterMapper {
     fun Character.toDomain(): MediaPersonShort {
         return MediaPersonShort(
             id = id,
-            fullName = name,
+            fullName = name.toStaffName(russian, null),
             imageUrl = BuildConfig.SHIKI_BASE_URL + image.original
         )
     }
 
     fun ShikiAnime.toDomain(): ShortMedia {
         return ShortMedia(
-            id = this.id ?: 0,
+            id = id ?: 0,
             mediaType = MediaType.ANIME,
-            title = this.name ?: "",
-            coverImageUrl = BuildConfig.SHIKI_BASE_URL + this.image?.original,
+            title = (name ?: "").toDomainTitle(null, russian, null),
+            coverImageUrl = BuildConfig.SHIKI_BASE_URL + image?.original,
             userRateStatus = null
         )
     }
 
     fun ShikiManga.toDomain(): ShortMedia {
         return ShortMedia(
-            id = this.id ?: 0,
+            id = id ?: 0,
             mediaType = MediaType.MANGA,
-            title = this.name ?: "",
-            coverImageUrl = BuildConfig.SHIKI_BASE_URL + this.image?.original,
+            title = (name ?: "").toDomainTitle(null, russian, null),
+            coverImageUrl = BuildConfig.SHIKI_BASE_URL + image?.original,
             userRateStatus = null
         )
     }
 
     fun ShikiSeyu.toDomain(): MediaPersonShort {
         return MediaPersonShort(
-            id = this.id,
-            fullName = this.name,
-            imageUrl = BuildConfig.SHIKI_BASE_URL + this.image?.original
+            id = id,
+            fullName = name.toStaffName(russian, null),
+            imageUrl = BuildConfig.SHIKI_BASE_URL + image?.original
         )
     }
 
     fun ShikiCharacter.toMediaCharacter(imageUrl: String? = null): MediaCharacter {
         return MediaCharacter(
             id = id,
-            fullName = name,
-            nativeName = japanese,
+            fullName = name.toStaffName(russian, japanese),
             alternativeNames = listOfNotNull(altName),
             imageUrl = imageUrl ?: (BuildConfig.SHIKI_BASE_URL + image.original),
             description = descriptionHtml,
@@ -98,6 +100,14 @@ object ShikimoriCharacterMapper {
                 entries = mangas?.map { it.toDomain() }.orEmpty()
             ),
             topicId = topicId
+        )
+    }
+
+    fun MangaDetailsQuery.Character.toDomain(): MediaPersonShort {
+        return MediaPersonShort(
+            id = id.toInt(),
+            fullName = name.toStaffName(russian, japanese),
+            imageUrl = poster?.posterShort?.mainUrl ?: ""
         )
     }
 

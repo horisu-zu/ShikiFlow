@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
@@ -54,6 +55,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private val PALETTE_STYLE_KEY = stringPreferencesKey("palette_style")
         private val PRIMARY_COLOR_KEY = longPreferencesKey("primary_color")
         private val SYSTEM_WALLPAPER_COLOR = booleanPreferencesKey("system_wallpaper")
+        private val TITLE_TYPE = stringPreferencesKey("title_type")
 
         private val LOCALE_KEY = stringPreferencesKey("locale")
         private val TRACK_MODE = stringPreferencesKey("track_theme")
@@ -118,7 +120,10 @@ class SettingsRepositoryImpl @Inject constructor(
                 browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
                 trackMode = preferences[TRACK_MODE]?.let { MediaType.valueOf(it) }
                     ?: MediaType.ANIME,
-                )
+                preferredTitleType = preferences[TITLE_TYPE]?.let { type ->
+                    PreferredTitleType.valueOf(type)
+                } ?: PreferredTitleType.ROMAJI
+            )
     }
 
     override val themeSettingsFlow: Flow<ThemeSettings> = dataStore.data
@@ -301,6 +306,12 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun savePreferredTitleType(preferredType: PreferredTitleType) {
+        dataStore.edit { preferences ->
+            preferences[TITLE_TYPE] = preferredType.name
+        }
+    }
+
     override suspend fun clearUserData() {
         dataStore.edit { preferences ->
             AuthType.entries.forEach { authType ->
@@ -311,6 +322,7 @@ class SettingsRepositoryImpl @Inject constructor(
             }
 
             preferences.remove(AUTH_TYPE)
+            preferences.remove(TITLE_TYPE)
         }
     }
 

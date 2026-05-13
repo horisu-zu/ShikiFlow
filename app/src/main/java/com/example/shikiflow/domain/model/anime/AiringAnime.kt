@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.anime
 
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlin.time.Duration
@@ -15,7 +16,7 @@ data class AiringAnime(
 
 data class AiringAnimeDataShort(
     val id: Int,
-    val title: String,
+    val title: MediaTitle,
     val mediaType: MediaType,
     val coverImageUrl: String,
     val totalEpisodes: Int?,

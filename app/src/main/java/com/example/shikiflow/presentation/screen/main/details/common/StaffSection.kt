@@ -30,6 +30,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
+import com.example.shikiflow.domain.model.staff.StaffRole.Companion.preferred
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -39,6 +42,7 @@ import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 @Composable
 fun StaffSection(
     staffShortList: List<StaffShort>,
+    preferredTitleType: PreferredTitleType,
     onMediaStaffClick: () -> Unit,
     onStaffClick: (Int) -> Unit,
     horizontalPadding: Dp,
@@ -79,6 +83,7 @@ fun StaffSection(
             ) { staffShort ->
                 StaffItem(
                     staffShort = staffShort,
+                    titleType = preferredTitleType,
                     onStaffClick = onStaffClick
                 )
             }
@@ -89,6 +94,7 @@ fun StaffSection(
 @Composable
 fun StaffItem(
     staffShort: StaffShort,
+    titleType: PreferredTitleType,
     onStaffClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -109,7 +115,7 @@ fun StaffItem(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
         ) {
             Text(
-                text = staffShort.fullName,
+                text = staffShort.fullName.preferred(titleType),
                 style = MaterialTheme.typography.bodySmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
@@ -120,7 +126,7 @@ fun StaffItem(
             ) {
                 staffShort.roles.forEach { staffRole ->
                     Text(
-                        text = staffRole,
+                        text = staffRole.preferred(titleType),
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         ),

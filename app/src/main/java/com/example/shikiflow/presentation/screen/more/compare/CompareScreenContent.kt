@@ -36,6 +36,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.ComparisonType
@@ -45,6 +47,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.user.compare.CompareScreenViewModel
 
 @Composable
@@ -54,6 +57,7 @@ fun CompareScreenContent(
     onMediaItemClick: (Int, MediaType) -> Unit,
     compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
     val uiState by compareScreenViewModel.uiState.collectAsStateWithLifecycle()
     val showState = rememberSaveable {
         ComparisonType.entries.associateWith { mutableStateOf(true) }
@@ -109,6 +113,7 @@ fun CompareScreenContent(
                                 ComparisonItem(
                                     mediaItem = media[index],
                                     mediaType = mediaType,
+                                    titleType = preferredTitleType,
                                     currentUserScore = media[index].currentUserScore,
                                     targetUserScore = media[index].targetUserScore,
                                     comparisonType = comparisonType,
@@ -210,6 +215,7 @@ private fun CompareHeader(
 private fun ComparisonItem(
     mediaItem: MediaComparison,
     mediaType: MediaType,
+    titleType: PreferredTitleType,
     currentUserScore: ShortUserRateData?,
     targetUserScore: ShortUserRateData?,
     comparisonType: ComparisonType,
@@ -238,12 +244,14 @@ private fun ComparisonItem(
                     contentDescription = "Media Image",
                     imageType = ImageType.Poster(width = 48.dp)
                 )
-                Text(
-                    text = mediaItem.title,
-                    style = MaterialTheme.typography.bodySmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
-                )
+                mediaItem.title?.let { mediaTitle ->
+                    Text(
+                        text = mediaTitle.preferred(titleType),
+                        style = MaterialTheme.typography.bodySmall,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
             VerticalDivider(
                 color = MaterialTheme.colorScheme.surfaceContainer,

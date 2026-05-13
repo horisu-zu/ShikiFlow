@@ -58,6 +58,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserRateData
@@ -77,6 +79,7 @@ import kotlin.time.Instant
 fun UserRateBottomSheet(
     userRate: UserRateData,
     rateUpdateState: RateUpdateState,
+    preferredTitleType: PreferredTitleType,
     onDismiss: () -> Unit,
     onSave: (SaveUserRate) -> Unit,
     onDelete: (Int) -> Unit,
@@ -137,7 +140,7 @@ fun UserRateBottomSheet(
         ) {
             SheetHeader(
                 posterUrl = userRate.posterUrl,
-                title = userRate.title,
+                title = userRate.title.preferred(preferredTitleType),
                 onDismiss = onDismiss
             )
 

@@ -44,6 +44,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.media.similar.SimilarMediaViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,6 +56,7 @@ fun SimilarMediaScreen(
     navOptions: MediaNavOptions,
     similarMediaViewModel: SimilarMediaViewModel = hiltViewModel()
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
     val lazyGridState = rememberLazyGridState()
     val similarMediaState = similarMediaViewModel.similarMediaFlow.collectAsLazyPagingItems()
 
@@ -152,6 +154,7 @@ fun SimilarMediaScreen(
                         similarMediaState[index]?.let { mediaRecommendation ->
                             BrowseGridItem(
                                 browseItem = mediaRecommendation,
+                                titleType = preferredTitleType,
                                 onItemClick = { id, mediaType ->
                                     when (mediaType) {
                                         MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)

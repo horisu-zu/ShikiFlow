@@ -50,7 +50,7 @@ class GroupUserRatesUseCase @Inject constructor(
 
                 MediaComparison(
                     id = mediaId,
-                    title = (currentUserRate ?: targetUserRate)?.title ?: "Unknown Title",
+                    title = (currentUserRate ?: targetUserRate)?.title,
                     imageUrl = (currentUserRate ?: targetUserRate)?.imageUrl,
                     currentUserScore = currentUserRate?.let { userRate ->
                         ShortUserRateData(

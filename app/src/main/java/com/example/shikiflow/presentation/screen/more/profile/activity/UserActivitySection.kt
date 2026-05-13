@@ -31,6 +31,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.activity.UserActivityViewModel
@@ -47,6 +48,7 @@ fun UserActivitySection(
     userActivityViewModel: UserActivityViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val preferredTitleType = LocalTitleTypeController.current
     val userActivityItems = userActivityViewModel.userActivity.collectAsLazyPagingItems()
 
     val isRefreshing by remember {
@@ -113,6 +115,7 @@ fun UserActivitySection(
                         userActivityItems[index]?.let { activityItem ->
                             ActivityItem(
                                 userActivity = activityItem,
+                                titleType = preferredTitleType,
                                 onListActivityClick = { mediaType, id ->
                                     val detailsNavRoute = when(mediaType) {
                                         MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)

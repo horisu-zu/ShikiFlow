@@ -5,6 +5,7 @@ query AnimeDetails(
         id
         name
         english
+        russian
         japanese
         synonyms
         kind
@@ -23,8 +24,8 @@ query AnimeDetails(
         nextEpisodeAt
         origin
 
-        genres { id name kind }
-        studios { id name imageUrl }
+        genres { name russian }
+        studios { id name }
 
         characterRoles {
             character { ...CharacterShort }
@@ -38,7 +39,7 @@ query AnimeDetails(
         #    ...PersonRoleShort
         #}
 
-        screenshots { id originalUrl }
+        screenshots { originalUrl }
 
         scoresStats { score count }
         statusesStats { status count }
@@ -81,6 +82,7 @@ query AnimeBrowse(
         malId
         name
         english
+        russian
         japanese
         synonyms
         kind
@@ -102,8 +104,8 @@ query AnimeBrowse(
         nextEpisodeAt,
         isCensored
 
-        genres { id name russian kind }
-        studios { id name imageUrl }
+        genres { name russian }
+        studios { name }
 
         userRate {
             ...AnimeUserRate

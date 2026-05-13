@@ -72,6 +72,7 @@ fun TracksSearchBarComponent(
 
     val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
     val rateUpdateState by tracksViewModel.rateUpdateState.collectAsStateWithLifecycle()
+    val preferredTitleType = LocalTitleTypeController.current
 
     LaunchedEffect(mediaType) {
         tracksViewModel.setMediaType(mediaType)
@@ -179,6 +180,7 @@ fun TracksSearchBarComponent(
                                 MediaType.ANIME -> {
                                     AnimeTrackGridItem(
                                         trackItem = item,
+                                        titleType = preferredTitleType,
                                         onClick = { id -> onMediaClick(mediaType, id) },
                                         onLongClick = { selectedItem = item },
                                         modifier = Modifier.animateItem()
@@ -187,6 +189,7 @@ fun TracksSearchBarComponent(
                                 MediaType.MANGA -> {
                                     MangaTrackItem(
                                         trackItem = item,
+                                        titleType = preferredTitleType,
                                         onClick = { id -> onMediaClick(mediaType, id) },
                                         onLongClick = { selectedItem = item },
                                         modifier = Modifier.animateItem()
@@ -229,6 +232,7 @@ fun TracksSearchBarComponent(
                     selectedItem?.let { item ->
                         UserRateBottomSheet(
                             userRate = item.toUserRateData(),
+                            preferredTitleType = preferredTitleType,
                             rateUpdateState = rateUpdateState,
                             onDismiss = {
                                 if (rateUpdateState != RateUpdateState.LOADING) {

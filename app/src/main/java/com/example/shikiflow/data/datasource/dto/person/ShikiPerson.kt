@@ -14,6 +14,7 @@ data class ShikiPerson(
     @Serializable(with = ShikiImageSerializer::class)
     val image: ShikiImage,
     val japanese: String?,
+    val russian: String?,
     @SerialName("birth_on") val birthDate: ShikiDate? = null,
     @SerialName("job_title")
     val jobTitle: String?,

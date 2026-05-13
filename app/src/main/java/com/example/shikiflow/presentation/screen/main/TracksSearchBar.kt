@@ -90,6 +90,7 @@ fun TracksSearchBar(
             .collect { tracksSearchViewModel.onQueryChange(it) }
     }
 
+    val clip = 12.dp
     val animatedHorizontalPadding by animateDpAsState(
         targetValue = if (isSearchActive) 8.dp
             else 0.dp
@@ -119,7 +120,7 @@ fun TracksSearchBar(
                                 text = stringResource(R.string.tracks_page_search)
                             )
                         },
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(clip),
                         leadingIcon = {
                             IconButton(
                                 onClick = {
@@ -153,7 +154,7 @@ fun TracksSearchBar(
                     Row(
                         modifier = Modifier
                             .weight(1f)
-                            .clip(RoundedCornerShape(16.dp))
+                            .clip(RoundedCornerShape(clip))
                             .background(itemsBackgroundColor)
                             .clickable {
                                 scope.launch {
@@ -187,7 +188,7 @@ fun TracksSearchBar(
                 onModeChange = onModeChange,
                 backgroundColor = itemsBackgroundColor,
                 modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(clip))
                     .background(itemsBackgroundColor)
                     .padding(all = 8.dp)
             )
@@ -199,12 +200,7 @@ fun TracksSearchBar(
         inputField = inputField,
         scrollBehavior = scrollBehavior,
         windowInsets = WindowInsets.statusBars,
-        shape = RoundedCornerShape(
-            topStart = 16.dp,
-            bottomStart = 16.dp,
-            topEnd = 12.dp,
-            bottomEnd = 12.dp
-        ),
+        shape = RoundedCornerShape(clip),
         colors = SearchBarDefaults.appBarWithSearchColors(
             searchBarColors = SearchBarDefaults.colors(
                 containerColor = containerColor

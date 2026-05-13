@@ -26,8 +26,7 @@ object StudioMapper {
     fun AnimeDetailsQuery.Studio.toStudioShort(): StudioShort {
         return StudioShort(
             id = id.toInt(),
-            name = name,
-            imageUrl = imageUrl
+            name = name
         )
     }
 }

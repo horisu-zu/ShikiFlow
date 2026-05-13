@@ -6,6 +6,7 @@ import com.example.graphql.anilist.fragment.ALCharacterMediaRoles
 import com.example.graphql.anilist.fragment.ALCharacterShort
 import com.example.graphql.anilist.fragment.ALMediaBrowseShort
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
 import com.example.graphql.anilist.type.CharacterRole as AnilistCharacterRole
 import com.example.shikiflow.domain.model.character.CharacterRole
 import com.example.shikiflow.domain.model.character.MediaCharacter
@@ -27,7 +28,7 @@ object AnilistCharacterMapper {
     fun ALCharacterShort.toDomain(): MediaPersonShort {
         return MediaPersonShort(
             id = id,
-            fullName = name?.full ?: "",
+            fullName = (name?.full ?: "").toStaffName(native = name?.native),
             imageUrl = image?.large ?: ""
         )
     }
@@ -50,9 +51,8 @@ object AnilistCharacterMapper {
     fun CharacterDetailsQuery.Character.toDomain(): MediaCharacter {
         return MediaCharacter(
             id = id,
-            fullName = name?.full ?: "",
-            nativeName = name?.native,
-            alternativeNames = name?.alternativeSpoiler?.mapNotNull { it }.orEmpty(),
+            fullName = (name?.full ?: "").toStaffName(native = name?.native),
+            alternativeNames = name?.alternative?.mapNotNull { it }.orEmpty(),
             imageUrl = image?.large ?: "",
             description = description,
             isFavorite = isFavourite,

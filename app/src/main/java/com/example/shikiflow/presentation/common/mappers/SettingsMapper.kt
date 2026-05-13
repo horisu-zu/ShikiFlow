@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.common.mappers
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
@@ -60,6 +61,15 @@ object SettingsMapper {
         return when(this) {
             ChapterUIMode.PAGE -> IconResource.Drawable(resId = R.drawable.ic_manga)
             ChapterUIMode.SCROLL -> IconResource.Drawable(resId = R.drawable.ic_scroll)
+        }
+    }
+
+    fun PreferredTitleType.displayValue(): Int {
+        return when(this) {
+            PreferredTitleType.ROMAJI -> R.string.preferred_title_type_romaji
+            PreferredTitleType.ENGLISH -> R.string.preferred_title_type_english
+            PreferredTitleType.RUSSIAN -> R.string.preferred_title_type_russian
+            PreferredTitleType.NATIVE -> R.string.preferred_title_type_native
         }
     }
 }

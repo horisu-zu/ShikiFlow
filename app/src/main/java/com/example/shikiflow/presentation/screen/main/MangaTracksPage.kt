@@ -38,6 +38,8 @@ import androidx.paging.compose.itemKey
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -59,6 +61,7 @@ fun MangaTracksPage(
     mangaTracksViewModel: MangaTracksViewModel = hiltViewModel()
 ) {
     val params by mangaTracksViewModel.params.collectAsStateWithLifecycle()
+    val preferredTitleType = LocalTitleTypeController.current
     val mangaTrackItems = mangaTracksViewModel.mangaTracks[userStatus]?.collectAsLazyPagingItems()
         ?: return
 
@@ -121,6 +124,7 @@ fun MangaTracksPage(
 
                         MangaTrackItem(
                             trackItem = trackItem,
+                            titleType = preferredTitleType,
                             onClick = { id ->
                                 onMangaClick(id)
                             },
@@ -153,6 +157,7 @@ fun MangaTracksPage(
             selectedItem?.let { item ->
                 UserRateBottomSheet(
                     userRate = item.toUserRateData(),
+                    preferredTitleType = preferredTitleType,
                     rateUpdateState = params.rateUpdateState,
                     onDismiss = {
                         if (params.rateUpdateState != RateUpdateState.LOADING) {
@@ -179,6 +184,7 @@ fun MangaTracksPage(
 @Composable
 fun MangaTrackItem(
     trackItem: MediaTrack,
+    titleType: PreferredTitleType,
     onClick: (Int) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -211,7 +217,7 @@ fun MangaTrackItem(
         )
 
         Text(
-            text = trackItem.shortData.name,
+            text = trackItem.shortData.name.preferred(titleType),
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,

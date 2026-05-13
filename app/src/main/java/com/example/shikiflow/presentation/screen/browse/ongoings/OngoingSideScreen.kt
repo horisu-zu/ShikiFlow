@@ -55,6 +55,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.DateMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.status
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.browse.calendar.OngoingsCalendarViewModel
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DayOfWeek
@@ -148,6 +149,7 @@ private fun OngoingSideScreenContent(
     modifier: Modifier = Modifier,
     ongoingsCalendarViewModel: OngoingsCalendarViewModel = hiltViewModel()
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
     val pagerState = rememberPagerState(
         initialPage = Clock.System.now()
             .toLocalDateTime(TimeZone.currentSystemDefault())
@@ -249,6 +251,7 @@ private fun OngoingSideScreenContent(
                             calendarItems[index]?.let { airingAnime ->
                                 AiringAnimeItem(
                                     airingAnime = airingAnime,
+                                    titleType = preferredTitleType,
                                     prevStatus = if(index > 0)
                                         calendarItems.peek(index - 1)?.let { airingAnime ->
                                             airingAnime.airingAt.status(

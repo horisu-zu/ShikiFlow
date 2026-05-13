@@ -29,12 +29,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.ShortMedia
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable
 fun CharacterMediaSection(
@@ -49,6 +52,7 @@ fun CharacterMediaSection(
         width = 120.dp,
         clip = RoundedCornerShape(clip),
     )
+    val preferredTitleType = LocalTitleTypeController.current
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
@@ -83,6 +87,7 @@ fun CharacterMediaSection(
                 MediaRoleItem(
                     mediaItem = items.entries[index],
                     imageType = imageType,
+                    titleType = preferredTitleType,
                     cornerShape = clip,
                     onItemClick = onItemClick
                 )
@@ -106,6 +111,7 @@ fun CharacterMediaSection(
 private fun MediaRoleItem(
     mediaItem: ShortMedia,
     imageType: ImageType,
+    titleType: PreferredTitleType,
     cornerShape: Dp,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -133,7 +139,7 @@ private fun MediaRoleItem(
         )
 
         Text(
-            text = mediaItem.title,
+            text = mediaItem.title.preferred(titleType),
             style = MaterialTheme.typography.labelMedium,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,

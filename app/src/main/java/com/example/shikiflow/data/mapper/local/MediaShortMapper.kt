@@ -11,6 +11,7 @@ import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.PosterMapper.toDomain
 import com.example.shikiflow.domain.model.media_details.MediaDetails
@@ -25,7 +26,7 @@ object MediaShortMapper {
             id = id,
             malId = malId,
             name = title,
-            synonyms = listOfNotNull(native),
+            synonyms = synonyms,
             mediaType = mediaType,
             kind = format,
             score = score,
@@ -38,7 +39,7 @@ object MediaShortMapper {
             airedOn = airedOn,
             releasedOn = releasedOn,
             studios = studios?.map { it.name } ?: emptyList(),
-            genres = genres,
+            genres = genres.map { it.romaji },
             poster = Poster(originalUrl = coverImageUrl)
         )
     }
@@ -96,7 +97,7 @@ object MediaShortMapper {
         return MediaShortData(
             id = id.toInt(),
             malId = id.toInt(),
-            name = name,
+            name = name.toDomainTitle(english, russian, japanese),
             synonyms = synonyms,
             mediaType = MediaType.ANIME,
             kind = kind?.toDomain(),
@@ -119,7 +120,7 @@ object MediaShortMapper {
         return MediaShortData(
             id = id.toInt(),
             malId = id.toInt(),
-            name = name,
+            name = name.toDomainTitle(english, russian, japanese),
             synonyms = synonyms,
             mediaType = MediaType.MANGA,
             kind = kind?.toDomain(),
@@ -141,9 +142,9 @@ object MediaShortMapper {
     fun MediaShort.toShortData() = MediaShortData(
         id = id,
         malId = idMal,
-        name = title?.romaji ?: "No Title",
+        name = title?.mediaTitle.toDomainTitle(),
         synonyms = buildList {
-            title?.english?.let { add(it) }
+            title?.mediaTitle?.english?.let { add(it) }
             synonyms?.mapNotNull { synonym ->
                 synonym?.let { add(it) }
             }

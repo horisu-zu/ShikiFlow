@@ -44,6 +44,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.browse.side.BrowseSideViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -108,6 +109,8 @@ private fun MainSideScreenContent(
     sideViewModel: BrowseSideViewModel = hiltViewModel()
 ) {
     val sideItems = sideViewModel.sideBrowseItems.collectAsLazyPagingItems()
+    val preferredTitleType = LocalTitleTypeController.current
+
     val lazyGridState = rememberLazyGridState()
     val isAtTop by remember {
         derivedStateOf {
@@ -156,6 +159,7 @@ private fun MainSideScreenContent(
                     val browseItem = sideItems[index]!!
                     BrowseGridItem(
                         browseItem = browseItem,
+                        titleType = preferredTitleType,
                         onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
                     )
                 }

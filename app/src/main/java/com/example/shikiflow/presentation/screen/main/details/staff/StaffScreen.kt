@@ -74,6 +74,8 @@ import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.ToggleFavoriteButton
@@ -88,6 +90,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.comment.Com
 import com.example.shikiflow.presentation.viewmodel.staff.staff_details.StaffViewModel
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,6 +102,7 @@ fun StaffScreen(
     val staffUiState by staffViewModel.uiState.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
+    val titleType = LocalTitleTypeController.current
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
@@ -122,8 +126,10 @@ fun StaffScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if(!scrolledFirst) stringResource(R.string.staff_title)
-                                else staffUiState.staffDetails?.fullName ?: stringResource(R.string.staff_title),
+                            text = if(!scrolledFirst) {
+                                stringResource(R.string.staff_title)
+                            } else staffUiState.staffDetails?.fullName?.preferred(titleType)
+                                ?: stringResource(R.string.staff_title),
                             style = MaterialTheme.typography.titleLarge,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -195,8 +201,8 @@ fun StaffScreen(
                     item {
                         StaffTitleSection(
                             avatarUrl = details.imageUrl,
-                            name = details.fullName,
-                            japaneseName = details.nativeName,
+                            name = details.fullName.preferred(titleType),
+                            nativeName = details.fullName.native,
                             staffRoles = details.shortRoles
                         )
                     }
@@ -220,6 +226,7 @@ fun StaffScreen(
                         item {
                             VoiceActorRolesSection(
                                 characterRoles = details.staffCharacterRoles,
+                                titleType = titleType,
                                 horizontalPadding = horizontalPadding,
                                 onCharacterClick = { characterId ->
                                     navOptions.navigateToCharacterDetails(characterId)
@@ -327,7 +334,7 @@ fun StaffScreen(
 private fun StaffTitleSection(
     avatarUrl: String?,
     name: String?,
-    japaneseName: String?,
+    nativeName: String?,
     staffRoles: Map<String, Int?>,
     modifier: Modifier = Modifier
 ) {
@@ -342,13 +349,9 @@ private fun StaffTitleSection(
         modifier = modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min),
-        verticalAlignment = Alignment.CenterVertically,
-        //horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start)
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        BaseImage(
-            model = avatarUrl,
-            imageType = ImageType.Poster()
-        )
+        BaseImage(model = avatarUrl)
 
         Spacer(Modifier.width(16.dp))
 
@@ -369,9 +372,9 @@ private fun StaffTitleSection(
                         overflow = TextOverflow.Ellipsis
                     )
                 }
-                japaneseName?.let { japaneseName ->
+                nativeName?.let {
                     Text(
-                        text = japaneseName,
+                        text = nativeName,
                         style = MaterialTheme.typography.bodyMedium.copy(
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                         ),
@@ -458,6 +461,7 @@ private fun StaffTitleSection(
 @Composable
 private fun VoiceActorRolesSection(
     characterRoles: PaginatedList<MediaPersonShort>,
+    titleType: PreferredTitleType,
     horizontalPadding: Dp,
     onCharacterClick: (Int) -> Unit,
     onPaginatedNavigate: () -> Unit,
@@ -497,7 +501,7 @@ private fun VoiceActorRolesSection(
             items(characterRoles.entries) { character ->
                 CharacterCard(
                     characterPoster = character.imageUrl,
-                    characterName = character.fullName,
+                    characterName = character.fullName.preferred(titleType),
                     onClick = {
                         onCharacterClick(character.id)
                     },

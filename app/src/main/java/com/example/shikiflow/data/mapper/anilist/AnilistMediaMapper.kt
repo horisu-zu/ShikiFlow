@@ -14,6 +14,7 @@ import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaOriginMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
@@ -28,6 +29,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -43,9 +45,8 @@ object AnilistMediaMapper {
             id = id,
             malId = idMal,
             mediaType = type?.toDomain() ?: MediaType.ANIME,
-            title = title?.romaji ?: "",
+            title = title?.mediaTitle.toDomainTitle(),
             descriptionHtml = description,
-            native = title?.native ?: "",
             synonyms = synonyms?.mapNotNull { it } ?: emptyList(),
             coverImageUrl = coverImage?.extraLarge ?: "",
             score = (averageScore ?: 0) / 10f,
@@ -54,7 +55,11 @@ object AnilistMediaMapper {
             volumes = volumes,
             format = format?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
-            genres = genres?.mapNotNull { it } ?: emptyList(),
+            genres = genres?.mapNotNull { genre ->
+                genre?.let {
+                    MediaTitle(genre, null, null, null)
+                }
+            } ?: emptyList(),
             characters = PaginatedList(
                 hasNextPage = characters?.pageInfo?.hasNextPage == true,
                 entries = characters?.nodes?.mapNotNull { it?.aLCharacterShort?.toDomain() }.orEmpty()
@@ -127,7 +132,7 @@ object AnilistMediaMapper {
             MediaType.ANIME -> {
                 BrowseMedia.Anime(
                     id = id,
-                    title = title?.romaji ?: "",
+                    title = title?.mediaTitle.toDomainTitle(),
                     posterUrl = coverImage?.extraLarge,
                     score = averageScore?.div(10.0f),
                     nextEpisodeAt = nextAiringEpisode?.let {
@@ -146,7 +151,7 @@ object AnilistMediaMapper {
             MediaType.MANGA -> {
                 BrowseMedia.Manga(
                     id = id,
-                    title = title?.romaji ?: "",
+                    title = title?.mediaTitle.toDomainTitle(),
                     posterUrl = coverImage?.extraLarge,
                     score = averageScore?.div(10.0f),
                     nextEpisodeAt = nextAiringEpisode?.let {
@@ -174,7 +179,7 @@ object AnilistMediaMapper {
     fun ALAiringAnime.toAiringData(): AiringAnimeDataShort {
         return AiringAnimeDataShort(
             id = id,
-            title = title?.romaji ?: "",
+            title = title?.mediaTitle.toDomainTitle(),
             mediaType = type?.toDomain() ?: MediaType.ANIME,
             coverImageUrl = coverImage?.large ?: "",
             totalEpisodes = episodes,

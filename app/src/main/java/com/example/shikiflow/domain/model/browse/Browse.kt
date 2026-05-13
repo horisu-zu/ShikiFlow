@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.media_details.MediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.MediaFormat
@@ -150,7 +151,7 @@ sealed interface Browse {
 
 sealed interface BrowseMedia : Browse {
     val id: Int
-    val title: String
+    val title: MediaTitle
     val posterUrl: String?
     val score: Float?
     val nextEpisodeAt: Instant?
@@ -160,7 +161,7 @@ sealed interface BrowseMedia : Browse {
 
     data class Anime(
         override val id: Int,
-        override val title: String,
+        override val title: MediaTitle,
         override val posterUrl: String?,
         override val score: Float?,
         override val nextEpisodeAt: Instant? = null,
@@ -175,7 +176,7 @@ sealed interface BrowseMedia : Browse {
 
     data class Manga(
         override val id: Int,
-        override val title: String,
+        override val title: MediaTitle,
         override val posterUrl: String?,
         override val score: Float?,
         override val nextEpisodeAt: Instant? = null,

@@ -28,6 +28,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -37,6 +39,7 @@ import com.example.shikiflow.presentation.common.foregroundGradient
 @Composable
 fun AnimeTrackGridItem(
     trackItem: MediaTrack,
+    titleType: PreferredTitleType,
     onClick: (Int) -> Unit,
     onLongClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -78,7 +81,7 @@ fun AnimeTrackGridItem(
                     )
             )
             Text(
-                text = trackItem.shortData.name,
+                text = trackItem.shortData.name.preferred(titleType),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),

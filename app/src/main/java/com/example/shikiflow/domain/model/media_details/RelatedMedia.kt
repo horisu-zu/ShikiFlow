@@ -6,7 +6,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 
 data class RelatedMedia(
     val id: Int,
-    val title: String,
+    val title: MediaTitle,
     val coverImageUrl: String,
     val mediaFormat: MediaFormat,
     val relationKind: RelationKind,

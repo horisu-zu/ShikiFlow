@@ -39,6 +39,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SortBottomSheet
 import com.example.shikiflow.presentation.common.SortConfig
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.StaffItem
 import com.example.shikiflow.presentation.viewmodel.staff.media_staff.MediaStaffViewModel
@@ -51,6 +52,7 @@ fun MediaStaffScreen(
     navOptions: MediaNavOptions,
     mediaStaffViewModel: MediaStaffViewModel = hiltViewModel()
 ) {
+    val titleType = LocalTitleTypeController.current
     val mediaStaffItems = mediaStaffViewModel.mediaStaffItems.collectAsLazyPagingItems()
     val mediaStaffParams by mediaStaffViewModel.mediaStaffParams.collectAsStateWithLifecycle()
     val authType by mediaStaffViewModel.authType.collectAsStateWithLifecycle()
@@ -115,6 +117,7 @@ fun MediaStaffScreen(
                         mediaStaffItems[index]?.let { staffShort ->
                             StaffItem(
                                 staffShort = staffShort,
+                                titleType = titleType,
                                 onStaffClick = { staffId ->
                                     navOptions.navigateToStaff(staffId)
                                 }
@@ -149,7 +152,7 @@ fun MediaStaffScreen(
         }
         if(showBottomSheet) {
             SortBottomSheet(
-                config = SortConfig<StaffType>(
+                config = SortConfig(
                     options = StaffType.entries,
                     selected = mediaStaffParams.staffSort,
                     onSortChange = { sort ->

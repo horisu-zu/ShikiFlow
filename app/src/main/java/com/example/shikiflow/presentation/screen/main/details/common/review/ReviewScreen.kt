@@ -45,6 +45,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.presentation.WindowSize
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -53,6 +54,7 @@ import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.getRatioColor
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.media.review.ReviewViewModel
 import com.example.shikiflow.utils.Converter.formatInstant
@@ -146,6 +148,7 @@ private fun ReviewHeader(
     review: Review,
     modifier: Modifier = Modifier
 ) {
+    val titleType = LocalTitleTypeController.current
     val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
     val windowSize by remember(windowSizeClass) {
         derivedStateOf {
@@ -178,7 +181,7 @@ private fun ReviewHeader(
 
         Text(
             text = buildAnnotatedString {
-                append(review.media?.title)
+                append(review.media?.title?.preferred(titleType))
                 append("\n")
                 withStyle(
                     style = SpanStyle(

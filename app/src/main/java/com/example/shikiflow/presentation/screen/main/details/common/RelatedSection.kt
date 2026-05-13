@@ -25,6 +25,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.media_details.RelatedMedia
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -32,10 +34,12 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.RelationKindMapper.displayValue
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable
 fun RelatedSection(
     relatedItems: List<RelatedMedia>,
+    preferredTitleType: PreferredTitleType,
     onItemClick: (Int, MediaType) -> Unit,
     onArrowClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -87,6 +91,7 @@ fun RelatedSection(
             relatedItems.take(3).forEach { relatedItem ->
                 RelatedItem(
                     relatedMedia = relatedItem,
+                    titleType = preferredTitleType,
                     onItemClick = onItemClick
                 )
             }
@@ -97,6 +102,7 @@ fun RelatedSection(
 @Composable
 fun RelatedItem(
     relatedMedia: RelatedMedia,
+    titleType: PreferredTitleType,
     onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -120,7 +126,7 @@ fun RelatedItem(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = relatedMedia.title,
+                text = relatedMedia.title.preferred(titleType),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.labelMedium

@@ -34,6 +34,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -41,6 +43,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.formatDaysHours
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.sortedBy
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.StatType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.StatType.Companion.displayValue
@@ -58,6 +61,8 @@ fun StaffSection(
     onStaffClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val titleType = LocalTitleTypeController.current
+
     LazyVerticalGrid(
         columns = GridCells.Adaptive(300.dp),
         modifier = modifier,
@@ -121,6 +126,7 @@ fun StaffSection(
                     staffStat = staffStat,
                     positionNumber = index + 1,
                     mediaType = currentMediaType,
+                    titleType = titleType,
                     onStaffClick = { staffId ->
                         onStaffClick(staffId)
                     },
@@ -138,6 +144,7 @@ fun StaffStatItem(
     staffStat: StaffStat,
     positionNumber: Int,
     mediaType: MediaType,
+    titleType: PreferredTitleType,
     onStaffClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -166,7 +173,7 @@ fun StaffStatItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = staffStat.staffShort.fullName,
+                text = staffStat.staffShort.fullName.preferred(titleType),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .offset(x = (-6).dp)

@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.repository
 
 import androidx.compose.ui.graphics.Color
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
@@ -45,6 +46,7 @@ interface SettingsRepository {
     suspend fun saveChapterUiMode(newMode: ChapterUIMode)
     suspend fun updateMangaSettings(settings: MangaChapterSettings)
     suspend fun saveChapterLanguages(chapterLanguages: Set<String>)
+    suspend fun savePreferredTitleType(preferredType: PreferredTitleType)
 
     suspend fun clearUserData()
     suspend fun clearUserData(authType: AuthType)

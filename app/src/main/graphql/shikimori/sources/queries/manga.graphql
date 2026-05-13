@@ -5,23 +5,27 @@ query MangaDetails(
         id
         name
         english
+        russian
         japanese
-        synonyms
         kind
         score
         status
         volumes
         chapters
-        airedOn { ...DateShort }
-        releasedOn { ...DateShort }
+        airedOn { year month day date }
+        releasedOn { year month day date }
 
         poster { originalUrl }
-
-        genres { id name kind }
+        genres { name russian }
 
         characterRoles {
-            id
-            character { ...CharacterShort }
+            character {
+                id
+                name
+                russian
+                japanese
+                poster { ...PosterShort }
+            }
         }
         personRoles {
             ...PersonRoleShort

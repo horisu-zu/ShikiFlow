@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.tracks
 
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 
 data class UserRate(
@@ -11,7 +12,7 @@ data class UserRate(
 
 data class ShortUserMediaRate(
     val id: Int,
-    val title: String,
+    val title: MediaTitle,
     val enTitle: String? = null,
     val ruTitle: String? = null,
     val imageUrl: String,

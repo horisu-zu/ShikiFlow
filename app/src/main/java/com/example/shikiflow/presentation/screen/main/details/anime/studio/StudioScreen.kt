@@ -61,6 +61,7 @@ import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.TriFilterChip
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.anime.studio.StudioViewModel
 import com.example.shikiflow.utils.IconResource
 
@@ -76,6 +77,7 @@ fun StudioScreen(
     val uiState by studioViewModel.uiState.collectAsStateWithLifecycle()
     val query by studioViewModel.query.collectAsStateWithLifecycle()
     val authType by studioViewModel.authType.collectAsStateWithLifecycle()
+    val preferredTitleType = LocalTitleTypeController.current
 
     LaunchedEffect(id) {
         studioViewModel.setStudioId(id)
@@ -256,6 +258,7 @@ fun StudioScreen(
                         studioAnimeData[index]?.let { browseItem ->
                             BrowseGridItem(
                                 browseItem = browseItem,
+                                titleType = preferredTitleType,
                                 onItemClick = { id, _ -> onMediaNavigate(id) }
                             )
                         }

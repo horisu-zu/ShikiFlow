@@ -109,8 +109,8 @@ class MangaDetailsViewModel @Inject constructor(
             }
             .flatMapLatest { state ->
                 getMangaDexUseCase(
-                    title = state.details!!.title,
-                    nativeTitle = state.details.native,
+                    title = state.details!!.title.romaji,
+                    nativeTitle = state.details.title.native,
                     malId = state.details.malId!!
                 )
             }.onEach { result ->

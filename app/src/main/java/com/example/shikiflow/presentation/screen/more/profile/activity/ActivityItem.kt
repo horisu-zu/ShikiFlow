@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.domain.model.user.MessageActivity
@@ -40,6 +42,7 @@ import com.example.shikiflow.utils.Converter.convertInstantToString
 @Composable
 fun ActivityItem(
     userActivity: UserActivity,
+    titleType: PreferredTitleType,
     onListActivityClick: (MediaType, Int) -> Unit,
     onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
@@ -50,6 +53,7 @@ fun ActivityItem(
         is ListActivity -> {
             ListActivityItem(
                 listActivity = userActivity,
+                titleType = titleType,
                 onListActivityClick = onListActivityClick,
                 modifier = modifier
             )
@@ -78,6 +82,7 @@ fun ActivityItem(
 @Composable
 fun ListActivityItem(
     listActivity: ListActivity,
+    titleType: PreferredTitleType,
     onListActivityClick: (MediaType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -110,7 +115,7 @@ fun ListActivityItem(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             )
             Text(
-                text = listActivity.title,
+                text = listActivity.title.preferred(titleType),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )

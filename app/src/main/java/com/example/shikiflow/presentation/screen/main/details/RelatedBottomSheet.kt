@@ -23,6 +23,7 @@ import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.RelatedMedia
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.common.RelatedItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -33,6 +34,7 @@ fun RelatedBottomSheet(
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState()
+    val preferredTitleType = LocalTitleTypeController.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -55,10 +57,13 @@ fun RelatedBottomSheet(
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
+
             HorizontalDivider()
+
             relatedItems.forEach { relatedItem ->
                 RelatedItem(
                     relatedMedia = relatedItem,
+                    titleType = preferredTitleType,
                     onItemClick = onItemClick,
                     modifier = Modifier.padding(horizontal = 12.dp)
                 )

@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.FadeEdge
@@ -49,6 +51,7 @@ import kotlin.time.Duration.Companion.minutes
 @Composable
 fun AiringAnimeItem(
     airingAnime: AiringAnime,
+    titleType: PreferredTitleType,
     prevStatus: AiringStatus?,
     nextStatus: AiringStatus?,
     onClick: (Int) -> Unit,
@@ -142,7 +145,7 @@ fun AiringAnimeItem(
                 )
 
                 Text(
-                    text = airingAnime.data.title,
+                    text = airingAnime.data.title.preferred(titleType),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold
                     ),

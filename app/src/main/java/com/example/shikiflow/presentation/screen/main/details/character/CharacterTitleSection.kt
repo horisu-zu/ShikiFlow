@@ -19,7 +19,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 fun CharacterTitleSection(
     avatarUrl: String,
     name: String?,
-    japaneseName: String?,
+    nativeName: String?,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -39,9 +39,9 @@ fun CharacterTitleSection(
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
-            japaneseName?.let { japaneseName ->
+            nativeName?.let {
                 Text(
-                    text = japaneseName,
+                    text = nativeName,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                     )

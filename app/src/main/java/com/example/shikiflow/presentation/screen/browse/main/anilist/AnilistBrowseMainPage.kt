@@ -40,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.BrowseType
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
@@ -54,6 +55,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.browse.main.anilist.AnilistBrowseSectionUiState
 import com.example.shikiflow.presentation.viewmodel.browse.main.anilist.AnilistBrowseViewModel
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable
 fun AnilistBrowseMainPage(
@@ -63,6 +65,7 @@ fun AnilistBrowseMainPage(
     onIsAtTopChange: (Boolean) -> Unit,
     browseViewModel: AnilistBrowseViewModel = hiltViewModel()
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
         derivedStateOf {
@@ -120,6 +123,7 @@ fun AnilistBrowseMainPage(
                         BrowseSection(
                             browseType = browseType,
                             sectionState = uiState.sections[browseType],
+                            preferredTitleType = preferredTitleType,
                             onSectionClick = { browseNavOptions.navigateToSideScreen(browseType) },
                             onRetryClick = { browseViewModel.onRetry(browseType) },
                             onItemClick = { id, mediaType ->
@@ -146,6 +150,7 @@ fun AnilistBrowseMainPage(
                         BrowseSection(
                             browseType = browseType,
                             sectionState = uiState.sections[browseType],
+                            preferredTitleType = preferredTitleType,
                             onSectionClick = { browseNavOptions.navigateToSideScreen(browseType) },
                             onRetryClick = { browseViewModel.onRetry(browseType) },
                             onItemClick = { id, mediaType ->
@@ -169,6 +174,7 @@ fun AnilistBrowseMainPage(
 private fun BrowseSection(
     browseType: BrowseType,
     sectionState: AnilistBrowseSectionUiState?,
+    preferredTitleType: PreferredTitleType,
     onSectionClick: () -> Unit,
     onRetryClick: () -> Unit,
     onItemClick: (Int, MediaType) -> Unit,
@@ -234,6 +240,7 @@ private fun BrowseSection(
                         items(uiState.browseMedia.size) { index ->
                             BrowseCardItem(
                                 browseItem = uiState.browseMedia[index],
+                                titleType = preferredTitleType,
                                 onItemClick = onItemClick,
                                 modifier = Modifier.width(itemWidth)
                             )

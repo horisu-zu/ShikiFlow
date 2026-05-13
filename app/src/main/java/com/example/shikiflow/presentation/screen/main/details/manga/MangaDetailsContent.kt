@@ -42,6 +42,8 @@ import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
@@ -66,6 +68,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.review.Revi
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable
 fun MangaDetailsContent(
@@ -86,6 +89,7 @@ fun MangaDetailsContent(
     val horizontalPadding = 12.dp
     val context = LocalContext.current
     val density = LocalDensity.current
+    val titleType = LocalTitleTypeController.current
 
     LazyColumn(
         modifier = modifier,
@@ -100,6 +104,7 @@ fun MangaDetailsContent(
             MangaDetailsHeader(
                 mangaDetails = mangaDetails,
                 mangaDexUiState = mangaDexUiState,
+                titleType = titleType,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onMangaDexIconClick = {
@@ -107,7 +112,7 @@ fun MangaDetailsContent(
                         mediaNavOptions.navigateToMangaRead(
                             mangaDexIds = mangaDexUiState.mangaDexIds,
                             malId = mangaDetails.malId!!,
-                            title = mangaDetails.title,
+                            title = mangaDetails.title.preferred(titleType),
                             completedChapters = mangaDetails.userRate?.progress ?: 0
                         )
                     } else if(mangaDexUiState.errorMessage != null) {
@@ -145,7 +150,7 @@ fun MangaDetailsContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(mangaDetails.genres) { genreItem ->
-                    CardItem(genreItem)
+                    CardItem(genreItem.preferred(titleType))
                 }
             }
         }
@@ -170,7 +175,7 @@ fun MangaDetailsContent(
                             onClick = {
                                 mediaNavOptions.navigateToMediaCharacters(
                                     mediaId = mangaDetails.id,
-                                    mediaTitle = mangaDetails.title,
+                                    mediaTitle = mangaDetails.title.preferred(titleType),
                                     mediaType = MediaType.MANGA
                                 )
                             },
@@ -192,7 +197,7 @@ fun MangaDetailsContent(
                         items(mangaDetails.characters.entries) { characterItem ->
                             CharacterCard(
                                 characterPoster = characterItem.imageUrl,
-                                characterName = characterItem.fullName,
+                                characterName = characterItem.fullName.preferred(titleType),
                                 onClick = {
                                     mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id)
                                 },
@@ -209,7 +214,7 @@ fun MangaDetailsContent(
                                     onNavigate = {
                                         mediaNavOptions.navigateToMediaCharacters(
                                             mediaId = mangaDetails.id,
-                                            mediaTitle = mangaDetails.title,
+                                            mediaTitle = mangaDetails.title.preferred(titleType),
                                             mediaType = MediaType.MANGA
                                         )
                                     },
@@ -230,6 +235,7 @@ fun MangaDetailsContent(
             item {
                 RelatedSection(
                     relatedItems = mangaDetails.relatedMedia,
+                    preferredTitleType = titleType,
                     onItemClick = { id, mediaType ->
                         if (mediaType == MediaType.ANIME) {
                             mediaNavOptions.navigateToAnimeDetails(id)
@@ -243,6 +249,7 @@ fun MangaDetailsContent(
             item {
                 StaffSection(
                     staffShortList = mangaDetails.staffList,
+                    preferredTitleType = titleType,
                     onMediaStaffClick = {
                         mediaNavOptions.navigateToMediaStaff(mangaDetails.id, MediaType.MANGA)
                     },
@@ -267,7 +274,11 @@ fun MangaDetailsContent(
                     mediaNavOptions.navigateToMediaStaff(mangaDetails.id, mangaDetails.mediaType)
                 },
                 onSimilarClick = {
-                    mediaNavOptions.navigateToSimilarPage(mangaDetails.id, mangaDetails.title, mangaDetails.mediaType)
+                    mediaNavOptions.navigateToSimilarPage(
+                        id = mangaDetails.id,
+                        title = mangaDetails.title.preferred(titleType),
+                        mediaType = mangaDetails.mediaType
+                    )
                 },
                 onExternalLinksClick = {
                     mediaNavOptions.navigateToLinksPage(mangaDetails.id, mangaDetails.mediaType)
@@ -342,6 +353,7 @@ fun MangaDetailsContent(
     if(rateBottomSheet) {
         UserRateBottomSheet(
             userRate = mangaDetails.toUiModel(),
+            preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->

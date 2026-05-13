@@ -44,10 +44,13 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.character.media.MediaCharactersViewModel
 
@@ -60,6 +63,7 @@ fun MediaCharactersScreen(
     navOptions: MediaNavOptions,
     mediaCharactersViewModel: MediaCharactersViewModel = hiltViewModel()
 ) {
+    val titleType = LocalTitleTypeController.current
     val mediaCharacterItems = mediaCharactersViewModel.mediaCharacters.collectAsLazyPagingItems()
 
     LaunchedEffect(mediaId) {
@@ -148,6 +152,7 @@ fun MediaCharactersScreen(
                             MediaCharacterItem(
                                 mediaPerson = mediaCharacterShort.mediaCharacter,
                                 role = stringResource(id = mediaCharacterShort.role.displayValue()),
+                                titleType = titleType,
                                 leftToRight = true,
                                 onItemClick = { characterId ->
                                     navOptions.navigateToCharacterDetails(characterId)
@@ -157,6 +162,7 @@ fun MediaCharactersScreen(
                             mediaCharacterShort.mediaPerson?.let { va ->
                                 MediaCharacterItem(
                                     mediaPerson = va,
+                                    titleType = titleType,
                                     leftToRight = false,
                                     onItemClick = { personId ->
                                         navOptions.navigateToStaff(personId)
@@ -200,6 +206,7 @@ fun MediaCharactersScreen(
 private fun MediaCharacterItem(
     mediaPerson: MediaPersonShort,
     role: String? = null,
+    titleType: PreferredTitleType,
     leftToRight: Boolean,
     onItemClick: (Int) -> Unit,
     modifier: Modifier
@@ -222,7 +229,7 @@ private fun MediaCharacterItem(
             horizontalAlignment = if(leftToRight) Alignment.Start else Alignment.End
         ) {
             Text(
-                text = mediaPerson.fullName,
+                text = mediaPerson.fullName.preferred(titleType),
                 style = MaterialTheme.typography.labelMedium.copy(
                     textAlign = if(leftToRight) TextAlign.Start else TextAlign.End
                 )

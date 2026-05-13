@@ -57,6 +57,7 @@
     <string name="settings_language_label">Язык</string>
     <string name="settings_language_system">Системный</string>
 
+    <string name="settings_preferred_title_type_desc">Выберите желаемый тип тайтла, который будет применён к названиям медиа, именам персонажей и персонала, жанров и т.д.</string>
     <string name="settings_app_ui_mode">Режим отображения</string>
     <string name="settings_clear_cache">Очистить кэш изображений</string>
     <string name="settings_chapter_ui_mode">Режим отображения глав</string>
@@ -220,7 +221,7 @@
     <string name="details_info_next_episode_at">Следующий эпизод в</string>
     <string name="details_info_released_on">Дата окончания</string>
     <string name="details_info_title_romaji">Ромадзи</string>
-    <string name="details_info_title_japanese">Японский</string>
+    <string name="details_info_title_native">Нативное</string>
     <string name="details_info_title_synonyms">Альтернативные названия</string>
     <string name="details_info_recommendations">Рекомендации</string>
     <string name="details_info_links">Ссылки</string>
@@ -276,6 +277,7 @@
 
     <string name="chapter_short_title">Гл. %1$s</string>
 
+    <string name="preferred_title_type_native">Нативный</string>
     <string name="character_title">Персонаж</string>
     <string name="staff_title">Персонал</string>
     <string name="works_title">Работы</string>
@@ -298,7 +300,7 @@
 
     <string name="media_status_announced">Анонсировано</string>
     <string name="media_status_ongoing">Онгоинг</string>
-    <string name="media_status_released">Вышло</string>
+    <string name="media_status_released">Завершено</string>
     <string name="media_status_manga_cancelled">Отменено</string>
     <string name="media_status_manga_hiatus">Хиатус</string>
 
@@ -471,4 +473,9 @@
     <string name="settings_theme_primary_color">Основной цвет</string>
     <string name="settings_chapter_languages">Языки глав</string>
     <string name="settings_chapter_languages_desc">Отображение глав с переводами на выбранных языках</string>
+
+    <string name="preferred_title_type_romaji">Ромадзи</string>
+    <string name="preferred_title_type_english">Английский</string>
+    <string name="preferred_title_type_russian">Русский</string>
+    <string name="settings_preferred_title_type">Тип тайтла</string>
 </resources>

@@ -32,6 +32,7 @@ import androidx.paging.compose.itemKey
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
@@ -51,6 +52,7 @@ fun AnimeTracksPage(
     modifier: Modifier = Modifier,
     tracksViewModel: AnimeTracksViewModel = hiltViewModel(),
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
     val params by tracksViewModel.params.collectAsStateWithLifecycle()
     val animeTrackItems = tracksViewModel.animeTracks[userStatus]?.collectAsLazyPagingItems()
         ?: return
@@ -88,6 +90,7 @@ fun AnimeTracksPage(
                     AppUiMode.LIST -> {
                         AnimeTracksListComponent(
                             trackItems = animeTrackItems,
+                            preferredTitleType = preferredTitleType,
                             isCurrentPage = isCurrentPage,
                             onAnimeClick = onAnimeClick,
                             onLongClick = { item ->
@@ -100,6 +103,7 @@ fun AnimeTracksPage(
                     AppUiMode.GRID -> {
                         AnimeTracksGridComponent(
                             trackItems = animeTrackItems,
+                            preferredTitleType = preferredTitleType,
                             isCurrentPage = isCurrentPage,
                             onAnimeClick = onAnimeClick,
                             onLongClick = { item ->
@@ -115,6 +119,7 @@ fun AnimeTracksPage(
             selectedItem?.let { item ->
                 UserRateBottomSheet(
                     userRate = item.toUserRateData(),
+                    preferredTitleType = preferredTitleType,
                     rateUpdateState = params.rateUpdateState,
                     onDismiss = {
                         if (params.rateUpdateState != RateUpdateState.LOADING) {
@@ -141,6 +146,7 @@ fun AnimeTracksPage(
 @Composable
 private fun AnimeTracksListComponent(
     trackItems: LazyPagingItems<MediaTrack>,
+    preferredTitleType: PreferredTitleType,
     isCurrentPage: Boolean,
     onAnimeClick: (Int) -> Unit,
     onLongClick: (MediaTrack) -> Unit,
@@ -178,6 +184,7 @@ private fun AnimeTracksListComponent(
 
             AnimeTrackItem(
                 userRate = item,
+                titleType = preferredTitleType,
                 onClick = onAnimeClick,
                 onLongClick = { onLongClick(item) },
                 modifier = Modifier.animateItem()
@@ -209,6 +216,7 @@ private fun AnimeTracksListComponent(
 @Composable
 private fun AnimeTracksGridComponent(
     trackItems: LazyPagingItems<MediaTrack>,
+    preferredTitleType: PreferredTitleType,
     isCurrentPage: Boolean,
     onAnimeClick: (Int) -> Unit,
     onLongClick: (MediaTrack) -> Unit,
@@ -245,6 +253,7 @@ private fun AnimeTracksGridComponent(
 
             AnimeTrackGridItem(
                 trackItem = trackItem,
+                titleType = preferredTitleType,
                 onClick = onAnimeClick,
                 onLongClick = { onLongClick(trackItem) },
                 modifier = Modifier.animateItem()

@@ -4,6 +4,7 @@ import com.example.graphql.anilist.fragment.ALReview
 import com.example.graphql.anilist.fragment.ALReviewMedia
 import com.example.graphql.anilist.fragment.ALReviewShort
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.domain.model.review.ReviewMedia
 import com.example.shikiflow.domain.model.review.ReviewShort
@@ -43,7 +44,7 @@ object AnilistReviewMapper {
     fun ALReviewMedia.toReviewMedia(): ReviewMedia {
         return ReviewMedia(
             id = id,
-            title = title?.romaji ?: "",
+            title = title?.mediaTitle.toDomainTitle(),
             bannerImage = bannerImage
         )
     }

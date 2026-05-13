@@ -8,8 +8,11 @@ import com.example.graphql.anilist.fragment.ALStaffEdgeShort
 import com.example.graphql.anilist.fragment.ALStaffShort
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.common.DateMapper.toLocalDate
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
+import com.example.shikiflow.data.mapper.common.StaffRoleMapper.toStaffRole
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.common.StaffMediaRole
@@ -22,7 +25,7 @@ object AnilistStaffMapper {
     fun ALStaffShort.toDomain(): MediaPersonShort {
         return MediaPersonShort(
             id = id,
-            fullName = name?.full ?: "",
+            fullName = (name?.full ?: "").toStaffName(native = name?.native),
             imageUrl = image?.large ?: ""
         )
     }
@@ -30,7 +33,7 @@ object AnilistStaffMapper {
     fun ALMediaBrowseShort.toDomain(): ShortMedia {
         return ShortMedia(
             id = id,
-            title = title?.romaji ?: "",
+            title = title?.mediaTitle.toDomainTitle(),
             mediaType = type?.toDomain() ?: MediaType.ANIME,
             coverImageUrl = coverImage?.large ?: "",
             userRateStatus = mediaListEntry?.status?.toDomain()
@@ -38,14 +41,14 @@ object AnilistStaffMapper {
     }
 
     fun ALStaffEdgeShort.toDomain(): StaffShort? {
-        val personShort = this.node?.aLStaffShort?.toDomain()
+        val personShort = node?.aLStaffShort?.toDomain()
 
         return personShort?.let { personShort ->
             StaffShort(
                 id = personShort.id,
                 fullName = personShort.fullName,
                 imageUrl = personShort.imageUrl,
-                roles = listOfNotNull(this.role)
+                roles = listOfNotNull(role?.toStaffRole())
             )
         }
     }
@@ -93,8 +96,7 @@ object AnilistStaffMapper {
     fun StaffDetailsQuery.Staff.toDomain(): StaffDetails {
         return StaffDetails(
             id = id,
-            fullName = name?.full,
-            nativeName = name?.native,
+            fullName = (name?.full ?: "").toStaffName(native = name?.native),
             description = description,
             imageUrl = image?.large,
             isFavorite = isFavourite,

@@ -18,6 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.BrowseMedia
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -27,6 +29,7 @@ import com.example.shikiflow.presentation.common.foregroundGradient
 @Composable
 fun BrowseCardItem(
     browseItem: BrowseMedia,
+    titleType: PreferredTitleType,
     onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -64,7 +67,7 @@ fun BrowseCardItem(
                 .padding(horizontal = 6.dp, vertical = 4.dp)
         ) {
             Text(
-                text = browseItem.title,
+                text = browseItem.title.preferred(titleType),
                 style = MaterialTheme.typography.labelMedium,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 2

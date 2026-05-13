@@ -7,6 +7,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
 import com.example.shikiflow.data.datasource.dto.media.ShikiShortUserRate
 import com.example.shikiflow.data.datasource.dto.ShikiShortUserRateResponse
 import com.example.shikiflow.data.datasource.dto.ShikiTargetType.Companion.toMediaType
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -53,7 +54,7 @@ object ShikimoriRateMapper {
             is ShikiShortUserRate.ShikiShortAnimeRate -> {
                 ShortUserMediaRate(
                     id = anime.id.toInt(),
-                    title = anime.name,
+                    title = anime.name.toDomainTitle(null, anime.russian, null),
                     ruTitle = anime.russian,
                     imageUrl = "${BuildConfig.SHIKI_BASE_URL}${anime.image.x96}",
                     score = score,
@@ -64,7 +65,7 @@ object ShikimoriRateMapper {
             is ShikiShortUserRate.ShikiShortMangaRate -> {
                 ShortUserMediaRate(
                     id = manga.id.toInt(),
-                    title = manga.name,
+                    title = manga.name.toDomainTitle(null, manga.russian, null),
                     ruTitle = manga.russian,
                     imageUrl = "${BuildConfig.SHIKI_BASE_URL}${manga.image.x96}",
                     score = score,

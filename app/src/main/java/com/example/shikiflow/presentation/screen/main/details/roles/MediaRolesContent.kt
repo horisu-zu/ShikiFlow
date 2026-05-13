@@ -36,12 +36,16 @@ import com.example.shikiflow.domain.model.common.MediaRole
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 
 @Composable
@@ -52,6 +56,8 @@ fun MediaRolesContent(
     paddingValues: PaddingValues,
     modifier: Modifier = Modifier
 ) {
+    val preferredTitleType = LocalTitleTypeController.current
+
     when (mediaRoles.loadState.refresh) {
         is LoadState.Loading -> {
             Box(
@@ -100,6 +106,7 @@ fun MediaRolesContent(
                             is CharacterMediaRole -> {
                                 CharacterMediaRoleItem(
                                     mediaRole = mediaRole,
+                                    titleType = preferredTitleType,
                                     onMediaClick = { id, mediaType ->
                                         when (mediaType) {
                                             MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
@@ -111,6 +118,7 @@ fun MediaRolesContent(
                             is StaffMediaRole -> {
                                 StaffMediaRoleItem(
                                     mediaRole = mediaRole,
+                                    titleType = preferredTitleType,
                                     onMediaClick = { id, mediaType ->
                                         when (mediaType) {
                                             MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
@@ -122,6 +130,7 @@ fun MediaRolesContent(
                             is VoiceActorMediaRole -> {
                                 VoiceActorMediaRoleItem(
                                     vaRole = mediaRole,
+                                    titleType = preferredTitleType,
                                     onCharacterClick = { id ->
                                         navOptions.navigateToCharacterDetails(id)
                                     },
@@ -164,6 +173,7 @@ fun MediaRolesContent(
 @Composable
 private fun CharacterMediaRoleItem(
     mediaRole: CharacterMediaRole,
+    titleType: PreferredTitleType,
     onMediaClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -187,7 +197,7 @@ private fun CharacterMediaRoleItem(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
         ) {
             Text(
-                text = mediaRole.shortMedia.title,
+                text = mediaRole.shortMedia.title.preferred(titleType),
                 style = MaterialTheme.typography.labelMedium
             )
             mediaRole.characterRole?.let { role ->
@@ -208,6 +218,7 @@ private fun CharacterMediaRoleItem(
 @Composable
 private fun StaffMediaRoleItem(
     mediaRole: StaffMediaRole,
+    titleType: PreferredTitleType,
     onMediaClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -231,7 +242,7 @@ private fun StaffMediaRoleItem(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
         ) {
             Text(
-                text = mediaRole.shortMedia.title,
+                text = mediaRole.shortMedia.title.preferred(titleType),
                 style = MaterialTheme.typography.labelMedium
             )
             Column(
@@ -256,6 +267,7 @@ private fun StaffMediaRoleItem(
 @Composable
 private fun VoiceActorMediaRoleItem(
     vaRole: VoiceActorMediaRole,
+    titleType: PreferredTitleType,
     onCharacterClick: (Int) -> Unit,
     onMediaClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
@@ -288,7 +300,7 @@ private fun VoiceActorMediaRoleItem(
                 )
             )
             Text(
-                text = vaRole.characterShort.fullName,
+                text = vaRole.characterShort.fullName.preferred(titleType),
                 style = MaterialTheme.typography.labelSmall,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
@@ -321,7 +333,7 @@ private fun VoiceActorMediaRoleItem(
                         cornerShape = cornerShape
                     )
                     Text(
-                        text = shortMedia.title,
+                        text = shortMedia.title.preferred(titleType),
                         style = MaterialTheme.typography.labelSmall,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,

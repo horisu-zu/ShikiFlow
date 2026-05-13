@@ -46,9 +46,11 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.presentation.screen.BottomNavItem.Companion.isBottomNavItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavRoute
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
@@ -58,6 +60,7 @@ import com.example.shikiflow.utils.toIcon
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun MainNavigator(
+    preferredTitleType: PreferredTitleType,
     onMoveToBack: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
@@ -135,7 +138,10 @@ fun MainNavigator(
             BottomBarState { show -> isBottomBarVisible = show }
         }
 
-        CompositionLocalProvider(LocalBottomBarController provides controller) {
+        CompositionLocalProvider(
+            LocalBottomBarController provides controller,
+            LocalTitleTypeController provides preferredTitleType
+        ) {
             NavDisplay(
                 backStack = mainNavBackStack,
                 onBack = {

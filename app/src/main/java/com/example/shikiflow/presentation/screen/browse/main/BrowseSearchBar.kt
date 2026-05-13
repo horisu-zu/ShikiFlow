@@ -77,7 +77,9 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
@@ -90,6 +92,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.social.UserSocialItem
 import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchViewModel
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -275,6 +278,7 @@ private fun SearchBarContent(
     searchViewModel: BrowseSearchViewModel = hiltViewModel()
 ) {
     val configuration = LocalWindowInfo.current
+    val preferredTitleType = LocalTitleTypeController.current
     val authType by searchViewModel.authType.collectAsStateWithLifecycle()
     val searchParams by searchViewModel.params.collectAsStateWithLifecycle()
 
@@ -395,6 +399,7 @@ private fun SearchBarContent(
                                 is BrowseMedia -> {
                                     BrowseGridItem(
                                         browseItem = browseItem,
+                                        titleType = preferredTitleType,
                                         onItemClick = { _, _ ->
                                             onNavigate(browseItem)
                                         }
@@ -403,6 +408,7 @@ private fun SearchBarContent(
                                 is Browse.Character -> {
                                     MediaPersonItem(
                                         mediaPerson = browseItem.data,
+                                        titleType = preferredTitleType,
                                         onItemClick = { _ ->
                                             onNavigate(browseItem)
                                         }
@@ -411,6 +417,7 @@ private fun SearchBarContent(
                                 is Browse.Staff -> {
                                     MediaPersonItem(
                                         mediaPerson = browseItem.data,
+                                        titleType = preferredTitleType,
                                         onItemClick = { _ ->
                                             onNavigate(browseItem)
                                         }
@@ -473,6 +480,7 @@ private fun SearchBarContent(
 @Composable
 private fun MediaPersonItem(
     mediaPerson: MediaPersonShort,
+    titleType: PreferredTitleType,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -489,7 +497,7 @@ private fun MediaPersonItem(
         )
 
         Text(
-            text = mediaPerson.fullName,
+            text = mediaPerson.fullName.preferred(titleType),
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(
                 horizontal = 4.dp,

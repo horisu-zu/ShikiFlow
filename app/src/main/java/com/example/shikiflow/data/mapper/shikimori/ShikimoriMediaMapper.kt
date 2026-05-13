@@ -13,6 +13,7 @@ import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaOriginMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RatingMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
@@ -27,11 +28,16 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle
+import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.utils.DateUtils.isInCurrentWeek
 import com.example.shikiflow.utils.DateUtils.timeDifference
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
@@ -42,9 +48,8 @@ object ShikimoriMediaMapper {
             id = id.toInt(),
             malId = id.toInt(),
             mediaType = MediaType.ANIME,
-            title = name,
+            title = name.toDomainTitle(english, russian, japanese),
             descriptionHtml = descriptionHtml ?: "",
-            native = japanese ?: "",
             synonyms = synonyms,
             coverImageUrl = poster?.originalUrl ?: "",
             score = score?.toFloat() ?: 0.0f,
@@ -54,7 +59,14 @@ object ShikimoriMediaMapper {
             format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
             ageRating = rating?.toDomain(),
-            genres = genres?.map { it.name } ?: emptyList(),
+            genres = genres?.map { genre ->
+                MediaTitle(
+                    romaji = genre.name,
+                    english = null,
+                    russian = genre.russian,
+                    native = null
+                )
+            } ?: emptyList(),
             characters = PaginatedList(
                 hasNextPage = false,
                 entries = characterRoles?.map { it.character.characterShort.toDomain() }.orEmpty()
@@ -89,23 +101,49 @@ object ShikimoriMediaMapper {
             id = id.toInt(),
             malId = id.toInt(),
             mediaType = MediaType.MANGA,
-            title = name,
+            title = name.toDomainTitle(english, russian, japanese),
             descriptionHtml = descriptionHtml ?: "",
-            native = japanese ?: "",
-            synonyms = synonyms,
+            synonyms = emptyList(),
             coverImageUrl = poster?.originalUrl ?: "",
             score = score?.toFloat() ?: 0.0f,
             totalCount = chapters,
             volumes = volumes,
             format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
-            genres = genres?.map { it.name } ?: emptyList(),
+            genres = genres?.map { genre ->
+                MediaTitle(
+                    romaji = genre.name,
+                    english = null,
+                    russian = genre.russian,
+                    native = null
+                )
+            } ?: emptyList(),
             characters = PaginatedList(
                 hasNextPage = false,
-                entries = characterRoles?.map { it.character.characterShort.toDomain() }.orEmpty()
+                entries = characterRoles?.map { it.character.toDomain() }.orEmpty()
             ),
-            airedOn = airedOn?.dateShort?.toDomain(),
-            releasedOn = releasedOn?.dateShort?.toDomain(),
+            airedOn = airedOn?.let { airedOn ->
+                airedOn.year?.let {
+                    Date(
+                        year = airedOn.year,
+                        month = airedOn.month,
+                        day = airedOn.day,
+                        date = airedOn.date?.let { LocalDate.parse(it.toString())
+                            .atStartOfDayIn(TimeZone.currentSystemDefault()) }
+                    )
+                }
+            },
+            releasedOn = releasedOn?.let { releasedOn ->
+                releasedOn.year?.let {
+                    Date(
+                        year = releasedOn.year,
+                        month = releasedOn.month,
+                        day = releasedOn.day,
+                        date = releasedOn.date?.let { LocalDate.parse(it.toString())
+                            .atStartOfDayIn(TimeZone.currentSystemDefault()) }
+                    )
+                }
+            },
             userRate = userRate?.userRateShort?.toDomain(mediaId = id.toInt(), MediaType.MANGA),
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             staffList = personRoles?.map { it.personRoleShort.toDomain() } ?: emptyList(),
@@ -127,52 +165,52 @@ object ShikimoriMediaMapper {
 
     fun AnimeBrowseQuery.Anime.toBrowseAnime(): BrowseMedia.Anime {
         return BrowseMedia.Anime(
-            id = this.id.toInt(),
-            title = this.name,
-            posterUrl = this.poster?.posterShort?.mainUrl,
-            score = this.score?.toFloat(),
-            mediaFormat = this.kind?.toDomain() ?: MediaFormat.UNKNOWN,
-            nextEpisodeAt = this.nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
-            userRateStatus = this.userRate?.animeUserRate?.status?.toDomain(),
-            episodesAired = this.episodesAired,
-            episodes = this.episodes,
-            studios = this.studios.map { it.name },
-            genres = this.genres?.map { it.name } ?: emptyList()
+            id = id.toInt(),
+            title = name.toDomainTitle(english, russian, japanese),
+            posterUrl = poster?.posterShort?.mainUrl,
+            score = score?.toFloat(),
+            mediaFormat = kind?.toDomain() ?: MediaFormat.UNKNOWN,
+            nextEpisodeAt = nextEpisodeAt?.let { Instant.parse(nextEpisodeAt.toString()) },
+            userRateStatus = userRate?.animeUserRate?.status?.toDomain(),
+            episodesAired = episodesAired,
+            episodes = episodes,
+            studios = studios.map { it.name },
+            genres = genres?.map { it.name } ?: emptyList()
         )
     }
 
     fun MangaBrowseQuery.Manga.toBrowseManga(): BrowseMedia.Manga {
         return BrowseMedia.Manga(
-            id = this.id.toInt(),
-            title = name,
-            posterUrl = this.poster?.posterShort?.originalUrl,
-            score = this.score?.toFloat(),
+            id = id.toInt(),
+            title = name.toDomainTitle(english, russian, japanese),
+            posterUrl = poster?.posterShort?.originalUrl,
+            score = score?.toFloat(),
             mediaType = MediaType.MANGA,
-            mediaFormat = this.kind?.toDomain() ?: MediaFormat.UNKNOWN,
-            userRateStatus = this.userRate?.mangaUserRate?.status?.toDomain()
+            mediaFormat = kind?.toDomain() ?: MediaFormat.UNKNOWN,
+            userRateStatus = userRate?.mangaUserRate?.status?.toDomain()
         )
     }
 
     fun ShikiManga.toBrowseManga(): BrowseMedia.Manga {
         return BrowseMedia.Manga(
-            id = this.id ?: 0,
-            title = this.name ?: "Unknown",
-            posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
-            score = this.score?.toFloat(),
-            mediaFormat = MangaKindEnum.valueOf(this.kind ?: "UNKNOWN__").toDomain(),
+            id = id ?: 0,
+            title = (name ?: "").toDomainTitle(null, russian, null),
+            posterUrl = "${BuildConfig.SHIKI_BASE_URL}${image?.original}",
+            score = score?.toFloat(),
+            mediaFormat = MangaKindEnum.valueOf(kind ?: "UNKNOWN__").toDomain(),
             userRateStatus = null
         )
     }
 
     fun ShikiAnime.toBrowseAnime(): BrowseMedia.Anime {
         return BrowseMedia.Anime(
-            id = this.id ?: 0,
-            title = this.name ?: "Unknown",
-            posterUrl = "${BuildConfig.SHIKI_BASE_URL}${this.image?.original}",
-            score = this.score?.toFloat(),
-            mediaFormat = AnimeKindEnum.valueOf(this.kind ?: "UNKNOWN__").toDomain(),
-            episodesAired = this.episodesAired ?: 0,
-            episodes = this.episodes ?: 0,
+            id = id ?: 0,
+            title = (name ?: "").toDomainTitle(null, russian, null),
+            posterUrl = "${BuildConfig.SHIKI_BASE_URL}${image?.original}",
+            score = score?.toFloat(),
+            mediaFormat = AnimeKindEnum.valueOf(kind ?: "UNKNOWN__").toDomain(),
+            episodesAired = episodesAired ?: 0,
+            episodes = episodes ?: 0,
             userRateStatus = null
         )
     }
@@ -191,7 +229,7 @@ object ShikimoriMediaMapper {
         return AiringAnime(
             data = AiringAnimeDataShort(
                 id = id.toInt(),
-                title = name,
+                title = name.toDomainTitle(english, russian, japanese),
                 mediaType = MediaType.ANIME,
                 coverImageUrl = poster?.posterShort?.originalUrl ?: "",
                 userRateStatus = userRate?.animeUserRate?.status?.toDomain(),

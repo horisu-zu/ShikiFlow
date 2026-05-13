@@ -12,9 +12,7 @@ query MediaDetails(
         idMal,
         type
         title {
-            english
-            romaji
-            native
+            ...MediaTitle
         }
         synonyms
         coverImage {

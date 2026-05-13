@@ -26,7 +26,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.FileSize
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.viewmodel.settings.SettingsViewModel
@@ -212,6 +214,34 @@ fun SettingsScreen(
                                         currentLocale = availableLocales.keys.toList()[selectedIndex]
                                         LocaleUtils.setDefaultLocale(currentLocale)
 
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            bottomSheetConfig.value = null
+                                        }
+                                    }
+                                )
+                            }
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_preferred_title_type),
+                            displayValue = stringResource(settingsState.settings.preferredTitleType.displayValue()),
+                            onClick = {
+                                val filteredTypes = PreferredTitleType.entries
+                                    .filter { type ->
+                                        if (settingsState.authType == AuthType.ANILIST) {
+                                            type != PreferredTitleType.RUSSIAN
+                                        } else true
+                                    }
+
+                                bottomSheetConfig.value = BottomSheetConfig(
+                                    title = resources.getString(R.string.settings_preferred_title_type_desc),
+                                    options = filteredTypes.map {
+                                        resources.getString(it.displayValue())
+                                    },
+                                    currentValue = resources.getString(
+                                        settingsState.settings.preferredTitleType.displayValue()
+                                    ),
+                                    onOptionClick = { selectedIndex ->
+                                        settingsViewModel.setTitleType(filteredTypes[selectedIndex])
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                                             bottomSheetConfig.value = null
                                         }

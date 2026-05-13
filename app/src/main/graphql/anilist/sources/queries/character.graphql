@@ -38,7 +38,7 @@ query CharacterDetails(
         name {
             full
             native
-            alternativeSpoiler
+            alternative
         }
         image {
             large

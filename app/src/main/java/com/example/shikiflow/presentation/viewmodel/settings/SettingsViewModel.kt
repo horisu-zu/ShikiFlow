@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -120,6 +121,12 @@ class SettingsViewModel @Inject constructor(
     fun setAppUiMode(appUiMode: AppUiMode) {
         viewModelScope.launch {
             settingsRepository.saveAppUiMode(appUiMode)
+        }
+    }
+
+    fun setTitleType(preferredType: PreferredTitleType) {
+        viewModelScope.launch {
+            settingsRepository.savePreferredTitleType(preferredType)
         }
     }
 

@@ -40,6 +40,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -53,6 +54,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.comment.Com
 import com.example.shikiflow.presentation.viewmodel.character.details.CharacterDetailsViewModel
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,6 +65,7 @@ fun CharacterDetailsScreen(
 ) {
     val uiState by characterDetailsViewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    val titleType = LocalTitleTypeController.current
 
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -81,8 +84,10 @@ fun CharacterDetailsScreen(
                 TopAppBar(
                     title = {
                         Text(
-                            text = if(isAtTop) stringResource(R.string.character_title)
-                                else uiState.details?.fullName ?: stringResource(R.string.character_title),
+                            text = if(isAtTop) {
+                                stringResource(R.string.character_title)
+                            } else uiState.details?.fullName?.preferred(titleType)
+                                ?: stringResource(R.string.character_title),
                             style = MaterialTheme.typography.titleLarge
                         )
                     },
@@ -154,8 +159,8 @@ fun CharacterDetailsScreen(
                     item {
                         CharacterTitleSection(
                             avatarUrl = characterDetails.imageUrl,
-                            name = characterDetails.fullName,
-                            japaneseName = characterDetails.nativeName
+                            name = characterDetails.fullName.preferred(titleType),
+                            nativeName = characterDetails.fullName.native
                         )
                     }
                     characterDetails.description?.let { description ->
@@ -177,6 +182,7 @@ fun CharacterDetailsScreen(
                     if(!characterDetails.voiceActors.isEmpty()) {
                         item {
                             Column(
+                                modifier = Modifier.padding(top = 4.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                             ) {
                                 TextWithDivider(
@@ -194,7 +200,7 @@ fun CharacterDetailsScreen(
                                     items(items = characterDetails.voiceActors) { vaItem ->
                                         CharacterCard(
                                             characterPoster = vaItem.imageUrl,
-                                            characterName = vaItem.fullName,
+                                            characterName = vaItem.fullName.preferred(titleType),
                                             onClick = { navOptions.navigateToStaff(vaItem.id) },
                                             modifier = Modifier.width(96.dp)
                                         )

@@ -59,6 +59,9 @@
     <string name="settings_language_system">System</string>
     <string name="settings_language_select">Select Locale</string>
 
+    <string name="settings_preferred_title_type">Preferred Title Type</string>
+    <string name="settings_preferred_title_type_desc">"Select Preferred Title Type that will be applied for media titles, characters, staff, genres, etc     "</string>
+
     <string name="settings_app_ui_mode">Display Mode</string>
     <string name="settings_clear_cache">Clear Image Cache</string>
     <string name="settings_chapter_ui_mode">Chapter UI Mode</string>
@@ -221,7 +224,7 @@
     <string name="details_info_next_episode_at">Next Episode at</string>
     <string name="details_info_released_on">Released on</string>
     <string name="details_info_title_romaji">Romaji</string>
-    <string name="details_info_title_japanese">Japanese</string>
+    <string name="details_info_title_native">Native</string>
     <string name="details_info_title_synonyms">Alternative Titles</string>
     <string name="details_info_recommendations">Recommendations</string>
     <string name="details_info_links">Links</string>
@@ -279,6 +282,11 @@
     <string name="bottom_nav_item_profile">Profile</string>
 
     <string name="chapter_short_title">Ch. %1$s</string>
+
+    <string name="preferred_title_type_romaji">Romaji</string>
+    <string name="preferred_title_type_english">English</string>
+    <string name="preferred_title_type_russian">Russian</string>
+    <string name="preferred_title_type_native">Native</string>
 
     <string name="character_title">Character</string>
     <string name="staff_title">Staff</string>

@@ -57,6 +57,7 @@
     <string name="settings_language_system">Системна</string>
     <string name="settings_language_select">Оберіть мову</string>
 
+    <string name="settings_preferred_title_type_desc">Виберіть бажаний тип тайтлу, що буде застосовано до назв медіа, імен персонажів та персоналу, жанрів тощо</string>
     <string name="settings_app_ui_mode">Режим відображення</string>
     <string name="settings_clear_cache">Очистити кеш зображень</string>
     <string name="settings_chapter_ui_mode">Режим відображення розділів</string>
@@ -220,7 +221,7 @@
     <string name="details_info_next_episode_at">Наступний епізод в</string>
     <string name="details_info_released_on">Дата закінчення</string>
     <string name="details_info_title_romaji">Ромаджі</string>
-    <string name="details_info_title_japanese">Японська</string>
+    <string name="details_info_title_native">Нативна</string>
     <string name="details_info_title_synonyms">Альтернативні назви</string>
     <string name="details_info_recommendations">Рекомендації</string>
     <string name="details_info_links">Посилання</string>
@@ -277,6 +278,7 @@
 
     <string name="chapter_short_title">Розділ %1$s</string>
 
+    <string name="preferred_title_type_native">Нативна</string>
     <string name="character_title">Персонаж</string>
     <string name="staff_title">Персонал</string>
     <string name="works_title">Роботи</string>
@@ -472,4 +474,8 @@
     <string name="settings_theme_primary_color">Основний колір</string>
     <string name="settings_chapter_languages">Мови розділів</string>
     <string name="settings_chapter_languages_desc">Відображення розділів з перекладами вибраними мовами</string>
+    <string name="preferred_title_type_romaji">Ромаджі</string>
+    <string name="preferred_title_type_english">Англійська</string>
+    <string name="preferred_title_type_russian">Російська</string>
+    <string name="settings_preferred_title_type">Тип тайтлу</string>
 </resources>

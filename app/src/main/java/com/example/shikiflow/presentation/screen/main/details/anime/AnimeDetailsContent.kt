@@ -43,6 +43,8 @@ import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
@@ -65,6 +67,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.comment.Com
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable
 fun AnimeDetailsContent(
@@ -86,6 +89,7 @@ fun AnimeDetailsContent(
     val horizontalPadding = 12.dp
     val context = LocalContext.current
     val density = LocalDensity.current
+    val titleType = LocalTitleTypeController.current
 
     LazyColumn(
         modifier = modifier,
@@ -100,6 +104,7 @@ fun AnimeDetailsContent(
             AnimeDetailsTitle(
                 animeDetails = animeDetails,
                 authType = currentAuthType,
+                titleType = titleType,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onPlayClick = { title, id, completedEpisodes ->
@@ -137,7 +142,7 @@ fun AnimeDetailsContent(
             ) {
                 items(animeDetails.genres) { genreItem ->
                     CardItem(
-                        item = genreItem
+                        item = genreItem.preferred(titleType)
                     )
                 }
             }
@@ -162,7 +167,7 @@ fun AnimeDetailsContent(
                             onClick = {
                                 mediaNavOptions.navigateToMediaCharacters(
                                     mediaId = animeDetails.id,
-                                    mediaTitle = animeDetails.title,
+                                    mediaTitle = animeDetails.title.preferred(titleType),
                                     mediaType = MediaType.ANIME
                                 )
                             },
@@ -185,7 +190,7 @@ fun AnimeDetailsContent(
                         items(animeDetails.characters.entries) { characterItem ->
                             CharacterCard(
                                 characterPoster = characterItem.imageUrl,
-                                characterName = characterItem.fullName,
+                                characterName = characterItem.fullName.preferred(titleType),
                                 onClick = { mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id) },
                                 modifier = Modifier
                                     .width(characterCardWidth)
@@ -200,7 +205,7 @@ fun AnimeDetailsContent(
                                     onNavigate = {
                                         mediaNavOptions.navigateToMediaCharacters(
                                             mediaId = animeDetails.id,
-                                            mediaTitle = animeDetails.title,
+                                            mediaTitle = animeDetails.title.preferred(titleType),
                                             mediaType = MediaType.ANIME
                                         )
                                     },
@@ -221,6 +226,7 @@ fun AnimeDetailsContent(
             item {
                 RelatedSection(
                     relatedItems = animeDetails.relatedMedia,
+                    preferredTitleType = titleType,
                     onArrowClick = { showRelatedBottomSheet = true },
                     onItemClick = { id, mediaType ->
                         if (mediaType == MediaType.ANIME) {
@@ -235,6 +241,7 @@ fun AnimeDetailsContent(
             item {
                 StaffSection(
                     staffShortList = animeDetails.staffList,
+                    preferredTitleType = titleType,
                     onMediaStaffClick = {
                         mediaNavOptions.navigateToMediaStaff(animeDetails.id, MediaType.MANGA)
                     },
@@ -280,7 +287,11 @@ fun AnimeDetailsContent(
                     mediaNavOptions.navigateToMediaStaff(mediaId = animeDetails.id, MediaType.ANIME)
                 },
                 onSimilarClick = {
-                    mediaNavOptions.navigateToSimilarPage(animeDetails.id, animeDetails.title, MediaType.ANIME)
+                    mediaNavOptions.navigateToSimilarPage(
+                        id = animeDetails.id,
+                        title = animeDetails.title.preferred(titleType),
+                        mediaType = MediaType.ANIME
+                    )
                 },
                 onExternalLinksClick = {
                     mediaNavOptions.navigateToLinksPage(animeDetails.id, MediaType.ANIME)
@@ -354,6 +365,7 @@ fun AnimeDetailsContent(
     if(rateBottomSheet) {
         UserRateBottomSheet(
             userRate = animeDetails.toUiModel(),
+            preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->

@@ -21,6 +21,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
 import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
@@ -36,10 +37,10 @@ import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.domain.model.user.MessageActivity
 import com.example.shikiflow.domain.model.user.TextActivity
+import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.StudioStat
@@ -69,7 +70,7 @@ object AnilistUserMapper {
             id = id,
             mediaId = media?.id ?: 0,
             mediaType = media?.type?.toDomain(),
-            title = media?.title?.romaji ?: "",
+            title = media?.title?.mediaTitle.toDomainTitle(),
             coverImage = media?.coverImage?.extraLarge ?: "",
             status = status.toUserRateStatus(),
             progress = progress?.toProgress() ?: emptyList(),
@@ -117,28 +118,29 @@ object AnilistUserMapper {
 
     fun ALFavoriteMediaShort.toUserFavorite(favoriteCategory: FavoriteCategory) = UserFavorite(
         id = id,
-        name = title?.romaji ?: "",
+        name = title?.mediaTitle.toDomainTitle(),
         imageUrl = coverImage?.extraLarge ?: "",
         favoriteCategory = favoriteCategory
     )
 
     fun ALFavoriteCharacterShort.toUserFavorite() = UserFavorite(
         id = id,
-        name = name?.full ?: "",
+        name = (name?.full ?: "").toDomainTitle(english = name?.full, russian = null, native = name?.native),
         imageUrl = image?.large ?: "",
         favoriteCategory = FavoriteCategory.CHARACTER
     )
 
     fun ALFavoriteStaffShort.toUserFavorite() = UserFavorite(
         id = id,
-        name = name?.full ?: "",
+        name = (name?.full ?: "").toDomainTitle(english = name?.full, russian = null, native = name?.native),
         imageUrl = image?.large ?: "",
         favoriteCategory = FavoriteCategory.STAFF
     )
 
     fun ALStudioShort.toUserFavorite() = UserFavorite(
         id = id,
-        name = name,
+        name = name.toDomainTitle(english = name, russian = null, native = null),
+        imageUrl = null,
         favoriteCategory = FavoriteCategory.STUDIO
     )
 

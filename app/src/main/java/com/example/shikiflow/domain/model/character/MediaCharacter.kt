@@ -3,11 +3,11 @@ package com.example.shikiflow.domain.model.character
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.ShortMedia
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
+import com.example.shikiflow.domain.model.staff.StaffName
 
 data class MediaCharacter(
     val id: Int,
-    val fullName: String,
-    val nativeName: String?,
+    val fullName: StaffName,
     val alternativeNames: List<String>,
     val imageUrl: String,
     val description: String?,

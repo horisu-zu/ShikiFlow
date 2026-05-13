@@ -8,6 +8,8 @@ import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.datasource.dto.person.Role
 import com.example.shikiflow.data.datasource.dto.person.ShikiPerson
 import com.example.shikiflow.data.mapper.common.DateMapper.toLocalDate
+import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
+import com.example.shikiflow.data.mapper.common.StaffRoleMapper.toStaffRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.StaffMediaRole
@@ -20,8 +22,7 @@ object ShikimoriStaffMapper {
     fun ShikiPerson.toStaffDetails(imageUrl: String?): StaffDetails {
         return StaffDetails(
             id = id,
-            fullName = name,
-            nativeName = japanese,
+            fullName = name.toStaffName(russian, japanese),
             description = null,
             imageUrl = imageUrl ?: "${BuildConfig.SHIKI_BASE_URL}${image.original}",
             isFavorite = null,
@@ -66,9 +67,11 @@ object ShikimoriStaffMapper {
     fun PersonRoleShort.toDomain(): StaffShort {
         return StaffShort(
             id = person.id.toInt(),
-            fullName = person.name,
+            fullName = person.name.toStaffName(person.russian, null),
             imageUrl = person.poster?.originalUrl ?: "",
-            roles = rolesEn
+            roles = rolesEn.mapIndexed { index, roleEn ->
+                roleEn.toStaffRole(russian = rolesRu.getOrNull(index))
+            }
         )
     }
 
@@ -100,7 +103,7 @@ object ShikimoriStaffMapper {
     fun ShikiStaffShort.toStaff(): MediaPersonShort {
         return MediaPersonShort(
             id = id.toInt(),
-            fullName = name,
+            fullName = name.toStaffName(russian, null),
             imageUrl = poster?.posterShort?.originalUrl ?: ""
         )
     }

@@ -38,6 +38,8 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.StarScore
@@ -49,12 +51,14 @@ import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displ
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun AnimeDetailsTitle(
     animeDetails: MediaDetails,
     authType: AuthType,
+    titleType: PreferredTitleType,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onPlayClick: (String, Int, Int) -> Unit,
@@ -108,7 +112,7 @@ fun AnimeDetailsTitle(
                 }
 
                 Text(
-                    text = animeDetails.title,
+                    text = animeDetails.title.preferred(titleType),
                     style = MaterialTheme.typography.headlineSmall
                 )
 
@@ -152,7 +156,7 @@ fun AnimeDetailsTitle(
                     isFavorite = animeDetails.isFavorite,
                     onStatusClick = onStatusClick,
                     onPlayClick = { onPlayClick(
-                        animeDetails.title,
+                        animeDetails.title.preferred(titleType),
                         animeDetails.id,
                         animeDetails.userRate?.progress ?: 0
                     ) },

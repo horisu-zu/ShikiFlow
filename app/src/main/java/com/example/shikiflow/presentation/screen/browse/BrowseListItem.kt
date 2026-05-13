@@ -22,6 +22,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.BrowseMedia
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.CardItem
@@ -31,6 +33,7 @@ import com.example.shikiflow.utils.Converter
 @Composable
 fun BrowseListItem(
     browseItem: BrowseMedia.Anime,
+    titleType: PreferredTitleType,
     onItemClick: (Int, MediaType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -56,7 +59,7 @@ fun BrowseListItem(
             horizontalAlignment = Alignment.Start
         ) {
             Text(
-                text = browseItem.title,
+                text = browseItem.title.preferred(titleType),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.Medium
                 ), maxLines = 2, overflow = TextOverflow.Ellipsis

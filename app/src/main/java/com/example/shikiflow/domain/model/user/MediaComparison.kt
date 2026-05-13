@@ -1,10 +1,11 @@
 package com.example.shikiflow.domain.model.user
 
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 
 data class MediaComparison(
     val id: Int,
-    val title: String,
+    val title: MediaTitle?,
     val imageUrl: String?,
     val currentUserScore: ShortUserRateData?,
     val targetUserScore: ShortUserRateData?

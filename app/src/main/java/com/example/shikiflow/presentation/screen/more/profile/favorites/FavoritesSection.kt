@@ -41,6 +41,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
@@ -49,6 +51,7 @@ import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.toTabRowItem
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.user.favorites.FavoritesViewModel
 import kotlinx.coroutines.launch
 
@@ -65,6 +68,7 @@ fun FavoritesSection(
     favoritesViewModel: FavoritesViewModel = hiltViewModel()
 ) {
     val params by favoritesViewModel.params.collectAsStateWithLifecycle()
+    val titleType = LocalTitleTypeController.current
 
     val pagerState = rememberPagerState(
         initialPage = params.currentCategory?.let { favoriteCategory ->
@@ -171,7 +175,7 @@ fun FavoritesSection(
                                     if(item.favoriteCategory == FavoriteCategory.STUDIO) {
                                         FavoriteStudioItem(
                                             id = item.id,
-                                            name = item.name,
+                                            name = item.name.preferred(titleType),
                                             onStudioClick = onStudioClick,
                                             modifier = Modifier
                                                 .fillMaxWidth()
@@ -180,6 +184,7 @@ fun FavoritesSection(
                                     } else {
                                         FavoriteItem(
                                             userFavorite = item,
+                                            titleType = titleType,
                                             onItemClick = { id ->
                                                 onFavoriteClick(favoriteCategories[page], id)
                                             },
@@ -219,6 +224,7 @@ fun FavoritesSection(
 @Composable
 private fun FavoriteItem(
     userFavorite: UserFavorite,
+    titleType: PreferredTitleType,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -238,7 +244,7 @@ private fun FavoriteItem(
             )
         }
         Text(
-            text = userFavorite.name,
+            text = userFavorite.name.preferred(titleType),
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,
