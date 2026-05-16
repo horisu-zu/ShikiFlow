@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.StarScore
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -51,7 +53,7 @@ import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displ
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
-import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.utils.DateUtils.calculateDuration
 import com.example.shikiflow.utils.toIcon
 
 @Composable
@@ -116,38 +118,66 @@ fun AnimeDetailsTitle(
                     style = MaterialTheme.typography.headlineSmall
                 )
 
-                Row(
-                    modifier = Modifier.padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                SnapFlingLazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
                 ) {
-                    ShortInfoItem(
-                        infoType = stringResource(id = R.string.details_short_info_type),
-                        infoItem = buildString {
-                            append(stringResource(id = animeDetails.format.displayValue()))
-                            append(" ∙ ")
-                            append(stringResource(id = animeDetails.status.displayValue()))
-                        }
-                    )
-                    ShortInfoItem(
-                        infoType = stringResource(id = R.string.details_short_info_episodes),
-                        infoItem = if (animeDetails.status != MediaStatus.ONGOING) {
-                            stringResource(
-                                id = R.string.episodes,
-                                animeDetails.totalCount.takeIf { it != 0 } ?: "?"
+                    item {
+                        ShortInfoItem(
+                            infoType = stringResource(id = R.string.details_short_info_type),
+                            infoItem = buildString {
+                                append(stringResource(id = animeDetails.format.displayValue()))
+                                append(" ∙ ")
+                                append(stringResource(id = animeDetails.status.displayValue()))
+                            }
+                        )
+                    }
+                    item {
+                        if(animeDetails.totalCount == 1 && animeDetails.durationMins != null) {
+                            val (hours, minutes) = animeDetails.durationMins.calculateDuration()
+
+                            ShortInfoItem(
+                                infoType = stringResource(id = R.string.details_info_duration),
+                                infoItem = when(hours) {
+                                    0 -> stringResource(
+                                        id = R.string.details_info_duration_min,
+                                        minutes
+                                    )
+                                    else -> stringResource(
+                                        id = R.string.details_info_duration_hours,
+                                        hours, minutes
+                                    )
+                                }
                             )
                         } else {
-                            stringResource(
-                                id = R.string.ongoing_episodes,
-                                animeDetails.currentProgress ?: 0,
-                                animeDetails.totalCount.takeIf { it != 0 } ?: "?"
+                            ShortInfoItem(
+                                infoType = stringResource(id = R.string.details_short_info_episodes),
+                                infoItem = if (animeDetails.status != MediaStatus.ONGOING) {
+                                    stringResource(
+                                        id = R.string.episodes,
+                                        animeDetails.totalCount.takeIf { it != 0 } ?: "?"
+                                    )
+                                } else {
+                                    stringResource(
+                                        id = R.string.ongoing_episodes,
+                                        animeDetails.currentProgress ?: 0,
+                                        animeDetails.totalCount.takeIf { it != 0 } ?: "?"
+                                    )
+                                }
                             )
                         }
-                    )
-                    animeDetails.ageRating?.let { ratingEnum ->
-                        ShortInfoItem(
-                            infoType = stringResource(id = R.string.details_short_info_age_rating),
-                            infoItem = stringResource(ratingEnum.displayValue())
-                        )
+                    }
+                    item {
+                        animeDetails.ageRating?.let { ratingEnum ->
+                            ShortInfoItem(
+                                infoType = stringResource(id = R.string.details_short_info_age_rating),
+                                infoItem = stringResource(ratingEnum.displayValue())
+                            )
+                        }
                     }
                 }
 

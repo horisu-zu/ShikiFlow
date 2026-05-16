@@ -35,6 +35,7 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.Stat
+import com.example.shikiflow.utils.StringUtils.stripHtml
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
@@ -46,7 +47,7 @@ object AnilistMediaMapper {
             malId = idMal,
             mediaType = type?.toDomain() ?: MediaType.ANIME,
             title = title?.mediaTitle.toDomainTitle(),
-            descriptionHtml = description,
+            descriptionHtml = description?.stripHtml(),
             synonyms = synonyms?.mapNotNull { it } ?: emptyList(),
             coverImageUrl = coverImage?.extraLarge ?: "",
             score = (averageScore ?: 0) / 10f,
@@ -143,9 +144,11 @@ object AnilistMediaMapper {
                     userRateStatus = mediaListEntry?.status?.toDomain(),
                     episodesAired = nextAiringEpisode?.episode?.let { it - 1 } ?: episodes,
                     episodes = episodes,
-                    studios = this.studios?.nodes?.mapNotNull { it?.aLStudioShort?.name }
+                    studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.name }
                         ?: emptyList(),
-                    genres = this.genres?.mapNotNull { it } ?: emptyList()
+                    genres = genres?.mapNotNull { genre ->
+                        genre?.toDomainTitle(null, null, null)
+                    } ?: emptyList()
                 )
             }
             MediaType.MANGA -> {

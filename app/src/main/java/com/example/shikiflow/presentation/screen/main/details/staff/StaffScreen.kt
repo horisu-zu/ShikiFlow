@@ -61,7 +61,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -81,16 +80,15 @@ import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.image.BaseImage
-import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterMediaSection
 import com.example.shikiflow.presentation.screen.main.details.character.PaginatedListNavigateIcon
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.presentation.viewmodel.staff.staff_details.StaffViewModel
-import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,7 +99,6 @@ fun StaffScreen(
 ) {
     val staffUiState by staffViewModel.uiState.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
     val titleType = LocalTitleTypeController.current
     val lazyListState = rememberLazyListState()
     val isAtTop by remember {
@@ -206,18 +203,14 @@ fun StaffScreen(
                             staffRoles = details.shortRoles
                         )
                     }
-                    details.description?.let { description ->
+                    if(!details.description.isHTMLStringBlank()) {
                         item {
                             ExpandableText(
-                                htmlText = description,
-                                authType = staffUiState.authType,
+                                htmlText = details.description ?: "",
                                 style = MaterialTheme.typography.bodySmall,
                                 collapsedMaxLines = 4,
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
-                                },
-                                onLinkClick = { url ->
-                                    WebIntent.openUrlCustomTab(context, url)
                                 }
                             )
                         }
@@ -310,7 +303,6 @@ fun StaffScreen(
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
                                 },
-                                onLinkClick = { WebIntent.openUrlCustomTab(context, it) },
                                 onTopicNavigate = { topicId ->
                                     navOptions.navigateToComments(
                                         screenMode = CommentsScreenMode.TOPIC,

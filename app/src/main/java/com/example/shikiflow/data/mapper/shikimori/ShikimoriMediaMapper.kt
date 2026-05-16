@@ -175,7 +175,14 @@ object ShikimoriMediaMapper {
             episodesAired = episodesAired,
             episodes = episodes,
             studios = studios.map { it.name },
-            genres = genres?.map { it.name } ?: emptyList()
+            genres = genres?.map { genre ->
+                MediaTitle(
+                    romaji = genre.name,
+                    english = null,
+                    russian = genre.russian,
+                    native = null
+                )
+            } ?: emptyList()
         )
     }
 

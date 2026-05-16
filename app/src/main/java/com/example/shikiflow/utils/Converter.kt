@@ -4,7 +4,6 @@ import android.content.res.Resources
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.track.Date as DomainDate
-import com.example.shikiflow.domain.model.track.MediaFormat
 import com.fleeksoft.ksoup.Ksoup
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -139,11 +138,6 @@ object Converter {
         }
     }
 
-    fun MediaFormat.isManga(): Boolean {
-        return this in setOf(MediaFormat.MANGA, MediaFormat.MANHWA,
-            MediaFormat.MANHUA, MediaFormat.ONE_SHOT, MediaFormat.DOUJIN)
-    }
-
     fun String.toAbbreviation(maxLetters: Int = 2): String {
         val words = this.split(Regex("\\s+")).filter { it.isNotBlank() }
 
@@ -164,10 +158,10 @@ object Converter {
         }
     }
 
-    fun String.isHTMLStringBlank(): Boolean {
-        val text = Ksoup.parse(this).text()
+    fun String?.isHTMLStringBlank(): Boolean {
+        val text = this?.let { Ksoup.parse(it) }?.text()
 
-        return text.isBlank()
+        return text.isNullOrBlank()
     }
 
     fun parseChapterNumber(chapterNumber: String): Float {

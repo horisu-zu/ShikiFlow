@@ -30,7 +30,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
@@ -54,7 +53,6 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadItem
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.social.UserSocialViewModel
-import com.example.shikiflow.utils.WebIntent
 import kotlinx.coroutines.launch
 
 @Composable
@@ -78,7 +76,6 @@ fun SocialSection(
         pageCount = { socialCategories.size }
     )
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
     val resources = LocalResources.current
 
     LaunchedEffect(userId) {
@@ -249,9 +246,6 @@ fun SocialSection(
                                                     }
 
                                                     navOptions.navigateToDetails(detailsNavRoute)
-                                                },
-                                                onLinkClick = { link ->
-                                                    WebIntent.openUrlCustomTab(context, link)
                                                 }
                                             )
                                         }

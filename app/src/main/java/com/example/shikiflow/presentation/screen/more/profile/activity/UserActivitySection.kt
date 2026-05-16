@@ -17,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -35,7 +34,6 @@ import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.activity.UserActivityViewModel
-import com.example.shikiflow.utils.WebIntent
 
 @Composable
 fun UserActivitySection(
@@ -47,7 +45,6 @@ fun UserActivitySection(
     modifier: Modifier = Modifier,
     userActivityViewModel: UserActivityViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val preferredTitleType = LocalTitleTypeController.current
     val userActivityItems = userActivityViewModel.userActivity.collectAsLazyPagingItems()
 
@@ -147,9 +144,6 @@ fun UserActivitySection(
                                     }
 
                                     navOptions.navigateToDetails(detailsNavRoute)
-                                },
-                                onLinkClick = { link ->
-                                    WebIntent.openUrlCustomTab(context, link)
                                 },
                                 modifier = Modifier.fillMaxWidth()
                             )

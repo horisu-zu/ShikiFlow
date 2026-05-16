@@ -40,4 +40,9 @@ object MediaFormatMapper {
             else -> Color(0xFF8C8C8C)
         }
     }
+
+    fun MediaFormat.isManga(): Boolean {
+        return this in setOf(MediaFormat.MANGA, MediaFormat.MANHWA,
+            MediaFormat.MANHUA, MediaFormat.ONE_SHOT, MediaFormat.DOUJIN)
+    }
 }

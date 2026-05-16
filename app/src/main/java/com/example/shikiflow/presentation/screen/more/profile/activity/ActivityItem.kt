@@ -22,7 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
@@ -46,7 +45,6 @@ fun ActivityItem(
     onListActivityClick: (MediaType, Int) -> Unit,
     onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when(userActivity) {
@@ -63,7 +61,6 @@ fun ActivityItem(
                 messageActivity = userActivity,
                 onUserClick = onUserClick,
                 onEntityClick = onEntityClick,
-                onLinkClick = onLinkClick,
                 modifier = modifier
             )
         }
@@ -72,7 +69,6 @@ fun ActivityItem(
                 textActivity = userActivity,
                 onUserClick = onUserClick,
                 onEntityClick = onEntityClick,
-                onLinkClick = onLinkClick,
                 modifier = modifier
             )
         }
@@ -140,7 +136,6 @@ fun TextActivityItem(
     textActivity: TextActivity,
     onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -185,12 +180,11 @@ fun TextActivityItem(
                 maxLines = 1
             )
         }
+
         ExpandableText(
             htmlText = textActivity.text,
-            authType = AuthType.ANILIST,
             style = MaterialTheme.typography.bodyMedium,
-            onEntityClick = onEntityClick,
-            onLinkClick = onLinkClick
+            onEntityClick = onEntityClick
         )
     }
 }
@@ -200,7 +194,6 @@ fun MessageActivityItem(
     messageActivity: MessageActivity,
     onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -249,12 +242,11 @@ fun MessageActivityItem(
                     maxLines = 1
                 )
             }
+
             ExpandableText(
                 htmlText = messageActivity.text,
-                authType = AuthType.ANILIST,
                 style = MaterialTheme.typography.bodyMedium,
-                onEntityClick = onEntityClick,
-                onLinkClick = onLinkClick
+                onEntityClick = onEntityClick
             )
         }
     }

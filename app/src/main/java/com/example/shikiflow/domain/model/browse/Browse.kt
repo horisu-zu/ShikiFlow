@@ -171,7 +171,7 @@ sealed interface BrowseMedia : Browse {
         val episodesAired: Int?,
         val episodes: Int?,
         val studios: List<String> = emptyList(),
-        val genres: List<String> = emptyList()
+        val genres: List<MediaTitle> = emptyList()
     ): BrowseMedia
 
     data class Manga(

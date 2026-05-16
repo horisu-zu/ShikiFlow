@@ -29,14 +29,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -48,7 +47,6 @@ import kotlin.time.Instant
 fun CommentItem(
     comment: Comment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
@@ -59,7 +57,6 @@ fun CommentItem(
             ShikimoriCommentItem(
                 commentData = comment,
                 onEntityClick = onEntityClick,
-                onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
                 modifier = modifier,
                 backgroundColor = backgroundColor
@@ -69,7 +66,6 @@ fun CommentItem(
             AnilistCommentTree(
                 commentData = comment,
                 onEntityClick = onEntityClick,
-                onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
                 modifier = modifier,
                 firstBackgroundColor = backgroundColor,
@@ -83,7 +79,6 @@ fun CommentItem(
 private fun ShikimoriCommentItem(
     commentData: ShikiComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
@@ -123,13 +118,11 @@ private fun ShikimoriCommentItem(
                 }
             }
         }
-        ExpandableText(
+
+        RichTextRenderer(
             htmlText = commentData.commentBody,
-            authType = AuthType.SHIKIMORI,
             style = MaterialTheme.typography.bodySmall,
-            onEntityClick = { type, id -> onEntityClick(type, id) },
-            onLinkClick = onLinkClick,
-            collapsedMaxLines = Int.MAX_VALUE
+            onEntityClick = { type, id -> onEntityClick(type, id) }
         )
     }
 }
@@ -138,7 +131,6 @@ private fun ShikimoriCommentItem(
 private fun AnilistCommentTree(
     commentData: ALComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     firstBackgroundColor: Color,
     secondBackgroundColor: Color,
@@ -160,7 +152,6 @@ private fun AnilistCommentTree(
         AnilistCommentItem(
             commentData = commentData,
             onEntityClick = onEntityClick,
-            onLinkClick = onLinkClick,
             onUserClick = onUserClick
         )
 
@@ -170,7 +161,6 @@ private fun AnilistCommentTree(
                     commentData = childComment,
                     depth = depth + 1,
                     onEntityClick = onEntityClick,
-                    onLinkClick = onLinkClick,
                     onUserClick = onUserClick,
                     firstBackgroundColor = firstBackgroundColor,
                     secondBackgroundColor = secondBackgroundColor
@@ -205,7 +195,6 @@ private fun AnilistCommentTree(
 private fun AnilistCommentItem(
     commentData: ALComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -252,13 +241,11 @@ private fun AnilistCommentItem(
                 }
             }
         }
-        ExpandableText(
+
+        RichTextRenderer(
             htmlText = commentData.commentBody,
-            authType = AuthType.ANILIST,
             style = MaterialTheme.typography.bodySmall,
-            onEntityClick = { type, id -> onEntityClick(type, id) },
-            onLinkClick = onLinkClick,
-            collapsedMaxLines = Int.MAX_VALUE
+            onEntityClick = { type, id -> onEntityClick(type, id) }
         )
     }
 }
@@ -267,7 +254,6 @@ private fun AnilistCommentItem(
 fun ThreadHeaderItem(
     threadHeader: Thread,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -299,13 +285,10 @@ fun ThreadHeaderItem(
             )
         }
         threadHeader.body?.let { headerBody ->
-            ExpandableText(
+            RichTextRenderer(
                 htmlText = headerBody,
-                authType = AuthType.ANILIST,
                 style = MaterialTheme.typography.bodySmall,
-                onEntityClick = { type, id -> onEntityClick(type, id) },
-                onLinkClick = onLinkClick,
-                collapsedMaxLines = Int.MAX_VALUE
+                onEntityClick = { type, id -> onEntityClick(type, id) }
             )
         }
     }

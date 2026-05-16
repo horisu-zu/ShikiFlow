@@ -32,7 +32,6 @@ import com.example.shikiflow.presentation.viewmodel.comment.section.CommentSecti
 fun CommentSection(
     topicId: Int,
     onEntityClick: (EntityType, Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onTopicNavigate: (Int) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
@@ -104,7 +103,6 @@ fun CommentSection(
                     CommentItem(
                         comment = comment,
                         onEntityClick = onEntityClick,
-                        onLinkClick = onLinkClick,
                         onUserClick = onUserClick,
                         modifier = Modifier
                     )

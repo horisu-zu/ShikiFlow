@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.common.comment
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,7 +22,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -40,7 +38,6 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
-import com.example.shikiflow.utils.WebIntent
 
 @Composable
 fun CommentsScreen(
@@ -50,8 +47,6 @@ fun CommentsScreen(
     navOptions: MediaNavOptions,
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
-
     Scaffold { paddingValues ->
         val contentPadding = PaddingValues(
             start = 12.dp,
@@ -66,7 +61,6 @@ fun CommentsScreen(
                     topicId = id,
                     threadHeader = threadHeader,
                     commentViewModel = commentViewModel,
-                    context = context,
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->
                         navOptions.navigateByEntity(entityType, id)
@@ -80,7 +74,6 @@ fun CommentsScreen(
                 CommentThreadSection(
                     commentId = id,
                     commentViewModel = commentViewModel,
-                    context = context,
                     contentPadding = contentPadding,
                     onEntityClick = { entityType, id ->
                         navOptions.navigateByEntity(entityType, id)
@@ -99,7 +92,6 @@ private fun TopicCommentsSection(
     topicId: Int,
     threadHeader: Thread?,
     commentViewModel: CommentViewModel,
-    context: Context,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
@@ -145,7 +137,6 @@ private fun TopicCommentsSection(
                         ThreadHeaderItem(
                             threadHeader = header,
                             onEntityClick = onEntityClick,
-                            onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
                             onUserClick = onUserClick,
                             modifier = Modifier
                         )
@@ -156,7 +147,6 @@ private fun TopicCommentsSection(
                         CommentItem(
                             comment = comment,
                             onEntityClick = onEntityClick,
-                            onLinkClick = { url -> WebIntent.openUrlCustomTab(context, url) },
                             onUserClick = onUserClick,
                             modifier = Modifier
                         )
@@ -199,7 +189,6 @@ private fun TopicCommentsSection(
 private fun CommentThreadSection(
     commentId: Int,
     commentViewModel: CommentViewModel,
-    context: Context,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
@@ -244,9 +233,6 @@ private fun CommentThreadSection(
                             title = commentType,
                             comments = comments,
                             onEntityClick = onEntityClick,
-                            onLinkClick = { url ->
-                                WebIntent.openUrlCustomTab(context, url)
-                            },
                             onUserClick = onUserClick
                         )
                     }
@@ -261,7 +247,6 @@ private fun CommentsMapSection(
     title: CommentType,
     comments: List<Comment>,
     onEntityClick: (EntityType, Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -295,7 +280,6 @@ private fun CommentsMapSection(
             CommentItem(
                 comment = comment,
                 onEntityClick = onEntityClick,
-                onLinkClick = onLinkClick,
                 onUserClick = onUserClick,
                 modifier = Modifier
                     .fillMaxWidth()

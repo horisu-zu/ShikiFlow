@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -66,9 +65,9 @@ import com.example.shikiflow.presentation.screen.main.details.common.comment.Com
 import com.example.shikiflow.presentation.screen.main.details.common.followings.MediaFollowingsSection
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewsSection
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
-import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
 @Composable
 fun MangaDetailsContent(
@@ -87,7 +86,6 @@ fun MangaDetailsContent(
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
     val horizontalPadding = 12.dp
-    val context = LocalContext.current
     val density = LocalDensity.current
     val titleType = LocalTitleTypeController.current
 
@@ -122,22 +120,21 @@ fun MangaDetailsContent(
                 onToggleFavorite = onToggleFavorite
             )
         }
-        item {
-            mangaDetails.descriptionHtml?.let {
-                ExpandableText(
-                    htmlText = mangaDetails.descriptionHtml,
-                    authType = authType,
-                    modifier = Modifier.fillMaxWidth(),
-                    style = MaterialTheme.typography.bodySmall,
-                    linkColor = MaterialTheme.colorScheme.primary,
-                    brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
-                    onEntityClick = { entityType, id ->
-                        mediaNavOptions.navigateByEntity(entityType, id)
-                    },
-                    onLinkClick = { url ->
-                        WebIntent.openUrlCustomTab(context, url)
-                    }
-                )
+
+        if(!mangaDetails.descriptionHtml.isHTMLStringBlank()) {
+            item {
+                mangaDetails.descriptionHtml?.let {
+                    ExpandableText(
+                        htmlText = mangaDetails.descriptionHtml,
+                        modifier = Modifier.fillMaxWidth(),
+                        style = MaterialTheme.typography.bodySmall,
+                        linkColor = MaterialTheme.colorScheme.primary,
+                        brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
+                        onEntityClick = { entityType, id ->
+                            mediaNavOptions.navigateByEntity(entityType, id)
+                        }
+                    )
+                }
             }
         }
 
@@ -331,9 +328,6 @@ fun MangaDetailsContent(
                     topicId = threadId,
                     onEntityClick = { entityType, id ->
                         mediaNavOptions.navigateByEntity(entityType, id)
-                    },
-                    onLinkClick = { url ->
-                        WebIntent.openUrlCustomTab(context, url)
                     },
                     onTopicNavigate = { topicId ->
                         mediaNavOptions.navigateToComments(

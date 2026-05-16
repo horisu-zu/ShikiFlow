@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -44,12 +43,11 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.review.Review
 import com.example.shikiflow.presentation.WindowSize
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -59,7 +57,6 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.media.review.ReviewViewModel
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
-import com.example.shikiflow.utils.WebIntent
 import com.materialkolor.ktx.harmonize
 
 @Composable
@@ -68,7 +65,6 @@ fun ReviewScreen(
     navOptions: MediaNavOptions,
     reviewViewModel: ReviewViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     val uiState by reviewViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(reviewId) {
@@ -116,19 +112,13 @@ fun ReviewScreen(
                 }
 
                 item {
-                    ExpandableText(
+                    RichTextRenderer(
                         htmlText = review.body,
-                        authType = AuthType.ANILIST,
                         modifier = Modifier.fillMaxWidth(),
-                        collapsedMaxLines = Int.MAX_VALUE,
                         style = MaterialTheme.typography.bodySmall,
                         linkColor = MaterialTheme.colorScheme.primary,
-                        brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
                         onEntityClick = { entityType, id ->
                             navOptions.navigateByEntity(entityType, id)
-                        },
-                        onLinkClick = { url ->
-                            WebIntent.openUrlCustomTab(context, url)
                         }
                     )
                 }

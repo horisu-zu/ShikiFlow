@@ -53,9 +53,9 @@ import com.example.shikiflow.presentation.screen.main.details.anime.ScoreItem
 import com.example.shikiflow.presentation.screen.main.details.anime.ShortInfoItem
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.utils.Converter.formatInstant
-import com.example.shikiflow.utils.Converter.isManga
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.isManga
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 

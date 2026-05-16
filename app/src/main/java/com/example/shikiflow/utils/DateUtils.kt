@@ -73,4 +73,11 @@ object DateUtils {
 
         return (targetInstant - now).inWholeMilliseconds
     }
+
+    fun Int.calculateDuration(): Pair<Int, Int> {
+        val hours = this / 60
+        val minutes = this % 60
+
+        return hours to minutes
+    }
 }

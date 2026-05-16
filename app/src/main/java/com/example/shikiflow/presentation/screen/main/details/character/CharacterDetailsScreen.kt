@@ -33,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -52,9 +51,9 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.CharacterCard
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.presentation.viewmodel.character.details.CharacterDetailsViewModel
-import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +63,6 @@ fun CharacterDetailsScreen(
     characterDetailsViewModel: CharacterDetailsViewModel = hiltViewModel()
 ) {
     val uiState by characterDetailsViewModel.uiState.collectAsStateWithLifecycle()
-    val context = LocalContext.current
     val titleType = LocalTitleTypeController.current
 
     val lazyListState = rememberLazyListState()
@@ -163,18 +161,14 @@ fun CharacterDetailsScreen(
                             nativeName = characterDetails.fullName.native
                         )
                     }
-                    characterDetails.description?.let { description ->
+                    if(!characterDetails.description.isHTMLStringBlank()) {
                         item {
                             ExpandableText(
-                                htmlText = description,
-                                authType = uiState.authType,
+                                htmlText = characterDetails.description ?: "",
                                 style = MaterialTheme.typography.bodySmall,
-                                collapsedMaxLines = 3,
+                                collapsedMaxLines = 4,
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
-                                },
-                                onLinkClick = { url ->
-                                    WebIntent.openUrlCustomTab(context, url)
                                 }
                             )
                         }
@@ -266,9 +260,6 @@ fun CharacterDetailsScreen(
                                         screenMode = CommentsScreenMode.TOPIC,
                                         id = topicId
                                     )
-                                },
-                                onLinkClick = { url ->
-                                    WebIntent.openUrlCustomTab(context, url)
                                 },
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)

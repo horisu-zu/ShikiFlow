@@ -103,7 +103,7 @@ fun BrowseListItem(
                 ) {
                     browseItem.genres.forEach { genre ->
                         CardItem(
-                            item = genre,
+                            item = genre.preferred(titleType),
                             style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier.clip(RoundedCornerShape(12.dp))
                         )

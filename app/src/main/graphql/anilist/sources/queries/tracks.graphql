@@ -4,7 +4,7 @@ query MediaListTracksQuery(
     $type: MediaType,
     $userId: Int,
     $status: MediaListStatus,
-    $order: [MediaListSort] = [UPDATED_TIME_DESC],
+    $order: [MediaListSort],
     $idsIn: [Int]
 ) {
     Page(page: $page, perPage: $limit) {

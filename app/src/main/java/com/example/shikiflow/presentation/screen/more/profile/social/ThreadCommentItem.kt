@@ -27,7 +27,6 @@ fun ThreadCommentItem(
     threadComment: ThreadComment,
     onThreadClick: () -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
-    onLinkClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -65,7 +64,6 @@ fun ThreadCommentItem(
         CommentItem(
             comment = threadComment.comment,
             onEntityClick = onEntityClick,
-            onLinkClick = onLinkClick,
             onUserClick = { /**/ },
             backgroundColor = MaterialTheme.colorScheme.background
         )

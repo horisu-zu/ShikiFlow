@@ -34,7 +34,6 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.RelationKindMapper.displayValue
-import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable
 fun RelatedSection(

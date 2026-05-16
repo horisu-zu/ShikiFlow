@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -65,7 +64,6 @@ import com.example.shikiflow.presentation.screen.main.details.common.review.Revi
 import com.example.shikiflow.presentation.screen.main.details.common.StaffSection
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
-import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
@@ -87,7 +85,6 @@ fun AnimeDetailsContent(
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
     val horizontalPadding = 12.dp
-    val context = LocalContext.current
     val density = LocalDensity.current
     val titleType = LocalTitleTypeController.current
 
@@ -113,20 +110,15 @@ fun AnimeDetailsContent(
                 onToggleFavorite = onToggleFavorite
             )
         }
-        if(animeDetails.descriptionHtml?.isHTMLStringBlank() != true) {
+        if(!animeDetails.descriptionHtml.isHTMLStringBlank()) {
             item {
                 ExpandableText(
                     htmlText = animeDetails.descriptionHtml ?: "",
-                    authType = currentAuthType,
                     modifier = Modifier.fillMaxWidth(),
                     style = MaterialTheme.typography.bodySmall,
                     linkColor = MaterialTheme.colorScheme.primary,
-                    brushColor = MaterialTheme.colorScheme.background.copy(0.8f),
                     onEntityClick = { entityType, id ->
                         mediaNavOptions.navigateByEntity(entityType, id)
-                    },
-                    onLinkClick = { url ->
-                        WebIntent.openUrlCustomTab(context, url)
                     }
                 )
             }
@@ -344,9 +336,6 @@ fun AnimeDetailsContent(
                     topicId = threadId,
                     onEntityClick = { entityType, id ->
                         mediaNavOptions.navigateByEntity(entityType, id)
-                    },
-                    onLinkClick = { url ->
-                        WebIntent.openUrlCustomTab(context, url)
                     },
                     onTopicNavigate = { topicId ->
                         mediaNavOptions.navigateToComments(

@@ -1,0 +1,829 @@
+package com.example.shikiflow.utils.parser_v2
+
+import com.example.shikiflow.BuildConfig
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Element
+import com.fleeksoft.ksoup.nodes.Node
+import com.fleeksoft.ksoup.nodes.TextNode
+import com.fleeksoft.ksoup.parser.Parser
+import org.json.JSONObject
+
+internal data class HtmlParseResult(
+    val blocks: List<RichTextBlock>,
+    val warnings: List<ParseWarning>
+)
+
+private val NON_DIGIT_REGEX = Regex("[^0-9]")
+private val ESCAPED_HTML_TAG_REGEX = Regex("""<[a-zA-Z/][^>]*>""")
+private val TABLE_CELL_TAGS: Set<String> = setOf("td", "th")
+private val NESTED_LIST_TAGS: Set<String> = setOf("ul", "ol")
+private val BLOCK_TAGS: Set<String> = setOf(
+    "p", "div", "ul", "ol", "li", "table", "blockquote",
+    "h1", "h2", "h3", "h4", "h5", "hr", "pre", "center",
+    "youtube", "video", "iframe"
+)
+
+internal class RichTextHtmlParser(
+    private val inlineParser: RichTextInlineParser
+) {
+    private val nonDigitRegex get() = NON_DIGIT_REGEX
+    private val blockTags get() = BLOCK_TAGS
+
+    fun parse(root: Element): HtmlParseResult {
+        val rootContext = ParseContext(inlineParser.config)
+
+        walkChildren(root, rootContext)
+        rootContext.flushText()
+
+        return HtmlParseResult(
+            blocks = rootContext.blocks.toList(),
+            warnings = rootContext.warnings.toList()
+        )
+    }
+
+    private fun walkChildren(parent: Element, ctx: ParseContext) {
+        ctx.flushText()
+        var inlineCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = ctx.currentLinkUrl,
+            listDepth = ctx.listDepth
+        )
+
+        fun flushInlineCtx() {
+            inlineCtx.flushText()
+            val blocks = inlineCtx.blocks
+            if (blocks.isNotEmpty()) {
+                val currentGroup = mutableListOf<RichTextBlock>()
+
+                fun emitGroup() {
+                    if (currentGroup.isEmpty()) return
+                    val containsText = currentGroup.any { it is RichTextBlock.Text }
+                    if (containsText && currentGroup.size > 1) {
+                        ctx.emitBlock(
+                            RichTextBlock.InlineGroup(
+                                currentGroup.toList(),
+                                inlineCtx.align
+                            )
+                        )
+                    } else {
+                        currentGroup.forEach { ctx.emitBlock(it) }
+                    }
+                    currentGroup.clear()
+                }
+
+                for (block in blocks) {
+                    val isInlineable =
+                        (block is RichTextBlock.Text && block.kind == RichTextTextKind.Paragraph) ||
+                                block is RichTextBlock.Image ||
+                                block is RichTextBlock.Link
+
+                    if (isInlineable) {
+                        if (isStealthBreak(block)) {
+                            emitGroup()
+                            ctx.emitBlock(block)
+                        } else if (block is RichTextBlock.Image) {
+                            // Only small, absolute-sized images should naturally flow inline with text (like icons).
+                            // Large/unknown images or percents should break the flow to prevent buggy Compose wrapping
+                            // and to allow the PostProcessor to assemble adjacent images into grids.
+                            val isIcon =
+                                block.width != null && !block.isPercent && block.width <= 128
+
+                            if (isIcon) {
+                                currentGroup.add(block)
+                            } else {
+                                emitGroup()
+                                ctx.emitBlock(block)
+                            }
+                        } else if (block is RichTextBlock.Link) {
+                            // Anilist links render as large cards. They must break inline flow.
+                            emitGroup()
+                            ctx.emitBlock(block)
+                        } else {
+                            currentGroup.add(block)
+                        }
+                    } else {
+                        emitGroup()
+                        ctx.emitBlock(block)
+                    }
+                }
+                emitGroup()
+
+                inlineCtx = ctx.detached(
+                    align = ctx.align,
+                    currentLinkUrl = ctx.currentLinkUrl,
+                    listDepth = ctx.listDepth
+                )
+            }
+        }
+
+        for (node in parent.childNodes()) {
+            val isBlockNode = node is Element && node.tagName().lowercase() in blockTags
+
+            if (isBlockNode) {
+                flushInlineCtx()
+                walkNode(node, ctx)
+            } else {
+                walkNode(node, inlineCtx)
+            }
+        }
+        flushInlineCtx()
+    }
+
+    private fun walkNode(node: Node, ctx: ParseContext) {
+        when (node) {
+            is TextNode -> {
+                val text = normalizeWhitespace(node.getWholeText())
+
+                if (text.isBlank() && text.contains("\n")) {
+                    if (ctx.hasBufferedInlineContent) {
+                        ctx.appendText("\n")
+                    }
+                    return
+                }
+
+                inlineParser.parseInto(text, ctx)
+            }
+
+            is Element -> walkElement(node, ctx)
+        }
+    }
+
+    private fun walkElement(element: Element, ctx: ParseContext) {
+        val tag = element.tagName().lowercase()
+        val textAlign = parseAlignment(tag, element.attr("align"), ctx.align)
+        val isNewAlign = textAlign != ctx.align
+
+        val workingCtx = if (isNewAlign) {
+            ctx.flushText()
+            ctx.shared(
+                align = textAlign,
+                currentLinkUrl = ctx.currentLinkUrl,
+                listDepth = ctx.listDepth
+            )
+        } else {
+            ctx
+        }
+
+        when {
+            tag == "p" -> {
+                workingCtx.flushText()
+                walkChildren(element, workingCtx)
+                workingCtx.flushText()
+            }
+            tag == "h1" || tag == "h2" || tag == "h3" || tag == "h4" || tag == "h5" -> {
+                handleHeading(element, workingCtx, tag[1].digitToInt())
+            }
+            tag == "spoiler" || element.hasClass("b-spoiler")
+                || element.hasClass("b-spoiler_block")
+                    -> handleSpoilerBlock(element, workingCtx)
+            tag == "blockquote" || element.hasClass("b-quote")
+                -> handleBlockquote(element, workingCtx)
+            tag == "hr" -> {
+                workingCtx.flushText()
+                val widthAttr = element.attr("width")
+                    .replace("%", "")
+                    .toIntOrNull()
+
+                workingCtx.emitBlock(
+                    RichTextBlock.HorizontalRule(
+                        widthPercent = widthAttr,
+                        align = workingCtx.align
+                    )
+                )
+            }
+            tag == "pre" -> {
+                workingCtx.flushText()
+                val code = element.selectFirst("code")?.wholeText() ?: element.wholeText()
+                if (code.isNotBlank()) {
+                    val trimmed = code.trim()
+                    if (looksLikeEscapedHtml(trimmed)) {
+                        val reparsed = Ksoup.parseBodyFragment(
+                            RichTextNormalizer.normalize(trimmed)
+                        ).body()
+                        walkChildren(reparsed, workingCtx)
+                        workingCtx.flushText()
+                    } else {
+                        workingCtx.emitBlock(
+                            RichTextBlock.CodeBlock(
+                                code = trimmed,
+                                align = workingCtx.align
+                            )
+                        )
+                    }
+                }
+            }
+            tag == "table" -> handleTable(element, workingCtx)
+            tag == "ul" || tag == "ol" -> handleList(element, workingCtx, isOrdered = tag == "ol")
+            tag == "img" -> handleImage(element, workingCtx, workingCtx.currentLinkUrl)
+            tag == "br" -> workingCtx.appendInline(RichTextInline.LineBreak)
+            tag == "center" -> {
+                workingCtx.flushText()
+                walkChildren(element, workingCtx)
+                workingCtx.flushText()
+            }
+            tag == "youtube" -> handleYoutubeElement(element, workingCtx)
+            tag == "div" -> handleDiv(element, workingCtx)
+            tag == "span" -> handleSpan(element, workingCtx)
+            tag == "video" || element.hasClass("b-video") -> handleVideoElement(element, workingCtx)
+            tag == "b" || tag == "strong" -> handleInlineWrapper(element, workingCtx) { RichTextInline.Bold(it) }
+            tag == "i" || tag == "em" -> handleInlineWrapper(element, workingCtx) { RichTextInline.Italic(it) }
+            tag == "del" || tag == "strike" || tag == "s" -> {
+                handleInlineWrapper(element, workingCtx) { RichTextInline.Strikethrough(it) }
+            }
+            tag == "a" -> handleAnchor(element, workingCtx)
+            tag == "code" -> {
+                val code = element.wholeText()
+                if (code.isNotBlank()) {
+                    workingCtx.appendInline(RichTextInline.InlineCode(code))
+                }
+            }
+            tag == "iframe" -> handleIframe(element, workingCtx)
+            tag == "style" || tag == "head" || tag == "script" -> { /* strip CSS/JS blocks entirely */ }
+            tag == "html" || tag == "body" -> walkChildren(element, workingCtx)
+            else -> walkChildren(element, workingCtx)
+        }
+
+        if (isNewAlign) {
+            workingCtx.flushText()
+        }
+    }
+
+    private fun walkInlineChildren(parent: Element, ctx: ParseContext) {
+        for (node in parent.childNodes()) {
+            when (node) {
+                is TextNode -> {
+                    val text = normalizeWhitespace(node.getWholeText())
+                    if (text.isBlank() && text.contains("\n")) {
+                        if (ctx.hasBufferedInlineContent) {
+                            ctx.appendText("\n")
+                        }
+                        continue
+                    }
+                    inlineParser.parseInto(text, ctx)
+                }
+
+                is Element -> walkInlineElement(node, ctx)
+            }
+        }
+    }
+
+    private fun walkInlineElement(element: Element, ctx: ParseContext) {
+        when (element.tagName().lowercase()) {
+            "b", "strong" -> handleInlineWrapper(element, ctx) { RichTextInline.Bold(it) }
+            "i", "em" -> handleInlineWrapper(element, ctx) { RichTextInline.Italic(it) }
+            "del", "strike", "s" -> {
+                if (element.parents().hasClass("b-mention")) {
+                    //Shikimori handling to defer from handling '@' symbol in reply links as a Strikethrough
+                    walkInlineChildren(element, ctx)
+                } else {
+                    handleInlineWrapper(element, ctx) { RichTextInline.Strikethrough(it) }
+                }
+            }
+
+            "a" -> handleAnchor(element, ctx)
+            "code" -> {
+                val code = element.wholeText()
+                if (code.isNotBlank()) {
+                    ctx.appendInline(RichTextInline.InlineCode(code))
+                }
+            }
+
+            "br" -> ctx.appendInline(RichTextInline.LineBreak)
+            "span" -> handleSpan(element, ctx)
+            else -> walkElement(element, ctx)
+        }
+    }
+
+    private fun handleHeading(element: Element, ctx: ParseContext, level: Int) {
+        ctx.flushText()
+
+        val headingCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = ctx.currentLinkUrl,
+            listDepth = ctx.listDepth
+        )
+        walkInlineChildren(element, headingCtx)
+
+        if (headingCtx.blocks.isEmpty()) {
+            val inlines = trimEdgeInlineText(headingCtx.consumeInlineBufferTrimmed())
+            if (!isBlankInlineList(inlines)) {
+                ctx.emitBlock(
+                    RichTextBlock.Text(
+                        inlines = inlines,
+                        kind = headingKind(level),
+                        align = ctx.align
+                    )
+                )
+            }
+            return
+        }
+
+        headingCtx.flushText()
+        for (block in headingCtx.blocks) {
+            ctx.emitBlock(applyHeadingKind(block, headingKind(level)))
+        }
+    }
+
+    private fun applyHeadingKind(block: RichTextBlock, kind: RichTextTextKind): RichTextBlock =
+        when (block) {
+            is RichTextBlock.Text -> block.copy(kind = kind)
+            is RichTextBlock.InlineGroup -> block.copy(
+                children = block.children.map { child ->
+                    if (child is RichTextBlock.Text) child.copy(kind = kind) else child
+                }
+            )
+
+            else -> block
+        }
+
+    private fun handleSpoilerBlock(element: Element, ctx: ParseContext) {
+        ctx.flushText()
+
+        val label = element.selectFirst("label")?.text()
+            ?: element.selectFirst("span")?.text()
+        val spoilerCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = ctx.currentLinkUrl,
+            listDepth = ctx.listDepth
+        )
+
+        walkChildren(element, spoilerCtx)
+        spoilerCtx.flushText()
+
+        if (spoilerCtx.blocks.isNotEmpty()) {
+            ctx.emitBlock(
+                RichTextBlock.Spoiler(
+                    label = label,
+                    children = spoilerCtx.blocks
+                        .filter { block ->
+                            block !is RichTextBlock.Text || block.inlines
+                                .extractPlainText().trim() != label?.trim()
+                        },
+                    align = ctx.align
+                )
+            )
+        }
+    }
+
+    private fun handleBlockquote(element: Element, ctx: ParseContext) {
+        ctx.flushText()
+
+        val quoteCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = ctx.currentLinkUrl
+        )
+
+        val senderNickname = element.selectFirst("span")?.text()
+        val senderAvatarUrl = element.selectFirst("img")
+            ?.attr("srcset")
+            ?: element.selectFirst("img")?.attr("src")
+
+        walkChildren(element, quoteCtx)
+        quoteCtx.flushText()
+
+        if (quoteCtx.blocks.isNotEmpty()) {
+            ctx.emitBlock(
+                RichTextBlock.Blockquote(
+                    senderNickname = senderNickname,
+                    senderAvatarUrl = senderAvatarUrl,
+                    children = quoteCtx.blocks,
+                    align = ctx.align
+                )
+            )
+        }
+    }
+
+    private fun handleTable(element: Element, ctx: ParseContext) {
+        ctx.flushText()
+        val rows = mutableListOf<TableRow>()
+
+        for (tr in element.select("tr")) {
+            val cells = mutableListOf<TableCell>()
+            for (td in tr.children()) {
+                if (td.tagName() !in TABLE_CELL_TAGS) continue
+                val cellAlign = parseAlignment(td.tagName(), td.attr("align"), ctx.align)
+                val cellCtx = ctx.detached(
+                    align = cellAlign,
+                    currentLinkUrl = ctx.currentLinkUrl
+                )
+                walkChildren(td, cellCtx)
+                cellCtx.flushText()
+                cells.add(TableCell(cellCtx.blocks.toList(), td.tagName() == "th", cellAlign))
+            }
+            if (cells.isNotEmpty()) {
+                rows.add(TableRow(cells))
+            }
+        }
+
+        if (rows.isNotEmpty()) {
+            ctx.emitBlock(RichTextBlock.Table(rows = rows, align = ctx.align))
+        }
+    }
+
+    private fun handleList(element: Element, ctx: ParseContext, isOrdered: Boolean) {
+        ctx.flushText()
+        val listItems = mutableListOf<ListItem>()
+        val depth = ctx.listDepth
+        val bulletSymbol = when (depth % 3) {
+            0 -> "•"
+            1 -> "◦"
+            else -> "▪"
+        }
+
+        var itemIndex = element.attr("start").toIntOrNull() ?: 1
+
+        val looseCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = ctx.currentLinkUrl,
+            listDepth = depth + 1
+        )
+
+        for (child in element.childNodes()) {
+            if (child is Element && child.tagName().lowercase() == "li") {
+                looseCtx.flushText()
+                if (looseCtx.blocks.isNotEmpty()) {
+                    listItems.add(ListItem(looseCtx.blocks.toList(), null))
+                    looseCtx.blocks.clear()
+                }
+
+                val itemCtx = ctx.detached(
+                    align = ctx.align,
+                    currentLinkUrl = ctx.currentLinkUrl,
+                    listDepth = depth + 1
+                )
+                walkChildren(child, itemCtx)
+                itemCtx.flushText()
+                listItems.add(
+                    ListItem(
+                        children = itemCtx.blocks.toList(),
+                        bullet = if (isOrdered) "${itemIndex++}." else bulletSymbol
+                    )
+                )
+                continue
+            }
+
+            if (child is Element && child.tagName().lowercase() in NESTED_LIST_TAGS) {
+                looseCtx.flushText()
+                if (looseCtx.blocks.isNotEmpty()) {
+                    listItems.add(ListItem(looseCtx.blocks.toList(), null))
+                    looseCtx.blocks.clear()
+                }
+
+                walkElement(child, looseCtx)
+                looseCtx.flushText()
+                if (looseCtx.blocks.isNotEmpty()) {
+                    listItems.add(ListItem(looseCtx.blocks.toList(), null))
+                    looseCtx.blocks.clear()
+                }
+                continue
+            }
+
+            if (child is TextNode) {
+                val text = normalizeWhitespace(child.getWholeText())
+                if (text.isBlank() && text.contains("\n")) continue
+            }
+
+            walkNode(child, looseCtx)
+        }
+
+        looseCtx.flushText()
+        if (looseCtx.blocks.isNotEmpty()) {
+            listItems.add(ListItem(looseCtx.blocks.toList(), null))
+        }
+
+        if (listItems.isNotEmpty()) {
+            ctx.emitBlock(RichTextBlock.ListBlock(items = listItems, align = ctx.align))
+        }
+    }
+
+    private fun handleImage(element: Element, ctx: ParseContext, linkUrl: String?) {
+        ctx.flushText()
+        val src = element.attr("src")
+            .let { src ->
+                if(src.contains("/user_images_h/thumbnail/")) {
+                    src.replace("/thumbnail/", "/original/")
+                } else src
+            }
+        if (src.isBlank()) return
+
+        val size = extractSizeFromUrl(src) ?: extractSizeFromNode(element)
+        val width = size?.first
+        val height = size?.second
+
+        val widthAttr = element.attr("width")
+        val hashWidth = widthAttr.startsWith("#")
+
+        val url = if(src.contains("/images/smileys/")) {
+            BuildConfig.SHIKI_BASE_URL + src
+        } else src
+
+        ctx.emitBlock(
+            RichTextBlock.Image(
+                url = url,
+                width = if (hashWidth) null else width,
+                height = height,
+                isPercent = if (hashWidth) false else widthAttr.contains("%"),
+                linkUrl = linkUrl,
+                align = ctx.align
+            )
+        )
+    }
+
+    private fun youtubeUrl(id: String): String =
+        if (id.contains("://")) id else "https://www.youtube.com/watch?v=$id"
+
+    private fun handleYoutubeElement(element: Element, ctx: ParseContext) {
+        ctx.flushText()
+        val id = element.id().trim()
+        if (id.isNotBlank()) {
+            ctx.emitBlock(
+                RichTextBlock.YouTube(
+                    videoIdOrUrl = youtubeUrl(id),
+                    align = ctx.align
+                )
+            )
+        } else {
+            walkChildren(element, ctx)
+        }
+    }
+
+    private fun handleDiv(element: Element, ctx: ParseContext) {
+        if (element.hasClass("b-video")) {
+            if (element.hasClass("youtube")) {
+                val anchor = element.selectFirst("a.video-link")
+                val url = anchor?.attr("data-href")?.ifBlank { null }
+                    ?: anchor?.attr("href")?.ifBlank { null }
+                if (url != null) {
+                    ctx.flushText()
+                    ctx.emitBlock(RichTextBlock.YouTube(videoIdOrUrl = url, align = ctx.align))
+                }
+            } else {
+                handleVideoElement(element, ctx)
+            }
+            return
+        } else if (element.hasClass("youtube")) {
+            ctx.flushText()
+            val id = element.id().trim()
+            if (id.isNotBlank()) {
+                ctx.emitBlock(
+                    RichTextBlock.YouTube(
+                        videoIdOrUrl = youtubeUrl(id),
+                        align = ctx.align
+                    )
+                )
+            }
+            return
+        }
+
+        if (element.attr("rel").lowercase() == "spoiler") {
+            handleSpoilerBlock(element, ctx)
+            return
+        }
+
+        walkChildren(element, ctx)
+    }
+
+    private fun handleSpan(element: Element, ctx: ParseContext) {
+        if (element.hasClass("markdown_spoiler")) {
+            handleSpoilerBlock(element, ctx)
+            return
+        }
+
+        if (hasBlockChildren(element)) {
+            walkChildren(element, ctx)
+        } else {
+            walkInlineChildren(element, ctx)
+        }
+    }
+
+    private fun handleVideoElement(element: Element, ctx: ParseContext) {
+        ctx.flushText()
+
+        val src = element.selectFirst("a.video-link")
+            ?.let { it.attr("data-href").ifBlank { it.attr("href") } }
+            ?.ifBlank { null }
+            ?: element.attr("src").ifBlank { null }
+            ?: element.attr("href").ifBlank { null }
+            ?: element.getElementsByTag("source").firstOrNull()?.attr("src")
+            ?: return
+
+        ctx.emitBlock(RichTextBlock.Video(url = src.trim(), align = ctx.align))
+    }
+
+    private fun handleAnchor(element: Element, ctx: ParseContext) {
+        val href = decodeHtmlAttribute(element.attr("href").trim()).trim('"', '\'', '\\')
+        val image = element.selectFirst("img")
+        if (image != null && href.isNotBlank() && element.text().isBlank()) {
+            handleImage(image, ctx, href)
+            return
+        }
+
+        if (href.isBlank()) {
+            walkInlineChildren(element, ctx)
+            return
+        }
+
+        if (element.hasClass("b-link") && element.hasAttr("data-attrs")) {
+            val hasNameSpans = element.select("span.name-en, span.name-ru").isNotEmpty()
+            if (hasNameSpans) {
+                val json = JSONObject(element.attr("data-attrs"))
+                val display = json.optString("russian").ifBlank {
+                    json.optString("name")
+                }
+
+                if (display.isNotBlank()) {
+                    ctx.appendInline(
+                        RichTextInline.Link(
+                            url = href,
+                            children = listOf(RichTextInline.Text(display))
+                        )
+                    )
+                    return
+                }
+            }
+        }
+
+        val subCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = href,
+            listDepth = ctx.listDepth
+        )
+        walkInlineChildren(element, subCtx)
+
+        if (subCtx.blocks.isEmpty()) {
+            val inlines = trimEdgeInlineText(subCtx.consumeInlineBufferTrimmed())
+            if (!isBlankInlineList(inlines)) {
+                ctx.appendInline(RichTextInline.Link(url = href, children = inlines))
+            }
+            return
+        }
+
+        subCtx.flushText()
+        ctx.flushText()
+        for (block in subCtx.blocks) {
+            ctx.emitBlock(applyLinkToBlock(block, href))
+        }
+    }
+
+    private fun applyLinkToBlock(block: RichTextBlock, href: String): RichTextBlock {
+        if (block is RichTextBlock.Image && block.linkUrl == null) return block.copy(linkUrl = href)
+        return transformTextInlines(block) { inlines -> listOf(RichTextInline.Link(href, inlines)) }
+    }
+
+    private fun handleInlineWrapper(
+        element: Element,
+        ctx: ParseContext,
+        wrap: (List<RichTextInline>) -> RichTextInline
+    ) {
+        val subCtx = ctx.detached(
+            align = ctx.align,
+            currentLinkUrl = ctx.currentLinkUrl,
+            listDepth = ctx.listDepth
+        )
+        walkInlineChildren(element, subCtx)
+
+        if (subCtx.blocks.isEmpty()) {
+            val inlines = trimEdgeInlineText(subCtx.consumeInlineBufferTrimmed())
+            if (!isBlankInlineList(inlines)) {
+                ctx.appendInline(wrap(inlines))
+            }
+            return
+        }
+
+        subCtx.flushText()
+        ctx.flushText()
+        for (block in subCtx.blocks) {
+            ctx.emitBlock(transformTextInlines(block) { inlines -> listOf(wrap(inlines)) })
+        }
+    }
+
+    private fun transformTextInlines(
+        block: RichTextBlock,
+        transform: (List<RichTextInline>) -> List<RichTextInline>
+    ): RichTextBlock = when (block) {
+        is RichTextBlock.Text -> block.copy(inlines = transform(block.inlines))
+        is RichTextBlock.InlineGroup -> block.copy(
+            children = block.children.map { transformTextInlines(it, transform) }
+        )
+
+        is RichTextBlock.Spoiler -> block.copy(
+            children = block.children.map { transformTextInlines(it, transform) }
+        )
+
+        is RichTextBlock.Blockquote -> block.copy(
+            children = block.children.map { transformTextInlines(it, transform) }
+        )
+
+        is RichTextBlock.ListBlock -> block.copy(
+            items = block.items.map { item ->
+                item.copy(children = item.children.map { transformTextInlines(it, transform) })
+            }
+        )
+
+        is RichTextBlock.Table -> block.copy(
+            rows = block.rows.map { row ->
+                row.copy(
+                    cells = row.cells.map { cell ->
+                        cell.copy(children = cell.children.map {
+                            transformTextInlines(
+                                it,
+                                transform
+                            )
+                        })
+                    }
+                )
+            }
+        )
+
+        else -> block
+    }
+
+    private fun handleIframe(element: Element, ctx: ParseContext) {
+        ctx.flushText()
+        val src = element.attr("src")
+        if (src.contains("youtube", ignoreCase = true) || src.contains(
+                "youtu.be",
+                ignoreCase = true
+            )
+        ) {
+            ctx.emitBlock(RichTextBlock.YouTube(videoIdOrUrl = src, align = ctx.align))
+        } else if (src.isNotBlank()) {
+            ctx.emitBlock(RichTextBlock.Video(url = src, align = ctx.align))
+        }
+    }
+
+    private fun decodeHtmlAttribute(value: String): String =
+        Parser.unescapeEntities(value, false)
+
+    private fun looksLikeEscapedHtml(text: String): Boolean {
+        val sample = if (text.length > 500) text.substring(0, 500) else text
+        val tagCount = ESCAPED_HTML_TAG_REGEX.findAll(sample).count()
+        return tagCount >= 3
+    }
+
+    private fun hasBlockChildren(element: Element): Boolean =
+        element.children().any { it.tagName().lowercase() in blockTags }
+
+    private fun isStealthBreak(block: RichTextBlock): Boolean {
+        if (block !is RichTextBlock.Text || block.kind != RichTextTextKind.Paragraph) return false
+        if (block.inlines.size != 1) return false
+        var current: RichTextInline = block.inlines.first()
+        while (true) {
+            when (current) {
+                is RichTextInline.Text -> return current.value == "\u200B"
+                is RichTextInline.Link -> if (current.children.size == 1) current =
+                    current.children.first() else return false
+
+                is RichTextInline.Bold -> if (current.children.size == 1) current =
+                    current.children.first() else return false
+
+                is RichTextInline.Italic -> if (current.children.size == 1) current =
+                    current.children.first() else return false
+
+                is RichTextInline.BoldItalic -> if (current.children.size == 1) current =
+                    current.children.first() else return false
+
+                is RichTextInline.Strikethrough -> if (current.children.size == 1) current =
+                    current.children.first() else return false
+
+                else -> return false
+            }
+        }
+    }
+
+    private fun extractSizeFromUrl(url: String): Pair<Int, Int>? {
+        val regex = """name=(\d+)x(\d+)""".toRegex()
+        val match = regex.find(url)
+
+        return match?.let {
+            val width = it.groupValues[1].toIntOrNull()
+            val height = it.groupValues[2].toIntOrNull()
+
+            if (width != null && height != null && height > 0) {
+                width to height
+            } else null
+        }
+    }
+
+    private fun extractSizeFromNode(node: Element): Pair<Int, Int>? {
+        val img = node.selectFirst("img") ?: return null
+
+        val dataWidth = img.attr("data-width").toIntOrNull()
+        val dataHeight = img.attr("data-height").toIntOrNull()
+
+        if (dataWidth != null && dataHeight != null && dataHeight > 0) {
+            return dataWidth to dataHeight
+        }
+
+        val width = img.attr("width")
+            .replace(nonDigitRegex, "")
+            .toIntOrNull()
+        val height = img.attr("height")
+            .replace(nonDigitRegex, "")
+            .toIntOrNull()
+
+        return if (width != null && height != null && height > 0) {
+            width to height
+        } else null
+    }
+}

@@ -20,6 +20,7 @@ import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -62,13 +63,22 @@ class AnilistTracksDataSource @Inject constructor(
         order: Sort<UserRateType>?,
         idsList: List<Int>?
     ): Result<List<MediaTrack>> {
+        val additionalSort = Sort(
+            type = UserRateType.ID,
+            direction = SortDirection.DESCENDING
+        ).toAnilistOrder()
+
         val query = MediaListTracksQuery(
             type = Optional.present(mediaType.toAnilistType()),
             page = Optional.presentIfNotNull(page),
             limit = Optional.presentIfNotNull(limit),
             userId = Optional.presentIfNotNull(userId),
             status = Optional.presentIfNotNull(status?.toAnilistRateStatus()),
-            order = Optional.presentIfNotNull(order?.toAnilistOrder()?.let { listOf(it) }),
+            order = Optional.presentIfNotNull(
+                order?.toAnilistOrder()?.let { order ->
+                    listOf(order, additionalSort)
+                }
+            ),
             idsIn = Optional.presentIfNotNull(idsList)
         )
 
