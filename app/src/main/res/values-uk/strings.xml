@@ -217,6 +217,7 @@
     <string name="details_info_duration">Тривалість</string>
     <string name="details_info_origin">Джерело</string>
     <string name="details_info_duration_min">%1$d хв.</string>
+    <string name="details_info_duration_hours">%1$dг. %2$d хв.</string>
     <string name="details_info_aired_on">Дата початку</string>
     <string name="details_info_next_episode_at">Наступний епізод в</string>
     <string name="details_info_released_on">Дата закінчення</string>

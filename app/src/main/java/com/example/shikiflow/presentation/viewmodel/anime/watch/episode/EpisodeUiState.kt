@@ -19,6 +19,5 @@ data class KodikEpisodeUiState(
 
 data class PlayerState(
     val isPlaying: Boolean = false,
-    val isBuffering: Boolean = true,
-    val duration: Long = 0L
+    val isBuffering: Boolean = true
 )

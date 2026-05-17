@@ -217,6 +217,7 @@
     <string name="details_info_duration">Длительность</string>
     <string name="details_info_origin">Источник</string>
     <string name="details_info_duration_min">%1$d мин.</string>
+    <string name="details_info_duration_hours">%1$dч. %2$d мин.</string>
     <string name="details_info_aired_on">Дата начала</string>
     <string name="details_info_next_episode_at">Следующий эпизод в</string>
     <string name="details_info_released_on">Дата окончания</string>

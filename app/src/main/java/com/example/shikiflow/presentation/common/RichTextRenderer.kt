@@ -74,6 +74,7 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.image.shimmerEffect
+import com.example.shikiflow.presentation.common.player.MiniPlayer
 import com.example.shikiflow.utils.LinkRouter
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.parser_v2.ParsedRichText
@@ -193,9 +194,9 @@ private fun RenderBlocks(
                     )
                 }
                 is RichTextBlock.Video -> {
-                    RichVideo(
-                        video = block,
-                        onClick = onLinkClick
+                    MiniPlayer(
+                        videoUrl = block.url,
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
                 is RichTextBlock.Spoiler -> {
@@ -262,13 +263,7 @@ private fun RenderBlocks(
                         onLinkClick = onLinkClick
                     )
                 }
-                is RichTextBlock.Link -> {
-                    LinkCard(
-                        block = block,
-                        style = style,
-                        onLinkClick = onLinkClick
-                    )
-                }
+                is RichTextBlock.Link -> Unit
             }
         }
     }
@@ -761,27 +756,27 @@ private fun RichGroupItem(
                 is RichTextBlock.Image -> {
                     RichImage(child, onLinkClick)
                 }
-                is RichTextBlock.Link -> {
+                /*is RichTextBlock.Link -> {
                     LinkCard(
                         block = child,
                         style = style,
                         onLinkClick = onLinkClick
                     )
-                }
+                }*/
                 else -> Unit
             }
         }
     }
 }
 
-@Composable
+/*@Composable
 fun LinkCard(
     block: RichTextBlock.Link,
     style: TextStyle,
     onLinkClick: (String) -> Unit
 ) {
 
-}
+}*/
 
 private fun RichTextAlignment.toTextAlign(): TextAlign = when (this) {
     RichTextAlignment.Start -> TextAlign.Start

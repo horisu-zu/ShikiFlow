@@ -1,11 +1,9 @@
 package com.example.shikiflow.utils.parser_v2
 
 import com.fleeksoft.ksoup.Ksoup
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 data class ParserConfig(
-    val enableAniListLinkBlocks: Boolean = true
+    val enableAniListLinkBlocks: Boolean = false
 )
 
 //Heavily influenced (90-95% of the code is copy-pasted) by AniSync HTML Parser

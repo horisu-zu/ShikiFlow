@@ -17,6 +17,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,6 +37,8 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
+import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
 
@@ -47,41 +50,47 @@ fun CommentsScreen(
     navOptions: MediaNavOptions,
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
-    Scaffold { paddingValues ->
-        val contentPadding = PaddingValues(
-            start = 12.dp,
-            end = 12.dp,
-            top = paddingValues.calculateTopPadding(),
-            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        )
+    val exoPlayerCache = rememberExoPlayerCache()
 
-        when(screenMode) {
-            CommentsScreenMode.TOPIC -> {
-                TopicCommentsSection(
-                    topicId = id,
-                    threadHeader = threadHeader,
-                    commentViewModel = commentViewModel,
-                    contentPadding = contentPadding,
-                    onEntityClick = { entityType, id ->
-                        navOptions.navigateByEntity(entityType, id)
-                    },
-                    onUserClick = { user ->
-                        navOptions.navigateToUserProfile(user)
-                    }
-                )
-            }
-            CommentsScreenMode.COMMENT -> {
-                CommentThreadSection(
-                    commentId = id,
-                    commentViewModel = commentViewModel,
-                    contentPadding = contentPadding,
-                    onEntityClick = { entityType, id ->
-                        navOptions.navigateByEntity(entityType, id)
-                    },
-                    onUserClick = { user ->
-                        navOptions.navigateToUserProfile(user)
-                    }
-                )
+    CompositionLocalProvider(
+        LocalExoPlayerCache provides exoPlayerCache
+    ) {
+        Scaffold { paddingValues ->
+            val contentPadding = PaddingValues(
+                start = 12.dp,
+                end = 12.dp,
+                top = paddingValues.calculateTopPadding(),
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            )
+
+            when(screenMode) {
+                CommentsScreenMode.TOPIC -> {
+                    TopicCommentsSection(
+                        topicId = id,
+                        threadHeader = threadHeader,
+                        commentViewModel = commentViewModel,
+                        contentPadding = contentPadding,
+                        onEntityClick = { entityType, id ->
+                            navOptions.navigateByEntity(entityType, id)
+                        },
+                        onUserClick = { user ->
+                            navOptions.navigateToUserProfile(user)
+                        }
+                    )
+                }
+                CommentsScreenMode.COMMENT -> {
+                    CommentThreadSection(
+                        commentId = id,
+                        commentViewModel = commentViewModel,
+                        contentPadding = contentPadding,
+                        onEntityClick = { entityType, id ->
+                            navOptions.navigateByEntity(entityType, id)
+                        },
+                        onUserClick = { user ->
+                            navOptions.navigateToUserProfile(user)
+                        }
+                    )
+                }
             }
         }
     }

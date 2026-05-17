@@ -599,8 +599,8 @@ internal class RichTextHtmlParser(
     private fun handleVideoElement(element: Element, ctx: ParseContext) {
         ctx.flushText()
 
-        val src = element.selectFirst("a.video-link")
-            ?.let { it.attr("data-href").ifBlank { it.attr("href") } }
+        val src = element.selectFirst(".video-link img[data-video]")
+            ?.attr("data-video")
             ?.ifBlank { null }
             ?: element.attr("src").ifBlank { null }
             ?: element.attr("href").ifBlank { null }

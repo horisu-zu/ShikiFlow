@@ -50,7 +50,9 @@ fun PlayerControls(
             )
         }
         if(isLoading) {
-            CircularProgressIndicator(modifier = Modifier.size(48.dp))
+            CircularProgressIndicator(
+                modifier = Modifier.size(48.dp)
+            )
         } else {
             ControlButton(
                 visible = showControls,
@@ -82,7 +84,7 @@ fun PlayerControls(
 }
 
 @Composable
-private fun ControlButton(
+fun ControlButton(
     visible: Boolean,
     onClick: () -> Unit,
     enabled: Boolean = true,

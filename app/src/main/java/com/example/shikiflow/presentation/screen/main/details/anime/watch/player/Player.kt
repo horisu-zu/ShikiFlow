@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,6 +35,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
@@ -62,6 +66,7 @@ fun Player(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
 
     var isFit by rememberSaveable { mutableStateOf(true) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
@@ -74,6 +79,20 @@ fun Player(
         delay(3000)
         if (playerState.isPlaying && !isDropdownExpanded) {
             showControls = false
+        }
+    }
+
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_PAUSE -> player?.pause()
+                else -> Unit
+            }
+        }
+
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
 
@@ -192,7 +211,7 @@ fun Player(
                 .windowInsetsPadding(WindowInsets.navigationBars)
         ) {
             PlayerBottomComponent(
-                duration = playerState.duration,
+                duration = player?.duration ?: 0L,
                 currentPosition = currentPosition,
                 playerEvent = playerEvent,
                 opTimeCode = episodeUiState.kodikEpisode?.opTimeCode,

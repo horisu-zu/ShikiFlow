@@ -39,7 +39,7 @@ class EpisodeViewModel @Inject constructor(
 
     val exoPlayer: ExoPlayer = ExoPlayer.Builder(context).build()
 
-    private val _currentPosition = MutableStateFlow<Long>(0L)
+    private val _currentPosition = MutableStateFlow(0L)
     val currentPosition = _currentPosition.asStateFlow()
 
     private val _uiState = MutableStateFlow(EpisodeUiState())
@@ -168,13 +168,11 @@ class EpisodeViewModel @Inject constructor(
 
             override fun onPlaybackStateChanged(playbackState: Int) {
                 val isBuffering = playbackState == Player.STATE_BUFFERING
-                val duration = exoPlayer.duration.coerceAtLeast(0L)
 
                 _uiState.update { state ->
                     state.copy(
                         playerState = state.playerState.copy(
-                            isBuffering = isBuffering,
-                            duration = duration
+                            isBuffering = isBuffering
                         )
                     )
                 }

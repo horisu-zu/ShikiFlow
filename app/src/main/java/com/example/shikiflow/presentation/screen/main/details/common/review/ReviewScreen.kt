@@ -22,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -52,6 +53,8 @@ import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.getRatioColor
+import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
+import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.media.review.ReviewViewModel
@@ -66,67 +69,72 @@ fun ReviewScreen(
     reviewViewModel: ReviewViewModel = hiltViewModel()
 ) {
     val uiState by reviewViewModel.uiState.collectAsStateWithLifecycle()
+    val playerCache = rememberExoPlayerCache()
 
     LaunchedEffect(reviewId) {
         reviewViewModel.setId(reviewId)
     }
 
-    LazyColumn(
-        contentPadding = PaddingValues(
-            start = 12.dp,
-            end = 12.dp,
-            top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding(),
-            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        ),
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    CompositionLocalProvider(
+        LocalExoPlayerCache provides playerCache
     ) {
-        if(uiState.isLoading) {
-            item {
-                Box(
-                    modifier = Modifier.fillParentMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
-        } else if(uiState.errorMessage != null) {
-            item {
-                Box(
-                    modifier = Modifier.fillParentMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    ErrorItem(
-                        message = uiState.errorMessage ?: stringResource(id = R.string.common_error),
-                        buttonLabel = stringResource(R.string.common_retry),
-                        onButtonClick = { reviewViewModel.onRefresh() }
-                    )
-                }
-            }
-        } else {
-            uiState.review?.let { review ->
+        LazyColumn(
+            contentPadding = PaddingValues(
+                start = 12.dp,
+                end = 12.dp,
+                top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding(),
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+            ),
+            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+        ) {
+            if(uiState.isLoading) {
                 item {
-                    ReviewHeader(
-                        review = review,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) { CircularProgressIndicator() }
                 }
+            } else if(uiState.errorMessage != null) {
+                item {
+                    Box(
+                        modifier = Modifier.fillParentMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = uiState.errorMessage ?: stringResource(id = R.string.common_error),
+                            buttonLabel = stringResource(R.string.common_retry),
+                            onButtonClick = { reviewViewModel.onRefresh() }
+                        )
+                    }
+                }
+            } else {
+                uiState.review?.let { review ->
+                    item {
+                        ReviewHeader(
+                            review = review,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
 
-                item {
-                    RichTextRenderer(
-                        htmlText = review.body,
-                        modifier = Modifier.fillMaxWidth(),
-                        style = MaterialTheme.typography.bodySmall,
-                        linkColor = MaterialTheme.colorScheme.primary,
-                        onEntityClick = { entityType, id ->
-                            navOptions.navigateByEntity(entityType, id)
-                        }
-                    )
-                }
+                    item {
+                        RichTextRenderer(
+                            htmlText = review.body,
+                            modifier = Modifier.fillMaxWidth(),
+                            style = MaterialTheme.typography.bodySmall,
+                            linkColor = MaterialTheme.colorScheme.primary,
+                            onEntityClick = { entityType, id ->
+                                navOptions.navigateByEntity(entityType, id)
+                            }
+                        )
+                    }
 
-                item {
-                    ReviewScoreComponent(
-                        score = review.score
-                    )
+                    item {
+                        ReviewScoreComponent(
+                            score = review.score
+                        )
+                    }
                 }
             }
         }

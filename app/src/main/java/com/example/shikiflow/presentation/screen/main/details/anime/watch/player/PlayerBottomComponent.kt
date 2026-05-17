@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -40,6 +41,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.data.response.TimeRange
@@ -108,6 +110,7 @@ fun PlayerBottomComponent(
                     },
                     thumbSize = thumbSize
                 )
+
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(horizontal = thumbSize / 2),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -146,12 +149,13 @@ fun PlayerBottomComponent(
 }
 
 @Composable
-private fun DurationBox(
+fun DurationBox(
     durationMs: Long,
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier.clip(RoundedCornerShape(4.dp))
+        modifier = modifier
+            .clip(RoundedCornerShape(4.dp))
             .background(Color.Black.copy(alpha = 0.65f))
             .padding(horizontal = 6.dp, vertical = 4.dp),
         contentAlignment = Alignment.Center
@@ -167,7 +171,7 @@ private fun DurationBox(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PlayerSlider(
+fun PlayerSlider(
     duration: Long,
     currentProgress: Long,
     onSeek: (Long) -> Unit,
@@ -197,7 +201,16 @@ private fun PlayerSlider(
         thumb = {
             SliderDefaults.Thumb(
                 thumbSize = DpSize(thumbSize, thumbSize),
-                interactionSource = remember { MutableInteractionSource() }
+                interactionSource = remember { MutableInteractionSource() },
+                modifier = Modifier.offset {
+                    if (thumbSize < 16.dp || thumbSize < 16.dp) {
+                        val offsetX = (16.dp - thumbSize).roundToPx() / 2
+                        val offsetY = (16.dp - thumbSize).roundToPx() / 2
+                        IntOffset(offsetX, offsetY)
+                    } else {
+                        IntOffset(0, 0)
+                    }
+                }
             )
         },
         track = { state ->
