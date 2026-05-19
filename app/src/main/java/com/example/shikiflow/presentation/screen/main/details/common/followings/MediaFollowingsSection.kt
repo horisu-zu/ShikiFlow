@@ -41,8 +41,8 @@ import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 

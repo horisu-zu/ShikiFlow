@@ -24,7 +24,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,7 +32,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -73,7 +71,6 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.presentation.common.player.MiniPlayer
 import com.example.shikiflow.utils.LinkRouter
 import com.example.shikiflow.utils.WebIntent
@@ -99,13 +96,8 @@ fun RichTextRenderer(
         RichTextParser.parse(htmlText, ParserConfig())
     }
 
-    LaunchedEffect(parsedText) {
-        Log.d("RichTextRenderer", "Blocks: $parsedText")
-    }
-
     val customUriHandler = object : UriHandler {
         override fun openUri(uri: String) {
-            Log.d("RichTextRenderer", "URI: $uri")
             val route = LinkRouter.getEntityData(uri)
 
             route?.let {
@@ -359,38 +351,6 @@ private fun RichImage(
                 onLinkClick(image.url)
             }
     )
-}
-
-@Composable
-private fun RichVideo(
-    video: RichTextBlock.Video,
-    onClick: (String) -> Unit
-) {
-    val imageType = ImageType.Screenshot(
-        width = Int.MAX_VALUE.dp
-    )
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(imageType.clip)
-            .clickable { onClick(video.url) },
-        contentAlignment = Alignment.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.75f))
-                .padding(all = 8.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.PlayArrow,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-            )
-        }
-    }
 }
 
 @Composable

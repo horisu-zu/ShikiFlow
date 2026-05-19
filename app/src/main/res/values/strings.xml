@@ -30,6 +30,19 @@
         <item quantity="other">%1$d hours ago</item>
     </plurals>
 
+    <plurals name="days">
+        <item quantity="one">%1$d day</item>
+        <item quantity="other">%1$d days</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%1$d hour</item>
+        <item quantity="other">%1$d hours</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+
     <string name="mtp_loading_error">Error loading tracked manga</string>
     <string name="atp_loading_error">Error Loading Anime Tracks</string>
     <string name="tracks_empty" translatable="false">There\'re no tracks in this category</string>
@@ -219,8 +232,8 @@
     <string name="details_info_studio">Studio</string>
     <string name="details_info_duration">Duration</string>
     <string name="details_info_origin">Origin</string>
-    <string name="details_info_duration_min">%1$d min.</string>
-    <string name="details_info_duration_hours">%1$dh. %2$d min.</string>
+    <string name="details_info_duration_min">%1$d mins</string>
+    <string name="details_info_duration_hours">%1$d hr %2$d mins</string>
     <string name="details_info_aired_on">Aired On</string>
     <string name="details_info_next_episode_at">Next Episode at</string>
     <string name="details_info_released_on">Released on</string>
@@ -242,6 +255,8 @@
     <string name="details_short_info_manga_volumes">Volumes</string>
     <string name="details_short_info_manga_chapters">Chapters</string>
     <string name="details_short_info_manga_started">Started</string>
+    <string name="details_short_info_airing_now">Airing Now</string>
+    <string name="details_short_info_airing_in">Airing In</string>
     <string name="details_related">Related</string>
     <string name="details_reviews_section_label">Reviews</string>
     <string name="media_details_following">Following</string>

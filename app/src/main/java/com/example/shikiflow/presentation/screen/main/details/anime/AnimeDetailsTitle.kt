@@ -22,7 +22,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,8 +57,16 @@ import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displ
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.mappers.DateMapper.isAiring
+import com.example.shikiflow.presentation.common.mappers.DateMapper.toCountdownString
+import com.example.shikiflow.presentation.common.mappers.DateMapper.untilNextEpisode
 import com.example.shikiflow.utils.DateUtils.calculateDuration
 import com.example.shikiflow.utils.toIcon
+import kotlinx.coroutines.delay
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Instant
 
 @Composable
 fun AnimeDetailsTitle(
@@ -124,7 +136,7 @@ fun AnimeDetailsTitle(
                         .fillMaxWidth()
                         .padding(vertical = 8.dp),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
                 ) {
                     item {
                         ShortInfoItem(
@@ -171,12 +183,33 @@ fun AnimeDetailsTitle(
                             )
                         }
                     }
-                    item {
-                        animeDetails.ageRating?.let { ratingEnum ->
+                    animeDetails.ageRating?.let { ageRating ->
+                        item {
                             ShortInfoItem(
                                 infoType = stringResource(id = R.string.details_short_info_age_rating),
-                                infoItem = stringResource(ratingEnum.displayValue())
+                                infoItem = stringResource(ageRating.displayValue())
                             )
+                        }
+                    }
+                    if(animeDetails.status == MediaStatus.ONGOING) {
+                        item {
+                            val isAiring = animeDetails.nextEpisodeAt?.isAiring(
+                                startDate = animeDetails.airedOn?.date ?: Clock.System.now(),
+                                episodeDuration = animeDetails.durationMins?.minutes ?: 0.minutes
+                            ) == true
+
+                            if (isAiring) {
+                                animeDetails.durationMins?.let { durationMins ->
+                                    AiringCountdown(durationMins, animeDetails.nextEpisodeAt)
+                                }
+                            } else {
+                                animeDetails.nextEpisodeAt?.let { nextEpisodeAt ->
+                                    ShortInfoItem(
+                                        infoType = stringResource(R.string.details_short_info_airing_in),
+                                        infoItem = nextEpisodeAt.untilNextEpisode()
+                                    )
+                                }
+                            }
                         }
                     }
                 }
@@ -350,4 +383,26 @@ fun HeaderButton(
     ) {
         content()
     }
+}
+
+@Composable
+fun AiringCountdown(
+    durationMins: Int,
+    airingAt: Instant
+) {
+    var countdownString by remember {
+        mutableStateOf(durationMins.minutes.toCountdownString(airingAt))
+    }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            delay(1.seconds)
+            countdownString = durationMins.minutes.toCountdownString(airingAt)
+        }
+    }
+
+    ShortInfoItem(
+        infoType = stringResource(R.string.details_short_info_airing_now),
+        infoItem = countdownString
+    )
 }

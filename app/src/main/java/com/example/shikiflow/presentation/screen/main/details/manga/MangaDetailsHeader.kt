@@ -10,6 +10,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -41,6 +42,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -119,39 +121,25 @@ fun MangaDetailsHeader(
                     style = MaterialTheme.typography.headlineSmall
                 )
 
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    ShortInfoItem(
-                        infoType = stringResource(R.string.details_short_info_manga_type),
-                        infoItem = buildString {
-                            append(stringResource(mangaDetails.format.displayValue()))
-                            append(" ∙ ")
-                            append(stringResource(id = mangaDetails.status.displayValue()))
-                        }
-                    )
-                    if (mangaDetails.status != MediaStatus.ONGOING && mangaDetails.status != MediaStatus.ANNOUNCED) {
-                        mangaDetails.releasedOn?.date?.let { releaseDate ->
-                            ShortInfoItem(
-                                infoType = stringResource(R.string.details_short_info_manga_published),
-                                infoItem = formatInstant(
-                                    instant = releaseDate,
-                                    includeTime = false
-                                )
-                            )
-                        }
-                        if(mangaDetails.volumes != null) {
-                            ShortInfoItem(
-                                infoType = stringResource(R.string.details_short_info_manga_volumes),
-                                infoItem = stringResource(R.string.volumes, mangaDetails.volumes)
-                            )
-                        }
-                        if(mangaDetails.totalCount != null) {
-                            ShortInfoItem(
-                                infoType = stringResource(R.string.details_short_info_manga_chapters),
-                                infoItem = stringResource(R.string.chapters, mangaDetails.totalCount)
-                            )
-                        }
-                    } else {
-                        mangaDetails.airedOn?.date?.let { startingDate ->
+                SnapFlingLazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    item {
+                        ShortInfoItem(
+                            infoType = stringResource(R.string.details_short_info_manga_type),
+                            infoItem = buildString {
+                                append(stringResource(mangaDetails.format.displayValue()))
+                                append(" ∙ ")
+                                append(stringResource(id = mangaDetails.status.displayValue()))
+                            }
+                        )
+                    }
+                    mangaDetails.airedOn?.date?.let { startingDate ->
+                        item {
                             ShortInfoItem(
                                 infoType = stringResource(R.string.details_short_info_manga_started),
                                 infoItem = formatInstant(
@@ -159,6 +147,35 @@ fun MangaDetailsHeader(
                                     includeTime = false
                                 )
                             )
+                        }
+                    }
+                    if (mangaDetails.status != MediaStatus.ONGOING && mangaDetails.status != MediaStatus.ANNOUNCED) {
+                        mangaDetails.releasedOn?.date?.let { releaseDate ->
+                            item {
+                                ShortInfoItem(
+                                    infoType = stringResource(R.string.details_short_info_manga_published),
+                                    infoItem = formatInstant(
+                                        instant = releaseDate,
+                                        includeTime = false
+                                    )
+                                )
+                            }
+                        }
+                        if(mangaDetails.volumes != null) {
+                            item {
+                                ShortInfoItem(
+                                    infoType = stringResource(R.string.details_short_info_manga_volumes),
+                                    infoItem = stringResource(R.string.volumes, mangaDetails.volumes)
+                                )
+                            }
+                        }
+                        if(mangaDetails.totalCount != null) {
+                            item {
+                                ShortInfoItem(
+                                    infoType = stringResource(R.string.details_short_info_manga_chapters),
+                                    infoItem = stringResource(R.string.chapters, mangaDetails.totalCount)
+                                )
+                            }
                         }
                     }
                 }

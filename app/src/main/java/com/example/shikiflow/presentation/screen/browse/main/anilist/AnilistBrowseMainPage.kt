@@ -46,7 +46,6 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
-import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.BrowseCardItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
@@ -55,6 +54,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.viewmodel.browse.main.anilist.AnilistBrowseSectionUiState
 import com.example.shikiflow.presentation.viewmodel.browse.main.anilist.AnilistBrowseViewModel
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 
 @Composable

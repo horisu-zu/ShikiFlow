@@ -30,6 +30,22 @@
         <item quantity="many">%1$d годин тому</item>
     </plurals>
 
+    <plurals name="days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дні</item>
+        <item quantity="many">%1$d днів</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%1$d годину</item>
+        <item quantity="few">%1$d години</item>
+        <item quantity="many">%1$d годин</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%1$d хвилину</item>
+        <item quantity="few">%1$d хвилини</item>
+        <item quantity="many">%1$d хвилин</item>
+    </plurals>
+
     <string name="mtp_loading_error">Помилка завантаження манґи</string>
     <string name="atp_loading_error">Помилка завантаження аніме</string>
 
@@ -217,7 +233,7 @@
     <string name="details_info_duration">Тривалість</string>
     <string name="details_info_origin">Джерело</string>
     <string name="details_info_duration_min">%1$d хв.</string>
-    <string name="details_info_duration_hours">%1$dг. %2$d хв.</string>
+    <string name="details_info_duration_hours">%1$d г. %2$d хв.</string>
     <string name="details_info_aired_on">Дата початку</string>
     <string name="details_info_next_episode_at">Наступний епізод в</string>
     <string name="details_info_released_on">Дата закінчення</string>
@@ -240,6 +256,7 @@
     <string name="details_short_info_manga_volumes">Томи</string>
     <string name="details_short_info_manga_chapters">Розділи</string>
     <string name="details_short_info_manga_started">Розпочато випуск</string>
+    <string name="details_short_info_airing_in">Епізод через</string>
     <string name="details_related">Пов\'язане</string>
     <string name="details_reviews_section_label">Огляди</string>
 
@@ -479,4 +496,5 @@
     <string name="preferred_title_type_english">Англійська</string>
     <string name="preferred_title_type_russian">Російська</string>
     <string name="settings_preferred_title_type">Тип тайтлу</string>
+    <string name="details_short_info_airing_now">В ефірі</string>
 </resources>

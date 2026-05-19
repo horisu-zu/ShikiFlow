@@ -1,67 +1,55 @@
 package com.example.shikiflow.presentation.common
 
 import androidx.activity.compose.LocalActivity
-import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.ime
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.State
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.Velocity
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import kotlinx.coroutines.launch
-import kotlin.math.abs
 
-fun Modifier.stretchOverscroll(): Modifier = composed {
-    val overscrollOffset = remember { Animatable(0f) }
-    val overscrollThreshold = 100f
-    val scope = rememberCoroutineScope()
-    val scale = remember {
-        derivedStateOf {
-            1f + (abs(overscrollOffset.value) / overscrollThreshold) * 0.02f
-        }
-    }
+@Composable
+fun Modifier.shimmerEffect(): Modifier {
+    val transition = rememberInfiniteTransition()
+    val startOffsetX by transition.animateFloat(
+        initialValue = 0f,
+        targetValue = 500f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(
+                durationMillis = 1000,
+                easing = FastOutSlowInEasing
+            ),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
-    this.nestedScroll(
-        object : NestedScrollConnection {
-            override fun onPostScroll(
-                consumed: Offset,
-                available: Offset,
-                source: NestedScrollSource
-            ): Offset {
-                val newOffset = overscrollOffset.value + available.y
-                scope.launch {
-                    overscrollOffset.snapTo(newOffset.coerceIn(-overscrollThreshold, overscrollThreshold))
-                }
-                return super.onPostScroll(consumed, available, source)
-            }
-
-            override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-                overscrollOffset.animateTo(0f, animationSpec = tween(durationMillis = 300))
-                return super.onPostFling(consumed, available)
-            }
-        }
-    ).graphicsLayer {
-        scaleY = scale.value
+    return drawBehind {
+        drawRect(
+            brush = Brush.linearGradient(
+                colors = listOf(
+                    Color(0x0FD8D8D8),
+                    Color(0x0F969292),
+                    Color(0x0F575757),
+                ),
+                start = Offset(startOffsetX, 0f),
+                end = Offset(startOffsetX + size.width, size.height)
+            )
+        )
     }
 }
 
@@ -117,17 +105,5 @@ fun Modifier.foregroundGradient(
                 endY = size.height * gradientFraction
             )
         )
-    }
-}
-
-@Composable
-fun rememberKeyboardState(): State<Boolean> {
-    val ime = WindowInsets.ime
-    val density = LocalDensity.current
-
-    return remember {
-        derivedStateOf {
-            ime.getBottom(density) > 0
-        }
     }
 }

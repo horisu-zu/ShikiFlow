@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.track.Date
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.atStartOfDayIn
+import kotlin.time.Instant
 
 object DateMapper {
     fun DateShort.toDomain(): Date? {
@@ -32,7 +33,9 @@ object DateMapper {
             year = year,
             month = month,
             day = day,
-            date = null
+            date = if(year != null && month != null && day != null) {
+                LocalDate(year, month, day).atStartOfDayIn(TimeZone.currentSystemDefault())
+            } else null
         )
     }
 

@@ -48,8 +48,8 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.DynamicTopAppBar
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.presentation.common.foregroundGradient
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

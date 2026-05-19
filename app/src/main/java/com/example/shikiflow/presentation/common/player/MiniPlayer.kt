@@ -161,7 +161,6 @@ fun MiniPlayer(
                 .background(Color.Black)
         )
 
-
         PlayerControls(
             playerState = playerState,
             onPlayClick = { exoPlayer.play() },
@@ -186,7 +185,7 @@ fun MiniPlayer(
             ),
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(horizontal = 8.dp, vertical = 6.dp)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
         ) {
             PlayerBottomComponent(
                 currentProgress = progress,

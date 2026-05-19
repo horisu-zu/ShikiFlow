@@ -5,9 +5,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.track.Date as DomainDate
 import com.fleeksoft.ksoup.Ksoup
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toJavaLocalDate
 import kotlinx.datetime.toLocalDateTime
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
@@ -44,30 +42,7 @@ object Converter {
         return SimpleDateFormat(pattern, Locale.getDefault()).format(date)
     }
 
-    fun formatDate(
-        date: LocalDate,
-        includeTime: Boolean = false,
-        locale: Locale = Locale.getDefault()
-    ): String {
-        val currentYear = Clock.System.now()
-            .toLocalDateTime(TimeZone.currentSystemDefault()).year
-        val instantYear = date.year
-
-        val pattern = buildString {
-            append ("dd MMM")
-            if (instantYear != currentYear) {
-                append(" yyyy")
-            }
-            if (includeTime) {
-                append(" HH:mm")
-            }
-        }
-
-        val formatter = DateTimeFormatter.ofPattern(pattern, locale)
-        return date.toJavaLocalDate().format(formatter)
-    }
-
-    fun DomainDate.format(locale: Locale = Locale.getDefault()): String? {
+    fun DomainDate.format(): String? {
         if(day == null && month == null && year == null) return null
 
         val currentYear = Clock.System.now()
@@ -85,7 +60,7 @@ object Converter {
             day ?: 1
         )
 
-        return DateTimeFormatter.ofPattern(pattern, locale).format(safeDate)
+        return DateTimeFormatter.ofPattern(pattern, Locale.getDefault()).format(safeDate)
     }
 
     fun convertInstantToString(resources: Resources, instant: Instant): String {

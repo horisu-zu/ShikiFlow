@@ -31,7 +31,7 @@ import com.example.shikiflow.domain.model.user.MessageActivity
 import com.example.shikiflow.domain.model.user.TextActivity
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserActivity
-import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.description
@@ -181,7 +181,7 @@ fun TextActivityItem(
             )
         }
 
-        ExpandableText(
+        RichTextRenderer(
             htmlText = textActivity.text,
             style = MaterialTheme.typography.bodyMedium,
             onEntityClick = onEntityClick
@@ -243,7 +243,7 @@ fun MessageActivityItem(
                 )
             }
 
-            ExpandableText(
+            RichTextRenderer(
                 htmlText = messageActivity.text,
                 style = MaterialTheme.typography.bodyMedium,
                 onEntityClick = onEntityClick

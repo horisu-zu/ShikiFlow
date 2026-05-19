@@ -48,7 +48,7 @@ fun MangaDetailsScreen(
                 contentAlignment = Alignment.Center
             ) {
                 ErrorItem(
-                    message = stringResource(id = R.string.details_error),
+                    message = uiState.errorMessage ?: stringResource(id = R.string.details_error),
                     buttonLabel = stringResource(R.string.common_retry),
                     onButtonClick = { mangaDetailsViewModel.onRefresh() }
                 )

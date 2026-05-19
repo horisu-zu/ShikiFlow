@@ -69,7 +69,6 @@ import com.example.shikiflow.domain.model.comment.DescriptionElement
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.image.shimmerEffect
 import com.example.shikiflow.utils.LinkRouter
 import com.example.shikiflow.utils.WebIntent
 import com.example.shikiflow.utils.parser.AnilistDialect
@@ -198,9 +197,7 @@ fun ExpandableText(
                         )
                     }
                 }
-                    .animateContentSize(
-                        animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
-                    ),
+                    .animateContentSize(animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()),
                 maxLines = if (isExpanded) Int.MAX_VALUE else collapsedMaxLines
             )
 

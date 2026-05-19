@@ -42,6 +42,7 @@ import coil3.request.crossfade
 import coil3.size.Size
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun BaseImage(

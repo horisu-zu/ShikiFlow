@@ -30,6 +30,22 @@
         <item quantity="many">%1$d часов назад</item>
     </plurals>
 
+    <plurals name="days">
+        <item quantity="one">%1$d день</item>
+        <item quantity="few">%1$d дня</item>
+        <item quantity="many">%1$d дней</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">%1$d час</item>
+        <item quantity="few">%1$d часа</item>
+        <item quantity="many">%1$d часов</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">%1$d минуту</item>
+        <item quantity="few">%1$d минуты</item>
+        <item quantity="many">%1$d минут</item>
+    </plurals>
+
     <string name="mtp_loading_error">Ошибка загрузки манги</string>
     <string name="atp_loading_error">Ошибка загрузки аниме</string>
 
@@ -217,7 +233,7 @@
     <string name="details_info_duration">Длительность</string>
     <string name="details_info_origin">Источник</string>
     <string name="details_info_duration_min">%1$d мин.</string>
-    <string name="details_info_duration_hours">%1$dч. %2$d мин.</string>
+    <string name="details_info_duration_hours">%1$d ч. %2$d мин.</string>
     <string name="details_info_aired_on">Дата начала</string>
     <string name="details_info_next_episode_at">Следующий эпизод в</string>
     <string name="details_info_released_on">Дата окончания</string>
@@ -239,6 +255,7 @@
     <string name="details_short_info_manga_volumes">Тома</string>
     <string name="details_short_info_manga_chapters">Главы</string>
     <string name="details_short_info_manga_started">Начало выхода</string>
+    <string name="details_short_info_airing_in">Эпизод через</string>
     <string name="details_related">Связанное</string>
     <string name="details_reviews_section_label">Обзоры</string>
 
@@ -479,4 +496,5 @@
     <string name="preferred_title_type_english">Английский</string>
     <string name="preferred_title_type_russian">Русский</string>
     <string name="settings_preferred_title_type">Тип тайтла</string>
+    <string name="details_short_info_airing_now">В эфире</string>
 </resources>

@@ -26,6 +26,7 @@ import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.mappers.MediaOriginMapper.displayValue
 import com.example.shikiflow.utils.Converter.format
 import com.example.shikiflow.utils.Converter.formatInstant
+import com.example.shikiflow.utils.DateUtils.calculateDuration
 
 @Composable
 fun AnimeShortInfoSection(
@@ -73,14 +74,22 @@ fun AnimeShortInfoSection(
             }
         }
         if (animeDetails.durationMins != null && animeDetails.durationMins != 0) {
+            val (hours, minutes) = animeDetails.durationMins.calculateDuration()
+
             DetailRow(
                 label = stringResource(R.string.details_info_duration),
                 content = {
                     Text(
-                        text = stringResource(
-                            R.string.details_info_duration_min,
-                            animeDetails.durationMins
-                        ),
+                        text = when(hours) {
+                            0 -> stringResource(
+                                id = R.string.details_info_duration_min,
+                                minutes
+                            )
+                            else -> stringResource(
+                                id = R.string.details_info_duration_hours,
+                                hours, minutes
+                            )
+                        },
                         overflow = TextOverflow.Ellipsis,
                         textAlign = TextAlign.End,
                         maxLines = 1,
@@ -124,9 +133,9 @@ fun AnimeShortInfoSection(
                 )
             }
         } else if (
-            animeDetails.status == MediaStatus.RELEASED
-            && animeDetails.releasedOn != null
-            && animeDetails.releasedOn != animeDetails.airedOn
+            animeDetails.status == MediaStatus.RELEASED &&
+            animeDetails.releasedOn != null &&
+            animeDetails.releasedOn != animeDetails.airedOn
         ) {
             animeDetails.releasedOn.format()?.let { date ->
                 DetailRow(
