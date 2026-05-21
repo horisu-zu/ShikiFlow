@@ -88,6 +88,7 @@ object ShikimoriCharacterMapper {
             alternativeNames = listOfNotNull(altName),
             imageUrl = imageUrl ?: (BuildConfig.SHIKI_BASE_URL + image.original),
             description = descriptionHtml,
+            attributes = null,
             isFavorite = favoured,
             favorites = null,
             voiceActors = seyu?.map { it.toDomain() } ?: emptyList(),

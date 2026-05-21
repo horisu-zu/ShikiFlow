@@ -6,6 +6,7 @@ import com.example.graphql.anilist.fragment.ALCharacterMediaRoles
 import com.example.graphql.anilist.fragment.ALCharacterShort
 import com.example.graphql.anilist.fragment.ALMediaBrowseShort
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StaffAttributesMapper.attributes
 import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
 import com.example.graphql.anilist.type.CharacterRole as AnilistCharacterRole
 import com.example.shikiflow.domain.model.character.CharacterRole
@@ -55,6 +56,7 @@ object AnilistCharacterMapper {
             alternativeNames = name?.alternative?.mapNotNull { it }.orEmpty(),
             imageUrl = image?.large ?: "",
             description = description,
+            attributes = attributes(),
             isFavorite = isFavourite,
             favorites = favourites,
             voiceActors = emptyList(),

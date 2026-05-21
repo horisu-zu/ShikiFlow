@@ -9,6 +9,7 @@ data class StaffDetails(
     val id: Int,
     val fullName: StaffName,
     val description: String?,
+    val attributes: StaffAttributes?,
     val imageUrl: String?,
     val isFavorite: Boolean?,
     val favorites: Int?,

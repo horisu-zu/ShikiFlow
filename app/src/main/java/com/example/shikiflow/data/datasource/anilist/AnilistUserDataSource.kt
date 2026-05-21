@@ -73,6 +73,7 @@ class AnilistUserDataSource @Inject constructor(
 
     override fun fetchCurrentUser(): Flow<DataResult<User>> {
         return apolloClient.query(CurrentUserQuery())
+            .fetchPolicy(FetchPolicy.NetworkFirst)
             .toFlow()
             .asDataResult { data ->
                 data.Viewer?.aLUserShort?.toDomain()

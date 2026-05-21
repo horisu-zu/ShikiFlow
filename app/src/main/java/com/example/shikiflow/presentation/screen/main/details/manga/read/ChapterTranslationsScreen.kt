@@ -190,7 +190,7 @@ private fun ChapterTranslationItem(
         ) {
             Text(
                 text = FlagConverter.getFlag(mangaDexChapter.translatedLanguage),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
             Text(
                 text = if(!mangaDexChapter.title.isNullOrEmpty()) mangaDexChapter.title

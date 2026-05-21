@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -43,7 +45,7 @@ import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.common.ExpandableText
+import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
@@ -53,6 +55,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.comment.Com
 import com.example.shikiflow.presentation.viewmodel.character.details.CharacterDetailsViewModel
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.presentation.screen.main.details.staff.StaffAttributes
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,10 +68,10 @@ fun CharacterDetailsScreen(
     val uiState by characterDetailsViewModel.uiState.collectAsStateWithLifecycle()
     val titleType = LocalTitleTypeController.current
 
-    val lazyListState = rememberLazyListState()
+    val lazyGridState = rememberLazyGridState()
     val isAtTop by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0
+            lazyGridState.firstVisibleItemIndex == 0
         }
     }
 
@@ -138,11 +141,12 @@ fun CharacterDetailsScreen(
                 )
             }
         } else {
-            val horizontalPadding = 12.dp
-
             uiState.details?.let { characterDetails ->
-                LazyColumn(
-                    state = lazyListState,
+                val horizontalPadding = 12.dp
+
+                LazyVerticalGrid(
+                    state = lazyGridState,
+                    columns = GridCells.Adaptive(180.dp),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = innerPadding.calculateTopPadding()),
@@ -154,19 +158,21 @@ fun CharacterDetailsScreen(
                     ),
                     verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                 ) {
-                    item {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         CharacterTitleSection(
                             avatarUrl = characterDetails.imageUrl,
                             name = characterDetails.fullName.preferred(titleType),
                             nativeName = characterDetails.fullName.native
                         )
                     }
+                    characterDetails.attributes?.let { attributes ->
+                        StaffAttributes(attributes)
+                    }
                     if(!characterDetails.description.isHTMLStringBlank()) {
-                        item {
-                            ExpandableText(
+                        item(span = { GridItemSpan(maxLineSpan) }) {
+                            RichTextRenderer(
                                 htmlText = characterDetails.description ?: "",
                                 style = MaterialTheme.typography.bodySmall,
-                                collapsedMaxLines = 4,
                                 onEntityClick = { entityType, id ->
                                     navOptions.navigateByEntity(entityType, id)
                                 }
@@ -174,7 +180,7 @@ fun CharacterDetailsScreen(
                         }
                     }
                     if(!characterDetails.voiceActors.isEmpty()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             Column(
                                 modifier = Modifier.padding(top = 4.dp),
                                 verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
@@ -204,7 +210,7 @@ fun CharacterDetailsScreen(
                         }
                     }
                     if(characterDetails.animeRoles.entries.isNotEmpty()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
                                 sectionTitle = stringResource(R.string.media_type_anime),
                                 items = characterDetails.animeRoles,
@@ -228,7 +234,7 @@ fun CharacterDetailsScreen(
                         }
                     }
                     if(characterDetails.mangaRoles.entries.isNotEmpty()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
                                 sectionTitle = stringResource(R.string.media_type_manga),
                                 items = characterDetails.mangaRoles,
@@ -252,7 +258,7 @@ fun CharacterDetailsScreen(
                         }
                     }
                     characterDetails.topicId?.let { topicId ->
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             CommentSection(
                                 topicId = topicId,
                                 onTopicNavigate = {

@@ -7,6 +7,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
+import com.apollographql.apollo.cache.normalized.FetchPolicy
+import com.apollographql.apollo.cache.normalized.fetchPolicy
 import com.example.graphql.shikimori.CurrentUserQuery
 import com.example.graphql.shikimori.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
@@ -47,6 +49,7 @@ class ShikimoriUserDataSource @Inject constructor(
 ): UserDataSource, BaseNetworkRepository() {
     override fun fetchCurrentUser(): Flow<DataResult<User>> {
         return apolloClient.query(CurrentUserQuery())
+            .fetchPolicy(FetchPolicy.NetworkFirst)
             .toFlow()
             .asDataResult { data ->
                 data.currentUser?.userShort?.toDomain()

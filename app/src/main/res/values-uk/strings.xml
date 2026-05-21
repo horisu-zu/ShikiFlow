@@ -261,6 +261,7 @@
     <string name="details_reviews_section_label">Огляди</string>
 
     <string name="media_details_following">Відслідковують</string>
+    <string name="airing_soon">Скоро в ефірі</string>
     <string name="rate_decrement">-</string>
     <string name="rate_increment">+</string>
     <string name="rewatches">Повторні перегляди</string>
@@ -497,4 +498,8 @@
     <string name="preferred_title_type_russian">Російська</string>
     <string name="settings_preferred_title_type">Тип тайтлу</string>
     <string name="details_short_info_airing_now">В ефірі</string>
+    <string name="years_active_present">донині</string>
+    <string name="gender_male">Чоловік</string>
+    <string name="gender_female">Жінка</string>
+    <string name="gender_other">Небінарний</string>
 </resources>

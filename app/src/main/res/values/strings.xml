@@ -261,6 +261,8 @@
     <string name="details_reviews_section_label">Reviews</string>
     <string name="media_details_following">Following</string>
 
+    <string name="airing_soon">Airing Soon</string>
+
     <string name="rate_decrement">-</string>
     <string name="rate_increment">+</string>
     <string name="rewatches">Rewatches</string>
@@ -515,4 +517,15 @@
     <string name="social_category_threads">Threads</string>
     <string name="social_category_thread_comments">Thread Comments</string>
     <string name="review_author_prefix">"A Review By "</string>
+
+    <string name="years_active_present">Present</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="gender_other">Non-Binary</string>
+    <string name="staff_attribute_date_of_birth">Date of Birth</string>
+    <string name="staff_attribute_date_of_death">Date of Death</string>
+    <string name="staff_attribute_age">Age</string>
+    <string name="staff_attribute_gender">Gender</string>
+    <string name="staff_attribute_years_active">Years Active</string>
+    <string name="staff_attribute_hometown">Hometown</string>
 </resources>

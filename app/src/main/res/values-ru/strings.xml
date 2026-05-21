@@ -260,6 +260,7 @@
     <string name="details_reviews_section_label">Обзоры</string>
 
     <string name="media_details_following">Отслеживают</string>
+    <string name="airing_soon">Скоро в эфире</string>
     <string name="rate_decrement">-</string>
     <string name="rate_increment">+</string>
     <string name="rewatches">Повторные просмотры</string>
@@ -487,7 +488,7 @@
     <string name="browse_type_trending_now">В тренде</string>
     <string name="browse_type_popular_this_season">Популярное в этом сзоне</string>
     <string name="profile_unfollow">Отписаться</string>
-    <string name="airing_episode">Эпизод</string>
+    <string name="airing_episode">Эпизод %1$s</string>
     <string name="settings_theme_primary_color">Основной цвет</string>
     <string name="settings_chapter_languages">Языки глав</string>
     <string name="settings_chapter_languages_desc">Отображение глав с переводами на выбранных языках</string>
@@ -497,4 +498,8 @@
     <string name="preferred_title_type_russian">Русский</string>
     <string name="settings_preferred_title_type">Тип тайтла</string>
     <string name="details_short_info_airing_now">В эфире</string>
+    <string name="years_active_present">н.в.</string>
+    <string name="gender_male">Мужчина</string>
+    <string name="gender_female">Женщина</string>
+    <string name="gender_other">Небинарный</string>
 </resources>

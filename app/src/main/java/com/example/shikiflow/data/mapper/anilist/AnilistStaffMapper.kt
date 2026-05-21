@@ -11,6 +11,7 @@ import com.example.shikiflow.data.mapper.common.DateMapper.toLocalDate
 import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.StaffAttributesMapper.attributes
 import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
 import com.example.shikiflow.data.mapper.common.StaffRoleMapper.toStaffRole
 import com.example.shikiflow.domain.model.common.PaginatedList
@@ -98,6 +99,7 @@ object AnilistStaffMapper {
             id = id,
             fullName = (name?.full ?: "").toStaffName(native = name?.native),
             description = description,
+            attributes = attributes(),
             imageUrl = image?.large,
             isFavorite = isFavourite,
             favorites = favourites,

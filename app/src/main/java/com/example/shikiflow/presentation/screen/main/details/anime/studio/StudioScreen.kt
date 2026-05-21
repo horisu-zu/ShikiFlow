@@ -104,7 +104,7 @@ fun StudioScreen(
                     title = {
                         Text(
                             text = studioName,
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )

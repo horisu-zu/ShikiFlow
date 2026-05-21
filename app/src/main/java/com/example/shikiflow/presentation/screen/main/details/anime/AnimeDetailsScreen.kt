@@ -63,12 +63,14 @@ fun AnimeDetailsScreen(
                 )
             }
         } else {
-            SharedTransitionLayout {
-                AnimatedVisibility(
-                    visible = selectedScreenshotIndex != null,
-                    modifier = Modifier.fillMaxSize().zIndex(1f)
-                ) {
-                    uiState.details?.let { details ->
+            uiState.details?.let { details ->
+                SharedTransitionLayout {
+                    AnimatedVisibility(
+                        visible = selectedScreenshotIndex != null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .zIndex(1f)
+                    ) {
                         FullScreenImageDialog(
                             imageUrls = details.screenshots,
                             initialIndex = selectedScreenshotIndex ?: 0,
@@ -78,8 +80,7 @@ fun AnimeDetailsScreen(
                             }
                         )
                     }
-                }
-                uiState.details?.let { details ->
+
                     PullToRefreshBox(
                         isRefreshing = uiState.isRefreshing,
                         onRefresh = { animeDetailsViewModel.onRefresh() }

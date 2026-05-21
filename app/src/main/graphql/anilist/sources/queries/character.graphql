@@ -43,6 +43,11 @@ query CharacterDetails(
         image {
             large
         }
+        age
+        gender
+        dateOfBirth {
+            ...Date
+        }
         isFavourite
         favourites
         anime: media(sort: [POPULARITY_DESC], type: ANIME) {

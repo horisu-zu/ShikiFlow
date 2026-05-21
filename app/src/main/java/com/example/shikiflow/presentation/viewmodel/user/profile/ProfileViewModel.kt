@@ -64,6 +64,31 @@ class ProfileViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
+        mutableUiState
+            .filter { state ->
+                state.user != null && state.authType != null
+            }
+            .distinctUntilChanged { old, new ->
+                old.user?.id == new.user?.id && !new.isRefreshing
+            }
+            .filter { state ->
+                state.user == state.currentUser
+            }
+            .flatMapLatest { state ->
+                userRepository.fetchCurrentUser(state.authType!!)
+            }
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    if(result is DataResult.Success) {
+                        settingsRepository.saveUserData(result.data, state.authType!!)
+
+                        state.copy()
+                    } else {
+                        result.toUiState()
+                    }
+                }
+            }.launchIn(viewModelScope)
+
         settingsRepository.userFlow
             .filterNotNull()
             .onEach { user ->

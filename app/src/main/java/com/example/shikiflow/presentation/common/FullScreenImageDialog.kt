@@ -50,9 +50,11 @@ fun SharedTransitionScope.FullScreenImageDialog(
         onImageChange(pagerState.currentPage)
     }
 
-    Box(modifier = modifier.background(Color.Black.copy(alpha = 0.7f))) {
+    Box(
+        modifier = modifier.background(Color.Black.copy(alpha = 0.7f))
+    ) {
         HorizontalPager(state = pagerState) { pageIndex ->
-            val isSelected = initialIndex == pageIndex
+            val isSelected = pagerState.currentPage == pageIndex && !pagerState.isScrollInProgress
 
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -65,7 +67,7 @@ fun SharedTransitionScope.FullScreenImageDialog(
                         .fillMaxWidth(0.8f)
                         .zoomable(rememberZoomState())
                         .then(
-                            if(isSelected && !pagerState.isScrollInProgress) {
+                            if(isSelected) {
                                 Modifier.sharedElement(
                                     sharedContentState = rememberSharedContentState(key = "screenshot-$pageIndex"),
                                     animatedVisibilityScope = visibilityScope

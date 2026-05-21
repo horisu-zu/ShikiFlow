@@ -25,12 +25,16 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +66,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -74,6 +80,8 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.presentation.screen.main.details.RoleType
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffAttributes
+import com.example.shikiflow.domain.model.staff.StaffName
 import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
@@ -87,7 +95,11 @@ import com.example.shikiflow.presentation.screen.main.details.common.CharacterCa
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.presentation.viewmodel.staff.staff_details.StaffViewModel
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.DateMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.GenderMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.utils.Converter.format
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -100,16 +112,16 @@ fun StaffScreen(
     val staffUiState by staffViewModel.uiState.collectAsStateWithLifecycle()
 
     val titleType = LocalTitleTypeController.current
-    val lazyListState = rememberLazyListState()
+    val lazyGridState = rememberLazyGridState()
     val isAtTop by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0 &&
-            lazyListState.firstVisibleItemScrollOffset == 0
+            lazyGridState.firstVisibleItemIndex == 0 &&
+            lazyGridState.firstVisibleItemScrollOffset == 0
         }
     }
     val scrolledFirst by remember {
         derivedStateOf {
-            lazyListState.firstVisibleItemIndex != 0
+            lazyGridState.firstVisibleItemIndex != 0
         }
     }
 
@@ -182,8 +194,9 @@ fun StaffScreen(
             staffUiState.staffDetails?.let { details ->
                 val horizontalPadding = 12.dp
 
-                LazyColumn(
-                    state = lazyListState,
+                LazyVerticalGrid(
+                    state = lazyGridState,
+                    columns = GridCells.Adaptive(300.dp),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = paddingValues.calculateTopPadding()),
@@ -195,16 +208,19 @@ fun StaffScreen(
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                 ) {
-                    item {
+                    item(span = { GridItemSpan(maxLineSpan) }) {
                         StaffTitleSection(
                             avatarUrl = details.imageUrl,
-                            name = details.fullName.preferred(titleType),
-                            nativeName = details.fullName.native,
+                            staffName = details.fullName,
+                            preferredType = titleType,
                             staffRoles = details.shortRoles
                         )
                     }
+                    details.attributes?.let { attributes ->
+                        StaffAttributes(attributes)
+                    }
                     if(!details.description.isHTMLStringBlank()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             ExpandableText(
                                 htmlText = details.description ?: "",
                                 style = MaterialTheme.typography.bodySmall,
@@ -216,7 +232,7 @@ fun StaffScreen(
                         }
                     }
                     if(details.staffCharacterRoles.entries.isNotEmpty()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             VoiceActorRolesSection(
                                 characterRoles = details.staffCharacterRoles,
                                 titleType = titleType,
@@ -243,7 +259,7 @@ fun StaffScreen(
                         }
                     }
                     if(details.staffAnimeRoles.entries.isNotEmpty()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
                                 sectionTitle = stringResource(R.string.media_type_anime),
                                 items = details.staffAnimeRoles,
@@ -270,7 +286,7 @@ fun StaffScreen(
                         }
                     }
                     if(details.staffMangaRoles.entries.isNotEmpty()) {
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
                                 sectionTitle = stringResource(R.string.media_type_manga),
                                 items = details.staffMangaRoles,
@@ -297,7 +313,7 @@ fun StaffScreen(
                         }
                     }
                     details.topicId?.let { topicId ->
-                        item {
+                        item(span = { GridItemSpan(maxLineSpan) }) {
                             CommentSection(
                                 topicId = topicId,
                                 onEntityClick = { entityType, id ->
@@ -325,8 +341,8 @@ fun StaffScreen(
 @Composable
 private fun StaffTitleSection(
     avatarUrl: String?,
-    name: String?,
-    nativeName: String?,
+    staffName: StaffName,
+    preferredType: PreferredTitleType,
     staffRoles: Map<String, Int?>,
     modifier: Modifier = Modifier
 ) {
@@ -336,6 +352,7 @@ private fun StaffTitleSection(
         targetValue = if (isExpanded) 180f else 0f,
         animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
+    val imageType = ImageType.Poster()
 
     Row(
         modifier = modifier
@@ -343,7 +360,10 @@ private fun StaffTitleSection(
             .height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        BaseImage(model = avatarUrl)
+        BaseImage(
+            model = avatarUrl,
+            imageType = imageType
+        )
 
         Spacer(Modifier.width(16.dp))
 
@@ -356,55 +376,58 @@ private fun StaffTitleSection(
                 .weight(1f)
         ) {
             Column(verticalArrangement = Arrangement.Center) {
-                name?.let { englishName ->
-                    Text(
-                        text = englishName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-                nativeName?.let {
-                    Text(
-                        text = nativeName,
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                        ),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                Text(
+                    text = staffName.preferred(preferredType),
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+
+                if(preferredType != PreferredTitleType.NATIVE) {
+                    staffName.native?.let { nativeName ->
+                        Text(
+                            text = nativeName,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
             }
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .clip(
-                    RoundedCornerShape(
-                        topStart = 12.dp,
-                        bottomStart = 12.dp,
-                        topEnd = if (isExpanded) 0.dp else 4.dp,
-                        bottomEnd = if (isExpanded) 0.dp else 4.dp,
-                    )
-                )
-                .clickable(
-                    interactionSource = mutableInteractionSource,
-                    indication = null,
-                    onClick = {
-                        isExpanded = !isExpanded
-                    }
-                )
-                .background(MaterialTheme.colorScheme.surfaceContainer),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                contentDescription = "Expand Button",
+        if(staffRoles.isNotEmpty()) {
+            Box(
                 modifier = Modifier
-                    .padding(horizontal = 8.dp)
-                    .rotate(rotationState)
-            )
+                    .fillMaxHeight()
+                    .clip(
+                        RoundedCornerShape(
+                            topStart = 12.dp,
+                            bottomStart = 12.dp,
+                            topEnd = if (isExpanded) 0.dp else 4.dp,
+                            bottomEnd = if (isExpanded) 0.dp else 4.dp,
+                        )
+                    )
+                    .clickable(
+                        interactionSource = mutableInteractionSource,
+                        indication = null,
+                        onClick = {
+                            isExpanded = !isExpanded
+                        }
+                    )
+                    .background(MaterialTheme.colorScheme.surfaceContainer),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = "Expand Button",
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .rotate(rotationState)
+                )
+            }
         }
 
         AnimatedVisibility(
@@ -422,7 +445,7 @@ private fun StaffTitleSection(
                 )
             ),
             modifier = Modifier
-                .fillMaxHeight()
+                .heightIn(max = imageType.width / imageType.aspectRatio)
                 .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
                 .background(MaterialTheme.colorScheme.surfaceContainer)
         ) {
@@ -512,5 +535,99 @@ private fun VoiceActorRolesSection(
                 }
             }
         }
+    }
+}
+
+fun LazyGridScope.StaffAttributes(
+    staffAttributes: StaffAttributes
+) {
+    staffAttributes.dateOfBirth?.let { date ->
+        date.format()?.let { value ->
+            item {
+                StaffAttributesItem(
+                    label = stringResource(R.string.staff_attribute_date_of_birth),
+                    value = value
+                )
+            }
+        }
+    }
+    staffAttributes.dateOfDeath?.let { date ->
+        date.format()?.let { value ->
+            item {
+                StaffAttributesItem(
+                    label = stringResource(R.string.staff_attribute_date_of_death),
+                    value = value
+                )
+            }
+        }
+    }
+    staffAttributes.age?.let { age ->
+        item {
+            StaffAttributesItem(
+                label = stringResource(R.string.staff_attribute_age),
+                value = age
+            )
+        }
+    }
+    staffAttributes.gender?.let { gender ->
+        item {
+            StaffAttributesItem(
+                label = stringResource(R.string.staff_attribute_gender),
+                value = stringResource(gender.displayValue())
+            )
+        }
+    }
+    staffAttributes.yearsActive?.let { yearsActive ->
+        item {
+            StaffAttributesItem(
+                label = stringResource(R.string.staff_attribute_years_active),
+                value = yearsActive.displayValue()
+            )
+        }
+    }
+    staffAttributes.hometown?.let { hometown ->
+        item {
+            StaffAttributesItem(
+                label = stringResource(R.string.staff_attribute_hometown),
+                value = hometown
+            )
+        }
+    }
+}
+
+@Composable
+private fun StaffAttributesItem(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall.copy(
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSecondaryContainer
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .background(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = RoundedCornerShape(8.dp)
+                )
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+        )
+
+        Text(
+            text = value,
+            style = MaterialTheme.typography.labelMedium,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }

@@ -184,9 +184,7 @@ fun ExpandableText(
         ) {
             Text(
                 text = text,
-                style = style.copy(
-                    lineHeight = style.lineHeight * 1.2
-                ),
+                style = style.copy(lineHeight = style.lineHeight * 1.2),
                 modifier = Modifier.drawWithContent {
                     drawContent()
                     if (!isExpanded && shouldShowButton) {

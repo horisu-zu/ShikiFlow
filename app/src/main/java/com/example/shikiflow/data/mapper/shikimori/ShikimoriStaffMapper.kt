@@ -24,6 +24,7 @@ object ShikimoriStaffMapper {
             id = id,
             fullName = name.toStaffName(russian, japanese),
             description = null,
+            attributes = null,
             imageUrl = imageUrl ?: "${BuildConfig.SHIKI_BASE_URL}${image.original}",
             isFavorite = null,
             favorites = null,
