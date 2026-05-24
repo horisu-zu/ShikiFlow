@@ -81,7 +81,7 @@ import com.example.shikiflow.utils.parser_v2.RichTextBlock
 import com.example.shikiflow.utils.parser_v2.RichTextInline
 import com.example.shikiflow.utils.parser_v2.RichTextParser
 import com.example.shikiflow.utils.parser_v2.RichTextTextKind
-import com.example.shikiflow.utils.parser_v2.getBlockquoteContent
+import com.example.shikiflow.utils.parser_v2.filterBlockquoteContent
 
 @Composable
 fun RichTextRenderer(
@@ -204,7 +204,11 @@ private fun RenderBlocks(
                 is RichTextBlock.Blockquote -> {
                     RichQuoteItem(
                         block = block,
-                        style = style
+                        style = style,
+                        linkColor = linkColor,
+                        codeBackground = codeBackground,
+                        spoilerColor = spoilerColor,
+                        onLinkClick = onLinkClick
                     )
                 }
                 is RichTextBlock.CodeBlock -> {
@@ -360,7 +364,7 @@ private fun RichSpoiler(
     linkColor: Color,
     codeBackground: Color,
     spoilerColor: Color,
-    onLinkClick: (String) -> Unit,
+    onLinkClick: (String) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(false) }
 
@@ -407,7 +411,11 @@ private fun RichSpoiler(
 @Composable
 private fun RichQuoteItem(
     block: RichTextBlock.Blockquote,
-    style: TextStyle
+    style: TextStyle,
+    linkColor: Color,
+    codeBackground: Color,
+    spoilerColor: Color,
+    onLinkClick: (String) -> Unit
 ) {
     val onBackgroundColor = MaterialTheme.colorScheme.onBackground
 
@@ -421,7 +429,8 @@ private fun RichQuoteItem(
                     size = Size(4.dp.toPx(), size.height)
                 )
             }
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         block.senderNickname?.let { nickname ->
             Row(
@@ -443,9 +452,13 @@ private fun RichQuoteItem(
             }
         }
 
-        Text(
-            text = getBlockquoteContent(block.children),
-            style = style
+        RenderBlocks(
+            blocks = filterBlockquoteContent(block),
+            style = style,
+            linkColor = linkColor,
+            codeBackground = codeBackground,
+            spoilerColor = spoilerColor,
+            onLinkClick = onLinkClick
         )
     }
 }

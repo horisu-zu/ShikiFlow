@@ -69,34 +69,29 @@ internal fun parseAlignment(
     }
 }
 
-//The problem with Blockquote is that in case of Shikimori API
-//it shows user data in content (originally List<RichTextBlock>)
-internal fun getBlockquoteContent(children: List<RichTextBlock>): String {
-    return children
-        .filter { it is RichTextBlock.Text || it is RichTextBlock.ListBlock }
-        .firstOrNull { child ->
-            when (child) {
-                is RichTextBlock.Text -> child.inlines.any { it !is RichTextInline.Link }
-                is RichTextBlock.ListBlock -> true
-                is RichTextBlock.InlineGroup -> true
-                else -> false
+internal fun filterBlockquoteContent(
+    block: RichTextBlock.Blockquote
+): List<RichTextBlock> {
+    val nicknameBlock = block.senderNickname?.let { nickname ->
+        block.children.filterIsInstance<RichTextBlock.Text>()
+            .firstOrNull { block ->
+                block.inlines.any { inline ->
+                    inline is RichTextInline.Link && inline.children.contains(RichTextInline.Text(nickname))
+                }
             }
-        }
-        ?.extractPlainText()
-        ?: children.first().extractPlainText()
-}
-
-private fun RichTextBlock.extractPlainText(): String =
-    when (this) {
-        is RichTextBlock.Text -> inlines.extractPlainText()
-        is RichTextBlock.ListBlock -> items.joinToString(" ") { item ->
-            item.children.joinToString(" ") { it.extractPlainText() }
-        }
-        is RichTextBlock.InlineGroup -> children.joinToString(" ") { children ->
-            children.extractPlainText()
-        }
-        else -> ""
     }
+
+    val avatarBlock = block.senderAvatarUrl?.let { avatarUrl ->
+        block.children.filterIsInstance<RichTextBlock.Image>()
+            .firstOrNull { block ->
+                avatarUrl.replace("/x32/", "/x16/").contains(block.url)
+            }
+    }
+
+    return block.children.filter { block ->
+        block != nicknameBlock && block != avatarBlock
+    }
+}
 
 fun List<RichTextInline>.extractPlainText(): String =
     joinToString("") { inline ->
