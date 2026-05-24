@@ -81,7 +81,7 @@ fun AnimeTrackGridItem(
                     )
             )
             Text(
-                text = trackItem.shortData.name.preferred(titleType),
+                text = trackItem.shortData.title.preferred(titleType),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),

@@ -59,8 +59,8 @@ class MediaTracksRepositoryImpl @Inject constructor(
         }
         .distinctUntilChanged()
 
-    override fun getLocalTrack(malId: Int, mediaType: MediaType): Flow<MediaTrack?> {
-        return mediaTracksDao.getTrackByMalId(malId, mediaType)
+    override fun getLocalTrack(id: Int, mediaType: MediaType): Flow<MediaTrack?> {
+        return mediaTracksDao.getTrackById(id, mediaType)
             .map { dto ->
                 dto?.toDomain()
             }

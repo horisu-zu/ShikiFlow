@@ -44,6 +44,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.track.media.MediaShortData
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
@@ -73,6 +74,7 @@ import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 fun MangaDetailsContent(
     authType: AuthType,
     mangaDetails: MediaDetails,
+    userRate: MediaUserTrack?,
     mangaDexUiState: MangaDexUiState,
     rateUpdateState: RateUpdateState,
     mediaNavOptions: MediaNavOptions,
@@ -101,6 +103,7 @@ fun MangaDetailsContent(
         item {
             MangaDetailsHeader(
                 mangaDetails = mangaDetails,
+                userRate = userRate,
                 mangaDexUiState = mangaDexUiState,
                 titleType = titleType,
                 horizontalPadding = horizontalPadding,
@@ -109,9 +112,10 @@ fun MangaDetailsContent(
                     if(mangaDexUiState.mangaDexIds.isNotEmpty()) {
                         mediaNavOptions.navigateToMangaRead(
                             mangaDexIds = mangaDexUiState.mangaDexIds,
-                            malId = mangaDetails.malId!!,
+                            trackerMangaId = mangaDetails.id,
+                            malId = mangaDetails.malId,
                             title = mangaDetails.title.preferred(titleType),
-                            completedChapters = mangaDetails.userRate?.progress ?: 0
+                            completedChapters = userRate?.progress ?: 0
                         )
                     } else if(mangaDexUiState.errorMessage != null) {
                         onMangaDexRefreshClick()
@@ -346,7 +350,7 @@ fun MangaDetailsContent(
 
     if(rateBottomSheet) {
         UserRateBottomSheet(
-            userRate = mangaDetails.toUiModel(),
+            userRate = mangaDetails.toUiModel(userRate),
             preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },

@@ -8,7 +8,6 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.model.user.stats.Stat
 import kotlin.time.Instant
 
@@ -34,7 +33,6 @@ data class MediaDetails(
     val nextEpisodeAt: Instant? = null,
     val origin: MediaOrigin? = null,
     val screenshots: List<String> = emptyList(),
-    val userRate: UserMediaRate?,
     val studios: List<StudioShort>? = null,
     val staffList: List<StaffShort> = emptyList(),
     val durationMins: Int? = null,

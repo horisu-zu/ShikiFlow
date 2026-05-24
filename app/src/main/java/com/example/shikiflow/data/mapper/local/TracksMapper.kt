@@ -51,7 +51,7 @@ object TracksMapper {
         score = track.score,
         mediaId = shortData.id,
         malId = shortData.malId,
-        title = shortData.name,
+        title = shortData.title,
         posterUrl = shortData.poster?.previewUrl,
         createDate = track.createdAt,
         updateDate = track.updatedAt,

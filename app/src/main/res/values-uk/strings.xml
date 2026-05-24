@@ -499,7 +499,13 @@
     <string name="settings_preferred_title_type">Тип тайтлу</string>
     <string name="details_short_info_airing_now">В ефірі</string>
     <string name="years_active_present">донині</string>
-    <string name="gender_male">Чоловік</string>
-    <string name="gender_female">Жінка</string>
+    <string name="gender_male">Чоловічий</string>
+    <string name="gender_female">Жіночий</string>
     <string name="gender_other">Небінарний</string>
+    <string name="staff_attribute_date_of_birth">Дата народження</string>
+    <string name="staff_attribute_date_of_death">Дата смерті</string>
+    <string name="staff_attribute_age">Вік</string>
+    <string name="staff_attribute_gender">Гендер</string>
+    <string name="staff_attribute_years_active">Роки активності</string>
+    <string name="staff_attribute_hometown">Рідне місто</string>
 </resources>

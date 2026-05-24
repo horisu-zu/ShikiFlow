@@ -130,7 +130,7 @@ class ChapterViewModel @Inject constructor(
                     if (!shouldUpdate) return@collectLatest
 
                     state.chapterNumber?.let { chapterNumber ->
-                        updateMangaProgressUseCase(state.malId!!, chapterNumber)
+                        updateMangaProgressUseCase(state.trackerMangaId!!, state.malId, chapterNumber)
                     }
                 }
         }
@@ -175,7 +175,8 @@ class ChapterViewModel @Inject constructor(
 
     fun setChapterData(
         mangaId: String,
-        malId: Int,
+        trackerMangaId: Int,
+        malId: Int?,
         chapterId: String,
         chapterNumber: Double,
         scanlationGroupsIds: List<String>,
@@ -184,6 +185,7 @@ class ChapterViewModel @Inject constructor(
         _chapterUiState.update { state ->
             state.copy(
                 mangaId = mangaId,
+                trackerMangaId = trackerMangaId,
                 malId = malId,
                 chapterId = chapterId,
                 chapterNumber = chapterNumber,

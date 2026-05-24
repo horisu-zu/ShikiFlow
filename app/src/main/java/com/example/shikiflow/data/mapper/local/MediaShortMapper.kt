@@ -25,7 +25,7 @@ object MediaShortMapper {
         return MediaShortData(
             id = id,
             malId = malId,
-            name = title,
+            title = title,
             synonyms = synonyms,
             mediaType = mediaType,
             kind = format,
@@ -48,7 +48,7 @@ object MediaShortMapper {
         return MediaShortData(
             id = id,
             malId = malId,
-            name = name,
+            title = name,
             synonyms = synonyms,
             mediaType = mediaType,
             kind = kind,
@@ -71,7 +71,7 @@ object MediaShortMapper {
         return MediaShortEntity(
             id = id,
             malId = malId,
-            name = name,
+            name = title,
             synonyms = synonyms,
             mediaType = mediaType,
             kind = kind,
@@ -97,7 +97,7 @@ object MediaShortMapper {
         return MediaShortData(
             id = id.toInt(),
             malId = id.toInt(),
-            name = name.toDomainTitle(english, russian, japanese),
+            title = name.toDomainTitle(english, russian, japanese),
             synonyms = synonyms,
             mediaType = MediaType.ANIME,
             kind = kind?.toDomain(),
@@ -120,7 +120,7 @@ object MediaShortMapper {
         return MediaShortData(
             id = id.toInt(),
             malId = id.toInt(),
-            name = name.toDomainTitle(english, russian, japanese),
+            title = name.toDomainTitle(english, russian, japanese),
             synonyms = synonyms,
             mediaType = MediaType.MANGA,
             kind = kind?.toDomain(),
@@ -142,7 +142,7 @@ object MediaShortMapper {
     fun MediaShort.toShortData() = MediaShortData(
         id = id,
         malId = idMal,
-        name = title?.mediaTitle.toDomainTitle(),
+        title = title?.mediaTitle.toDomainTitle(),
         synonyms = buildList {
             title?.mediaTitle?.english?.let { add(it) }
             synonyms?.mapNotNull { synonym ->

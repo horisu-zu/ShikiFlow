@@ -183,19 +183,6 @@ fragment RelatedMangaShort on Manga {
     kind
 }
 
-fragment UserRateShort on UserRate {
-    id
-    text
-    status
-    episodes
-    chapters
-    volumes
-    rewatches
-    score
-    createdAt
-    updatedAt
-}
-
 fragment ShikiCharacterRole on CharacterRole {
     id
     rolesEn

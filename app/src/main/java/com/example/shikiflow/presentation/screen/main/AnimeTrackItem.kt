@@ -67,7 +67,7 @@ fun AnimeTrackItem(
             verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
         ) {
             Text(
-                text = userRate.shortData.name.preferred(titleType),
+                text = userRate.shortData.title.preferred(titleType),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold
                 ),

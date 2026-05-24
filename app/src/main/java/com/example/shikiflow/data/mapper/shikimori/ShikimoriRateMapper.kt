@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.mapper.shikimori
 
-import com.example.graphql.shikimori.fragment.UserRateShort
 import com.example.graphql.shikimori.type.UserRateStatusEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
@@ -108,24 +107,6 @@ object ShikimoriRateMapper {
         return MediaTypeStats(
             animeStats = statsMap[MediaType.ANIME],
             mangaStats = statsMap[MediaType.MANGA]
-        )
-    }
-
-    fun UserRateShort.toDomain(mediaId: Int, mediaType: MediaType): UserMediaRate {
-        return UserMediaRate(
-            rateId = this.id.toInt(),
-            mediaId = mediaId,
-            rateStatus = this.status.toDomain(),
-            progress = when(mediaType) {
-                MediaType.ANIME -> this.episodes
-                MediaType.MANGA -> this.chapters
-            },
-            progressVolumes = this.volumes,
-            repeat = this.rewatches,
-            textNotes = this.text,
-            score = this.score,
-            createdAt = Instant.parse(this.createdAt.toString()),
-            updatedAt = Instant.parse(this.updatedAt.toString())
         )
     }
 }

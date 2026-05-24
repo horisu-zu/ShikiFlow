@@ -63,6 +63,7 @@ fun MangaDetailsScreen(
                         MangaDetailsContent(
                             authType = authType,
                             mangaDetails = details,
+                            userRate = uiState.userRate,
                             mangaDexUiState = uiState.mangaDexUiState,
                             rateUpdateState = uiState.rateUpdateState,
                             mediaNavOptions = navOptions,

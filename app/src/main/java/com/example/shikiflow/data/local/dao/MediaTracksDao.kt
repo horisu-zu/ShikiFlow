@@ -66,10 +66,10 @@ interface MediaTracksDao {
     @Query("""
         SELECT * FROM media_track
         INNER JOIN media_short ON media_track.mediaId = media_short.id
-        WHERE media_short.malId = :malId
+        WHERE media_short.id = :id
         AND media_short.mediaType = :mediaType
     """)
-    fun getTrackByMalId(malId: Int, mediaType: MediaType): Flow<MediaTrackDto?>
+    fun getTrackById(id: Int, mediaType: MediaType): Flow<MediaTrackDto?>
 
     @Transaction
     @Query("""

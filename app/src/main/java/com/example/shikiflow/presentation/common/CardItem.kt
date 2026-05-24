@@ -27,13 +27,13 @@ fun CardItem(
                 other = if(onClick != null) {
                     Modifier.clickable(onClick = onClick)
                 } else Modifier
-            ).background(MaterialTheme.colorScheme.primaryContainer),
+            ).background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = item,
             style = style.copy(
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+                color = MaterialTheme.colorScheme.onSecondaryContainer
             ),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
         )

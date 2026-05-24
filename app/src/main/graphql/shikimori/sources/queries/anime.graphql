@@ -35,9 +35,9 @@ query AnimeDetails(
             ...RelatedMediaShort
         }
 
-        #personRoles {
-        #    ...PersonRoleShort
-        #}
+        personRoles {
+            ...PersonRoleShort
+        }
 
         screenshots { originalUrl }
 
@@ -45,10 +45,6 @@ query AnimeDetails(
         statusesStats { status count }
 
         descriptionHtml
-
-        userRate {
-            ...UserRateShort
-        }
 
         topic {
             id

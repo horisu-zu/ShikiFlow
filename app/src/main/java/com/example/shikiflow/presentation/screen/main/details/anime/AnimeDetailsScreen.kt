@@ -89,6 +89,7 @@ fun AnimeDetailsScreen(
                             AnimeDetailsContent(
                                 currentAuthType = authType,
                                 animeDetails = details,
+                                userRate = uiState.userRate,
                                 rateUpdateState = uiState.rateUpdateState,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 selectedScreenshotIndex = selectedScreenshotIndex,

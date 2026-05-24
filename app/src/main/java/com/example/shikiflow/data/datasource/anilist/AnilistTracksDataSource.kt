@@ -126,7 +126,7 @@ class AnilistTracksDataSource @Inject constructor(
                         } ?: emptyList()
                     }
                 }?.filter { mediaTrack ->
-                    mediaTrack.shortData.name.romaji.contains(title, ignoreCase = true) ||
+                    mediaTrack.shortData.title.romaji.contains(title, ignoreCase = true) ||
                             mediaTrack.shortData.synonyms?.any { synonym ->
                                 synonym.contains(title, ignoreCase = true)
                             } == true

@@ -16,10 +16,10 @@ class UpdateMangaProgressUseCase @Inject constructor(
     private val mediaTracksRepository: MediaTracksRepository,
     private val mediaRepository: MediaRepository
 ) {
-    suspend operator fun invoke(malId: Int, chapterNumber: Double) {
+    suspend operator fun invoke(mangaId: Int, malId: Int?, chapterNumber: Double) {
         val chapterNum = chapterNumber.toInt()
 
-        mediaTracksRepository.getLocalTrack(malId, MediaType.MANGA)
+        mediaTracksRepository.getLocalTrack(mangaId, MediaType.MANGA)
             .first()
             ?.let { mediaTrack ->
                 if(mediaTrack.track.progress >= chapterNum) return
@@ -46,7 +46,7 @@ class UpdateMangaProgressUseCase @Inject constructor(
                     }
                 }.collect()
             } ?: run {
-                mediaRepository.getMediaDetails(idMal = malId, mediaType = MediaType.MANGA)
+                mediaRepository.getMediaDetails(id = mangaId, mediaType = MediaType.MANGA)
                     .onEach { result ->
                         if(result is DataResult.Success) {
                             mediaTracksRepository.saveUserRate(

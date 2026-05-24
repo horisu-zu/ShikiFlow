@@ -45,6 +45,7 @@ import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.track.media.MediaShortData
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
@@ -71,6 +72,7 @@ import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 fun AnimeDetailsContent(
     currentAuthType: AuthType,
     animeDetails: MediaDetails,
+    userRate: MediaUserTrack?,
     rateUpdateState: RateUpdateState,
     sharedTransitionScope: SharedTransitionScope,
     selectedScreenshotIndex: Int?,
@@ -100,6 +102,7 @@ fun AnimeDetailsContent(
         item {
             AnimeDetailsTitle(
                 animeDetails = animeDetails,
+                userRate = userRate,
                 authType = currentAuthType,
                 titleType = titleType,
                 horizontalPadding = horizontalPadding,
@@ -229,22 +232,6 @@ fun AnimeDetailsContent(
                 )
             }
         }
-        if(animeDetails.staffList.isNotEmpty()) {
-            item {
-                StaffSection(
-                    staffShortList = animeDetails.staffList,
-                    preferredTitleType = titleType,
-                    onMediaStaffClick = {
-                        mediaNavOptions.navigateToMediaStaff(animeDetails.id, MediaType.MANGA)
-                    },
-                    onStaffClick = { staffId ->
-                        mediaNavOptions.navigateToStaff(staffId)
-                    },
-                    horizontalPadding = horizontalPadding,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
         if(animeDetails.screenshots.isNotEmpty()) {
             item {
                 ScreenshotSection(
@@ -252,6 +239,22 @@ fun AnimeDetailsContent(
                     selectedIndex = selectedScreenshotIndex,
                     onScreenshotClick = onScreenshotClick,
                     sharedTransitionScope = sharedTransitionScope,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+        if(animeDetails.staffList.isNotEmpty()) {
+            item {
+                StaffSection(
+                    staffShortList = animeDetails.staffList,
+                    preferredTitleType = titleType,
+                    onMediaStaffClick = {
+                        mediaNavOptions.navigateToMediaStaff(animeDetails.id, MediaType.ANIME)
+                    },
+                    onStaffClick = { staffId ->
+                        mediaNavOptions.navigateToStaff(staffId)
+                    },
+                    horizontalPadding = horizontalPadding,
                     modifier = Modifier.fillMaxWidth()
                 )
             }
@@ -353,7 +356,7 @@ fun AnimeDetailsContent(
     }
     if(rateBottomSheet) {
         UserRateBottomSheet(
-            userRate = animeDetails.toUiModel(),
+            userRate = animeDetails.toUiModel(userRate),
             preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
             onDismiss = { rateBottomSheet = false },

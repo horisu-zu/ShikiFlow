@@ -4,6 +4,7 @@ import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 
 data class ChapterUiState(
     val mangaId: String? = null,
+    val trackerMangaId: Int? = null,
     val malId: Int? = null,
     val chapterId: String? = null,
     val chapterNumber: Double? = null,

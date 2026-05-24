@@ -77,10 +77,10 @@ class MangaChaptersViewModel @Inject constructor(
             }.launchIn(viewModelScope)
 
         _chaptersUiState
-            .mapNotNull { state -> state.malId }
+            .mapNotNull { state -> state.mangaId }
             .distinctUntilChanged()
-            .flatMapLatest { malId ->
-                mediaTracksRepository.getLocalTrack(malId, MediaType.MANGA)
+            .flatMapLatest { mangaId ->
+                mediaTracksRepository.getLocalTrack(mangaId, MediaType.MANGA)
             }
             .onEach { track ->
                 _chaptersUiState.update { state ->
@@ -97,11 +97,11 @@ class MangaChaptersViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun setIds(mangaDexId: String, malId: Int) {
+    fun setIds(mangaDexId: String, mangaId: Int) {
         _chaptersUiState.update { state ->
             state.copy(
                 mangaDexId = mangaDexId,
-                malId = malId
+                mangaId = mangaId
             )
         }
     }

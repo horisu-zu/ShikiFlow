@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.viewmodel.manga.details
 
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.MediaDetails
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.presentation.UiState
 
@@ -10,6 +11,7 @@ data class MangaDetailsUiState(
     val userId: Int? = null,
     val authType: AuthType? = null,
     val details: MediaDetails? = null,
+    val userRate: MediaUserTrack? = null,
     val mangaDexUiState: MangaDexUiState = MangaDexUiState(),
     val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
     override val isLoading: Boolean = true,

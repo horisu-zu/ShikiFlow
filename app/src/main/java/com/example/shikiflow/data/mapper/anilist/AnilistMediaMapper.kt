@@ -6,7 +6,6 @@ import com.example.graphql.anilist.fragment.ALAiringAnimeShort
 import com.example.graphql.anilist.fragment.MediaBrowse
 import com.example.graphql.anilist.fragment.MediaFollowingShort
 import com.example.shikiflow.data.mapper.anilist.AnilistCharacterMapper.toDomain
-import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
@@ -71,7 +70,6 @@ object AnilistMediaMapper {
                 Instant.fromEpochSeconds(it.aLAiringEpisodeShort.airingAt.toLong())
             },
             origin = source?.toDomain() ?: MediaOrigin.UNKNOWN,
-            userRate = mediaListEntry?.aLRateEntry?.toDomain(),
             studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.toStudioShort() } ?: emptyList(),
             staffList = staff?.edges?.mapNotNull { staffEdge ->
                 staffEdge?.aLStaffEdgeShort?.toDomain()

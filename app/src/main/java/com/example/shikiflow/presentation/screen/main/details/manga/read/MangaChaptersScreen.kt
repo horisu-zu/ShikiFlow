@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MangaChaptersScreen(
     mangaDexId: String,
-    malId: Int,
+    mangaId: Int,
     title: String,
     navOptions: MangaReadNavOptions,
     mangaChaptersViewModel: MangaChaptersViewModel = hiltViewModel()
@@ -112,7 +112,7 @@ fun MangaChaptersScreen(
     }
 
     LaunchedEffect(mangaDexId) {
-        mangaChaptersViewModel.setIds(mangaDexId, malId)
+        mangaChaptersViewModel.setIds(mangaDexId, mangaId)
     }
 
     Scaffold(

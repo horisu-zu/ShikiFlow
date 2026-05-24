@@ -22,7 +22,8 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToMangaRead(
         mangaDexIds: List<String>,
-        malId: Int,
+        trackerMangaId: Int,
+        malId: Int?,
         title: String,
         completedChapters: Int
     )

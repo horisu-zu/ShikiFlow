@@ -4,6 +4,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import kotlin.time.Clock
 import kotlin.time.Instant
 
@@ -30,14 +31,14 @@ data class UserRateData(
     val volumesCount: Int
 ) {
     companion object {
-        fun MediaDetails.toUiModel(): UserRateData {
+        fun MediaDetails.toUiModel(userRate: MediaUserTrack?): UserRateData {
             return userRate?.let { userRate ->
                 UserRateData(
-                    id = userRate.rateId,
+                    id = userRate.id,
                     mediaType = mediaType,
-                    status = userRate.rateStatus,
+                    status = userRate.status,
                     progress = userRate.progress,
-                    progressVolumes = userRate.progressVolumes,
+                    progressVolumes = userRate.progressVolumes ?: 0,
                     rewatches = userRate.repeat,
                     score = userRate.score,
                     mediaId = id,
@@ -60,7 +61,7 @@ data class UserRateData(
             )
         }
 
-        fun createEmpty(
+        private fun createEmpty(
             mediaId: Int,
             malId: Int?,
             mediaTitle: MediaTitle,

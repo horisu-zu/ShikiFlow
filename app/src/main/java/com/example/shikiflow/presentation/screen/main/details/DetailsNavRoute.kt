@@ -29,7 +29,8 @@ sealed interface DetailsNavRoute : NavKey {
     @Serializable
     data class MangaRead(
         val mangaDexIds: List<String>,
-        val malId: Int,
+        val trackerMangaId: Int,
+        val malId: Int?,
         val title: String,
         val completedChapters: Int
     ) : DetailsNavRoute

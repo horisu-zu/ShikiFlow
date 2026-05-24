@@ -499,7 +499,13 @@
     <string name="settings_preferred_title_type">Тип тайтла</string>
     <string name="details_short_info_airing_now">В эфире</string>
     <string name="years_active_present">н.в.</string>
-    <string name="gender_male">Мужчина</string>
-    <string name="gender_female">Женщина</string>
+    <string name="gender_male">Мужской</string>
+    <string name="gender_female">Женский</string>
     <string name="gender_other">Небинарный</string>
+    <string name="staff_attribute_date_of_birth">Дата рождения</string>
+    <string name="staff_attribute_date_of_death">Дата смерти</string>
+    <string name="staff_attribute_age">Возраст</string>
+    <string name="staff_attribute_gender">Гендер</string>
+    <string name="staff_attribute_years_active">Года активности</string>
+    <string name="staff_attribute_hometown">Родной город</string>
 </resources>

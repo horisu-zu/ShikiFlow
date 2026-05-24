@@ -217,7 +217,7 @@ fun MangaTrackItem(
         )
 
         Text(
-            text = trackItem.shortData.name.preferred(titleType),
+            text = trackItem.shortData.title.preferred(titleType),
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,

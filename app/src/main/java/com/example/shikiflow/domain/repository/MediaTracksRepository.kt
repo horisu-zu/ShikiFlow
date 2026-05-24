@@ -11,7 +11,7 @@ import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface MediaTracksRepository {
-    fun getLocalTrack(malId: Int, mediaType: MediaType): Flow<MediaTrack?>
+    fun getLocalTrack(id: Int, mediaType: MediaType): Flow<MediaTrack?>
 
     suspend fun syncTracks()
 

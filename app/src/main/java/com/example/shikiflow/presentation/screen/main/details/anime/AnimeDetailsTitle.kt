@@ -45,6 +45,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
@@ -71,6 +72,7 @@ import kotlin.time.Instant
 @Composable
 fun AnimeDetailsTitle(
     animeDetails: MediaDetails,
+    userRate: MediaUserTrack?,
     authType: AuthType,
     titleType: PreferredTitleType,
     horizontalPadding: Dp,
@@ -221,16 +223,16 @@ fun AnimeDetailsTitle(
                     onPlayClick = { onPlayClick(
                         animeDetails.title.preferred(titleType),
                         animeDetails.id,
-                        animeDetails.userRate?.progress ?: 0
+                        userRate?.progress ?: 0
                     ) },
                     onToggleFavorite = onToggleFavorite,
-                    status = animeDetails.userRate?.rateStatus,
+                    status = userRate?.status,
                     allEpisodes = (
                         if(animeDetails.status == MediaStatus.RELEASED) animeDetails.totalCount
                             else animeDetails.currentProgress
                     ) ?: 0,
-                    watchedEpisodes = animeDetails.userRate?.progress,
-                    score = animeDetails.userRate?.score
+                    watchedEpisodes = userRate?.progress,
+                    score = userRate?.score
                 )
             }
         }

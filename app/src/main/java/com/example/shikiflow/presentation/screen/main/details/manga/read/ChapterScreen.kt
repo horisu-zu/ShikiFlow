@@ -60,7 +60,8 @@ import com.example.shikiflow.presentation.viewmodel.manga.read.chapter.ChapterVi
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ChapterScreen(
-    malId: Int,
+    malId: Int?,
+    trackerMangaId: Int,
     chapterUiData: ChapterUiData,
     navOptions: MangaReadNavOptions,
     chapterViewModel: ChapterViewModel = hiltViewModel()
@@ -77,6 +78,7 @@ fun ChapterScreen(
     LaunchedEffect(chapterUiState.uiSettings.isDataSaverEnabled) {
         chapterViewModel.setChapterData(
             mangaId = chapterUiData.mangaId,
+            trackerMangaId = trackerMangaId,
             malId = malId,
             chapterId = chapterUiData.chapterId,
             chapterNumber = chapterUiData.chapterNumber?.toDoubleOrNull() ?: 0.0,

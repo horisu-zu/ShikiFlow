@@ -41,6 +41,7 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
@@ -64,6 +65,7 @@ import com.materialkolor.ktx.harmonize
 @Composable
 fun MangaDetailsHeader(
     mangaDetails: MediaDetails,
+    userRate: MediaUserTrack?,
     mangaDexUiState: MangaDexUiState,
     titleType: PreferredTitleType,
     horizontalPadding: Dp,
@@ -181,10 +183,10 @@ fun MangaDetailsHeader(
                 }
 
                 MangaUserRateItem(
-                    userRateStatus = mangaDetails.userRate?.rateStatus,
+                    userRateStatus = userRate?.status,
                     allChapters = mangaDetails.totalCount ?: 0,
-                    readChapters = mangaDetails.userRate?.progress ?: 0,
-                    score = mangaDetails.userRate?.score ?: 0,
+                    readChapters = userRate?.progress ?: 0,
+                    score = userRate?.score ?: 0,
                     isManga = mangaDetails.format.isManga(),
                     isFavorite = mangaDetails.isFavorite,
                     mangaDexUiState = mangaDexUiState,
