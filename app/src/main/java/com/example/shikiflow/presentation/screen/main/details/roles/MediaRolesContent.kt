@@ -95,7 +95,9 @@ fun MediaRolesContent(
                     start = 12.dp,
                     end = 12.dp,
                     top = 8.dp,
-                    bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    bottom = WindowInsets.navigationBars
+                        .asPaddingValues()
+                        .calculateBottomPadding() + 56.dp
                 ),
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)

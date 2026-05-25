@@ -58,6 +58,9 @@ class AiringPagingSource @Inject constructor(
                 .filter { airingAnime ->
                     if (onList) airingAnime.data.userRateStatus != null else true
                 }
+                .sortedBy { airingAnime ->
+                    airingAnime.airingAt
+                }
 
             LoadResult.Page(
                 data = combined,

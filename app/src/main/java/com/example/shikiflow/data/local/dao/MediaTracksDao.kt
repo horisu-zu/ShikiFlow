@@ -5,6 +5,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.RawQuery
+import androidx.room.RoomRawQuery
 import androidx.room.Transaction
 import androidx.room.Update
 import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
@@ -84,20 +86,8 @@ interface MediaTracksDao {
         mediaType: MediaType
     ): PagingSource<Int, MediaTrackDto>
 
-    @Transaction
-    @Query("""
-        SELECT * FROM media_track 
-        INNER JOIN media_short ON media_track.mediaId = media_short.id
-        WHERE (:status IS NULL OR media_track.status = :status) 
-        AND (trim(:title) = '' OR name LIKE '%' || :title || '%' OR synonyms LIKE '%' || :title || '%')
-        AND media_short.mediaType = :mediaType
-        ORDER BY updatedAt DESC
-    """)
-    fun browseMediaTracks(
-        title: String,
-        mediaType: MediaType,
-        status: String?
-    ): PagingSource<Int, MediaTrackDto>
+    @RawQuery(observedEntities = [MediaTrackDto::class, MediaShortEntity::class])
+    fun browseMediaTracks(query: RoomRawQuery): PagingSource<Int, MediaTrackDto>
 
     @Query("""
         SELECT COUNT(*) == 0 FROM media_track

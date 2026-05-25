@@ -6,6 +6,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
+import androidx.room.RoomRawQuery
 import androidx.room.withTransaction
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
@@ -17,6 +18,9 @@ import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.SortDirection
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
@@ -126,8 +130,47 @@ class MediaTracksRepositoryImpl @Inject constructor(
     override fun browseMediaTracks(
         title: String,
         mediaType: MediaType,
-        userRateStatus: UserRateStatus?
+        userRateStatus: UserRateStatus?,
+        sort: Sort<UserRateType>
     ): Flow<PagingData<MediaTrack>> {
+        val column = when (sort.type) {
+            UserRateType.ID -> "id"
+            UserRateType.ADDED_AT -> "createdAt"
+            UserRateType.UPDATED_AT -> "updatedAt"
+            UserRateType.SCORE -> "score"
+            UserRateType.PROGRESS -> "progress"
+        }
+        val direction = when (sort.direction) {
+            SortDirection.ASCENDING  -> "ASC"
+            SortDirection.DESCENDING -> "DESC"
+        }
+        val sortOption = "$column $direction"
+
+        val whereStatus = if (userRateStatus != null) "AND media_track.status = ?" else ""
+        val whereTitle  = if (title.isNotBlank()) "AND (name LIKE ? OR synonyms LIKE ?)" else ""
+
+        val query = RoomRawQuery(
+            sql = """
+                SELECT * FROM media_track
+                INNER JOIN media_short ON media_track.mediaId = media_short.id
+                WHERE media_short.mediaType = ?
+                $whereStatus
+                $whereTitle
+                ORDER BY $sortOption
+            """.trimIndent(),
+            onBindStatement = { stmt ->
+                var index = 1
+
+                stmt.bindText(index++, mediaType.name)
+                if (userRateStatus != null) stmt.bindText(index++, userRateStatus.name)
+                if (title.isNotBlank()) {
+                    val like = "%$title%"
+                    stmt.bindText(index++, like)
+                    stmt.bindText(index++, like)
+                }
+            }
+        )
+
         return Pager(
             config = PagingConfig(
                 pageSize = 24,
@@ -136,7 +179,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
                 initialLoadSize = 24
             ),
             pagingSourceFactory = {
-                mediaTracksDao.browseMediaTracks(title, mediaType, userRateStatus?.name)
+                mediaTracksDao.browseMediaTracks(query = query)
             }
         ).flow.map { pagingData ->
             pagingData.map { track ->

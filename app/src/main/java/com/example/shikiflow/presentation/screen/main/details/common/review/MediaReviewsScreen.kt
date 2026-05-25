@@ -96,7 +96,9 @@ fun MediaReviewsScreen(
                         start = 12.dp,
                         end = 12.dp,
                         top = paddingValues.calculateTopPadding(),
-                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                        bottom = WindowInsets.navigationBars
+                            .asPaddingValues()
+                            .calculateBottomPadding() + 56.dp
                     ),
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),

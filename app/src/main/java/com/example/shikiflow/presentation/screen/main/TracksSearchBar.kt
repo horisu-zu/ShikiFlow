@@ -32,11 +32,9 @@ import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,21 +42,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.iconResource
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
-import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksSearchViewModel
 import com.example.shikiflow.utils.toIcon
-import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalMaterial3Api::class,
-    FlowPreview::class,
     ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
@@ -68,8 +61,7 @@ fun TracksSearchBar(
     containerColor: Color,
     itemColor: Color,
     onModeChange: (MediaType) -> Unit,
-    mainNavOptions: MainNavOptions,
-    tracksSearchViewModel: TracksSearchViewModel = hiltViewModel()
+    mainNavOptions: MainNavOptions
 ) {
     val searchBarState = rememberSearchBarState()
     val textFieldState = rememberTextFieldState()
@@ -80,25 +72,19 @@ fun TracksSearchBar(
         searchBarState.currentValue == SearchBarValue.Expanded
     }
 
-    BackHandler(isSearchActive) {
-        focusManager.clearFocus()
-    }
-
-    LaunchedEffect(textFieldState) {
-        snapshotFlow { textFieldState.text.toString() }
-            .debounce(300)
-            .collect { tracksSearchViewModel.onQueryChange(it) }
-    }
-
     val clip = 12.dp
     val animatedHorizontalPadding by animateDpAsState(
         targetValue = if (isSearchActive) 8.dp
-            else 0.dp
+        else 0.dp
     )
 
     val itemsBackgroundColor = when(isSearchActive) {
         true -> MaterialTheme.colorScheme.background
         false -> itemColor
+    }
+
+    BackHandler(isSearchActive) {
+        focusManager.clearFocus()
     }
 
     val inputField = @Composable {
@@ -220,8 +206,8 @@ fun TracksSearchBar(
         )
     ) {
         TracksSearchBarComponent(
+            text = textFieldState.text.toString(),
             mediaType = currentTrackMode,
-            isAppBarVisible = true,
             onMediaClick = { mediaType, id ->
                 val detailsNavRoute = when(mediaType) {
                     MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)

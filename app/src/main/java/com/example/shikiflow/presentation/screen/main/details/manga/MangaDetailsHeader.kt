@@ -140,6 +140,22 @@ fun MangaDetailsHeader(
                             }
                         )
                     }
+                    if(mangaDetails.volumes != null && mangaDetails.volumes != 0) {
+                        item {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_volumes),
+                                infoItem = stringResource(R.string.volumes, mangaDetails.volumes)
+                            )
+                        }
+                    }
+                    if(mangaDetails.totalCount != null && mangaDetails.totalCount != 0) {
+                        item {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_chapters),
+                                infoItem = stringResource(R.string.chapters, mangaDetails.totalCount)
+                            )
+                        }
+                    }
                     mangaDetails.airedOn?.date?.let { startingDate ->
                         item {
                             ShortInfoItem(
@@ -151,33 +167,15 @@ fun MangaDetailsHeader(
                             )
                         }
                     }
-                    if (mangaDetails.status != MediaStatus.ONGOING && mangaDetails.status != MediaStatus.ANNOUNCED) {
-                        mangaDetails.releasedOn?.date?.let { releaseDate ->
-                            item {
-                                ShortInfoItem(
-                                    infoType = stringResource(R.string.details_short_info_manga_published),
-                                    infoItem = formatInstant(
-                                        instant = releaseDate,
-                                        includeTime = false
-                                    )
+                    mangaDetails.releasedOn?.date?.let { releaseDate ->
+                        item {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_manga_published),
+                                infoItem = formatInstant(
+                                    instant = releaseDate,
+                                    includeTime = false
                                 )
-                            }
-                        }
-                        if(mangaDetails.volumes != null) {
-                            item {
-                                ShortInfoItem(
-                                    infoType = stringResource(R.string.details_short_info_manga_volumes),
-                                    infoItem = stringResource(R.string.volumes, mangaDetails.volumes)
-                                )
-                            }
-                        }
-                        if(mangaDetails.totalCount != null) {
-                            item {
-                                ShortInfoItem(
-                                    infoType = stringResource(R.string.details_short_info_manga_chapters),
-                                    infoItem = stringResource(R.string.chapters, mangaDetails.totalCount)
-                                )
-                            }
+                            )
                         }
                     }
                 }
@@ -258,7 +256,7 @@ fun MangaUserRateItem(
             val iconTint by animateColorAsState(
                 targetValue = when(isFavorite) {
                     true -> MaterialTheme.colorScheme.error
-                    false -> MaterialTheme.colorScheme.onPrimaryContainer
+                    false -> MaterialTheme.colorScheme.onSecondaryContainer
                 },
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
@@ -290,7 +288,7 @@ fun MangaUserRateItem(
                     Icon(
                         imageVector = Icons.Default.Refresh,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         modifier = Modifier.size(24.dp)
                     )
                 } else {
@@ -298,14 +296,14 @@ fun MangaUserRateItem(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_mangadex_v2),
                             contentDescription = "Manga Read Navigate",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.size(24.dp)
                         )
                     } else {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_circle),
                             contentDescription = "Empty Response",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
                             modifier = Modifier.size(24.dp)
                         )
                     }

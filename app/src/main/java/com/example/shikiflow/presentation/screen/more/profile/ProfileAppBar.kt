@@ -151,7 +151,7 @@ fun ProfileAppBar(
                             modifier = Modifier
                                 .align(Alignment.Bottom)
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
                                 .then(
                                     if (userData.isFollowing == null) {
                                         Modifier.shimmerEffect()
@@ -196,12 +196,14 @@ private fun UserComponent(
                 ) {
                     Text(
                         text = stringResource(R.string.profile_follows_you),
-                        style = MaterialTheme.typography.labelSmall,
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            color = MaterialTheme.colorScheme.onTertiaryContainer
+                        ),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
                             .clip(RoundedCornerShape(percent = 16))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
                             .padding(horizontal = 6.dp, vertical = 4.dp)
                     )
                 }
@@ -241,7 +243,7 @@ private fun UserFollowComponent(
     ) {
         Icon(
             imageVector = Icons.Default.Add,
-            tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+            tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(
                 alpha = if(isFollowing == null) 0f else 1f
             ),
             contentDescription = null,
@@ -255,7 +257,7 @@ private fun UserFollowComponent(
             },
             style = MaterialTheme.typography.bodySmall.copy(
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                color = MaterialTheme.colorScheme.onSecondaryContainer.copy(
                     alpha = if(isFollowing == null) 0f else 1f
                 )
             )

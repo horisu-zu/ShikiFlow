@@ -39,12 +39,6 @@ sealed interface MediaSort : SortType {
         RELEASE_DATE;
 
         companion object {
-            val ongoingOptions = listOf<MediaSort>(
-                Common.POPULARITY,
-                Common.SCORE,
-                TRENDING
-            )
-
             fun from(name: String?): MediaSort =
                 entries.find { it.name == name }
                     ?: Common.entries.find { it.name == name }

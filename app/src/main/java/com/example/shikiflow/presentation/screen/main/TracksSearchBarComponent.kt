@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,9 +35,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -46,21 +49,26 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.local.TracksMapper.toUserRateData
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.SortBottomSheet
+import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksSearchViewModel
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 
+@OptIn(FlowPreview::class)
 @Composable
 fun TracksSearchBarComponent(
+    text: String,
     mediaType: MediaType,
-    isAppBarVisible: Boolean,
     onMediaClick: (MediaType, Int) -> Unit,
     modifier: Modifier = Modifier,
     tracksViewModel: TracksSearchViewModel = hiltViewModel()
@@ -69,13 +77,21 @@ fun TracksSearchBarComponent(
     val chips = listOf(null) + UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
     var selectedTabSearch by rememberSaveable { mutableIntStateOf(0) }
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
+    var showBottomSheet by remember { mutableStateOf(false) }
 
     val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
     val rateUpdateState by tracksViewModel.rateUpdateState.collectAsStateWithLifecycle()
+    val tracksParams by tracksViewModel.params.collectAsStateWithLifecycle()
     val preferredTitleType = LocalTitleTypeController.current
 
     LaunchedEffect(mediaType) {
         tracksViewModel.setMediaType(mediaType)
+    }
+
+    LaunchedEffect(text) {
+        snapshotFlow { text }
+            .debounce(300)
+            .collect { query -> tracksViewModel.onQueryChange(query) }
     }
 
     LaunchedEffect(selectedTabSearch) {
@@ -89,6 +105,18 @@ fun TracksSearchBarComponent(
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = { showBottomSheet = true },
+                containerColor = MaterialTheme.colorScheme.surfaceContainer,
+                contentColor = MaterialTheme.colorScheme.onSurface
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_sort),
+                    contentDescription = "Show Sort Bottom Sheet"
+                )
+            }
+        },
         modifier = modifier
     ) { paddingValues ->
         Column(
@@ -136,7 +164,6 @@ fun TracksSearchBarComponent(
                     )
                 }
             }
-
             if(trackItems.loadState.refresh is LoadState.Error) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -149,109 +176,116 @@ fun TracksSearchBarComponent(
                     )
                 }
             } else {
-                PullToRefreshCustomBox(
-                    isRefreshing = trackItems.loadState.refresh is LoadState.Loading,
-                    onRefresh = { trackItems.refresh() },
-                    enabled = isAppBarVisible
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(120.dp),
+                    contentPadding = PaddingValues(
+                        start = horizontalPadding,
+                        end = horizontalPadding,
+                        top = 12.dp,
+                        bottom = WindowInsets.navigationBars
+                            .asPaddingValues()
+                            .calculateBottomPadding() + 56.dp //+FAB size
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.background)
                 ) {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(120.dp),
-                        contentPadding = PaddingValues(
-                            start = horizontalPadding,
-                            end = horizontalPadding,
-                            top = 12.dp,
-                            bottom = WindowInsets.navigationBars
-                                .asPaddingValues()
-                                .calculateBottomPadding()
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colorScheme.background)
-                    ) {
-                        items(
-                            count = trackItems.itemCount,
-                            key = trackItems.itemKey { it.shortData.id }
-                        ) { index ->
-                            val item = trackItems[index] ?: return@items
+                    items(
+                        count = trackItems.itemCount,
+                        key = trackItems.itemKey { it.shortData.id }
+                    ) { index ->
+                        val item = trackItems[index] ?: return@items
 
-                            when(item.shortData.mediaType) {
-                                MediaType.ANIME -> {
-                                    AnimeTrackGridItem(
-                                        trackItem = item,
-                                        titleType = preferredTitleType,
-                                        onClick = { id -> onMediaClick(mediaType, id) },
-                                        onLongClick = { selectedItem = item },
-                                        modifier = Modifier.animateItem()
-                                    )
-                                }
-                                MediaType.MANGA -> {
-                                    MangaTrackItem(
-                                        trackItem = item,
-                                        titleType = preferredTitleType,
-                                        onClick = { id -> onMediaClick(mediaType, id) },
-                                        onLongClick = { selectedItem = item },
-                                        modifier = Modifier.animateItem()
-                                    )
-                                }
-                            }
-                        }
-                        trackItems.apply {
-                            when {
-                                loadState.append is LoadState.Error -> {
-                                    item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 8.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            ErrorItem(
-                                                message = stringResource(R.string.common_error),
-                                                buttonLabel = stringResource(R.string.common_retry),
-                                                onButtonClick = { trackItems.retry() }
-                                            )
-                                        }
-                                    }
-                                }
-                                loadState.append is LoadState.Loading -> {
-                                    item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                                        Box(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 8.dp),
-                                            contentAlignment = Alignment.Center
-                                        ) { CircularProgressIndicator() }
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    selectedItem?.let { item ->
-                        UserRateBottomSheet(
-                            userRate = item.toUserRateData(),
-                            preferredTitleType = preferredTitleType,
-                            rateUpdateState = rateUpdateState,
-                            onDismiss = {
-                                if (rateUpdateState != RateUpdateState.LOADING) {
-                                    selectedItem = null
-                                }
-                            },
-                            onSave = { saveUserRate ->
-                                tracksViewModel.saveUserRate(saveUserRate)
-                            },
-                            onDelete = { entryId ->
-                                tracksViewModel.deleteUserRate(
-                                    entryId = entryId,
-                                    mediaId = item.shortData.id,
-                                    malId = item.shortData.malId,
-                                    mediaType = item.shortData.mediaType
+                        when(item.shortData.mediaType) {
+                            MediaType.ANIME -> {
+                                AnimeTrackGridItem(
+                                    trackItem = item,
+                                    titleType = preferredTitleType,
+                                    onClick = { id -> onMediaClick(mediaType, id) },
+                                    onLongClick = { selectedItem = item },
+                                    modifier = Modifier.animateItem()
                                 )
                             }
-                        )
+                            MediaType.MANGA -> {
+                                MangaTrackItem(
+                                    trackItem = item,
+                                    titleType = preferredTitleType,
+                                    onClick = { id -> onMediaClick(mediaType, id) },
+                                    onLongClick = { selectedItem = item },
+                                    modifier = Modifier.animateItem()
+                                )
+                            }
+                        }
                     }
+                    trackItems.apply {
+                        when {
+                            loadState.append is LoadState.Error -> {
+                                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { trackItems.retry() }
+                                        )
+                                    }
+                                }
+                            }
+                            loadState.append is LoadState.Loading -> {
+                                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                selectedItem?.let { item ->
+                    UserRateBottomSheet(
+                        userRate = item.toUserRateData(),
+                        preferredTitleType = preferredTitleType,
+                        rateUpdateState = rateUpdateState,
+                        onDismiss = {
+                            if (rateUpdateState != RateUpdateState.LOADING) {
+                                selectedItem = null
+                            }
+                        },
+                        onSave = { saveUserRate ->
+                            tracksViewModel.saveUserRate(saveUserRate)
+                        },
+                        onDelete = { entryId ->
+                            tracksViewModel.deleteUserRate(
+                                entryId = entryId,
+                                mediaId = item.shortData.id,
+                                malId = item.shortData.malId,
+                                mediaType = item.shortData.mediaType
+                            )
+                        }
+                    )
+                }
+
+                if(showBottomSheet) {
+                    SortBottomSheet(
+                        config = SortConfig(
+                            options = UserRateType.entries,
+                            selected = tracksParams.sort,
+                            onSortChange = { userRateSort ->
+                                tracksViewModel.setSort(userRateSort)
+                            }
+                        ),
+                        onDismiss = { showBottomSheet = false }
+                    )
                 }
             }
         }

@@ -97,7 +97,9 @@ fun ThreadsScreen(
                 start = 12.dp,
                 end = 12.dp,
                 top = paddingValues.calculateTopPadding(),
-                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                bottom = WindowInsets.navigationBars
+                    .asPaddingValues()
+                    .calculateBottomPadding() + 56.dp
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {

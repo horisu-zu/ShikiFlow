@@ -222,7 +222,9 @@ fun MangaChaptersScreen(
                     start = 8.dp,
                     end = 8.dp,
                     top = 12.dp,
-                    bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+                    bottom = WindowInsets.navigationBars
+                        .asPaddingValues()
+                        .calculateBottomPadding() + 56.dp
                 ),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {

@@ -1,6 +1,8 @@
 package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
@@ -24,7 +26,8 @@ interface MediaTracksRepository {
     fun browseMediaTracks(
         title: String,
         mediaType: MediaType,
-        userRateStatus: UserRateStatus? = null
+        userRateStatus: UserRateStatus?,
+        sort: Sort<UserRateType>
     ): Flow<PagingData<MediaTrack>>
 
     fun saveUserRate(

@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
@@ -28,8 +30,10 @@ import javax.inject.Inject
 class TracksSearchViewModel @Inject constructor(
     private val mediaTracksRepository: MediaTracksRepository
 ): ViewModel() {
-    private val _params = MutableStateFlow(TracksParams())
     private val _query = MutableStateFlow("")
+
+    private val _params = MutableStateFlow(TracksParams())
+    val params = _params.asStateFlow()
 
     private val _rateUpdateState = MutableStateFlow(RateUpdateState.INITIAL)
     val rateUpdateState = _rateUpdateState.asStateFlow()
@@ -49,7 +53,8 @@ class TracksSearchViewModel @Inject constructor(
             mediaTracksRepository.browseMediaTracks(
                 mediaType = params.mediaType!!,
                 title = params.query,
-                userRateStatus = params.userRateStatus
+                userRateStatus = params.userRateStatus,
+                sort = params.sort
             )
         }.cachedIn(viewModelScope)
 
@@ -116,6 +121,12 @@ class TracksSearchViewModel @Inject constructor(
     fun setMediaType(mediaType: MediaType) {
         _params.update { params ->
             params.copy(mediaType = mediaType)
+        }
+    }
+
+    fun setSort(sort: Sort<UserRateType>) {
+        _params.update { params ->
+            params.copy(sort = sort)
         }
     }
 

@@ -336,7 +336,7 @@ private fun UserStatusItem(
                 Icon(
                     imageVector = Icons.Default.PlayArrow,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -344,7 +344,7 @@ private fun UserStatusItem(
             val iconTint by animateColorAsState(
                 targetValue = when(isFavorite) {
                     true -> MaterialTheme.colorScheme.error
-                    false -> MaterialTheme.colorScheme.onPrimaryContainer
+                    false -> MaterialTheme.colorScheme.onSecondaryContainer
                 },
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
@@ -379,7 +379,7 @@ fun HeaderButton(
                 enabled = enabled,
                 onClick = onClick
             )
-            .background(MaterialTheme.colorScheme.primaryContainer)
+            .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(12.dp),
         contentAlignment = Alignment.Center
     ) {

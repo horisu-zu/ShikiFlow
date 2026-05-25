@@ -206,7 +206,7 @@ class ShikimoriMediaDataSource @Inject constructor(
         airingAtGreater: Long,
         airingAtLesser: Long
     ): Result<List<AiringAnime>> {
-        val ongoingsIds = animeApi.getOngoingsCalendar().mapNotNull { calendarAnime ->
+        val ongoingsIds = animeApi.getOngoingsCalendar().map { calendarAnime ->
             calendarAnime.shikiAnime.id
         }
 
