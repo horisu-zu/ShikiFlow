@@ -74,7 +74,7 @@ fun TypeSelector(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(percent = 24))
+                    .clip(shape = RoundedCornerShape(percent = 20))
                     .clickable {
                         if (!isSelected) {
                             onTypeSelect(statsBarType)

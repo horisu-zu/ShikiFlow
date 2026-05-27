@@ -36,7 +36,7 @@ import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChapterSettingsBottomSheet(
+fun ReaderSettingsBottomSheet(
     onDismiss: () -> Unit,
     mangaSettings: MangaChapterSettings,
     onSettingsChange: (MangaChapterSettings) -> Unit,

@@ -1,17 +1,19 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.presentation.common.image.ChapterItem
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -23,12 +25,14 @@ fun ChapterScrollModeComponent(
     chapterPageUrls: List<String>,
     chapterPageIndex: Int,
     onPageChange: (Int) -> Unit,
-    onScrollDetected: () -> Unit,
+    onNavigationChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var containerSize by remember { mutableStateOf(IntSize.Zero) }
     val lazyListState = rememberLazyListState(
         initialFirstVisibleItemIndex = chapterPageIndex
     )
+    val zoomState = rememberZoomState()
 
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }
@@ -38,16 +42,16 @@ fun ChapterScrollModeComponent(
             }
     }
 
-    LaunchedEffect(lazyListState) {
+    /*LaunchedEffect(lazyListState) {
         snapshotFlow {
             lazyListState.firstVisibleItemIndex to
             lazyListState.firstVisibleItemScrollOffset
         }
             .distinctUntilChanged()
             .collect {
-                onScrollDetected()
+                onNavigationChange()
             }
-    }
+    }*/
 
     LaunchedEffect(chapterPageIndex) {
         if(lazyListState.firstVisibleItemIndex != chapterPageIndex) {
@@ -57,17 +61,37 @@ fun ChapterScrollModeComponent(
 
     LazyColumn(
         state = lazyListState,
-        modifier = modifier.zoomable(rememberZoomState()),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(
-            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-        )
+        modifier = modifier
+            .onSizeChanged { newSize ->
+                containerSize = newSize
+            }
+            .zoomable(
+                zoomState = zoomState,
+                onTap = { offset ->
+                    if(offset.x < containerSize.width * 0.35f) {
+                        if (chapterPageIndex > 0) {
+                            onPageChange(chapterPageIndex - 1)
+                        }
+                    }
+                    else if(offset.x > containerSize.width * 0.65f) {
+                        if (chapterPageIndex < chapterPageUrls.size - 1) {
+                            onPageChange(chapterPageIndex + 1)
+                        }
+                    }
+                    else {
+                        onNavigationChange()
+                    }
+                },
+                onDoubleTap = {
+                    zoomState.reset()
+                    onNavigationChange()
+                }
+            ),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         items(chapterPageUrls.size) { index ->
-            val chapterPageUrl = chapterPageUrls[index]
-
             ChapterItem(
-                pageUrl = chapterPageUrl,
+                pageUrl = chapterPageUrls[index],
                 pageNumber = index + 1,
                 contentScale = ContentScale.FillWidth
             )

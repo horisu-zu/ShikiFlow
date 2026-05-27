@@ -12,8 +12,6 @@ import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -22,7 +20,6 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -38,13 +35,8 @@ class ChapterViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val updateMangaProgressUseCase: UpdateMangaProgressUseCase
 ): ViewModel() {
-
-    private val _interactionEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
-    private val _isFocused = MutableStateFlow(false)
     private val _chapterUiState = MutableStateFlow(ChapterUiState())
     val chapterUiState = _chapterUiState.asStateFlow()
-
-    private val hideDelayMs = 2500L
 
     init {
         settingsRepository.mangaSettingsFlow.onEach { mangaChapterSettings ->
@@ -96,24 +88,6 @@ class ChapterViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-        _interactionEvent
-            .flatMapLatest {
-                _isFocused.flatMapLatest { isFocused ->
-                    flow {
-                        emit(true)
-                        if(!isFocused) {
-                            delay(hideDelayMs)
-                            emit(false)
-                        }
-                    }
-                }
-            }
-            .onEach { isInteracting ->
-                _chapterUiState.update { state ->
-                    state.copy(isNavigationVisible = isInteracting)
-                }
-            }.launchIn(viewModelScope)
-
         viewModelScope.launch {
             _chapterUiState
                 .distinctUntilChangedBy { state ->
@@ -157,12 +131,12 @@ class ChapterViewModel @Inject constructor(
         }
     }
 
-    fun onInteractionStart() {
-        _interactionEvent.tryEmit(Unit)
-    }
-
-    fun changeFocusedState(newValue: Boolean) {
-        _isFocused.value = newValue
+    fun onNavigationChange() {
+        _chapterUiState.update { state ->
+            state.copy(
+                isNavigationVisible = !state.isNavigationVisible
+            )
+        }
     }
 
     fun updatePage(pageIndex: Int) {

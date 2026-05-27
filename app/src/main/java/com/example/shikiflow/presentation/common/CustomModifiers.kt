@@ -85,6 +85,7 @@ fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
     return this.layout { measurable, constraints ->
         val overridenWidth = constraints.maxWidth + 2 * horizontal.roundToPx()
         val placeable = measurable.measure(constraints.copy(maxWidth = overridenWidth))
+
         layout(placeable.width, placeable.height) {
             placeable.place(0, 0)
         }

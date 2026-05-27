@@ -1,14 +1,19 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.VisibilityThreshold
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,19 +24,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -41,10 +42,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -55,6 +57,7 @@ import com.example.shikiflow.domain.model.mangadex.chapter_metadata.MangaChapter
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SideSheet
+import com.example.shikiflow.presentation.common.systemBarsVisibility
 import com.example.shikiflow.presentation.viewmodel.manga.read.chapter.ChapterViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -70,9 +73,6 @@ fun ChapterScreen(
     val chaptersList = chapterViewModel.mangaChaptersItems.collectAsLazyPagingItems()
 
     val showBottomSheet = remember { mutableStateOf(false) }
-    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
-        snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
-    )
     var isSheetOpen by remember { mutableStateOf(false) }
 
     LaunchedEffect(chapterUiState.uiSettings.isDataSaverEnabled) {
@@ -135,6 +135,7 @@ fun ChapterScreen(
                         chaptersList[index]?.let { chapterItem ->
                             ChaptersListItem(
                                 chapterMetadata = chapterItem,
+                                isCurrent = chapterItem.attributes.chapter == chapterUiData.chapterNumber,
                                 onItemClick = { id, chapterNum, title ->
                                     navOptions.navigateToChapter(
                                         chapterUiData = chapterUiData.copy(
@@ -182,34 +183,83 @@ fun ChapterScreen(
             }
         },
         mainContent = {
-            Scaffold(
-                modifier = Modifier.then(
-                    other = if(chapterUiState.uiSettings.chapterUIMode == ChapterUIMode.SCROLL) {
-                        Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-                    } else Modifier
-                ),
-                topBar = {
-                    Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .systemBarsVisibility(chapterUiState.isNavigationVisible),
+                contentAlignment = Alignment.Center
+            ) {
+                if(chapterUiState.isLoading) {
+                    CircularProgressIndicator()
+                } else if(chapterUiState.chapterError != null) {
+                    ErrorItem(
+                        message = chapterUiState.chapterError ?: stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { chapterViewModel.onRefresh() }
+                    )
+                } else {
+                    when (chapterUiState.uiSettings.chapterUIMode) {
+                        ChapterUIMode.PAGE -> {
+                            ChapterPageModeComponent(
+                                chapterPageUrls = chapterUiState.chapterData,
+                                chapterPageIndex = chapterUiState.currentPageIndex,
+                                onPageChange = { pageIndex ->
+                                    chapterViewModel.updatePage(pageIndex)
+                                },
+                                onNavigationChange = chapterViewModel::onNavigationChange,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                        ChapterUIMode.SCROLL -> {
+                            ChapterScrollModeComponent(
+                                chapterPageUrls = chapterUiState.chapterData,
+                                chapterPageIndex = chapterUiState.currentPageIndex,
+                                onPageChange = { pageIndex ->
+                                    chapterViewModel.updatePage(pageIndex)
+                                },
+                                onNavigationChange = chapterViewModel::onNavigationChange,
+                                modifier = Modifier.fillMaxSize()
+                            )
+                        }
+                    }
+
+                    AnimatedVisibility(
+                        visible = chapterUiState.isNavigationVisible,
+                        enter = fadeIn() + slideInVertically(
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessMedium,
+                                visibilityThreshold = IntOffset.VisibilityThreshold
+                            ),
+                            initialOffsetY = { offset -> -offset / 2 }
+                        ),
+                        exit = fadeOut() + slideOutVertically(
+                            animationSpec = spring(
+                                stiffness = Spring.StiffnessMedium,
+                                visibilityThreshold = IntOffset.VisibilityThreshold
+                            ),
+                            targetOffsetY = { offset -> -offset / 2 }
+                        ),
+                        modifier = Modifier.align(Alignment.TopCenter)
+                    ) {
                         TopAppBar(
                             title = {
                                 Text(
                                     text = buildString {
                                         chapterUiData.chapterNumber?.let { chapterNumber ->
                                             append(
-                                                stringResource(id = R.string.media_item_chapter, chapterNumber)
+                                                stringResource(id = R.string.chapter_short_title, chapterNumber)
                                             )
-                                            append(" — ")
                                         }
                                         if(!chapterUiData.title.isNullOrEmpty()) {
+                                            append(" - ")
                                             append(chapterUiData.title)
                                         }
                                     },
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleSmall
                                 )
                             },
-                            scrollBehavior = scrollBehavior,
                             navigationIcon = {
                                 IconButton(
                                     onClick = { navOptions.navigateBack() }
@@ -230,122 +280,58 @@ fun ChapterScreen(
                                         modifier = Modifier.size(24.dp)
                                     )
                                 }
-                                IconButton(
-                                    onClick = { isSheetOpen = true }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.List,
-                                        contentDescription = "Scanlation Group Chapters",
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                }
                             }
                         )
-                        HorizontalDivider()
                     }
-                }
-            ) { paddingValues ->
-                if(chapterUiState.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                } else if(chapterUiState.chapterError != null) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = chapterUiState.chapterError ?: stringResource(R.string.common_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { chapterViewModel.onRefresh() }
-                        )
-                    }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize()) {
-                        when(chapterUiState.uiSettings.chapterUIMode) {
-                            ChapterUIMode.PAGE -> {
-                                ChapterPageModeComponent(
-                                    chapterPageUrls = chapterUiState.chapterData,
-                                    chapterPageIndex = chapterUiState.currentPageIndex,
-                                    onPageChange = { pageIndex ->
-                                        chapterViewModel.updatePage(pageIndex)
+
+                    AnimatedContent(
+                        targetState = chapterUiState.isNavigationVisible,
+                        transitionSpec = {
+                            fadeIn() togetherWith fadeOut() using SizeTransform(clip = false)
+                        },
+                        contentAlignment = Alignment.BottomCenter,
+                        modifier = Modifier.align(Alignment.BottomCenter)
+                    ) { isVisible ->
+                        when (isVisible) {
+                            true -> {
+                                ChapterNavigationComponent(
+                                    currentPage = chapterUiState.currentPageIndex + 1,
+                                    pageCount = chapterUiState.chapterData.size,
+                                    onNavigateClick = { pageNumber ->
+                                        chapterViewModel.updatePage(pageNumber - 1)
                                     },
-                                    onScrollDetected = chapterViewModel::onInteractionStart,
+                                    onSheetOpenClick = { isSheetOpen = true },
                                     modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(
-                                            top = paddingValues.calculateTopPadding()
-                                        )
+                                        .navigationBarsPadding()
+                                        .imePadding()
+                                        .padding(bottom = 4.dp)
                                 )
                             }
-                            ChapterUIMode.SCROLL -> {
-                                ChapterScrollModeComponent(
-                                    chapterPageUrls = chapterUiState.chapterData,
-                                    chapterPageIndex = chapterUiState.currentPageIndex,
-                                    onPageChange = { pageIndex ->
-                                        chapterViewModel.updatePage(pageIndex)
-                                    },
-                                    onScrollDetected = chapterViewModel::onInteractionStart,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(top = paddingValues.calculateTopPadding())
-                                )
-                            }
-                        }
-                        AnimatedContent(
-                            targetState = chapterUiState.isNavigationVisible,
-                            transitionSpec = {
-                                fadeIn() togetherWith fadeOut() using SizeTransform(clip = false)
-                            },
-                            contentAlignment = Alignment.BottomCenter,
-                            modifier = Modifier.align(Alignment.BottomCenter)
-                        ) { isVisible ->
-                            when(isVisible) {
-                                true -> {
-                                    ChapterNavigationComponent(
+                            false -> {
+                                if (chapterUiState.uiSettings.chapterUIMode == ChapterUIMode.PAGE) {
+                                    ChapterProgressBarComponent(
                                         currentPage = chapterUiState.currentPageIndex + 1,
                                         pageCount = chapterUiState.chapterData.size,
-                                        onNavigateClick = { pageNumber ->
-                                            chapterViewModel.onInteractionStart()
+                                        onSegmentClick = { pageNumber ->
                                             chapterViewModel.updatePage(pageNumber - 1)
                                         },
-                                        onFocusChange = { isFocused ->
-                                            chapterViewModel.changeFocusedState(isFocused)
-                                        },
-                                        modifier = Modifier
-                                            .navigationBarsPadding()
-                                            .imePadding()
-                                            .padding(bottom = 4.dp)
+                                        modifier = Modifier.padding(bottom = 12.dp)
                                     )
-                                }
-                                false -> {
-                                    if(chapterUiState.uiSettings.chapterUIMode == ChapterUIMode.PAGE) {
-                                        ChapterProgressBarComponent(
-                                            currentPage = chapterUiState.currentPageIndex + 1,
-                                            pageCount = chapterUiState.chapterData.size,
-                                            onSegmentClick = { pageNumber ->
-                                                chapterViewModel.updatePage(pageNumber - 1)
-                                            },
-                                            modifier = Modifier.navigationBarsPadding()
-                                        )
-                                    }
                                 }
                             }
                         }
                     }
                 }
-                if(showBottomSheet.value) {
-                    ChapterSettingsBottomSheet(
-                        mangaSettings = chapterUiState.uiSettings,
-                        onDismiss = { showBottomSheet.value = false },
-                        onSettingsChange = { newSettings ->
-                            chapterViewModel.updateSettings(newSettings)
-                        }
-                    )
-                }
+            }
+
+            if(showBottomSheet.value) {
+                ReaderSettingsBottomSheet(
+                    mangaSettings = chapterUiState.uiSettings,
+                    onDismiss = { showBottomSheet.value = false },
+                    onSettingsChange = { newSettings ->
+                        chapterViewModel.updateSettings(newSettings)
+                    }
+                )
             }
         }
     )
@@ -354,6 +340,7 @@ fun ChapterScreen(
 @Composable
 private fun ChaptersListItem(
     chapterMetadata: MangaChapterMetadata,
+    isCurrent: Boolean,
     onItemClick: (String, String?, String?) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -367,6 +354,10 @@ private fun ChaptersListItem(
                     chapterMetadata.attributes.title
                 )
             }
+            .background(
+                color = if(isCurrent) MaterialTheme.colorScheme.background
+                    else Color.Unspecified
+            )
             .padding(horizontal = 6.dp, vertical = 4.dp)
     ) {
         Text(
@@ -375,7 +366,7 @@ private fun ChaptersListItem(
                     append(stringResource(R.string.media_item_chapter, chapterNumber))
                 }
                 chapterMetadata.attributes.title?.let { chapterTitle ->
-                    append(" — $chapterTitle")
+                    append(" - $chapterTitle")
                 }
             },
             style = MaterialTheme.typography.bodyMedium

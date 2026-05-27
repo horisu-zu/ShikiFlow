@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.isImeVisible
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -14,7 +16,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FloatingToolbarDefaults
 import androidx.compose.material3.HorizontalFloatingToolbar
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,7 +45,7 @@ fun ChapterNavigationComponent(
     currentPage: Int,
     pageCount: Int,
     onNavigateClick: (Int) -> Unit,
-    onFocusChange: (Boolean) -> Unit,
+    onSheetOpenClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var pageInput by remember { mutableStateOf(currentPage.toString()) }
@@ -63,7 +67,19 @@ fun ChapterNavigationComponent(
 
     HorizontalFloatingToolbar(
         expanded = true,
-        shape = RoundedCornerShape(size = 24.dp),
+        shape = RoundedCornerShape(percent = 32),
+        floatingActionButton = {
+            FloatingToolbarDefaults.StandardFloatingActionButton(
+                onClick = onSheetOpenClick,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.List,
+                    contentDescription = "Scanlation Group Chapters",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        },
         modifier = modifier.heightIn(max = 56.dp)
     ) {
         IconButton(
@@ -86,11 +102,11 @@ fun ChapterNavigationComponent(
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number
             ),
-            modifier = Modifier.width(40.dp)
+            modifier = Modifier
+                .width(40.dp)
                 .onFocusChanged { focusState ->
                     if(focusState.isFocused) {
                         isEditing = true
-                        onFocusChange(true)
                     } else if(isEditing) {
                         val targetPage = pageInput.toIntOrNull()
 
@@ -106,12 +122,13 @@ fun ChapterNavigationComponent(
                         }
 
                         isEditing = false
-                        onFocusChange(false)
                     }
                 },
             decorationBox = { innerTextField ->
                 Box(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(end = 2.dp)
                         .clip(RoundedCornerShape(6.dp))
                         .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)),
                     contentAlignment = Alignment.Center

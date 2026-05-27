@@ -28,7 +28,7 @@ fun ChapterPageModeComponent(
     chapterPageUrls: List<String>,
     chapterPageIndex: Int,
     onPageChange: (Int) -> Unit,
-    onScrollDetected: () -> Unit,
+    onNavigationChange: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pageCount = chapterPageUrls.size
@@ -65,15 +65,6 @@ fun ChapterPageModeComponent(
     ) { page ->
         val scrollState = rememberScrollState()
 
-        LaunchedEffect(scrollState) {
-            snapshotFlow { scrollState.scrollIndicatorState?.scrollOffset }
-                .filter { it != 0 }
-                .distinctUntilChanged()
-                .collect {
-                    onScrollDetected()
-                }
-        }
-
         ChapterItem(
             pageUrl = chapterPageUrls[page],
             pageNumber = chapterPageIndex + 1,
@@ -98,11 +89,11 @@ fun ChapterPageModeComponent(
                             }
                         }
                         else {
-                            onScrollDetected()
+                            onNavigationChange()
                         }
                     },
                     onDoubleTap = {
-                        onScrollDetected()
+                        onNavigationChange()
                     }
                 )
         )

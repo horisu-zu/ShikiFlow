@@ -4,6 +4,8 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -69,12 +71,6 @@ fun ProfileNavigator(
                     navOptions = profileNavOptions
                 )
             }
-            entry<ProfileNavRoute.Details> { route ->
-                DetailsNavigator(
-                    detailsNavRoute = route.detailsNavRoute,
-                    mainNavOptions = profileNavOptions
-                )
-            }
             entry<ProfileNavRoute.Settings> {
                 SettingsScreen()
             }
@@ -85,6 +81,40 @@ fun ProfileNavigator(
                 CompareScreen(
                     targetUser = route.targetUser,
                     navOptions = profileNavOptions
+                )
+            }
+            entry<ProfileNavRoute.Details>(
+                metadata = {
+                    NavDisplay.transitionSpec {
+                        fadeIn(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ) togetherWith fadeOut(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    } + NavDisplay.popTransitionSpec {
+                        fadeIn(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ) togetherWith fadeOut(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    }
+                }
+            ) { route ->
+                DetailsNavigator(
+                    detailsNavRoute = route.detailsNavRoute,
+                    mainNavOptions = profileNavOptions
                 )
             }
         },
