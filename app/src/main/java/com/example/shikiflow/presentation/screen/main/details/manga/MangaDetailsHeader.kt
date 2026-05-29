@@ -82,7 +82,7 @@ fun MangaDetailsHeader(
             model = mangaDetails.coverImageUrl,
             imageType = ImageType.Poster(
                 width = Int.MAX_VALUE.dp,
-                clip = RoundedCornerShape(0.dp),
+                shape = RoundedCornerShape(0.dp),
                 aspectRatio = if(!isLandscape) 2f / 2.85f
                     else 2.25f
             ),

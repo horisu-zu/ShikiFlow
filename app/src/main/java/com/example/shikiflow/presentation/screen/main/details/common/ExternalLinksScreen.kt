@@ -187,7 +187,7 @@ private fun LinkItem(
                     imageType = ImageType.Custom(
                         aspectRatio = 1f,
                         width = 24.dp,
-                        clip = RoundedCornerShape(0.dp)
+                        shape = RoundedCornerShape(0.dp)
                     )
                 )
             } ?: Icon(

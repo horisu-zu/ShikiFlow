@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import android.util.Log
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,6 +49,7 @@ import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.viewmodel.manga.tracks.MangaTracksViewModel
 
 @Composable
@@ -69,8 +71,12 @@ fun MangaTracksPage(
     val isAtTop by remember {
         derivedStateOf {
             lazyGridState.firstVisibleItemIndex == 0 &&
-                    lazyGridState.firstVisibleItemScrollOffset == 0
+            lazyGridState.firstVisibleItemScrollOffset == 0
         }
+    }
+
+    LaunchedEffect(mangaTrackItems.loadState) {
+        Log.d("MangaTracksPage", "Load State: ${mangaTrackItems.loadState}")
     }
 
     LaunchedEffect(isCurrentPage, isAtTop) {
@@ -82,12 +88,6 @@ fun MangaTracksPage(
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
 
     when(mangaTrackItems.loadState.refresh) {
-        LoadState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        }
         is LoadState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -116,39 +116,52 @@ fun MangaTracksPage(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = modifier.fillMaxSize()
                 ) {
-                    items(
-                        count = mangaTrackItems.itemCount,
-                        key = mangaTrackItems.itemKey { it.track.id }
-                    ) { index ->
-                        val trackItem = mangaTrackItems[index] ?: return@items
-
-                        MangaTrackItem(
-                            trackItem = trackItem,
-                            titleType = preferredTitleType,
-                            onClick = { id ->
-                                onMangaClick(id)
-                            },
-                            onLongClick = { selectedItem = trackItem },
-                            modifier = Modifier.animateItem()
-                        )
-                    }
-
-                    if (mangaTrackItems.loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
-                        }
-                    }
-                    if (mangaTrackItems.loadState.append is LoadState.Error) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            ErrorItem(
-                                message = stringResource(R.string.mtp_loading_error),
-                                buttonLabel = stringResource(R.string.common_retry),
-                                showFace = false,
-                                onButtonClick = { mangaTrackItems.retry() }
+                    mangaTrackItems.apply {
+                        if (loadState.refresh is LoadState.Loading ||
+                            (
+                                loadState.refresh is LoadState.NotLoading &&
+                                !loadState.append.endOfPaginationReached &&
+                                mangaTrackItems.itemCount == 0
                             )
+                        ) {
+                            items(count = 12) {
+                                BrowseGridItemPlaceholder()
+                            }
+                        } else if (loadState.refresh is LoadState.NotLoading) {
+                            items(
+                                count = mangaTrackItems.itemCount,
+                                key = mangaTrackItems.itemKey { it.track.id }
+                            ) { index ->
+                                val trackItem = mangaTrackItems[index] ?: return@items
+
+                                MangaTrackItem(
+                                    trackItem = trackItem,
+                                    titleType = preferredTitleType,
+                                    onClick = { id ->
+                                        onMangaClick(id)
+                                    },
+                                    onLongClick = { selectedItem = trackItem },
+                                    modifier = Modifier.animateItem()
+                                )
+                            }
+                        }
+
+                        if (loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
+                        } else if (loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ErrorItem(
+                                    message = stringResource(R.string.mtp_loading_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    showFace = false,
+                                    onButtonClick = { mangaTrackItems.retry() }
+                                )
+                            }
                         }
                     }
                 }
@@ -212,7 +225,7 @@ fun MangaTrackItem(
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
                 width = Int.MAX_VALUE.dp,
-                clip = RoundedCornerShape(cornerShape)
+                shape = RoundedCornerShape(cornerShape)
             )
         )
 

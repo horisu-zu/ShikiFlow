@@ -12,6 +12,7 @@ import com.example.graphql.shikimori.MangaStaffQuery
 import com.example.graphql.shikimori.StaffDetailsQuery
 import com.example.graphql.shikimori.StaffSearchQuery
 import com.example.shikiflow.data.datasource.StaffDataSource
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.sortByRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaff
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toStaffDetails
@@ -80,7 +81,7 @@ class ShikimoriStaffDataSource @Inject constructor(
                     return result.fold(
                         onSuccess = { response ->
                             LoadResult.Page(
-                                data = response,
+                                data = response.sortByRole(),
                                 prevKey = null,
                                 nextKey = null
                             )

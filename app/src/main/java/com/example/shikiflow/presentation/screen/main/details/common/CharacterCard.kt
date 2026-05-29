@@ -43,7 +43,7 @@ fun CharacterCard(
             imageType = ImageType.Custom(
                 width = Int.MAX_VALUE.dp,
                 aspectRatio = 2f / 2.85f,
-                clip = RoundedCornerShape(shapePercent)
+                shape = RoundedCornerShape(shapePercent)
             )
         )
         Text(

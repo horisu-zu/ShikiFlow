@@ -19,6 +19,7 @@ import com.example.shikiflow.data.mapper.common.RatingMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.sortByRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.AiringAnimeDataShort
@@ -76,7 +77,8 @@ object ShikimoriMediaMapper {
             origin = origin?.toDomain() ?: MediaOrigin.UNKNOWN,
             screenshots = screenshots.map { it.originalUrl },
             studios = studios.map { it.toStudioShort() },
-            staffList = personRoles?.map { it.personRoleShort.toDomain() } ?: emptyList(),
+            staffList = personRoles?.map { it.personRoleShort.toDomain() }
+                ?.sortByRole() ?: emptyList(),
             durationMins = duration,
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             scoreStats = scoresStats?.map { (score, count) ->
@@ -144,7 +146,8 @@ object ShikimoriMediaMapper {
                 }
             },
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
-            staffList = personRoles?.map { it.personRoleShort.toDomain() } ?: emptyList(),
+            staffList = personRoles?.map { it.personRoleShort.toDomain() }
+                ?.sortByRole() ?: emptyList(),
             scoreStats = scoresStats?.map { (score, count) ->
                 Stat(
                     type = score,

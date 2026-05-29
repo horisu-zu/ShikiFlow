@@ -57,7 +57,7 @@ fun BrowseCoverItem(
             contentScale = ContentScale.Crop,
             imageType = ImageType.Poster(
                 width = coverWidth,
-                clip = RoundedCornerShape(cornerShape)
+                shape = RoundedCornerShape(cornerShape)
             ),
             onClick = onClick
         )

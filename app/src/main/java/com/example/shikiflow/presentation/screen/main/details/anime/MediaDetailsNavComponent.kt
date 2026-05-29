@@ -19,9 +19,7 @@ import com.example.shikiflow.utils.IconResource
 @Composable
 fun MediaDetailsNavComponent(
     authType: AuthType,
-    mediaType: MediaType,
     onThreadsClick: () -> Unit,
-    onStaffClick: () -> Unit,
     onSimilarClick: () -> Unit,
     onExternalLinksClick: () -> Unit
 ) {
@@ -32,23 +30,12 @@ fun MediaDetailsNavComponent(
         verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
         horizontalAlignment = Alignment.Start
     ) {
-        when(authType) {
-            AuthType.ANILIST -> {
-                GeneralItem(
-                    icon = IconResource.Drawable(resId = R.drawable.ic_thread),
-                    title = stringResource(R.string.details_info_threads),
-                    onClick = { onThreadsClick() }
-                )
-            }
-            AuthType.SHIKIMORI -> {
-                if(mediaType == MediaType.ANIME) {
-                    GeneralItem(
-                        icon = IconResource.Drawable(resId = R.drawable.ic_group),
-                        title = stringResource(id = R.string.staff_title),
-                        onClick = { onStaffClick() }
-                    )
-                }
-            }
+        if(authType == AuthType.ANILIST) {
+            GeneralItem(
+                icon = IconResource.Drawable(resId = R.drawable.ic_thread),
+                title = stringResource(R.string.details_info_threads),
+                onClick = { onThreadsClick() }
+            )
         }
         GeneralItem(
             icon = IconResource.Drawable(resId = R.drawable.ic_intersection),

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -35,6 +36,7 @@ import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.foregroundGradient
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun AnimeTrackGridItem(
@@ -48,7 +50,7 @@ fun AnimeTrackGridItem(
     val imageType = ImageType.Poster(
         width = Int.MAX_VALUE.dp,
         aspectRatio = 2f / 2.6f,
-        clip = RoundedCornerShape(clipPercent)
+        shape = RoundedCornerShape(clipPercent)
     )
 
     val progressBarHeight = 4.dp
@@ -71,7 +73,12 @@ fun AnimeTrackGridItem(
                 imageType = imageType,
                 contentDescription = "Poster",
                 modifier = Modifier
-                    .clip(RoundedCornerShape(bottomStartPercent = clipPercent, bottomEndPercent = clipPercent))
+                    .clip(
+                        shape = RoundedCornerShape(
+                            bottomStartPercent = clipPercent,
+                            bottomEndPercent = clipPercent
+                        )
+                    )
                     .foregroundGradient(
                         gradientColors = listOf(
                             Color.Transparent,
@@ -144,5 +151,49 @@ fun AnimeTrackGridItem(
         } else {
             Spacer(modifier = Modifier.height(progressBarHeight))
         }
+    }
+}
+
+@Composable
+fun AnimeTrackGridItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    val progressBarHeight = 4.dp
+    val clipPercent = 8
+    val imageType = ImageType.Poster(
+        width = Int.MAX_VALUE.dp,
+        aspectRatio = 2f / 2.6f,
+        shape = RoundedCornerShape(clipPercent)
+    )
+
+    Column(
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(clipPercent))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .then(modifier),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(imageType.aspectRatio)
+                .shimmerEffect()
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = clipPercent.dp)
+                .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .shimmerEffect()
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(progressBarHeight)
+                .shimmerEffect()
+        )
     }
 }

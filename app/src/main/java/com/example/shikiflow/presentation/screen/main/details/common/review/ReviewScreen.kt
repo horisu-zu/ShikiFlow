@@ -167,7 +167,7 @@ private fun ReviewHeader(
                 contentScale = ContentScale.Crop,
                 imageType = ImageType.Screenshot(
                     width = Int.MAX_VALUE.dp,
-                    clip = RoundedCornerShape(percent = 8),
+                    shape = RoundedCornerShape(percent = 8),
                     aspectRatio = when(windowSize) {
                         WindowSize.COMPACT -> 16f / 9f
                         else -> 3.2f

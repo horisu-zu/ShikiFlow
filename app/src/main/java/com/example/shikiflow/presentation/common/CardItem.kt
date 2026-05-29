@@ -22,7 +22,8 @@ fun CardItem(
     style: TextStyle = MaterialTheme.typography.labelMedium,
 ) {
     Box(
-        modifier = modifier.clip(RoundedCornerShape(8.dp))
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
             .then(
                 other = if(onClick != null) {
                     Modifier.clickable(onClick = onClick)

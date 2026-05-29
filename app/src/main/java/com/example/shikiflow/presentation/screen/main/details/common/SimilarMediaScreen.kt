@@ -44,6 +44,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.media.similar.SimilarMediaViewModel
 
@@ -112,12 +113,6 @@ fun SimilarMediaScreen(
         }
     ) { innerPadding ->
         when (similarMediaState.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
             is LoadState.Error -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -147,24 +142,31 @@ fun SimilarMediaScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    items(
-                        count = similarMediaState.itemCount,
-                        key = { index -> similarMediaState[index]?.id ?: index }
-                    ) { index ->
-                        similarMediaState[index]?.let { mediaRecommendation ->
-                            BrowseGridItem(
-                                browseItem = mediaRecommendation,
-                                titleType = preferredTitleType,
-                                onItemClick = { id, mediaType ->
-                                    when (mediaType) {
-                                        MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                        MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                    }
-                                }
-                            )
-                        }
-                    }
                     similarMediaState.apply {
+                        if (loadState.refresh is LoadState.Loading) {
+                            items(count = 24) {
+                                BrowseGridItemPlaceholder()
+                            }
+                        } else if (loadState.refresh is LoadState.NotLoading) {
+                            items(
+                                count = similarMediaState.itemCount,
+                                key = { index -> similarMediaState[index]?.id ?: index }
+                            ) { index ->
+                                similarMediaState[index]?.let { mediaRecommendation ->
+                                    BrowseGridItem(
+                                        browseItem = mediaRecommendation,
+                                        titleType = preferredTitleType,
+                                        onItemClick = { id, mediaType ->
+                                            when (mediaType) {
+                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+
                         if (loadState.append is LoadState.Loading) {
                             item(span = { GridItemSpan(maxLineSpan) }) {
                                 Box(

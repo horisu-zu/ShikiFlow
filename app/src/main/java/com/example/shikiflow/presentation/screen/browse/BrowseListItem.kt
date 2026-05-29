@@ -2,10 +2,14 @@ package com.example.shikiflow.presentation.screen.browse
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +32,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter
 
 @Composable
@@ -54,36 +59,30 @@ fun BrowseListItem(
             coverWidth = 96.dp,
             cornerShape = roundedCornerShape
         )
+
         Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = browseItem.title.preferred(titleType),
                 style = MaterialTheme.typography.labelLarge.copy(
                     fontWeight = FontWeight.Medium
-                ), maxLines = 2, overflow = TextOverflow.Ellipsis
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
             )
+
             if(browseItem.studios.isNotEmpty()) {
                 Text(
-                    text = buildAnnotatedString {
-                        browseItem.studios.forEachIndexed { index, studio ->
-                            withStyle(
-                                style = SpanStyle(
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            ) {
-                                append(studio)
-                            }
-                            if (index != browseItem.studios.lastIndex) {
-                                append(" • ")
-                            }
-                        }
-                    },
-                    style = MaterialTheme.typography.labelSmall
+                    text = browseItem.studios.joinToString(separator = " • "),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 )
             }
+
             Text(
                 text = listOfNotNull(
                     stringResource(id = browseItem.mediaFormat.displayValue()),
@@ -96,6 +95,7 @@ fun BrowseListItem(
                 ).joinToString(" • "),
                 style = MaterialTheme.typography.labelSmall
             )
+
             if(browseItem.genres.isNotEmpty()) {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
@@ -110,6 +110,7 @@ fun BrowseListItem(
                     }
                 }
             }
+
             browseItem.nextEpisodeAt?.let { instant ->
                 Text(
                     text = buildAnnotatedString {
@@ -125,6 +126,81 @@ fun BrowseListItem(
                     },
                     style = MaterialTheme.typography.labelMedium
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun BrowseListItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    maxValue: Int = 3
+) {
+    val indexValue = itemIndex % maxValue + 1
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+        verticalAlignment = Alignment.Top
+    ) {
+        Box(
+            modifier = Modifier
+                .width(96.dp)
+                .aspectRatio(2f / 2.85f)
+                .clip(RoundedCornerShape(12.dp))
+                .shimmerEffect()
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(120.dp / 1.5f * (maxValue - indexValue + 1))
+                    .height(MaterialTheme.typography.labelLarge.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(times = indexValue) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width(64.dp)
+                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .shimmerEffect()
+                    )
+
+                    if(index != indexValue - 1) {
+                        Text(
+                            text = " • ",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+            ) {
+                repeat(times = maxValue - indexValue + 1) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width(36.dp * (maxValue - index))
+                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp + 16.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .shimmerEffect()
+                    )
+                }
             }
         }
     }

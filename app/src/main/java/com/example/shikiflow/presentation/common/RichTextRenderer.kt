@@ -442,7 +442,7 @@ private fun RichQuoteItem(
                     model = block.senderAvatarUrl,
                     imageType = ImageType.Square(
                         width = 24.dp,
-                        clip = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp)
                     )
                 )
                 Text(

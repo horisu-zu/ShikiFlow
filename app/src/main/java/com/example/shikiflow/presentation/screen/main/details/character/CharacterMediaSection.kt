@@ -50,7 +50,7 @@ fun CharacterMediaSection(
     val clip = 12.dp
     val imageType = ImageType.Poster(
         width = 120.dp,
-        clip = RoundedCornerShape(clip),
+        shape = RoundedCornerShape(clip),
     )
     val preferredTitleType = LocalTitleTypeController.current
 
@@ -98,7 +98,7 @@ fun CharacterMediaSection(
                         modifier = Modifier
                             .width(imageType.width)
                             .aspectRatio(imageType.aspectRatio)
-                            .clip(imageType.clip),
+                            .clip(imageType.shape),
                         onNavigate = { onPaginatedNavigate() }
                     )
                 }
@@ -119,7 +119,7 @@ private fun MediaRoleItem(
     Box(
         modifier = modifier
             .width(imageType.width)
-            .clip(imageType.clip)
+            .clip(imageType.shape)
             .clickable { onItemClick(mediaItem.id) }
     ) {
         BrowseCoverItem(

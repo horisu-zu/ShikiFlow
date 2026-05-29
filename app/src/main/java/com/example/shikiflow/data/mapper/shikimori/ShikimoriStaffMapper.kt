@@ -16,6 +16,7 @@ import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.domain.model.staff.StaffRole
 import com.example.shikiflow.domain.model.staff.StaffShort
 
 object ShikimoriStaffMapper {
@@ -108,4 +109,50 @@ object ShikimoriStaffMapper {
             imageUrl = poster?.posterShort?.originalUrl ?: ""
         )
     }
+
+    fun List<StaffShort>.sortByRole(): List<StaffShort> {
+        return sortedBy { staff ->
+            staff.roles.rolePriority()
+        }
+    }
+
+    private fun List<StaffRole>.rolePriority(): Int {
+        return minOfOrNull { role ->
+            staffRoleOrder.indexOf(role.english).takeIf { it >= 0 } ?: Int.MAX_VALUE
+        } ?: Int.MAX_VALUE
+    }
+
+    private val staffRoleOrder = listOf(
+        "Original Creator",
+        "Director",
+        "Chief Producer",
+        "Theme Song Performance",
+        "Theme Song Arrangement",
+        "Art Director",
+        "Assistant Producer",
+        "Series Composition",
+        "Chief Animation Director",
+        "Character Design",
+        "Color Design",
+        "Executive Producer",
+        "Episode Director",
+        "Storyboard",
+        "Music",
+        "Sound Director",
+        "Director of Photography",
+        "Editing",
+        "Producer",
+        "Planning",
+        "Assistant Director",
+        "Theme Song Composition",
+        "Theme Song Lyrics",
+        "Script",
+        "Animation Director",
+        "Assistant Animation Director",
+        "Background Art",
+        "Recording",
+        "Recording Assistant",
+        "Sound Effects",
+        "ADR Director"
+    )
 }

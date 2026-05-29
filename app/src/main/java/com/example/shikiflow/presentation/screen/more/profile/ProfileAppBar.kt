@@ -81,7 +81,7 @@ fun ProfileAppBar(
                     contentScale = ContentScale.FillWidth,
                     imageType = ImageType.Screenshot(
                         width = Dp.Unspecified,
-                        clip = RoundedCornerShape(0.dp)
+                        shape = RoundedCornerShape(0.dp)
                     ),
                     modifier = Modifier
                         .foregroundGradient(
@@ -108,7 +108,7 @@ fun ProfileAppBar(
                         imageType = ImageType.Custom(
                             width = lerp(108.dp, 60.dp, progress),
                             aspectRatio = 1f,
-                            clip = RoundedCornerShape(percent = 16)
+                            shape = RoundedCornerShape(percent = 16)
                         ),
                         backgroundColor = backgroundColor,
                         isScrolled = scrollBehavior.state.collapsedFraction == 1f,

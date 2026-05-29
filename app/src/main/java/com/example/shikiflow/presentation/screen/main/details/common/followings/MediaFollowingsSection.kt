@@ -178,7 +178,7 @@ private fun FollowingUserItem(
             BaseImage(
                 model = userData.avatarUrl,
                 imageType = ImageType.Square(
-                    clip = RoundedCornerShape(percent = 16),
+                    shape = RoundedCornerShape(percent = 16),
                     width = 32.dp
                 )
             )

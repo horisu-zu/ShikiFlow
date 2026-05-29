@@ -42,17 +42,6 @@ fun ChapterScrollModeComponent(
             }
     }
 
-    /*LaunchedEffect(lazyListState) {
-        snapshotFlow {
-            lazyListState.firstVisibleItemIndex to
-            lazyListState.firstVisibleItemScrollOffset
-        }
-            .distinctUntilChanged()
-            .collect {
-                onNavigationChange()
-            }
-    }*/
-
     LaunchedEffect(chapterPageIndex) {
         if(lazyListState.firstVisibleItemIndex != chapterPageIndex) {
             lazyListState.scrollToItem(index = chapterPageIndex)

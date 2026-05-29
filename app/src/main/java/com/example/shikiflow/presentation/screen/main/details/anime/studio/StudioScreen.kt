@@ -61,6 +61,7 @@ import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.TriFilterChip
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.anime.studio.StudioViewModel
 import com.example.shikiflow.utils.IconResource
@@ -211,12 +212,6 @@ fun StudioScreen(
         }
     ) { paddingValues ->
         when (studioAnimeData.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
             is LoadState.Error -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -251,19 +246,26 @@ fun StudioScreen(
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(
-                        count = studioAnimeData.itemCount,
-                        key = studioAnimeData.itemKey { it.id }
-                    ) { index ->
-                        studioAnimeData[index]?.let { browseItem ->
-                            BrowseGridItem(
-                                browseItem = browseItem,
-                                titleType = preferredTitleType,
-                                onItemClick = { id, _ -> onMediaNavigate(id) }
-                            )
-                        }
-                    }
                     studioAnimeData.apply {
+                        if (loadState.refresh is LoadState.Loading) {
+                            items(count = 24) {
+                                BrowseGridItemPlaceholder()
+                            }
+                        } else if (loadState.refresh is LoadState.NotLoading) {
+                            items(
+                                count = studioAnimeData.itemCount,
+                                key = studioAnimeData.itemKey { it.id }
+                            ) { index ->
+                                studioAnimeData[index]?.let { browseItem ->
+                                    BrowseGridItem(
+                                        browseItem = browseItem,
+                                        titleType = preferredTitleType,
+                                        onItemClick = { id, _ -> onMediaNavigate(id) }
+                                    )
+                                }
+                            }
+                        }
+
                         if (loadState.append is LoadState.Loading) {
                             item(span = { GridItemSpan(maxLineSpan) }) {
                                 Box(

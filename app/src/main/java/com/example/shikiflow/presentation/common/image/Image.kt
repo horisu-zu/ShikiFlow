@@ -79,7 +79,7 @@ fun BaseImage(
                     else Modifier.width(imageType.width)
             )
             .aspectRatio(imageType.aspectRatio)
-            .clip(imageType.clip)
+            .clip(imageType.shape)
             .then(
                 if(onClick != null) {
                     Modifier.clickable { onClick() }

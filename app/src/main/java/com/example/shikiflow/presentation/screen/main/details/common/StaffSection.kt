@@ -5,9 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -84,6 +86,7 @@ fun StaffSection(
                 StaffItem(
                     staffShort = staffShort,
                     titleType = preferredTitleType,
+                    width = 144.dp,
                     onStaffClick = onStaffClick
                 )
             }
@@ -96,10 +99,12 @@ fun StaffItem(
     staffShort: StaffShort,
     titleType: PreferredTitleType,
     onStaffClick: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    width: Dp = Dp.Unspecified
 ) {
     Row(
         modifier = modifier
+            .height(IntrinsicSize.Max)
             .clip(RoundedCornerShape(12.dp))
             .clickable { onStaffClick(staffShort.id) },
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start)
@@ -110,7 +115,7 @@ fun StaffItem(
         )
         Column(
             modifier = Modifier
-                .width(144.dp)
+                .width(width)
                 .padding(vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
         ) {

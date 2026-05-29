@@ -201,7 +201,7 @@ private fun UserItem(
             model = imageUrl,
             imageType = ImageType.Square(
                 width = 40.dp,
-                clip = RoundedCornerShape(percent = 24)
+                shape = RoundedCornerShape(percent = 24)
             )
         )
 
@@ -553,7 +553,7 @@ private fun TrackerUserItem(
             model = user.avatarUrl,
             imageType = ImageType.Square(
                 width = 24.dp,
-                clip = RoundedCornerShape(percent = 24)
+                shape = RoundedCornerShape(percent = 24)
             )
         )
     }

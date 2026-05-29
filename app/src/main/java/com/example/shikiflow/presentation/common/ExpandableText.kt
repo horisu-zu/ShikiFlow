@@ -544,7 +544,7 @@ private fun QuoteItem(
                         model = quoteElement.senderAvatarUrl,
                         imageType = ImageType.Square(
                             width = 24.dp,
-                            clip = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp)
                         )
                     )
                     Text(
@@ -573,7 +573,7 @@ private fun VideoItem(
 
     Box(
         modifier = modifier.fillMaxWidth()
-            .clip(imageType.clip)
+            .clip(imageType.shape)
             .clickable { onVideoClick() },
         contentAlignment = Alignment.Center
     ) {

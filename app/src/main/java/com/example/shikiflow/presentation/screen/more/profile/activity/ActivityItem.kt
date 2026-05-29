@@ -86,7 +86,7 @@ fun ListActivityItem(
 
     Row(
         modifier = modifier
-            .clip(imageType.clip)
+            .clip(imageType.shape)
             .then(
                 if(listActivity.mediaType != null) {
                     Modifier.clickable {
@@ -157,7 +157,7 @@ fun TextActivityItem(
                 model = textActivity.user.avatarUrl,
                 imageType = ImageType.Square(
                     width = 24.dp,
-                    clip = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp)
                 )
             )
             Text(
@@ -219,7 +219,7 @@ fun MessageActivityItem(
                     model = messageActivity.messenger.avatarUrl,
                     imageType = ImageType.Square(
                         width = 24.dp,
-                        clip = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp)
                     )
                 )
                 Text(

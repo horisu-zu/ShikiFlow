@@ -17,11 +17,11 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -35,6 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -58,7 +59,9 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.screen.browse.main.anilist.AnilistBrowseMainPage
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.screen.browse.BrowseListItem
+import com.example.shikiflow.presentation.screen.browse.BrowseListItemPlaceholder
 import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
@@ -71,7 +74,7 @@ fun BrowseScreen(
     browseViewModel: BrowseViewModel = hiltViewModel()
 ) {
     val horizontalPadding = 12.dp
-    var isAtTop by remember { mutableStateOf(false) }
+    var isAtTop by remember { mutableStateOf(true) }
     val authType by browseViewModel.authType.collectAsStateWithLifecycle()
 
     Scaffold(
@@ -121,74 +124,78 @@ fun ShikimoriBrowseMainPage(
     val showBottomSheet = remember { mutableStateOf(false) }
 
     var currentType by rememberSaveable { mutableStateOf(MediaType.ANIME) }
-    val uiMode = when(browseUiSettings.browseUiMode) {
-        BrowseUiMode.AUTO -> browseUiSettings.appUiMode
-        BrowseUiMode.LIST -> AppUiMode.LIST
-        BrowseUiMode.GRID -> AppUiMode.GRID
-    }
-
-    when (uiMode) {
-        AppUiMode.LIST -> {
-            BrowseListComponent(
-                browseState = ongoingBrowseState,
-                currentType = currentType,
-                preferredTitleType = preferredTitleType,
-                horizontalPadding = horizontalPadding,
-                onSideScreenNavigate = { browseType ->
-                    browseNavOptions.navigateToSideScreen(browseType)
-                },
-                onMediaTypeChange = { currentType = it },
-                onNavigate = { id, mediaType ->
-                    val detailsNavRoute = when(mediaType) {
-                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                    }
-
-                    browseNavOptions.navigateToDetails(detailsNavRoute)
-                },
-                onSettingClick = { showBottomSheet.value = true },
-                onIsAtTopChange = onIsAtTopChange,
-                modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
-            )
-        }
-        AppUiMode.GRID -> {
-            BrowseGridComponent(
-                browseState = ongoingBrowseState,
-                currentType = currentType,
-                preferredTitleType = preferredTitleType,
-                horizontalPadding = horizontalPadding,
-                onSideScreenNavigate = { browseType ->
-                    browseNavOptions.navigateToSideScreen(browseType)
-                },
-                onMediaTypeChange = { currentType = it },
-                onNavigate = { id, mediaType ->
-                    val detailsNavRoute = when(mediaType) {
-                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                    }
-
-                    browseNavOptions.navigateToDetails(detailsNavRoute)
-                },
-                onSettingClick = { showBottomSheet.value = true },
-                onIsAtTopChange = onIsAtTopChange,
-                modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
-            )
+    val uiMode = browseUiSettings.browseUiMode?.let { browseUiMode ->
+        when(browseUiMode) {
+            BrowseUiMode.AUTO -> browseUiSettings.appUiMode
+            BrowseUiMode.LIST -> AppUiMode.LIST
+            BrowseUiMode.GRID -> AppUiMode.GRID
         }
     }
 
-    if(showBottomSheet.value) {
-        BrowseMainBottomSheet(
-            currentBrowseMode = browseUiSettings.browseUiMode,
-            ongoingOrder = MediaSort.Shikimori.ongoingOptions,
-            currentOngoingMode = browseUiSettings.browseOngoingOrder,
-            onDismiss = { showBottomSheet.value = false },
-            onModeSelect = { newMode ->
-                browseViewModel.setBrowseUiMode(newMode)
-            },
-            onSortSelect = { newOrder ->
-                browseViewModel.setBrowseOngoingOrder(newOrder)
+    uiMode?.let {
+        when (uiMode) {
+            AppUiMode.LIST -> {
+                BrowseListComponent(
+                    browseState = ongoingBrowseState,
+                    currentType = currentType,
+                    preferredTitleType = preferredTitleType,
+                    horizontalPadding = horizontalPadding,
+                    onSideScreenNavigate = { browseType ->
+                        browseNavOptions.navigateToSideScreen(browseType)
+                    },
+                    onMediaTypeChange = { currentType = it },
+                    onNavigate = { id, mediaType ->
+                        val detailsNavRoute = when(mediaType) {
+                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                        }
+
+                        browseNavOptions.navigateToDetails(detailsNavRoute)
+                    },
+                    onSettingClick = { showBottomSheet.value = true },
+                    onIsAtTopChange = onIsAtTopChange,
+                    modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+                )
             }
-        )
+            AppUiMode.GRID -> {
+                BrowseGridComponent(
+                    browseState = ongoingBrowseState,
+                    currentType = currentType,
+                    preferredTitleType = preferredTitleType,
+                    horizontalPadding = horizontalPadding,
+                    onSideScreenNavigate = { browseType ->
+                        browseNavOptions.navigateToSideScreen(browseType)
+                    },
+                    onMediaTypeChange = { currentType = it },
+                    onNavigate = { id, mediaType ->
+                        val detailsNavRoute = when(mediaType) {
+                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                        }
+
+                        browseNavOptions.navigateToDetails(detailsNavRoute)
+                    },
+                    onSettingClick = { showBottomSheet.value = true },
+                    onIsAtTopChange = onIsAtTopChange,
+                    modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+                )
+            }
+        }
+
+        if(showBottomSheet.value) {
+            BrowseMainBottomSheet(
+                currentBrowseMode = browseUiSettings.browseUiMode ?: BrowseUiMode.AUTO,
+                ongoingOrder = MediaSort.Shikimori.ongoingOptions,
+                currentOngoingMode = browseUiSettings.browseOngoingOrder ?: MediaSort.Common.POPULARITY,
+                onDismiss = { showBottomSheet.value = false },
+                onModeSelect = { newMode ->
+                    browseViewModel.setBrowseUiMode(newMode)
+                },
+                onSortSelect = { newOrder ->
+                    browseViewModel.setBrowseOngoingOrder(newOrder)
+                }
+            )
+        }
     }
 }
 
@@ -238,14 +245,7 @@ fun BrowseListComponent(
 
         item { OngoingTitleComponent(onSettingClick = onSettingClick) }
 
-        if(browseState.loadState.refresh is LoadState.Loading) {
-            item {
-                Box(
-                    modifier = Modifier.fillParentMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
-        } else if(browseState.loadState.refresh is LoadState.Error) {
+        if(browseState.loadState.refresh is LoadState.Error) {
             item {
                 Box(
                     modifier = Modifier.fillParentMaxSize(),
@@ -259,16 +259,22 @@ fun BrowseListComponent(
                 }
             }
         } else {
-            items(
-                count = browseState.itemCount,
-                key = browseState.itemKey { it.id }
-            ) { index ->
-                browseState[index]?.let { browseItem ->
-                    BrowseListItem(
-                        browseItem = browseItem as BrowseMedia.Anime,
-                        titleType = preferredTitleType,
-                        onItemClick = onNavigate
-                    )
+            if(browseState.loadState.refresh is LoadState.Loading) {
+                items(count = 9) { index ->
+                    BrowseListItemPlaceholder(itemIndex = index % 3 + 1)
+                }
+            } else if(browseState.loadState.refresh is LoadState.NotLoading) {
+                items(
+                    count = browseState.itemCount,
+                    key = browseState.itemKey { it.id }
+                ) { index ->
+                    browseState[index]?.let { browseItem ->
+                        BrowseListItem(
+                            browseItem = browseItem as BrowseMedia.Anime,
+                            titleType = preferredTitleType,
+                            onItemClick = onNavigate
+                        )
+                    }
                 }
             }
             if(browseState.loadState.append is LoadState.Loading) {
@@ -348,16 +354,6 @@ fun BrowseGridComponent(
         }
 
         when (browseState.loadState.refresh) {
-            is LoadState.Loading -> {
-                item(span = { GridItemSpan(maxLineSpan) }) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(windowInfo.containerDpSize.height * 0.65f),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            }
             is LoadState.Error -> {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
@@ -375,19 +371,26 @@ fun BrowseGridComponent(
                 }
             }
             else -> {
-                items(
-                    count = browseState.itemCount,
-                    key = browseState.itemKey { it.id }
-                ) { index ->
-                    browseState[index]?.let { browseItem ->
-                        BrowseGridItem(
-                            browseItem = browseItem,
-                            titleType = preferredTitleType,
-                            onItemClick = onNavigate
-                        )
-                    }
-                }
                 browseState.apply {
+                    if(loadState.refresh is LoadState.Loading) {
+                        items(count = 24) {
+                            BrowseGridItemPlaceholder()
+                        }
+                    } else if(loadState.refresh is LoadState.NotLoading) {
+                        items(
+                            count = browseState.itemCount,
+                            key = browseState.itemKey { it.id }
+                        ) { index ->
+                            browseState[index]?.let { browseItem ->
+                                BrowseGridItem(
+                                    browseItem = browseItem,
+                                    titleType = preferredTitleType,
+                                    onItemClick = onNavigate
+                                )
+                            }
+                        }
+                    }
+
                     if (loadState.append is LoadState.Loading) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             Box(
@@ -396,7 +399,7 @@ fun BrowseGridComponent(
                             ) { CircularProgressIndicator() }
                         }
                     }
-                    if (browseState.loadState.append is LoadState.Error) {
+                    else if (browseState.loadState.append is LoadState.Error) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             ErrorItem(
                                 message = stringResource(R.string.b_mss_error),
@@ -429,9 +432,15 @@ private fun OngoingTitleComponent(
             )
         )
 
-        IconButton(onClick = { onSettingClick() }) {
+        IconButton(
+            onClick = { onSettingClick() },
+            shape = RoundedCornerShape(percent = 24),
+            colors = IconButtonDefaults.iconButtonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+            )
+        ) {
             Icon(
-                imageVector = Icons.Default.Settings,
+                painter = painterResource(id = R.drawable.ic_sort),
                 contentDescription = null
             )
         }

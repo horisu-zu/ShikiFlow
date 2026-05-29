@@ -30,7 +30,7 @@ fun UserSocialItem(
             model = user.avatarUrl,
             imageType = ImageType.Square(
                 width = 48.dp,
-                clip = RoundedCornerShape(18)
+                shape = RoundedCornerShape(18)
             )
         )
         Text(

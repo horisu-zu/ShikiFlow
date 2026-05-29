@@ -36,12 +36,12 @@ fun BrowseCardItem(
     val clip = 12.dp
     val imageType = ImageType.Poster(
         width = Int.MAX_VALUE.dp,
-        clip = RoundedCornerShape(clip)
+        shape = RoundedCornerShape(clip)
     )
 
     Box(
         modifier = modifier
-            .clip(imageType.clip)
+            .clip(imageType.shape)
             .clickable { onItemClick(browseItem.id, browseItem.mediaType) }
     ) {
         BrowseCoverItem(

@@ -232,7 +232,7 @@ private fun FavoriteItem(
 
     Column(
         modifier = modifier
-            .clip(imageType.clip)
+            .clip(imageType.shape)
             .clickable { onItemClick(userFavorite.id) },
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {

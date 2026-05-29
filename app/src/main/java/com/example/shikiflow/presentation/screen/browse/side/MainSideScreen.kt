@@ -44,6 +44,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.BrowseTypeMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.browse.side.BrowseSideViewModel
 
@@ -155,15 +156,23 @@ private fun MainSideScreenContent(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                items(sideItems.itemCount) { index ->
-                    val browseItem = sideItems[index]!!
-                    BrowseGridItem(
-                        browseItem = browseItem,
-                        titleType = preferredTitleType,
-                        onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
-                    )
-                }
                 sideItems.apply {
+                    if (loadState.refresh is LoadState.Loading) {
+                        items(count = 24) {
+                            BrowseGridItemPlaceholder()
+                        }
+                    } else if (loadState.refresh is LoadState.NotLoading) {
+                        items(sideItems.itemCount) { index ->
+                            sideItems[index]?.let { browseItem ->
+                                BrowseGridItem(
+                                    browseItem = browseItem,
+                                    titleType = preferredTitleType,
+                                    onItemClick = { id, mediaType -> onMediaNavigate(id, mediaType) }
+                                )
+                            }
+                        }
+                    }
+
                     if (loadState.append is LoadState.Loading) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             Box(

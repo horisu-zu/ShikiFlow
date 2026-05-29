@@ -7,6 +7,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.material3.MaterialTheme.colorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -25,10 +26,18 @@ import androidx.core.view.WindowInsetsControllerCompat
 
 @Composable
 fun Modifier.shimmerEffect(): Modifier {
+    val colors = listOf(
+        colorScheme.surfaceContainerHighest,
+        colorScheme.surfaceContainerHigh,
+        colorScheme.surfaceContainerLow,
+        colorScheme.surfaceContainerHigh,
+        colorScheme.surfaceContainerHighest,
+    )
+
     val transition = rememberInfiniteTransition()
     val startOffsetX by transition.animateFloat(
         initialValue = 0f,
-        targetValue = 500f,
+        targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             animation = tween(
                 durationMillis = 1000,
@@ -41,11 +50,7 @@ fun Modifier.shimmerEffect(): Modifier {
     return drawBehind {
         drawRect(
             brush = Brush.linearGradient(
-                colors = listOf(
-                    Color(0x0FD8D8D8),
-                    Color(0x0F969292),
-                    Color(0x0F575757),
-                ),
+                colors = colors,
                 start = Offset(startOffsetX, 0f),
                 end = Offset(startOffsetX + size.width, size.height)
             )

@@ -60,84 +60,80 @@ fun AnimeTracksPage(
 
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
 
-    when (animeTrackItems.loadState.refresh) {
-        is LoadState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        }
-        is LoadState.Error -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                ErrorItem(
-                    message = (animeTrackItems.loadState.refresh as LoadState.Error)
-                        .error.message ?: stringResource(R.string.atp_loading_error),
-                    buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { animeTrackItems.refresh() }
-                )
-            }
-        }
-        else -> {
-            PullToRefreshCustomBox(
-                isRefreshing = animeTrackItems.loadState.refresh is LoadState.Loading,
-                enabled = isAppBarVisible,
-                onRefresh = { animeTrackItems.refresh() }
-            ) {
-                when (appUiMode) {
-                    AppUiMode.LIST -> {
-                        AnimeTracksListComponent(
-                            trackItems = animeTrackItems,
-                            preferredTitleType = preferredTitleType,
-                            isCurrentPage = isCurrentPage,
-                            onAnimeClick = onAnimeClick,
-                            onLongClick = { item ->
-                                selectedItem = item
-                            },
-                            onIsAtTopChange = onIsAtTopChange,
-                            modifier = modifier
-                        )
-                    }
-                    AppUiMode.GRID -> {
-                        AnimeTracksGridComponent(
-                            trackItems = animeTrackItems,
-                            preferredTitleType = preferredTitleType,
-                            isCurrentPage = isCurrentPage,
-                            onAnimeClick = onAnimeClick,
-                            onLongClick = { item ->
-                                selectedItem = item
-                            },
-                            onIsAtTopChange = onIsAtTopChange,
-                            modifier = modifier
-                        )
-                    }
+    appUiMode?.let { uiMode ->
+        when (animeTrackItems.loadState.refresh) {
+            is LoadState.Error -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = (animeTrackItems.loadState.refresh as LoadState.Error)
+                            .error.message ?: stringResource(R.string.atp_loading_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { animeTrackItems.refresh() }
+                    )
                 }
             }
-
-            selectedItem?.let { item ->
-                UserRateBottomSheet(
-                    userRate = item.toUserRateData(),
-                    preferredTitleType = preferredTitleType,
-                    rateUpdateState = params.rateUpdateState,
-                    onDismiss = {
-                        if (params.rateUpdateState != RateUpdateState.LOADING) {
-                            selectedItem = null
+            else -> {
+                PullToRefreshCustomBox(
+                    isRefreshing = animeTrackItems.loadState.refresh is LoadState.Loading,
+                    enabled = isAppBarVisible,
+                    onRefresh = { animeTrackItems.refresh() }
+                ) {
+                    when (uiMode) {
+                        AppUiMode.LIST -> {
+                            AnimeTracksListComponent(
+                                trackItems = animeTrackItems,
+                                preferredTitleType = preferredTitleType,
+                                isCurrentPage = isCurrentPage,
+                                onAnimeClick = onAnimeClick,
+                                onLongClick = { item ->
+                                    selectedItem = item
+                                },
+                                onIsAtTopChange = onIsAtTopChange,
+                                modifier = modifier
+                            )
                         }
-                    },
-                    onSave = { saveUserRate ->
-                        tracksViewModel.saveUserRate(saveUserRate)
-                    },
-                    onDelete = { entryId ->
-                        tracksViewModel.deleteUserRate(
-                            entryId = entryId,
-                            mediaId = item.shortData.id,
-                            malId = item.shortData.malId,
-                            mediaType = item.shortData.mediaType
-                        )
+                        AppUiMode.GRID -> {
+                            AnimeTracksGridComponent(
+                                trackItems = animeTrackItems,
+                                preferredTitleType = preferredTitleType,
+                                isCurrentPage = isCurrentPage,
+                                onAnimeClick = onAnimeClick,
+                                onLongClick = { item ->
+                                    selectedItem = item
+                                },
+                                onIsAtTopChange = onIsAtTopChange,
+                                modifier = modifier
+                            )
+                        }
                     }
-                )
+                }
+
+                selectedItem?.let { item ->
+                    UserRateBottomSheet(
+                        userRate = item.toUserRateData(),
+                        preferredTitleType = preferredTitleType,
+                        rateUpdateState = params.rateUpdateState,
+                        onDismiss = {
+                            if (params.rateUpdateState != RateUpdateState.LOADING) {
+                                selectedItem = null
+                            }
+                        },
+                        onSave = { saveUserRate ->
+                            tracksViewModel.saveUserRate(saveUserRate)
+                        },
+                        onDelete = { entryId ->
+                            tracksViewModel.deleteUserRate(
+                                entryId = entryId,
+                                mediaId = item.shortData.id,
+                                malId = item.shortData.malId,
+                                mediaType = item.shortData.mediaType
+                            )
+                        }
+                    )
+                }
             }
         }
     }
@@ -176,30 +172,42 @@ private fun AnimeTracksListComponent(
         ),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        items(
-            count = trackItems.itemCount,
-            key = trackItems.itemKey { it.track.id }
-        ) { index ->
-            val item = trackItems[index] ?: return@items
-
-            AnimeTrackItem(
-                userRate = item,
-                titleType = preferredTitleType,
-                onClick = onAnimeClick,
-                onLongClick = { onLongClick(item) },
-                modifier = Modifier.animateItem()
-            )
-        }
         trackItems.apply {
-            if(loadState.append is LoadState.Loading) {
+            if (loadState.refresh is LoadState.Loading ||
+                (
+                    loadState.refresh is LoadState.NotLoading &&
+                    !loadState.append.endOfPaginationReached &&
+                    trackItems.itemCount == 0
+                )
+            ) {
+                items(count = 12) { index ->
+                    AnimeTrackItemPlaceholder(index)
+                }
+            } else if (loadState.refresh is LoadState.NotLoading) {
+                items(
+                    count = trackItems.itemCount,
+                    key = trackItems.itemKey { it.track.id }
+                ) { index ->
+                    val item = trackItems[index] ?: return@items
+
+                    AnimeTrackItem(
+                        userRate = item,
+                        titleType = preferredTitleType,
+                        onClick = onAnimeClick,
+                        onLongClick = { onLongClick(item) },
+                        modifier = Modifier.animateItem()
+                    )
+                }
+            }
+
+            if (loadState.append is LoadState.Loading) {
                 item {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
                 }
-            }
-            if(loadState.append is LoadState.Error) {
+            } else if (loadState.append is LoadState.Error) {
                 item {
                     ErrorItem(
                         message = stringResource(R.string.atp_loading_error),
@@ -245,30 +253,42 @@ private fun AnimeTracksGridComponent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        items(
-            count = trackItems.itemCount,
-            key = trackItems.itemKey { it.track.id }
-        ) { index ->
-            val trackItem = trackItems[index] ?: return@items
-
-            AnimeTrackGridItem(
-                trackItem = trackItem,
-                titleType = preferredTitleType,
-                onClick = onAnimeClick,
-                onLongClick = { onLongClick(trackItem) },
-                modifier = Modifier.animateItem()
-            )
-        }
         trackItems.apply {
-            if(loadState.append is LoadState.Loading) {
+            if (loadState.refresh is LoadState.Loading ||
+                (
+                    loadState.refresh is LoadState.NotLoading &&
+                    !loadState.append.endOfPaginationReached &&
+                    trackItems.itemCount == 0
+                )
+            ) {
+                items(count = 12) {
+                    AnimeTrackGridItemPlaceholder()
+                }
+            } else if (loadState.refresh is LoadState.NotLoading) {
+                items(
+                    count = trackItems.itemCount,
+                    key = trackItems.itemKey { it.track.id }
+                ) { index ->
+                    val trackItem = trackItems[index] ?: return@items
+
+                    AnimeTrackGridItem(
+                        trackItem = trackItem,
+                        titleType = preferredTitleType,
+                        onClick = onAnimeClick,
+                        onLongClick = { onLongClick(trackItem) },
+                        modifier = Modifier.animateItem()
+                    )
+                }
+            }
+
+            if (loadState.append is LoadState.Loading) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
                 }
-            }
-            if(loadState.append is LoadState.Error) {
+            } else if(loadState.append is LoadState.Error) {
                 item(span = { GridItemSpan(maxLineSpan) }) {
                     ErrorItem(
                         message = stringResource(R.string.atp_loading_error),

@@ -118,7 +118,7 @@ fun RelatedItem(
             model = relatedMedia.coverImageUrl,
             imageType = ImageType.Square(
                 width = 48.dp,
-                clip = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp)
             )
         )
         Column(

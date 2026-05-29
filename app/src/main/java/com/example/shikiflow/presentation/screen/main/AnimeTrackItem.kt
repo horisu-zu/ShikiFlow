@@ -6,9 +6,12 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,9 +35,11 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.StatusCard
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaStatusMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SeasonMapper.determineSeason
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -149,6 +154,76 @@ fun AnimeTrackItem(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun AnimeTrackItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    maxValue: Int = 3
+) {
+    val indexValue = itemIndex % maxValue + 1
+    val imageType = ImageType.Poster()
+
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
+        verticalAlignment = Alignment.Top
+    ) {
+        Box(
+            modifier = Modifier
+                .width(imageType.width)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .shimmerEffect()
+        )
+
+        Column(
+            modifier = Modifier.padding(vertical = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(120.dp / 1.5f * (maxValue - indexValue + 1))
+                    .height(MaterialTheme.typography.labelLarge.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(4) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .shimmerEffect()
+                    )
+
+                    if(index != 3) {
+                        Text(
+                            text = " • ",
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        )
+                    }
+                }
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(4.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .shimmerEffect()
+            )
         }
     }
 }

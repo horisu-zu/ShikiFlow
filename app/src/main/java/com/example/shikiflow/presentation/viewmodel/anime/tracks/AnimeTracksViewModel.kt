@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.cachedIn
-import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
@@ -18,7 +17,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
@@ -42,12 +40,12 @@ class AnimeTracksViewModel @Inject constructor(
     private val _params = MutableStateFlow(MediaTracksParams())
     val params = _params.asStateFlow()
 
-    val appUiMode: StateFlow<AppUiMode> = settingsRepository.settingsFlow
+    val appUiMode = settingsRepository.settingsFlow
         .map { it.appUiMode }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = AppUiMode.LIST
+            initialValue = null
         )
 
     init {
