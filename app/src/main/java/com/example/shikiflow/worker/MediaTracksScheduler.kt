@@ -50,8 +50,6 @@ class MediaTracksScheduler @Inject constructor(
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
-        val workManager = WorkManager.getInstance(context)
-
         val mediaTracksRequest = PeriodicWorkRequestBuilder<MediaTracksWorker>(
             repeatInterval = 1, repeatIntervalTimeUnit = TimeUnit.DAYS
         )

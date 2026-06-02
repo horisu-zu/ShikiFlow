@@ -67,7 +67,9 @@ import com.example.shikiflow.presentation.screen.main.details.common.followings.
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewsSection
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.presentation.screen.main.details.common.MediaTagItem
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
 @Composable
@@ -151,7 +153,23 @@ fun MangaDetailsContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(mangaDetails.genres) { genreItem ->
-                    CardItem(genreItem.preferred(titleType))
+                    CardItem(
+                        item = stringResource(genreItem.displayValue())
+                    )
+                }
+            }
+        }
+
+        item {
+            LazyRow(
+                modifier = Modifier
+                    .ignoreHorizontalParentPadding(horizontalPadding)
+                    .fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(mangaDetails.tags) { tagItem ->
+                    MediaTagItem(tagItem)
                 }
             }
         }

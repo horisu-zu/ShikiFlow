@@ -20,12 +20,16 @@ import com.example.graphql.anilist.type.MediaListStatus
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
 import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
+import com.example.shikiflow.data.mapper.common.GenreMapper
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
+import com.example.shikiflow.data.mapper.common.TagMapper
 import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
+import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -411,27 +415,31 @@ object AnilistUserMapper {
         } ?: emptyList()
     }
 
-    fun ALUserGenres.toGenreStats(): List<TypeStat> {
+    fun ALUserGenres.toGenreStats(): List<TypeStat<Genre>> {
         return genres?.mapNotNull { genreStat ->
-            TypeStat(
-                type = genreStat?.genre ?: "",
-                count = genreStat?.count ?: 0,
-                meanScore = genreStat?.meanScore?.toFloat() ?: 0f,
-                timeWatched = genreStat?.minutesWatched?.minutesToDays() ?: 0f,
-                chaptersRead = genreStat?.chaptersRead ?: 0
-            )
+            GenreMapper.fromString(genreStat?.genre ?: "")?.let { genre ->
+                TypeStat(
+                    type = genre,
+                    count = genreStat?.count ?: 0,
+                    meanScore = genreStat?.meanScore?.toFloat() ?: 0f,
+                    timeWatched = genreStat?.minutesWatched?.minutesToDays() ?: 0f,
+                    chaptersRead = genreStat?.chaptersRead ?: 0
+                )
+            }
         } ?: emptyList()
     }
 
-    fun ALUserTags.toTagsStats(): List<TypeStat> {
+    fun ALUserTags.toTagsStats(): List<TypeStat<MediaTagEnum>> {
         return tags?.mapNotNull { tagStat ->
-            TypeStat(
-                type = tagStat?.tag?.name ?: "",
-                count = tagStat?.count ?: 0,
-                meanScore = tagStat?.meanScore?.toFloat() ?: 0f,
-                timeWatched = tagStat?.minutesWatched?.minutesToDays() ?: 0f,
-                chaptersRead = tagStat?.chaptersRead ?: 0
-            )
+            TagMapper.fromString(tagStat?.tag?.name ?: "")?.let { tag ->
+                TypeStat(
+                    type = tag,
+                    count = tagStat?.count ?: 0,
+                    meanScore = tagStat?.meanScore?.toFloat() ?: 0f,
+                    timeWatched = tagStat?.minutesWatched?.minutesToDays() ?: 0f,
+                    chaptersRead = tagStat?.chaptersRead ?: 0
+                )
+            }
         } ?: emptyList()
     }
 

@@ -82,7 +82,7 @@ class ProfileViewModel @Inject constructor(
                     if(result is DataResult.Success) {
                         settingsRepository.saveUserData(result.data, state.authType!!)
 
-                        state.copy()
+                        state
                     } else {
                         result.toUiState()
                     }

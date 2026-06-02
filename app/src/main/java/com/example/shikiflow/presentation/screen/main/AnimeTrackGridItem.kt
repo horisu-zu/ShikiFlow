@@ -171,12 +171,18 @@ fun AnimeTrackGridItemPlaceholder(
             .clip(shape = RoundedCornerShape(clipPercent))
             .background(MaterialTheme.colorScheme.surfaceContainer)
             .then(modifier),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(imageType.aspectRatio)
+                .clip(
+                    shape = RoundedCornerShape(
+                        bottomStartPercent = clipPercent,
+                        bottomEndPercent = clipPercent
+                    )
+                )
                 .shimmerEffect()
         )
 
@@ -184,7 +190,7 @@ fun AnimeTrackGridItemPlaceholder(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = clipPercent.dp)
-                .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
                 .shimmerEffect()
         )

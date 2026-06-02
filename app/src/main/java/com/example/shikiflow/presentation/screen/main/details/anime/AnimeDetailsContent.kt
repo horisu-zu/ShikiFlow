@@ -66,7 +66,9 @@ import com.example.shikiflow.presentation.screen.main.details.common.StaffSectio
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.presentation.screen.main.details.common.MediaTagItem
 
 @Composable
 fun AnimeDetailsContent(
@@ -137,8 +139,22 @@ fun AnimeDetailsContent(
             ) {
                 items(animeDetails.genres) { genreItem ->
                     CardItem(
-                        item = genreItem.preferred(titleType)
+                        item = stringResource(genreItem.displayValue())
                     )
+                }
+            }
+        }
+        item {
+            SnapFlingLazyRow(
+                snapPosition = SnapPosition.Start,
+                contentPadding = PaddingValues(horizontal = horizontalPadding),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                modifier = Modifier
+                    .ignoreHorizontalParentPadding(horizontalPadding)
+                    .fillMaxWidth()
+            ) {
+                items(animeDetails.tags) { tagItem ->
+                    MediaTagItem(tagItem)
                 }
             }
         }

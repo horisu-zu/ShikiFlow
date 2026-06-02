@@ -86,7 +86,8 @@ fun AnimeDetailsTitle(
 
     Box(modifier = modifier.fillMaxWidth()) {
         BaseImage(
-            model = animeDetails.coverImageUrl,
+            model = if(!isLandscape) animeDetails.coverImageUrl
+                else animeDetails.bannerImageUrl ?: animeDetails.coverImageUrl,
             imageType = ImageType.Poster(
                 width = Int.MAX_VALUE.dp,
                 shape = RoundedCornerShape(0.dp),

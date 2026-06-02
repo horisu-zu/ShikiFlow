@@ -24,6 +24,8 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserSt
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
+import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
@@ -126,11 +128,11 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
-    override fun getUserGenres(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+    override fun getUserGenres(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<Genre>>>>> {
         TODO("Not Available")
     }
 
-    override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+    override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<MediaTagEnum>>>>> {
         TODO("Not Available")
     }
 

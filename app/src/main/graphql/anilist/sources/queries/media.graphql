@@ -20,10 +20,15 @@ query MediaDetails(
             large
             medium
         }
+        bannerImage
         description(asHtml: true)
         format
         status
         genres
+        tags {
+            name
+            isMediaSpoiler
+        }
         source
         characters(sort: [RELEVANCE, ROLE, FAVOURITES_DESC]) {
             pageInfo {

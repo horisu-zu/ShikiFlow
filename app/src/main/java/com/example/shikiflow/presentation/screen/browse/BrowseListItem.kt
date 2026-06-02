@@ -153,7 +153,7 @@ fun BrowseListItemPlaceholder(
         )
 
         Column(
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
             horizontalAlignment = Alignment.Start
         ) {
             Box(

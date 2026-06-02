@@ -44,6 +44,8 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toUserFavorit
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
+import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -150,7 +152,7 @@ class AnilistUserDataSource @Inject constructor(
 
     override fun getUserGenres(
         userId: Int
-    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat<Genre>>>>> {
         val genresQuery = UserGenresQuery(userId)
 
         val response = apolloClient.query(genresQuery)
@@ -168,7 +170,7 @@ class AnilistUserDataSource @Inject constructor(
         return response
     }
 
-    override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+    override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<MediaTagEnum>>>>> {
         val tagsQuery = UserTagsQuery(userId)
 
         val response = apolloClient.query(tagsQuery)

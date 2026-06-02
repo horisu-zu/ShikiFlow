@@ -51,6 +51,8 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.viewmodel.manga.tracks.MangaTracksViewModel
+import com.example.shikiflow.utils.PagingUtils.fetched
+import com.example.shikiflow.utils.PagingUtils.isInitialLoad
 
 @Composable
 fun MangaTracksPage(
@@ -117,17 +119,7 @@ fun MangaTracksPage(
                     modifier = modifier.fillMaxSize()
                 ) {
                     mangaTrackItems.apply {
-                        if (loadState.refresh is LoadState.Loading ||
-                            (
-                                loadState.refresh is LoadState.NotLoading &&
-                                !loadState.append.endOfPaginationReached &&
-                                mangaTrackItems.itemCount == 0
-                            )
-                        ) {
-                            items(count = 12) {
-                                BrowseGridItemPlaceholder()
-                            }
-                        } else if (loadState.refresh is LoadState.NotLoading) {
+                        if (mangaTrackItems.fetched()) {
                             items(
                                 count = mangaTrackItems.itemCount,
                                 key = mangaTrackItems.itemKey { it.track.id }
@@ -143,6 +135,10 @@ fun MangaTracksPage(
                                     onLongClick = { selectedItem = trackItem },
                                     modifier = Modifier.animateItem()
                                 )
+                            }
+                        } else if (mangaTrackItems.isInitialLoad()) {
+                            items(count = 12) {
+                                BrowseGridItemPlaceholder()
                             }
                         }
 

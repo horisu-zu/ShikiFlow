@@ -130,9 +130,8 @@ apollo {
 }
 
 ksp {
-    //[OUTDATED] Set ksp.incremental.log = true in gradle.properties and now KSP2 works fine...
-    //Enabled aggregating task for Hilt and there are no problems now...
-    ksp.useKsp2 = true // PSI issue with KSP2 I don't know how to fix
+    ksp.useKsp2 = true
+    arg("room.schemaLocation", "$projectDir/schemas")
 }
 
 hilt {

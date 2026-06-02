@@ -71,13 +71,20 @@ object DateMapper {
         val timer = when {
             days > 0 -> buildString {
                 append(pluralStringResource(R.plurals.days, days.toInt(), days))
-                append(", ")
-                append(pluralStringResource(R.plurals.hours, hours.toInt(), hours))
+                if(hours > 0L) {
+                    append(", ")
+                    append(pluralStringResource(R.plurals.hours, hours.toInt(), hours))
+                } else if(minutes > 0L) {
+                    append(", ")
+                    append(pluralStringResource(R.plurals.minutes, minutes.toInt(), minutes))
+                }
             }
             hours > 0 -> buildString {
                 append(pluralStringResource(R.plurals.hours, hours.toInt(), hours))
-                append(", ")
-                append(pluralStringResource(R.plurals.minutes, minutes.toInt(), minutes))
+                if(minutes > 0L) {
+                    append(", ")
+                    append(pluralStringResource(R.plurals.minutes, minutes.toInt(), minutes))
+                }
             }
             minutes > 0 -> pluralStringResource(R.plurals.minutes, minutes.toInt(), minutes)
             else -> stringResource(R.string.airing_soon)

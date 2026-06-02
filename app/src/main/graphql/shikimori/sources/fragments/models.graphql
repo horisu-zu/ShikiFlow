@@ -149,8 +149,8 @@ fragment StudioShort on Studio {
 }
 
 fragment GenreShort on Genre {
-    id
     name
+    russian
     kind
 }
 

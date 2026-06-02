@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.shikiflow.data.local.entity.PosterEntity
 import com.example.shikiflow.data.local.entity.ReleaseDateEntity
+import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.MediaFormat
@@ -32,6 +33,6 @@ data class MediaShortEntity(
     val releasedOn: ReleaseDateEntity?,
     @Embedded(prefix = "poster")
     val poster: PosterEntity?,
-    val genres: List<String>,
+    val genres: List<Genre>,
     val studios: List<String>?
 )

@@ -40,6 +40,8 @@ import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.media.MediaTrack
+import com.example.shikiflow.utils.PagingUtils.fetched
+import com.example.shikiflow.utils.PagingUtils.isInitialLoad
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -173,17 +175,7 @@ private fun AnimeTracksListComponent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         trackItems.apply {
-            if (loadState.refresh is LoadState.Loading ||
-                (
-                    loadState.refresh is LoadState.NotLoading &&
-                    !loadState.append.endOfPaginationReached &&
-                    trackItems.itemCount == 0
-                )
-            ) {
-                items(count = 12) { index ->
-                    AnimeTrackItemPlaceholder(index)
-                }
-            } else if (loadState.refresh is LoadState.NotLoading) {
+            if (trackItems.fetched()) {
                 items(
                     count = trackItems.itemCount,
                     key = trackItems.itemKey { it.track.id }
@@ -197,6 +189,10 @@ private fun AnimeTracksListComponent(
                         onLongClick = { onLongClick(item) },
                         modifier = Modifier.animateItem()
                     )
+                }
+            } else if (trackItems.isInitialLoad()) {
+                items(count = 12) { index ->
+                    AnimeTrackItemPlaceholder(index)
                 }
             }
 
@@ -254,17 +250,7 @@ private fun AnimeTracksGridComponent(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         trackItems.apply {
-            if (loadState.refresh is LoadState.Loading ||
-                (
-                    loadState.refresh is LoadState.NotLoading &&
-                    !loadState.append.endOfPaginationReached &&
-                    trackItems.itemCount == 0
-                )
-            ) {
-                items(count = 12) {
-                    AnimeTrackGridItemPlaceholder()
-                }
-            } else if (loadState.refresh is LoadState.NotLoading) {
+            if (trackItems.fetched()) {
                 items(
                     count = trackItems.itemCount,
                     key = trackItems.itemKey { it.track.id }
@@ -278,6 +264,10 @@ private fun AnimeTracksGridComponent(
                         onLongClick = { onLongClick(trackItem) },
                         modifier = Modifier.animateItem()
                     )
+                }
+            } else if (trackItems.isInitialLoad()) {
+                items(count = 12) {
+                    AnimeTrackGridItemPlaceholder()
                 }
             }
 

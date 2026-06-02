@@ -322,7 +322,7 @@ private fun RichImage(
                         } ?: Modifier.heightIn(min = 160.dp)
                     )
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surface)
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
                     .shimmerEffect()
             )
         },
@@ -701,11 +701,7 @@ private fun RichGroupItem(
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = when (block.align.toTextAlign()) {
-            TextAlign.Center -> Arrangement.spacedBy(
-                8.dp,
-                Alignment.CenterHorizontally
-            )
-
+            TextAlign.Center -> Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally)
             TextAlign.Right -> Arrangement.spacedBy(8.dp, Alignment.End)
             else -> Arrangement.spacedBy(8.dp, Alignment.Start)
         },

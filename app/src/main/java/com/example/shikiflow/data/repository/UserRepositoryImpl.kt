@@ -9,6 +9,8 @@ import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -87,7 +89,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserGenres(
         userId: Int
-    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat<Genre>>>>> {
         return withSource(dataSource) { dataSource ->
             dataSource.getUserGenres(userId)
         }
@@ -95,7 +97,7 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserTags(
         userId: Int
-    ): Flow<DataResult<MediaTypeStats<List<TypeStat>>>> {
+    ): Flow<DataResult<MediaTypeStats<List<TypeStat<MediaTagEnum>>>>> {
         return withSource(dataSource) { dataSource ->
             dataSource.getUserTags(userId)
         }

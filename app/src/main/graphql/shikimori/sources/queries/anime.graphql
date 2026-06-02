@@ -24,7 +24,7 @@ query AnimeDetails(
         nextEpisodeAt
         origin
 
-        genres { name russian }
+        genres { ...GenreShort }
         studios { id name }
 
         characterRoles {

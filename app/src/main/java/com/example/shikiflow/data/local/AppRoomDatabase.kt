@@ -3,6 +3,7 @@ package com.example.shikiflow.data.local
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.shikiflow.data.local.converter.GenreConverter
 import com.example.shikiflow.data.local.converter.InstantConverter
 import com.example.shikiflow.data.local.converter.ListConverter
 import com.example.shikiflow.data.local.converter.MediaTitleConverter
@@ -15,13 +16,14 @@ import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
         MediaTrackEntity::class,
         MediaShortEntity::class
     ],
-    version = 3,
-    exportSchema = false
+    version = 1,
+    exportSchema = true
 )
 @TypeConverters(
     InstantConverter::class,
     ListConverter::class,
-    MediaTitleConverter::class
+    MediaTitleConverter::class,
+    GenreConverter::class
 )
 abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun mediaTracksDao(): MediaTracksDao

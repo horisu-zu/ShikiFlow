@@ -16,7 +16,7 @@ query MangaDetails(
         releasedOn { year month day date }
 
         poster { originalUrl }
-        genres { name russian }
+        genres { ...GenreShort }
 
         characterRoles {
             character {

@@ -28,7 +28,8 @@ fun CardItem(
                 other = if(onClick != null) {
                     Modifier.clickable(onClick = onClick)
                 } else Modifier
-            ).background(MaterialTheme.colorScheme.secondaryContainer),
+            )
+            .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(

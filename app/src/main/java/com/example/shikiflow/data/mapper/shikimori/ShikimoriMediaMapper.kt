@@ -1,15 +1,18 @@
 package com.example.shikiflow.data.mapper.shikimori
 
+import android.util.Log
 import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
 import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.graphql.shikimori.type.AnimeKindEnum
+import com.example.graphql.shikimori.type.GenreKindEnum
 import com.example.graphql.shikimori.type.MangaKindEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.dto.ShikiAnime
 import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
+import com.example.shikiflow.data.mapper.common.GenreMapper
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaOriginMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
@@ -18,6 +21,7 @@ import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RatingMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
+import com.example.shikiflow.data.mapper.common.TagMapper
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.sortByRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
@@ -28,6 +32,7 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTag
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.MediaFormat
@@ -52,6 +57,7 @@ object ShikimoriMediaMapper {
             descriptionHtml = descriptionHtml ?: "",
             synonyms = synonyms,
             coverImageUrl = poster?.originalUrl ?: "",
+            bannerImageUrl = null,
             score = score?.toFloat() ?: 0.0f,
             totalCount = episodes,
             currentProgress = episodesAired,
@@ -59,14 +65,17 @@ object ShikimoriMediaMapper {
             format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
             ageRating = rating?.toDomain(),
-            genres = genres?.map { genre ->
-                MediaTitle(
-                    romaji = genre.name,
-                    english = null,
-                    russian = genre.russian,
-                    native = null
-                )
+            genres = genres?.mapNotNull { genre ->
+                GenreMapper.fromString(genre.genreShort.name)
             } ?: emptyList(),
+            tags = genres
+                ?.filter { genre ->
+                    genre.genreShort.kind != GenreKindEnum.genre
+                }?.mapNotNull { genre ->
+                    TagMapper.fromString(genre.genreShort.name)?.let { tag ->
+                        MediaTag(tag = tag)
+                    }
+                } ?: emptyList(),
             characters = PaginatedList(
                 hasNextPage = false,
                 entries = characterRoles?.map { it.character.characterShort.toDomain() }.orEmpty()
@@ -106,19 +115,23 @@ object ShikimoriMediaMapper {
             descriptionHtml = descriptionHtml ?: "",
             synonyms = emptyList(),
             coverImageUrl = poster?.originalUrl ?: "",
+            bannerImageUrl = null,
             score = score?.toFloat() ?: 0.0f,
             totalCount = chapters,
             volumes = volumes,
             format = kind?.toDomain() ?: MediaFormat.UNKNOWN,
             status = status?.toDomain() ?: MediaStatus.UNKNOWN,
-            genres = genres?.map { genre ->
-                MediaTitle(
-                    romaji = genre.name,
-                    english = null,
-                    russian = genre.russian,
-                    native = null
-                )
+            genres = genres?.mapNotNull { genre ->
+                GenreMapper.fromString(genre.genreShort.name)
             } ?: emptyList(),
+            tags = genres
+                ?.filter { genre ->
+                    genre.genreShort.kind != GenreKindEnum.genre
+                }?.mapNotNull { genre ->
+                    TagMapper.fromString(genre.genreShort.name)?.let { tag ->
+                        MediaTag(tag = tag)
+                    }
+                } ?: emptyList(),
             characters = PaginatedList(
                 hasNextPage = false,
                 entries = characterRoles?.map { it.character.toDomain() }.orEmpty()

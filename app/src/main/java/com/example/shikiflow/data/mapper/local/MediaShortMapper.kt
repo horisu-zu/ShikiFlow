@@ -9,6 +9,7 @@ import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toDom
 import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
+import com.example.shikiflow.data.mapper.common.GenreMapper
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
@@ -39,7 +40,7 @@ object MediaShortMapper {
             airedOn = airedOn,
             releasedOn = releasedOn,
             studios = studios?.map { it.name } ?: emptyList(),
-            genres = genres.map { it.romaji },
+            genres = genres,
             poster = Poster(originalUrl = coverImageUrl)
         )
     }
@@ -111,7 +112,7 @@ object MediaShortMapper {
             airedOn = airedOn?.dateShort?.toDomain(),
             releasedOn = releasedOn?.dateShort?.toDomain(),
             studios = studios.map { name },
-            genres = genres?.map { name } ?: emptyList(),
+            genres = genres?.mapNotNull { GenreMapper.fromString(name) } ?: emptyList(),
             poster = poster?.posterShort?.toDomain()
         )
     }
@@ -134,7 +135,7 @@ object MediaShortMapper {
             airedOn = airedOn?.dateShort?.toDomain(),
             releasedOn = releasedOn?.dateShort?.toDomain(),
             studios = null,
-            genres = genres?.map { name } ?: emptyList(),
+            genres = genres?.mapNotNull { GenreMapper.fromString(name) } ?: emptyList(),
             poster = poster?.posterShort?.toDomain()
         )
     }
@@ -161,7 +162,11 @@ object MediaShortMapper {
         airedOn = startDate?.date?.toDomain(),
         releasedOn = endDate?.date?.toDomain(),
         studios = studios?.nodes?.mapNotNull { it?.name } ?: emptyList(),
-        genres = genres?.mapNotNull { it } ?: emptyList(),
+        genres = genres?.mapNotNull { genre ->
+            genre?.let {
+                GenreMapper.fromString(genre)
+            }
+        } ?: emptyList(),
         poster = coverImage?.mediaCoverShort?.toDomain()
     )
 }

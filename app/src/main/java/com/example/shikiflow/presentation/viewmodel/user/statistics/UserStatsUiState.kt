@@ -1,6 +1,8 @@
 package com.example.shikiflow.presentation.viewmodel.user.statistics
 
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
@@ -19,8 +21,8 @@ data class UserStatsUiState(
 
     val statsSectionType: UserStatsSectionType = UserStatsSectionType.OVERVIEW,
     val overviewStats: MediaTypeStats<OverviewStats> = MediaTypeStats(),
-    val genreStats: UserStatsSectionUiState<MediaTypeStats<List<TypeStat>>> = UserStatsSectionUiState(),
-    val tagsStats: UserStatsSectionUiState<MediaTypeStats<List<TypeStat>>> = UserStatsSectionUiState(),
+    val genreStats: UserStatsSectionUiState<MediaTypeStats<List<TypeStat<Genre>>>> = UserStatsSectionUiState(),
+    val tagsStats: UserStatsSectionUiState<MediaTypeStats<List<TypeStat<MediaTagEnum>>>> = UserStatsSectionUiState(),
     val staffStats: UserStatsSectionUiState<MediaTypeStats<List<StaffStat>>> = UserStatsSectionUiState(),
     val voiceActorsStats: UserStatsSectionUiState<List<StaffStat>> = UserStatsSectionUiState(),
     val studiosStats: UserStatsSectionUiState<List<StudioStat>> = UserStatsSectionUiState(),

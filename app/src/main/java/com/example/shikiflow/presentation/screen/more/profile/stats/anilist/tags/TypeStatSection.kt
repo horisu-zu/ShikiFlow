@@ -31,13 +31,17 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.CombinedStat
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.model.user.stats.TypeStat
+import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.formatDaysHours
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.sortedBy
+import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.ShortStatsOverviewItem
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.StatType
@@ -48,8 +52,8 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 
 @Composable
-fun TypeStatSection(
-    typeStats: List<TypeStat>,
+fun <T> TypeStatSection(
+    typeStats: List<TypeStat<T>>,
     statsBarType: StatsBarType,
     typesList: List<MediaType>,
     currentMediaType: MediaType,
@@ -167,8 +171,9 @@ fun StatItem(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val label = when(stat) {
-                is TypeStat -> stat.type
+            val label = when (stat) {
+                is TypeStat<*> if stat.type is Genre -> stringResource(stat.type.displayValue())
+                is TypeStat<*> if stat.type is MediaTagEnum -> stringResource(stat.type.displayValue())
                 is StudioStat -> stat.studioShort.name
                 else -> ""
             }

@@ -12,7 +12,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.screen.more.GeneralItem
 import com.example.shikiflow.utils.IconResource
 

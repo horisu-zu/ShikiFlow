@@ -182,7 +182,7 @@ fun AnimeTrackItemPlaceholder(
 
         Column(
             modifier = Modifier.padding(vertical = 2.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
         ) {
             Box(
                 modifier = Modifier
