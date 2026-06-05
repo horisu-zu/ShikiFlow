@@ -8,6 +8,8 @@ import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.sort.MediaSort
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -44,7 +46,10 @@ class ShikiBrowseViewModel @Inject constructor(
                 browseOptions = MediaBrowseOptions(
                     mediaType = MediaType.ANIME,
                     status = MediaStatus.ONGOING,
-                    order = order
+                    sort = Sort(
+                        type = order,
+                        direction = SortDirection.DESCENDING
+                    ),
                 )
             )
         }.cachedIn(viewModelScope)

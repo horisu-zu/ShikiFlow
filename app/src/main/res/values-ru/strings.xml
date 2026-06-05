@@ -125,10 +125,17 @@
     <string name="ongoing_browse_mode_trending">Популярное сейчас</string>
 
     <string name="browse_search_label_media">Медиа</string>
-    <string name="browse_search_label_kind">Тип</string>
+    <string name="browse_search_label_format">Формат</string>
     <string name="browse_search_label_status">Статус</string>
     <string name="browse_search_label_sort_by">Сортировать по</string>
     <string name="browse_search_label_age_rating">Рейтинг</string>
+    <string name="browse_search_label_genre">Жанры</string>
+    <string name="browse_search_label_season_year">Год</string>
+    <string name="browse_search_label_season">Сезон</string>
+    <string name="browse_search_filters_add_genre">Добавить жанр</string>
+    <string name="browse_search_genre_search_label">Поиск жанров…</string>
+    <string name="browse_search_label_tag">Тэги</string>
+    <string name="browse_search_tag_search_label">Поиск тэгов…</string>
 
     <string name="chapter_ui_mode_page">Постраничный</string>
     <string name="chapter_ui_mode_scroll">Лента</string>
@@ -323,33 +330,33 @@
     <string name="media_status_manga_cancelled">Отменено</string>
     <string name="media_status_manga_hiatus">Хиатус</string>
 
-    <string name="anime_kind_movie">Фильм</string>
-    <string name="anime_kind_music">Музыкальный клип</string>
-    <string name="anime_kind_special">Спецвыпуск</string>
-    <string name="anime_kind_tv_special">TV Спецвыпуск</string>
-    <string name="anime_kind_tv_short">Короткий TV эпизод</string>
-    <string name="manga_kind_manga">Манга</string>
-    <string name="manga_kind_manhwa">Манхва</string>
-    <string name="manga_kind_manhua">Маньхуа</string>
-    <string name="manga_kind_light_novel">Ранобэ</string>
-    <string name="manga_kind_novel">Новелла</string>
-    <string name="manga_kind_one_shot">Ваншот</string>
-    <string name="manga_kind_doujin">Додзинси</string>
+    <string name="anime_format_movie">Фильм</string>
+    <string name="anime_format_music">Музыкальный клип</string>
+    <string name="anime_format_special">Спецвыпуск</string>
+    <string name="anime_format_tv_special">TV Спецвыпуск</string>
+    <string name="anime_format_tv_short">Короткий TV эпизод</string>
+    <string name="manga_format_manga">Манга</string>
+    <string name="manga_format_manhwa">Манхва</string>
+    <string name="manga_format_manhua">Маньхуа</string>
+    <string name="manga_format_light_novel">Ранобэ</string>
+    <string name="manga_format_novel">Новелла</string>
+    <string name="manga_format_one_shot">Ваншот</string>
+    <string name="manga_format_doujin">Додзинси</string>
 
-    <string name="relation_kind_adaptation">Адаптация</string>
-    <string name="relation_kind_alternative_setting">Альтернативный сеттинг</string>
-    <string name="relation_kind_alternative_version">Альтернативная версия</string>
-    <string name="relation_kind_character">Персонаж</string>
-    <string name="relation_kind_full_story">Полная история</string>
-    <string name="relation_kind_other">Другое</string>
-    <string name="relation_kind_prequel">Приквел</string>
-    <string name="relation_kind_sequel">Сиквел</string>
-    <string name="relation_kind_side_story">Побочная история</string>
-    <string name="relation_kind_spin_off">Спин-офф</string>
-    <string name="relation_kind_summary">Пересказ</string>
-    <string name="relation_kind_source">Источник</string>
-    <string name="relation_kind_contains">Содержит</string>
-    <string name="relation_kind_compilation">Компиляция</string>
+    <string name="relation_format_adaptation">Адаптация</string>
+    <string name="relation_format_alternative_setting">Альтернативный сеттинг</string>
+    <string name="relation_format_alternative_version">Альтернативная версия</string>
+    <string name="relation_format_character">Персонаж</string>
+    <string name="relation_format_full_story">Полная история</string>
+    <string name="relation_format_other">Другое</string>
+    <string name="relation_format_prequel">Приквел</string>
+    <string name="relation_format_sequel">Сиквел</string>
+    <string name="relation_format_side_story">Побочная история</string>
+    <string name="relation_format_spin_off">Спин-офф</string>
+    <string name="relation_format_summary">Пересказ</string>
+    <string name="relation_format_source">Источник</string>
+    <string name="relation_format_contains">Содержит</string>
+    <string name="relation_format_compilation">Компиляция</string>
 
     <string name="season_spring">Весна</string>
     <string name="season_summer">Лето</string>
@@ -532,6 +539,7 @@
     <string name="genre_supernatural">Сверхъестественное</string>
     <string name="genre_thriller">Триллер</string>
 
+    <string name="genre_yaoi">Яой</string>
     <string name="media_tag_achromatic">Ахроматический</string>
     <string name="media_tag_achronological_order">Нехронологический порядок</string>
     <string name="media_tag_acrobatics">Акробатика</string>
@@ -618,7 +626,6 @@
     <string name="media_tag_cowboys">Ковбои</string>
     <string name="media_tag_creature_taming">Укрощение существ</string>
     <string name="media_tag_crime">Преступление</string>
-    <string name="media_tag_criminal_organization">Преступная организация</string>
     <string name="media_tag_crossdressing">Кроссдрессинг</string>
     <string name="media_tag_crossover">Кроссовер</string>
     <string name="media_tag_cult">Культ</string>
@@ -686,7 +693,6 @@
     <string name="media_tag_gekiga">Гэкига</string>
     <string name="media_tag_gender_bending">Смена пола</string>
     <string name="media_tag_ghost">Призраки</string>
-    <string name="media_tag_girls_love">Сёдзё-ай</string>
     <string name="media_tag_go">Го</string>
     <string name="media_tag_goblin">Гоблины</string>
     <string name="media_tag_gods">Боги</string>
@@ -731,10 +737,8 @@
     <string name="media_tag_lost_civilization">Потерянная цивилизация</string>
     <string name="media_tag_love_polygon">Любовный многоугольник</string>
     <string name="media_tag_love_status_quo">Романтический подтекст</string>
-    <string name="media_tag_love_triangle">Любовный треугольник</string>
     <string name="media_tag_mafia">Мафия</string>
     <string name="media_tag_magic">Магия</string>
-    <string name="media_tag_magical_sex_shift">Магическая смена пола</string>
     <string name="media_tag_mahou_shoujo">Махо-сёдзё</string>
     <string name="media_tag_mahjong">Маджонг</string>
     <string name="media_tag_maids">Горничные</string>
@@ -911,8 +915,8 @@
     <string name="media_tag_wuxia">Уся</string>
     <string name="media_tag_yakuza">Якудза</string>
     <string name="media_tag_yandere">Яндэрэ</string>
-    <string name="media_tag_yaoi">Яой</string>
     <string name="media_tag_youkai">Ёкаи</string>
     <string name="media_tag_yuri">Юри</string>
     <string name="media_tag_zombie">Зомби</string>
+    <string name="genre_girls_love">Сёдзё-ай</string>
 </resources>

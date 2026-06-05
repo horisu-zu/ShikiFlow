@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.mapper.shikimori
 
-import android.util.Log
 import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery

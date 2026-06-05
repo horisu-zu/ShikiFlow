@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,7 +48,10 @@ class BrowseSideViewModel @Inject constructor(
             mediaRepository.paginatedBrowseMedia(
                 browseOptions = MediaBrowseOptions(
                     mediaType = params.browseType?.mediaType!!,
-                    order = params.browseType.sort,
+                    sort = Sort(
+                        type = params.browseType.sort,
+                        direction = SortDirection.DESCENDING
+                    ),
                     status = params.browseType.status,
                     season = params.browseType.season
                 )

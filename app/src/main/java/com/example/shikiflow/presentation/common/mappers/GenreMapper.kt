@@ -28,6 +28,10 @@ object GenreMapper {
             Genre.SPORTS -> R.string.genre_sports
             Genre.SUPERNATURAL -> R.string.genre_supernatural
             Genre.THRILLER -> R.string.genre_thriller
+            Genre.BOYS_LOVE -> R.string.media_tag_boys_love
+            Genre.GIRLS_LOVE -> R.string.genre_girls_love
+            Genre.YURI -> R.string.media_tag_yuri
+            Genre.YAOI -> R.string.genre_yaoi
         }
     }
 }

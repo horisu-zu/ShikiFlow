@@ -61,6 +61,7 @@
     <string name="common_unknown">Unknown</string>
     <string name="common_note">Note</string>
     <string name="common_ok" translatable="false">OK</string>
+    <string name="common_default">Default</string>
 
     <string name="tracker_services_update_title">Update Tracks on All Connected Services</string>
     <string name="tracker_services_update_note">
@@ -127,10 +128,17 @@
     <string name="ongoing_browse_mode_trending">Trending</string>
 
     <string name="browse_search_label_media">Media</string>
-    <string name="browse_search_label_kind">Kind</string>
+    <string name="browse_search_label_format">Format</string>
     <string name="browse_search_label_status">Status</string>
     <string name="browse_search_label_sort_by">Sort by</string>
     <string name="browse_search_label_age_rating">Age Rating</string>
+    <string name="browse_search_label_genre">Genres</string>
+    <string name="browse_search_label_tag">Tags</string>
+    <string name="browse_search_label_season_year">Year</string>
+    <string name="browse_search_label_season">Season</string>
+    <string name="browse_search_filters_add_genre">Add Genre</string>
+    <string name="browse_search_genre_search_label">Search Genres…</string>
+    <string name="browse_search_tag_search_label">Search Tags…</string>
 
     <string name="chapter_ui_mode_page">Page</string>
     <string name="chapter_ui_mode_scroll">Scroll</string>
@@ -329,7 +337,7 @@
 
     <string name="progress_suffix" translatable="false">" ∙ %1$d/%2$d"</string>
     <string name="score_suffix" translatable="false">" ∙ %1$s ★"</string>
-
+f
     <string name="media_user_progress" translatable="false">%1$d/%2$d</string>
     <string name="media_score" translatable="false">%1$s ★</string>
 
@@ -339,38 +347,38 @@
     <string name="media_status_manga_cancelled">Cancelled</string>
     <string name="media_status_manga_hiatus">Hiatus</string>
 
-    <string name="anime_kind_tv" translatable="false">TV</string>
-    <string name="anime_kind_ona" translatable="false">ONA</string>
-    <string name="anime_kind_ova" translatable="false">OVA</string>
-    <string name="anime_kind_cm" translatable="false">CM</string>
-    <string name="anime_kind_pv" translatable="false">PV</string>
-    <string name="anime_kind_movie">Movie</string>
-    <string name="anime_kind_music">Music</string>
-    <string name="anime_kind_special">Special</string>
-    <string name="anime_kind_tv_special">TV Special</string>
-    <string name="anime_kind_tv_short">TV Short</string>
-    <string name="manga_kind_manga">Manga</string>
-    <string name="manga_kind_manhwa">Manhwa</string>
-    <string name="manga_kind_manhua">Manhua</string>
-    <string name="manga_kind_light_novel">Light Novel</string>
-    <string name="manga_kind_novel">Novel</string>
-    <string name="manga_kind_one_shot">One Shot</string>
-    <string name="manga_kind_doujin">Doujin</string>
+    <string name="anime_format_tv" translatable="false">TV</string>
+    <string name="anime_format_ona" translatable="false">ONA</string>
+    <string name="anime_format_ova" translatable="false">OVA</string>
+    <string name="anime_format_cm" translatable="false">CM</string>
+    <string name="anime_format_pv" translatable="false">PV</string>
+    <string name="anime_format_movie">Movie</string>
+    <string name="anime_format_music">Music</string>
+    <string name="anime_format_special">Special</string>
+    <string name="anime_format_tv_special">TV Special</string>
+    <string name="anime_format_tv_short">TV Short</string>
+    <string name="manga_format_manga">Manga</string>
+    <string name="manga_format_manhwa">Manhwa</string>
+    <string name="manga_format_manhua">Manhua</string>
+    <string name="manga_format_light_novel">Light Novel</string>
+    <string name="manga_format_novel">Novel</string>
+    <string name="manga_format_one_shot">One Shot</string>
+    <string name="manga_format_doujin">Doujin</string>
 
-    <string name="relation_kind_adaptation">Adaptation</string>
-    <string name="relation_kind_alternative_setting">Alternative Setting</string>
-    <string name="relation_kind_alternative_version">Alternative version</string>
-    <string name="relation_kind_character">Character</string>
-    <string name="relation_kind_full_story">Full Story</string>
-    <string name="relation_kind_other">Other</string>
-    <string name="relation_kind_prequel">Prequel</string>
-    <string name="relation_kind_sequel">Sequel</string>
-    <string name="relation_kind_side_story">Side Story</string>
-    <string name="relation_kind_spin_off">Spin Off</string>
-    <string name="relation_kind_summary">Summary</string>
-    <string name="relation_kind_source">Source</string>
-    <string name="relation_kind_contains">Contains</string>
-    <string name="relation_kind_compilation">Compilation</string>
+    <string name="relation_format_adaptation">Adaptation</string>
+    <string name="relation_format_alternative_setting">Alternative Setting</string>
+    <string name="relation_format_alternative_version">Alternative version</string>
+    <string name="relation_format_character">Character</string>
+    <string name="relation_format_full_story">Full Story</string>
+    <string name="relation_format_other">Other</string>
+    <string name="relation_format_prequel">Prequel</string>
+    <string name="relation_format_sequel">Sequel</string>
+    <string name="relation_format_side_story">Side Story</string>
+    <string name="relation_format_spin_off">Spin Off</string>
+    <string name="relation_format_summary">Summary</string>
+    <string name="relation_format_source">Source</string>
+    <string name="relation_format_contains">Contains</string>
+    <string name="relation_format_compilation">Compilation</string>
 
     <string name="season_spring">Spring</string>
     <string name="season_summer">"Summer"</string>
@@ -551,6 +559,8 @@
     <string name="genre_sports">Sports</string>
     <string name="genre_supernatural">Supernatural</string>
     <string name="genre_thriller">Thriller</string>
+    <string name="genre_girls_love">Girls\' Love</string>
+    <string name="genre_yaoi">Yaoi</string>
 
     <string name="media_tag_achromatic">Achromatic</string>
     <string name="media_tag_achronological_order">Achronological Order</string>
@@ -638,7 +648,6 @@
     <string name="media_tag_cowboys">Cowboys</string>
     <string name="media_tag_creature_taming">Creature Taming</string>
     <string name="media_tag_crime">Crime</string>
-    <string name="media_tag_criminal_organization">Criminal Organization</string>
     <string name="media_tag_crossdressing">Crossdressing</string>
     <string name="media_tag_crossover">Crossover</string>
     <string name="media_tag_cult">Cult</string>
@@ -706,7 +715,6 @@
     <string name="media_tag_gekiga">Gekiga</string>
     <string name="media_tag_gender_bending">Gender Bending</string>
     <string name="media_tag_ghost">Ghost</string>
-    <string name="media_tag_girls_love">Girls\' Love</string>
     <string name="media_tag_go">Go</string>
     <string name="media_tag_goblin">Goblin</string>
     <string name="media_tag_gods">Gods</string>
@@ -751,10 +759,8 @@
     <string name="media_tag_lost_civilization">Lost Civilization</string>
     <string name="media_tag_love_polygon">Love Polygon</string>
     <string name="media_tag_love_status_quo">Love Status Quo</string>
-    <string name="media_tag_love_triangle">Love Triangle</string>
     <string name="media_tag_mafia">Mafia</string>
     <string name="media_tag_magic">Magic</string>
-    <string name="media_tag_magical_sex_shift">Magical Sex Shift</string>
     <string name="media_tag_mahou_shoujo">Mahou Shoujo</string>
     <string name="media_tag_mahjong">Mahjong</string>
     <string name="media_tag_maids">Maids</string>
@@ -931,7 +937,6 @@
     <string name="media_tag_wuxia">Wuxia</string>
     <string name="media_tag_yakuza">Yakuza</string>
     <string name="media_tag_yandere">Yandere</string>
-    <string name="media_tag_yaoi">Yaoi</string>
     <string name="media_tag_youkai">Youkai</string>
     <string name="media_tag_yuri">Yuri</string>
     <string name="media_tag_zombie">Zombie</string>

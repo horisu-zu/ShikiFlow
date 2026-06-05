@@ -22,8 +22,8 @@ object SettingsMapper {
     fun ThemeMode.iconResource(): IconResource {
         return when(this) {
             ThemeMode.SYSTEM -> IconResource.Drawable(resId = R.drawable.ic_system_theme)
-            ThemeMode.LIGHT -> IconResource.Drawable(resId = R.drawable.ic_light_theme)
-            ThemeMode.DARK -> IconResource.Drawable(resId = R.drawable.ic_dark_theme)
+            ThemeMode.LIGHT -> IconResource.Drawable(resId = R.drawable.ic_sun)
+            ThemeMode.DARK -> IconResource.Drawable(resId = R.drawable.ic_moon)
         }
     }
 

@@ -15,6 +15,8 @@ import kotlin.time.Duration
 import kotlin.time.Instant
 
 object DateUtils {
+    const val BASE_YEAR = 1917
+
     fun Instant.thisWeekdayTimestamp(dayOfWeek: DayOfWeek, isEndOfDay: Boolean): Long {
         val dateTime = this.toLocalDateTime(TimeZone.currentSystemDefault())
 
@@ -79,5 +81,13 @@ object DateUtils {
         val minutes = this % 60
 
         return hours to minutes
+    }
+
+    fun seasonYears(): List<Int> {
+        val currentYear = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .year
+
+        return ((currentYear + 1)downTo BASE_YEAR).toList()
     }
 }

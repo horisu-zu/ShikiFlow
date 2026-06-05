@@ -9,8 +9,8 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 
 data class MediaSeason(
-    val season: MediaSeasonEnum,
-    val year: Int
+    val seasonEnum: MediaSeasonEnum?,
+    val year: Int?
 ) {
     companion object {
         fun currentSeason(): MediaSeason {
@@ -25,7 +25,7 @@ data class MediaSeason(
             }
 
             return MediaSeason(
-                season = season,
+                seasonEnum = season,
                 year = date.year
             )
         }
@@ -42,7 +42,7 @@ data class MediaSeason(
             }
 
             return MediaSeason(
-                season = next,
+                seasonEnum = next,
                 year = if (next == WINTER) date.year + 1 else date.year
             )
         }

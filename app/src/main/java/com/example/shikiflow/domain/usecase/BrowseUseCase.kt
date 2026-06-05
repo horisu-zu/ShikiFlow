@@ -3,6 +3,8 @@ package com.example.shikiflow.domain.usecase
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +23,10 @@ class BrowseUseCase @Inject constructor(
         val result = mediaRepository.browseMedia(
             browseOptions = MediaBrowseOptions(
                 mediaType = browseType.mediaType,
-                order = browseType.sort,
+                sort = Sort(
+                    type = browseType.sort,
+                    direction = SortDirection.DESCENDING
+                ),
                 status = browseType.status,
                 season = browseType.season,
                 countryOfOrigin = browseType.countryOfOrigin

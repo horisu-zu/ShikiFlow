@@ -144,32 +144,36 @@ fun MangaDetailsContent(
             }
         }
 
-        item {
-            LazyRow(
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(mangaDetails.genres) { genreItem ->
-                    CardItem(
-                        item = stringResource(genreItem.displayValue())
-                    )
+        if(mangaDetails.genres.isNotEmpty()) {
+            item {
+                LazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(mangaDetails.genres) { genreItem ->
+                        CardItem(
+                            item = stringResource(genreItem.displayValue())
+                        )
+                    }
                 }
             }
         }
 
-        item {
-            LazyRow(
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(mangaDetails.tags) { tagItem ->
-                    MediaTagItem(tagItem)
+        if(mangaDetails.tags.isNotEmpty()) {
+            item {
+                LazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(mangaDetails.tags) { tagItem ->
+                        MediaTagItem(tagItem)
+                    }
                 }
             }
         }

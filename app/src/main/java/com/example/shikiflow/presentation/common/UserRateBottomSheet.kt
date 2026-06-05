@@ -16,14 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.outlined.CheckCircle
+import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -444,7 +443,7 @@ private fun RoundBox(
     Box(
         modifier = Modifier
             .size(36.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(percent = 24))
             .background(
                 color = if (enabled) MaterialTheme.colorScheme.surface
                     else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
@@ -522,7 +521,7 @@ private fun ChangeRow(
                     enabled = enabled
                 ) {
                     Icon(
-                        imageVector = Icons.Outlined.CheckCircle,
+                        imageVector = Icons.Outlined.Done,
                         contentDescription = null,
                         modifier = Modifier.size(36.dp)
                     )

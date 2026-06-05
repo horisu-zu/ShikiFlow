@@ -128,33 +128,53 @@ fun AnimeDetailsContent(
                 )
             }
         }
-        item {
-            SnapFlingLazyRow(
-                snapPosition = SnapPosition.Start,
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth()
-            ) {
-                items(animeDetails.genres) { genreItem ->
-                    CardItem(
-                        item = stringResource(genreItem.displayValue())
+        if(animeDetails.genres.isNotEmpty()) {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TextWithDivider(
+                        text = stringResource(R.string.user_stats_section_genres)
                     )
+                    SnapFlingLazyRow(
+                        snapPosition = SnapPosition.Start,
+                        contentPadding = PaddingValues(horizontal = horizontalPadding),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                        modifier = Modifier
+                            .ignoreHorizontalParentPadding(horizontalPadding)
+                            .fillMaxWidth()
+                    ) {
+                        items(animeDetails.genres) { genreItem ->
+                            CardItem(
+                                item = stringResource(genreItem.displayValue())
+                            )
+                        }
+                    }
                 }
             }
         }
-        item {
-            SnapFlingLazyRow(
-                snapPosition = SnapPosition.Start,
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth()
-            ) {
-                items(animeDetails.tags) { tagItem ->
-                    MediaTagItem(tagItem)
+        if(animeDetails.tags.isNotEmpty()) {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TextWithDivider(
+                        text = stringResource(R.string.user_stats_section_tags)
+                    )
+                    SnapFlingLazyRow(
+                        snapPosition = SnapPosition.Start,
+                        contentPadding = PaddingValues(horizontal = horizontalPadding),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                        modifier = Modifier
+                            .ignoreHorizontalParentPadding(horizontalPadding)
+                            .fillMaxWidth()
+                    ) {
+                        items(animeDetails.tags) { tagItem ->
+                            MediaTagItem(tagItem)
+                        }
+                    }
                 }
             }
         }

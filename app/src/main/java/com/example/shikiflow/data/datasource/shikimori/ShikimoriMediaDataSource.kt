@@ -16,6 +16,7 @@ import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.AiringPagingSource
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
+import com.example.shikiflow.data.mapper.common.GenreMapper.toShikimoriGenre
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiAnimeKind
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toShikiMangaKind
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toShikimoriAnimeStatus
@@ -24,6 +25,7 @@ import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriBrowseOrd
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
 import com.example.shikiflow.data.mapper.common.RatingMapper.toShikiRating
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toShikiSeason
+import com.example.shikiflow.data.mapper.common.TagMapper.toShikimoriTag
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toAiringAnime
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toBrowseAnime
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriMediaMapper.toBrowseManga
@@ -110,18 +112,39 @@ class ShikimoriMediaDataSource @Inject constructor(
         browseOptions: MediaBrowseOptions,
         isRefresh: Boolean
     ): Result<List<BrowseMedia>> {
+        if(
+            browseOptions.name?.isBlank() == true &&
+            browseOptions.format == null &&
+            browseOptions.status == null &&
+            browseOptions.ageRating == null &&
+            browseOptions.season == null &&
+            browseOptions.genres.isEmpty() &&
+            browseOptions.tags.isEmpty()
+        ) return Result.success(emptyList())
+
         return  when(browseOptions.mediaType) {
             MediaType.ANIME -> {
                 val query = AnimeBrowseQuery(
                     page = Optional.presentIfNotNull(page),
                     limit = Optional.presentIfNotNull(limit),
                     search = Optional.presentIfNotNull(browseOptions.name),
-                    order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
+                    order = Optional.presentIfNotNull(browseOptions.sort?.type?.toShikimoriBrowseOrder()),
                     kind = Optional.presentIfNotNull(browseOptions.format?.toShikiAnimeKind()?.name),
                     status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriAnimeStatus()?.name),
                     season = Optional.presentIfNotNull(browseOptions.season?.toShikiSeason()),
                     score = Optional.presentIfNotNull(browseOptions.score),
-                    genre = Optional.presentIfNotNull(browseOptions.genre),
+                    genre = if(browseOptions.genres.isNotEmpty() || browseOptions.tags.isNotEmpty()) {
+                        val genres = browseOptions.genres.mapNotNull { genre ->
+                            genre.toShikimoriGenre()
+                        }
+                        val tags = browseOptions.tags.mapNotNull { tag ->
+                            tag.toShikimoriTag()
+                        }
+
+                        Optional.presentIfNotNull(
+                            value = (genres + tags).joinToString(",").ifEmpty { null }
+                        )
+                    } else Optional.absent(),
                     rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name),
                     censored = Optional.present(true)
                 )
@@ -146,10 +169,21 @@ class ShikimoriMediaDataSource @Inject constructor(
                     page = Optional.presentIfNotNull(page),
                     limit = Optional.presentIfNotNull(limit),
                     search = Optional.presentIfNotNull(browseOptions.name),
-                    order = Optional.presentIfNotNull(browseOptions.order?.toShikimoriBrowseOrder()),
+                    order = Optional.presentIfNotNull(browseOptions.sort?.type?.toShikimoriBrowseOrder()),
                     kind = Optional.presentIfNotNull(browseOptions.format?.toShikiMangaKind()?.name),
                     status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriMangaStatus()?.name),
-                    genre = Optional.presentIfNotNull(browseOptions.genre),
+                    genre = if(browseOptions.genres.isNotEmpty() || browseOptions.tags.isNotEmpty()) {
+                        val genres = browseOptions.genres.mapNotNull { genre ->
+                            genre.toShikimoriGenre()
+                        }
+                        val tags = browseOptions.tags.mapNotNull { tag ->
+                            tag.toShikimoriTag()
+                        }
+
+                        Optional.presentIfNotNull(
+                            value = (genres + tags).joinToString(",").ifEmpty { null }
+                        )
+                    } else Optional.absent(),
                     score = Optional.presentIfNotNull(browseOptions.score),
                     censored = Optional.present(true)
                 )

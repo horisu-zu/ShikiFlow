@@ -16,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -32,12 +31,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.CheckboxItem
 import com.example.shikiflow.utils.FlagConverter
 
 data class BottomSheetConfig(
@@ -145,8 +142,8 @@ fun LanguagesBottomSheet(
             }
 
             items(supportedLanguages.entries.toList()) { (code, language) ->
-                LanguageGridItem(
-                    language = language,
+                CheckboxItem(
+                    label = language,
                     isSelected = currentLanguages.contains(code),
                     onToggle = { contains ->
                         if(contains) {
@@ -155,36 +152,10 @@ fun LanguagesBottomSheet(
                             currentLanguages.add(code)
                         }
                         onSave(currentLanguages)
-                    }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun LanguageGridItem(
-    language: String,
-    isSelected: Boolean,
-    onToggle: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(percent = 16))
-            .semantics { role = Role.Checkbox }
-            .clickable { onToggle(isSelected) },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Checkbox(
-            checked = isSelected,
-            onCheckedChange = { onToggle(isSelected) }
-        )
-
-        Text(
-            text = language,
-            style = MaterialTheme.typography.labelMedium
-        )
     }
 }

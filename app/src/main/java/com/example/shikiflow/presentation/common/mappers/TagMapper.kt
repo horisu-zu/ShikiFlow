@@ -92,7 +92,6 @@ object TagMapper {
             MediaTagEnum.COWBOYS -> R.string.media_tag_cowboys
             MediaTagEnum.CREATURE_TAMING -> R.string.media_tag_creature_taming
             MediaTagEnum.CRIME -> R.string.media_tag_crime
-            MediaTagEnum.CRIMINAL_ORGANIZATION -> R.string.media_tag_criminal_organization
             MediaTagEnum.CROSSDRESSING -> R.string.media_tag_crossdressing
             MediaTagEnum.CROSSOVER -> R.string.media_tag_crossover
             MediaTagEnum.CULT -> R.string.media_tag_cult
@@ -160,7 +159,6 @@ object TagMapper {
             MediaTagEnum.GEKIGA -> R.string.media_tag_gekiga
             MediaTagEnum.GENDER_BENDING -> R.string.media_tag_gender_bending
             MediaTagEnum.GHOST -> R.string.media_tag_ghost
-            MediaTagEnum.GIRLS_LOVE -> R.string.media_tag_girls_love
             MediaTagEnum.GO -> R.string.media_tag_go
             MediaTagEnum.GOBLIN -> R.string.media_tag_goblin
             MediaTagEnum.GODS -> R.string.media_tag_gods
@@ -205,10 +203,8 @@ object TagMapper {
             MediaTagEnum.LOST_CIVILIZATION -> R.string.media_tag_lost_civilization
             MediaTagEnum.LOVE_POLYGON -> R.string.media_tag_love_polygon
             MediaTagEnum.LOVE_STATUS_QUO -> R.string.media_tag_love_status_quo
-            MediaTagEnum.LOVE_TRIANGLE -> R.string.media_tag_love_triangle
             MediaTagEnum.MAFIA -> R.string.media_tag_mafia
             MediaTagEnum.MAGIC -> R.string.media_tag_magic
-            MediaTagEnum.MAGICAL_SEX_SHIFT -> R.string.media_tag_magical_sex_shift
             MediaTagEnum.MAHOU_SHOUJO -> R.string.media_tag_mahou_shoujo
             MediaTagEnum.MAHJONG -> R.string.media_tag_mahjong
             MediaTagEnum.MAIDS -> R.string.media_tag_maids
@@ -385,7 +381,6 @@ object TagMapper {
             MediaTagEnum.WUXIA -> R.string.media_tag_wuxia
             MediaTagEnum.YAKUZA -> R.string.media_tag_yakuza
             MediaTagEnum.YANDERE -> R.string.media_tag_yandere
-            MediaTagEnum.YAOI -> R.string.media_tag_yaoi
             MediaTagEnum.YOUKAI -> R.string.media_tag_youkai
             MediaTagEnum.YURI -> R.string.media_tag_yuri
             MediaTagEnum.ZOMBIE -> R.string.media_tag_zombie

@@ -1,26 +1,32 @@
 package com.example.shikiflow.domain.model.media_details
 
-enum class Genre {
+import com.example.shikiflow.domain.model.auth.AuthType
+
+enum class Genre(val supportedBy: Set<AuthType> = setOf(AuthType.ANILIST, AuthType.SHIKIMORI)) {
     ACTION,
     ADVENTURE,
-    AVANT_GARDE,
+    AVANT_GARDE(supportedBy = setOf(AuthType.SHIKIMORI)),
     COMEDY,
     DRAMA,
     ECCHI,
-    EROTICA,
+    EROTICA(supportedBy = setOf(AuthType.SHIKIMORI)),
     FANTASY,
-    GOURMET,
+    GOURMET(supportedBy = setOf(AuthType.SHIKIMORI)),
     HENTAI,
     HORROR,
-    MAHOU_SHOUJO,
-    MECHA,
-    MUSIC,
+    MAHOU_SHOUJO(supportedBy = setOf(AuthType.ANILIST)),
+    MECHA(supportedBy = setOf(AuthType.ANILIST)),
+    MUSIC(supportedBy = setOf(AuthType.ANILIST)),
     MYSTERY,
-    PSYCHOLOGICAL,
+    PSYCHOLOGICAL(supportedBy = setOf(AuthType.ANILIST)),
     ROMANCE,
     SCI_FI,
     SLICE_OF_LIFE,
     SPORTS,
     SUPERNATURAL,
-    THRILLER
+    THRILLER,
+    BOYS_LOVE(supportedBy = setOf(AuthType.SHIKIMORI)),
+    GIRLS_LOVE(supportedBy = setOf(AuthType.SHIKIMORI)),
+    YURI(supportedBy = setOf(AuthType.SHIKIMORI)),
+    YAOI(supportedBy = setOf(AuthType.SHIKIMORI))
 }

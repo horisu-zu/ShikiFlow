@@ -105,7 +105,8 @@ query MediaBrowse(
     $mediaType: MediaType!,
     $format: MediaFormat
     $score: Int,
-    $genre: String,
+    $genreIn: [String],
+    $tagIn: [String],
     $season: MediaSeason
     $seasonYear: Int,
     $countryOfOrigin: CountryCode
@@ -118,7 +119,8 @@ query MediaBrowse(
             type: $mediaType,
             format: $format,
             averageScore_greater: $score,
-            genre: $genre,
+            genre_in: $genreIn,
+            tag_in: $tagIn,
             season: $season,
             seasonYear: $seasonYear,
             countryOfOrigin: $countryOfOrigin

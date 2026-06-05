@@ -125,10 +125,17 @@
     <string name="ongoing_browse_mode_trending">Популярне зараз</string>
 
     <string name="browse_search_label_media">Медіа</string>
-    <string name="browse_search_label_kind">Тип</string>
+    <string name="browse_search_label_format">Формат</string>
     <string name="browse_search_label_status">Статус</string>
     <string name="browse_search_label_sort_by">Сортувати за</string>
     <string name="browse_search_label_age_rating">Рейтинг</string>
+    <string name="browse_search_label_genre">Жанри</string>
+    <string name="browse_search_label_season_year">Рік</string>
+    <string name="browse_search_label_season">Сезон</string>
+    <string name="browse_search_filters_add_genre">Додати жанр</string>
+    <string name="browse_search_genre_search_label">Пошук жанрів…</string>
+    <string name="browse_search_label_tag">Теґи</string>
+    <string name="browse_search_tag_search_label">Пошук теґів…</string>
 
     <string name="chapter_ui_mode_page">Посторінковий</string>
     <string name="chapter_ui_mode_scroll">Стрічка</string>
@@ -324,33 +331,33 @@
     <string name="media_status_manga_cancelled">Скасовано</string>
     <string name="media_status_manga_hiatus">Хіатус</string>
 
-    <string name="anime_kind_movie">Фільм</string>
-    <string name="anime_kind_music">Музикальний кліп</string>
-    <string name="anime_kind_special">Спецвипуск</string>
-    <string name="anime_kind_tv_special">TV Спецвипуск</string>
-    <string name="anime_kind_tv_short">Короткий TV епізод</string>
-    <string name="manga_kind_manga">Манґа</string>
-    <string name="manga_kind_manhwa">Манхва</string>
-    <string name="manga_kind_manhua">Маньхуа</string>
-    <string name="manga_kind_light_novel">Ранобе</string>
-    <string name="manga_kind_novel">Новелла</string>
-    <string name="manga_kind_one_shot">Ваншот</string>
-    <string name="manga_kind_doujin">Доджінші</string>
+    <string name="anime_format_movie">Фільм</string>
+    <string name="anime_format_music">Музикальний кліп</string>
+    <string name="anime_format_special">Спецвипуск</string>
+    <string name="anime_format_tv_special">TV Спецвипуск</string>
+    <string name="anime_format_tv_short">Короткий TV епізод</string>
+    <string name="manga_format_manga">Манґа</string>
+    <string name="manga_format_manhwa">Манхва</string>
+    <string name="manga_format_manhua">Маньхуа</string>
+    <string name="manga_format_light_novel">Ранобе</string>
+    <string name="manga_format_novel">Новелла</string>
+    <string name="manga_format_one_shot">Ваншот</string>
+    <string name="manga_format_doujin">Доджінші</string>
 
-    <string name="relation_kind_adaptation">Адаптація</string>
-    <string name="relation_kind_alternative_setting">Альтернативний сеттінґ</string>
-    <string name="relation_kind_alternative_version">Альтернативна версія</string>
-    <string name="relation_kind_character">Персонаж</string>
-    <string name="relation_kind_full_story">Повна історія</string>
-    <string name="relation_kind_other">Інше</string>
-    <string name="relation_kind_prequel">Приквел</string>
-    <string name="relation_kind_sequel">Сіквел</string>
-    <string name="relation_kind_side_story">Побічна історія</string>
-    <string name="relation_kind_spin_off">Спін-оф</string>
-    <string name="relation_kind_summary">Переказ</string>
-    <string name="relation_kind_source">Джерело</string>
-    <string name="relation_kind_contains">Містить</string>
-    <string name="relation_kind_compilation">Компіляція</string>
+    <string name="relation_format_adaptation">Адаптація</string>
+    <string name="relation_format_alternative_setting">Альтернативний сеттінґ</string>
+    <string name="relation_format_alternative_version">Альтернативна версія</string>
+    <string name="relation_format_character">Персонаж</string>
+    <string name="relation_format_full_story">Повна історія</string>
+    <string name="relation_format_other">Інше</string>
+    <string name="relation_format_prequel">Приквел</string>
+    <string name="relation_format_sequel">Сіквел</string>
+    <string name="relation_format_side_story">Побічна історія</string>
+    <string name="relation_format_spin_off">Спін-оф</string>
+    <string name="relation_format_summary">Переказ</string>
+    <string name="relation_format_source">Джерело</string>
+    <string name="relation_format_contains">Містить</string>
+    <string name="relation_format_compilation">Компіляція</string>
 
     <string name="season_spring">Весна</string>
     <string name="season_summer">Літо</string>
@@ -445,7 +452,7 @@
 
     <string name="user_stats_section_overview">Огляд</string>
     <string name="user_stats_section_genres">Жанри</string>
-    <string name="user_stats_section_tags">Теги</string>
+    <string name="user_stats_section_tags">Теґи</string>
     <string name="user_stats_section_voice_actors">Сейю</string>
     <string name="user_stats_section_studios">Студії</string>
 
@@ -532,6 +539,7 @@
     <string name="genre_supernatural">Надприродне</string>
     <string name="genre_thriller">Трилер</string>
 
+    <string name="genre_yaoi">Яой</string>
     <string name="media_tag_achromatic">Ахроматичний</string>
     <string name="media_tag_achronological_order">Нехронологічний порядок</string>
     <string name="media_tag_acrobatics">Акробатика</string>
@@ -586,7 +594,7 @@
     <string name="media_tag_body_swapping">Обмін тілами</string>
     <string name="media_tag_bowling">Боулінг</string>
     <string name="media_tag_boxing">Бокс</string>
-    <string name="media_tag_boys_love">Boys\' Love</string>
+    <string name="media_tag_boys_love">Шонен-ай</string>
     <string name="media_tag_brainwashing">Промивання мізків</string>
     <string name="media_tag_bullying">Булінг</string>
     <string name="media_tag_butler">Дворецькі</string>
@@ -618,7 +626,6 @@
     <string name="media_tag_cowboys">Ковбої</string>
     <string name="media_tag_creature_taming">Приборкання істот</string>
     <string name="media_tag_crime">Злочинність</string>
-    <string name="media_tag_criminal_organization">Злочинна організація</string>
     <string name="media_tag_crossdressing">Кросдресинг</string>
     <string name="media_tag_crossover">Кросовер</string>
     <string name="media_tag_cult">Культ</string>
@@ -686,7 +693,6 @@
     <string name="media_tag_gekiga">Ґекіґа</string>
     <string name="media_tag_gender_bending">Зміна статі</string>
     <string name="media_tag_ghost">Привиди</string>
-    <string name="media_tag_girls_love">Шоджо-ай</string>
     <string name="media_tag_go">Ґо</string>
     <string name="media_tag_goblin">Ґобліни</string>
     <string name="media_tag_gods">Боги</string>
@@ -731,10 +737,8 @@
     <string name="media_tag_lost_civilization">Втрачена цивілізація</string>
     <string name="media_tag_love_polygon">Любовний багатокутник</string>
     <string name="media_tag_love_status_quo">Романтичний підтекст</string>
-    <string name="media_tag_love_triangle">Любовний трикутник</string>
     <string name="media_tag_mafia">Мафія</string>
     <string name="media_tag_magic">Магія</string>
-    <string name="media_tag_magical_sex_shift">Магічна зміна статі</string>
     <string name="media_tag_mahou_shoujo">Махо-шоджо</string>
     <string name="media_tag_mahjong">Маджонг</string>
     <string name="media_tag_maids">Покоївки</string>
@@ -911,8 +915,8 @@
     <string name="media_tag_wuxia">Уся</string>
     <string name="media_tag_yakuza">Якудза</string>
     <string name="media_tag_yandere">Яндере</string>
-    <string name="media_tag_yaoi">Яой</string>
     <string name="media_tag_youkai">Йокаї</string>
     <string name="media_tag_yuri">Юрі</string>
     <string name="media_tag_zombie">Зомбі</string>
+    <string name="genre_girls_love">Шоджо-ай</string>
 </resources>

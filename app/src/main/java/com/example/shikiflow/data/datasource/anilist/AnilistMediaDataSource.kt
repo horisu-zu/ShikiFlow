@@ -26,14 +26,17 @@ import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toDto
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
+import com.example.shikiflow.data.mapper.common.GenreMapper.toAnilistGenre
 import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toAnilistFormat
 import com.example.shikiflow.data.mapper.common.MediaStatusMapper.toAnilistStatus
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
+import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistReviewSort
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudio
+import com.example.shikiflow.data.mapper.common.TagMapper.toAnilistTag
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.browse.BrowseMedia
@@ -123,20 +126,47 @@ class AnilistMediaDataSource @Inject constructor(
         browseOptions: MediaBrowseOptions,
         isRefresh: Boolean
     ): Result<List<BrowseMedia>> {
-        if(browseOptions.name?.isBlank() == true) return Result.success(emptyList())
+        if(
+            browseOptions.name?.isBlank() == true &&
+            browseOptions.format == null &&
+            browseOptions.status == null &&
+            browseOptions.ageRating == null &&
+            browseOptions.season == null &&
+            browseOptions.genres.isEmpty() &&
+            browseOptions.tags.isEmpty()
+        ) return Result.success(emptyList())
 
         val browseQuery = MediaBrowseQuery(
             page = page,
             perPage = limit,
-            search = Optional.presentIfNotNull(browseOptions.name),
+            search = Optional.presentIfNotNull(browseOptions.name?.ifBlank { null }),
             mediaType = browseOptions.mediaType.toAnilistType(),
             status = Optional.presentIfNotNull(browseOptions.status?.toAnilistStatus()),
-            sort = browseOptions.order?.toAnilistBrowseOrder() ?: ALMediaSort.SCORE_DESC,
+            sort = browseOptions.sort?.toAnilistMediaSort() ?: ALMediaSort.POPULARITY_DESC,
             format = Optional.presentIfNotNull(browseOptions.format?.toAnilistFormat()),
             score = Optional.presentIfNotNull(browseOptions.score),
-            genre = Optional.presentIfNotNull(browseOptions.genre),
-            season = Optional.presentIfNotNull(browseOptions.season?.season?.toAnilistSeason()),
-            seasonYear = Optional.presentIfNotNull(browseOptions.season?.year),
+            genreIn = if(browseOptions.genres.isNotEmpty()) {
+                Optional.presentIfNotNull(
+                    value = browseOptions.genres.map { genre ->
+                        genre.toAnilistGenre().orEmpty()
+                    }
+                )
+            } else Optional.absent(),
+            tagIn = if(browseOptions.tags.isNotEmpty()) {
+                Optional.presentIfNotNull(
+                    value = browseOptions.tags.map { tag ->
+                        tag.toAnilistTag().orEmpty()
+                    }
+                )
+            } else Optional.absent(),
+            season = when(browseOptions.mediaType) {
+                MediaType.ANIME -> Optional.presentIfNotNull(browseOptions.season?.seasonEnum?.toAnilistSeason())
+                MediaType.MANGA -> Optional.absent()
+            },
+            seasonYear = when(browseOptions.mediaType) {
+                MediaType.ANIME -> Optional.presentIfNotNull(browseOptions.season?.year)
+                MediaType.MANGA -> Optional.absent()
+            },
             countryOfOrigin = Optional.presentIfNotNull(browseOptions.countryOfOrigin?.toDto())
         )
 

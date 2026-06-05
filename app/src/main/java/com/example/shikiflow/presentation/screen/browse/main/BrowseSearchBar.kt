@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.clearText
@@ -31,6 +32,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExpandedFullScreenSearchBar
@@ -53,11 +55,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,7 +66,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalWindowInfo
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -74,11 +74,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
-import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
@@ -279,28 +279,38 @@ private fun SearchBarContent(
 ) {
     val configuration = LocalWindowInfo.current
     val preferredTitleType = LocalTitleTypeController.current
+    val lazyGridState = rememberLazyGridState()
+    val scope = rememberCoroutineScope()
+
     val authType by searchViewModel.authType.collectAsStateWithLifecycle()
     val searchParams by searchViewModel.params.collectAsStateWithLifecycle()
-
     val browseItems = searchViewModel.browseItems.collectAsLazyPagingItems()
 
-    var showBottomSheet by remember { mutableStateOf(false) }
+    val isAtTop by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex <= 1
+        }
+    }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
                 containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                onClick = { showBottomSheet = true },
+                onClick = {
+                    scope.launch {
+                        lazyGridState.animateScrollToItem(0)
+                    }
+                },
                 modifier = Modifier
                     .imePadding()
                     .animateFloatingActionButton(
-                        visible = searchParams.searchType == SearchType.MEDIA,
+                        visible = !isAtTop,
                         alignment = Alignment.BottomCenter
                     )
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_sort),
-                    contentDescription = "Show Filters"
+                    imageVector = Icons.Default.KeyboardArrowUp,
+                    contentDescription = "Scroll Up"
                 )
             }
         },
@@ -309,12 +319,14 @@ private fun SearchBarContent(
     ) { paddingValues ->
         PullToRefreshBox(
             isRefreshing = browseItems.loadState.refresh is LoadState.Loading,
+            enabled = false,
             onRefresh = { browseItems.refresh() },
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
             LazyVerticalGrid(
+                state = lazyGridState,
                 columns = when (searchParams.searchType) {
                     SearchType.USER -> GridCells.Adaptive(180.dp)
                     else -> GridCells.Adaptive(108.dp)
@@ -374,6 +386,19 @@ private fun SearchBarContent(
                                 )
                             )
                         }
+                    }
+                }
+
+                if(searchParams.searchType == SearchType.MEDIA && authType != null) {
+                    item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                        BrowseSearchFilters(
+                            horizontalPadding = horizontalPadding,
+                            authType = authType ?: AuthType.ANILIST,
+                            searchOptions = searchParams.mediaBrowseOptions,
+                            onOptionsChanged = { newOptions ->
+                                searchViewModel.updateSearchOptions(newOptions)
+                            }
+                        )
                     }
                 }
 
@@ -458,20 +483,6 @@ private fun SearchBarContent(
                         }
                     }
                 }
-            }
-        }
-
-        if (showBottomSheet) {
-            authType?.let { authType ->
-                SearchBottomSheet(
-                    authType = authType,
-                    searchOptions = searchParams.mediaBrowseOptions,
-                    onOptionsChanged = { newOptions -> searchViewModel.updateSearchOptions(newOptions) },
-                    onTypeChanged = { newType ->
-                        searchViewModel.updateSearchOptions(MediaBrowseOptions(newType))
-                    },
-                    onDismiss = { showBottomSheet = false }
-                )
             }
         }
     }
