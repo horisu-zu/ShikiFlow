@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -11,6 +12,8 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.presentation.screen.main.TracksFilterType
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -18,7 +21,9 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -28,7 +33,8 @@ import javax.inject.Inject
 @OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class TracksSearchViewModel @Inject constructor(
-    private val mediaTracksRepository: MediaTracksRepository
+    private val mediaTracksRepository: MediaTracksRepository,
+    private val settingsRepository: SettingsRepository
 ): ViewModel() {
     private val _query = MutableStateFlow("")
 
@@ -37,6 +43,17 @@ class TracksSearchViewModel @Inject constructor(
 
     private val _rateUpdateState = MutableStateFlow(RateUpdateState.INITIAL)
     val rateUpdateState = _rateUpdateState.asStateFlow()
+
+    init {
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { authType ->
+                _params.update { params ->
+                    params.copy(authType = authType)
+                }
+            }.launchIn(viewModelScope)
+    }
 
     val animeTracksItems = combine(
         _params,
@@ -54,7 +71,8 @@ class TracksSearchViewModel @Inject constructor(
                 mediaType = params.mediaType!!,
                 title = params.query,
                 userRateStatus = params.userRateStatus,
-                sort = params.sort
+                sort = params.sort,
+                genres = params.genres
             )
         }.cachedIn(viewModelScope)
 
@@ -127,6 +145,23 @@ class TracksSearchViewModel @Inject constructor(
     fun setSort(sort: Sort<UserRateType>) {
         _params.update { params ->
             params.copy(sort = sort)
+        }
+    }
+
+    fun setGenre(genre: Genre) {
+        _params.update { params ->
+            params.copy(
+                genres = if(params.genres.contains(genre)) params.genres - genre
+                    else params.genres + genre
+            )
+        }
+    }
+
+    fun setFilterType(filterType: TracksFilterType) {
+        _params.update { params ->
+            params.copy(
+                currentFilterType = filterType
+            )
         }
     }
 

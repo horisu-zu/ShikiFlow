@@ -112,7 +112,9 @@ object MediaShortMapper {
             airedOn = airedOn?.dateShort?.toDomain(),
             releasedOn = releasedOn?.dateShort?.toDomain(),
             studios = studios.map { name },
-            genres = genres?.mapNotNull { GenreMapper.fromString(name) } ?: emptyList(),
+            genres = genres?.mapNotNull { genre ->
+                GenreMapper.fromString(genre.name)
+            } ?: emptyList(),
             poster = poster?.posterShort?.toDomain()
         )
     }
@@ -135,7 +137,9 @@ object MediaShortMapper {
             airedOn = airedOn?.dateShort?.toDomain(),
             releasedOn = releasedOn?.dateShort?.toDomain(),
             studios = null,
-            genres = genres?.mapNotNull { GenreMapper.fromString(name) } ?: emptyList(),
+            genres = genres?.mapNotNull { genre ->
+                GenreMapper.fromString(genre.name)
+            } ?: emptyList(),
             poster = poster?.posterShort?.toDomain()
         )
     }

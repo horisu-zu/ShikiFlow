@@ -6,8 +6,6 @@ sealed interface SortType {
 }
 
 sealed interface MediaSort : SortType {
-    val name: String
-
     enum class Common : MediaSort {
         SCORE,
         POPULARITY

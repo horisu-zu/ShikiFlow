@@ -18,6 +18,7 @@ import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -131,10 +132,12 @@ class MediaTracksRepositoryImpl @Inject constructor(
         title: String,
         mediaType: MediaType,
         userRateStatus: UserRateStatus?,
-        sort: Sort<UserRateType>
+        sort: Sort<UserRateType>,
+        genres: List<Genre>
     ): Flow<PagingData<MediaTrack>> {
+        val mediaShortPrefix = "media_short"
         val column = when (sort.type) {
-            UserRateType.ID -> "id"
+            UserRateType.ID -> "$mediaShortPrefix.id"
             UserRateType.ADDED_AT -> "createdAt"
             UserRateType.UPDATED_AT -> "updatedAt"
             UserRateType.SCORE -> "score"
@@ -148,6 +151,11 @@ class MediaTracksRepositoryImpl @Inject constructor(
 
         val whereStatus = if (userRateStatus != null) "AND media_track.status = ?" else ""
         val whereTitle  = if (title.isNotBlank()) "AND (name LIKE ? OR synonyms LIKE ?)" else ""
+        val whereGenres = if (genres.isNotEmpty()) {
+            "AND (" + genres.joinToString(" OR ") {
+                "media_short.genres LIKE ?"
+            } + ")"
+        } else ""
 
         val query = RoomRawQuery(
             sql = """
@@ -156,6 +164,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
                 WHERE media_short.mediaType = ?
                 $whereStatus
                 $whereTitle
+                $whereGenres
                 ORDER BY $sortOption
             """.trimIndent(),
             onBindStatement = { stmt ->
@@ -167,6 +176,11 @@ class MediaTracksRepositoryImpl @Inject constructor(
                     val like = "%$title%"
                     stmt.bindText(index++, like)
                     stmt.bindText(index++, like)
+                }
+                if (genres.isNotEmpty()) {
+                    genres.forEach { genre ->
+                        stmt.bindText(index++, "%${genre.name}%")
+                    }
                 }
             }
         )

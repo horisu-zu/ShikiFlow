@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -56,8 +57,8 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
-import com.example.shikiflow.presentation.common.SortBottomSheet
 import com.example.shikiflow.presentation.common.SortConfig
+import com.example.shikiflow.presentation.common.TracksSortBottomSheet
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksSearchViewModel
@@ -79,6 +80,7 @@ fun TracksSearchBarComponent(
     var selectedItem by remember { mutableStateOf<MediaTrack?>(null) }
     var showBottomSheet by remember { mutableStateOf(false) }
 
+    val lazyGridState = rememberLazyGridState()
     val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
     val rateUpdateState by tracksViewModel.rateUpdateState.collectAsStateWithLifecycle()
     val tracksParams by tracksViewModel.params.collectAsStateWithLifecycle()
@@ -101,6 +103,12 @@ fun TracksSearchBarComponent(
                 else -> null
             }
         )
+    }
+
+    LaunchedEffect(trackItems.loadState) {
+        if(trackItems.loadState.refresh is LoadState.NotLoading) {
+            lazyGridState.animateScrollToItem(0)
+        }
     }
 
     Scaffold(
@@ -177,6 +185,7 @@ fun TracksSearchBarComponent(
                 }
             } else {
                 LazyVerticalGrid(
+                    state = lazyGridState,
                     columns = GridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(
                         start = horizontalPadding,
@@ -275,8 +284,10 @@ fun TracksSearchBarComponent(
                     )
                 }
 
-                if(showBottomSheet) {
-                    SortBottomSheet(
+                if(showBottomSheet && tracksParams.authType != null) {
+                    TracksSortBottomSheet(
+                        authType = tracksParams.authType!!,
+                        currentFilterType = tracksParams.currentFilterType,
                         config = SortConfig(
                             options = UserRateType.entries,
                             selected = tracksParams.sort,
@@ -284,7 +295,14 @@ fun TracksSearchBarComponent(
                                 tracksViewModel.setSort(userRateSort)
                             }
                         ),
-                        onDismiss = { showBottomSheet = false }
+                        selectedGenres = tracksParams.genres,
+                        onDismiss = { showBottomSheet = false },
+                        onFilterTypeChange = { filterType ->
+                            tracksViewModel.setFilterType(filterType)
+                        },
+                        onGenreChange = { genre ->
+                            tracksViewModel.setGenre(genre)
+                        }
                     )
                 }
             }

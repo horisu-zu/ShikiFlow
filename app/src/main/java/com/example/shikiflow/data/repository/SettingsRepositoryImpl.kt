@@ -224,7 +224,7 @@ class SettingsRepositoryImpl @Inject constructor(
         }
 
         dataStore.edit { preferences ->
-            preferences[key] = ongoingOrder.name
+            preferences[key] = ongoingOrder.toString()
         }
     }
 

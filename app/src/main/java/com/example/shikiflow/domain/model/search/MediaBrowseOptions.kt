@@ -23,4 +23,19 @@ data class MediaBrowseOptions(
     val score: Int? = null,
     val ageRating: AgeRating? = null,
     val countryOfOrigin: CountryOfOrigin? = null
-)
+) {
+    companion object {
+        fun MediaBrowseOptions.isEmpty(): Boolean {
+            return name == null &&
+                status == null &&
+                sort == null &&
+                format == null &&
+                season == null &&
+                genres.isEmpty() &&
+                tags.isEmpty() &&
+                score == null &&
+                ageRating == null &&
+                countryOfOrigin == null
+        }
+    }
+}
