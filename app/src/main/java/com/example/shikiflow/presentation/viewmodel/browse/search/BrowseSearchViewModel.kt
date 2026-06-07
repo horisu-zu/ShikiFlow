@@ -56,7 +56,9 @@ class BrowseSearchViewModel @Inject constructor(
             )
         )
     }
-        .distinctUntilChanged()
+        .distinctUntilChanged { old, new ->
+            old.mediaBrowseOptions == new.mediaBrowseOptions && old.searchType == new.searchType
+        }
         .flatMapLatest { params ->
             when(params.searchType) {
                 SearchType.MEDIA -> {
@@ -91,6 +93,22 @@ class BrowseSearchViewModel @Inject constructor(
     override fun updateSearchOptions(browseOptions: MediaBrowseOptions) {
         _params.update { params ->
             params.copy(mediaBrowseOptions = browseOptions)
+        }
+    }
+
+    override fun changeFiltersVisibility() {
+        _params.update { params ->
+            params.copy(showFilters = !params.showFilters)
+        }
+    }
+
+    override fun clearFilters() {
+        _params.update { params ->
+            params.copy(
+                mediaBrowseOptions = MediaBrowseOptions(
+                    mediaType = params.mediaBrowseOptions.mediaType
+                )
+            )
         }
     }
 

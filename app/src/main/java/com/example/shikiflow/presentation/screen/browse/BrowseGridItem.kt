@@ -67,12 +67,14 @@ fun BrowseGridItem(
 
         Text(
             text = listOfNotNull(
-                browseItem.mediaFormat?.displayValue()?.let { formatRes ->
-                    stringResource(id = formatRes)
+                browseItem.mediaFormat?.let { mediaFormat ->
+                    stringResource(id = mediaFormat.displayValue())
                 },
-                browseItem.score?.let { score ->
-                    stringResource(id = R.string.media_score, score)
-                }
+                browseItem.score
+                    ?.takeIf { it != 0.0f }
+                    ?.let { score ->
+                        stringResource(id = R.string.media_score, score)
+                    }
             ).joinToString(" • "),
             style = MaterialTheme.typography.labelSmall
         )

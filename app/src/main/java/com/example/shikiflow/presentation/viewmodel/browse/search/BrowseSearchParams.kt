@@ -6,5 +6,6 @@ import com.example.shikiflow.presentation.screen.browse.main.SearchType
 
 data class BrowseSearchParams(
     val searchType: SearchType = SearchType.MEDIA,
-    val mediaBrowseOptions: MediaBrowseOptions = MediaBrowseOptions(MediaType.ANIME)
+    val mediaBrowseOptions: MediaBrowseOptions = MediaBrowseOptions(MediaType.ANIME),
+    val showFilters: Boolean = true
 )

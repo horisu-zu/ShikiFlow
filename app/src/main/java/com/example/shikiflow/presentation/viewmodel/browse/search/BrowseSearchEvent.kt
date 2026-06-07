@@ -8,5 +8,9 @@ interface BrowseSearchEvent {
 
     fun updateSearchOptions(browseOptions: MediaBrowseOptions)
 
+    fun changeFiltersVisibility()
+
+    fun clearFilters()
+
     fun onQueryChange(query: String)
 }

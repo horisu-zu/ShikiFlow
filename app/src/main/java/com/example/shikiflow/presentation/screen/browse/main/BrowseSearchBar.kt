@@ -395,9 +395,8 @@ private fun SearchBarContent(
                             horizontalPadding = horizontalPadding,
                             authType = authType ?: AuthType.ANILIST,
                             searchOptions = searchParams.mediaBrowseOptions,
-                            onOptionsChanged = { newOptions ->
-                                searchViewModel.updateSearchOptions(newOptions)
-                            }
+                            showFilters = searchParams.showFilters,
+                            event = searchViewModel
                         )
                     }
                 }

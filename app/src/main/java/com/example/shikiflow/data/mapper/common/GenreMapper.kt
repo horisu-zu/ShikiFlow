@@ -56,7 +56,7 @@ object GenreMapper {
         }
     }
 
-    //Schema says it allows to search by genre ids
+    //Schema says it allows search by genre ids only
     fun DomainGenre.toShikimoriGenre(): String? {
         return when(this) {
             DomainGenre.ACTION -> "1"

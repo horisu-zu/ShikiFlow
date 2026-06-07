@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -20,8 +21,10 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +41,7 @@ import com.example.shikiflow.domain.model.media_details.MediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaSeasonEnum
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
+import com.example.shikiflow.domain.model.search.MediaBrowseOptions.Companion.isEmpty
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
@@ -55,6 +59,7 @@ import com.example.shikiflow.presentation.common.mappers.SeasonMapper.displayVal
 import com.example.shikiflow.presentation.common.mappers.SeasonMapper.iconResource
 import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
+import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchEvent
 import com.example.shikiflow.utils.DateUtils
 import com.example.shikiflow.utils.toIcon
 
@@ -63,318 +68,366 @@ fun BrowseSearchFilters(
     horizontalPadding: Dp,
     authType: AuthType,
     searchOptions: MediaBrowseOptions,
-    onOptionsChanged: (MediaBrowseOptions) -> Unit
+    showFilters: Boolean,
+    event: BrowseSearchEvent
 ) {
     val showGenreBottomSheet = remember { mutableStateOf(false) }
+    val showClearButton = remember(searchOptions) {
+        !searchOptions.isEmpty()
+    }
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-            verticalAlignment = Alignment.CenterVertically
+    Column {
+        AnimatedVisibility(
+            visible = showFilters,
+            enter = fadeIn() + expandVertically(),
+            exit = fadeOut() + shrinkVertically()
         ) {
-            MediaType.entries.forEach { item ->
-                FilterChip(
-                    selected = searchOptions.mediaType == item,
-                    onClick = {
-                        onOptionsChanged(
-                            searchOptions.copy(
-                                mediaType = item
-                            )
-                        )
-                    },
-                    label = { Text(stringResource(item.displayValue())) },
-                    leadingIcon = if(searchOptions.mediaType == item) {
-                         {
-                            Icon(
-                                imageVector = Icons.Default.Done,
-                                contentDescription = null
-                            )
-                        }
-                    } else { null },
-                    modifier = Modifier.height(32.dp)
-                )
-            }
-        }
-
-        SnapFlingLazyRow(
-            modifier = Modifier
-                .ignoreHorizontalParentPadding(horizontalPadding)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = horizontalPadding),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            item {
-                ChipWithMenu(
-                    title = stringResource(R.string.common_default),
-                    values = listOf(
-                        MediaSort.Common.entries,
-                        when(authType) {
-                            AuthType.SHIKIMORI -> MediaSort.Shikimori.entries
-                            AuthType.ANILIST -> MediaSort.Anilist.entries
-                        }
-                    ).flatten(),
-                    selectedValue = searchOptions.sort?.type,
-                    onValueSelected = { sortType ->
-                        onOptionsChanged(
-                            searchOptions.copy(
-                                sort = if(sortType == searchOptions.sort?.type) null
-                                    else Sort(
-                                        type = sortType,
-                                        direction = searchOptions.sort?.direction ?: SortDirection.DESCENDING
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
+                modifier = Modifier.padding(bottom = 12.dp)
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    MediaType.entries.forEach { item ->
+                        FilterChip(
+                            selected = searchOptions.mediaType == item,
+                            onClick = {
+                                event.updateSearchOptions(
+                                    searchOptions.copy(
+                                        mediaType = item
                                     )
-                            )
-                        )
-                    },
-                    itemLabel = { stringResource(it.displayValue()) },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_sort_descending),
-                            contentDescription = null,
-                            tint = if(searchOptions.sort?.type != null) LocalContentColor.current
-                                else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            label = { Text(stringResource(item.displayValue())) },
+                            leadingIcon = if (searchOptions.mediaType == item) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.Done,
+                                        contentDescription = null
+                                    )
+                                }
+                            } else {
+                                null
+                            },
+                            modifier = Modifier.height(32.dp)
                         )
                     }
-                )
-            }
+                }
 
-            if(authType == AuthType.ANILIST) {
-                item {
-                    AnimatedVisibility(
-                        visible = searchOptions.sort?.type != null,
-                        enter = fadeIn() + expandHorizontally(),
-                        exit = fadeOut() + shrinkHorizontally()
-                    ) {
+                SnapFlingLazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    item {
                         ChipWithMenu(
-                            title = stringResource(R.string.browse_search_label_sort_by),
-                            values = SortDirection.entries,
-                            selectedValue = searchOptions.sort?.direction,
-                            onValueSelected = { direction ->
-                                onOptionsChanged(
+                            title = stringResource(R.string.common_default),
+                            values = listOf(
+                                MediaSort.Common.entries,
+                                when (authType) {
+                                    AuthType.SHIKIMORI -> MediaSort.Shikimori.entries
+                                    AuthType.ANILIST -> MediaSort.Anilist.entries
+                                }
+                            ).flatten(),
+                            selectedValue = searchOptions.sort?.type,
+                            onValueSelected = { sortType ->
+                                event.updateSearchOptions(
                                     searchOptions.copy(
-                                        sort = searchOptions.sort?.copy(
-                                            direction = direction
+                                        sort = if (sortType == searchOptions.sort?.type) null
+                                            else Sort(
+                                                type = sortType,
+                                                direction = searchOptions.sort?.direction
+                                                    ?: SortDirection.DESCENDING
+                                            )
+                                    )
+                                )
+                            },
+                            itemLabel = { stringResource(it.displayValue()) },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_sort_descending),
+                                    contentDescription = null,
+                                    tint = if (searchOptions.sort?.type != null) LocalContentColor.current
+                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                        )
+                    }
+
+                    if (authType == AuthType.ANILIST) {
+                        item {
+                            AnimatedVisibility(
+                                visible = searchOptions.sort?.type != null,
+                                enter = fadeIn() + expandHorizontally(),
+                                exit = fadeOut() + shrinkHorizontally()
+                            ) {
+                                ChipWithMenu(
+                                    title = stringResource(R.string.browse_search_label_sort_by),
+                                    values = SortDirection.entries,
+                                    selectedValue = searchOptions.sort?.direction,
+                                    onValueSelected = { direction ->
+                                        event.updateSearchOptions(
+                                            searchOptions.copy(
+                                                sort = searchOptions.sort?.copy(
+                                                    direction = direction
+                                                )
+                                            )
                                         )
+                                    },
+                                    itemLabel = { stringResource(it.displayValue()) }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                SnapFlingLazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    item {
+                        ChipWithMenu(
+                            title = stringResource(R.string.browse_search_label_format),
+                            values = MediaFormat.entries.filter { formatEntry ->
+                                formatEntry.mediaType == searchOptions.mediaType
+                            }.filter { formatEntry ->
+                                authType in formatEntry.supportedBy
+                            },
+                            selectedValue = searchOptions.format,
+                            onValueSelected = { format ->
+                                event.updateSearchOptions(
+                                    searchOptions.copy(
+                                        format = if (searchOptions.format == format) null
+                                            else format
                                     )
                                 )
                             },
                             itemLabel = { stringResource(it.displayValue()) }
                         )
                     }
+                    item {
+                        ChipWithMenu(
+                            title = stringResource(R.string.browse_search_label_status),
+                            values = MediaStatus.entries.filter { statusEntry ->
+                                authType to searchOptions.mediaType !in statusEntry.exclusions
+                            }.filter { status ->
+                                searchOptions.mediaType in status.mediaType
+                            },
+                            selectedValue = searchOptions.status,
+                            onValueSelected = { status ->
+                                event.updateSearchOptions(
+                                    searchOptions.copy(
+                                        status = if (searchOptions.status == status) null
+                                            else status
+                                    )
+                                )
+                            },
+                            itemLabel = { stringResource(it.displayValue()) }
+                        )
+                    }
+                    item {
+                        AnimatedVisibility(
+                            visible = authType == AuthType.SHIKIMORI && searchOptions.mediaType == MediaType.ANIME,
+                            enter = fadeIn() + expandHorizontally(),
+                            exit = fadeOut() + shrinkHorizontally()
+                        ) {
+                            ChipWithMenu(
+                                title = stringResource(R.string.browse_search_label_age_rating),
+                                values = AgeRating.entries,
+                                selectedValue = searchOptions.ageRating,
+                                onValueSelected = { ageRating ->
+                                    event.updateSearchOptions(
+                                        searchOptions.copy(
+                                            ageRating = if (searchOptions.ageRating == ageRating) null
+                                                else ageRating
+                                        )
+                                    )
+                                },
+                                itemLabel = { stringResource(it.displayValue()) }
+                            )
+                        }
+                    }
                 }
-            }
-        }
 
-        SnapFlingLazyRow(
-            modifier = Modifier
-                .ignoreHorizontalParentPadding(horizontalPadding)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = horizontalPadding),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            item {
-                ChipWithMenu(
-                    title = stringResource(R.string.browse_search_label_format),
-                    values = MediaFormat.entries.filter { formatEntry ->
-                        formatEntry.mediaType == searchOptions.mediaType
-                    }.filter { formatEntry ->
-                        authType in formatEntry.supportedBy
-                    },
-                    selectedValue = searchOptions.format,
-                    onValueSelected = { format ->
-                        onOptionsChanged(
-                            searchOptions.copy(
-                                format = if(searchOptions.format == format) null
-                                    else format
-                            )
-                        )
-                    },
-                    itemLabel = { stringResource(it.displayValue()) }
-                )
-            }
-            item {
-                ChipWithMenu(
-                    title = stringResource(R.string.browse_search_label_status),
-                    values = MediaStatus.entries.filter { statusEntry ->
-                        authType to searchOptions.mediaType !in statusEntry.exclusions
-                    }.filter { status ->
-                        searchOptions.mediaType in status.mediaType
-                    },
-                    selectedValue = searchOptions.status,
-                    onValueSelected = { status ->
-                        onOptionsChanged(
-                            searchOptions.copy(
-                                status = if(searchOptions.status == status) null
-                                    else status
-                            )
-                        )
-                    },
-                    itemLabel = { stringResource(it.displayValue()) }
-                )
-            }
-            item {
                 AnimatedVisibility(
-                    visible = authType == AuthType.SHIKIMORI && searchOptions.mediaType == MediaType.ANIME,
-                    enter = fadeIn() + expandHorizontally(),
-                    exit = fadeOut() + shrinkHorizontally()
+                    visible = searchOptions.mediaType == MediaType.ANIME,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
                 ) {
-                    ChipWithMenu(
-                        title = stringResource(R.string.browse_search_label_age_rating),
-                        values = AgeRating.entries,
-                        selectedValue = searchOptions.ageRating,
-                        onValueSelected = { ageRating ->
-                            onOptionsChanged(
-                                searchOptions.copy(
-                                    ageRating = if(searchOptions.ageRating == ageRating) null
-                                        else ageRating
-                                )
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        AnimatedVisibility(
+                            visible = authType == AuthType.ANILIST || searchOptions.season?.year != null,
+                            enter = fadeIn() + expandHorizontally(),
+                            exit = fadeOut() + shrinkHorizontally()
+                        ) {
+                            ChipWithMenu(
+                                title = stringResource(R.string.browse_search_label_season),
+                                values = MediaSeasonEnum.entries,
+                                selectedValue = searchOptions.season?.seasonEnum,
+                                onValueSelected = { season ->
+                                    event.updateSearchOptions(
+                                        searchOptions.copy(
+                                            season = MediaSeason(
+                                                seasonEnum = if (searchOptions.season?.seasonEnum == season) null
+                                                else season,
+                                                year = searchOptions.season?.year
+                                            )
+                                        )
+                                    )
+                                },
+                                itemLabel = { stringResource(it.displayValue()) },
+                                itemLeadingIcon = { season ->
+                                    season.iconResource()
+                                        .toIcon(
+                                            modifier = Modifier.size(20.dp)
+                                        )
+                                },
+                                leadingIcon = if (searchOptions.season?.seasonEnum != null) {
+                                    {
+                                        searchOptions.season.seasonEnum
+                                            .iconResource()
+                                            .toIcon(
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                    }
+                                } else { null }
                             )
-                        },
-                        itemLabel = { stringResource(it.displayValue()) }
-                    )
-                }
-            }
-        }
+                        }
 
-        AnimatedVisibility(
-            visible = searchOptions.mediaType == MediaType.ANIME,
-            enter = fadeIn() + expandVertically(),
-            exit = fadeOut() + shrinkVertically()
-        ) {
-            SnapFlingLazyRow(
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                item {
-                    ChipWithMenu(
-                        title = stringResource(R.string.browse_search_label_season),
-                        values = MediaSeasonEnum.entries,
-                        selectedValue = searchOptions.season?.seasonEnum,
-                        onValueSelected = { season ->
-                            onOptionsChanged(
-                                searchOptions.copy(
-                                    season = MediaSeason(
-                                        seasonEnum = if(searchOptions.season?.seasonEnum == season) null
-                                            else season,
-                                        year = searchOptions.season?.year
+                        ChipWithMenu(
+                            title = stringResource(R.string.browse_search_label_season_year),
+                            values = DateUtils.seasonYears(),
+                            selectedValue = searchOptions.season?.year,
+                            onValueSelected = { year ->
+                                event.updateSearchOptions(
+                                    searchOptions.copy(
+                                        season = MediaSeason(
+                                            seasonEnum = searchOptions.season?.seasonEnum,
+                                            year = if (searchOptions.season?.year == year) null
+                                                else year
+                                        )
                                     )
                                 )
-                            )
-                        },
-                        itemLabel = { stringResource(it.displayValue()) },
-                        itemLeadingIcon = { season ->
-                            season.iconResource()
-                                .toIcon(
-                                    modifier = Modifier.size(20.dp)
-                                )
-                        },
-                        leadingIcon = if(searchOptions.season?.seasonEnum != null) {
-                            {
-                                searchOptions.season.seasonEnum
-                                    .iconResource()
-                                    .toIcon(
-                                        modifier = Modifier.size(20.dp)
-                                    )
-                            }
-                        } else { null }
-                    )
-                }
-                item {
-                    ChipWithMenu(
-                        title = stringResource(R.string.browse_search_label_season_year),
-                        values = DateUtils.seasonYears(),
-                        selectedValue = searchOptions.season?.year,
-                        onValueSelected = { year ->
-                            onOptionsChanged(
-                                searchOptions.copy(
-                                    season = MediaSeason(
-                                        seasonEnum = searchOptions.season?.seasonEnum,
-                                        year = if(searchOptions.season?.year == year) null
-                                            else year
-                                    )
-                                )
-                            )
-                        },
-                        itemLabel = { it.toString() }
-                    )
-                }
-            }
-        }
-
-        SnapFlingLazyRow(
-            modifier = Modifier
-                .ignoreHorizontalParentPadding(horizontalPadding)
-                .fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = horizontalPadding),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if(searchOptions.genres.isNotEmpty()) {
-                items(searchOptions.genres.size) { index ->
-                    val selectedGenre = searchOptions.genres[index]
-
-                    FilterChip(
-                        selected = true,
-                        onClick = {
-                            onOptionsChanged(
-                                searchOptions.copy(
-                                    genres = searchOptions.genres - selectedGenre
-                                )
-                            )
-                        },
-                        label = {
-                            Text(
-                                stringResource(selectedGenre.displayValue())
-                            )
-                        },
-                        modifier = Modifier.height(32.dp)
-                    )
-                }
-            }
-            if(searchOptions.tags.isNotEmpty()) {
-                items(searchOptions.tags.size) { index ->
-                    val selectedTag = searchOptions.tags[index]
-
-                    FilterChip(
-                        selected = true,
-                        onClick = {
-                            onOptionsChanged(
-                                searchOptions.copy(
-                                    tags = searchOptions.tags - selectedTag
-                                )
-                            )
-                        },
-                        label = {
-                            Text(
-                                stringResource(selectedTag.displayValue())
-                            )
-                        },
-                        modifier = Modifier.height(32.dp)
-                    )
-                }
-            }
-            item {
-                FilterChip(
-                    selected = false,
-                    onClick = { showGenreBottomSheet.value = true },
-                    label = { Text(stringResource(R.string.browse_search_filters_add_genre)) },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            contentDescription = null
+                            },
+                            itemLabel = { it.toString() }
                         )
-                    },
-                    modifier = Modifier.height(32.dp)
+                    }
+                }
+
+                SnapFlingLazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth(),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (searchOptions.genres.isNotEmpty()) {
+                        items(searchOptions.genres.size) { index ->
+                            val selectedGenre = searchOptions.genres[index]
+
+                            FilterChip(
+                                selected = true,
+                                onClick = {
+                                    event.updateSearchOptions(
+                                        searchOptions.copy(
+                                            genres = searchOptions.genres - selectedGenre
+                                        )
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        stringResource(selectedGenre.displayValue())
+                                    )
+                                },
+                                modifier = Modifier.height(32.dp)
+                            )
+                        }
+                    }
+                    if (searchOptions.tags.isNotEmpty()) {
+                        items(searchOptions.tags.size) { index ->
+                            val selectedTag = searchOptions.tags[index]
+
+                            FilterChip(
+                                selected = true,
+                                onClick = {
+                                    event.updateSearchOptions(
+                                        searchOptions.copy(
+                                            tags = searchOptions.tags - selectedTag
+                                        )
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        stringResource(selectedTag.displayValue())
+                                    )
+                                },
+                                modifier = Modifier.height(32.dp)
+                            )
+                        }
+                    }
+                    item {
+                        FilterChip(
+                            selected = false,
+                            onClick = { showGenreBottomSheet.value = true },
+                            label = { Text(stringResource(R.string.browse_search_filters_add_genre)) },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    tint = MaterialTheme.colorScheme.onSurface,
+                                    contentDescription = null
+                                )
+                            },
+                            modifier = Modifier.height(32.dp)
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
+        ) {
+            TextButton(
+                onClick = { event.changeFiltersVisibility() }
+            ) {
+                Text(
+                    text = if(showFilters) "Hide Filters"
+                        else "Show Filters",
+                    style = LocalTextStyle.current.copy(
+                        color = MaterialTheme.colorScheme.primary
+                    )
                 )
+            }
+
+            AnimatedVisibility(
+                visible = showClearButton,
+                enter = fadeIn() + expandHorizontally(),
+                exit = fadeOut() + shrinkHorizontally()
+            ) {
+                TextButton(
+                    onClick = { event.clearFilters() }
+                ) {
+                    Text(
+                        text = "Clear Filters",
+                        style = LocalTextStyle.current.copy(
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    )
+                }
             }
         }
 
@@ -382,7 +435,9 @@ fun BrowseSearchFilters(
             GenreBottomSheet(
                 authType = authType,
                 searchOptions = searchOptions,
-                onOptionsChanged = onOptionsChanged,
+                onOptionsChanged = { browseOptions ->
+                    event.updateSearchOptions(browseOptions)
+                },
                 onDismiss = { showGenreBottomSheet.value = false }
             )
         }

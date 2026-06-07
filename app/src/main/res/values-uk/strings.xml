@@ -63,6 +63,7 @@
     <string name="common_unknown">Невідомо</string>
     <string name="common_note">Нотатка</string>
 
+    <string name="common_default">За замовчуванням</string>
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
         оскільки синхронізація оновлень відбувається за ідентифікатором MAL,

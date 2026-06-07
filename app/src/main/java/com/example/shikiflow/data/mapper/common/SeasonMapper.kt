@@ -3,25 +3,8 @@ package com.example.shikiflow.data.mapper.common
 import com.example.graphql.anilist.type.MediaSeason as AnilistMediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaSeason
 import com.example.shikiflow.domain.model.media_details.MediaSeasonEnum
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
-import kotlin.time.Clock
 
 object SeasonMapper {
-    fun String.toDomainSeason(): MediaSeason {
-        val splitParts = this.split("_")
-
-        require(splitParts.size == 2) { "Invalid Season Format: $this" }
-
-        val season = MediaSeasonEnum.valueOf(splitParts[0].uppercase())
-        val year = splitParts[1].toInt()
-
-        return MediaSeason(
-            seasonEnum = season,
-            year = year
-        )
-    }
-
     fun parseMediaSeason(year: Int, season: AnilistMediaSeason): MediaSeason {
         return MediaSeason(
             seasonEnum = MediaSeasonEnum.valueOf(season.name),
@@ -38,32 +21,19 @@ object SeasonMapper {
         }
     }
 
-    fun MediaSeason.toShikiSeason(): String {
-        return buildString {
-            seasonEnum?.let { seasonEnum ->
-                append(seasonEnum.name.lowercase())
+    fun MediaSeason.toShikiSeason(): String? {
+        return if(seasonEnum != null || year != null) {
+            buildString {
+                seasonEnum?.let { seasonEnum ->
+                    append(seasonEnum.name.lowercase())
+                }
+                if(seasonEnum != null && year != null) {
+                    append("_")
+                }
+                year?.let {
+                    append(year)
+                }
             }
-            if(seasonEnum != null && year != null) {
-                append("_")
-            }
-            year?.let {
-                append(year)
-            }
-        }
-    }
-
-    fun currentShikiSeason(): String {
-        val now = Clock.System.now()
-        val date = now.toLocalDateTime(TimeZone.currentSystemDefault()).date
-
-        val year = date.year
-        val season = when(date.month.ordinal + 1) {
-            in 1..3 -> MediaSeasonEnum.WINTER
-            in 4..6 -> MediaSeasonEnum.SPRING
-            in 7..9 -> MediaSeasonEnum.SUMMER
-            else -> MediaSeasonEnum.FALL
-        }
-
-        return "${season.name.lowercase()}_$year"
+        } else null
     }
 }

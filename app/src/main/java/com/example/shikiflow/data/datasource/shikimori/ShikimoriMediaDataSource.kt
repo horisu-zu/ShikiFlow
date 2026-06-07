@@ -117,7 +117,7 @@ class ShikimoriMediaDataSource @Inject constructor(
             browseOptions.format == null &&
             browseOptions.status == null &&
             browseOptions.ageRating == null &&
-            browseOptions.season == null &&
+            browseOptions.season?.year == null && browseOptions.season?.seasonEnum == null &&
             browseOptions.genres.isEmpty() &&
             browseOptions.tags.isEmpty()
         ) return Result.success(emptyList())

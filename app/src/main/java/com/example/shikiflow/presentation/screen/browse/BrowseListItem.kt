@@ -196,7 +196,7 @@ fun BrowseListItemPlaceholder(
                     Box(
                         modifier = Modifier
                             .width(36.dp * (maxValue - index))
-                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp + 16.dp)
+                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp + 12.dp)
                             .clip(RoundedCornerShape(8.dp))
                             .shimmerEffect()
                     )
