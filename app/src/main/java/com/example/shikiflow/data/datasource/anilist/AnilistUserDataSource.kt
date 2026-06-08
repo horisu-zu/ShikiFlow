@@ -32,7 +32,7 @@ import com.example.graphql.anilist.UserThreadsQuery
 import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
-import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toShortUserMediaRate
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
@@ -493,7 +493,7 @@ class AnilistUserDataSource @Inject constructor(
             ?.lists
             ?.flatMap { listEntry ->
                 listEntry?.entries?.mapNotNull { entry ->
-                    entry?.aLRateEntryShort?.toDomain()
+                    entry?.aLRateEntryShort?.toShortUserMediaRate()
                 } ?: emptyList()
             } ?: throw IllegalStateException("No data returned from Short User Rate Query")
 

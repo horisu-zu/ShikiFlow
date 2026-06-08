@@ -25,7 +25,7 @@ object AnilistRateMapper {
         )
     }
 
-    fun ALRateEntryShort.toDomain(): ShortUserMediaRate {
+    fun ALRateEntryShort.toShortUserMediaRate(): ShortUserMediaRate {
         return ShortUserMediaRate(
             id = mediaId,
             title = media?.title?.mediaTitle.toDomainTitle(),

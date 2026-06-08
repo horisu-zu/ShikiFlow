@@ -57,9 +57,7 @@ class CompareScreenViewModel @Inject constructor(
         MediaType.entries.forEach { mediaType ->
             _uiState
                 .filter { state ->
-                    state.currentUser != null &&
-                        state.targetUserId != null &&
-                        state.mediaType == mediaType
+                    state.targetUserId != null && state.mediaType == mediaType
                 }
                 .distinctUntilChanged { old, new ->
                     old.targetUserId == new.targetUserId &&
@@ -67,7 +65,6 @@ class CompareScreenViewModel @Inject constructor(
                 }
                 .flatMapLatest { state ->
                     groupUserRatesUseCase(
-                        currentUserId = state.currentUser!!.id,
                         targetUserId = state.targetUserId!!,
                         mediaType = state.mediaType!!
                     )

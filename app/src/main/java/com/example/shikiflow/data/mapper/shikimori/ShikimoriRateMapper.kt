@@ -53,8 +53,7 @@ object ShikimoriRateMapper {
             is ShikiShortUserRate.ShikiShortAnimeRate -> {
                 ShortUserMediaRate(
                     id = anime.id.toInt(),
-                    title = anime.name.toDomainTitle(null, anime.russian, null),
-                    ruTitle = anime.russian,
+                    title = anime.name.toDomainTitle(anime.name, anime.russian, null),
                     imageUrl = "${BuildConfig.SHIKI_BASE_URL}${anime.image.x96}",
                     score = score,
                     status = status.toDomain(),
@@ -64,8 +63,7 @@ object ShikimoriRateMapper {
             is ShikiShortUserRate.ShikiShortMangaRate -> {
                 ShortUserMediaRate(
                     id = manga.id.toInt(),
-                    title = manga.name.toDomainTitle(null, manga.russian, null),
-                    ruTitle = manga.russian,
+                    title = manga.name.toDomainTitle(manga.name, manga.russian, null),
                     imageUrl = "${BuildConfig.SHIKI_BASE_URL}${manga.image.x96}",
                     score = score,
                     status = status.toDomain(),

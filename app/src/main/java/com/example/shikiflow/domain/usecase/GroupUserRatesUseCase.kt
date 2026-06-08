@@ -5,6 +5,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.domain.model.user.MediaComparison
 import com.example.shikiflow.domain.model.user.ShortUserRateData
+import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.async
@@ -15,10 +16,10 @@ import retrofit2.HttpException
 import javax.inject.Inject
 
 class GroupUserRatesUseCase @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val mediaTracksRepository: MediaTracksRepository
 ) {
     operator fun invoke(
-        currentUserId: Int,
         targetUserId: Int,
         mediaType: MediaType
     ): Flow<DataResult<Map<ComparisonType, List<MediaComparison>>>> = flow {
@@ -27,7 +28,7 @@ class GroupUserRatesUseCase @Inject constructor(
 
             val (currentUserRates, targetUserRates) = coroutineScope {
                 val currentUser = async {
-                    userRepository.getMediaRates(currentUserId, mediaType)
+                    mediaTracksRepository.getShortUserMediaRates(mediaType)
                 }
 
                 val targetUser = async {

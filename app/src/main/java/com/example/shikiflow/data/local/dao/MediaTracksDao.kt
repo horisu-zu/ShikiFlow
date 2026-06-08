@@ -90,6 +90,14 @@ interface MediaTracksDao {
     fun browseMediaTracks(query: RoomRawQuery): PagingSource<Int, MediaTrackDto>
 
     @Query("""
+        SELECT * FROM media_track
+        INNER JOIN media_short ON media_track.mediaId = media_short.id
+        WHERE media_short.mediaType = :mediaType
+        ORDER BY updatedAt DESC
+    """)
+    suspend fun getMediaTracks(mediaType: MediaType): List<MediaTrackDto>
+
+    @Query("""
         SELECT COUNT(*) == 0 FROM media_track
         INNER JOIN media_short ON media_track.mediaId = media_short.id
         WHERE mediaType = :mediaType

@@ -14,6 +14,7 @@ import com.example.shikiflow.data.local.mediator.MediaTracksMediator
 import com.example.shikiflow.data.mapper.local.MediaShortMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toEntity
 import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toMediaEntity
+import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toShortUserMediaRate
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
@@ -27,6 +28,7 @@ import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
@@ -201,6 +203,16 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
         }
     }
+
+    override suspend fun getShortUserMediaRates(
+        mediaType: MediaType
+    ): List<ShortUserMediaRate> {
+        return appRoomDatabase.mediaTracksDao().getMediaTracks(mediaType)
+            .map { mediaTrack ->
+                mediaTrack.toShortUserMediaRate()
+            }
+    }
+
 
     override fun saveUserRate(
         entryId: Int?,

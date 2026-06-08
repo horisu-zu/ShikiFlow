@@ -3,10 +3,12 @@ package com.example.shikiflow.data.mapper.local
 import com.example.graphql.anilist.fragment.MediaListShort
 import com.example.graphql.shikimori.fragment.AnimeUserRateWithModel
 import com.example.graphql.shikimori.fragment.MangaUserRateWithModel
+import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackDto
 import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
+import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import kotlin.time.Instant
 
@@ -98,6 +100,17 @@ object MediaTrackMapper {
             createdAt = createdAt,
             updatedAt = updatedAt,
             mediaId = mediaId
+        )
+    }
+
+    fun MediaTrackDto.toShortUserMediaRate(): ShortUserMediaRate {
+        return ShortUserMediaRate(
+            id = media.id,
+            title = media.name,
+            imageUrl = media.poster?.originalUrl ?: "",
+            score = track.score,
+            status = track.status,
+            progress = track.progress
         )
     }
 }
