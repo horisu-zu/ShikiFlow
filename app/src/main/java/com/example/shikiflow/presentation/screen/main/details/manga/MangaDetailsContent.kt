@@ -1,20 +1,20 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
@@ -23,15 +23,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
@@ -67,6 +64,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.followings.
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewsSection
 import com.example.shikiflow.presentation.viewmodel.manga.details.MangaDexUiState
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.common.MediaTagItem
@@ -90,7 +88,6 @@ fun MangaDetailsContent(
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
     val horizontalPadding = 12.dp
-    val density = LocalDensity.current
     val titleType = LocalTitleTypeController.current
 
     LazyColumn(
@@ -146,17 +143,26 @@ fun MangaDetailsContent(
 
         if(mangaDetails.genres.isNotEmpty()) {
             item {
-                LazyRow(
-                    modifier = Modifier
-                        .ignoreHorizontalParentPadding(horizontalPadding)
-                        .fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = horizontalPadding),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(mangaDetails.genres) { genreItem ->
-                        CardItem(
-                            item = stringResource(genreItem.displayValue())
-                        )
+                    TextWithDivider(
+                        text = stringResource(R.string.user_stats_section_genres)
+                    )
+                    SnapFlingLazyRow(
+                        snapPosition = SnapPosition.Start,
+                        contentPadding = PaddingValues(horizontal = horizontalPadding),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                        modifier = Modifier
+                            .ignoreHorizontalParentPadding(horizontalPadding)
+                            .fillMaxWidth()
+                    ) {
+                        items(mangaDetails.genres) { genreItem ->
+                            CardItem(
+                                item = stringResource(genreItem.displayValue())
+                            )
+                        }
                     }
                 }
             }
@@ -164,15 +170,24 @@ fun MangaDetailsContent(
 
         if(mangaDetails.tags.isNotEmpty()) {
             item {
-                LazyRow(
-                    modifier = Modifier
-                        .ignoreHorizontalParentPadding(horizontalPadding)
-                        .fillMaxWidth(),
-                    contentPadding = PaddingValues(horizontal = horizontalPadding),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(mangaDetails.tags) { tagItem ->
-                        MediaTagItem(tagItem)
+                    TextWithDivider(
+                        text = stringResource(R.string.user_stats_section_tags)
+                    )
+                    SnapFlingLazyRow(
+                        snapPosition = SnapPosition.Start,
+                        contentPadding = PaddingValues(horizontal = horizontalPadding),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                        modifier = Modifier
+                            .ignoreHorizontalParentPadding(horizontalPadding)
+                            .fillMaxWidth()
+                    ) {
+                        items(mangaDetails.tags) { tagItem ->
+                            MediaTagItem(tagItem)
+                        }
                     }
                 }
             }
@@ -180,8 +195,12 @@ fun MangaDetailsContent(
 
         if(mangaDetails.characters.entries.isNotEmpty()) {
             item {
-                var maxCardHeight by remember { mutableIntStateOf(0) }
-                val characterCardWidth = 96.dp
+                val clipPercent = 16
+                val imageType = ImageType.Custom(
+                    width = 96.dp,
+                    aspectRatio = 2f / 2.85f,
+                    shape = RoundedCornerShape(clipPercent)
+                )
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -224,11 +243,8 @@ fun MangaDetailsContent(
                                 onClick = {
                                     mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id)
                                 },
-                                modifier = Modifier
-                                    .width(characterCardWidth)
-                                    .onSizeChanged { size ->
-                                        maxCardHeight = size.height
-                                    }
+                                clipPercent = clipPercent,
+                                imageType = imageType
                             )
                         }
                         if(mangaDetails.characters.hasNextPage) {
@@ -242,11 +258,9 @@ fun MangaDetailsContent(
                                         )
                                     },
                                     modifier = Modifier
-                                        .height(
-                                            height = with(density) { maxCardHeight.toDp() }
-                                        )
-                                        .width(characterCardWidth)
-                                        .clip(CircleShape)
+                                        .width(imageType.width)
+                                        .aspectRatio(imageType.aspectRatio)
+                                        .clip(imageType.shape)
                                 )
                             }
                         }

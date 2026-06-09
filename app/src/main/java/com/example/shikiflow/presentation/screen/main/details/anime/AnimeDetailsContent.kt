@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.HorizontalDivider
@@ -24,15 +24,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
@@ -66,6 +63,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.StaffSectio
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentSection
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.common.MediaTagItem
@@ -89,7 +87,6 @@ fun AnimeDetailsContent(
     var showRelatedBottomSheet by remember { mutableStateOf(false) }
 
     val horizontalPadding = 12.dp
-    val density = LocalDensity.current
     val titleType = LocalTitleTypeController.current
 
     LazyColumn(
@@ -180,8 +177,12 @@ fun AnimeDetailsContent(
         }
         if(animeDetails.characters.entries.isNotEmpty()) {
             item {
-                var maxCardHeight by remember { mutableIntStateOf(0) }
-                val characterCardWidth = 96.dp
+                val clipPercent = 16
+                val imageType = ImageType.Custom(
+                    width = 96.dp,
+                    aspectRatio = 2f / 2.85f,
+                    shape = RoundedCornerShape(clipPercent)
+                )
 
                 Column(
                     modifier = Modifier.fillMaxWidth(),
@@ -223,11 +224,8 @@ fun AnimeDetailsContent(
                                 characterPoster = characterItem.imageUrl,
                                 characterName = characterItem.fullName.preferred(titleType),
                                 onClick = { mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id) },
-                                modifier = Modifier
-                                    .width(characterCardWidth)
-                                    .onSizeChanged { size ->
-                                        maxCardHeight = size.height
-                                    }
+                                clipPercent = clipPercent,
+                                imageType = imageType
                             )
                         }
                         if(animeDetails.characters.hasNextPage) {
@@ -241,11 +239,9 @@ fun AnimeDetailsContent(
                                         )
                                     },
                                     modifier = Modifier
-                                        .height(
-                                            height = with(density) { maxCardHeight.toDp() }
-                                        )
-                                        .width(characterCardWidth)
-                                        .clip(CircleShape)
+                                        .width(imageType.width)
+                                        .aspectRatio(imageType.aspectRatio)
+                                        .clip(imageType.shape)
                                 )
                             }
                         }

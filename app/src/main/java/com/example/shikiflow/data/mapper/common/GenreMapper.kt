@@ -27,6 +27,11 @@ object GenreMapper {
             "Sports" -> DomainGenre.SPORTS
             "Supernatural" -> DomainGenre.SUPERNATURAL
             "Thriller", "Suspense" -> DomainGenre.THRILLER
+            "Shounen" -> DomainGenre.SHOUNEN
+            "Seinen" -> DomainGenre.SEINEN
+            "Shoujo" -> DomainGenre.SHOUJO
+            "Josei" -> DomainGenre.JOSEI
+            "Kids" -> DomainGenre.KIDS
             else -> null
         }
     }
@@ -77,6 +82,11 @@ object GenreMapper {
             DomainGenre.THRILLER -> "117"
             DomainGenre.EROTICA -> "539"
             DomainGenre.GOURMET -> "543"
+            DomainGenre.SHOUNEN -> "27"
+            DomainGenre.SEINEN -> "25"
+            DomainGenre.SHOUJO -> "42"
+            DomainGenre.JOSEI -> "43"
+            DomainGenre.KIDS -> "15"
             else -> null
         }
     }

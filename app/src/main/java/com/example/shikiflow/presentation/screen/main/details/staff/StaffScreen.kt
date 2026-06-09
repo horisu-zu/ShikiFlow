@@ -36,7 +36,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -482,7 +481,12 @@ private fun VoiceActorRolesSection(
     onPaginatedNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val cardWidth = 96.dp
+    val clipPercent = 16
+    val imageType = ImageType.Custom(
+        width = 96.dp,
+        aspectRatio = 2f / 2.85f,
+        shape = RoundedCornerShape(clipPercent)
+    )
 
     Column(
         modifier = modifier,
@@ -520,7 +524,8 @@ private fun VoiceActorRolesSection(
                     onClick = {
                         onCharacterClick(character.id)
                     },
-                    modifier = Modifier.width(cardWidth)
+                    clipPercent = clipPercent,
+                    imageType = imageType
                 )
             }
             if(characterRoles.hasNextPage) {
@@ -528,9 +533,9 @@ private fun VoiceActorRolesSection(
                     PaginatedListNavigateIcon(
                         onNavigate = { onPaginatedNavigate() },
                         modifier = Modifier
-                            .width(cardWidth)
-                            .aspectRatio(2f / 2.85f)
-                            .clip(CircleShape)
+                            .width(imageType.width)
+                            .aspectRatio(imageType.aspectRatio)
+                            .clip(imageType.shape)
                     )
                 }
             }

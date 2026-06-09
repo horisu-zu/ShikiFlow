@@ -3,6 +3,11 @@ package com.example.shikiflow.domain.model.media_details
 import com.example.shikiflow.domain.model.auth.AuthType
 
 enum class Genre(val supportedBy: Set<AuthType> = setOf(AuthType.ANILIST, AuthType.SHIKIMORI)) {
+    SHOUNEN(supportedBy = setOf(AuthType.SHIKIMORI)),
+    SEINEN(supportedBy = setOf(AuthType.SHIKIMORI)),
+    SHOUJO(supportedBy = setOf(AuthType.SHIKIMORI)),
+    JOSEI(supportedBy = setOf(AuthType.SHIKIMORI)),
+    KIDS(supportedBy = setOf(AuthType.SHIKIMORI)),
     ACTION,
     ADVENTURE,
     AVANT_GARDE(supportedBy = setOf(AuthType.SHIKIMORI)),

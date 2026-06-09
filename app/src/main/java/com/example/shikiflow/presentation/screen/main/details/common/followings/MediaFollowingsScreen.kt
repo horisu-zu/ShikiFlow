@@ -100,7 +100,7 @@ fun MediaFollowingsScreen(
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
                 ) {
                     if(mediaFollowingItems.loadState.refresh is LoadState.Loading) {
-                        items(6) {
+                        items(12) {
                             MediaFollowingItemPlaceholder(
                                 modifier = Modifier.fillMaxWidth()
                             )

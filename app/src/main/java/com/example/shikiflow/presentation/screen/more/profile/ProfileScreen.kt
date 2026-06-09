@@ -53,10 +53,6 @@ fun ProfileScreen(
     LaunchedEffect(user) {
         user?.let {
             profileViewModel.setUser(user)
-
-            if(user.isFollowing == null && user.id != uiState.currentUser?.id) {
-                profileViewModel.getFollow(user.id)
-            }
         }
     }
 

@@ -69,7 +69,7 @@ object ShikimoriMediaMapper {
             } ?: emptyList(),
             tags = genres
                 ?.filter { genre ->
-                    genre.genreShort.kind != GenreKindEnum.genre
+                    genre.genreShort.kind == GenreKindEnum.theme
                 }?.mapNotNull { genre ->
                     TagMapper.fromString(genre.genreShort.name)?.let { tag ->
                         MediaTag(tag = tag)
@@ -125,7 +125,7 @@ object ShikimoriMediaMapper {
             } ?: emptyList(),
             tags = genres
                 ?.filter { genre ->
-                    genre.genreShort.kind != GenreKindEnum.genre
+                    genre.genreShort.kind == GenreKindEnum.theme
                 }?.mapNotNull { genre ->
                     TagMapper.fromString(genre.genreShort.name)?.let { tag ->
                         MediaTag(tag = tag)

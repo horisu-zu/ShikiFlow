@@ -89,6 +89,28 @@ class ProfileViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
+        mutableUiState
+            .filter { state ->
+                state.user != null && state.user.isFollowing == null && state.user != state.currentUser
+            }
+            .distinctUntilChanged { old, new ->
+                old.user?.id == new.user?.id && !new.isRefreshing
+            }
+            .onEach { state ->
+                userRepository.getFollow(state.user?.id!!).let { result ->
+                    if(result is DataResult.Success) {
+                        mutableUiState.update { state ->
+                            state.copy(
+                                user = state.user?.copy(
+                                    isFollowing = result.data.isFollowing,
+                                    isFollower = result.data.isFollower
+                                )
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+
         settingsRepository.userFlow
             .filterNotNull()
             .onEach { user ->
@@ -112,7 +134,8 @@ class ProfileViewModel @Inject constructor(
 
     fun setUser(user: User) {
         mutableUiState.update { state ->
-            state.copy(user = user)
+            if (state.user?.id == user.id) state
+                else state.copy(user = user)
         }
     }
 
@@ -132,23 +155,6 @@ class ProfileViewModel @Inject constructor(
                         state.copy(
                             user = state.user?.copy(
                                 isFollowing = result.data
-                            )
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    fun getFollow(userId: Int) {
-        viewModelScope.launch {
-            userRepository.getFollow(userId).let { result ->
-                if(result is DataResult.Success) {
-                    mutableUiState.update { state ->
-                        state.copy(
-                            user = state.user?.copy(
-                                isFollowing = result.data.isFollowing,
-                                isFollower = result.data.isFollower
                             )
                         )
                     }

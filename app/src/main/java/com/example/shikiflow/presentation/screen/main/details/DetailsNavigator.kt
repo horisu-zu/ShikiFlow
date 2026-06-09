@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.example.shikiflow.presentation.screen.main.details
 
 import androidx.compose.animation.ExitTransition
@@ -6,8 +8,11 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -17,6 +22,7 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.common.scene.BottomSheetSceneStrategy
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.SimilarMediaScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.AnimeDetailsScreen
@@ -42,6 +48,7 @@ fun DetailsNavigator(
     mainNavOptions: MainNavOptions
 ) {
     val detailsBackstack = rememberNavBackStack(detailsNavRoute)
+    val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
     val options = object : MediaNavOptions {
         override fun navigateToCharacterDetails(characterId: Int) {
@@ -169,6 +176,7 @@ fun DetailsNavigator(
 
     NavDisplay(
         backStack = detailsBackstack,
+        sceneStrategies = listOf(bottomSheetStrategy),
         entryProvider = entryProvider {
             entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
@@ -188,7 +196,9 @@ fun DetailsNavigator(
                     navOptions = options
                 )
             }
-            entry<DetailsNavRoute.SimilarPage> { route ->
+            entry<DetailsNavRoute.SimilarPage>(
+                metadata = BottomSheetSceneStrategy.bottomSheet()
+            ) { route ->
                 SimilarMediaScreen(
                     mediaTitle = route.title,
                     mediaId = route.id,
@@ -196,11 +206,12 @@ fun DetailsNavigator(
                     navOptions = options
                 )
             }
-            entry<DetailsNavRoute.ExternalLinks> { route ->
+            entry<DetailsNavRoute.ExternalLinks>(
+                metadata = BottomSheetSceneStrategy.bottomSheet()
+            ) { route ->
                 ExternalLinksScreen(
                     mediaId = route.mediaId,
-                    mediaType = route.mediaType,
-                    navOptions = options
+                    mediaType = route.mediaType
                 )
             }
             entry<DetailsNavRoute.MangaRead> { route ->

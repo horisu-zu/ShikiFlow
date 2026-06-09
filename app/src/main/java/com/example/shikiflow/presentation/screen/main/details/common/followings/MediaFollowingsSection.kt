@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,7 +55,9 @@ fun MediaFollowingsSection(
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val rows = if(mediaFollowings.entries.size > 1) 2 else 1
+    val rows = remember(mediaFollowings) {
+        if(mediaFollowings.entries.size > 1) 2 else 1
+    }
 
     Column(
         modifier = modifier,

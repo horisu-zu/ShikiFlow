@@ -32,6 +32,11 @@ object GenreMapper {
             Genre.GIRLS_LOVE -> R.string.genre_girls_love
             Genre.YURI -> R.string.media_tag_yuri
             Genre.YAOI -> R.string.genre_yaoi
+            Genre.SHOUNEN -> R.string.media_tag_shounen
+            Genre.SEINEN -> R.string.media_tag_seinen
+            Genre.SHOUJO -> R.string.media_tag_shoujo
+            Genre.JOSEI -> R.string.media_tag_josei
+            Genre.KIDS -> R.string.media_tag_kids
         }
     }
 }

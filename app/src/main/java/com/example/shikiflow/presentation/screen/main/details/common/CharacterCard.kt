@@ -20,16 +20,20 @@ fun CharacterCard(
     characterPoster: String?,
     characterName: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    clipPercent: Int = 16,
+    imageType: ImageType = ImageType.Custom(
+        width = Int.MAX_VALUE.dp,
+        aspectRatio = 2f / 2.85f,
+        shape = RoundedCornerShape(clipPercent)
+    )
 ) {
-    val shapePercent = 16
-
     Column(
         modifier = modifier
             .clip(
                 shape = RoundedCornerShape(
-                    topStartPercent = shapePercent,
-                    topEndPercent = shapePercent,
+                    topStartPercent = clipPercent,
+                    topEndPercent = clipPercent,
                     bottomStartPercent = 4,
                     bottomEndPercent = 4
                 )
@@ -40,11 +44,7 @@ fun CharacterCard(
     ) {
         BaseImage(
             model = characterPoster,
-            imageType = ImageType.Custom(
-                width = Int.MAX_VALUE.dp,
-                aspectRatio = 2f / 2.85f,
-                shape = RoundedCornerShape(shapePercent)
-            )
+            imageType = imageType
         )
         Text(
             text = characterName,

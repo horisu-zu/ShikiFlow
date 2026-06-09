@@ -4,40 +4,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -53,7 +39,6 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.media.links.ExternalLinksViewModel
 import com.example.shikiflow.utils.WebIntent.openUrlCustomTab
 
@@ -62,98 +47,53 @@ import com.example.shikiflow.utils.WebIntent.openUrlCustomTab
 fun ExternalLinksScreen(
     mediaId: Int,
     mediaType: MediaType,
-    navOptions: MediaNavOptions,
     externalLinksViewModel: ExternalLinksViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
     val uiState by externalLinksViewModel.uiState.collectAsStateWithLifecycle()
 
     val lazyListState = rememberLazyListState()
-    val isAtTop by remember {
-        derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0 &&
-            lazyListState.firstVisibleItemScrollOffset == 0
-        }
-    }
 
     LaunchedEffect(mediaId, mediaType) {
         externalLinksViewModel.setMedia(mediaId, mediaType)
     }
 
-    Scaffold(
-        topBar = {
-            Column {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.external_links_label),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                    },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = { navOptions.navigateBack() }
-                        ) {
-                            Icon(
-                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
-                    )
-                )
-                if(!isAtTop) { HorizontalDivider() }
+    LazyColumn(
+        state = lazyListState,
+        contentPadding = PaddingValues(all = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+    ) {
+        if(uiState.isLoading) {
+            item {
+                Box(
+                    modifier = Modifier.fillParentMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) { CircularProgressIndicator() }
             }
-        }
-    ) { innerPadding ->
-        LazyColumn(
-            state = lazyListState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
-                .clip(RoundedCornerShape(12.dp)),
-            contentPadding = PaddingValues(
-                start = 12.dp,
-                end = 12.dp,
-                top = 12.dp,
-                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-            ),
-            verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
-        ) {
-            if(uiState.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            } else if(uiState.errorMessage != null) {
-                item {
-                    Box(
-                        modifier = Modifier
-                            .fillParentMaxSize()
-                            .padding(horizontal = 24.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = uiState.errorMessage ?: stringResource(R.string.common_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { externalLinksViewModel.onRefresh() }
-                        )
-                    }
-                }
-            } else {
-                items(uiState.links) { item ->
-                    LinkItem(
-                        link = item,
-                        onLinkClick = { url ->
-                            openUrlCustomTab(context, url)
-                        },
-                        modifier = Modifier.fillMaxWidth()
+        } else if(uiState.errorMessage != null) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillParentMaxSize()
+                        .padding(horizontal = 24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    ErrorItem(
+                        message = uiState.errorMessage ?: stringResource(R.string.common_error),
+                        buttonLabel = stringResource(R.string.common_retry),
+                        onButtonClick = { externalLinksViewModel.onRefresh() }
                     )
                 }
+            }
+        } else {
+            items(uiState.links) { item ->
+                LinkItem(
+                    link = item,
+                    onLinkClick = { url ->
+                        openUrlCustomTab(context, url)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -168,7 +108,7 @@ private fun LinkItem(
     Row(
         modifier = modifier.height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.background)
             .clickable { onLinkClick(link.url) }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -177,7 +117,7 @@ private fun LinkItem(
         Box(
             modifier = Modifier.fillMaxHeight()
                 .clip(RoundedCornerShape(8.dp))
-                .background(MaterialTheme.colorScheme.background)
+                .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(all = 8.dp),
             contentAlignment = Alignment.Center
         ) {
@@ -201,20 +141,5 @@ private fun LinkItem(
             text = link.siteName,
             style = MaterialTheme.typography.bodyLarge
         )
-        /*Column(
-            modifier = modifier.weight(1f),
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
-        ) {
-            Text(
-                text = link.siteName,
-                style = MaterialTheme.typography.bodyLarge
-            )
-            Text(
-                text = link.url,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(0.75f)
-                )
-            )
-        }*/
     }
 }
