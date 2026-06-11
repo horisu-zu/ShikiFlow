@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -187,7 +188,7 @@ class EpisodeViewModel @Inject constructor(
                 exoPlayer.let { player ->
                     _currentPosition.update { player.currentPosition }
                 }
-                delay(500L)
+                delay(500L.milliseconds)
             }
         }
     }
@@ -205,7 +206,7 @@ class EpisodeViewModel @Inject constructor(
 
     override fun onSeek(milliseconds: Long) {
         exoPlayer.let { player ->
-            val newPosition = player.currentPosition + milliseconds
+            val newPosition = (player.currentPosition + milliseconds).coerceAtLeast(0L)
             player.seekTo(newPosition)
         }
     }

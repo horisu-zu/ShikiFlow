@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -287,7 +288,9 @@ fun AnimeDetailsContent(
                         mediaNavOptions.navigateToStaff(staffId)
                     },
                     horizontalPadding = horizontalPadding,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize()
                 )
             }
         }

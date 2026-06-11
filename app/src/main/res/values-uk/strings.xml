@@ -265,6 +265,7 @@
     <string name="details_short_info_manga_chapters">Розділи</string>
     <string name="details_short_info_manga_started">Розпочато випуск</string>
     <string name="details_short_info_airing_in">Епізод через</string>
+    <string name="details_short_info_airing_on">Прем\'єра</string>
     <string name="details_related">Пов\'язане</string>
     <string name="details_reviews_section_label">Огляди</string>
 

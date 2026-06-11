@@ -18,6 +18,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
 import androidx.compose.foundation.style.MutableStyleState
+import androidx.compose.foundation.style.border
+import androidx.compose.foundation.style.size
 import androidx.compose.foundation.style.styleable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -31,7 +33,6 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,7 +61,25 @@ import kotlin.math.abs
 fun ColorPickerBottomSheet(
     currentColor: Color,
     useSystemWallpaperColor: Boolean,
-    onDismiss: () -> Unit,
+    onSave: (Color, Boolean) -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        ColorPickerBottomSheetContent(
+            currentColor = currentColor,
+            useSystemWallpaperColor = useSystemWallpaperColor,
+            onSave = onSave
+        )
+    }
+}
+
+@OptIn(ExperimentalFoundationStyleApi::class)
+@Composable
+private fun ColorPickerBottomSheetContent(
+    currentColor: Color,
+    useSystemWallpaperColor: Boolean,
     onSave: (Color, Boolean) -> Unit
 ) {
     val horizontalPadding = 12.dp
@@ -78,9 +97,6 @@ fun ColorPickerBottomSheet(
         mutableStateOf(useSystemWallpaperColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
     }
 
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
-    )
     val outlineColor: @Composable (Boolean) -> Color = { boolean ->
         if(useSystemColor) {
             MaterialTheme.colorScheme.outline
@@ -92,142 +108,137 @@ fun ColorPickerBottomSheet(
         }
     }
 
-    ModalBottomSheet(
-        sheetState = sheetState,
-        onDismissRequest = onDismiss
+    (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
+        LaunchedEffect(Unit) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                window.isNavigationBarContrastEnforced = false
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = horizontalPadding, vertical = 6.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
-            LaunchedEffect(Unit) {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    window.isNavigationBarContrastEnforced = false
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.color_picker_bottom_sheet_system_label),
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+                Switch(
+                    checked = useSystemColor,
+                    onCheckedChange = { useSystemColor = !useSystemColor }
+                )
+            }
+        }
+
+        SnapFlingLazyRow(
+            modifier = Modifier
+                .ignoreHorizontalParentPadding(horizontalPadding)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = horizontalPadding),
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start)
+        ) {
+            items(ColorMapper.getPickerQuickColors()) { color ->
+                val isCurrent = remember(hue) {
+                    abs(hue - color.extractHue()) < 0.5f
+                }
+                val borderWidth = if(isCurrent) 3.dp else 1.dp
+                val borderColor = outlineColor(isCurrent)
+
+                Box(
+                    modifier = Modifier
+                        .styleable(
+                            styleState = styleState
+                        ) {
+                            size(40.dp)
+                            shape(RoundedCornerShape(percent = 24))
+                            border(
+                                width = borderWidth,
+                                color = borderColor
+                            )
+                            background(color)
+                        }
+                        .clickable(
+                            enabled = !useSystemColor,
+                            onClick = { hue = color.extractHue() }
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if(isCurrent) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            tint = borderColor,
+                            contentDescription = "Current Primary Color",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
             }
         }
 
-        Column(
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = horizontalPadding, vertical = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = stringResource(R.string.color_picker_bottom_sheet_system_label),
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Switch(
-                        checked = useSystemColor,
-                        onCheckedChange = { useSystemColor = !useSystemColor }
-                    )
-                }
-            }
-
-            SnapFlingLazyRow(
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth(),
-                contentPadding = PaddingValues(horizontal = horizontalPadding),
-                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start)
-            ) {
-                items(ColorMapper.getPickerQuickColors()) { color ->
-                    val isCurrent = remember(hue) {
-                        abs(hue - color.extractHue()) < 0.5f
-                    }
-                    val borderWidth = if(isCurrent) 3.dp else 1.dp
-                    val borderColor = outlineColor(isCurrent)
-
-                    Box(
-                        modifier = Modifier
-                            .styleable(
-                                styleState = styleState
-                            ) {
-                                size(40.dp)
-                                shape(RoundedCornerShape(percent = 24))
-                                border(
-                                    width = borderWidth,
-                                    color = borderColor
-                                )
-                                background(color)
-                            }
-                            .clickable(
-                                enabled = !useSystemColor,
-                                onClick = { hue = color.extractHue() }
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if(isCurrent) {
-                            Icon(
-                                imageVector = Icons.Default.Check,
-                                tint = borderColor,
-                                contentDescription = "Current Primary Color",
-                                modifier = Modifier.size(24.dp)
-                            )
+                .height(40.dp)
+                .clip(RoundedCornerShape(percent = 24))
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = (0..360 step 8).map { hue ->
+                            Color.hsl(hue.toFloat(), saturation, lightness)
                         }
-                    }
-                }
-            }
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .clip(RoundedCornerShape(percent = 24))
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = (0..360 step 8).map { hue ->
-                                Color.hsl(hue.toFloat(), saturation, lightness)
-                            }
-                        )
                     )
-                    .then(
-                        if(useSystemColor) {
-                            Modifier.border(
-                                width = 3.dp,
-                                color = MaterialTheme.colorScheme.outline,
-                                shape = RoundedCornerShape(percent = 24)
-                            )
-                        } else Modifier
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Slider(
-                    value = hue,
-                    onValueChange = { hue = it },
-                    enabled = !useSystemColor,
-                    valueRange = 0f..360f,
-                    colors = SliderDefaults.colors(
-                        thumbColor = MaterialTheme.colorScheme.onSurface,
-                        activeTrackColor = Color.Transparent,
-                        inactiveTrackColor = Color.Transparent,
-                        disabledActiveTrackColor = Color.Transparent,
-                        disabledActiveTickColor = Color.Transparent,
-                        disabledInactiveTickColor = Color.Transparent,
-                        disabledInactiveTrackColor = Color.Transparent
-                    ),
-                    modifier = Modifier.fillMaxWidth()
                 )
-            }
+                .then(
+                    if(useSystemColor) {
+                        Modifier.border(
+                            width = 3.dp,
+                            color = MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(percent = 24)
+                        )
+                    } else Modifier
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Slider(
+                value = hue,
+                onValueChange = { hue = it },
+                enabled = !useSystemColor,
+                valueRange = 0f..360f,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.onSurface,
+                    activeTrackColor = Color.Transparent,
+                    inactiveTrackColor = Color.Transparent,
+                    disabledActiveTrackColor = Color.Transparent,
+                    disabledActiveTickColor = Color.Transparent,
+                    disabledInactiveTickColor = Color.Transparent,
+                    disabledInactiveTrackColor = Color.Transparent
+                ),
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            Button(
+                shape = RoundedCornerShape(percent = 24),
+                onClick = { onSave(selectedColor, useSystemColor) }
             ) {
-                Button(
-                    shape = RoundedCornerShape(percent = 24),
-                    onClick = { onSave(selectedColor, useSystemColor) }
-                ) {
-                    Text(
-                        text = stringResource(R.string.color_picker_bottom_sheet_save)
-                    )
-                }
+                Text(
+                    text = stringResource(R.string.color_picker_bottom_sheet_save)
+                )
             }
         }
     }

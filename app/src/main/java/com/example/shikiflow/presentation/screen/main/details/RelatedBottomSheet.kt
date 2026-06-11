@@ -12,7 +12,6 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -33,12 +32,10 @@ fun RelatedBottomSheet(
     onItemClick: (Int, MediaType) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
     val preferredTitleType = LocalTitleTypeController.current
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = sheetState,
         modifier = Modifier.heightIn(min = 480.dp)
     ) {
         (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->

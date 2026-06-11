@@ -20,8 +20,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -58,8 +59,9 @@ fun <T : SortType> SortBottomSheet(
     config: SortConfig<T>,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
     )
 
     ModalBottomSheet(
@@ -86,8 +88,9 @@ fun TracksSortBottomSheet(
     onDismiss: () -> Unit
 ) {
     var filterType by remember { mutableStateOf(currentFilterType) }
-    val sheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
     )
 
     LaunchedEffect(filterType) {

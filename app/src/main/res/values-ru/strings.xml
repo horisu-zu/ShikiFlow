@@ -264,6 +264,7 @@
     <string name="details_short_info_manga_chapters">Главы</string>
     <string name="details_short_info_manga_started">Начало выхода</string>
     <string name="details_short_info_airing_in">Эпизод через</string>
+    <string name="details_short_info_airing_on">Премьера</string>
     <string name="details_related">Связанное</string>
     <string name="details_reviews_section_label">Обзоры</string>
 

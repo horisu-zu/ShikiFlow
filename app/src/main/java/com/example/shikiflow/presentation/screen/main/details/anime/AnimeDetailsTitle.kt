@@ -61,6 +61,7 @@ import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.common.mappers.DateMapper.isAiring
 import com.example.shikiflow.presentation.common.mappers.DateMapper.toCountdownString
 import com.example.shikiflow.presentation.common.mappers.DateMapper.untilNextEpisode
+import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.DateUtils.calculateDuration
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.delay
@@ -213,6 +214,16 @@ fun AnimeDetailsTitle(
                                     )
                                 }
                             }
+                        }
+                    } else if(animeDetails.status == MediaStatus.ANNOUNCED && animeDetails.nextEpisodeAt != null) {
+                        item {
+                            ShortInfoItem(
+                                infoType = stringResource(R.string.details_short_info_airing_on),
+                                infoItem = formatInstant(
+                                    instant = animeDetails.nextEpisodeAt,
+                                    includeDayOfWeek = true
+                                )
+                            )
                         }
                     }
                 }

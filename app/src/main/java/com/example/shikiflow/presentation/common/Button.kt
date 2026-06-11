@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
 import androidx.compose.foundation.style.MutableStyleState
+import androidx.compose.foundation.style.size
 import androidx.compose.foundation.style.styleable
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults

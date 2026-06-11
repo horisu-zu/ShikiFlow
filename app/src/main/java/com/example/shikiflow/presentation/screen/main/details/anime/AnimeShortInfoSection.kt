@@ -98,8 +98,8 @@ fun AnimeShortInfoSection(
                 }
             )
         }
-        animeDetails.airedOn?.let { airedOn ->
-            airedOn.format()?.let { date ->
+        if(animeDetails.status != MediaStatus.ANNOUNCED && animeDetails.airedOn != null) {
+            animeDetails.airedOn.format()?.let { date ->
                 DetailRow(
                     label = stringResource(R.string.details_info_aired_on),
                     content = {

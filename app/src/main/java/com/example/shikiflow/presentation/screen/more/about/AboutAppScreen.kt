@@ -88,22 +88,23 @@ fun AboutAppScreen(
         }
     }
 
-    uiState.latestRelease?.let { release ->
-        ReleaseNotesBottomSheet(
-            currentVersion = uiState.currentRelease.tagName,
-            release = release,
-            onDismiss = { showBottomSheet.value = false },
-            onDownloadReleaseClick = {
-                WebIntent.openUrlCustomTab(
-                    context = context,
-                    url = (
-                        release.assets.firstOrNull { asset ->
-                            asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
-                        } ?: release.assets.first()
-                    ).downloadUrl
-                )
-            },
-            showBottomSheet = showBottomSheet.value
-        )
+    if(showBottomSheet.value) {
+        uiState.latestRelease?.let { release ->
+            ReleaseNotesBottomSheet(
+                currentVersion = uiState.currentRelease.tagName,
+                release = release,
+                onDismiss = { showBottomSheet.value = false },
+                onDownloadReleaseClick = {
+                    WebIntent.openUrlCustomTab(
+                        context = context,
+                        url = (
+                                release.assets.firstOrNull { asset ->
+                                    asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
+                                } ?: release.assets.first()
+                                ).downloadUrl
+                    )
+                }
+            )
+        }
     }
 }

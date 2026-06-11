@@ -20,8 +20,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateSetOf
@@ -47,14 +47,13 @@ data class BottomSheetConfig(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsBottomSheet(
+    sheetState: SheetState,
     title: String,
     options: List<String>,
     currentValue: String,
     onOptionClick: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
-
     ModalBottomSheet(
         sheetState = sheetState,
         onDismissRequest = onDismiss
@@ -109,13 +108,10 @@ fun LanguagesBottomSheet(
     onSave: (Set<String>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
     val supportedLanguages = FlagConverter.locales
-
     val currentLanguages = remember { mutableStateSetOf(*initialLanguages.toTypedArray()) }
 
     ModalBottomSheet(
-        sheetState = sheetState,
         onDismissRequest = onDismiss
     ) {
         (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->

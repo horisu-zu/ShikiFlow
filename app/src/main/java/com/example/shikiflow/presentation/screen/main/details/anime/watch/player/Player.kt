@@ -48,6 +48,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.KodikEpi
 import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.PlayerState
 import com.example.shikiflow.presentation.common.systemBarsVisibility
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(UnstableApi::class)
 @Composable
@@ -76,7 +77,7 @@ fun Player(
     val isLoading = player?.playbackState == Player.STATE_BUFFERING || episodeUiState.isLoading
 
     LaunchedEffect(showControls, playerState.isPlaying, isDropdownExpanded) {
-        delay(3000)
+        delay(3000.milliseconds)
         if (playerState.isPlaying && !isDropdownExpanded) {
             showControls = false
         }
@@ -91,6 +92,7 @@ fun Player(
         }
 
         lifecycleOwner.lifecycle.addObserver(observer)
+
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
         }

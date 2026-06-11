@@ -265,6 +265,7 @@
     <string name="details_short_info_manga_started">Started</string>
     <string name="details_short_info_airing_now">Airing Now</string>
     <string name="details_short_info_airing_in">Airing In</string>
+    <string name="details_short_info_airing_on">Airing On</string>
     <string name="details_related">Related</string>
     <string name="details_reviews_section_label">Reviews</string>
     <string name="media_details_following">Following</string>

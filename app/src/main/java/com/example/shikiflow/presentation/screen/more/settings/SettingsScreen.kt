@@ -9,7 +9,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.SheetValue
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -57,14 +58,14 @@ fun SettingsScreen(
     val settingsState by settingsViewModel.settingsState.collectAsStateWithLifecycle()
     val openCacheDialog = remember { mutableStateOf(false) }
     var showColorPickerBottomSheet by remember { mutableStateOf(false) }
+    var showLanguagesBottomSheet by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
     val bottomSheetConfig = remember { mutableStateOf<BottomSheetConfig?>(null) }
 
     val availableLocales = remember { context.getAvailableLocales() }
     var currentLocale by remember { mutableStateOf(LocaleUtils.getDefaultLocale()) }
-    var showLanguagesBottomSheet by remember { mutableStateOf(false) }
 
     if(openCacheDialog.value) {
         CustomDialog(
@@ -351,6 +352,7 @@ fun SettingsScreen(
 
         bottomSheetConfig.value?.let { config ->
             SettingsBottomSheet(
+                sheetState = sheetState,
                 title = config.title,
                 currentValue = config.currentValue,
                 options = config.options,

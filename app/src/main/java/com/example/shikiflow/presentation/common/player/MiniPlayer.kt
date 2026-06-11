@@ -54,6 +54,7 @@ import com.example.shikiflow.presentation.screen.main.details.anime.watch.player
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerSlider
 import com.example.shikiflow.presentation.viewmodel.anime.watch.episode.PlayerState
 import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 @Composable
 fun MiniPlayer(
@@ -110,7 +111,7 @@ fun MiniPlayer(
         while (playerState.isPlaying) {
             progress = exoPlayer.currentPosition
 
-            delay(500L)
+            delay(500L.milliseconds)
         }
     }
 

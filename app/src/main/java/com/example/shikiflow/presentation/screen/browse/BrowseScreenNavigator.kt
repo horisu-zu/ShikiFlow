@@ -51,7 +51,36 @@ fun BrowseScreenNavigator(
                     browseNavOptions = browseNavOptions
                 )
             }
-            entry<BrowseNavRoute.SideScreen> { route ->
+            entry<BrowseNavRoute.SideScreen>(
+                metadata = {
+                    NavDisplay.transitionSpec {
+                        slideInHorizontally(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            initialOffsetX = { it / 2 }
+                        ) togetherWith fadeOut(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    } + NavDisplay.popTransitionSpec {
+                        slideInHorizontally(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ) togetherWith fadeOut(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    }
+                }
+            ) { route ->
                 BrowseSideScreen(
                     browseType = route.browseType,
                     navOptions = browseNavOptions

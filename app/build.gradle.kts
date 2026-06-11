@@ -21,7 +21,7 @@ val versionProps = Properties().also {
 
 android {
     namespace = "com.example.shikiflow"
-    compileSdk = 36
+    compileSdk = 37
 
 
     androidResources {
@@ -53,7 +53,6 @@ android {
             versionNameSuffix = "-DEBUG"
             isDebuggable = true
             isMinifyEnabled = false
-            isShrinkResources = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -62,7 +61,7 @@ android {
         release {
             isDebuggable = false
             isMinifyEnabled = true
-            isShrinkResources = false
+            isShrinkResources = true
             isCrunchPngs = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -143,6 +142,7 @@ secrets {
 }
 
 dependencies {
+    ksp(libs.kotlin.metadata.jvm)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
