@@ -1,13 +1,16 @@
 package com.example.shikiflow.presentation.screen.browse.ongoings
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -214,8 +217,15 @@ private fun OngoingSideScreenContent(
             state = pagerState,
             modifier = Modifier.fillMaxSize()
         ) { page ->
+            val lazyGridState = rememberLazyGridState()
             val calendarItems = ongoingsCalendarViewModel.calendarItems[DayOfWeek.entries[page]]
                 ?.collectAsLazyPagingItems() ?: return@HorizontalPager
+
+            val columns by remember {
+                derivedStateOf {
+                    lazyGridState.layoutInfo.maxSpan.coerceAtLeast(1)
+                }
+            }
 
             when(calendarItems.loadState.refresh) {
                 is LoadState.Loading -> {
@@ -240,11 +250,14 @@ private fun OngoingSideScreenContent(
                     }
                 }
                 else -> {
-                    LazyColumn(
+                    LazyVerticalGrid(
+                        state = lazyGridState,
+                        columns = GridCells.Adaptive(minSize = 240.dp),
                         contentPadding = PaddingValues(
                             horizontal = 16.dp,
                             vertical = 8.dp
                         ),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(calendarItems.itemCount) { index ->
@@ -252,14 +265,14 @@ private fun OngoingSideScreenContent(
                                 AiringAnimeItem(
                                     airingAnime = airingAnime,
                                     titleType = preferredTitleType,
-                                    prevStatus = if(index > 0)
-                                        calendarItems.peek(index - 1)?.let { airingAnime ->
+                                    prevStatus = if(index >= columns)
+                                        calendarItems.peek(index - columns)?.let { airingAnime ->
                                             airingAnime.airingAt.status(
                                                 duration = airingAnime.data.duration ?: 30.minutes
                                             )
                                         } else null,
-                                    nextStatus = if(index < calendarItems.itemCount - 1)
-                                        calendarItems.peek(index + 1)
+                                    nextStatus = if(index < calendarItems.itemCount - columns)
+                                        calendarItems.peek(index + columns)
                                             ?.let { airingAnime ->
                                                 airingAnime.airingAt.status(
                                                     duration = airingAnime.data.duration ?: 30.minutes

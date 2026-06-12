@@ -7,8 +7,8 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
-import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
 import com.example.graphql.shikimori.AnimeBrowseQuery
 import com.example.graphql.shikimori.AnimeDetailsQuery
 import com.example.graphql.shikimori.MangaBrowseQuery
@@ -50,8 +50,13 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.DataResult
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 class ShikimoriMediaDataSource @Inject constructor(
@@ -206,44 +211,51 @@ class ShikimoriMediaDataSource @Inject constructor(
         }
     }
 
+    private val calendarMutex = Mutex()
+    private var cachedOngoingIds: List<Int>? = null
+
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun getAiringAnimes(
         onList: Boolean,
         airingAtGreater: Long,
         airingAtLesser: Long
     ): Flow<PagingData<AiringAnime>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 30,
-                enablePlaceholders = true,
-                prefetchDistance = 12,
-                initialLoadSize = 30
-            ),
-            pagingSourceFactory = {
-                AiringPagingSource(
-                    mediaDataSource = this,
-                    onList = onList,
-                    airingAtGreater = airingAtGreater,
-                    airingAtLesser = airingAtLesser
-                )
+        return flow {
+            val calendarIds = calendarMutex.withLock {
+                cachedOngoingIds
+                    ?: animeApi.getOngoingsCalendar()
+                        .mapNotNull { it.shikiAnime.id }
+                        .also { cachedOngoingIds = it }
             }
-        ).flow
+
+            emit(calendarIds)
+        }.flatMapLatest { ongoingsIds ->
+            Pager(
+                config = PagingConfig(
+                    pageSize = 30,
+                    enablePlaceholders = true,
+                    prefetchDistance = 12,
+                    initialLoadSize = 30
+                ),
+                pagingSourceFactory = {
+                    AiringPagingSource(
+                        method = { page, limit ->
+                            getAiringSchedule(ongoingsIds, page, limit)
+                        },
+                        onList = onList,
+                        airingAtGreater = airingAtGreater,
+                        airingAtLesser = airingAtLesser
+                    )
+                }
+            ).flow
+        }
     }
 
-    /**
-     * Main problem with the API Calendar method is
-     * the absence of media cover images and user rate statuses
-     */
-    override suspend fun getAiringSchedule(
+    suspend fun getAiringSchedule(
+        ongoingsIds: List<Int>,
         page: Int,
-        limit: Int,
-        onList: Boolean,
-        airingAtGreater: Long,
-        airingAtLesser: Long
+        limit: Int
     ): Result<List<AiringAnime>> {
-        val ongoingsIds = animeApi.getOngoingsCalendar().map { calendarAnime ->
-            calendarAnime.shikiAnime.id
-        }
-
         if((page - 1) * limit > ongoingsIds.size) return Result.success(emptyList())
 
         val pagedIds = ongoingsIds

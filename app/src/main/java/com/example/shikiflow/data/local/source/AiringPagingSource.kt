@@ -2,7 +2,6 @@ package com.example.shikiflow.data.local.source
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -16,7 +15,7 @@ import javax.inject.Inject
  * loading 2 pages per once is better UX (I think)
  */
 class AiringPagingSource @Inject constructor(
-    private val mediaDataSource: MediaDataSource,
+    private val method: suspend (page: Int, limit: Int) -> Result<List<AiringAnime>>,
     private val onList: Boolean,
     private val airingAtGreater: Long,
     private val airingAtLesser: Long
@@ -29,22 +28,10 @@ class AiringPagingSource @Inject constructor(
         return try {
             val (r1, r2) = coroutineScope {
                 val p1 = async {
-                    mediaDataSource.getAiringSchedule(
-                        page = page,
-                        limit = pageSize,
-                        onList = onList,
-                        airingAtGreater = airingAtGreater,
-                        airingAtLesser = airingAtLesser
-                    ).getOrThrow()
+                    method(page, pageSize).getOrThrow()
                 }
                 val p2 = async {
-                    mediaDataSource.getAiringSchedule(
-                        page = page + 1,
-                        limit = pageSize,
-                        onList = onList,
-                        airingAtGreater = airingAtGreater,
-                        airingAtLesser = airingAtLesser
-                    ).getOrThrow()
+                    method(page + 1, pageSize).getOrThrow()
                 }
 
                 p1.await() to p2.await()

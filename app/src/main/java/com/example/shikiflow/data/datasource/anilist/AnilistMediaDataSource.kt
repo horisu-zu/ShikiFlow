@@ -6,8 +6,8 @@ import androidx.paging.PagingData
 import androidx.paging.filter
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
-import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.AiringScheduleQuery
 import com.example.graphql.anilist.MediaBrowseQuery
 import com.example.graphql.anilist.MediaDetailsQuery
@@ -203,7 +203,7 @@ class AnilistMediaDataSource @Inject constructor(
             pagingSourceFactory = {
                 GenericPagingSource(
                     method = { page, limit ->
-                        getAiringSchedule(page, limit, onList, airingAtGreater, airingAtLesser)
+                        getAiringSchedule(page, limit, airingAtGreater, airingAtLesser)
                     }
                 )
             }
@@ -220,10 +220,9 @@ class AnilistMediaDataSource @Inject constructor(
         }
     }
 
-    override suspend fun getAiringSchedule(
+    suspend fun getAiringSchedule(
         page: Int,
         limit: Int,
-        onList: Boolean,
         airingAtGreater: Long,
         airingAtLesser: Long
     ): Result<List<AiringAnime>> {

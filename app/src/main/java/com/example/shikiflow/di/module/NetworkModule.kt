@@ -1,9 +1,9 @@
 package com.example.shikiflow.di.module
 
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.cache.normalized.api.MemoryCacheFactory
-import com.apollographql.apollo.cache.normalized.normalizedCache
 import com.apollographql.apollo.network.okHttpClient
+import com.apollographql.cache.normalized.memory.MemoryCacheFactory
+import com.example.graphql.anilist.cache.Cache.cache
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.di.annotations.GithubOkHttpClient
 import com.example.shikiflow.di.annotations.GithubRetrofit
@@ -181,7 +181,7 @@ class NetworkModule {
         return ApolloClient.Builder()
             .serverUrl("${BuildConfig.SHIKI_BASE_URL}/api/graphql")
             .okHttpClient(okHttpClient)
-            .normalizedCache(cacheFactory)
+            .cache(cacheFactory)
             .build()
     }
 
@@ -196,7 +196,7 @@ class NetworkModule {
         return ApolloClient.Builder()
             .serverUrl(BuildConfig.ANILIST_GRAPHQL_URL)
             .okHttpClient(okHttpClient)
-            .normalizedCache(cacheFactory)
+            .cache(cacheFactory)
             .httpExposeErrorBody(true)
             .build()
     }

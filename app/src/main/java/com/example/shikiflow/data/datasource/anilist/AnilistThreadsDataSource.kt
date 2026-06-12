@@ -1,8 +1,8 @@
 package com.example.shikiflow.data.datasource.anilist
 
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaThreadsQuery
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery

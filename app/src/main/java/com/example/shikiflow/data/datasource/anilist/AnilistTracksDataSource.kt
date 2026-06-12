@@ -3,8 +3,8 @@ package com.example.shikiflow.data.datasource.anilist
 import androidx.paging.ExperimentalPagingApi
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
-import com.apollographql.apollo.cache.normalized.FetchPolicy
-import com.apollographql.apollo.cache.normalized.fetchPolicy
+import com.apollographql.cache.normalized.FetchPolicy
+import com.apollographql.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.DeleteUserRateMutation
 import com.example.graphql.anilist.MediaListCollectionQuery
 import com.example.graphql.anilist.MediaListEntryShortQuery

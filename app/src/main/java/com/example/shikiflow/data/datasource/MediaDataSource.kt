@@ -45,14 +45,6 @@ interface MediaDataSource {
         airingAtLesser: Long
     ): Flow<PagingData<AiringAnime>>
 
-    suspend fun getAiringSchedule(
-        page: Int,
-        limit: Int,
-        onList: Boolean,
-        airingAtGreater: Long,
-        airingAtLesser: Long
-    ): Result<List<AiringAnime>>
-
     fun getSimilarMedia(mediaType: MediaType, mediaId: Int): Flow<PagingData<BrowseMedia>>
 
     suspend fun loadMediaRecommendations(

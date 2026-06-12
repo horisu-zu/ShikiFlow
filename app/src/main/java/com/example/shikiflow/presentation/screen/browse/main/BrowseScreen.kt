@@ -21,7 +21,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -434,10 +433,7 @@ private fun OngoingTitleComponent(
 
         IconButton(
             onClick = { onSettingClick() },
-            shape = RoundedCornerShape(percent = 24),
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
-            )
+            shape = RoundedCornerShape(percent = 24)
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_sort),

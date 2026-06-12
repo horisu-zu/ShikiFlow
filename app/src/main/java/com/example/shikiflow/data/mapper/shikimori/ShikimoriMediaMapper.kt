@@ -89,13 +89,13 @@ object ShikimoriMediaMapper {
                 ?.sortByRole() ?: emptyList(),
             durationMins = duration,
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
-            scoreStats = scoresStats?.map { (score, count) ->
+            scoreStats = scoresStats?.map { (_, score, count) ->
                 Stat(
                     type = score,
                     value = count.toFloat()
                 )
             }?.sortedBy { it.type }.orEmpty(),
-            statusesStats = statusesStats?.map { (status, count) ->
+            statusesStats = statusesStats?.map { (_, status, count) ->
                 Stat(
                     type = status.toDomain(),
                     value = count.toFloat()
@@ -160,13 +160,13 @@ object ShikimoriMediaMapper {
             relatedMedia = related?.map { it.relatedMediaShort.toDomain() } ?: emptyList(),
             staffList = personRoles?.map { it.personRoleShort.toDomain() }
                 ?.sortByRole() ?: emptyList(),
-            scoreStats = scoresStats?.map { (score, count) ->
+            scoreStats = scoresStats?.map { (_, score, count) ->
                 Stat(
                     type = score,
                     value = count.toFloat()
                 )
             }?.sortedBy { it.type }.orEmpty(),
-            statusesStats = statusesStats?.map { (status, count) ->
+            statusesStats = statusesStats?.map { (_, status, count) ->
                 Stat(
                     type = status.toDomain(),
                     value = count.toFloat()

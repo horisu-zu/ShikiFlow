@@ -67,21 +67,7 @@ object AnilistThreadsMapper {
         )
     }
     
-    /*fun AnilistThreadHeader.toDomain(): ALThreadHeader {
-        return ALThreadHeader(
-            id = id,
-            commentBody = body ?: "",
-            dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
-            sender = user?.aLUserShort?.toDomain(),
-            title = title,
-            viewCount = viewCount ?: 0,
-            replyCount = replyCount ?: 0
-        )
-    }*/
-    
     fun TopicCommentsQuery.ThreadComment.toDomain(): ALComment {
-        Log.d("AnilistThreadsMapper", "ChildComments: $childComments")
-        Log.d("AnilistThreadsMapper", "Comment: $this")
         return ALComment(
             id = id,
             commentBody = comment ?: "",
@@ -160,13 +146,16 @@ object AnilistThreadsMapper {
                             avatar = (userMap["avatar"] as? Map<*, *>)?.let { avatarMap ->
                                 TopicCommentsQuery.Avatar(
                                     large = avatarMap["large"] as? String,
-                                    medium = avatarMap["medium"] as? String
+                                    medium = avatarMap["medium"] as? String,
+                                    __typename = ""
                                 )
-                            }
+                            },
+                            __typename = ""
                         )
                     },
                     childComments = map["childComments"],
-                    likeCount = (map["likeCount"] as? Number)?.toInt() ?: 0
+                    likeCount = (map["likeCount"] as? Number)?.toInt() ?: 0,
+                    __typename = ""
                 )
             }
         } catch (e: Exception) {

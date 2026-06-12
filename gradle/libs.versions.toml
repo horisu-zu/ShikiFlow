@@ -1,6 +1,7 @@
 [versions]
 agp = "9.2.1"
 apollo = "5.0.0"
+apollo-cache = "1.0.3"
 appcompat = "1.7.1"
 material3 = "1.5.0-alpha21"
 material-icons = "1.7.8"
@@ -87,7 +88,8 @@ retrofit-kotlinx-serialization = { group = "com.squareup.retrofit2", name = "con
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "hilt" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-apollo-normalized-cache = { group = "com.apollographql.apollo", name = "apollo-normalized-cache", version.ref = "apollo" }
+apollo-normalized-cache = { group = "com.apollographql.cache", name = "normalized-cache", version.ref = "apollo-cache" }
+apollo-normalized-cache-plugin = { group = "com.apollographql.cache", name = "normalized-cache-apollo-compiler-plugin", version.ref = "apollo-cache" }
 apollo-runtime = { module = "com.apollographql.apollo:apollo-runtime", version.ref = "apollo"}
 zoomable = { group = "net.engawapg.lib", name = "zoomable", version.ref = "zoomable" }
 androidx-lifecycle-viewmodel-navigation3-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-navigation3-android", version.ref = "lifecycleViewmodelNavigation3Android" }

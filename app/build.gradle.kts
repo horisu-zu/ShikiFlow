@@ -114,6 +114,8 @@ apollo {
         schemaFile.set(file("src/main/graphql/shikimori/schema.graphql"))
         srcDir("src/main/graphql/shikimori/sources")
         generateKotlinModels.set(true)
+        plugin(libs.apollo.normalized.cache.plugin)
+        pluginArgument("com.apollographql.cache.packageName", packageName.get())
     }
     service("anilist-api") {
         packageName.set("$graphQLPackageName.anilist")
@@ -125,6 +127,8 @@ apollo {
             "$appPackageName.data.datasource.dto.anilist.CountryOfOriginDto",
             "$appPackageName.data.datasource.dto.anilist.CountryOfOriginDto.countryOfOriginAdapter"
         )
+        plugin(libs.apollo.normalized.cache.plugin)
+        pluginArgument("com.apollographql.cache.packageName", packageName.get())
     }
 }
 

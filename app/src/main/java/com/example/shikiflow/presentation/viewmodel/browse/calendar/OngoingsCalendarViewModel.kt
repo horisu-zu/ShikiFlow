@@ -35,11 +35,11 @@ class OngoingsCalendarViewModel @Inject constructor(
             .distinctUntilChanged()
             .flatMapLatest { params ->
                 val start = now.thisWeekdayTimestamp(
-                    dayOfWeek = params.currentDay!!,
+                    dayOfWeek = dayOfWeek,
                     isEndOfDay = false
                 )
                 val end = now.thisWeekdayTimestamp(
-                    dayOfWeek = params.currentDay,
+                    dayOfWeek = dayOfWeek,
                     isEndOfDay = true
                 )
 
