@@ -3,7 +3,7 @@ package com.example.shikiflow.di.module
 import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
-import com.example.shikiflow.data.repository.GithubRepositoryImpl
+import com.example.shikiflow.data.repository.ReleaseRepositoryImpl
 import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MediaRepositoryImpl
@@ -13,7 +13,7 @@ import com.example.shikiflow.data.repository.UserRepositoryImpl
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
-import com.example.shikiflow.domain.repository.GithubRepository
+import com.example.shikiflow.domain.repository.ReleaseRepository
 import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MediaRepository
@@ -81,8 +81,8 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindGithubRepository(
-        impl: GithubRepositoryImpl
-    ): GithubRepository
+        impl: ReleaseRepositoryImpl
+    ): ReleaseRepository
 
     @Binds
     @Singleton

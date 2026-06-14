@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Refresh
@@ -28,24 +30,20 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.presentation.viewmodel.more.about.AboutUiState
+import com.example.shikiflow.presentation.viewmodel.more.about.CheckUpdateState
 
 @Composable
 fun CheckUpdateSection(
     uiState: AboutUiState,
     onButtonClick: () -> Unit,
-    onDownloadClick: (String) -> Unit,
+    onDownloadClick: (String, String) -> Unit,
     onShowBottomSheet: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val latestVersion = uiState.latestRelease
-    val isLatest = if (latestVersion == null) { true } else {
-        "v${uiState.currentRelease.tagName}" == latestVersion.tagName
-    }
-
     AnimatedContent(
-        targetState = isLatest,
+        targetState = uiState.checkUpdateState is CheckUpdateState.UpdateAvailable,
         transitionSpec = {
-            expandVertically(
+            fadeIn() + expandVertically(
                 animationSpec = spring(
                     dampingRatio = Spring.DampingRatioNoBouncy,
                     stiffness = Spring.StiffnessMediumLow
@@ -59,7 +57,7 @@ fun CheckUpdateSection(
         },
         modifier = modifier
     ) { targetState ->
-        if(!targetState) {
+        if(targetState) {
             uiState.latestRelease?.let { latestRelease ->
                 LatestReleaseItem(
                     latestRelease = latestRelease,
@@ -91,6 +89,7 @@ private fun CheckUpdateButton(
             containerColor = MaterialTheme.colorScheme.background,
             contentColor = MaterialTheme.colorScheme.primary
         ),
+        shape = RoundedCornerShape(percent = 32),
         onClick = onButtonClick
     ) {
         Row(
@@ -112,29 +111,26 @@ private fun CheckUpdateButton(
                     style = MaterialTheme.typography.bodyMedium
                 )
             } else {
-                when(uiState.latestRelease) {
-                    null -> {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.about_check_updates),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
-                    else -> {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = null,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        Text(
-                            text = stringResource(R.string.about_latest_version),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    }
+                if (uiState.latestRelease != null && uiState.checkUpdateState is CheckUpdateState.UpToDate) {
+                    Icon(
+                        imageVector = Icons.Default.Check,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.about_latest_version),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                } else if (uiState.latestRelease == null) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text(
+                        text = stringResource(R.string.about_check_updates),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
         }

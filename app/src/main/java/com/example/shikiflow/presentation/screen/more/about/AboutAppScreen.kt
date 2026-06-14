@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.about
 
-import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -52,8 +51,9 @@ fun AboutAppScreen(
             CheckUpdateSection(
                 uiState = uiState,
                 onButtonClick = { aboutViewModel.checkForUpdates() },
-                onDownloadClick = { url ->
-                    WebIntent.openUrlCustomTab(context, url)
+                onDownloadClick = { fileName, url ->
+                    aboutViewModel.downloadRelease(fileName, url)
+                    showBottomSheet.value = true
                 },
                 onShowBottomSheet = { showBottomSheet.value = true }
             )
@@ -93,17 +93,10 @@ fun AboutAppScreen(
             ReleaseNotesBottomSheet(
                 currentVersion = uiState.currentRelease.tagName,
                 release = release,
+                updateState = uiState.updateState,
+                autoInstall = uiState.autoInstall,
                 onDismiss = { showBottomSheet.value = false },
-                onDownloadReleaseClick = {
-                    WebIntent.openUrlCustomTab(
-                        context = context,
-                        url = (
-                                release.assets.firstOrNull { asset ->
-                                    asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
-                                } ?: release.assets.first()
-                                ).downloadUrl
-                    )
-                }
+                event = aboutViewModel
             )
         }
     }

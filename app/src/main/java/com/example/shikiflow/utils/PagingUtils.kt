@@ -4,16 +4,16 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 
 object PagingUtils {
-    fun <T: Any> LazyPagingItems<T>.isInitialLoad(): Boolean {
+    fun <T: Any> LazyPagingItems<T>.isLoading(): Boolean {
         return loadState.refresh is LoadState.Loading ||
             (
                 loadState.refresh is LoadState.NotLoading &&
                 !loadState.append.endOfPaginationReached &&
-                this.itemCount == 0
+                itemCount == 0
             )
     }
 
     fun <T: Any> LazyPagingItems<T>.fetched(): Boolean {
-        return loadState.append.endOfPaginationReached || this.itemCount > 0
+        return loadState.append.endOfPaginationReached || itemCount > 0
     }
 }

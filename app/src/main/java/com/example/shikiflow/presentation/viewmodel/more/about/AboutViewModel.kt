@@ -2,12 +2,13 @@ package com.example.shikiflow.presentation.viewmodel.more.about
 
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.BuildConfig
-import com.example.shikiflow.domain.repository.GithubRepository
+import com.example.shikiflow.domain.repository.ReleaseRepository
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -18,8 +19,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class AboutViewModel @Inject constructor(
-    private val githubRepository: GithubRepository
-): UiStateViewModel<AboutUiState>() {
+    private val releaseRepository: ReleaseRepository
+): UiStateViewModel<AboutUiState>(), AboutEvent {
 
     override val initialState: AboutUiState = AboutUiState()
 
@@ -30,7 +31,7 @@ class AboutViewModel @Inject constructor(
             }
             .distinctUntilChanged()
             .flatMapLatest {
-                githubRepository.getLatestRelease(
+                releaseRepository.getLatestRelease(
                     owner = BuildConfig.OWNER,
                     repo = BuildConfig.REPO
                 )
@@ -48,42 +49,66 @@ class AboutViewModel @Inject constructor(
                     }
                 }
             }.launchIn(viewModelScope)
+
+        mutableUiState
+            .filter { state ->
+                state.latestRelease != null
+            }
+            .distinctUntilChanged { old, new ->
+                old.latestRelease == new.latestRelease
+            }
+            .onEach {
+                mutableUiState.update { state ->
+                    if("v${state.currentRelease.tagName}" == state.latestRelease?.tagName) {
+                        state.copy(
+                            checkUpdateState = CheckUpdateState.UpToDate
+                        )
+                    } else {
+                        state.copy(
+                            checkUpdateState = CheckUpdateState.UpdateAvailable
+                        )
+                    }
+                }
+            }.launchIn(viewModelScope)
+
+        mutableUiState
+            .filter { state ->
+                state.updateState is UpdateState.Completed
+            }
+            .distinctUntilChangedBy { state -> state.updateState }
+            .onEach { state ->
+                if(state.updateState is UpdateState.Completed && state.autoInstall) {
+                    installRelease(state.updateState.fileName)
+                }
+            }.launchIn(viewModelScope)
     }
 
-    fun checkForUpdates() {
+    override fun checkForUpdates() {
         mutableUiState.update { state ->
             state.copy(isLoading = true)
         }
     }
 
-    /*fun getLocalVersion() {
-        viewModelScope.launch {
-            if(_currentVersion.value is Resource.Success) return@launch
-
-            try {
-                _currentVersion.value = Resource.Loading()
-
-                val currentLocalVersion = githubRepository.getLatestLocalVersion(
-                    versionTag = BuildConfig.VERSION_NAME
-                )
-
-                val version = currentLocalVersion ?: run {
-                    githubRepository.getReleaseByVersion(
-                        owner = BuildConfig.OWNER,
-                        repo = BuildConfig.REPO,
-                        versionTag = BuildConfig.VERSION_NAME
-                    ).also { release ->
-                        release?.let {
-                            githubRepository.saveLocalVersion(release)
-                        }
-                    }
+    override fun downloadRelease(fileName: String, url: String) {
+        releaseRepository.downloadRelease(url, fileName)
+            .onEach { state ->
+                mutableUiState.update { uiState ->
+                    uiState.copy(
+                        updateState = state
+                    )
                 }
+            }.launchIn(viewModelScope)
+    }
 
-                _currentVersion.value = Resource.Success(version)
-            } catch (e: Exception) {
-                Log.e("AboutViewModel", "Error: ${e.message}")
-                _currentVersion.value = Resource.Error("Error: ${e.message}")
-            }
+    override fun installRelease(fileName: String) {
+        releaseRepository.installRelease(fileName)
+    }
+
+    override fun setAutoInstall(autoInstall: Boolean) {
+        mutableUiState.update { state ->
+            state.copy(
+                autoInstall = autoInstall
+            )
         }
-    }*/
+    }
 }

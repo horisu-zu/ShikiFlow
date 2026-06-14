@@ -1,26 +1,23 @@
 package com.example.shikiflow.domain.repository
 
 import com.example.shikiflow.domain.model.common.GithubRelease
+import com.example.shikiflow.presentation.viewmodel.more.about.UpdateState
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 
-interface GithubRepository {
-    suspend fun getLatestRelease(
+interface ReleaseRepository {
+    fun getLatestRelease(
         owner: String,
         repo: String
     ): Flow<DataResult<GithubRelease>>
 
-    suspend fun getReleaseByVersion(
+    fun getReleaseByVersion(
         owner: String,
         repo: String,
         versionTag: String
     ): Flow<DataResult<GithubRelease>>
 
-    /*suspend fun getLatestLocalVersion(
-        versionTag: String
-    ): GithubRelease?
+    fun downloadRelease(url: String, fileName: String): Flow<UpdateState>
 
-    suspend fun saveLocalVersion(
-        githubRelease: GithubRelease
-    )*/
+    fun installRelease(fileName: String)
 }

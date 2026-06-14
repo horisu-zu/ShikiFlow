@@ -252,7 +252,7 @@ private fun OngoingSideScreenContent(
                 else -> {
                     LazyVerticalGrid(
                         state = lazyGridState,
-                        columns = GridCells.Adaptive(minSize = 240.dp),
+                        columns = GridCells.Adaptive(minSize = 320.dp),
                         contentPadding = PaddingValues(
                             horizontal = 16.dp,
                             vertical = 8.dp

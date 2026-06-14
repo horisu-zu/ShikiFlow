@@ -41,7 +41,7 @@ import com.example.shikiflow.presentation.viewmodel.anime.tracks.AnimeTracksView
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.utils.PagingUtils.fetched
-import com.example.shikiflow.utils.PagingUtils.isInitialLoad
+import com.example.shikiflow.utils.PagingUtils.isLoading
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +79,7 @@ fun AnimeTracksPage(
             }
             else -> {
                 PullToRefreshCustomBox(
-                    isRefreshing = animeTrackItems.loadState.refresh is LoadState.Loading,
+                    isRefreshing = false,
                     enabled = isAppBarVisible,
                     onRefresh = { animeTrackItems.refresh() }
                 ) {
@@ -175,7 +175,11 @@ private fun AnimeTracksListComponent(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         trackItems.apply {
-            if (trackItems.fetched()) {
+            if (trackItems.isLoading()) {
+                items(count = 12) { index ->
+                    AnimeTrackItemPlaceholder(index)
+                }
+            } else if (trackItems.fetched()) {
                 items(
                     count = trackItems.itemCount,
                     key = trackItems.itemKey { it.track.id }
@@ -189,10 +193,6 @@ private fun AnimeTracksListComponent(
                         onLongClick = { onLongClick(item) },
                         modifier = Modifier.animateItem()
                     )
-                }
-            } else if (trackItems.isInitialLoad()) {
-                items(count = 12) { index ->
-                    AnimeTrackItemPlaceholder(index)
                 }
             }
 
@@ -250,7 +250,11 @@ private fun AnimeTracksGridComponent(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         trackItems.apply {
-            if (trackItems.fetched()) {
+            if (trackItems.isLoading()) {
+                items(count = 12) {
+                    AnimeTrackGridItemPlaceholder()
+                }
+            } else if (trackItems.fetched()) {
                 items(
                     count = trackItems.itemCount,
                     key = trackItems.itemKey { it.track.id }
@@ -264,10 +268,6 @@ private fun AnimeTracksGridComponent(
                         onLongClick = { onLongClick(trackItem) },
                         modifier = Modifier.animateItem()
                     )
-                }
-            } else if (trackItems.isInitialLoad()) {
-                items(count = 12) {
-                    AnimeTrackGridItemPlaceholder()
                 }
             }
 

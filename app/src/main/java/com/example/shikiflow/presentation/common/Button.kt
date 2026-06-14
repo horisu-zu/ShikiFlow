@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,7 +30,8 @@ fun Button(
     label: String = "Confirm operation",
     containerColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
     onClick: () -> Unit,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    shape: Shape = RoundedCornerShape(8.dp)
 ) {
     val styleState = remember { MutableStyleState(null) }
 
@@ -45,7 +47,7 @@ fun Button(
         ),
         border = if (enabled) BorderStroke(0.dp, Color.Transparent) else
             BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
-        shape = RoundedCornerShape(8.dp)
+        shape = shape
     ) {
         icon?.let {
             icon.toIcon(

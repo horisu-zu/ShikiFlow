@@ -188,6 +188,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
+    implementation(libs.coil.svg)
 
     //Paging3
     implementation(libs.androidx.paging.compose)
@@ -216,6 +217,7 @@ dependencies {
     implementation(libs.androidx.media3.ui)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.exoplayer.hls)
+    implementation(libs.androidx.media3.datasource.okhttp)
     //implementation(libs.androidx.media3.media.session)
 
     //Pager Indicator

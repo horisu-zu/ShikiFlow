@@ -32,7 +32,7 @@ import com.example.shikiflow.domain.model.common.GithubRelease
 @Composable
 fun LatestReleaseItem(
     latestRelease: GithubRelease,
-    onDownloadClick: (String) -> Unit,
+    onDownloadClick: (String, String) -> Unit,
     showBottomSheet: () -> Unit,
     modifier: Modifier
 ) {
@@ -73,7 +73,8 @@ fun LatestReleaseItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End)
         ) {
             TextButton(
-                onClick = { showBottomSheet() }
+                onClick = { showBottomSheet() },
+                shape = RoundedCornerShape(percent = 32)
             ) {
                 Text(
                     text = stringResource(R.string.update_release_notes),
@@ -83,18 +84,20 @@ fun LatestReleaseItem(
 
             Button(
                 onClick = {
+                    val asset = latestRelease.assets.firstOrNull { asset ->
+                        asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
+                    } ?: latestRelease.assets.first()
+
                     onDownloadClick(
-                        (
-                            latestRelease.assets.firstOrNull { asset ->
-                                asset.releaseName.contains(Build.SUPPORTED_ABIS.first())
-                            } ?: latestRelease.assets.first()
-                        ).downloadUrl
+                        asset.releaseName,
+                        asset.downloadUrl
                     )
                 },
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.secondary,
                     contentColor = MaterialTheme.colorScheme.onSecondary
-                )
+                ),
+                shape = RoundedCornerShape(percent = 32)
             ) {
                 Text(
                     text = stringResource(R.string.update_download),

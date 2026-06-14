@@ -171,7 +171,9 @@
     <string name="release_notes_latest_version">Остання версія: %1$s</string>
     <string name="release_notes_release_date">Дата випуску: %1$s</string>
     <string name="release_notes_update_size">Розмір</string>
+    <string name="release_notes_updating">Оновлення завантажується…</string>
 
+    <string name="release_notes_install_update">Встановити оновлення</string>
     <string name="profile_screen_empty">Профіль %1$s пустий</string>
     <string name="more_profile_compare">Порівняти</string>
     <string name="activity_planned">Заплановано</string>
@@ -921,4 +923,5 @@
     <string name="media_tag_yuri">Юрі</string>
     <string name="media_tag_zombie">Зомбі</string>
     <string name="genre_girls_love">Шоджо-ай</string>
+    <string name="release_notes_auto_install_label">Автоматично встановити після завершення завантаження</string>
 </resources>
