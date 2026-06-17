@@ -17,7 +17,9 @@ class MediaTracksWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         return try {
-            mediaTracksRepository.syncTracks()
+            val userId = workerParams.inputData.getInt("userId", -1)
+
+            mediaTracksRepository.syncTracks(userId)
             Result.success()
         } catch (e: Exception) {
             e.printStackTrace()

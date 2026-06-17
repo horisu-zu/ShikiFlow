@@ -62,7 +62,7 @@ class ShikimoriTracksDataSource @Inject constructor(
 
                     response.data?.userRates?.map { userRate ->
                         userRate.animeUserRateWithModel.toMediaDomain()
-                    } ?: emptyList()
+                    } ?: throw Exception("Failed to fetch anime tracks for user $userId")
                 }
                 MediaType.MANGA -> {
                     val query = MangaTracksQuery(
@@ -77,7 +77,7 @@ class ShikimoriTracksDataSource @Inject constructor(
 
                     response.data?.userRates?.map { userRate ->
                         userRate.mangaUserRateWithModel.toMediaDomain()
-                    } ?: emptyList()
+                    } ?: throw Exception("Failed to fetch manga tracks for user $userId")
                 }
             }
 

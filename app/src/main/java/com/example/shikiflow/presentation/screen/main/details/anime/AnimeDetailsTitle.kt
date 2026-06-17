@@ -153,7 +153,7 @@ fun AnimeDetailsTitle(
                         )
                     }
                     item {
-                        if(animeDetails.totalCount == 1 && animeDetails.durationMins != null) {
+                        if(animeDetails.totalCount == 1 && animeDetails.durationMins != null && animeDetails.durationMins != 0) {
                             val (hours, minutes) = animeDetails.durationMins.calculateDuration()
 
                             ShortInfoItem(

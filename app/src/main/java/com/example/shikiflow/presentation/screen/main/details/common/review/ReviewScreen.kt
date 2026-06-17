@@ -20,7 +20,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -147,7 +147,7 @@ private fun ReviewHeader(
     modifier: Modifier = Modifier
 ) {
     val titleType = LocalTitleTypeController.current
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
     val windowSize by remember(windowSizeClass) {
         derivedStateOf {
             WindowSize.from(windowSizeClass)

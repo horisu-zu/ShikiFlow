@@ -7,6 +7,7 @@ import com.apollographql.apollo.exception.CacheMissException
 import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
@@ -78,7 +79,9 @@ abstract class BaseNetworkRepository {
 
                 else -> DataResult.Loading
             }
-        }.onStart { emit(DataResult.Loading) }
+        }
+        .onStart { emit(DataResult.Loading) }
+        .catch { emit(DataResult.Error(message = it.message ?: "Unknown Error")) }
 
     fun <T : Operation.Data> ApolloResponse<T>.toResult(): Result<T> {
         if (hasErrors()) {

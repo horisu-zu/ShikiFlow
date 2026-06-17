@@ -63,6 +63,7 @@ fun SettingsScreen(
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
     val bottomSheetConfig = remember { mutableStateOf<BottomSheetConfig?>(null) }
+    var selectedTracker by remember { mutableStateOf<AuthType?>(null) }
 
     val availableLocales = remember { context.getAvailableLocales() }
     var currentLocale by remember { mutableStateOf(LocaleUtils.getDefaultLocale()) }
@@ -111,10 +112,10 @@ fun SettingsScreen(
                             currentAuthType = settingsState.authType,
                             serviceUpdateState = settingsState.settings.serviceUpdateState,
                             connectedServicesMap = settingsState.connectedServices,
-                            onServiceClick = { authType, connectedUser ->
-                                when(connectedUser) {
+                            onServiceClick = { authType, isConnected ->
+                                when(isConnected) {
                                     true -> {
-                                        settingsViewModel.clearUserData(authType)
+                                        selectedTracker = authType
                                     }
                                     false -> {
                                         val authUrl = settingsViewModel.getAuthorizationUrl(authType)
@@ -382,6 +383,18 @@ fun SettingsScreen(
                 },
                 onDismiss = { showLanguagesBottomSheet = false }
             )
+        }
+
+        selectedTracker?.let { authType ->
+            settingsState.connectedServices[authType]?.let { serviceUser ->
+                TrackerUserBottomSheet(
+                    authType = authType,
+                    user = serviceUser,
+                    onSwitch = { settingsViewModel.setAuthType(authType, serviceUser.id) },
+                    onLogout = { settingsViewModel.clearUserData(authType) },
+                    onDismiss = { selectedTracker = null }
+                )
+            }
         }
     }
 }

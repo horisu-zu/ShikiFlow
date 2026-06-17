@@ -31,10 +31,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.CheckboxItem
+import com.example.shikiflow.presentation.common.TextWithIcon
+import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.iconResource
 import com.example.shikiflow.utils.FlagConverter
 
 data class BottomSheetConfig(
@@ -150,6 +160,91 @@ fun LanguagesBottomSheet(
                         onSave(currentLanguages)
                     },
                     modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TrackerUserBottomSheet(
+    authType: AuthType,
+    user: User,
+    onSwitch: () -> Unit,
+    onLogout: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    ModalBottomSheet(
+        onDismissRequest = onDismiss
+    ) {
+        (LocalView.current.parent as? DialogWindowProvider)?.window?.let { window ->
+            LaunchedEffect(Unit) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    window.isNavigationBarContrastEnforced = false
+                }
+            }
+        }
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                BaseImage(
+                    model = user.avatarUrl,
+                    imageType = ImageType.Square(
+                        width = 64.dp,
+                        shape = RoundedCornerShape(percent = 24)
+                    )
+                )
+
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom)
+                ) {
+                    TextWithIcon(
+                        text = stringResource(authType.displayValue()),
+                        iconResources = listOf(authType.iconResource()),
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                        )
+                    )
+                    Text(
+                        text = user.nickname,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Button(
+                    label = "Switch Account",
+                    onClick = onSwitch,
+                    shape = RoundedCornerShape(percent = 24),
+                    modifier = Modifier.weight(1f)
+                )
+                Button(
+                    label = "Log Out",
+                    onClick = onLogout,
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    shape = RoundedCornerShape(percent = 24),
+                    modifier = Modifier.weight(1f)
                 )
             }
         }

@@ -73,12 +73,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
     }
 
-    override suspend fun syncTracks() {
-        val userId = settingsRepository.userFlow
-            .filterNotNull()
-            .first()
-            .id
-
+    override suspend fun syncTracks(userId: Int) {
         withSourceSuspend(dataSource) { dataSource ->
             val allTracks = coroutineScope {
                 val animeTracks = async { dataSource.getTracksLibrary(userId, MediaType.ANIME) }
@@ -95,6 +90,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
             }
 
             appRoomDatabase.withTransaction {
+                appRoomDatabase.clearAllTables()
                 mediaTracksDao.insertTracks(tracks)
                 mediaTracksDao.insertItems(items)
             }

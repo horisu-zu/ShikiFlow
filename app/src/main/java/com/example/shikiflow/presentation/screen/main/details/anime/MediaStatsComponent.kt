@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -48,7 +48,7 @@ fun MediaStatsComponent(
     modifier: Modifier = Modifier
 ) {
     val barHorizontalPadding = 12.dp
-    val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
 
     val windowSize by remember(windowSizeClass) {
         derivedStateOf {

@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 interface MediaTracksRepository {
     fun getLocalTrack(id: Int, mediaType: MediaType): Flow<MediaTrack?>
 
-    suspend fun syncTracks()
+    suspend fun syncTracks(userId: Int)
 
     fun getMediaTracks(
         status: UserRateStatus,

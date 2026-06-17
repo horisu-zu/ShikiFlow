@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.screen
 
 import android.content.res.Configuration
-import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -22,7 +21,7 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
@@ -47,7 +46,6 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
-import com.example.shikiflow.presentation.screen.BottomNavItem.Companion.isBottomNavItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavRoute
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
@@ -64,7 +62,7 @@ fun MainNavigator(
     onMoveToBack: () -> Unit
 ) {
     val configuration = LocalConfiguration.current
-    val adaptiveInfo = currentWindowAdaptiveInfo()
+    val adaptiveInfo = currentWindowAdaptiveInfoV2()
 
     val items = BottomNavItem.items
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Main)
@@ -144,48 +142,32 @@ fun MainNavigator(
         ) {
             NavDisplay(
                 backStack = mainNavBackStack,
-                onBack = {
-                    if(mainNavBackStack.last().isBottomNavItem()) {
-                        onMoveToBack()
-                    } else {
-                        mainNavBackStack.removeLastOrNull()
-                    }
-                },
+                onBack = { onMoveToBack() },
                 entryProvider = entryProvider {
-                    entry<MainNavRoute.Main>(
-                        metadata = BottomNavItem.topNavigationTransitionSpec
-                    ) {
+                    entry<MainNavRoute.Main> {
                         MainScreenNavigator(
                             mainScreenBackStack = mainScreenBackStack
                         )
                     }
-                    entry<MainNavRoute.Browse>(
-                        metadata = BottomNavItem.topNavigationTransitionSpec
-                    ) {
+                    entry<MainNavRoute.Browse> {
                         BrowseScreenNavigator(
                             browseBackStack = browseBackStack
                         )
                     }
-                    entry<MainNavRoute.Profile>(
-                        metadata = BottomNavItem.topNavigationTransitionSpec
-                    ) {
+                    entry<MainNavRoute.Profile> {
                         ProfileNavigator(
                             profileBackstack = profileBackstack
                         )
                     }
                 },
                 transitionSpec = {
-                    fadeIn(
+                    slideInVertically(
+                        initialOffsetY = { it / 2 },
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessLow
+                            stiffness = Spring.StiffnessMediumLow
                         )
-                    ) togetherWith fadeOut(
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioNoBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    )
+                    ) + fadeIn() togetherWith  ExitTransition.None
                 },
                 popTransitionSpec = {
                     fadeIn(
@@ -253,21 +235,5 @@ sealed class BottomNavItem(
 
     companion object {
         val items = listOf(Main, Browse, Profile)
-
-        fun NavKey.isBottomNavItem() = items.any { it.route == this }
-
-        val topNavigationTransitionSpec = NavDisplay.transitionSpec {
-            slideInVertically(
-                initialOffsetY = { it / 2 },
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            ) + fadeIn() togetherWith  ExitTransition.None
-        } + NavDisplay.popTransitionSpec {
-            EnterTransition.None togetherWith fadeOut()
-        } + NavDisplay.predictivePopTransitionSpec {
-            EnterTransition.None togetherWith fadeOut()
-        }
     }
 }

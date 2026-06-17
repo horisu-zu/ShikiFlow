@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -504,8 +505,7 @@ private fun TrackerServiceItem(
             text = stringResource(authType.displayValue()),
             style = MaterialTheme.typography.labelLarge,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f)
+            overflow = TextOverflow.Ellipsis
         )
 
         AnimatedContent(
@@ -522,8 +522,12 @@ private fun TrackerServiceItem(
                         dampingRatio = Spring.DampingRatioNoBouncy,
                         stiffness = Spring.StiffnessMediumLow
                     )
-                ) using SizeTransform(clip = false)
-            }
+                ) using SizeTransform(
+                    clip = false,
+                    sizeAnimationSpec = { _, _ -> snap() }
+                )
+            },
+            modifier = Modifier.weight(1f)
         ) { targetUser ->
             if(targetUser != null) {
                 TrackerUserItem(targetUser)
@@ -546,7 +550,8 @@ private fun TrackerUserItem(
             text = user.nickname,
             style = MaterialTheme.typography.labelMedium,
             maxLines = 1,
-            overflow = TextOverflow.Ellipsis
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false)
         )
 
         BaseImage(

@@ -46,7 +46,7 @@ class MainViewModel @Inject constructor(
         }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Lazily,
             initialValue = AuthState.Loading
         )
 
@@ -86,7 +86,9 @@ class MainViewModel @Inject constructor(
                             is DataResult.Success -> {
                                 settingsRepository.saveUserData(result.data, type)
 
-                                mediaTracksScheduler.scheduleSyncs()
+                                if(currentAuthType == null) {
+                                    mediaTracksScheduler.scheduleSyncs(result.data.id)
+                                }
                             }
                         }
                     }
@@ -96,8 +98,8 @@ class MainViewModel @Inject constructor(
 }
 
 sealed interface AuthState {
-    object Initial : AuthState
-    object Loading : AuthState
-    object Success : AuthState
+    data object Initial : AuthState
+    data object Loading : AuthState
+    data object Success : AuthState
     data class Error(val message: String) : AuthState
 }

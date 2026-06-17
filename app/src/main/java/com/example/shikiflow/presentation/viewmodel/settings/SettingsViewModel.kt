@@ -12,15 +12,16 @@ import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.ThemeMode
+import com.example.shikiflow.worker.MediaTracksScheduler
 import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,54 +30,49 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val authRepository: AuthRepository,
-    private val cacheRepository: CacheRepository
+    private val cacheRepository: CacheRepository,
+    private val mediaTracksScheduler: MediaTracksScheduler
 ): ViewModel() {
 
     private val _settingsState = MutableStateFlow(SettingsUiState())
     val settingsState = _settingsState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            combine(
-                settingsRepository.settingsFlow.distinctUntilChanged(),
-                settingsRepository.themeSettingsFlow.distinctUntilChanged(),
-                settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
-                settingsRepository.connectedServicesFlow.distinctUntilChanged(),
-                settingsRepository.chapterLanguagesFlow.distinctUntilChanged()
-            ) { settings, themeSettings, mangaSettings, connectedServices, chapterLanguages ->
+        combine(
+            settingsRepository.settingsFlow.distinctUntilChanged(),
+            settingsRepository.themeSettingsFlow.distinctUntilChanged(),
+            settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
+            settingsRepository.connectedServicesFlow.distinctUntilChanged(),
+            settingsRepository.chapterLanguagesFlow.distinctUntilChanged()
+        ) { settings, themeSettings, mangaSettings, connectedServices, chapterLanguages ->
+            _settingsState.update { state ->
+                state.copy(
+                    settings = settings,
+                    themeSettings = themeSettings,
+                    mangaSettings = mangaSettings,
+                    connectedServices = connectedServices,
+                    chapterLanguages = chapterLanguages
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { user ->
                 _settingsState.update { state ->
-                    state.copy(
-                        settings = settings,
-                        themeSettings = themeSettings,
-                        mangaSettings = mangaSettings,
-                        connectedServices = connectedServices,
-                        chapterLanguages = chapterLanguages
-                    )
+                    state.copy(user = user)
                 }
-            }.collect()
-        }
+            }.launchIn(viewModelScope)
 
-        viewModelScope.launch {
-            settingsRepository.userFlow
-                .filterNotNull()
-                .first()
-                .let { user ->
-                    _settingsState.update { state ->
-                        state.copy(user = user)
-                    }
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { authType ->
+                _settingsState.update { state ->
+                    state.copy(authType = authType)
                 }
-        }
-
-        viewModelScope.launch {
-            settingsRepository.authTypeFlow
-                .filterNotNull()
-                .first()
-                .let { authType ->
-                    _settingsState.update { state ->
-                        state.copy(authType = authType)
-                    }
-                }
-        }
+            }.launchIn(viewModelScope)
     }
 
     fun getAuthorizationUrl(authType: AuthType): String {
@@ -93,10 +89,19 @@ class SettingsViewModel @Inject constructor(
 
     fun clearCache() {
         viewModelScope.launch {
-            val isSuccess = cacheRepository.clearCache()
-            if (isSuccess) {
-                loadCacheSize()
+            cacheRepository.clearCache().let { isSuccess ->
+                if(isSuccess) {
+                    loadCacheSize()
+                }
             }
+        }
+    }
+
+    fun setAuthType(authType: AuthType, userId: Int) {
+        viewModelScope.launch {
+            settingsRepository.saveAuthType(authType)
+
+            mediaTracksScheduler.scheduleOneTimeSync(userId)
         }
     }
 
