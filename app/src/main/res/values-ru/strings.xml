@@ -112,6 +112,7 @@
         Подключите существующий аккаунт для обновления отслеживаемого на всех сервисах сразу
     </string>
 
+    <string name="settings_log_out">Выйти из аккаунта</string>
     <string name="color_picker_bottom_sheet_system_label">Использовать цвет заставки системы</string>
     <string name="color_picker_bottom_sheet_save">Применить</string>
     <string name="next_episode">"Следующий эпизод в "</string>
@@ -138,6 +139,7 @@
     <string name="browse_search_label_tag">Тэги</string>
     <string name="browse_search_tag_search_label">Поиск тэгов…</string>
 
+    <string name="browse_search_clear_filters">Очистить фильтры</string>
     <string name="chapter_ui_mode_page">Постраничный</string>
     <string name="chapter_ui_mode_scroll">Лента</string>
 
@@ -924,4 +926,7 @@
     <string name="media_tag_zombie">Зомби</string>
     <string name="genre_girls_love">Сёдзё-ай</string>
     <string name="release_notes_auto_install_label">Автоматически установить после завершения загрузки</string>
+    <string name="settings_switch_account">Перейти на аккаунт</string>
+    <string name="browse_search_hide_filters">Скрыть фильтры</string>
+    <string name="browse_search_show_filters">Показать фильтры</string>
 </resources>

@@ -83,12 +83,12 @@ fun BrowseSearchFilters(
             exit = fadeOut() + shrinkVertically()
         ) {
             Column(
-                verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
                 modifier = Modifier.padding(bottom = 12.dp)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 ) {
                     MediaType.entries.forEach { item ->
                         FilterChip(
@@ -96,7 +96,14 @@ fun BrowseSearchFilters(
                             onClick = {
                                 event.updateSearchOptions(
                                     searchOptions.copy(
-                                        mediaType = item
+                                        mediaType = item,
+                                        format = null,
+                                        status = if(
+                                            searchOptions.status?.mediaType?.contains(item) == true &&
+                                            authType to item !in searchOptions.status.exclusions
+                                            ) {
+                                                searchOptions.status
+                                            } else null
                                     )
                                 )
                             },
@@ -108,9 +115,7 @@ fun BrowseSearchFilters(
                                         contentDescription = null
                                     )
                                 }
-                            } else {
-                                null
-                            },
+                            } else { null },
                             modifier = Modifier.height(32.dp)
                         )
                     }
@@ -119,7 +124,8 @@ fun BrowseSearchFilters(
                 SnapFlingLazyRow(
                     modifier = Modifier
                         .ignoreHorizontalParentPadding(horizontalPadding)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -153,7 +159,7 @@ fun BrowseSearchFilters(
                                     painter = painterResource(id = R.drawable.ic_sort_descending),
                                     contentDescription = null,
                                     tint = if (searchOptions.sort?.type != null) LocalContentColor.current
-                                    else MaterialTheme.colorScheme.onSurfaceVariant,
+                                        else MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(20.dp)
                                 )
                             }
@@ -190,7 +196,8 @@ fun BrowseSearchFilters(
                 SnapFlingLazyRow(
                     modifier = Modifier
                         .ignoreHorizontalParentPadding(horizontalPadding)
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .padding(bottom = 12.dp),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     verticalAlignment = Alignment.CenterVertically
@@ -266,7 +273,8 @@ fun BrowseSearchFilters(
                 ) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 12.dp)
                     ) {
                         AnimatedVisibility(
                             visible = authType == AuthType.ANILIST || searchOptions.season?.year != null,
@@ -365,7 +373,7 @@ fun BrowseSearchFilters(
                                 selected = true,
                                 onClick = {
                                     event.updateSearchOptions(
-                                        searchOptions.copy(
+                                        browseOptions = searchOptions.copy(
                                             tags = searchOptions.tags - selectedTag
                                         )
                                     )
@@ -405,8 +413,8 @@ fun BrowseSearchFilters(
                 onClick = { event.changeFiltersVisibility() }
             ) {
                 Text(
-                    text = if(showFilters) "Hide Filters"
-                        else "Show Filters",
+                    text = if(showFilters) stringResource(R.string.browse_search_hide_filters)
+                        else stringResource(R.string.browse_search_show_filters),
                     style = LocalTextStyle.current.copy(
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -422,7 +430,7 @@ fun BrowseSearchFilters(
                     onClick = { event.clearFilters() }
                 ) {
                     Text(
-                        text = "Clear Filters",
+                        text = stringResource(R.string.browse_search_clear_filters),
                         style = LocalTextStyle.current.copy(
                             color = MaterialTheme.colorScheme.error
                         )

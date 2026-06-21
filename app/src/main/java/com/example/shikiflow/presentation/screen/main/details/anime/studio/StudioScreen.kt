@@ -18,6 +18,9 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
@@ -41,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,8 +69,13 @@ import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholde
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.anime.studio.StudioViewModel
 import com.example.shikiflow.utils.IconResource
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
+import kotlin.time.Duration.Companion.milliseconds
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class,
+    FlowPreview::class
+)
 @Composable
 fun StudioScreen(
     id: Int,
@@ -76,7 +85,6 @@ fun StudioScreen(
     studioViewModel: StudioViewModel = hiltViewModel()
 ) {
     val uiState by studioViewModel.uiState.collectAsStateWithLifecycle()
-    val query by studioViewModel.query.collectAsStateWithLifecycle()
     val authType by studioViewModel.authType.collectAsStateWithLifecycle()
     val preferredTitleType = LocalTitleTypeController.current
 
@@ -86,6 +94,7 @@ fun StudioScreen(
 
     val studioAnimeData = studioViewModel.studioTitles.collectAsLazyPagingItems()
 
+    val textFieldState = rememberTextFieldState()
     val lazyGridState = rememberLazyGridState()
     val isAtTop by remember {
         derivedStateOf {
@@ -96,6 +105,14 @@ fun StudioScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(
         snapAnimationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
     )
+
+    LaunchedEffect(textFieldState.text) {
+        snapshotFlow { textFieldState.text }
+            .debounce(500.milliseconds)
+            .collect { query ->
+                studioViewModel.setQuery(query.toString())
+            }
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -195,9 +212,8 @@ fun StudioScreen(
                 authType?.let {
                     if(authType == AuthType.SHIKIMORI) {
                         SearchPanel(
-                            query = query,
+                            textFieldState = textFieldState,
                             label = stringResource(R.string.browse_page_search),
-                            onQueryChange = studioViewModel::setQuery,
                             modifier = Modifier
                                 .background(
                                     color = if(isAtTop) MaterialTheme.colorScheme.background
@@ -293,9 +309,8 @@ fun StudioScreen(
 
 @Composable
 private fun SearchPanel(
-    query: String,
+    textFieldState: TextFieldState,
     label: String,
-    onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -306,19 +321,18 @@ private fun SearchPanel(
             .padding(all = 8.dp)
     ) {
         BasicTextField(
-            value = query,
-            onValueChange = onQueryChange,
+            state = textFieldState,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp, vertical = 2.dp),
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.onSurface
             ),
-            singleLine = true,
+            lineLimits = TextFieldLineLimits.SingleLine,
             cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-            decorationBox = { innerTextField ->
+            decorator = { innerTextField ->
                 Box {
-                    if (query.isEmpty()) {
+                    if (textFieldState.text.isEmpty()) {
                         TextWithIcon(
                             text = label,
                             iconResources = listOf(

@@ -14,10 +14,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.outlined.Person
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -27,8 +23,11 @@ import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
+import androidx.compose.material3.adaptive.navigationsuite.rememberNavigationSuiteScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,24 +37,22 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.window.core.layout.WindowSizeClass
-import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.presentation.navigation.BottomNavItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavRoute
 import com.example.shikiflow.presentation.screen.browse.BrowseScreenNavigator
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.MainScreenNavigator
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavigator
-import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun MainNavigator(
     preferredTitleType: PreferredTitleType,
@@ -63,15 +60,15 @@ fun MainNavigator(
 ) {
     val configuration = LocalConfiguration.current
     val adaptiveInfo = currentWindowAdaptiveInfoV2()
+    val navigationSuiteState = rememberNavigationSuiteScaffoldState()
 
-    val items = BottomNavItem.items
     val mainNavBackStack = rememberNavBackStack(MainNavRoute.Main)
     val mainScreenBackStack = rememberNavBackStack(MainScreenNavRoute.MainTracks)
     val browseBackStack = rememberNavBackStack(BrowseNavRoute.BrowseScreen)
     val profileBackstack = rememberNavBackStack(ProfileNavRoute.Profile(null))
 
     val isKeyboardVisible = WindowInsets.isImeVisible &&
-        configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+            configuration.orientation == Configuration.ORIENTATION_PORTRAIT
     var isBottomBarVisible by remember { mutableStateOf(true) }
 
     val isExpanded = adaptiveInfo.windowSizeClass.isWidthAtLeastBreakpoint(
@@ -79,24 +76,37 @@ fun MainNavigator(
     )
 
     val customNavType = when {
-        isKeyboardVisible || !isBottomBarVisible -> NavigationSuiteType.None
         isExpanded -> NavigationSuiteType.NavigationRail
         else -> NavigationSuiteScaffoldDefaults.navigationSuiteType(adaptiveInfo)
     }
 
+    val showNavigation by remember(mainNavBackStack, isKeyboardVisible, isBottomBarVisible) {
+        derivedStateOf {
+            !isKeyboardVisible && isBottomBarVisible
+        }
+    }
+
+    LaunchedEffect(showNavigation) {
+        when(showNavigation) {
+            true -> navigationSuiteState.show()
+            false -> navigationSuiteState.hide()
+        }
+    }
+
     NavigationSuiteScaffold(
+        state = navigationSuiteState,
         navigationSuiteType = customNavType,
         navigationSuiteColors = NavigationSuiteDefaults.colors(
             navigationBarContainerColor = MaterialTheme.colorScheme.surfaceContainer,
             navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer
         ),
         navigationItems = {
-            items.forEach { navItem ->
+            BottomNavItem.items.forEach { navItem ->
                 val isSelected = mainNavBackStack.last() == navItem.route
 
                 NavigationSuiteItem(
                     icon = {
-                        when(isSelected) {
+                        when (isSelected) {
                             true -> navItem.selectedIconRes
                             false -> navItem.unselectedIconRes
                         }.toIcon(
@@ -133,11 +143,11 @@ fun MainNavigator(
         }
     ) {
         val controller = remember {
-            BottomBarState { show -> isBottomBarVisible = show }
+            NavBarState { show -> isBottomBarVisible = show }
         }
 
         CompositionLocalProvider(
-            LocalBottomBarController provides controller,
+            LocalNavBarController provides controller,
             LocalTitleTypeController provides preferredTitleType
         ) {
             NavDisplay(
@@ -203,37 +213,5 @@ fun MainNavigator(
                 )
             )
         }
-    }
-}
-
-sealed class BottomNavItem(
-    val title: Int,
-    val selectedIconRes: IconResource,
-    val unselectedIconRes: IconResource,
-    val route: MainNavRoute
-): NavKey {
-    object Main : BottomNavItem(
-        title = R.string.bottom_nav_item_main,
-        selectedIconRes = IconResource.Drawable(R.drawable.ic_selected_book),
-        unselectedIconRes = IconResource.Drawable(R.drawable.ic_unselected_book),
-        route = MainNavRoute.Main
-    )
-
-    object Browse : BottomNavItem(
-        title = R.string.bottom_nav_item_browse,
-        selectedIconRes = IconResource.Drawable(R.drawable.ic_selected_browse),
-        unselectedIconRes = IconResource.Drawable(R.drawable.ic_unselected_browse),
-        route = MainNavRoute.Browse
-    )
-
-    object Profile : BottomNavItem(
-        title = R.string.bottom_nav_item_profile,
-        selectedIconRes = IconResource.Vector(Icons.Default.Person),
-        unselectedIconRes = IconResource.Vector(Icons.Outlined.Person),
-        route = MainNavRoute.Profile
-    )
-
-    companion object {
-        val items = listOf(Main, Browse, Profile)
     }
 }

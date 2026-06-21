@@ -64,6 +64,7 @@ import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.ma
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksSearchViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 @Composable
@@ -92,7 +93,7 @@ fun TracksSearchBarComponent(
 
     LaunchedEffect(text) {
         snapshotFlow { text }
-            .debounce(300)
+            .debounce(500.milliseconds)
             .collect { query -> tracksViewModel.onQueryChange(query) }
     }
 

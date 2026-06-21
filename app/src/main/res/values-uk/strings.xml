@@ -112,6 +112,7 @@
         Під\'єднайте Ваш наявний акаунт для оновлення відстежуваного на всіх сервісах за раз
     </string>
 
+    <string name="settings_log_out">Вийти з аккаунту</string>
     <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>
     <string name="color_picker_bottom_sheet_save">Застосувати</string>
     <string name="next_episode">"Наступний епізод в "</string>
@@ -138,6 +139,7 @@
     <string name="browse_search_label_tag">Теґи</string>
     <string name="browse_search_tag_search_label">Пошук теґів…</string>
 
+    <string name="browse_search_clear_filters">Очистити фільтри</string>
     <string name="chapter_ui_mode_page">Посторінковий</string>
     <string name="chapter_ui_mode_scroll">Стрічка</string>
 
@@ -924,4 +926,7 @@
     <string name="media_tag_zombie">Зомбі</string>
     <string name="genre_girls_love">Шоджо-ай</string>
     <string name="release_notes_auto_install_label">Автоматично встановити після завершення завантаження</string>
+    <string name="settings_switch_account">Перейти на аккаунт</string>
+    <string name="browse_search_hide_filters">Приховати фільтри</string>
+    <string name="browse_search_show_filters">Показати фільтри</string>
 </resources>

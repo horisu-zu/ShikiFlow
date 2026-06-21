@@ -23,7 +23,6 @@ android {
     namespace = "com.example.shikiflow"
     compileSdk = 37
 
-
     androidResources {
         localeFilters += listOf(
             "en",

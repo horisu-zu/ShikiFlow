@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details.common
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +31,7 @@ fun CharacterCard(
 ) {
     Column(
         modifier = modifier
+            .width(imageType.width)
             .clip(
                 shape = RoundedCornerShape(
                     topStartPercent = clipPercent,

@@ -96,6 +96,7 @@ import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(
     ExperimentalMaterial3Api::class,
@@ -125,7 +126,7 @@ fun BrowseSearchBar(
 
     LaunchedEffect(textFieldState) {
         snapshotFlow { textFieldState.text.toString() }
-            .debounce(300)
+            .debounce(500.milliseconds)
             .collect { searchViewModel.onQueryChange(it) }
     }
 

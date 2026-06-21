@@ -112,6 +112,8 @@
     <string name="settings_sign_out">Sign Out</string>
     <string name="settings_tracker_services_title">Tracker Services</string>
     <string name="settings_tracker_services_display">Connect your existing account to update tracks on all services at once</string>
+    <string name="settings_switch_account">Switch Account</string>
+    <string name="settings_log_out">Log Out</string>
 
     <string name="color_picker_bottom_sheet_system_label">Use System Wallpaper Color</string>
     <string name="color_picker_bottom_sheet_save">Apply</string>
@@ -139,6 +141,9 @@
     <string name="browse_search_filters_add_genre">Add Genre</string>
     <string name="browse_search_genre_search_label">Search Genres…</string>
     <string name="browse_search_tag_search_label">Search Tags…</string>
+    <string name="browse_search_hide_filters">Hide Filters</string>
+    <string name="browse_search_show_filters">Show Filters</string>
+    <string name="browse_search_clear_filters">Clear Filters</string>
 
     <string name="chapter_ui_mode_page">Page</string>
     <string name="chapter_ui_mode_scroll">Scroll</string>

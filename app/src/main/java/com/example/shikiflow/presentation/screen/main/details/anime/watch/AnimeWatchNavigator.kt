@@ -15,7 +15,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.presentation.screen.LocalBottomBarController
+import com.example.shikiflow.presentation.screen.LocalNavBarController
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.EpisodeScreen
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.EpisodeMetadata
 
@@ -26,7 +26,8 @@ fun AnimeWatchNavigator(
     completedEpisodes: Int,
     onNavigateBack: () -> Unit
 ) {
-    val bottomBarController = LocalBottomBarController.current
+    val navBarController = LocalNavBarController.current
+
     val watchBackstack = rememberNavBackStack(AnimeWatchNavRoute.TranslationSelect(shikimoriId))
 
     val isOnEpisodeScreen by remember {
@@ -36,7 +37,7 @@ fun AnimeWatchNavigator(
     }
 
     LaunchedEffect(isOnEpisodeScreen) {
-        bottomBarController.setVisibility(!isOnEpisodeScreen)
+        navBarController.setVisibility(!isOnEpisodeScreen)
     }
 
     val options = object : AnimeWatchNavOptions {

@@ -15,7 +15,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.presentation.screen.LocalBottomBarController
+import com.example.shikiflow.presentation.screen.LocalNavBarController
 
 @Composable
 fun MangaReadNavigator(
@@ -25,7 +25,8 @@ fun MangaReadNavigator(
     title: String,
     onNavigateBack: () -> Unit
 ) {
-    val bottomBarController = LocalBottomBarController.current
+    val navBarController = LocalNavBarController.current
+
     val mangaReadBackstack = when(mangaDexIds.size) {
         1 -> rememberNavBackStack(MangaReadNavRoute.ChaptersScreen(
             mangaDexId = mangaDexIds[0],
@@ -46,7 +47,7 @@ fun MangaReadNavigator(
     }
 
     LaunchedEffect(isOnChapterScreen) {
-        bottomBarController.setVisibility(!isOnChapterScreen)
+        navBarController.setVisibility(!isOnChapterScreen)
     }
 
     val navOptions = object : MangaReadNavOptions {
@@ -65,7 +66,8 @@ fun MangaReadNavigator(
 
         override fun navigateToChapter(chapterUiData: ChapterUiData) {
             mangaReadBackstack.removeAll { navKey ->
-                navKey is MangaReadNavRoute.ChapterScreen
+                navKey is MangaReadNavRoute.ChapterScreen ||
+                navKey is MangaReadNavRoute.ChapterTranslationsScreen
             }
             mangaReadBackstack.add(MangaReadNavRoute.ChapterScreen(chapterUiData))
         }

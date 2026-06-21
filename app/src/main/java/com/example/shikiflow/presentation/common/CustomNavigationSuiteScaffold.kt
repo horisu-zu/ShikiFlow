@@ -8,6 +8,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -19,22 +20,24 @@ import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationRail
-import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.ShortNavigationBar
+import androidx.compose.material3.ShortNavigationBarItem
 import androidx.compose.material3.Text
+import androidx.compose.material3.WideNavigationRail
+import androidx.compose.material3.WideNavigationRailDefaults
+import androidx.compose.material3.WideNavigationRailItem
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
-import com.example.shikiflow.presentation.screen.BottomNavItem
+import com.example.shikiflow.presentation.navigation.BottomNavItem
 import com.example.shikiflow.utils.toIcon
 
 @Composable
@@ -46,9 +49,14 @@ fun CustomNavigationSuiteScaffold(
     navContainerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     content: @Composable (PaddingValues) -> Unit
 ) {
-    val isRail = navigationType == NavigationSuiteType.NavigationRail
-    val isBottomBar = navigationType == NavigationSuiteType.ShortNavigationBarCompact ||
-            navigationType == NavigationSuiteType.ShortNavigationBarMedium
+    val isRail = remember(navigationType) {
+        navigationType == NavigationSuiteType.NavigationRail ||
+        navigationType == NavigationSuiteType.WideNavigationRailCollapsed
+    }
+    val isBottomBar = remember(navigationType) {
+        navigationType == NavigationSuiteType.ShortNavigationBarCompact ||
+        navigationType == NavigationSuiteType.ShortNavigationBarMedium
+    }
 
     Row(
         modifier = Modifier
@@ -72,13 +80,19 @@ fun CustomNavigationSuiteScaffold(
                 )
             )
         ) {
-            NavigationRail(
-                containerColor = navContainerColor
+            WideNavigationRail(
+                colors = WideNavigationRailDefaults.colors(
+                    containerColor = navContainerColor
+                ),
+                arrangement = Arrangement.Top,
+                contentPadding = PaddingValues(0.dp)
             ) {
                 navItems.forEach { navItem ->
                     val isSelected = selectedRoute == navItem.route
+                    val railExpanded = navigationType == NavigationSuiteType.WideNavigationRailExpanded
 
-                    NavigationRailItem(
+                    WideNavigationRailItem(
+                        railExpanded = railExpanded,
                         selected = isSelected,
                         icon = {
                             when(isSelected) {
@@ -96,11 +110,7 @@ fun CustomNavigationSuiteScaffold(
                                 )
                             )
                         },
-                        onClick = {
-                            if(!isSelected) {
-                                onNavClick(navItem)
-                            }
-                        }
+                        onClick = { onNavClick(navItem) }
                     )
                 }
             }
@@ -108,16 +118,16 @@ fun CustomNavigationSuiteScaffold(
 
         Scaffold(
             modifier = Modifier.weight(1f),
-            contentWindowInsets = if (isRail) {
-                ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.safeDrawing.only(WindowInsetsSides.Start))
-            } else {
-                ScaffoldDefaults.contentWindowInsets
-            },
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets
+                .apply {
+                    if(isRail) {
+                        exclude(WindowInsets.safeDrawing.only(WindowInsetsSides.Start))
+                    }
+                },
             bottomBar = {
                 AnimatedVisibility(
                     visible = isBottomBar,
                     enter = expandVertically(
-                        initialHeight = { it },
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioNoBouncy,
                             stiffness = Spring.StiffnessLow
@@ -131,13 +141,13 @@ fun CustomNavigationSuiteScaffold(
                         )
                     )
                 ) {
-                    NavigationBar(
+                    ShortNavigationBar(
                         containerColor = navContainerColor
                     ) {
                         navItems.forEach { navItem ->
                             val isSelected = selectedRoute == navItem.route
 
-                            NavigationBarItem(
+                            ShortNavigationBarItem(
                                 selected = isSelected,
                                 icon = {
                                     when(isSelected) {
@@ -155,11 +165,7 @@ fun CustomNavigationSuiteScaffold(
                                         )
                                     )
                                 },
-                                onClick = {
-                                    if(!isSelected) {
-                                        onNavClick(navItem)
-                                    }
-                                }
+                                onClick = { onNavClick(navItem) }
                             )
                         }
                     }

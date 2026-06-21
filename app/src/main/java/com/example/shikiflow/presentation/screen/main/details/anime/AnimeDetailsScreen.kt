@@ -5,7 +5,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
@@ -115,7 +114,6 @@ fun AnimeDetailsScreen(
                                 },
                                 mediaNavOptions = navOptions,
                                 modifier = Modifier.padding(
-                                    start = paddingValues.calculateStartPadding(LayoutDirection.Ltr),
                                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),
                                 )
                             )

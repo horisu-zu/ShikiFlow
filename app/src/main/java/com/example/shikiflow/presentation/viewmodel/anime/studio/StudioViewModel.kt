@@ -13,11 +13,7 @@ import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
@@ -36,10 +32,6 @@ class StudioViewModel @Inject constructor(
     private val userRepository: UserRepository,
     settingsRepository: SettingsRepository
 ): UiStateViewModel<StudioUiState>() {
-
-    private val _query = MutableStateFlow("")
-    val query = _query.asStateFlow()
-
     override val initialState: StudioUiState = StudioUiState()
 
     val authType = settingsRepository.authTypeFlow
@@ -98,14 +90,10 @@ class StudioViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    val studioTitles = combine(
-        mutableUiState.filter { state ->
+    val studioTitles = mutableUiState
+        .filter { state ->
             state.studioId != null && state.sortType != null
-        },
-        _query.debounce(300L)
-    ) { state, query ->
-        state.copy(query = query)
-    }
+        }
         .distinctUntilChanged { old, new ->
             old.studioId == new.studioId && old.sortType == new.sortType &&
             old.query == new.query && old.onUserList == new.onUserList
@@ -162,7 +150,11 @@ class StudioViewModel @Inject constructor(
     }
 
     fun setQuery(query: String) {
-        _query.update { query }
+        mutableUiState.update { state ->
+            state.copy(
+                query = query
+            )
+        }
     }
 
     fun setSortType(sortType: SortType) {
