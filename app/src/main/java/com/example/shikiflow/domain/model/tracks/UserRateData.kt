@@ -93,7 +93,7 @@ data class SaveUserRate(
     val mediaId: Int,
     val malId: Int?,
     val userStatus: UserRateStatus,
-    val score: Int = 0,
+    val score: Float = 0f,
     val progress: Int = 0,
     val progressVolumes: Int? = null,
     val repeat: Int = 0

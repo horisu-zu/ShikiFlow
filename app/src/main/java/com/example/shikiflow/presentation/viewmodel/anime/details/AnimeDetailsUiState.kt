@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.anime.details
 
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
@@ -14,6 +15,7 @@ data class AnimeDetailsUiState(
     val details: MediaDetails? = null,
     val userRate: MediaUserTrack? = null,
     val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
+    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
     val isRefreshing: Boolean = false,
     override val isLoading: Boolean = true,
     override val errorMessage: String? = null

@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
@@ -23,6 +24,7 @@ import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
@@ -42,6 +44,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private fun userAvatar(authType: AuthType) = stringPreferencesKey("${authType}_user_avatar_url")
         private fun userNickname(authType: AuthType) = stringPreferencesKey("${authType}user_nickname")
         private fun userBanner(authType: AuthType) = stringPreferencesKey("${authType}user_banner")
+        private fun userScoreFormat(authType: AuthType) = stringPreferencesKey("${authType}_score_format")
 
         private val TRACKER_SERVICE_UPDATE = booleanPreferencesKey("tracker_update")
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
@@ -84,6 +87,25 @@ class SettingsRepositoryImpl @Inject constructor(
             }
     }
 
+    override val userSettingsFlow = dataStore.data
+        .map { preferences ->
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            } ?: AuthType.ANILIST
+
+            UserSettings(
+                showAdultContent = false,
+                preferredTitleType = preferences[TITLE_TYPE]?.let { type ->
+                    PreferredTitleType.valueOf(type)
+                } ?: PreferredTitleType.ROMAJI,
+                scoreFormat = preferences[userScoreFormat(currentAuthType)]?.let { format ->
+                    ScoreFormat.valueOf(format)
+                } ?: ScoreFormat.POINT_10
+            )
+        }
+
+
+
     override val authTypeFlow = dataStore.data
         .map { preferences ->
             preferences[AUTH_TYPE]?.let { authType ->
@@ -119,10 +141,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
                 browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
                 trackMode = preferences[TRACK_MODE]?.let { MediaType.valueOf(it) }
-                    ?: MediaType.ANIME,
-                preferredTitleType = preferences[TITLE_TYPE]?.let { type ->
-                    PreferredTitleType.valueOf(type)
-                } ?: PreferredTitleType.ROMAJI
+                    ?: MediaType.ANIME
             )
     }
 
@@ -181,6 +200,13 @@ class SettingsRepositoryImpl @Inject constructor(
             preferences[TRANSLATED_LANGUAGES] ?: emptySet()
         }
 
+    override fun scoreFormat(authType: AuthType): Flow<ScoreFormat> = dataStore.data
+        .map { preferences ->
+            preferences[userScoreFormat(authType)]?.let { format ->
+                ScoreFormat.valueOf(format)
+            } ?: ScoreFormat.POINT_10
+        }
+
     override suspend fun saveAuthType(authType: AuthType) {
         dataStore.edit { preferences ->
             preferences[AUTH_TYPE] = authType.name
@@ -195,6 +221,7 @@ class SettingsRepositoryImpl @Inject constructor(
             user.profileBannerUrl?.let { profileBannerUrl ->
                 preferences[userBanner(authType)] = profileBannerUrl
             }
+            preferences[userScoreFormat(authType)] = user.scoreFormat.name
         }
     }
 
@@ -309,6 +336,16 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun savePreferredTitleType(preferredType: PreferredTitleType) {
         dataStore.edit { preferences ->
             preferences[TITLE_TYPE] = preferredType.name
+        }
+    }
+
+    override suspend fun saveScoreFormat(scoreFormat: ScoreFormat) {
+        dataStore.edit { preferences ->
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            } ?: AuthType.ANILIST
+
+            preferences[userScoreFormat(currentAuthType)] = scoreFormat.name
         }
     }
 

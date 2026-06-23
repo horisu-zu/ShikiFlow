@@ -17,9 +17,11 @@ import com.example.shikiflow.data.datasource.dto.ShikiCreateRateRequest
 import com.example.shikiflow.data.datasource.dto.ShikiUpdateRateRequest
 import com.example.shikiflow.data.mapper.common.OrderMapper.toShikimoriOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toShikimoriRateStatus
+import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.formatAniListValue
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.di.annotations.ShikimoriApollo
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain as toMediaDomain
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -31,6 +33,7 @@ import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.collections.map
+import kotlin.math.roundToInt
 import kotlin.toString
 
 @OptIn(ExperimentalPagingApi::class)
@@ -214,7 +217,7 @@ class ShikimoriTracksDataSource @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?
+        score: Float?
     ): UserMediaRate {
         return when(entryId) {
             null -> {
@@ -227,7 +230,7 @@ class ShikimoriTracksDataSource @Inject constructor(
                     chapters = if(mediaType == MediaType.MANGA) progress else null,
                     volumes = progressVolumes,
                     rewatches = repeat,
-                    score = score
+                    score = score?.roundToInt()
                 )
 
                 Log.d("ShikimoriTracksDataSource", "Create Request: $createRequest")
@@ -240,7 +243,7 @@ class ShikimoriTracksDataSource @Inject constructor(
                     episodes = if(mediaType == MediaType.ANIME) progress else null,
                     volumes = progressVolumes,
                     rewatches = repeat,
-                    score = score,
+                    score = score?.roundToInt(),
                     status = status.toShikimoriRateStatus().name
                 )
 
@@ -262,9 +265,14 @@ class ShikimoriTracksDataSource @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?
+        score: Float?,
+        scoreFormat: ScoreFormat
     ) {
         val entryId = getServiceUserRate(malId, mediaType)
+
+        val formattedScore = score?.let {
+            scoreFormat.formatAniListValue(score)
+        }
 
         saveUserRate(
             userId = userId,
@@ -275,7 +283,7 @@ class ShikimoriTracksDataSource @Inject constructor(
             progress = progress,
             progressVolumes = progressVolumes,
             repeat = repeat,
-            score = score
+            score = formattedScore
         )
     }
 

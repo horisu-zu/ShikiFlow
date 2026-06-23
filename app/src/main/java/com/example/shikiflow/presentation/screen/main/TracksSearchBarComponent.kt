@@ -266,6 +266,7 @@ fun TracksSearchBarComponent(
                         userRate = item.toUserRateData(),
                         preferredTitleType = preferredTitleType,
                         rateUpdateState = rateUpdateState,
+                        scoreFormat = tracksParams.scoreFormat,
                         onDismiss = {
                             if (rateUpdateState != RateUpdateState.LOADING) {
                                 selectedItem = null

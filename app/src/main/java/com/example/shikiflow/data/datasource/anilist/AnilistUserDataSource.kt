@@ -11,6 +11,7 @@ import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
 import com.example.graphql.anilist.ToggleFollowMutation
+import com.example.graphql.anilist.UpdateUserMutation
 import com.example.graphql.anilist.UserActivitiesQuery
 import com.example.graphql.anilist.UserFavoriteAnimeQuery
 import com.example.graphql.anilist.UserFavoriteCharactersQuery
@@ -41,11 +42,16 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStaffStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStudiosStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toTagsStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toUserFavorite
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toUserSettings
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
+import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.toAnilistFormat
+import com.example.shikiflow.data.mapper.common.TitleTypeMapper.toAnilistType
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -54,6 +60,7 @@ import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
+import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -579,6 +586,25 @@ class AnilistUserDataSource @Inject constructor(
             .execute()
             .asDataResult { data ->
                 data.ToggleFollow?.isFollowing == true
+            }
+
+        return response
+    }
+
+    override suspend fun setUserSettings(
+        preferredTitleType: PreferredTitleType?,
+        scoreFormat: ScoreFormat?
+    ): DataResult<UserSettings> {
+        val userSettingsMutation = UpdateUserMutation(
+            titleLanguage = Optional.presentIfNotNull(preferredTitleType?.toAnilistType()),
+            scoreFormat = Optional.presentIfNotNull(scoreFormat?.toAnilistFormat())
+        )
+
+        val response = apolloClient.mutation(userSettingsMutation)
+            .execute()
+            .asDataResult { data ->
+                data.UpdateUser?.aLUserSettings?.toUserSettings()
+                    ?: error("Error updating User Settings")
             }
 
         return response

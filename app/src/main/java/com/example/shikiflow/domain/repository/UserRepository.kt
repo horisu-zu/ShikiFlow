@@ -3,8 +3,10 @@ package com.example.shikiflow.domain.repository
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.browse.Browse
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -14,6 +16,7 @@ import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
+import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -69,4 +72,9 @@ interface UserRepository {
         userId: Int,
         isFollowing: Boolean
     ): DataResult<Boolean>
+
+    suspend fun setUserSettings(
+        preferredTitleType: PreferredTitleType? = null,
+        scoreFormat: ScoreFormat? = null
+    ): DataResult<UserSettings>
 }

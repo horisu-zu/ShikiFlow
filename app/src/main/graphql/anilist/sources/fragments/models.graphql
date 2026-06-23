@@ -160,6 +160,32 @@ fragment ALUserShort on User {
     }
     bannerImage
     isFollowing
+    mediaListOptions {
+        scoreFormat
+    }
+}
+
+fragment ALUserSettings on User {
+    id
+    options {
+        displayAdultContent
+        staffNameLanguage
+        titleLanguage
+        airingNotifications
+    }
+    mediaListOptions {
+        scoreFormat
+        animeList {
+            advancedScoringEnabled
+            advancedScoring
+            customLists
+        }
+        mangaList {
+            advancedScoringEnabled
+            advancedScoring
+            customLists
+        }
+    }
 }
 
 fragment ALMediaFollowingUser on User {

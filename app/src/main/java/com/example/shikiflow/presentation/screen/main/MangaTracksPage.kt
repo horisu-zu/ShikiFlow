@@ -168,6 +168,7 @@ fun MangaTracksPage(
                     userRate = item.toUserRateData(),
                     preferredTitleType = preferredTitleType,
                     rateUpdateState = params.rateUpdateState,
+                    scoreFormat = params.scoreFormat,
                     onDismiss = {
                         if (params.rateUpdateState != RateUpdateState.LOADING) {
                             selectedItem = null

@@ -38,6 +38,7 @@ import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +59,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
@@ -67,11 +69,17 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.floatingPointRange
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.formatValue
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.steps
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.valueRange
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.toIcon
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 import kotlin.time.Instant
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +88,7 @@ fun UserRateBottomSheet(
     userRate: UserRateData,
     rateUpdateState: RateUpdateState,
     preferredTitleType: PreferredTitleType,
+    scoreFormat: ScoreFormat,
     onDismiss: () -> Unit,
     onSave: (SaveUserRate) -> Unit,
     onDelete: (Int) -> Unit,
@@ -99,7 +108,9 @@ fun UserRateBottomSheet(
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
-    var selectedScore by remember { mutableIntStateOf(userRate.score) }
+    var selectedScore by remember {
+        mutableFloatStateOf(scoreFormat.formatValue(userRate.score.toFloat()))
+    }
     var progress by remember { mutableIntStateOf(userRate.progress) }
     var progressVolumes by remember { mutableIntStateOf(userRate.progressVolumes) }
     var rewatches by remember { mutableIntStateOf(userRate.rewatches) }
@@ -162,6 +173,7 @@ fun UserRateBottomSheet(
                 ) {
                     ScoreSelector(
                         score = selectedScore,
+                        scoreFormat = scoreFormat,
                         onScoreChange = { selectedScore = it }
                     )
                     ProgressColumn(
@@ -313,9 +325,10 @@ private fun StatusChips(
 
 @Composable
 private fun ScoreSelector(
-    score: Int,
-    onScoreChange: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    score: Float,
+    onScoreChange: (Float) -> Unit,
+    modifier: Modifier = Modifier,
+    scoreFormat: ScoreFormat
 ) {
     Row(
         modifier = modifier,
@@ -323,16 +336,21 @@ private fun ScoreSelector(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Slider(
-            value = score.toFloat(),
-            onValueChange = { onScoreChange(it.toInt()) },
-            steps = 9,
-            valueRange = 0f..10f,
+            value = score,
+            onValueChange = { value ->
+                val step = scoreFormat.valueRange().step
+                val rounded = (value / step).roundToInt() * step
+
+                onScoreChange(rounded)
+            },
+            steps = scoreFormat.valueRange().steps(),
+            valueRange = scoreFormat.valueRange().floatingPointRange(),
             modifier = Modifier
                 .height(24.dp)
                 .weight(1f)
         )
         Text(
-            text = score.toString(),
+            text = scoreFormat.displayValue(score),
             style = MaterialTheme.typography.bodyLarge
         )
     }

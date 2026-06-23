@@ -7,7 +7,6 @@ import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
-import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
@@ -46,14 +45,9 @@ interface MediaTracksRepository {
         progress: Int? = null,
         progressVolumes: Int? = null,
         repeat: Int? = null,
-        score: Int? = null,
+        score: Float? = null,
         mediaShortData: MediaShortData? = null
     ): Flow<DataResult<UserMediaRate>>
-
-    suspend fun updateMediaTrack(
-        mediaTrack: MediaUserTrack,
-        mediaShortData: MediaShortData? = null
-    )
 
     fun deleteUserRate(
         entryId: Int,

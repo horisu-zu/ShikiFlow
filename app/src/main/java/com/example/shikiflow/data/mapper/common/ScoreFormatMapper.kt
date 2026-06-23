@@ -14,4 +14,37 @@ object ScoreFormatMapper {
             ALScoreFormat.UNKNOWN__ -> ScoreFormat.POINT_10
         }
     }
+
+    fun ScoreFormat.toAnilistFormat(): ALScoreFormat {
+        return when(this) {
+            ScoreFormat.POINT_100 -> ALScoreFormat.POINT_100
+            ScoreFormat.POINT_10_DECIMAL -> ALScoreFormat.POINT_10_DECIMAL
+            ScoreFormat.POINT_10 -> ALScoreFormat.POINT_10
+            ScoreFormat.POINT_5 -> ALScoreFormat.POINT_5
+            ScoreFormat.POINT_3 -> ALScoreFormat.POINT_3
+        }
+    }
+
+    fun ScoreFormat.formatShikimoriValue(score: Float): Float {
+        return when(this) {
+            ScoreFormat.POINT_100 -> score * 10
+            ScoreFormat.POINT_10_DECIMAL, ScoreFormat.POINT_10 -> score
+            ScoreFormat.POINT_5 -> score / 2
+            ScoreFormat.POINT_3 -> score / 3
+        }
+    }
+
+    fun ScoreFormat.formatAniListValue(score: Float): Float {
+        return when(this) {
+            ScoreFormat.POINT_100 -> score / 10
+            ScoreFormat.POINT_10_DECIMAL, ScoreFormat.POINT_10 -> score
+            ScoreFormat.POINT_5 -> score * 2
+            ScoreFormat.POINT_3 -> when {
+                score >= 3f -> 9f
+                score >= 2f -> 6f
+                score >= 1f -> 3f
+                else -> 0f
+            }
+        }
+    }
 }

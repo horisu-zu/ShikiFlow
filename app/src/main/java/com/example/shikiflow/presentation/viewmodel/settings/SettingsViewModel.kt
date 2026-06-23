@@ -4,13 +4,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
+import com.example.shikiflow.domain.model.settings.MangaChapterSettings
+import com.example.shikiflow.domain.model.settings.Settings
+import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserSettings
+import com.example.shikiflow.domain.repository.UserRepository
+import com.example.shikiflow.utils.DataResult
 import com.example.shikiflow.utils.ThemeMode
 import com.example.shikiflow.worker.MediaTracksScheduler
 import com.materialkolor.PaletteStyle
@@ -28,6 +36,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
+    private val userRepository: UserRepository,
     private val settingsRepository: SettingsRepository,
     private val authRepository: AuthRepository,
     private val cacheRepository: CacheRepository,
@@ -42,16 +51,18 @@ class SettingsViewModel @Inject constructor(
             settingsRepository.settingsFlow.distinctUntilChanged(),
             settingsRepository.themeSettingsFlow.distinctUntilChanged(),
             settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
+            settingsRepository.userSettingsFlow.distinctUntilChanged(),
             settingsRepository.connectedServicesFlow.distinctUntilChanged(),
             settingsRepository.chapterLanguagesFlow.distinctUntilChanged()
-        ) { settings, themeSettings, mangaSettings, connectedServices, chapterLanguages ->
+        ) { values ->
             _settingsState.update { state ->
                 state.copy(
-                    settings = settings,
-                    themeSettings = themeSettings,
-                    mangaSettings = mangaSettings,
-                    connectedServices = connectedServices,
-                    chapterLanguages = chapterLanguages
+                    settings = values[0] as Settings,
+                    themeSettings = values[1] as ThemeSettings,
+                    mangaSettings = values[2] as MangaChapterSettings,
+                    userSettings = values[3] as UserSettings,
+                    connectedServices = values[4] as Map<AuthType, User>,
+                    chapterLanguages = values[5] as Set<String>
                 )
             }
         }.launchIn(viewModelScope)
@@ -132,6 +143,17 @@ class SettingsViewModel @Inject constructor(
     fun setTitleType(preferredType: PreferredTitleType) {
         viewModelScope.launch {
             settingsRepository.savePreferredTitleType(preferredType)
+        }
+    }
+
+    fun setScoreFormat(scoreFormat: ScoreFormat) {
+        viewModelScope.launch {
+            userRepository.setUserSettings(scoreFormat = scoreFormat)
+                .also { result ->
+                    if(result is DataResult.Success) {
+                        settingsRepository.saveScoreFormat(result.data.scoreFormat)
+                    }
+                }
         }
     }
 

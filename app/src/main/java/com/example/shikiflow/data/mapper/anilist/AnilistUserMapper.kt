@@ -11,6 +11,7 @@ import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
 import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
+import com.example.graphql.anilist.fragment.ALUserSettings
 import com.example.graphql.anilist.fragment.ALUserShort
 import com.example.graphql.anilist.fragment.ALUserStaff
 import com.example.graphql.anilist.fragment.ALUserStudios
@@ -25,11 +26,15 @@ import com.example.shikiflow.data.mapper.common.MediaFormatMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
+import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.toDomainFormat
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.data.mapper.common.TagMapper
+import com.example.shikiflow.data.mapper.common.TitleTypeMapper.toDomainType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -45,6 +50,7 @@ import com.example.shikiflow.domain.model.user.ListActivity
 import com.example.shikiflow.domain.model.user.MessageActivity
 import com.example.shikiflow.domain.model.user.TextActivity
 import com.example.shikiflow.domain.model.user.UserFavorite
+import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.StudioStat
@@ -56,7 +62,8 @@ object AnilistUserMapper {
             id = id,
             nickname = name,
             avatarUrl = avatar?.large ?: "",
-            profileBannerUrl = bannerImage
+            profileBannerUrl = bannerImage,
+            scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
         )
     }
 
@@ -483,5 +490,13 @@ object AnilistUserMapper {
                 )
             }
         } ?: emptyList()
+    }
+
+    fun ALUserSettings.toUserSettings(): UserSettings {
+        return UserSettings(
+            showAdultContent = false,
+            preferredTitleType = options?.titleLanguage?.toDomainType() ?: PreferredTitleType.ROMAJI,
+            scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
+        )
     }
 }

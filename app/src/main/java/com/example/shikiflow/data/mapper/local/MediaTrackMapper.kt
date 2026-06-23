@@ -10,6 +10,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
+import kotlin.math.roundToInt
 import kotlin.time.Instant
 
 object MediaTrackMapper {
@@ -51,7 +52,7 @@ object MediaTrackMapper {
             progress = episodes,
             progressVolumes = null,
             repeat = rewatches,
-            score = score,
+            score = score * 10,
             text = text,
             createdAt = Instant.parse(createdAt.toString()),
             updatedAt = Instant.parse(updatedAt.toString())
@@ -66,7 +67,7 @@ object MediaTrackMapper {
             progress = chapters,
             progressVolumes = volumes,
             repeat = rewatches,
-            score = score,
+            score = score * 10,
             text = text,
             createdAt = Instant.parse(createdAt.toString()),
             updatedAt = Instant.parse(updatedAt.toString())
@@ -81,7 +82,7 @@ object MediaTrackMapper {
             progress = progress ?: 0,
             progressVolumes = progressVolumes,
             repeat = repeat ?: 0,
-            score = score.score?.toInt() ?: 0,
+            score = (score.score?.times(10))?.roundToInt() ?: 0,
             text = null,
             createdAt = Instant.fromEpochSeconds(createdAt?.toLong() ?: 0L),
             updatedAt = Instant.fromEpochSeconds(updatedAt?.toLong() ?: 0L)

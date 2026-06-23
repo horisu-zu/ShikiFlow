@@ -7,6 +7,7 @@ import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
+import kotlin.math.roundToInt
 import kotlin.time.Instant
 
 object AnilistRateMapper {
@@ -19,7 +20,7 @@ object AnilistRateMapper {
             progressVolumes = progressVolumes ?: 0,
             repeat = repeat ?: 0,
             textNotes = notes,
-            score = score.score?.toInt() ?: 0,
+            score = (score.score?.times(10))?.roundToInt() ?: 0,
             createdAt = Instant.fromEpochSeconds(createdAt?.toLong() ?: 0L),
             updatedAt = Instant.fromEpochSeconds(updatedAt?.toLong() ?: 0L)
         )

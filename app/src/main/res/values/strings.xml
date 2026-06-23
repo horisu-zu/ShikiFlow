@@ -75,6 +75,8 @@
 
     <string name="settings_preferred_title_type">Preferred Title Type</string>
     <string name="settings_preferred_title_type_desc">"Select Preferred Title Type that will be applied for media titles, characters, staff, genres, etc     "</string>
+    <string name="settings_score_format">Score Format</string>
+    <string name="settings_score_format_desc">Select Scoring System</string>
 
     <string name="settings_app_ui_mode">Display Mode</string>
     <string name="settings_clear_cache">Clear Image Cache</string>
@@ -949,4 +951,10 @@ f
     <string name="media_tag_youkai">Youkai</string>
     <string name="media_tag_yuri">Yuri</string>
     <string name="media_tag_zombie">Zombie</string>
+
+    <string name="score_format_100_point">100 Point</string>
+    <string name="score_format_10_point_decimal">10 Point Decimal</string>
+    <string name="score_format_10_point">10 Point</string>
+    <string name="score_format_5_point">5 Point</string>
+    <string name="score_format_3_point_smiley">3 Point Smiley</string>
 </resources>

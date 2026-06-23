@@ -42,7 +42,7 @@ object ShikimoriRateMapper {
             progressVolumes = this.volumes ?: 0,
             repeat = this.rewatches,
             textNotes = this.text,
-            score = this.score,
+            score = score.times(10),
             createdAt = Instant.parse(this.createdAt),
             updatedAt = Instant.parse(this.updatedAt)
         )

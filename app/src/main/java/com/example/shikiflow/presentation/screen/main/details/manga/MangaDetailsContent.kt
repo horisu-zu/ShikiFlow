@@ -36,6 +36,7 @@ import com.example.shikiflow.data.mapper.local.MediaShortMapper.toShortData
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -77,6 +78,7 @@ fun MangaDetailsContent(
     userRate: MediaUserTrack?,
     mangaDexUiState: MangaDexUiState,
     rateUpdateState: RateUpdateState,
+    scoreFormat: ScoreFormat,
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
     onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
@@ -105,6 +107,7 @@ fun MangaDetailsContent(
                 userRate = userRate,
                 mangaDexUiState = mangaDexUiState,
                 titleType = titleType,
+                scoreFormat = scoreFormat,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onMangaDexIconClick = {
@@ -385,6 +388,7 @@ fun MangaDetailsContent(
             userRate = mangaDetails.toUiModel(userRate),
             preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
+            scoreFormat = scoreFormat,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
                 onSaveUserRate(save, mangaDetails.toShortData())

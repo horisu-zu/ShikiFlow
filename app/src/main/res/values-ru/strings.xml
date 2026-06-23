@@ -75,6 +75,7 @@
     <string name="settings_language_system">Системный</string>
 
     <string name="settings_preferred_title_type_desc">Выберите желаемый тип тайтла, который будет применён к названиям медиа, именам персонажей и персонала, жанров и т.д.</string>
+    <string name="settings_score_format_desc">Выберите формат оценивания</string>
     <string name="settings_app_ui_mode">Режим отображения</string>
     <string name="settings_clear_cache">Очистить кэш изображений</string>
     <string name="settings_chapter_ui_mode">Режим отображения глав</string>
@@ -929,4 +930,10 @@
     <string name="settings_switch_account">Перейти на аккаунт</string>
     <string name="browse_search_hide_filters">Скрыть фильтры</string>
     <string name="browse_search_show_filters">Показать фильтры</string>
+    <string name="score_format_100_point">100-бальная</string>
+    <string name="score_format_10_point_decimal">10-бальная с плавающей точкой</string>
+    <string name="score_format_10_point">10-бальная</string>
+    <string name="score_format_5_point">5-бальная</string>
+    <string name="score_format_3_point_smiley">3-бальная</string>
+    <string name="settings_score_format">Система оценивания</string>
 </resources>

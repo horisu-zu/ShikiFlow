@@ -59,6 +59,17 @@ class AnimeTracksViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
+
+        settingsRepository.userSettingsFlow
+            .filterNotNull()
+            .distinctUntilChangedBy { settings -> settings.scoreFormat }
+            .onEach { settings ->
+                _params.update { params ->
+                    params.copy(
+                        scoreFormat = settings.scoreFormat
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     val animeTracks = UserRateStatus.entries.associateWith { userRateStatus ->

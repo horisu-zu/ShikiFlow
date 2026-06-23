@@ -219,7 +219,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?,
+        score: Float?,
         mediaShortData: MediaShortData?
     ): Flow<DataResult<UserMediaRate>> = flow {
         emit(DataResult.Loading)
@@ -279,7 +279,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?
+        score: Float?
     ) {
         try {
             withSourceSuspend(
@@ -298,7 +298,8 @@ class MediaTracksRepositoryImpl @Inject constructor(
                             progress = progress,
                             progressVolumes = progressVolumes,
                             repeat = repeat,
-                            score = score
+                            score = score,
+                            scoreFormat = settingsRepository.scoreFormat(AuthType.ANILIST).first()
                         )
                     }
                 }
@@ -308,7 +309,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun updateMediaTrack(
+    suspend fun updateMediaTrack(
         mediaTrack: MediaUserTrack,
         mediaShortData: MediaShortData?
     ) {

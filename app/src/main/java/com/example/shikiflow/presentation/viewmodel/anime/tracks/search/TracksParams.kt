@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.anime.tracks.search
 
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
@@ -19,5 +20,6 @@ data class TracksParams(
         direction = SortDirection.DESCENDING
     ),
     val currentFilterType: TracksFilterType = TracksFilterType.SORT,
-    val genres: List<Genre> = emptyList()
+    val genres: List<Genre> = emptyList(),
+    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10
 )

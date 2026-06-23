@@ -126,6 +126,17 @@ class AnimeDetailsViewModel @Inject constructor(
                     state.copy(authType = authType)
                 }
             }.launchIn(viewModelScope)
+
+        settingsRepository.userSettingsFlow
+            .filterNotNull()
+            .distinctUntilChangedBy { settings -> settings.scoreFormat }
+            .onEach { settings ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        scoreFormat = settings.scoreFormat
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     fun saveUserRate(

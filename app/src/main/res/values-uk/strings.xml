@@ -75,6 +75,7 @@
     <string name="settings_language_select">Оберіть мову</string>
 
     <string name="settings_preferred_title_type_desc">Виберіть бажаний тип тайтлу, що буде застосовано до назв медіа, імен персонажів та персоналу, жанрів тощо</string>
+    <string name="settings_score_format_desc">Оберіть формат оцінювання</string>
     <string name="settings_app_ui_mode">Режим відображення</string>
     <string name="settings_clear_cache">Очистити кеш зображень</string>
     <string name="settings_chapter_ui_mode">Режим відображення розділів</string>
@@ -929,4 +930,10 @@
     <string name="settings_switch_account">Перейти на аккаунт</string>
     <string name="browse_search_hide_filters">Приховати фільтри</string>
     <string name="browse_search_show_filters">Показати фільтри</string>
+    <string name="score_format_100_point">100-бальна</string>
+    <string name="score_format_10_point_decimal">10-бальна з плаваючою точкою</string>
+    <string name="score_format_10_point">10-бальна</string>
+    <string name="score_format_5_point">5-бальна</string>
+    <string name="score_format_3_point_smiley">3-бальна</string>
+    <string name="settings_score_format">Система оцінювання</string>
 </resources>

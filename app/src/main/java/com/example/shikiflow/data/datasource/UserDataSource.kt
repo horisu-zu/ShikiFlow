@@ -2,8 +2,10 @@ package com.example.shikiflow.data.datasource
 
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.browse.Browse
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
@@ -13,6 +15,7 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
+import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
@@ -76,4 +79,9 @@ interface UserDataSource {
         userId: Int,
         isFollowing: Boolean
     ): DataResult<Boolean>
+
+    suspend fun setUserSettings(
+        preferredTitleType: PreferredTitleType?,
+        scoreFormat: ScoreFormat?
+    ): DataResult<UserSettings>
 }

@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.datasource
 
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -42,7 +43,7 @@ interface MediaTracksDataSource {
         progress: Int? = null,
         progressVolumes: Int? = null,
         repeat: Int? = null,
-        score: Int? = null
+        score: Float? = null
     ): UserMediaRate
 
     suspend fun saveServiceUserRate(
@@ -53,7 +54,8 @@ interface MediaTracksDataSource {
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?
+        score: Float?,
+        scoreFormat: ScoreFormat
     )
 
     suspend fun deleteUserRate(

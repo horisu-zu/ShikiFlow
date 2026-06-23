@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -68,6 +69,7 @@ fun MangaDetailsHeader(
     userRate: MediaUserTrack?,
     mangaDexUiState: MangaDexUiState,
     titleType: PreferredTitleType,
+    scoreFormat: ScoreFormat,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onMangaDexIconClick: () -> Unit,
@@ -185,6 +187,7 @@ fun MangaDetailsHeader(
                     allChapters = mangaDetails.totalCount ?: 0,
                     readChapters = userRate?.progress ?: 0,
                     score = userRate?.score ?: 0,
+                    scoreFormat = scoreFormat,
                     isManga = mangaDetails.format.isManga(),
                     isFavorite = mangaDetails.isFavorite,
                     mangaDexUiState = mangaDexUiState,
@@ -203,6 +206,7 @@ fun MangaUserRateItem(
     allChapters: Int,
     readChapters: Int,
     score: Int,
+    scoreFormat: ScoreFormat,
     isManga: Boolean,
     isFavorite: Boolean?,
     mangaDexUiState: MangaDexUiState,
@@ -243,7 +247,8 @@ fun MangaUserRateItem(
                     status = userRateStatus ?: UserRateStatus.UNKNOWN,
                     allEpisodes = allChapters,
                     watchedEpisodes = readChapters,
-                    score = score,
+                    score = score.toFloat(),
+                    scoreFormat = scoreFormat,
                     mediaType = MediaType.MANGA
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(

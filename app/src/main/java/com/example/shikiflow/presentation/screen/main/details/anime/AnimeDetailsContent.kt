@@ -38,6 +38,7 @@ import com.example.shikiflow.data.mapper.local.MediaShortMapper.toShortData
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -75,6 +76,7 @@ fun AnimeDetailsContent(
     animeDetails: MediaDetails,
     userRate: MediaUserTrack?,
     rateUpdateState: RateUpdateState,
+    scoreFormat: ScoreFormat,
     sharedTransitionScope: SharedTransitionScope,
     selectedScreenshotIndex: Int?,
     onScreenshotClick: (Int) -> Unit,
@@ -100,11 +102,12 @@ fun AnimeDetailsContent(
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
         item {
-            AnimeDetailsTitle(
+            AnimeDetailsHeader(
                 animeDetails = animeDetails,
                 userRate = userRate,
                 authType = currentAuthType,
                 titleType = titleType,
+                scoreFormat = scoreFormat,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onPlayClick = { title, id, completedEpisodes ->
@@ -390,6 +393,7 @@ fun AnimeDetailsContent(
             userRate = animeDetails.toUiModel(userRate),
             preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
+            scoreFormat = scoreFormat,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
                 onSaveUserRate(save, animeDetails.toShortData())

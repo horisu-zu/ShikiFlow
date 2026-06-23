@@ -42,6 +42,8 @@ import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.maxValue
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.IconResource
@@ -144,11 +146,14 @@ fun MediaFollowingItem(
                         append(
                             when(mediaFollowing.scoreFormat) {
                                 ScoreFormat.POINT_10_DECIMAL -> score
+                                ScoreFormat.POINT_3 -> mediaFollowing.scoreFormat.displayValue(score)
                                 else -> score.toInt()
                             }
                         )
-                        append(" / ")
-                        append(mediaFollowing.scoreFormat.maxVal)
+                        if(mediaFollowing.scoreFormat != ScoreFormat.POINT_3) {
+                            append(" / ")
+                            append(mediaFollowing.scoreFormat.maxValue())
+                        }
                     },
                     iconResources = listOf(
                         IconResource.Vector(imageVector = Icons.Default.Star)

@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.FileSize
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
@@ -36,6 +37,7 @@ import com.example.shikiflow.presentation.viewmodel.settings.SettingsViewModel
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
 import com.example.shikiflow.utils.IconResource
@@ -225,7 +227,7 @@ fun SettingsScreen(
                         ),
                         SectionItem.Default(
                             title = stringResource(R.string.settings_preferred_title_type),
-                            displayValue = stringResource(settingsState.settings.preferredTitleType.displayValue()),
+                            displayValue = stringResource(settingsState.userSettings.preferredTitleType.displayValue()),
                             onClick = {
                                 val filteredTypes = PreferredTitleType.entries
                                     .filter { type ->
@@ -240,10 +242,31 @@ fun SettingsScreen(
                                         resources.getString(it.displayValue())
                                     },
                                     currentValue = resources.getString(
-                                        settingsState.settings.preferredTitleType.displayValue()
+                                        settingsState.userSettings.preferredTitleType.displayValue()
                                     ),
                                     onOptionClick = { selectedIndex ->
                                         settingsViewModel.setTitleType(filteredTypes[selectedIndex])
+                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                            bottomSheetConfig.value = null
+                                        }
+                                    }
+                                )
+                            }
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_score_format),
+                            displayValue = stringResource(settingsState.userSettings.scoreFormat.displayValue()),
+                            isVisible = settingsState.authType == AuthType.ANILIST,
+                            onClick = {
+                                bottomSheetConfig.value = BottomSheetConfig(
+                                    title = resources.getString(R.string.settings_score_format_desc),
+                                    options = ScoreFormat.entries.map { format ->
+                                        resources.getString(format.displayValue())
+                                    },
+                                    currentValue = resources.getString(settingsState.userSettings.scoreFormat.displayValue()),
+                                    onOptionClick = { selectedIndex ->
+                                        settingsViewModel.setScoreFormat(ScoreFormat.entries[selectedIndex])
+
                                         scope.launch { sheetState.hide() }.invokeOnCompletion {
                                             bottomSheetConfig.value = null
                                         }

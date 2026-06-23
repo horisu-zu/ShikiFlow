@@ -117,6 +117,7 @@ fun AnimeTracksPage(
                     UserRateBottomSheet(
                         userRate = item.toUserRateData(),
                         preferredTitleType = preferredTitleType,
+                        scoreFormat = params.scoreFormat,
                         rateUpdateState = params.rateUpdateState,
                         onDismiss = {
                             if (params.rateUpdateState != RateUpdateState.LOADING) {

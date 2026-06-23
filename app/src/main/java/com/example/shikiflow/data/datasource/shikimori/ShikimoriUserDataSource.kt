@@ -24,11 +24,14 @@ import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserSt
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
+import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
@@ -291,5 +294,12 @@ class ShikimoriUserDataSource @Inject constructor(
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Unknown Error")
         }
+    }
+
+    override suspend fun setUserSettings(
+        preferredTitleType: PreferredTitleType?,
+        scoreFormat: ScoreFormat?
+    ): DataResult<UserSettings> {
+        TODO("AniList API only")
     }
 }

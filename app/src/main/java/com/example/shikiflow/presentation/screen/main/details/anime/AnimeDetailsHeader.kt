@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -71,11 +72,12 @@ import kotlin.time.Duration.Companion.seconds
 import kotlin.time.Instant
 
 @Composable
-fun AnimeDetailsTitle(
+fun AnimeDetailsHeader(
     animeDetails: MediaDetails,
     userRate: MediaUserTrack?,
     authType: AuthType,
     titleType: PreferredTitleType,
+    scoreFormat: ScoreFormat,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onPlayClick: (String, Int, Int) -> Unit,
@@ -230,6 +232,14 @@ fun AnimeDetailsTitle(
 
                 UserStatusItem(
                     authType = authType,
+                    status = userRate?.status,
+                    allEpisodes = (
+                        if(animeDetails.status == MediaStatus.RELEASED) animeDetails.totalCount
+                            else animeDetails.currentProgress
+                        ) ?: 0,
+                    watchedEpisodes = userRate?.progress,
+                    score = userRate?.score?.toFloat(),
+                    scoreFormat = scoreFormat,
                     isFavorite = animeDetails.isFavorite,
                     onStatusClick = onStatusClick,
                     onPlayClick = { onPlayClick(
@@ -237,14 +247,7 @@ fun AnimeDetailsTitle(
                         animeDetails.id,
                         userRate?.progress ?: 0
                     ) },
-                    onToggleFavorite = onToggleFavorite,
-                    status = userRate?.status,
-                    allEpisodes = (
-                        if(animeDetails.status == MediaStatus.RELEASED) animeDetails.totalCount
-                            else animeDetails.currentProgress
-                    ) ?: 0,
-                    watchedEpisodes = userRate?.progress,
-                    score = userRate?.score
+                    onToggleFavorite = onToggleFavorite
                 )
             }
         }
@@ -295,7 +298,8 @@ private fun UserStatusItem(
     status: UserRateStatus?,
     allEpisodes: Int,
     watchedEpisodes: Int?,
-    score: Int?,
+    score: Float?,
+    scoreFormat: ScoreFormat,
     isFavorite: Boolean?,
     onStatusClick: () -> Unit,
     onPlayClick: () -> Unit,
@@ -333,7 +337,8 @@ private fun UserStatusItem(
                     status = status ?: UserRateStatus.UNKNOWN,
                     allEpisodes = allEpisodes,
                     watchedEpisodes = watchedEpisodes,
-                    score = score
+                    score = score,
+                    scoreFormat = scoreFormat
                 ),
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = MaterialTheme.colorScheme.surface,

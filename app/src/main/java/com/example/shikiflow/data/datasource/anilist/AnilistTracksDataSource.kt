@@ -16,8 +16,10 @@ import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toAnilistRateStatus
+import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.formatShikimoriValue
 import com.example.shikiflow.data.mapper.local.TracksMapper.toDomain
 import com.example.shikiflow.di.annotations.AnilistApollo
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
@@ -26,6 +28,7 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.formatValue
 import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.Result
@@ -143,7 +146,7 @@ class AnilistTracksDataSource @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?
+        score: Float?
     ): UserMediaRate {
         val userRateQuery = SaveUserRateMutation(
             rateEntryId = Optional.presentIfNotNull(entryId),
@@ -152,7 +155,7 @@ class AnilistTracksDataSource @Inject constructor(
             progress = Optional.presentIfNotNull(progress),
             progressVolumes = Optional.presentIfNotNull(progressVolumes),
             repeat = Optional.presentIfNotNull(repeat),
-            scoreRaw = Optional.presentIfNotNull(score?.times(10))
+            score = Optional.presentIfNotNull(score?.toDouble())
         )
 
         val response = apolloClient.mutation(userRateQuery).execute()
@@ -173,9 +176,14 @@ class AnilistTracksDataSource @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Int?
+        score: Float?,
+        scoreFormat: ScoreFormat
     ) {
         val (mediaId, entryId) = getServiceUserRate(malId, mediaType)
+
+        val formattedScore = score?.let {
+            scoreFormat.formatShikimoriValue(score)
+        }
 
         saveUserRate(
             userId = userId,
@@ -186,7 +194,7 @@ class AnilistTracksDataSource @Inject constructor(
             progress = progress,
             progressVolumes = progressVolumes,
             repeat = repeat,
-            score = score
+            score = formattedScore
         )
     }
 

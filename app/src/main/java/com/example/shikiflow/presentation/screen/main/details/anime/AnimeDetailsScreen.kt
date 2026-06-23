@@ -90,6 +90,7 @@ fun AnimeDetailsScreen(
                                 animeDetails = details,
                                 userRate = uiState.userRate,
                                 rateUpdateState = uiState.rateUpdateState,
+                                scoreFormat = uiState.scoreFormat,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 selectedScreenshotIndex = selectedScreenshotIndex,
                                 onScreenshotClick = { index ->
