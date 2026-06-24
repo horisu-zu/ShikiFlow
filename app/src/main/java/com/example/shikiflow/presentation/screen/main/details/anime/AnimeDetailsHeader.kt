@@ -306,6 +306,21 @@ private fun UserStatusItem(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val style = MaterialTheme.typography.bodyMedium.copy(
+        color = MaterialTheme.colorScheme.surface,
+        fontWeight = FontWeight.SemiBold
+    )
+
+    val (text, inlineContent) = UserRateStatusMapper.mapUserRateStatusToString(
+        status = status ?: UserRateStatus.UNKNOWN,
+        allEpisodes = allEpisodes,
+        watchedEpisodes = watchedEpisodes,
+        score = score,
+        scoreFormat = scoreFormat,
+        mediaType = MediaType.ANIME,
+        style = style
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -333,17 +348,9 @@ private fun UserStatusItem(
                 tint = MaterialTheme.colorScheme.surface
             )
             Text(
-                text = UserRateStatusMapper.mapUserRateStatusToString(
-                    status = status ?: UserRateStatus.UNKNOWN,
-                    allEpisodes = allEpisodes,
-                    watchedEpisodes = watchedEpisodes,
-                    score = score,
-                    scoreFormat = scoreFormat
-                ),
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.surface,
-                    fontWeight = FontWeight.SemiBold
-                )
+                text = text,
+                inlineContent = inlineContent,
+                style = style
             )
         }
         if(authType == AuthType.SHIKIMORI) {

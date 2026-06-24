@@ -28,7 +28,6 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.formatValue
 import com.example.shikiflow.utils.DataResult
 import javax.inject.Inject
 import kotlin.Result

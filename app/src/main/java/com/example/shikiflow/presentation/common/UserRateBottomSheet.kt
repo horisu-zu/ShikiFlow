@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.common
 
 import android.os.Build
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +51,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -169,12 +172,13 @@ fun UserRateBottomSheet(
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                 ) {
                     ScoreSelector(
                         score = selectedScore,
                         scoreFormat = scoreFormat,
-                        onScoreChange = { selectedScore = it }
+                        onScoreChange = { selectedScore = it },
+                        modifier = Modifier.fillMaxWidth()
                     )
                     ProgressColumn(
                         userRate = userRate.copy(
@@ -326,9 +330,44 @@ private fun StatusChips(
 @Composable
 private fun ScoreSelector(
     score: Float,
+    scoreFormat: ScoreFormat,
     onScoreChange: (Float) -> Unit,
-    modifier: Modifier = Modifier,
-    scoreFormat: ScoreFormat
+    modifier: Modifier = Modifier
+) {
+    when(scoreFormat) {
+        ScoreFormat.POINT_100,
+        ScoreFormat.POINT_10_DECIMAL,
+        ScoreFormat.POINT_10 -> {
+            ScoreSlider(
+                score = score,
+                scoreFormat = scoreFormat,
+                onScoreChange = onScoreChange,
+                modifier = modifier
+            )
+        }
+        ScoreFormat.POINT_5 -> {
+            StarScore(
+                score = score,
+                onScoreChange = onScoreChange,
+                modifier = modifier
+            )
+        }
+        ScoreFormat.POINT_3 -> {
+            SmileyScore(
+                score = score,
+                onScoreChange = onScoreChange,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScoreSlider(
+    score: Float,
+    scoreFormat: ScoreFormat,
+    onScoreChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
         modifier = modifier,
@@ -353,6 +392,90 @@ private fun ScoreSelector(
             text = scoreFormat.displayValue(score),
             style = MaterialTheme.typography.bodyLarge
         )
+    }
+}
+
+@Composable
+private fun StarScore(
+    score: Float,
+    onScoreChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(5) { index ->
+            val isSelected = score.roundToInt() >= index + 1
+
+            IconButton(
+                onClick = {
+                    val newScore = index + 1f
+                    onScoreChange(
+                        if (newScore == score) 0f
+                            else newScore
+                    )
+                },
+                shape = RoundedCornerShape(percent = 24)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = when (isSelected) {
+                        true -> MaterialTheme.colorScheme.secondary
+                        false -> MaterialTheme.colorScheme.surfaceBright
+                    },
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SmileyScore(
+    score: Float,
+    onScoreChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LaunchedEffect(score) {
+        Log.d("SmileyScore", "Score: $score")
+    }
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(3) { index ->
+            val isSelected = score.roundToInt() >= index + 1
+
+            IconButton(
+                onClick = {
+                    val newScore = index + 1f
+                    onScoreChange(
+                        if (newScore == score) 0f
+                            else newScore
+                    )
+                },
+                shape = RoundedCornerShape(percent = 24)
+            ) {
+                Icon(
+                    painter = when (index) {
+                        2 -> painterResource(R.drawable.ic_satisfied)
+                        1 -> painterResource(R.drawable.ic_neutral)
+                        else -> painterResource(R.drawable.ic_dissatisfied)
+                    },
+                    contentDescription = null,
+                    tint = when (isSelected) {
+                        true -> MaterialTheme.colorScheme.secondary
+                        false -> MaterialTheme.colorScheme.surfaceBright
+                    },
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        }
     }
 }
 

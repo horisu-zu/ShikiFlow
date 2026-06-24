@@ -347,7 +347,6 @@
     <string name="media_user_status_dropped">Dropped</string>
 
     <string name="progress_suffix" translatable="false">" ∙ %1$d/%2$d"</string>
-    <string name="score_suffix" translatable="false">" ∙ %1$s ★"</string>
 f
     <string name="media_user_progress" translatable="false">%1$d/%2$d</string>
     <string name="media_score" translatable="false">%1$s ★</string>

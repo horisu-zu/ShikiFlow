@@ -218,6 +218,21 @@ fun MangaUserRateItem(
     val rateColor = (userRateStatus ?: UserRateStatus.UNKNOWN).color()
         .harmonize(MaterialTheme.colorScheme.background)
 
+    val style = MaterialTheme.typography.bodyMedium.copy(
+        color = rateColor,
+        fontWeight = FontWeight.SemiBold
+    )
+
+    val (text, inlineContent) = UserRateStatusMapper.mapUserRateStatusToString(
+        status = userRateStatus ?: UserRateStatus.UNKNOWN,
+        allEpisodes = allChapters,
+        watchedEpisodes = readChapters,
+        score = score.toFloat(),
+        scoreFormat = scoreFormat,
+        mediaType = MediaType.MANGA,
+        style = style
+    )
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -243,14 +258,8 @@ fun MangaUserRateItem(
                 tint = rateColor
             )
             Text(
-                text = UserRateStatusMapper.mapUserRateStatusToString(
-                    status = userRateStatus ?: UserRateStatus.UNKNOWN,
-                    allEpisodes = allChapters,
-                    watchedEpisodes = readChapters,
-                    score = score.toFloat(),
-                    scoreFormat = scoreFormat,
-                    mediaType = MediaType.MANGA
-                ),
+                text = text,
+                inlineContent = inlineContent,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     color = rateColor,
                     fontWeight = FontWeight.SemiBold
