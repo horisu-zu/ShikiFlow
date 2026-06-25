@@ -94,11 +94,11 @@ object ShikimoriCharacterMapper {
             voiceActors = seyu?.map { it.toDomain() } ?: emptyList(),
             animeRoles = PaginatedList(
                 hasNextPage = (animes?.size ?: 0) > 24,
-                entries = animes?.map { it.toDomain() }.orEmpty()
+                entries = animes?.map { it.toDomain().toCharacterRole() }.orEmpty()
             ),
             mangaRoles = PaginatedList(
                 hasNextPage = (mangas?.size ?: 0) > 24,
-                entries = mangas?.map { it.toDomain() }.orEmpty()
+                entries = mangas?.map { it.toDomain().toCharacterRole() }.orEmpty()
             ),
             topicId = topicId
         )

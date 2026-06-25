@@ -12,7 +12,6 @@ import com.example.graphql.shikimori.CharacterDetailsQuery
 import com.example.graphql.shikimori.CharacterSearchQuery
 import com.example.graphql.shikimori.MangaCharactersQuery
 import com.example.shikiflow.data.datasource.CharactersDataSource
-import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toCharacterRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toMediaCharacter
 import com.example.shikiflow.data.remote.CharacterApi
@@ -80,7 +79,7 @@ class ShikimoriCharactersDataSource @Inject constructor(
                         val mediaRoles = when(mediaType) {
                             MediaType.ANIME -> details.animeRoles.entries
                             MediaType.MANGA -> details.mangaRoles.entries
-                        }.map { it.toCharacterRole() }
+                        }
 
                         LoadResult.Page(
                             data = mediaRoles,

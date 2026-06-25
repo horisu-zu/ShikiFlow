@@ -61,13 +61,13 @@ object AnilistStaffMapper {
         )
     }
 
-    fun ALMediaStaffRoles?.toDomain(): PaginatedList<ShortMedia> {
+    fun ALMediaStaffRoles?.toStaffMediaRoles(): PaginatedList<StaffMediaRole> {
         val hasNextPage = this?.pageInfo?.hasNextPage == true
+
         val mediaRoles = this?.edges
-            ?.distinctBy { it?.aLMediaStaffRole?.node?.aLMediaBrowseShort?.id }
             ?.mapNotNull { edge ->
-                edge?.aLMediaStaffRole?.node?.aLMediaBrowseShort?.toDomain()
-            }
+                edge?.aLMediaStaffRole?.toStaffMediaRole()
+            }?.groupRoles()
 
         return mediaRoles
             ?.let { entries ->
@@ -76,6 +76,17 @@ object AnilistStaffMapper {
                     entries = entries
                 )
             } ?: PaginatedList(false, emptyList())
+    }
+
+    fun List<StaffMediaRole>.groupRoles(): List<StaffMediaRole> {
+        return this.groupBy { it.shortMedia.id }
+            .mapValues { (_, staffRoles) ->
+                StaffMediaRole(
+                    shortMedia = staffRoles.first().shortMedia,
+                    staffRoles = staffRoles.flatMap { it.staffRoles }
+                )
+            }.values
+            .toList()
     }
 
     /*fun ALMediaStaffRoles?.toStaffMediaRoles(): List<StaffMediaRole> {
@@ -116,8 +127,8 @@ object AnilistStaffMapper {
                         entries = characterRoles
                     )
                 } ?: PaginatedList(hasNextPage = false, entries = emptyList()),
-            staffAnimeRoles = animeStaffRoles?.aLMediaStaffRoles.toDomain(),
-            staffMangaRoles = mangaStaffRoles?.aLMediaStaffRoles.toDomain(),
+            staffAnimeRoles = animeStaffRoles?.aLMediaStaffRoles.toStaffMediaRoles(),
+            staffMangaRoles = mangaStaffRoles?.aLMediaStaffRoles.toStaffMediaRoles(),
             topicId = null
         )
     }

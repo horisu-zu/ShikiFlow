@@ -62,22 +62,18 @@ object AnilistCharacterMapper {
             voiceActors = emptyList(),
             animeRoles = PaginatedList(
                 hasNextPage = anime?.aLCharacterMediaRoles?.pageInfo?.hasNextPage == true,
-                entries = anime?.aLCharacterMediaRoles?.edges?.mapNotNull {
-                    it?.node?.aLMediaBrowseShort?.toDomain()
-                }.orEmpty(),
+                entries = anime?.aLCharacterMediaRoles?.toCharacterMediaRole().orEmpty(),
             ),
             mangaRoles = PaginatedList(
                 hasNextPage = manga?.aLCharacterMediaRoles?.pageInfo?.hasNextPage == true,
-                entries = manga?.aLCharacterMediaRoles?.edges?.mapNotNull {
-                    it?.node?.aLMediaBrowseShort?.toDomain()
-                }.orEmpty()
+                entries = manga?.aLCharacterMediaRoles?.toCharacterMediaRole().orEmpty()
             ),
             topicId = null
         )
     }
 
     fun ALCharacterMediaRoles.toCharacterMediaRole(): List<CharacterMediaRole> {
-        return this.edges?.mapNotNull {
+        return edges?.mapNotNull {
             it?.node?.aLMediaBrowseShort?.toDomain(
                 characterRole = it.characterRole?.toDomain() ?: CharacterRole.UNKNOWN
             )

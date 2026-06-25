@@ -41,7 +41,7 @@ object ScoreFormatMapper {
             ScoreFormat.POINT_100,
             ScoreFormat.POINT_10,
             ScoreFormat.POINT_5 -> score.roundToInt().toString()
-            ScoreFormat.POINT_10_DECIMAL ->  "%.1f".format(score)
+            ScoreFormat.POINT_10_DECIMAL -> if (score % 1 == 0f) score.roundToInt().toString() else "%.1f".format(score)
             ScoreFormat.POINT_3 -> "-"
         }
     }

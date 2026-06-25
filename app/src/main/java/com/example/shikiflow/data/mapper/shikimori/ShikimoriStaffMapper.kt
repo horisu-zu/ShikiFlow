@@ -43,7 +43,7 @@ object ShikimoriStaffMapper {
                     )
                 } ?: PaginatedList(false, emptyList()),
             staffAnimeRoles = works?.mapNotNull { work ->
-                work.anime?.toDomain()
+                work.anime?.toStaffRole(work.role)
             }
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { animeRoles ->
@@ -53,7 +53,7 @@ object ShikimoriStaffMapper {
                     )
                 } ?: PaginatedList(false, emptyList()),
             staffMangaRoles = works?.mapNotNull { work ->
-                work.manga?.toDomain()
+                work.manga?.toStaffRole(work.role)
             }
                 ?.takeIf { it.isNotEmpty() }
                 ?.let { mangaRoles ->
@@ -92,7 +92,7 @@ object ShikimoriStaffMapper {
     }
     
     fun Role.toVoiceActorRole(): List<VoiceActorMediaRole> {
-        val vaRoles = this.characters.map { character ->
+        val vaRoles = characters.map { character ->
             VoiceActorMediaRole(
                 characterShort = character.toDomain(),
                 shortMediaList = animes.map { it.toDomain() }
