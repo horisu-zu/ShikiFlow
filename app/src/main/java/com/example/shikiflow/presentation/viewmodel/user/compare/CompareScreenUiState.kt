@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.user.compare
 
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.domain.model.user.MediaComparison
@@ -10,7 +11,8 @@ data class CompareScreenUiState(
     val targetUserId: Int? = null,
     val mediaType: MediaType? = null,
     val mediaUiState: Map<MediaType, CompareMediaUiState> =
-        MediaType.entries.associateWith { CompareMediaUiState() }
+        MediaType.entries.associateWith { CompareMediaUiState() },
+    val scoreFormat: ScoreFormat? = null
 )
 
 data class CompareMediaUiState(

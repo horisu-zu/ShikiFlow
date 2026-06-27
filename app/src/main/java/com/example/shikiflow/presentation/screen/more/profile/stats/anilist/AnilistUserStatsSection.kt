@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -84,7 +83,6 @@ fun AnilistUserStatsSection(
                 StatsSectionItem(
                     stats = (uiState.overviewStats.animeStats ?: uiState.overviewStats.mangaStats)
                         ?.shortStats.takeIf { !it.isNullOrEmpty() },
-                    isLoading = uiState.isLoading,
                     errorMessage = uiState.errorMessage,
                     onRetryClick = { event.onRefresh(uiState.statsSectionType) }
                 ) {
@@ -100,11 +98,11 @@ fun AnilistUserStatsSection(
             UserStatsSectionType.GENRES -> {
                 StatsSectionItem(
                     stats = uiState.genreStats.stats?.get(uiState.mediaType),
-                    isLoading = uiState.genreStats.isLoading,
                     errorMessage = uiState.genreStats.errorMessage,
                     onRetryClick = { event.onRefresh(uiState.statsSectionType) }
                 ) {
                     TypeStatSection(
+                        isLoading = uiState.genreStats.isLoading,
                         typeStats = uiState.genreStats.stats?.get(uiState.mediaType) ?: emptyList(),
                         statsBarType = uiState.genresBarType[uiState.mediaType] ?: StatsBarType.TITLES,
                         typesList =  uiState.typesList,
@@ -123,11 +121,11 @@ fun AnilistUserStatsSection(
             UserStatsSectionType.TAGS -> {
                 StatsSectionItem(
                     stats = uiState.tagsStats.stats?.get(uiState.mediaType),
-                    isLoading = uiState.tagsStats.isLoading,
                     errorMessage = uiState.tagsStats.errorMessage,
                     onRetryClick = { event.onRefresh(uiState.statsSectionType) }
                 ) {
                     TypeStatSection(
+                        isLoading = uiState.tagsStats.isLoading,
                         typeStats = uiState.tagsStats.stats?.get(uiState.mediaType) ?: emptyList(),
                         statsBarType = uiState.tagsBarType[uiState.mediaType] ?: StatsBarType.TITLES,
                         typesList =  uiState.typesList,
@@ -146,11 +144,11 @@ fun AnilistUserStatsSection(
             UserStatsSectionType.STAFF -> {
                 StatsSectionItem(
                     stats = uiState.staffStats.stats?.get(uiState.mediaType),
-                    isLoading = uiState.staffStats.isLoading,
                     errorMessage = uiState.staffStats.errorMessage,
                     onRetryClick = { event.onRefresh(uiState.statsSectionType) }
                 ) {
                     StaffSection(
+                        isLoading = uiState.staffStats.isLoading,
                         staffStats = uiState.staffStats.stats?.get(uiState.mediaType) ?: emptyList(),
                         staffBarType = uiState.staffBarType[uiState.mediaType] ?: StatsBarType.TITLES,
                         typesList = uiState.typesList,
@@ -172,11 +170,11 @@ fun AnilistUserStatsSection(
             UserStatsSectionType.VOICE_ACTORS -> {
                 StatsSectionItem(
                     stats = uiState.voiceActorsStats.stats,
-                    isLoading = uiState.voiceActorsStats.isLoading,
                     errorMessage = uiState.voiceActorsStats.errorMessage,
                     onRetryClick = { event.onRefresh(uiState.statsSectionType) }
                 ) {
                     StaffSection(
+                        isLoading = uiState.voiceActorsStats.isLoading,
                         staffStats = uiState.voiceActorsStats.stats ?: emptyList(),
                         staffBarType = uiState.voiceActorsBarType,
                         typesList = listOf(MediaType.ANIME),
@@ -198,11 +196,11 @@ fun AnilistUserStatsSection(
             UserStatsSectionType.STUDIOS -> {
                 StatsSectionItem(
                     stats = uiState.studiosStats.stats,
-                    isLoading = uiState.studiosStats.isLoading,
                     errorMessage = uiState.studiosStats.errorMessage,
                     onRetryClick = { event.onRefresh(uiState.statsSectionType) }
                 ) {
                     StudiosSection(
+                        isLoading = uiState.studiosStats.isLoading,
                         typeStats = uiState.studiosStats.stats ?: emptyList(),
                         statsBarType = uiState.studiosBarType,
                         horizontalPadding = horizontalPadding,
@@ -223,21 +221,11 @@ fun AnilistUserStatsSection(
 @Composable
 private fun <T> StatsSectionItem(
     stats: List<T>?,
-    isLoading: Boolean,
     errorMessage: String?,
     onRetryClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
-    if(!stats.isNullOrEmpty()) {
-        content()
-    } else if(isLoading) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    } else if(errorMessage != null) {
+    if(errorMessage != null) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -248,7 +236,7 @@ private fun <T> StatsSectionItem(
                 onButtonClick = { onRetryClick() }
             )
         }
-    } else {
+    } else if(stats?.isEmpty() == true) {
         Box(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
@@ -257,5 +245,7 @@ private fun <T> StatsSectionItem(
                 message = stringResource(R.string.stats_empty_label)
             )
         }
+    } else {
+        content()
     }
 }

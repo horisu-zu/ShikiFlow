@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.common
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,20 +13,22 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
+import androidx.compose.foundation.style.MutableStyleState
+import androidx.compose.foundation.style.size
+import androidx.compose.foundation.style.styleable
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -66,7 +67,7 @@ fun <T> HorizontalStatsBar(
     modifier: Modifier = Modifier,
     barType: SegmentedProgressBarType = SegmentedProgressBarType.Row(
         barHeight = 12.dp,
-        barShape = CircleShape,
+        barShape = RoundedCornerShape(percent = 24),
         itemSize = 12.dp
     )
 ) {
@@ -120,6 +121,7 @@ fun <T> HorizontalStatsBar(
                         )
                     }
                 }
+
                 SegmentedProgressBarItem(
                     stats = stats,
                     color = color,
@@ -161,6 +163,7 @@ private fun <T> SegmentedProgressBarItem(
     }
 }
 
+@OptIn(ExperimentalFoundationStyleApi::class)
 @Composable
 private fun SegmentedDataRowItem(
     status: String,
@@ -170,18 +173,20 @@ private fun SegmentedDataRowItem(
     modifier: Modifier = Modifier
 ) {
     val backgroundColor = MaterialTheme.colorScheme.background
+    val styleState = remember { MutableStyleState(null) }
 
     Row(
         modifier = modifier.height(IntrinsicSize.Min),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        Canvas(modifier = Modifier.size(size)) {
-            drawCircle(
-                color = color.harmonize(backgroundColor),
-                style = Fill
-            )
-        }
+        Box(
+            modifier = Modifier.styleable(styleState) {
+                size(size)
+                shape(RoundedCornerShape(percent = 32))
+                background(color.harmonize(backgroundColor))
+            }
+        )
         Text(
             text = buildAnnotatedString {
                 append(status)
@@ -211,7 +216,8 @@ private fun SegmentedDataColumnItem(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .clip(RoundedCornerShape(8.dp))
                 .background(
                     color = color

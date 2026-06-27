@@ -8,13 +8,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -42,8 +43,10 @@ import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.display
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.formatDaysHours
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.sortedBy
 import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.ShortStatsOverviewItem
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.ShortStatsOverviewItemPlaceholder
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.StatType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.StatType.Companion.displayValue
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.StatType.Companion.iconResource
@@ -53,6 +56,7 @@ import kotlin.collections.component2
 
 @Composable
 fun <T> TypeStatSection(
+    isLoading: Boolean,
     typeStats: List<TypeStat<T>>,
     statsBarType: StatsBarType,
     typesList: List<MediaType>,
@@ -116,19 +120,28 @@ fun <T> TypeStatSection(
             )
         }
 
-        typeStats.sortedBy(
-            type = statsBarType,
-            mediaType = currentMediaType
-        ).forEachIndexed { index, typeStat ->
-            item(key = typeStat.type) {
-                StatItem(
-                    stat = typeStat,
-                    positionNumber = index + 1,
-                    mediaType = currentMediaType,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .animateItem()
+        if (isLoading) {
+            items(12) { index ->
+                TypeStatItemPlaceholder(
+                    itemIndex = index,
+                    modifier = Modifier.fillMaxWidth()
                 )
+            }
+        } else {
+            typeStats.sortedBy(
+                type = statsBarType,
+                mediaType = currentMediaType
+            ).forEachIndexed { index, typeStat ->
+                item(key = typeStat.type) {
+                    StatItem(
+                        stat = typeStat,
+                        positionNumber = index + 1,
+                        mediaType = currentMediaType,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItem()
+                    )
+                }
             }
         }
     }
@@ -186,7 +199,7 @@ fun StatItem(
             Box(
                 modifier = Modifier
                     .size(24.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(percent = 32))
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
@@ -212,6 +225,55 @@ fun StatItem(
                     label = stringResource(id = type.displayValue(mediaType)),
                     value = statValue,
                     iconResource = type.iconResource(mediaType),
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TypeStatItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val indexValue = itemIndex % 3 + 1
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(72.dp + 24.dp * indexValue)
+                    .height(MaterialTheme.typography.titleLarge.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            repeat(3) { index ->
+                ShortStatsOverviewItemPlaceholder(
+                    itemIndex = index,
                     modifier = Modifier.weight(1f)
                 )
             }

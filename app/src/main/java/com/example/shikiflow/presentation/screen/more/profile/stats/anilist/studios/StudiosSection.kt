@@ -19,9 +19,11 @@ import com.example.shikiflow.presentation.common.mappers.ProfileMapper.sortedBy
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.TypeSelector
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.tags.StatItem
+import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.tags.TypeStatItemPlaceholder
 
 @Composable
 fun StudiosSection(
+    isLoading: Boolean,
     typeStats: List<StudioStat>,
     statsBarType: StatsBarType,
     horizontalPadding: Dp,
@@ -53,20 +55,29 @@ fun StudiosSection(
             )
         }
 
-        typeStats.sortedBy(
-            type = statsBarType,
-            mediaType = MediaType.ANIME
-        ).forEachIndexed { index, studioStat ->
-            item(key = studioStat.studioShort.id) {
-                StatItem(
-                    stat = studioStat,
-                    positionNumber = index + 1,
-                    mediaType = MediaType.ANIME,
-                    onClick = { onStudioClick(studioStat.studioShort) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .animateItem()
+        if (isLoading) {
+            items(12) { index ->
+                TypeStatItemPlaceholder(
+                    itemIndex = index,
+                    modifier = Modifier.fillMaxWidth()
                 )
+            }
+        } else {
+            typeStats.sortedBy(
+                type = statsBarType,
+                mediaType = MediaType.ANIME
+            ).forEachIndexed { index, studioStat ->
+                item(key = studioStat.studioShort.id) {
+                    StatItem(
+                        stat = studioStat,
+                        positionNumber = index + 1,
+                        mediaType = MediaType.ANIME,
+                        onClick = { onStudioClick(studioStat.studioShort) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .animateItem()
+                    )
+                }
             }
         }
     }

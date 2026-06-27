@@ -113,6 +113,7 @@ class ProfileViewModel @Inject constructor(
 
         settingsRepository.userFlow
             .filterNotNull()
+            .distinctUntilChanged()
             .onEach { user ->
                 mutableUiState.update { state ->
                     state.copy(
@@ -123,10 +124,12 @@ class ProfileViewModel @Inject constructor(
 
         settingsRepository.authTypeFlow
             .filterNotNull()
+            .distinctUntilChanged()
             .onEach { authType ->
                 mutableUiState.update { state ->
                     state.copy(
-                        authType = authType
+                        authType = authType,
+                        selectedTabIndex = 0
                     )
                 }
             }.launchIn(viewModelScope)
@@ -134,8 +137,13 @@ class ProfileViewModel @Inject constructor(
 
     fun setUser(user: User) {
         mutableUiState.update { state ->
-            if (state.user?.id == user.id) state
-                else state.copy(user = user)
+            state.copy(user = user)
+        }
+    }
+
+    fun setTab(tabIndex: Int) {
+        mutableUiState.update { state ->
+            state.copy(selectedTabIndex = tabIndex)
         }
     }
 

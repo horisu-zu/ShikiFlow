@@ -3,8 +3,11 @@ package com.example.shikiflow.presentation.screen.more.profile.activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -36,6 +39,7 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.description
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter.convertInstantToString
 
 @Composable
@@ -98,9 +102,9 @@ fun ListActivityItem(
     ) {
         BaseImage(
             model = listActivity.coverImage,
-            contentDescription = "Poster",
-            modifier = Modifier.width(96.dp)
+            contentDescription = "Poster"
         )
+
         Column(
             modifier = Modifier.padding(vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -110,11 +114,13 @@ fun ListActivityItem(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             )
+
             Text(
                 text = listActivity.title.preferred(titleType),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.SemiBold
             )
+
             Text(
                 text = listActivity.description()
                     .withStyledDigits(
@@ -126,6 +132,59 @@ fun ListActivityItem(
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun ListActivityItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    maxValue: Int = 3
+) {
+    val imageType = ImageType.Poster()
+    val indexValue = itemIndex % maxValue + 1
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(imageType.width)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .shimmerEffect()
+        )
+
+        Column(
+            modifier = Modifier.padding(vertical = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(80.dp * (maxValue - indexValue + 1))
+                    .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Box(
+                modifier = Modifier
+                    .padding(top = 2.dp)
+                    .width(120.dp * indexValue)
+                    .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
             )
         }
     }

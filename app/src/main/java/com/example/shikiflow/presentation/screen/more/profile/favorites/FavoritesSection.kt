@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -51,6 +53,7 @@ import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.toTabRowItem
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.user.favorites.FavoritesViewModel
 import kotlinx.coroutines.launch
@@ -127,12 +130,6 @@ fun FavoritesSection(
                 ?.collectAsLazyPagingItems() ?: return@HorizontalPager
 
             when (userFavoriteItems.loadState.refresh) {
-                is LoadState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
                 is LoadState.Error -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -167,29 +164,42 @@ fun FavoritesSection(
                             ),
                             modifier = Modifier.fillMaxSize()
                         ) {
-                            items(
-                                count = userFavoriteItems.itemCount,
-                                key = { index -> userFavoriteItems[index]?.id ?: index }
-                            ) { index ->
-                                userFavoriteItems[index]?.let { item ->
-                                    if(item.favoriteCategory == FavoriteCategory.STUDIO) {
-                                        FavoriteStudioItem(
-                                            id = item.id,
-                                            name = item.name.preferred(titleType),
-                                            onStudioClick = onStudioClick,
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .aspectRatio(1.5f)
+                            if (userFavoriteItems.loadState.refresh is LoadState.Loading) {
+                                items(24) { index ->
+                                    if (favoriteCategories[page] == FavoriteCategory.STUDIO) {
+                                        FavoriteStudioItemPlaceholder(
+                                            itemIndex = index,
+                                            modifier = Modifier.aspectRatio(1.5f)
                                         )
                                     } else {
-                                        FavoriteItem(
-                                            userFavorite = item,
-                                            titleType = titleType,
-                                            onItemClick = { id ->
-                                                onFavoriteClick(favoriteCategories[page], id)
-                                            },
-                                            modifier = Modifier.fillMaxWidth()
-                                        )
+                                        FavoriteItemPlaceholder()
+                                    }
+                                }
+                            } else if (userFavoriteItems.loadState.refresh is LoadState.NotLoading) {
+                                items(
+                                    count = userFavoriteItems.itemCount,
+                                    key = { index -> userFavoriteItems[index]?.id ?: index }
+                                ) { index ->
+                                    userFavoriteItems[index]?.let { item ->
+                                        if(item.favoriteCategory == FavoriteCategory.STUDIO) {
+                                            FavoriteStudioItem(
+                                                id = item.id,
+                                                name = item.name.preferred(titleType),
+                                                onStudioClick = onStudioClick,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .aspectRatio(1.5f)
+                                            )
+                                        } else {
+                                            FavoriteItem(
+                                                userFavorite = item,
+                                                titleType = titleType,
+                                                onItemClick = { id ->
+                                                    onFavoriteClick(favoriteCategories[page], id)
+                                                },
+                                                modifier = Modifier.fillMaxWidth()
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -236,13 +246,11 @@ private fun FavoriteItem(
             .clickable { onItemClick(userFavorite.id) },
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
-        userFavorite.imageUrl?.let { imageUrl ->
-            BaseImage(
-                model = imageUrl,
-                contentScale = ContentScale.Crop,
-                imageType = imageType
-            )
-        }
+        BaseImage(
+            model = userFavorite.imageUrl,
+            contentScale = ContentScale.Crop,
+            imageType = imageType
+        )
         Text(
             text = userFavorite.name.preferred(titleType),
             style = MaterialTheme.typography.labelSmall,
@@ -253,6 +261,38 @@ private fun FavoriteItem(
                 end = 4.dp,
                 bottom = 4.dp
             )
+        )
+    }
+}
+
+@Composable
+private fun FavoriteItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    val imageType = ImageType.Poster(width = Int.MAX_VALUE.dp)
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(imageType.width)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .shimmerEffect()
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .padding(
+                    start = 4.dp,
+                    end = 4.dp,
+                    bottom = 4.dp
+                )
         )
     }
 }
@@ -280,5 +320,33 @@ private fun FavoriteStudioItem(
             overflow = TextOverflow.Ellipsis,
             maxLines = 2
         )
+    }
+}
+
+@Composable
+private fun FavoriteStudioItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    maxValue: Int = 4
+) {
+    val indexValue = itemIndex % maxValue + 1
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 12.dp, vertical = 18.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        repeat((maxValue / indexValue).coerceAtMost(2)) { index ->
+            Box(
+                modifier = Modifier
+                    .width(40.dp * (indexValue + index))
+                    .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+        }
     }
 }

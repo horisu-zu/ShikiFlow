@@ -10,6 +10,7 @@ data class ProfileUiState(
     val currentUser: User? = null,
     val userStatsCategories: UserStatsCategories = UserStatsCategories(),
     val authType: AuthType? = null,
+    val selectedTabIndex: Int = 0,
 
     override val errorMessage: String? = null,
     override val isLoading: Boolean = true,

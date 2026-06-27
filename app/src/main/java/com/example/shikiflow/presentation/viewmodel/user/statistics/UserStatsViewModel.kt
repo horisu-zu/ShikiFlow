@@ -12,6 +12,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -51,14 +52,12 @@ class UserStatsViewModel @Inject constructor(
                                 isRefreshing = false
                             )
                         }
-
                         is DataResult.Success -> {
                             state.copy(
                                 overviewStats = result.data,
                                 isLoading = false
                             )
                         }
-
                         is DataResult.Error -> {
                             state.copy(
                                 errorMessage = result.message,
@@ -269,18 +268,14 @@ class UserStatsViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
-        mutableUiState
-            .filter { uiState ->
-                uiState.userId != null
-            }
+        settingsRepository.authTypeFlow
+            .filterNotNull()
             .distinctUntilChanged()
-            .flatMapLatest {
-                settingsRepository.authTypeFlow
-            }
             .onEach { authType ->
                 mutableUiState.update { state ->
                     state.copy(
-                        authType = authType
+                        authType = authType,
+                        statsSectionType = UserStatsSectionType.OVERVIEW
                     )
                 }
             }.launchIn(viewModelScope)

@@ -51,6 +51,7 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadItem
+import com.example.shikiflow.presentation.screen.main.details.common.ThreadItemPlaceholder
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.social.UserSocialViewModel
 import kotlinx.coroutines.launch
@@ -137,12 +138,6 @@ fun SocialSection(
                 ?.collectAsLazyPagingItems() ?: return@HorizontalPager
 
             when(socialItems.loadState.refresh) {
-                is LoadState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
                 is LoadState.Error -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -180,74 +175,93 @@ fun SocialSection(
                                 .fillMaxSize()
                                 .padding(top = paddingValues.calculateTopPadding())
                         ) {
-                            items(socialItems.itemCount) { index ->
-                                socialItems[index]?.let { item ->
-                                    when(item) {
-                                        is Follower -> {
-                                            UserSocialItem(
-                                                user = item.data,
-                                                modifier = Modifier
-                                                    .clip(RoundedCornerShape(12.dp))
-                                                    .clickable {
-                                                        navOptions.navigateToProfile(item.data)
-                                                    }
-                                                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                            if (socialItems.loadState.refresh is LoadState.Loading) {
+                                items(24) { index ->
+                                    when (category) {
+                                        SocialCategory.THREADS -> {
+                                            ThreadItemPlaceholder(itemIndex = index)
+                                        }
+                                        SocialCategory.COMMENTS -> {
+                                            ThreadCommentItemPlaceholder(itemIndex = index)
+                                        }
+                                        else -> {
+                                            UserSocialItemPlaceholder(
+                                                index = index,
+                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
                                             )
                                         }
-                                        is Thread -> {
-                                            ThreadItem(
-                                                threadData = item.data,
-                                                resources = resources,
-                                                onThreadClick = { id ->
-                                                    val navRoute = DetailsNavRoute.Comments(
-                                                        screenMode = CommentsScreenMode.TOPIC,
-                                                        threadHeader = item.data,
-                                                        id = id
-                                                    )
+                                    }
+                                }
+                            } else if (socialItems.loadState.refresh is LoadState.NotLoading) {
+                                items(socialItems.itemCount) { index ->
+                                    socialItems[index]?.let { item ->
+                                        when(item) {
+                                            is Follower -> {
+                                                UserSocialItem(
+                                                    user = item.data,
+                                                    modifier = Modifier
+                                                        .clip(RoundedCornerShape(12.dp))
+                                                        .clickable {
+                                                            navOptions.navigateToProfile(item.data)
+                                                        }
+                                                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                                                )
+                                            }
+                                            is Thread -> {
+                                                ThreadItem(
+                                                    threadData = item.data,
+                                                    resources = resources,
+                                                    onThreadClick = { id ->
+                                                        val navRoute = DetailsNavRoute.Comments(
+                                                            screenMode = CommentsScreenMode.TOPIC,
+                                                            threadHeader = item.data,
+                                                            id = id
+                                                        )
 
-                                                    navOptions.navigateToDetails(navRoute)
-                                                },
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
-                                        }
-                                        is ThreadComment -> {
-                                            ThreadCommentItem(
-                                                threadComment = item,
-                                                onThreadClick = {
-                                                    val navRoute = DetailsNavRoute.Comments(
-                                                        screenMode = CommentsScreenMode.TOPIC,
-                                                        threadHeader = item.thread,
-                                                        id = item.thread.id
-                                                    )
+                                                        navOptions.navigateToDetails(navRoute)
+                                                    },
+                                                    modifier = Modifier.fillMaxWidth()
+                                                )
+                                            }
+                                            is ThreadComment -> {
+                                                ThreadCommentItem(
+                                                    threadComment = item,
+                                                    onThreadClick = {
+                                                        val navRoute = DetailsNavRoute.Comments(
+                                                            screenMode = CommentsScreenMode.TOPIC,
+                                                            threadHeader = item.thread,
+                                                            id = item.thread.id
+                                                        )
 
-                                                    navOptions.navigateToDetails(navRoute)
-                                                },
-                                                onEntityClick = { entityType, id ->
-                                                    val detailsNavRoute = when (entityType) {
-                                                        EntityType.CHARACTER -> {
-                                                            DetailsNavRoute.CharacterDetails(id)
+                                                        navOptions.navigateToDetails(navRoute)
+                                                    },
+                                                    onEntityClick = { entityType, id ->
+                                                        val detailsNavRoute = when (entityType) {
+                                                            EntityType.CHARACTER -> {
+                                                                DetailsNavRoute.CharacterDetails(id)
+                                                            }
+                                                            EntityType.PERSON -> {
+                                                                DetailsNavRoute.Staff(id)
+                                                            }
+                                                            EntityType.ANIME -> {
+                                                                DetailsNavRoute.AnimeDetails(id)
+                                                            }
+                                                            EntityType.MANGA, EntityType.RANOBE -> {
+                                                                DetailsNavRoute.MangaDetails(id)
+                                                            }
+                                                            EntityType.COMMENT -> {
+                                                                DetailsNavRoute.Comments(
+                                                                    screenMode = CommentsScreenMode.COMMENT,
+                                                                    threadHeader = item.thread,
+                                                                    id = id
+                                                                )
+                                                            }
                                                         }
-                                                        EntityType.PERSON -> {
-                                                            DetailsNavRoute.Staff(id)
-                                                        }
-                                                        EntityType.ANIME -> {
-                                                            DetailsNavRoute.AnimeDetails(id)
-                                                        }
-                                                        EntityType.MANGA, EntityType.RANOBE -> {
-                                                            DetailsNavRoute.MangaDetails(id)
-                                                        }
-                                                        EntityType.COMMENT -> {
-                                                            DetailsNavRoute.Comments(
-                                                                screenMode = CommentsScreenMode.COMMENT,
-                                                                threadHeader = item.thread,
-                                                                id = id
-                                                            )
-                                                        }
+
+                                                        navOptions.navigateToDetails(detailsNavRoute)
                                                     }
-
-                                                    navOptions.navigateToDetails(detailsNavRoute)
-                                                }
-                                            )
+                                                )
+                                            }
                                         }
                                     }
                                 }

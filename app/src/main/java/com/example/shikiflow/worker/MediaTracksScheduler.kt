@@ -41,6 +41,7 @@ class MediaTracksScheduler @Inject constructor(
                 )
             )
             .setConstraints(networkConstraints)
+            .setInitialDelay(5000L, TimeUnit.MILLISECONDS)
             .setBackoffCriteria(BackoffPolicy.LINEAR, ONE_TIME_BACKOFF_DELAY, TimeUnit.MILLISECONDS)
             .build()
 

@@ -46,6 +46,7 @@ import jakarta.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 
 class ShikimoriUserDataSource @Inject constructor(
@@ -132,23 +133,23 @@ class ShikimoriUserDataSource @Inject constructor(
     }
 
     override fun getUserGenres(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<Genre>>>>> {
-        TODO("Not Available")
+        return emptyFlow()
     }
 
     override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<MediaTagEnum>>>>> {
-        TODO("Not Available")
+        return emptyFlow()
     }
 
     override fun getUserStaff(userId: Int): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> {
-        TODO("Not Available")
+        return emptyFlow()
     }
 
     override fun getUserVoiceActors(userId: Int): Flow<DataResult<List<StaffStat>>> {
-        TODO("Not Available")
+        return emptyFlow()
     }
 
     override fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>> {
-        TODO("Not Available")
+        return emptyFlow()
     }
 
     override fun getUserFavorites(

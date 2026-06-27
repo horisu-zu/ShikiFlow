@@ -68,12 +68,6 @@ fun UserActivitySection(
         }
     ) {
         when(userActivityItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
             is LoadState.Error -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -96,57 +90,65 @@ fun UserActivitySection(
                         vertical = 8.dp
                     )
                 ) {
-                    items(
-                        count = userActivityItems.itemCount,
-                        span = { index ->
-                            val item = userActivityItems.peek(index)
-
-                            GridItemSpan(
-                                currentLineSpan = when(item) {
-                                    is ListActivity -> 1
-                                    else -> maxLineSpan
-                                }
+                    if (userActivityItems.loadState.refresh is LoadState.Loading) {
+                        items(12) { index ->
+                            ListActivityItemPlaceholder(
+                                itemIndex = index
                             )
                         }
-                    ) { index ->
-                        userActivityItems[index]?.let { activityItem ->
-                            ActivityItem(
-                                userActivity = activityItem,
-                                titleType = preferredTitleType,
-                                onListActivityClick = { mediaType, id ->
-                                    val detailsNavRoute = when(mediaType) {
-                                        MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                                        MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                                    }
+                    } else if(userActivityItems.loadState.refresh is LoadState.NotLoading) {
+                        items(
+                            count = userActivityItems.itemCount,
+                            span = { index ->
+                                val item = userActivityItems.peek(index)
 
-                                    navOptions.navigateToDetails(detailsNavRoute)
-                                },
-                                onUserClick = { user ->
-                                    navOptions.navigateToProfile(user)
-                                },
-                                onEntityClick = { entityType, id ->
-                                    val detailsNavRoute = when (entityType) {
-                                        EntityType.CHARACTER -> {
-                                            DetailsNavRoute.CharacterDetails(id)
-                                        }
-                                        EntityType.PERSON -> {
-                                            DetailsNavRoute.Staff(id)
-                                        }
-                                        EntityType.ANIME -> {
-                                            DetailsNavRoute.AnimeDetails(id)
-                                        }
-                                        EntityType.MANGA, EntityType.RANOBE -> {
-                                            DetailsNavRoute.MangaDetails(id)
-                                        }
-                                        EntityType.COMMENT -> {
-                                            DetailsNavRoute.Comments(CommentsScreenMode.COMMENT, id, null)
-                                        }
+                                GridItemSpan(
+                                    currentLineSpan = when(item) {
+                                        is ListActivity -> 1
+                                        else -> maxLineSpan
                                     }
+                                )
+                            }
+                        ) { index ->
+                            userActivityItems[index]?.let { activityItem ->
+                                ActivityItem(
+                                    userActivity = activityItem,
+                                    titleType = preferredTitleType,
+                                    onListActivityClick = { mediaType, id ->
+                                        val detailsNavRoute = when(mediaType) {
+                                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                                        }
 
-                                    navOptions.navigateToDetails(detailsNavRoute)
-                                },
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                                        navOptions.navigateToDetails(detailsNavRoute)
+                                    },
+                                    onUserClick = { user ->
+                                        navOptions.navigateToProfile(user)
+                                    },
+                                    onEntityClick = { entityType, id ->
+                                        val detailsNavRoute = when (entityType) {
+                                            EntityType.CHARACTER -> {
+                                                DetailsNavRoute.CharacterDetails(id)
+                                            }
+                                            EntityType.PERSON -> {
+                                                DetailsNavRoute.Staff(id)
+                                            }
+                                            EntityType.ANIME -> {
+                                                DetailsNavRoute.AnimeDetails(id)
+                                            }
+                                            EntityType.MANGA, EntityType.RANOBE -> {
+                                                DetailsNavRoute.MangaDetails(id)
+                                            }
+                                            EntityType.COMMENT -> {
+                                                DetailsNavRoute.Comments(CommentsScreenMode.COMMENT, id, null)
+                                            }
+                                        }
+
+                                        navOptions.navigateToDetails(detailsNavRoute)
+                                    },
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
                         }
                     }
 

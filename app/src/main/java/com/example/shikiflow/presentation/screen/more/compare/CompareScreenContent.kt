@@ -100,6 +100,7 @@ fun CompareScreenContent(
                                     currentUserScore = media[index].currentUserScore,
                                     targetUserScore = media[index].targetUserScore,
                                     comparisonType = comparisonType,
+                                    scoreFormat = uiState.scoreFormat,
                                     onItemClick = { mediaId ->
                                         onMediaItemClick(mediaId, mediaType)
                                     },

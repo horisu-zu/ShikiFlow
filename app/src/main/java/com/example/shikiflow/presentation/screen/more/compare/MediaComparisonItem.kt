@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -31,6 +32,8 @@ import com.example.shikiflow.domain.model.user.MediaComparison
 import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.formatValue
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
 import com.example.shikiflow.presentation.common.shimmerEffect
 
@@ -42,6 +45,7 @@ fun MediaComparisonItem(
     currentUserScore: ShortUserRateData?,
     targetUserScore: ShortUserRateData?,
     comparisonType: ComparisonType,
+    scoreFormat: ScoreFormat?,
     onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -89,11 +93,13 @@ fun MediaComparisonItem(
                 ) {
                     when(currentUserScore.userScore) {
                         0 -> { "-" }
-                        else -> currentUserScore.userScore.toString()
+                        else -> scoreFormat?.displayValue(
+                            score = scoreFormat.formatValue(currentUserScore.userScore.toFloat())
+                        ) ?: currentUserScore.userScore.toString()
                     }
                 } else {
                     stringResource(
-                        id = (currentUserScore?.status ?:  UserRateStatus.PLANNED).mapStatus(
+                        id = (currentUserScore?.status ?: UserRateStatus.PLANNED).mapStatus(
                             mediaType = mediaType
                         )
                     )
@@ -120,7 +126,9 @@ fun MediaComparisonItem(
                 ) {
                     when(targetUserScore.userScore) {
                         0 -> { "-" }
-                        else -> targetUserScore.userScore.toString()
+                        else -> scoreFormat?.displayValue(
+                            ScoreFormat.POINT_10_DECIMAL.formatValue(targetUserScore.userScore.toFloat())
+                        ) ?: targetUserScore.userScore.toString()
                     }
                 } else {
                     stringResource(

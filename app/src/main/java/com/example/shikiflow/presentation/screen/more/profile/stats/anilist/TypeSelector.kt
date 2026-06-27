@@ -7,9 +7,13 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -24,11 +28,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun TypeSelector(
@@ -89,6 +95,28 @@ fun TypeSelector(
                         horizontal = 6.dp,
                         vertical = 4.dp
                     )
+            )
+        }
+    }
+}
+
+@Composable
+fun TypeSelectorPlaceholder(
+    itemsCount: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(itemsCount) { index ->
+            Box(
+                modifier = Modifier
+                    .width(48.dp + index * 12.dp)
+                    .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp + 8.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
             )
         }
     }

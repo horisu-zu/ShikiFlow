@@ -17,10 +17,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -61,6 +58,7 @@ fun ProfileScreen(
             uiState = uiState,
             isCurrentUser = uiState.currentUser?.id == user.id,
             navOptions = navOptions,
+            onPageChange = { index -> profileViewModel.setTab(index) },
             onProfileRefresh = { profileViewModel.onRefresh() },
             onToggleFollow = { isFollowing ->
                 profileViewModel.toggleFollow(user.id, isFollowing)
@@ -75,6 +73,7 @@ fun ProfileScreenContent(
     uiState: ProfileUiState,
     isCurrentUser: Boolean,
     navOptions: ProfileNavOptions,
+    onPageChange: (Int) -> Unit,
     onProfileRefresh: () -> Unit,
     onToggleFollow: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -117,8 +116,7 @@ fun ProfileScreenContent(
             }
         } else {
             val horizontalPadding = 12.dp
-            var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-            val sectionsList = remember(uiState.userStatsCategories) {
+            val sectionsList = retain(uiState.userStatsCategories) {
                 ProfileSectionType.getTabRows(uiState.userStatsCategories)
             }
 
@@ -130,9 +128,9 @@ fun ProfileScreenContent(
                 if(sectionsList.isNotEmpty()) {
                     ConnectedButtonGroup(
                         items = sectionsList,
-                        selectedIndex = selectedTabIndex,
+                        selectedIndex = uiState.selectedTabIndex,
                         onItemSelection = { index ->
-                            selectedTabIndex = index
+                            onPageChange(index)
                         },
                         modifier = Modifier
                             .background(backgroundColor)
@@ -140,7 +138,7 @@ fun ProfileScreenContent(
                     )
 
                     uiState.user?.let { userData ->
-                        when(sectionsList[selectedTabIndex].value) {
+                        when(sectionsList[uiState.selectedTabIndex].value) {
                             ProfileSectionType.USER_STATS -> {
                                 UserStatsSection(
                                     userData = userData,

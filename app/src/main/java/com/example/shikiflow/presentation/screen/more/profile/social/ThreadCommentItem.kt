@@ -3,10 +3,13 @@ package com.example.shikiflow.presentation.screen.more.profile.social
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,8 +22,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.user.social.ThreadComment
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadStatsItem
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentItem
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentItemPlaceholder
 
 @Composable
 fun ThreadCommentItem(
@@ -34,7 +39,7 @@ fun ThreadCommentItem(
             .clip(RoundedCornerShape(12.dp))
             .clickable { onThreadClick() }
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(all = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Row(
@@ -61,11 +66,67 @@ fun ThreadCommentItem(
                 )
             )
         }
+
         CommentItem(
             comment = threadComment.comment,
             onEntityClick = onEntityClick,
             onUserClick = { /**/ },
             backgroundColor = MaterialTheme.colorScheme.background
+        )
+    }
+}
+
+@Composable
+fun ThreadCommentItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val indexValue = itemIndex % 2 + 1
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                repeat(indexValue) { index ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = 0.9f - 0.2f * index)
+                            .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .shimmerEffect()
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+            ) {
+                repeat(2) {
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .shimmerEffect()
+                    )
+                }
+            }
+        }
+
+        CommentItemPlaceholder(
+            backgroundColor = MaterialTheme.colorScheme.background,
+            itemIndex = itemIndex
         )
     }
 }

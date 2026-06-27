@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -28,6 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.Comment
@@ -39,6 +42,7 @@ import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
 import kotlin.time.Instant
@@ -339,5 +343,76 @@ private fun CommentUserItem(
             ),
             maxLines = 1
         )
+    }
+}
+
+@Composable
+fun CommentItemPlaceholder(
+    backgroundColor: Color,
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    maxValue: Int = 3
+) {
+    val indexValue = itemIndex % maxValue + 1
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(backgroundColor)
+            .padding(all = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val avatarImageType = ImageType.Square(
+                width = 24.dp,
+                shape = RoundedCornerShape(percent = 16)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(avatarImageType.width)
+                    .clip(avatarImageType.shape)
+                    .shimmerEffect()
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(96.dp + itemIndex * 12.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Text(
+                text = "·",
+                style = MaterialTheme.typography.labelMedium
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(96.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+        }
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            repeat(maxValue - indexValue + 1) { index ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.9f - index * 0.15f)
+                        .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+            }
+        }
     }
 }

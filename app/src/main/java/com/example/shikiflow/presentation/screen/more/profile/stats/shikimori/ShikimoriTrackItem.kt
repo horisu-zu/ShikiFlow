@@ -84,9 +84,10 @@ fun ShikimoriTrackItem(
                 },
                 style = MaterialTheme.typography.titleMedium
             )
+
             VerticalBarsChart(
                 barData = mediaStats.scoreStatsTitles.map { scoreStat ->
-                    Stat<String>(
+                    Stat(
                         type = scoreStat.type.toString(),
                         value = scoreStat.value
                     )

@@ -21,8 +21,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -67,7 +71,38 @@ fun <T : SingleMediaRole> CharacterMediaSection(
         shape = RoundedCornerShape(clip),
     )
     val preferredTitleType = LocalTitleTypeController.current
+
     var cardFace by retain { mutableStateOf(CardFace.Front) }
+    val cardFaceMap = retain {
+        mutableStateMapOf<SingleMediaRole, CardFace>().apply {
+            items.entries.forEach { role ->
+                put(role, CardFace.Front)
+            }
+        }
+    }
+
+    val commonCardFace by remember {
+        derivedStateOf {
+            val firstFace = cardFaceMap.values.firstOrNull()
+            val allSame = cardFaceMap.values.all { it == firstFace }
+
+            if (allSame) firstFace else null
+        }
+    }
+
+    LaunchedEffect(cardFace) {
+        cardFaceMap.apply {
+            items.entries.forEach { role ->
+                this[role] = cardFace
+            }
+        }
+    }
+
+    LaunchedEffect(commonCardFace) {
+        commonCardFace?.let { commonFace ->
+            cardFace = commonFace
+        }
+    }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
@@ -117,9 +152,14 @@ fun <T : SingleMediaRole> CharacterMediaSection(
                     mediaItem = items.entries[index],
                     imageType = imageType,
                     titleType = preferredTitleType,
-                    cardFace = cardFace,
+                    cardFace = cardFaceMap[items.entries[index]] ?: CardFace.Front,
                     cornerShape = clip,
-                    onItemClick = onItemClick
+                    onItemClick = onItemClick,
+                    onCardFaceChange = { newFace ->
+                        cardFaceMap.apply {
+                            this[items.entries[index]] = newFace
+                        }
+                    }
                 )
             }
             if(items.hasNextPage) {
@@ -145,9 +185,14 @@ private fun MediaRoleItem(
     cardFace: CardFace,
     cornerShape: Dp,
     onItemClick: (Int) -> Unit,
+    onCardFaceChange: (CardFace) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var cardFace by retain(cardFace) { mutableStateOf(cardFace) }
+
+    LaunchedEffect(cardFace) {
+        onCardFaceChange(cardFace)
+    }
 
     FlipCard(
         cardFace = cardFace,

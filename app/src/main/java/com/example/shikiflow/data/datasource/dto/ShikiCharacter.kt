@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.datasource.dto
 
+import com.example.shikiflow.data.datasource.dto.media.ShikiCharacterMedia
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -20,6 +21,6 @@ data class ShikiCharacter(
     @SerialName("topic_id") val topicId: Int?,
     @SerialName("updated_at") val updatedAt: String?,
     val seyu: List<ShikiSeyu>?,
-    val animes: List<ShikiAnime>?,
-    val mangas: List<ShikiManga>?
+    val animes: List<ShikiCharacterMedia>?,
+    val mangas: List<ShikiCharacterMedia>?
 )

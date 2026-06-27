@@ -12,8 +12,11 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,6 +41,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -53,6 +57,7 @@ import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.threads.ThreadsViewModel
 import com.example.shikiflow.utils.Converter.convertInstantToString
@@ -220,6 +225,7 @@ fun ThreadItem(
                     modifier = Modifier.weight(1f)
                 )
             }
+
             ThreadStatsItem(
                 viewCount = threadData.viewCount,
                 replyCount = threadData.replyCount,
@@ -231,12 +237,88 @@ fun ThreadItem(
                 )
             )
         }
+
         if(threadData.lastReplyUser != null && threadData.lastRepliedAt != null) {
             ShortUserItem(
                 userData = threadData.lastReplyUser,
                 replyInstant = threadData.lastRepliedAt,
                 resources = resources,
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+fun ThreadItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val indexValue = itemIndex % 2 + 1
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                repeat(indexValue) { index ->
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth(fraction = 0.9f - 0.2f * index)
+                            .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .shimmerEffect()
+                    )
+                }
+            }
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
+            ) {
+                repeat(2) {
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .shimmerEffect()
+                    )
+                }
+            }
+        }
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val avatarImageType = ImageType.Square(
+                width = 24.dp,
+                shape = RoundedCornerShape(4.dp)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(avatarImageType.width)
+                    .clip(avatarImageType.shape)
+                    .shimmerEffect()
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(96.dp + itemIndex * 12.dp)
+                    .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
             )
         }
     }
@@ -283,7 +365,8 @@ fun ThreadStatsItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.clip(RoundedCornerShape(8.dp))
+        modifier = modifier
+            .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 6.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)

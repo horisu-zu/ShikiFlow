@@ -87,6 +87,7 @@ class ShikimoriTracksDataSource @Inject constructor(
             responseList.addAll(pageResponse)
 
             if (pageResponse.size < pageSize) break
+
             currentPage++
         }
 

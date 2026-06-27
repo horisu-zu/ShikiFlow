@@ -8,6 +8,7 @@ import com.example.shikiflow.data.datasource.dto.ShikiAnime
 import com.example.shikiflow.data.datasource.dto.ShikiCharacter
 import com.example.shikiflow.data.datasource.dto.ShikiManga
 import com.example.shikiflow.data.datasource.dto.ShikiSeyu
+import com.example.shikiflow.data.datasource.dto.media.ShikiCharacterMedia
 import com.example.shikiflow.data.datasource.dto.person.Character
 import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.StaffNameMapper.toStaffName
@@ -21,7 +22,7 @@ import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 
 object ShikimoriCharacterMapper {
-    fun String.toCharacterRole(): CharacterRole {
+    private fun String.toCharacterRole(): CharacterRole {
         return when(this) {
             "Main" -> CharacterRole.MAIN
             "Supporting" -> CharacterRole.SUPPORTING
@@ -73,6 +74,16 @@ object ShikimoriCharacterMapper {
         )
     }
 
+    fun ShikiCharacterMedia.toShortMedia(): ShortMedia {
+        return ShortMedia(
+            id = id ?: 0,
+            mediaType = MediaType.ANIME,
+            title = (name ?: "").toDomainTitle(null, russian, null),
+            coverImageUrl = BuildConfig.SHIKI_BASE_URL + image?.original,
+            userRateStatus = null
+        )
+    }
+
     fun ShikiSeyu.toDomain(): MediaPersonShort {
         return MediaPersonShort(
             id = id,
@@ -94,13 +105,20 @@ object ShikimoriCharacterMapper {
             voiceActors = seyu?.map { it.toDomain() } ?: emptyList(),
             animeRoles = PaginatedList(
                 hasNextPage = (animes?.size ?: 0) > 24,
-                entries = animes?.map { it.toDomain().toCharacterRole() }.orEmpty()
+                entries = animes?.map { it.toCharacterRole() }.orEmpty()
             ),
             mangaRoles = PaginatedList(
                 hasNextPage = (mangas?.size ?: 0) > 24,
-                entries = mangas?.map { it.toDomain().toCharacterRole() }.orEmpty()
+                entries = mangas?.map { it.toCharacterRole() }.orEmpty()
             ),
             topicId = topicId
+        )
+    }
+
+    fun ShikiCharacterMedia.toCharacterRole(): CharacterMediaRole {
+        return CharacterMediaRole(
+            shortMedia = this.toShortMedia(),
+            characterRole = role?.toCharacterRole()
         )
     }
 
@@ -110,9 +128,5 @@ object ShikimoriCharacterMapper {
             fullName = name.toStaffName(russian, japanese),
             imageUrl = poster?.posterShort?.mainUrl ?: ""
         )
-    }
-
-    fun ShortMedia.toCharacterRole(): CharacterMediaRole {
-        return CharacterMediaRole(shortMedia = this)
     }
 }

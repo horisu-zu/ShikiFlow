@@ -283,8 +283,7 @@ fun BrowseListComponent(
                         contentAlignment = Alignment.Center
                     ) { CircularProgressIndicator() }
                 }
-            }
-            if(browseState.loadState.append is LoadState.Error) {
+            } else if(browseState.loadState.append is LoadState.Error) {
                 item {
                     ErrorItem(
                         message = stringResource(R.string.b_mss_error),
