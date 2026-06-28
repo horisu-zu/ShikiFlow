@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +28,7 @@ import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserStatsCategories.Companion.isEmpty
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
+import com.example.shikiflow.presentation.common.ConnectedButtonGroupPlaceholder
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute.*
 import com.example.shikiflow.presentation.screen.more.profile.favorites.FavoritesSection
@@ -98,12 +97,7 @@ fun ProfileScreenContent(
             )
         }
     ) { paddingValues ->
-        if(uiState.isLoading && uiState.userStatsCategories.isEmpty()) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(uiState.errorMessage != null) {
+        if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -122,19 +116,22 @@ fun ProfileScreenContent(
 
             Column(
                 modifier = modifier
-                    .padding(top = paddingValues.calculateTopPadding())
                     .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding())
             ) {
-                if(sectionsList.isNotEmpty()) {
+                if(uiState.isLoading && uiState.userStatsCategories.isEmpty()) {
+                    ConnectedButtonGroupPlaceholder(
+                        itemsCount = 3,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                    )
+                } else if(sectionsList.isNotEmpty()) {
                     ConnectedButtonGroup(
                         items = sectionsList,
                         selectedIndex = uiState.selectedTabIndex,
                         onItemSelection = { index ->
                             onPageChange(index)
                         },
-                        modifier = Modifier
-                            .background(backgroundColor)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
 
                     uiState.user?.let { userData ->

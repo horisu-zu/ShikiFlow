@@ -72,7 +72,7 @@ fun DetailsNavigator(
         }
 
         override fun navigateToSimilarPage(id: Int, title: String, mediaType: MediaType) {
-            detailsBackstack.add(DetailsNavRoute.SimilarPage(id, title, mediaType))
+            detailsBackstack.add(DetailsNavRoute.SimilarMedia(id, title, mediaType))
         }
 
         override fun navigateToLinksPage(id: Int, mediaType: MediaType) {
@@ -177,6 +177,7 @@ fun DetailsNavigator(
     NavDisplay(
         backStack = detailsBackstack,
         sceneStrategies = listOf(bottomSheetStrategy),
+        onBack = { options.navigateBack() },
         entryProvider = entryProvider {
             entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
@@ -196,14 +197,21 @@ fun DetailsNavigator(
                     navOptions = options
                 )
             }
-            entry<DetailsNavRoute.SimilarPage>(
+            entry<DetailsNavRoute.SimilarMedia>(
                 metadata = BottomSheetSceneStrategy.bottomSheet()
             ) { route ->
                 SimilarMediaScreen(
                     mediaTitle = route.title,
                     mediaId = route.id,
                     mediaType = route.mediaType,
-                    navOptions = options
+                    onMediaNavigate = { id, mediaType ->
+                        options.navigateBack().let {
+                            when (mediaType) {
+                                MediaType.ANIME -> options.navigateToAnimeDetails(id)
+                                MediaType.MANGA -> options.navigateToMangaDetails(id)
+                            }
+                        }
+                    }
                 )
             }
             entry<DetailsNavRoute.ExternalLinks>(

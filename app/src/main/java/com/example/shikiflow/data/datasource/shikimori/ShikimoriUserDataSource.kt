@@ -83,13 +83,11 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
-    override fun getUserStatsCategories(
+    override suspend fun getUserStatsCategories(
         userId: Int,
         isRefresh: Boolean
-    ): Flow<DataResult<UserStatsCategories>> = flow {
-        emit(DataResult.Loading)
-
-        try {
+    ): DataResult<UserStatsCategories> {
+        return try {
             val (userRates, favorites, friends) = coroutineScope {
                 val userRates = async {
                     userApi.getUserRates(userId = userId.toLong())
@@ -108,9 +106,9 @@ class ShikimoriUserDataSource @Inject constructor(
 
             val userStatsCategories = mapUserStats(userRates, favorites, friends)
 
-            emit(DataResult.Success(userStatsCategories))
+            DataResult.Success(userStatsCategories)
         } catch (e: Exception) {
-            emit(DataResult.Error(e.message ?: "Unknown Error"))
+            DataResult.Error(e.message ?: "Unknown Error")
         }
     }
 

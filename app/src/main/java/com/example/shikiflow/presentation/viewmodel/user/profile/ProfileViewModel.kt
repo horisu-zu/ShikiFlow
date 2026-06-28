@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -36,7 +37,10 @@ class ProfileViewModel @Inject constructor(
                 old.user?.id == new.user?.id && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                userRepository.getUserStatsCategories(state.user?.id!!, state.isRefreshing)
+                flow {
+                    emit(DataResult.Loading)
+                    emit(userRepository.getUserStatsCategories(state.user!!.id, state.isRefreshing))
+                }
             }
             .onEach { result ->
                 mutableUiState.update { state ->

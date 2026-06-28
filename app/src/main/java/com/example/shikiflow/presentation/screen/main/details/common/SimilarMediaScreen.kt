@@ -29,7 +29,6 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
-import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
@@ -41,7 +40,7 @@ fun SimilarMediaScreen(
     mediaTitle: String,
     mediaId: Int,
     mediaType: MediaType,
-    navOptions: MediaNavOptions,
+    onMediaNavigate: (Int, MediaType) -> Unit,
     similarMediaViewModel: SimilarMediaViewModel = hiltViewModel()
 ) {
     val preferredTitleType = LocalTitleTypeController.current
@@ -113,10 +112,7 @@ fun SimilarMediaScreen(
                                     browseItem = mediaRecommendation,
                                     titleType = preferredTitleType,
                                     onItemClick = { id, mediaType ->
-                                        when (mediaType) {
-                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                        }
+                                        onMediaNavigate(id, mediaType)
                                     }
                                 )
                             }

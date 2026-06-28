@@ -116,10 +116,10 @@ class AnilistUserDataSource @Inject constructor(
         }
     }
 
-    override fun getUserStatsCategories(
+    override suspend fun getUserStatsCategories(
         userId: Int,
         isRefresh: Boolean
-    ): Flow<DataResult<UserStatsCategories>> {
+    ): DataResult<UserStatsCategories> {
         val userStatsCategoriesQuery = UserStatsCategoriesQuery(userId)
 
         val response = apolloClient.query(userStatsCategoriesQuery)
@@ -129,7 +129,7 @@ class AnilistUserDataSource @Inject constructor(
                     false -> FetchPolicy.CacheFirst
                 }
             )
-            .toFlow()
+            .execute()
             .asDataResult { response ->
                 response.toDomain()
             }

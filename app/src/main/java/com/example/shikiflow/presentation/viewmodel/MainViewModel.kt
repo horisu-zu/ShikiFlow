@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -18,7 +17,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -49,16 +47,6 @@ class MainViewModel @Inject constructor(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
             initialValue = AuthState.Loading
-        )
-
-    val preferredTitleType = settingsRepository.userSettingsFlow
-        .mapNotNull { settings ->
-            settings?.preferredTitleType
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000L),
-            initialValue = PreferredTitleType.ROMAJI
         )
 
     fun handleAuthCode(uriResponse: Uri) {

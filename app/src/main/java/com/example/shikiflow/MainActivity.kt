@@ -35,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val themeSettings by mainViewModel.themeSettings.collectAsStateWithLifecycle()
             val authState by mainViewModel.authState.collectAsStateWithLifecycle()
-            val preferredTitleType by mainViewModel.preferredTitleType.collectAsStateWithLifecycle()
 
             if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 window.isNavigationBarContrastEnforced = false
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity() {
                     if(authState != AuthState.Loading) {
                         AppNavigator(
                             authState = authState,
-                            preferredTitleType = preferredTitleType,
                             onFinishActivity = { this.moveTaskToBack(true) }
                         )
                     }

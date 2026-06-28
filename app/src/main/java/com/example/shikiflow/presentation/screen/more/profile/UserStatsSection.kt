@@ -29,7 +29,7 @@ fun UserStatsSection(
 ) {
     val uiState by userStatsViewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(userData) {
         userStatsViewModel.setInitialParams(userData.id, typesList)
     }
 

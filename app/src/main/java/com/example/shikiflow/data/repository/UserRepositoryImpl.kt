@@ -130,11 +130,11 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getUserStatsCategories(
+    override suspend fun getUserStatsCategories(
         userId: Int,
         isRefresh: Boolean
-    ): Flow<DataResult<UserStatsCategories>> {
-        return withSource(dataSource) { dataSource ->
+    ): DataResult<UserStatsCategories> {
+        return withSourceSuspend(dataSource) { dataSource ->
             dataSource.getUserStatsCategories(userId, isRefresh)
         }
     }

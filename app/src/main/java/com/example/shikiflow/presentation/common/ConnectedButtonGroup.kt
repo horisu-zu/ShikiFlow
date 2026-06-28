@@ -1,9 +1,11 @@
 package com.example.shikiflow.presentation.common
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
@@ -15,6 +17,7 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -72,6 +75,35 @@ fun <T> ConnectedButtonGroup(
                     )
                 }
             }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+fun ConnectedButtonGroupPlaceholder(
+    modifier: Modifier = Modifier,
+    itemsCount: Int = 3
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+    ) {
+        repeat(itemsCount) { index ->
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .height(ToggleButtonDefaults.MinHeight)
+                    .clip(
+                        shape = when {
+                            itemsCount == 1 -> ButtonGroupDefaults.connectedMiddleButtonPressShape
+                            index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShape
+                            index == itemsCount - 1 -> ButtonGroupDefaults.connectedTrailingButtonShape
+                            else -> ButtonGroupDefaults.connectedMiddleButtonPressShape
+                        }
+                    )
+                    .shimmerEffect()
+            )
         }
     }
 }

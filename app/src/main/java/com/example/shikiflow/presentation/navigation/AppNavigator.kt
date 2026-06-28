@@ -16,7 +16,6 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.presentation.auth.AuthScreen
 import com.example.shikiflow.presentation.screen.MainNavigator
 import com.example.shikiflow.presentation.viewmodel.AuthState
@@ -24,7 +23,6 @@ import com.example.shikiflow.presentation.viewmodel.AuthState
 @Composable
 fun AppNavigator(
     authState: AuthState,
-    preferredTitleType: PreferredTitleType,
     onFinishActivity: () -> Unit
 ) {
     val startKey = remember {
@@ -91,7 +89,6 @@ fun AppNavigator(
                 }
             ) {
                 MainNavigator(
-                    preferredTitleType = preferredTitleType,
                     onMoveToBack = onFinishActivity
                 )
             }

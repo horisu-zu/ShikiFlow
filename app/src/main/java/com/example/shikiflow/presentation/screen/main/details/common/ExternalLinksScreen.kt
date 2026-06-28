@@ -12,11 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +31,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
@@ -39,6 +40,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.viewmodel.media.links.ExternalLinksViewModel
 import com.example.shikiflow.utils.WebIntent.openUrlCustomTab
 
@@ -64,11 +66,11 @@ fun ExternalLinksScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
         if(uiState.isLoading) {
-            item {
-                Box(
-                    modifier = Modifier.fillParentMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
+            items(count = 6) { index ->
+                LinkItemPlaceholder(
+                    itemIndex = index,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         } else if(uiState.errorMessage != null) {
             item {
@@ -106,7 +108,8 @@ private fun LinkItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.height(IntrinsicSize.Min)
+        modifier = modifier
+            .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.background)
             .clickable { onLinkClick(link.url) }
@@ -115,7 +118,8 @@ private fun LinkItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(
-            modifier = Modifier.fillMaxHeight()
+            modifier = Modifier
+                .fillMaxHeight()
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colorScheme.surfaceContainer)
                 .padding(all = 8.dp),
@@ -137,9 +141,49 @@ private fun LinkItem(
                 modifier = Modifier.size(24.dp)
             )
         }
+
         Text(
             text = link.siteName,
             style = MaterialTheme.typography.bodyLarge
+        )
+    }
+}
+
+@Composable
+private fun LinkItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.background)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.surfaceContainer)
+                .padding(all = 8.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(percent = 16))
+                    .shimmerEffect()
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .width(144.dp - itemIndex * 16.dp)
+                .height(MaterialTheme.typography.bodyLarge.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .shimmerEffect()
         )
     }
 }
