@@ -38,10 +38,7 @@ import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
-import com.example.shikiflow.domain.model.review.Review
-import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
-import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -374,18 +371,6 @@ class ShikimoriMediaDataSource @Inject constructor(
                 anime.toBrowseAnime()
             }
         }
-    }
-
-    override fun getMediaReviews(
-        mediaId: Int,
-        mediaType: MediaType,
-        sort: Sort<ReviewType>
-    ): Flow<PagingData<ReviewShort>> {
-        TODO("API doesn't provide such a method (not yet, at least)")
-    }
-
-    override fun getReview(reviewId: Int): Flow<DataResult<Review>> {
-        TODO("API doesn't provide such a method (not yet, at least)")
     }
 
     override fun getStudio(studioId: Int): Flow<DataResult<Studio>> {

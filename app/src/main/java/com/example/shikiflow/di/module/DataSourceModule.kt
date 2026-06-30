@@ -5,11 +5,13 @@ import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.datasource.MediaTracksDataSource
+import com.example.shikiflow.data.datasource.ReviewDataSource
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistAuthDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistCharactersDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistMediaDataSource
+import com.example.shikiflow.data.datasource.anilist.AnilistReviewDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistStaffDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistThreadsDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistTracksDataSource
@@ -89,6 +91,13 @@ interface DataSourceModule {
     fun bindAnilistMediaDetailsDataSource(
         impl: AnilistMediaDataSource
     ): MediaDataSource
+
+    @AniList
+    @Binds
+    @Singleton
+    fun bindAnilistMediaReviewsDataSource(
+        impl: AnilistReviewDataSource
+    ): ReviewDataSource
 
     @Shikimori
     @Binds

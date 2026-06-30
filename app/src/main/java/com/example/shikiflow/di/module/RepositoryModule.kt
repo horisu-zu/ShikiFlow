@@ -8,6 +8,7 @@ import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MediaRepositoryImpl
 import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
+import com.example.shikiflow.data.repository.ReviewRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
 import com.example.shikiflow.domain.repository.AuthRepository
@@ -18,6 +19,7 @@ import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.example.shikiflow.domain.repository.ReviewRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.Binds
@@ -47,6 +49,12 @@ interface RepositoryModule {
     fun bindMediaDetailsRepository(
         impl: MediaRepositoryImpl
     ): MediaRepository
+
+    @Binds
+    @Singleton
+    fun bindMediaReviewRepository(
+        impl: ReviewRepositoryImpl
+    ): ReviewRepository
 
     @Binds
     @Singleton

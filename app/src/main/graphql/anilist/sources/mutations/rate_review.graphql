@@ -1,0 +1,11 @@
+mutation RateReview(
+    $reviewId: Int!,
+    $rating: ReviewRating!
+) {
+    RateReview(
+        reviewId: $reviewId,
+        rating: $rating
+    ) {
+        ...ALReviewRate
+    }
+}

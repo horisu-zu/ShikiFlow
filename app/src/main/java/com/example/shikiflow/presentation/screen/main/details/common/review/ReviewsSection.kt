@@ -47,6 +47,7 @@ import com.example.shikiflow.presentation.common.mappers.ColorMapper.getRatioCol
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.getScoreRatioIcon
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.onColor
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 
@@ -231,7 +232,7 @@ fun ReviewRatingItem(
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.SemiBold
         ),
-        color = MaterialTheme.colorScheme.onSurface,
+        color = ratingColor.onColor(),
         modifier = modifier
             .clip(CircleShape)
             .background(color = ratingColor)

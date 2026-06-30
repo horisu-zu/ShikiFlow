@@ -121,10 +121,10 @@
     <string name="browse_on_my_list">В моём списке</string>
     <string name="browse_ongoings">Онгоинги</string>
     <string name="browse_mode_select">Режим отображения и сортировка</string>
-    <string name="ongoing_browse_mode_score">Рейтинг</string>
+    <string name="ongoing_browse_mode_score">Оценка</string>
     <string name="ongoing_browse_mode_popularity">Популярность</string>
     <string name="ongoing_browse_mode_aired_on">Дата начала</string>
-    <string name="ongoing_browse_mode_score_shiki">Рейтинг Shikimori</string>
+    <string name="ongoing_browse_mode_score_shiki">Оценка Shikimori</string>
     <string name="ongoing_browse_mode_trending">Популярное сейчас</string>
 
     <string name="browse_search_label_media">Медиа</string>

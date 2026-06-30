@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -46,9 +47,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.media3.common.PlaybackException
 import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.ui.PlayerView
+import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.ControlButton
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.DurationBox
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.player.PlayerSlider
@@ -97,6 +101,12 @@ fun MiniPlayer(
                     isBuffering = playbackState == Player.STATE_BUFFERING
                 )
             }
+
+            override fun onPlayerError(error: PlaybackException) {
+                playerState = playerState.copy(
+                    errorMessage = error.message
+                )
+            }
         }
 
         exoPlayer.addListener(listener)
@@ -135,42 +145,49 @@ fun MiniPlayer(
             .aspectRatio(videoAspectRatio)
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-                if(playerState.isPlaying) {
-                    exoPlayer.pause()
-                } else {
-                    exoPlayer.play()
+                when (playerState.isPlaying) {
+                    true -> exoPlayer.pause()
+                    false -> exoPlayer.play()
                 }
             }
     ) {
-        AndroidView(
-            factory = {
-                PlayerView(context).apply {
-                    player = exoPlayer
-                    useController = false
-                }
-            },
-            update = { view ->
-                view.player = exoPlayer
-                if (exoPlayer.playbackState == Player.STATE_IDLE) {
-                    exoPlayer.prepare()
-                }
-            },
-            onRelease = { playerView ->
-                playerView.player = null
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surfaceContainer)
-        )
+        if (playerState.errorMessage == null) {
+            AndroidView(
+                factory = {
+                    PlayerView(context).apply {
+                        player = exoPlayer
+                        useController = false
+                    }
+                },
+                update = { view ->
+                    view.player = exoPlayer
+                    if (exoPlayer.playbackState == Player.STATE_IDLE) {
+                        exoPlayer.prepare()
+                    }
+                },
+                onRelease = { playerView ->
+                    playerView.player = null
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            )
+        }
 
         PlayerControls(
             playerState = playerState,
             onPlayClick = { exoPlayer.play() },
+            onRetry = {
+                playerState = playerState.copy(
+                    errorMessage = null
+                )
+                playerCache.getOrCreate(videoUrl)
+            },
             modifier = Modifier.align(Alignment.Center)
         )
 
         AnimatedVisibility(
-            visible = !playerState.isPlaying && !playerState.isBuffering,
+            visible = !playerState.isPlaying && !playerState.isBuffering && playerState.errorMessage == null,
             enter = fadeIn() + slideInVertically(
                 animationSpec = spring(
                     stiffness = Spring.StiffnessMedium,
@@ -207,6 +224,7 @@ fun MiniPlayer(
 private fun PlayerControls(
     playerState: PlayerState,
     onPlayClick: () -> Unit,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     AnimatedVisibility(
@@ -218,6 +236,12 @@ private fun PlayerControls(
         if(playerState.isBuffering) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp)
+            )
+        } else if (playerState.errorMessage != null) {
+            ErrorItem(
+                message = playerState.errorMessage,
+                buttonLabel = stringResource(R.string.common_retry),
+                onButtonClick = { onRetry() }
             )
         } else {
             ControlButton(

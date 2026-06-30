@@ -6,10 +6,7 @@ import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
-import com.example.shikiflow.domain.model.review.Review
-import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
-import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -56,14 +53,6 @@ interface MediaRepository {
         order: SortType? = null,
         onList: Boolean? = null
     ): Flow<PagingData<BrowseMedia>>
-
-    fun getMediaReviews(
-        mediaId: Int,
-        mediaType: MediaType,
-        sort: Sort<ReviewType>
-    ): Flow<PagingData<ReviewShort>>
-
-    fun getReview(reviewId: Int): Flow<DataResult<Review>>
 
     fun getStudio(studioId: Int): Flow<DataResult<Studio>>
 

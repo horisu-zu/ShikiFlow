@@ -1,16 +1,23 @@
 package com.example.shikiflow.presentation.screen.main.details.common.review
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
@@ -31,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
@@ -46,13 +55,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.review.Review
+import com.example.shikiflow.domain.model.review.ReviewRating
 import com.example.shikiflow.presentation.WindowSize
+import com.example.shikiflow.presentation.common.DigitCounter
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.getRatioColor
+import com.example.shikiflow.presentation.common.mappers.ColorMapper.onColor
+import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.getScoreRatioIcon
 import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
 import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
@@ -60,6 +73,7 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.media.review.ReviewViewModel
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 
 @Composable
@@ -132,7 +146,13 @@ fun ReviewScreen(
 
                     item {
                         ReviewScoreComponent(
-                            score = review.score
+                            score = review.score,
+                            likesCount = review.likesCount,
+                            ratingAmount = review.ratingAmount,
+                            userRating = review.userRating,
+                            onRatingClick = { rating, isUserRating ->
+                                reviewViewModel.toggleRating(reviewId,rating, isUserRating)
+                            }
                         )
                     }
                 }
@@ -156,6 +176,8 @@ private fun ReviewHeader(
 
     val boxItemPadding = 12.dp
     val backgroundColor = MaterialTheme.colorScheme.background.copy(alpha = 0.35f)
+    val scoreRatioColor = getRatioColor(review.score / 100f)
+        .harmonize(MaterialTheme.colorScheme.background)
 
     Box(
         modifier = modifier,
@@ -255,11 +277,28 @@ private fun ReviewHeader(
                 .padding(all = boxItemPadding)
         )
 
-        ReviewScoreComponent(
-            score = review.score,
+        Text(
+            text = buildAnnotatedString {
+                append(review.score.toString())
+                withStyle(
+                    style = SpanStyle(
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Light
+                    )
+                ) {
+                    append("/100")
+                }
+            },
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = scoreRatioColor.onColor()
+            ),
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(all = boxItemPadding)
+                .clip(RoundedCornerShape(percent = 16))
+                .background(scoreRatioColor)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
         )
     }
 }
@@ -267,28 +306,127 @@ private fun ReviewHeader(
 @Composable
 private fun ReviewScoreComponent(
     score: Int,
+    likesCount: Int,
+    ratingAmount: Int,
+    userRating: ReviewRating,
+    onRatingClick: (ReviewRating, Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = buildAnnotatedString {
-            append(score.toString())
-            withStyle(
-                style = SpanStyle(
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Light
-                )
-            ) {
-                append("/100")
-            }
-        },
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.titleSmall,
-        modifier = modifier
-            .clip(RoundedCornerShape(percent = 16))
-            .background(
-                color = getRatioColor(score / 100f)
-                    .harmonize(MaterialTheme.colorScheme.background)
+    val ratioColor = getRatioColor(score / 100f)
+        .harmonize(MaterialTheme.colorScheme.background)
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        UserScoreComponent(
+            reviewRating = ReviewRating.UP_VOTE,
+            userRating = userRating,
+            score = likesCount,
+            color = getRatioColor(1f)
+                .harmonize(MaterialTheme.colorScheme.background),
+            iconResource = getScoreRatioIcon(1f),
+            onRatingClick = onRatingClick
+        )
+
+        Row(
+            modifier = Modifier
+                .height(IntrinsicSize.Max)
+                .clip(RoundedCornerShape(percent = 16))
+                .background(MaterialTheme.colorScheme.secondaryContainer),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.ongoing_browse_mode_score),
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier.padding(start = 12.dp)
             )
-            .padding(horizontal = 8.dp, vertical = 6.dp)
-    )
+
+            Column(
+                modifier = Modifier
+                    .width(64.dp)
+                    .clip(RoundedCornerShape(topStartPercent = 16, bottomStartPercent = 16))
+                    .background(ratioColor)
+                    .padding(all = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+            ) {
+                Text(
+                    text = score.toString(),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = ratioColor.onColor()
+                    )
+                )
+
+                HorizontalDivider(
+                    color = ratioColor.onColor()
+                )
+
+                Text(
+                    text = "100",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = ratioColor.onColor()
+                    )
+                )
+            }
+        }
+
+        UserScoreComponent(
+            reviewRating = ReviewRating.DOWN_VOTE,
+            userRating = userRating,
+            score = ratingAmount - likesCount,
+            iconResource = getScoreRatioIcon(1f / 3f),
+            color = getRatioColor(1f / 3f)
+                .harmonize(MaterialTheme.colorScheme.background),
+            onRatingClick = onRatingClick
+        )
+    }
+}
+
+@Composable
+private fun UserScoreComponent(
+    reviewRating: ReviewRating,
+    userRating: ReviewRating,
+    score: Int,
+    iconResource: IconResource,
+    color: Color,
+    onRatingClick: (ReviewRating, Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isUserRating = userRating == reviewRating
+
+    Row(
+        modifier = modifier
+            .animateContentSize()
+            .clip(RoundedCornerShape(percent = 32))
+            .background(color.copy(alpha = 0.2f))
+            .padding(all = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        iconResource.toIcon(
+            tint = color,
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(percent = 24))
+                .clickable { onRatingClick(reviewRating, isUserRating) }
+                .then(
+                    if (isUserRating) {
+                        Modifier.background(color.copy(alpha = 0.5f))
+                    } else Modifier
+                )
+                .padding(all = 4.dp)
+        )
+
+        DigitCounter(
+            count = score,
+            style = MaterialTheme.typography.titleSmall.copy(
+                color = color
+            )
+        )
+    }
 }

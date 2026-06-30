@@ -6,7 +6,7 @@ import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.domain.repository.ReviewRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +20,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class MediaReviewsViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository
+    private val reviewRepository: ReviewRepository
 ): ViewModel() {
 
     private val _params = MutableStateFlow(ReviewsParams())
@@ -49,7 +49,7 @@ class MediaReviewsViewModel @Inject constructor(
         }
         .distinctUntilChanged()
         .flatMapLatest { params ->
-            mediaRepository.getMediaReviews(
+            reviewRepository.getMediaReviews(
                 mediaId = params.mediaId!!,
                 mediaType = params.mediaType!!,
                 sort = params.sort

@@ -550,13 +550,12 @@ private fun ProgressCard(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .border(1.dp, MaterialTheme.colorScheme.onSurface, RoundedCornerShape(12.dp))
+            .border(1.dp, MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(12.dp))
             .padding(horizontal = 12.dp, vertical = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            //text = "$title — $count",
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(
                     fontWeight = FontWeight.Medium

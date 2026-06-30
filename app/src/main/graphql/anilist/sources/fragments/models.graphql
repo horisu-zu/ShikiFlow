@@ -589,6 +589,7 @@ fragment ALReview on Review {
     score
     rating
     ratingAmount
+    userRating
     user {
         ...ALUserShort
     }
@@ -597,6 +598,13 @@ fragment ALReview on Review {
     }
     createdAt
     updatedAt
+}
+
+fragment ALReviewRate on Review {
+    id
+    userRating
+    rating
+    ratingAmount
 }
 
 fragment ALReviewMedia on Media {

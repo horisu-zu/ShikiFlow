@@ -14,8 +14,6 @@ import com.example.graphql.anilist.MediaDetailsQuery
 import com.example.graphql.anilist.MediaExternalLinksQuery
 import com.example.graphql.anilist.MediaFollowingQuery
 import com.example.graphql.anilist.MediaRecommendationsQuery
-import com.example.graphql.anilist.MediaReviewQuery
-import com.example.graphql.anilist.MediaReviewsQuery
 import com.example.graphql.anilist.StudioBrowseQuery
 import com.example.graphql.anilist.StudioQuery
 import com.example.graphql.anilist.type.MediaSort as ALMediaSort
@@ -23,7 +21,6 @@ import com.example.shikiflow.data.datasource.MediaDataSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toBrowse
 import com.example.shikiflow.data.mapper.anilist.AnilistMediaMapper.toDomain
-import com.example.shikiflow.data.mapper.anilist.AnilistReviewMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toDto
 import com.example.shikiflow.data.mapper.common.ExternalLinksMapper.toDomain
 import com.example.shikiflow.data.mapper.common.GenreMapper.toAnilistGenre
@@ -33,7 +30,6 @@ import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistBrowseOrder
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistMediaSort
 import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistOrder
-import com.example.shikiflow.data.mapper.common.OrderMapper.toAnilistReviewSort
 import com.example.shikiflow.data.mapper.common.SeasonMapper.toAnilistSeason
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudio
 import com.example.shikiflow.data.mapper.common.TagMapper.toAnilistTag
@@ -44,10 +40,7 @@ import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
-import com.example.shikiflow.domain.model.review.Review
-import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
-import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -314,65 +307,6 @@ class AnilistMediaDataSource @Inject constructor(
                     node?.mediaBrowse?.toBrowse(mediaType = MediaType.ANIME)
                 } ?: throw NoSuchElementException("Empty Response")
         }
-    }
-
-    override fun getMediaReviews(
-        mediaId: Int,
-        mediaType: MediaType,
-        sort: Sort<ReviewType>
-    ): Flow<PagingData<ReviewShort>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 9,
-                initialLoadSize = 15
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource(
-                    method = { page, pageSize ->
-                        paginatedMediaReviews(mediaId, sort, page, pageSize)
-                    }
-                )
-            }
-        ).flow
-    }
-
-    suspend fun paginatedMediaReviews(
-        mediaId: Int,
-        sort: Sort<ReviewType>,
-        page: Int,
-        limit: Int
-    ): Result<List<ReviewShort>> {
-        val reviewsQuery = MediaReviewsQuery(
-            mediaId = mediaId,
-            sort = sort.toAnilistReviewSort(),
-            page = page,
-            perPage = limit
-        )
-
-        val response = apolloClient.query(reviewsQuery).execute()
-
-        return response.toResult().map { data ->
-            data.Media
-                ?.reviews
-                ?.nodes
-                ?.mapNotNull { reviewNode ->
-                    reviewNode?.aLReviewShort?.toDomain()
-                } ?: emptyList()
-        }
-    }
-
-    override fun getReview(reviewId: Int): Flow<DataResult<Review>> {
-        val reviewQuery = MediaReviewQuery(reviewId)
-
-        val response = apolloClient.query(reviewQuery)
-            .toFlow()
-            .asDataResult { data ->
-                data.Review?.aLReview?.toDomain() ?: throw NoSuchElementException("Empty Response")
-            }
-
-        return response
     }
 
     override fun getStudio(studioId: Int): Flow<DataResult<Studio>> {

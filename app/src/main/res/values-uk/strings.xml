@@ -121,10 +121,10 @@
     <string name="browse_on_my_list">В моєму списку</string>
     <string name="browse_ongoings">Онґоінґи</string>
     <string name="browse_mode_select">Режим відображення та сортування</string>
-    <string name="ongoing_browse_mode_score">Рейтинг</string>
+    <string name="ongoing_browse_mode_score">Оцінка</string>
     <string name="ongoing_browse_mode_popularity">Популярність</string>
     <string name="ongoing_browse_mode_aired_on">Дата початку</string>
-    <string name="ongoing_browse_mode_score_shiki">Рейтинг Шикіморі</string>
+    <string name="ongoing_browse_mode_score_shiki">Оцінка Шикіморі</string>
     <string name="ongoing_browse_mode_trending">Популярне зараз</string>
 
     <string name="browse_search_label_media">Медіа</string>

@@ -13,10 +13,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.ExternalLinkData
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
-import com.example.shikiflow.domain.model.review.Review
-import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
-import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -152,24 +149,6 @@ class MediaRepositoryImpl @Inject constructor(
                     )
                 }
             ).flow
-        }
-    }
-
-    override fun getMediaReviews(
-        mediaId: Int,
-        mediaType: MediaType,
-        sort: Sort<ReviewType>
-    ): Flow<PagingData<ReviewShort>> {
-        return withSource(dataSource) { dataSource ->
-            dataSource.getMediaReviews(mediaId, mediaType, sort)
-        }
-    }
-
-    override fun getReview(
-        reviewId: Int
-    ): Flow<DataResult<Review>> {
-        return withSource(dataSource) { dataSource ->
-            dataSource.getReview(reviewId)
         }
     }
 

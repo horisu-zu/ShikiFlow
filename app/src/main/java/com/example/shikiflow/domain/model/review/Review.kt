@@ -8,6 +8,7 @@ data class Review(
     val title: String,
     val body: String,
     val score: Int,
+    val userRating: ReviewRating,
     val author: User,
     val media: ReviewMedia?,
     val likesCount: Int,

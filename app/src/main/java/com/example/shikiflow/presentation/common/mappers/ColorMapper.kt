@@ -2,6 +2,8 @@ package com.example.shikiflow.presentation.common.mappers
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.ColorUtils
 import com.example.shikiflow.domain.model.track.UserRateStatus
 
 object ColorMapper {
@@ -29,10 +31,17 @@ object ColorMapper {
         ratio: Float
     ): Color {
         return when {
-            ratio < 1 / 3f -> Color(0xFFCF6562)
-            ratio < 2 / 3f -> Color(0xFFC2B75A)
+            ratio <= 1 / 3f -> Color(0xFFCF6562)
+            ratio <= 2 / 3f -> Color(0xFFC2B75A)
             else -> Color(0xFF62CF71)
         }
+    }
+
+    fun Color.onColor(): Color {
+        val luminance = ColorUtils.calculateLuminance(this.toArgb())
+
+        return if (luminance < 0.3f) Color.White
+            else Color(0xFF1A1A1A)
     }
 
     fun getPickerQuickColors(): List<Color> {

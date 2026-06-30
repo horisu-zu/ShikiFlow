@@ -1,7 +1,8 @@
 package com.example.shikiflow.presentation.viewmodel.media.review
 
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.repository.MediaRepository
+import com.example.shikiflow.domain.model.review.ReviewRating
+import com.example.shikiflow.domain.repository.ReviewRepository
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,12 +13,13 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ReviewViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository
+    private val reviewRepository: ReviewRepository
 ): UiStateViewModel<ReviewUiState>() {
 
     override val initialState: ReviewUiState = ReviewUiState()
@@ -25,6 +27,33 @@ class ReviewViewModel @Inject constructor(
     fun setId(reviewId: Int) {
         mutableUiState.update { state ->
             state.copy(reviewId = reviewId)
+        }
+    }
+
+    fun toggleRating(
+        reviewId: Int,
+        rating: ReviewRating,
+        isUserRating: Boolean
+    ) {
+        viewModelScope.launch {
+            reviewRepository.toggleReviewRating(
+                reviewId = reviewId,
+                rating = if (isUserRating) ReviewRating.NO_VOTE else rating
+            ).let { result ->
+                if(result is DataResult.Success) {
+                    val reviewRate = result.data
+
+                    mutableUiState.update { state ->
+                        state.copy(
+                            review = state.review?.copy(
+                                userRating = reviewRate.userRating,
+                                likesCount = reviewRate.rating,
+                                ratingAmount = reviewRate.ratingAmount
+                            )
+                        )
+                    }
+                }
+            }
         }
     }
 
@@ -43,7 +72,7 @@ class ReviewViewModel @Inject constructor(
                 old.reviewId == new.reviewId && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                mediaRepository.getReview(state.reviewId!!)
+                reviewRepository.getReview(state.reviewId!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
