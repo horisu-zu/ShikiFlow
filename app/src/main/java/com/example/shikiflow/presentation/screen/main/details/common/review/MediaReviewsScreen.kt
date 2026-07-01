@@ -71,12 +71,6 @@ fun MediaReviewsScreen(
         }
     ) { paddingValues ->
         when(mediaReviewItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
             is LoadState.Error -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -104,14 +98,23 @@ fun MediaReviewsScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    items(mediaReviewItems.itemCount) { index ->
-                        mediaReviewItems[index]?.let { reviewShort ->
-                            ReviewShortItem(
-                                review = reviewShort,
-                                onReviewClick = { reviewId ->
-                                    navOptions.navigateToReview(reviewId)
-                                }
+                    if (mediaReviewItems.loadState.refresh is LoadState.Loading) {
+                        items(16) { index ->
+                            ReviewShortItemPlaceholder(
+                                itemIndex = index,
+                                modifier = Modifier.fillMaxWidth()
                             )
+                        }
+                    } else {
+                        items(mediaReviewItems.itemCount) { index ->
+                            mediaReviewItems[index]?.let { reviewShort ->
+                                ReviewShortItem(
+                                    review = reviewShort,
+                                    onReviewClick = { reviewId ->
+                                        navOptions.navigateToReview(reviewId)
+                                    }
+                                )
+                            }
                         }
                     }
 

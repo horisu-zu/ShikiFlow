@@ -6,11 +6,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
@@ -24,8 +26,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
@@ -43,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -50,6 +53,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
@@ -68,6 +72,7 @@ import com.example.shikiflow.presentation.common.mappers.ColorMapper.onColor
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.getScoreRatioIcon
 import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
 import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.media.review.ReviewViewModel
@@ -105,10 +110,15 @@ fun ReviewScreen(
         ) {
             if(uiState.isLoading) {
                 item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+                    ReviewHeaderPlaceholder(modifier = Modifier.fillMaxWidth())
+                }
+
+                item {
+                    ReviewBodyPlaceholder()
+                }
+
+                item {
+                    ReviewScoreComponentPlaceholder(modifier = Modifier.fillMaxWidth())
                 }
             } else if(uiState.errorMessage != null) {
                 item {
@@ -427,6 +437,223 @@ private fun UserScoreComponent(
             style = MaterialTheme.typography.titleSmall.copy(
                 color = color
             )
+        )
+    }
+}
+
+@Composable
+private fun ReviewHeaderPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    val boxItemPadding = 12.dp
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
+    val windowSize by remember(windowSizeClass) {
+        derivedStateOf {
+            WindowSize.from(windowSizeClass)
+        }
+    }
+
+    Box(
+        modifier = modifier
+            .aspectRatio(
+                when (windowSize) {
+                    WindowSize.COMPACT -> 16f / 9f
+                    else -> 3.2f
+                }
+            )
+            .clip(RoundedCornerShape(percent = 8)),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .width(288.dp)
+                .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp + 24.dp)
+                .clip(RoundedCornerShape(percent = 24))
+                .shimmerEffect()
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(all = boxItemPadding)
+                .width(96.dp)
+                .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp * 2 + 8.dp)
+                .clip(RoundedCornerShape(percent = 16))
+                .shimmerEffect()
+        )
+
+        ReviewRatingItemPlaceholder(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(all = boxItemPadding)
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(all = boxItemPadding)
+                .width(64.dp)
+                .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp + 12.dp)
+                .clip(RoundedCornerShape(percent = 16))
+                .shimmerEffect()
+        )
+    }
+}
+
+@Composable
+private fun ReviewBodyPlaceholder(
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = LocalTextStyle.current
+) {
+    val imageType = ImageType.Screenshot()
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
+    ) {
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
+            repeat(40) { index ->
+                val indexValue = index % 8 + 1
+                val itemWidth = if (indexValue <= 4) {
+                    48.dp + indexValue * 12.dp
+                } else {
+                    88.dp - indexValue * 6.dp
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(itemWidth)
+                        .height(textStyle.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 48.dp)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .shimmerEffect()
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
+            repeat(40) { index ->
+                val indexValue = index % 8 + 1
+                val itemWidth = if (indexValue <= 4) {
+                    64.dp + indexValue * 4.dp
+                } else {
+                    96.dp - indexValue * 8.dp
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(itemWidth)
+                        .height(textStyle.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewScoreComponentPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ReviewUserScorePlaceholder()
+
+        Row(
+            modifier = Modifier
+                .height(IntrinsicSize.Max)
+                .clip(RoundedCornerShape(percent = 16))
+                .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f))
+                .padding(all = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(64.dp)
+                    .height(MaterialTheme.typography.titleLarge.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .shimmerEffect()
+            )
+
+            Column(
+                modifier = Modifier
+                    .width(64.dp)
+                    .clip(RoundedCornerShape(topStartPercent = 16, bottomStartPercent = 16)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(32.dp)
+                        .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+
+                HorizontalDivider(
+                    color = MaterialTheme.colorScheme.surfaceContainer
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(32.dp)
+                        .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+            }
+        }
+
+        ReviewUserScorePlaceholder()
+    }
+}
+
+@Composable
+private fun ReviewUserScorePlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(percent = 32))
+            .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f))
+            .padding(all = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(RoundedCornerShape(percent = 24))
+                .shimmerEffect()
+        )
+
+        Box(
+            modifier = Modifier
+                .width(32.dp)
+                .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .shimmerEffect()
         )
     }
 }

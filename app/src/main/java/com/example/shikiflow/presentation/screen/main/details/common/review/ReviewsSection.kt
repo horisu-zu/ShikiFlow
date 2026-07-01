@@ -3,7 +3,9 @@ package com.example.shikiflow.presentation.screen.main.details.common.review
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -15,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -25,6 +26,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.review.ReviewShort
@@ -48,6 +51,7 @@ import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.ge
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.onColor
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 
@@ -147,7 +151,7 @@ fun ReviewShortItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            ReviewRatingItem(
+            ReviewStatsItem(
                 score = review.score,
                 likesCount = review.likesCount,
                 ratingAmount = review.ratingAmount
@@ -164,7 +168,79 @@ fun ReviewShortItem(
 }
 
 @Composable
-private fun ReviewRatingItem(
+fun ReviewShortItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val itemIndexValue = itemIndex % 5 + 1
+    val imageType = ImageType.Square(
+        shape = RoundedCornerShape(percent = 16),
+        width = 24.dp
+    )
+
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(all = 12.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(imageType.width)
+                        .clip(imageType.shape)
+                        .shimmerEffect()
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(32.dp + itemIndexValue * 8.dp)
+                        .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+            }
+
+            ReviewStatsItemPlaceholder()
+        }
+
+        FlowRow(
+            maxLines = 2,
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
+            repeat(16) { index ->
+                val indexValue = index % 8 + 1
+                val itemWidth = if (indexValue <= 4) {
+                    64.dp + indexValue * 4.dp
+                } else {
+                    96.dp - indexValue * 8.dp
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(itemWidth)
+                        .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .shimmerEffect()
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ReviewStatsItem(
     score: Int,
     likesCount: Int,
     ratingAmount: Int,
@@ -188,6 +264,21 @@ private fun ReviewRatingItem(
 }
 
 @Composable
+private fun ReviewStatsItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier.height(IntrinsicSize.Min),
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        ReviewRatingItemPlaceholder()
+
+        ReviewScoreItemPlaceholder()
+    }
+}
+
+@Composable
 private fun ReviewScoreItem(
     score: Int,
     modifier: Modifier = Modifier
@@ -200,11 +291,23 @@ private fun ReviewScoreItem(
         tint = scoreColor,
         modifier = modifier
             .size(24.dp)
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(percent = 24))
             .background(
                 color = scoreColor.copy(alpha = 0.2f)
             )
             .padding(all = 4.dp)
+    )
+}
+
+@Composable
+private fun ReviewScoreItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .size(24.dp)
+            .clip(RoundedCornerShape(percent = 24))
+            .shimmerEffect()
     )
 }
 
@@ -214,7 +317,9 @@ fun ReviewRatingItem(
     ratingAmount: Int,
     modifier: Modifier = Modifier
 ) {
-    val likesRatio = likesCount / ratingAmount.toFloat()
+    val likesRatio = remember(likesCount, ratingAmount) {
+        likesCount / ratingAmount.toFloat()
+    }
     val ratingColor = getRatioColor(likesRatio)
         .harmonize(MaterialTheme.colorScheme.background)
 
@@ -234,11 +339,38 @@ fun ReviewRatingItem(
         ),
         color = ratingColor.onColor(),
         modifier = modifier
-            .clip(CircleShape)
+            .clip(RoundedCornerShape(percent = 32))
             .background(color = ratingColor)
-            .padding(
-                horizontal = 6.dp,
-                vertical = 4.dp
-            )
+            .padding(horizontal = 6.dp, vertical = 4.dp)
     )
+}
+
+@Composable
+fun ReviewRatingItemPlaceholder(
+   modifier: Modifier = Modifier
+) {
+    val textStyle = MaterialTheme.typography.bodySmall
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(percent = 32))
+            .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f))
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .width(48.dp)
+                .height(textStyle.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .shimmerEffect()
+        )
+
+        Icon(
+            imageVector = Icons.Default.Star,
+            contentDescription = null,
+            modifier = Modifier.size(textStyle.lineHeight.value.dp)
+        )
+    }
 }
