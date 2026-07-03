@@ -1,10 +1,14 @@
 package com.example.shikiflow.presentation.screen.main.details.common.comment
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -12,7 +16,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -21,6 +24,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +56,7 @@ fun CommentItem(
     comment: Comment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
+    onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     secondBackgroundColor: Color = MaterialTheme.colorScheme.background
@@ -71,6 +76,7 @@ fun CommentItem(
                 commentData = comment,
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
+                onLikeToggle = onLikeToggle,
                 modifier = modifier,
                 firstBackgroundColor = backgroundColor,
                 secondBackgroundColor = secondBackgroundColor
@@ -107,10 +113,11 @@ private fun ShikimoriCommentItem(
                     modifier = Modifier.weight(1f)
                 )
             }
+
             if(commentData.isOfftopic) {
                 Box(
                     modifier = Modifier
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(percent = 32))
                         .background(MaterialTheme.colorScheme.tertiary.copy(alpha = 0.75f))
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     contentAlignment = Alignment.Center
@@ -136,6 +143,7 @@ private fun AnilistCommentTree(
     commentData: ALComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
+    onLikeToggle: (Int) -> Unit,
     firstBackgroundColor: Color,
     secondBackgroundColor: Color,
     modifier: Modifier = Modifier,
@@ -156,7 +164,8 @@ private fun AnilistCommentTree(
         AnilistCommentItem(
             commentData = commentData,
             onEntityClick = onEntityClick,
-            onUserClick = onUserClick
+            onUserClick = onUserClick,
+            onLikeToggle = onLikeToggle
         )
 
         if(depth <= 2) {
@@ -166,6 +175,7 @@ private fun AnilistCommentTree(
                     depth = depth + 1,
                     onEntityClick = onEntityClick,
                     onUserClick = onUserClick,
+                    onLikeToggle = onLikeToggle,
                     firstBackgroundColor = firstBackgroundColor,
                     secondBackgroundColor = secondBackgroundColor
                 )
@@ -173,7 +183,8 @@ private fun AnilistCommentTree(
         } else {
             if(commentData.childComments.isNotEmpty()) {
                 Box(
-                    modifier = Modifier.clip(CircleShape)
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(percent = 32))
                         .clickable { onEntityClick(EntityType.COMMENT,commentData.id) }
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                         .padding(horizontal = 8.dp, vertical = 6.dp),
@@ -200,6 +211,7 @@ private fun AnilistCommentItem(
     commentData: ALComment,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
+    onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -220,11 +232,20 @@ private fun AnilistCommentItem(
                 )
             }
 
-            if(commentData.likesCount > 0) { //Could be temporary if I decide to integrate a request
-                //Plan to add isLiked field and different coloring depending on its value
+            if(commentData.likesCount > 0) {
+                val likeTint by animateColorAsState(
+                    targetValue = if(commentData.isLiked) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+
                 Row(
-                    modifier = Modifier.clip(CircleShape)
-                        //.background(MaterialTheme.colorScheme.error.copy(alpha = 0.6f))
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(percent = 32))
+                        .clickable { onLikeToggle(commentData.id) }
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
                     verticalAlignment = Alignment.CenterVertically
@@ -232,14 +253,15 @@ private fun AnilistCommentItem(
                     Text(
                         text = commentData.likesCount.toString(),
                         style = MaterialTheme.typography.labelSmall.copy(
-                            color = MaterialTheme.colorScheme.error,
+                            color = likeTint,
                             fontWeight = FontWeight.Medium
                         )
                     )
+
                     Icon(
                         imageVector = Icons.Default.Favorite,
                         contentDescription = "Likes Count",
-                        tint = MaterialTheme.colorScheme.error,
+                        tint = likeTint,
                         modifier = Modifier.size(16.dp)
                     )
                 }
@@ -312,7 +334,7 @@ private fun CommentUserItem(
         Row(
             modifier = Modifier
                 .offset(x = (-4).dp)
-                .clip(CircleShape)
+                .clip(RoundedCornerShape(percent = 32))
                 .clickable { onUserClick(userData) }
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -381,7 +403,7 @@ fun CommentItemPlaceholder(
 
             Box(
                 modifier = Modifier
-                    .width(96.dp + itemIndex * 12.dp)
+                    .width(72.dp + itemIndex * 16.dp)
                     .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
                     .shimmerEffect()
@@ -401,13 +423,21 @@ fun CommentItemPlaceholder(
             )
         }
 
-        Column(
+        FlowRow(
+            maxLines = 4,
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            repeat(maxValue - indexValue + 1) { index ->
+            repeat(16 + indexValue * 4) { index ->
+                val indexValue = index % 8 + 1
+                val itemWidth = when (indexValue <= 4) {
+                    true -> 40.dp + indexValue * 12.dp
+                    false -> 80.dp - indexValue * 6.dp
+                }
+
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(fraction = 0.9f - index * 0.15f)
+                        .width(itemWidth)
                         .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
                         .shimmerEffect()

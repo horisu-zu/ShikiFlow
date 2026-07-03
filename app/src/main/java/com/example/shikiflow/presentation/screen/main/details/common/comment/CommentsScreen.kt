@@ -41,6 +41,8 @@ import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
 import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
+import com.example.shikiflow.utils.PagingUtils.fetched
+import com.example.shikiflow.utils.PagingUtils.isLoading
 
 @Composable
 fun CommentsScreen(
@@ -132,14 +134,6 @@ private fun TopicCommentsSection(
                     }
                 }
             }
-            is LoadState.Loading -> {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
-            }
             else -> {
                 threadHeader?.let { header ->
                     item {
@@ -151,22 +145,38 @@ private fun TopicCommentsSection(
                         )
                     }
                 }
-                items(commentItems.itemCount) { index ->
-                    commentItems[index]?.let { comment ->
-                        CommentItem(
-                            comment = comment,
-                            onEntityClick = onEntityClick,
-                            onUserClick = onUserClick,
-                            modifier = Modifier
+
+                if(commentItems.fetched()) {
+                    items(commentItems.itemCount) { index ->
+                        commentItems[index]?.let { comment ->
+                            CommentItem(
+                                comment = comment,
+                                onEntityClick = onEntityClick,
+                                onUserClick = onUserClick,
+                                onLikeToggle = { commentId ->
+                                    commentViewModel.toggleLike(commentId)
+                                },
+                                modifier = Modifier
+                            )
+                        }
+                    }
+                } else if (commentItems.isLoading()) {
+                    items(12) { index ->
+                        CommentItemPlaceholder(
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                            itemIndex = index,
+                            maxValue = 4
                         )
                     }
                 }
+
                 commentItems.apply {
                     when {
                         loadState.append is LoadState.Error -> {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                         .padding(vertical = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) {
@@ -181,7 +191,8 @@ private fun TopicCommentsSection(
                         loadState.append is LoadState.Loading -> {
                             item {
                                 Box(
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier
+                                        .fillMaxWidth()
                                         .padding(vertical = 8.dp),
                                     contentAlignment = Alignment.Center
                                 ) { CircularProgressIndicator() }
@@ -242,7 +253,10 @@ private fun CommentThreadSection(
                             title = commentType,
                             comments = comments,
                             onEntityClick = onEntityClick,
-                            onUserClick = onUserClick
+                            onUserClick = onUserClick,
+                            onLikeToggle = { commentId ->
+                                commentViewModel.toggleLike(commentId)
+                            }
                         )
                     }
                 }
@@ -257,6 +271,7 @@ private fun CommentsMapSection(
     comments: List<Comment>,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
+    onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -290,6 +305,7 @@ private fun CommentsMapSection(
                 comment = comment,
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
+                onLikeToggle = onLikeToggle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)

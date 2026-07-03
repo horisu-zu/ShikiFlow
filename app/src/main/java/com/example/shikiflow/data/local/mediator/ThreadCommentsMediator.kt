@@ -7,35 +7,30 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.apollographql.apollo.exception.ApolloHttpException
-import com.example.shikiflow.data.datasource.MediaTracksDataSource
-import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.entity.keys.RemoteKey
-import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackDto
-import com.example.shikiflow.data.mapper.local.MediaShortMapper.toEntity
-import com.example.shikiflow.data.mapper.local.MediaTrackMapper.toEntity
-import com.example.shikiflow.domain.model.sort.Sort
-import com.example.shikiflow.domain.model.sort.SortDirection
-import com.example.shikiflow.domain.model.sort.UserRateType
-import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.data.local.entity.thread_comment.CommentEntity
+import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.allSenders
+import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.toEntityList
+import com.example.shikiflow.domain.model.comment.ALComment
+import com.example.shikiflow.domain.model.comment.Comment
 import org.json.JSONObject
 
 @OptIn(ExperimentalPagingApi::class)
-class MediaTracksMediator(
-    private val mediaTracksDataSource: MediaTracksDataSource,
+class ThreadCommentsMediator(
     private val appRoomDatabase: AppRoomDatabase,
-    private val userRateStatus: UserRateStatus,
-    private val userId: Int?,
-    private val mediaType: MediaType
-): RemoteMediator<Int, MediaTrackDto>() {
-    private val mediaTracksDao = appRoomDatabase.mediaTracksDao()
+    private val method: suspend (Int, Int) -> Result<List<Comment>>,
+    private val topicId: Int
+): RemoteMediator<Int, CommentEntity>() {
+
+    private val threadCommentsDao = appRoomDatabase.threadCommentsDao()
     private val remoteKeysDao = appRoomDatabase.remoteKeysDao()
 
-    private val queryKey = "${mediaType}_$userRateStatus"
+    private val queryKey = topicId.toString()
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, MediaTrackDto>
+        state: PagingState<Int, CommentEntity>
     ): MediatorResult {
         val page = when(loadType) {
             LoadType.REFRESH -> 1
@@ -48,33 +43,28 @@ class MediaTracksMediator(
             }
         }
 
-        val response = mediaTracksDataSource.getMediaTracks(
-            page = page,
-            limit = state.config.pageSize,
-            mediaType = mediaType,
-            status = userRateStatus,
-            userId = userId,
-            order = Sort(
-                type = UserRateType.UPDATED_AT,
-                direction = SortDirection.DESCENDING
-            )
-        )
+        val response = method(page, state.config.pageSize)
 
         return response.fold(
             onSuccess = { data ->
                 val endOfPaginationReached = data.size < state.config.pageSize
-                val tracks = data.map { userRate ->
-                    userRate.track.toEntity()
-                }
-                val items = data.map { userRate ->
-                    userRate.shortData.toEntity()
-                }
+
+                val comments = data.mapNotNull { comment ->
+                    if (comment is ALComment) {
+                        comment.toEntityList(topicId)
+                    } else null
+                }.flatten()
+
+                val users = data.mapNotNull { comment ->
+                    if (comment is ALComment) {
+                        comment.allSenders()
+                    } else null
+                }.flatten()
 
                 appRoomDatabase.withTransaction {
-                    if(loadType == LoadType.REFRESH) {
+                    if (loadType == LoadType.REFRESH) {
                         remoteKeysDao.delete(queryKey)
-                        mediaTracksDao.clearItemsByStatus(userRateStatus.name, mediaType, state.config.pageSize)
-                        mediaTracksDao.clearTracksByStatus(userRateStatus.name, mediaType, state.config.pageSize)
+                        threadCommentsDao.deleteCommentsByThreadId(topicId)
                     }
 
                     remoteKeysDao.insert(
@@ -84,8 +74,9 @@ class MediaTracksMediator(
                             nextKey = if (endOfPaginationReached) null else page + 1
                         )
                     )
-                    mediaTracksDao.insertTracks(tracks)
-                    mediaTracksDao.insertItems(items)
+
+                    threadCommentsDao.insertAllComments(comments)
+                    threadCommentsDao.insertAllUsers(users)
                 }
 
                 MediatorResult.Success(endOfPaginationReached)

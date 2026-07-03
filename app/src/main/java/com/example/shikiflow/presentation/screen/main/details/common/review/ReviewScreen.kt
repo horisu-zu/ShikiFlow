@@ -519,10 +519,9 @@ private fun ReviewBodyPlaceholder(
         ) {
             repeat(40) { index ->
                 val indexValue = index % 8 + 1
-                val itemWidth = if (indexValue <= 4) {
-                    48.dp + indexValue * 12.dp
-                } else {
-                    88.dp - indexValue * 6.dp
+                val itemWidth = when (indexValue <= 4) {
+                    true -> 48.dp + indexValue * 12.dp
+                    false -> 88.dp - indexValue * 6.dp
                 }
 
                 Box(
@@ -550,10 +549,9 @@ private fun ReviewBodyPlaceholder(
         ) {
             repeat(40) { index ->
                 val indexValue = index % 8 + 1
-                val itemWidth = if (indexValue <= 4) {
-                    64.dp + indexValue * 4.dp
-                } else {
-                    96.dp - indexValue * 8.dp
+                val itemWidth = when (indexValue <= 4) {
+                    true -> 64.dp + indexValue * 4.dp
+                    false -> 96.dp - indexValue * 8.dp
                 }
 
                 Box(

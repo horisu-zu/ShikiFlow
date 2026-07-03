@@ -235,6 +235,9 @@ fun SocialSection(
 
                                                         navOptions.navigateToDetails(navRoute)
                                                     },
+                                                    onLikeToggle = { commentId ->
+                                                        userSocialViewModel.toggleCommentLike(commentId)
+                                                    },
                                                     onEntityClick = { entityType, id ->
                                                         val detailsNavRoute = when (entityType) {
                                                             EntityType.CHARACTER -> {

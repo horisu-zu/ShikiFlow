@@ -4,8 +4,9 @@ import android.util.Log
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.fragment.ALThread
+import com.example.graphql.anilist.fragment.ALThreadComment
 import com.example.graphql.anilist.fragment.ALThreadCommentWithHeader
-import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.ThreadType
@@ -60,13 +61,25 @@ object AnilistThreadsMapper {
             categories = categories?.mapNotNull { it?.name } ?: emptyList(),
             viewCount = viewCount ?: 0,
             replyCount = replyCount ?: 0,
-            lastReplyUser = replyUser?.aLUserShort?.toDomain(),
+            lastReplyUser = replyUser?.aLUserShort?.toDomainUser(),
             lastRepliedAt = Instant.fromEpochSeconds(repliedAt?.toLong() ?: 0L),
-            createdBy = user?.aLUserShort?.toDomain(),
+            createdBy = user?.aLUserShort?.toDomainUser(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong())
         )
     }
-    
+
+    fun ALThreadComment.toDomain(): ALComment {
+        return ALComment(
+            id = id,
+            commentBody = comment ?: "",
+            dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
+            sender = user?.aLUserShort?.toDomainUser(),
+            childComments = childComments.parseChildComments().map { it.toDomain() },
+            likesCount = likeCount,
+            isLiked = isLiked ?: false
+        )
+    }
+
     fun TopicCommentsQuery.ThreadComment.toDomain(): ALComment {
         return ALComment(
             id = id,
@@ -74,11 +87,13 @@ object AnilistThreadsMapper {
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
                 id = user?.id ?: 0,
+                nickname = user?.name ?: "",
                 avatarUrl = user?.avatar?.large ?: "",
-                nickname = user?.name ?: ""
+                profileBannerUrl = user?.bannerImage ?: ""
             ),
             childComments = childComments.parseChildComments().map { it.toDomain() },
-            likesCount = likeCount
+            likesCount = likeCount,
+            isLiked = isLiked ?: false
         )
     }
 
@@ -89,11 +104,13 @@ object AnilistThreadsMapper {
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
                 id = user?.id ?: 0,
-                avatarUrl = user?.avatar?.medium ?: "",
-                nickname = user?.name ?: ""
+                nickname = user?.name ?: "",
+                avatarUrl = user?.avatar?.large ?: "",
+                profileBannerUrl = user?.bannerImage ?: ""
             ),
             childComments = childComments.parseChildComments().map { it.toDomain() },
-            likesCount = likeCount
+            likesCount = likeCount,
+            isLiked = isLiked ?: false
         )
     }
 
@@ -105,9 +122,10 @@ object AnilistThreadsMapper {
                     id = id,
                     commentBody = comment ?: "",
                     dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
-                    sender = user?.aLUserShort?.toDomain(),
+                    sender = user?.aLUserShort?.toDomainUser(),
                     childComments = emptyList(),
-                    likesCount = likeCount
+                    likesCount = likeCount,
+                    isLiked = isLiked ?: false
                 )
             )
         }
@@ -146,15 +164,16 @@ object AnilistThreadsMapper {
                             avatar = (userMap["avatar"] as? Map<*, *>)?.let { avatarMap ->
                                 TopicCommentsQuery.Avatar(
                                     large = avatarMap["large"] as? String,
-                                    medium = avatarMap["medium"] as? String,
                                     __typename = ""
                                 )
                             },
+                            bannerImage = userMap["bannerImage"] as? String,
                             __typename = ""
                         )
                     },
                     childComments = map["childComments"],
                     likeCount = (map["likeCount"] as? Number)?.toInt() ?: 0,
+                    isLiked = map["isLiked"] as? Boolean ?: false,
                     __typename = ""
                 )
             }

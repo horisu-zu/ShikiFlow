@@ -24,4 +24,6 @@ interface CommentRepository {
         mediaId: Int,
         threadSort: Sort<ThreadType>
     ): Flow<PagingData<Thread>>
+
+    suspend fun toggleCommentLike(commentId: Int)
 }

@@ -1,0 +1,25 @@
+mutation ToggleLike(
+    $likeableId: Int!,
+    $type: LikeableType!
+) {
+    ToggleLikeV2(
+        id: $likeableId,
+        type: $type
+    ) {
+        ... on ListActivity {
+            ...ALListActivity
+        }
+        ... on TextActivity {
+            ...ALTextActivity
+        }
+        ... on MessageActivity {
+            ...ALMessageActivity
+        }
+        ... on Thread {
+            ...ALThread
+        }
+        ... on ThreadComment {
+            ...ALThreadComment
+        }
+    }
+}

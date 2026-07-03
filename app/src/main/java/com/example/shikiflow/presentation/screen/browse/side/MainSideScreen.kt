@@ -129,12 +129,6 @@ private fun MainSideScreenContent(
     }
 
     when(sideItems.loadState.refresh) {
-        is LoadState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        }
         is LoadState.Error -> {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -180,8 +174,7 @@ private fun MainSideScreenContent(
                                 contentAlignment = Alignment.Center
                             ) { CircularProgressIndicator() }
                         }
-                    }
-                    if (loadState.append is LoadState.Error) {
+                    } else if (loadState.append is LoadState.Error) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             ErrorItem(
                                 message = stringResource(R.string.b_mss_error),

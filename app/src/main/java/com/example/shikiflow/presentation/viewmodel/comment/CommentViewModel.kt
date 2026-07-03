@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -27,7 +28,7 @@ class CommentViewModel @Inject constructor(
     private val commentsRepository: CommentRepository
 ): ViewModel() {
 
-    private var _uiState = MutableStateFlow(CommentsUiState())
+    private val _uiState = MutableStateFlow(CommentsUiState())
     val uiState = _uiState.asStateFlow()
 
     val comments = _uiState
@@ -79,8 +80,7 @@ class CommentViewModel @Inject constructor(
                         repliesMap = state.repliesMap + (commentId to newState)
                     )
                 }
-            }
-            .launchIn(viewModelScope)
+            }.launchIn(viewModelScope)
     }
 
     fun setTopicId(topicId: Int) {
@@ -92,6 +92,12 @@ class CommentViewModel @Inject constructor(
     fun setCommentId(commentId: Int) {
         _uiState.update { state ->
             state.copy(commentId = commentId)
+        }
+    }
+
+    fun toggleLike(commentId: Int) {
+        viewModelScope.launch {
+            commentsRepository.toggleCommentLike(commentId)
         }
     }
 

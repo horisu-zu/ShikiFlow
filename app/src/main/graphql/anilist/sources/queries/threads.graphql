@@ -28,13 +28,14 @@ query TopicComments(
                 name
                 avatar {
                     large
-                    medium
                 }
+                bannerImage
             }
             comment(asHtml: true)
             createdAt
             childComments
             likeCount
+            isLiked
         }
     }
 }
@@ -49,12 +50,13 @@ query TopicComment(
             name
             avatar {
                 large
-                medium
             }
+            bannerImage
         }
         comment(asHtml: true)
         createdAt
         childComments
         likeCount
+        isLiked
     }
 }

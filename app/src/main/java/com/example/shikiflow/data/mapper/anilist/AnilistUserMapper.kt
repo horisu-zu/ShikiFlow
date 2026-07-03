@@ -9,6 +9,7 @@ import com.example.graphql.anilist.fragment.ALMediaFollowingUser
 import com.example.graphql.anilist.fragment.ALMessageActivity
 import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
+import com.example.graphql.anilist.fragment.ALUser
 import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.graphql.anilist.fragment.ALUserSettings
@@ -57,13 +58,22 @@ import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
 
 object AnilistUserMapper {
-    fun ALUserShort.toDomain(): User {
+    fun ALUser.toDomainUser(): User {
         return User(
             id = id,
             nickname = name,
             avatarUrl = avatar?.large ?: "",
             profileBannerUrl = bannerImage,
             scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
+        )
+    }
+
+    fun ALUserShort.toDomainUser(): User {
+        return User(
+            id = id,
+            nickname = name,
+            avatarUrl = avatar?.large ?: "",
+            profileBannerUrl = bannerImage
         )
     }
 
@@ -112,7 +122,7 @@ object AnilistUserMapper {
         return TextActivity(
             id = id,
             text = text ?: "",
-            user = user?.aLUserShort?.toDomain() ?: User(),
+            user = user?.aLUserShort?.toDomainUser() ?: User(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong())
         )
     }
@@ -121,8 +131,8 @@ object AnilistUserMapper {
         return MessageActivity(
             id = id,
             text = message ?: "",
-            messenger = messenger?.aLUserShort?.toDomain() ?: User(),
-            recipient = recipient?.aLUserShort?.toDomain() ?: User(),
+            messenger = messenger?.aLUserShort?.toDomainUser() ?: User(),
+            recipient = recipient?.aLUserShort?.toDomainUser() ?: User(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong())
         )
     }

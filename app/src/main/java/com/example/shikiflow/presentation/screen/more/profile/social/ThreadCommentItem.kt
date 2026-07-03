@@ -32,6 +32,7 @@ fun ThreadCommentItem(
     threadComment: ThreadComment,
     onThreadClick: () -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
+    onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -71,6 +72,7 @@ fun ThreadCommentItem(
             comment = threadComment.comment,
             onEntityClick = onEntityClick,
             onUserClick = { /**/ },
+            onLikeToggle = onLikeToggle,
             backgroundColor = MaterialTheme.colorScheme.background
         )
     }

@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -48,11 +49,7 @@ fun CommentSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
-        if(uiState.isLoading) {
-            Box(contentAlignment = Alignment.Center) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-        } else if(uiState.errorMessage != null) {
+        if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -65,7 +62,14 @@ fun CommentSection(
                 )
             }
         } else {
-            if(uiState.comments.isNotEmpty()) {
+            if (uiState.isLoading) {
+                repeat(5) { index ->
+                    CommentItemPlaceholder(
+                        backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                        itemIndex = index
+                    )
+                }
+            } else if(uiState.comments.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
@@ -99,11 +103,13 @@ fun CommentSection(
                         )
                     }
                 }
+
                 uiState.comments.forEach { comment ->
                     CommentItem(
                         comment = comment,
                         onEntityClick = onEntityClick,
                         onUserClick = onUserClick,
+                        onLikeToggle = { /**/ },
                         modifier = Modifier
                     )
                 }

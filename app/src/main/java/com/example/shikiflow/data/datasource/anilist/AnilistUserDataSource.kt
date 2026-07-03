@@ -36,6 +36,7 @@ import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toShortUserMediaRate
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toStaffStats
@@ -85,7 +86,7 @@ class AnilistUserDataSource @Inject constructor(
             .fetchPolicy(FetchPolicy.NetworkFirst)
             .toFlow()
             .asDataResult { data ->
-                data.Viewer?.aLUserShort?.toDomain()
+                data.Viewer?.aLUser?.toDomainUser()
                     ?: throw IllegalStateException("No user data returned")
             }
     }
@@ -413,7 +414,7 @@ class AnilistUserDataSource @Inject constructor(
                 ?.let { list ->
                     list.mapNotNull { user ->
                         user?.aLUserShort?.let { alUser ->
-                            Follower(alUser.toDomain())
+                            Follower(alUser.toDomainUser())
                         }
                     }
                 } ?: emptyList()
@@ -437,7 +438,7 @@ class AnilistUserDataSource @Inject constructor(
                 ?.let { list ->
                     list.mapNotNull { user ->
                         user?.aLUserShort?.let { alUser ->
-                            Follower(alUser.toDomain())
+                            Follower(alUser.toDomainUser())
                         }
                     }
                 } ?: emptyList()
@@ -527,7 +528,7 @@ class AnilistUserDataSource @Inject constructor(
                 ?.mapNotNull { user ->
                     user?.aLUserShort?.let { alUser ->
                         Browse.User(
-                            data = alUser.toDomain()
+                            data = alUser.toDomainUser()
                         )
                     }
                 } ?: emptyList()

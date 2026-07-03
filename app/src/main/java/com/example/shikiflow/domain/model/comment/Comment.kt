@@ -24,5 +24,6 @@ data class ALComment(
     override val dateTime: Instant,
     override val sender: User?,
     val childComments: List<ALComment>,
-    val likesCount: Int
+    val likesCount: Int,
+    val isLiked: Boolean
 ): Comment

@@ -151,7 +151,7 @@ fragment Score on MediaList {
     score(format: POINT_10_DECIMAL)
 }
 
-fragment ALUserShort on User {
+fragment ALUser on User {
     id
     name
     avatar {
@@ -163,6 +163,15 @@ fragment ALUserShort on User {
     mediaListOptions {
         scoreFormat
     }
+}
+
+fragment ALUserShort on User {
+    id
+    name
+    avatar {
+        large
+    }
+    bannerImage
 }
 
 fragment ALUserSettings on User {
@@ -555,6 +564,7 @@ fragment ALThreadComment on ThreadComment {
     createdAt
     childComments
     likeCount
+    isLiked
 }
 
 fragment ALThreadCommentWithHeader on ThreadComment {
@@ -569,6 +579,10 @@ fragment ALThreadCommentWithHeader on ThreadComment {
     createdAt
     childComments
     likeCount
+    isLiked
+    likes {
+        ...ALUserShort
+    }
 }
 
 fragment ALReviewShort on Review {

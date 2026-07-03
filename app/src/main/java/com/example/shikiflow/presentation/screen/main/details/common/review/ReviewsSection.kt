@@ -356,7 +356,7 @@ fun ReviewRatingItemPlaceholder(
             .clip(RoundedCornerShape(percent = 32))
             .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f))
             .padding(horizontal = 6.dp, vertical = 4.dp),
-        horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Box(

@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -110,11 +111,11 @@ fun ThreadsScreen(
         ) {
             when(threadsState.loadState.refresh) {
                 is LoadState.Loading -> {
-                    item {
-                        Box(
-                            modifier = Modifier.fillParentMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) { CircularProgressIndicator() }
+                    items(count = 12) { index ->
+                        ThreadItemPlaceholder(
+                            itemIndex = index,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 is LoadState.Error -> {
@@ -267,14 +268,22 @@ fun ThreadItemPlaceholder(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            Column(
+            FlowRow(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(4.dp)
+                maxLines = 2,
+                horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
             ) {
-                repeat(indexValue) { index ->
+                repeat(4 * indexValue) { index ->
+                    val rowIndex = index % 6 + 1
+                    val itemWidth = when (rowIndex <= 3) {
+                        true -> 64.dp - rowIndex * 12.dp + indexValue * 4.dp
+                        false -> 32.dp + rowIndex * 12.dp - indexValue * 4.dp
+                    }
+
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth(fraction = 0.9f - 0.2f * index)
+                            .width(itemWidth)
                             .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
                             .shimmerEffect()
@@ -283,12 +292,16 @@ fun ThreadItemPlaceholder(
             }
 
             Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(horizontal = 6.dp, vertical = 4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
             ) {
-                repeat(2) {
+                repeat(2) { index ->
                     Box(
                         modifier = Modifier
-                            .width(48.dp)
+                            .width(32.dp + index * 8.dp)
                             .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
                             .shimmerEffect()

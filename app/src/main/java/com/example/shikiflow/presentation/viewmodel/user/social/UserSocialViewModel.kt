@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.user.social.SocialCategory
+import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -13,12 +14,14 @@ import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class UserSocialViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val commentRepository: CommentRepository
 ): ViewModel() {
 
     private val _params = MutableStateFlow(SocialParams())
@@ -46,6 +49,12 @@ class UserSocialViewModel @Inject constructor(
     fun setCategory(socialCategory: SocialCategory) {
         _params.update { state ->
             state.copy(currentCategory = socialCategory)
+        }
+    }
+
+    fun toggleCommentLike(commentId: Int) {
+        viewModelScope.launch {
+            commentRepository.toggleCommentLike(commentId)
         }
     }
 }

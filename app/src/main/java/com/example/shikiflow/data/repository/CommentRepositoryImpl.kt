@@ -4,10 +4,12 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.CommentsDataSource
+import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
@@ -15,6 +17,7 @@ import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -24,7 +27,8 @@ import javax.inject.Inject
 class CommentRepositoryImpl @Inject constructor(
     @param:Shikimori private val shikimoriDataSource: CommentsDataSource,
     @param:AniList private val anilistDataSource: CommentsDataSource,
-    private val settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository,
+    private val appRoomDatabase: AppRoomDatabase
 ): CommentRepository, BaseNetworkRepository() {
 
     private val dataSource = settingsRepository.authTypeFlow
@@ -55,21 +59,7 @@ class CommentRepositoryImpl @Inject constructor(
 
     override fun getPaginatedComments(topicId: Int): Flow<PagingData<Comment>> {
         return withSource(dataSource) { dataSource ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = 15,
-                    enablePlaceholders = true,
-                    prefetchDistance = 5,
-                    initialLoadSize = 15
-                ),
-                pagingSourceFactory = {
-                    GenericPagingSource(
-                        method = { page, limit ->
-                            dataSource.getComments(topicId, page, limit)
-                        }
-                    )
-                }
-            ).flow
+            dataSource.getPaginatedComments(topicId)
         }
     }
 
@@ -93,6 +83,25 @@ class CommentRepositoryImpl @Inject constructor(
                     )
                 }
             ).flow
+        }
+    }
+
+    override suspend fun toggleCommentLike(commentId: Int) {
+        val threadCommentsDao = appRoomDatabase.threadCommentsDao()
+
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.toggleCommentLike(commentId).let { result ->
+                if (result is DataResult.Success && result.data is ALComment) {
+                    val comment = threadCommentsDao.getCommentById(commentId)
+
+                    threadCommentsDao.updateComment(
+                        comment = comment.copy(
+                            likesCount = result.data.likesCount,
+                            isLiked = result.data.isLiked
+                        )
+                    )
+                }
+            }
         }
     }
 }
