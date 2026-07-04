@@ -216,7 +216,7 @@ class HTMLParser(private val strategy: HTMLDialect) {
                 val annotatedString = element.annotatedString
 
                 val commentAnnotations = annotatedString.getStringAnnotations(
-                    tag = EntityType.COMMENT.name,
+                    tag = EntityType.COMMENT_REPLY.name,
                     start = 0,
                     end = annotatedString.length
                 )

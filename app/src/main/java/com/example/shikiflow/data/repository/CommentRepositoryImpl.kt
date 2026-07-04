@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.source.GenericPagingSource
+import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.toTree
 import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -41,6 +42,8 @@ class CommentRepositoryImpl @Inject constructor(
         }
         .distinctUntilChanged()
 
+    private val threadCommentsDao = appRoomDatabase.threadCommentsDao()
+
     override suspend fun getComments(
         topicId: Int,
         page: Int,
@@ -48,6 +51,16 @@ class CommentRepositoryImpl @Inject constructor(
     ): Result<List<Comment>> {
         return withSourceSuspend(dataSource) { dataSource ->
             dataSource.getComments(topicId, page, limit)
+        }
+    }
+
+    override fun observeComments(commentsIds: Set<Int>): Flow<List<Comment>> {
+        return threadCommentsDao.getComments(commentsIds).map { commentEntities ->
+            commentEntities.map { commentEntity ->
+                val subtree = threadCommentsDao.getSubtree(commentEntity.comment.id)
+
+                subtree.toTree(rootId = commentEntity.comment.id)
+            }
         }
     }
 
@@ -87,19 +100,19 @@ class CommentRepositoryImpl @Inject constructor(
     }
 
     override suspend fun toggleCommentLike(commentId: Int) {
-        val threadCommentsDao = appRoomDatabase.threadCommentsDao()
-
         return withSourceSuspend(dataSource) { dataSource ->
             dataSource.toggleCommentLike(commentId).let { result ->
                 if (result is DataResult.Success && result.data is ALComment) {
                     val comment = threadCommentsDao.getCommentById(commentId)
 
-                    threadCommentsDao.updateComment(
-                        comment = comment.copy(
-                            likesCount = result.data.likesCount,
-                            isLiked = result.data.isLiked
+                    comment?.let {
+                        threadCommentsDao.updateComment(
+                            comment = comment.copy(
+                                likesCount = result.data.likesCount,
+                                isLiked = result.data.isLiked
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

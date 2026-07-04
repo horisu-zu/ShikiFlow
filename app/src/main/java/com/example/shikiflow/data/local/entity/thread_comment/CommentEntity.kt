@@ -9,5 +9,10 @@ data class CommentEntity(
         parentColumn = "senderId",
         entityColumn = "id"
     )
-    val sender: UserShortEntity
+    val sender: UserShortEntity,
+    @Relation(
+        parentColumn = "threadId",
+        entityColumn = "id"
+    )
+    val thread: ThreadEntity?
 )

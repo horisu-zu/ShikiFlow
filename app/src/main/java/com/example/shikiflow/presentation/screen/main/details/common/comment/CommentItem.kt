@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.common.comment
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
@@ -42,6 +43,7 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.presentation.common.DigitCounter
 import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -185,7 +187,7 @@ private fun AnilistCommentTree(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(percent = 32))
-                        .clickable { onEntityClick(EntityType.COMMENT,commentData.id) }
+                        .clickable { onEntityClick(EntityType.COMMENT_TREE,commentData.id) }
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     contentAlignment = Alignment.CenterEnd
@@ -214,6 +216,15 @@ private fun AnilistCommentItem(
     onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val likeTint by animateColorAsState(
+        targetValue = if(commentData.isLiked) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        )
+    )
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
@@ -232,39 +243,31 @@ private fun AnilistCommentItem(
                 )
             }
 
-            if(commentData.likesCount > 0) {
-                val likeTint by animateColorAsState(
-                    targetValue = if(commentData.isLiked) MaterialTheme.colorScheme.error
-                        else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioNoBouncy,
-                        stiffness = Spring.StiffnessMediumLow
-                    )
-                )
-
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(percent = 32))
-                        .clickable { onLikeToggle(commentData.id) }
-                        .padding(horizontal = 8.dp, vertical = 6.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = commentData.likesCount.toString(),
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(percent = 32))
+                    .clickable { onLikeToggle(commentData.id) }
+                    .padding(horizontal = 8.dp, vertical = 6.dp)
+                    .animateContentSize(),
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if(commentData.likesCount > 0) {
+                    DigitCounter(
+                        count = commentData.likesCount,
                         style = MaterialTheme.typography.labelSmall.copy(
                             color = likeTint,
                             fontWeight = FontWeight.Medium
                         )
                     )
-
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Likes Count",
-                        tint = likeTint,
-                        modifier = Modifier.size(16.dp)
-                    )
                 }
+
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Likes Count",
+                    tint = likeTint,
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
 
@@ -370,9 +373,9 @@ private fun CommentUserItem(
 
 @Composable
 fun CommentItemPlaceholder(
-    backgroundColor: Color,
     itemIndex: Int,
     modifier: Modifier = Modifier,
+    backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     maxValue: Int = 3
 ) {
     val indexValue = itemIndex % maxValue + 1

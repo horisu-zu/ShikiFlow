@@ -32,7 +32,7 @@ object LinkRouter {
                 "ranobe" -> EntityType.RANOBE
                 "characters" -> EntityType.CHARACTER
                 "people" -> EntityType.PERSON
-                "comments" -> EntityType.COMMENT
+                "comments" -> EntityType.COMMENT_REPLY
                 else -> return null
             }
             return EntityData(id = shikimoriMatch.groupValues[2], type = type)

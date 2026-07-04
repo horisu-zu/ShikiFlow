@@ -32,6 +32,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute.*
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.activity.UserActivityViewModel
 
@@ -128,19 +129,26 @@ fun UserActivitySection(
                                     onEntityClick = { entityType, id ->
                                         val detailsNavRoute = when (entityType) {
                                             EntityType.CHARACTER -> {
-                                                DetailsNavRoute.CharacterDetails(id)
+                                                CharacterDetails(id)
                                             }
                                             EntityType.PERSON -> {
-                                                DetailsNavRoute.Staff(id)
+                                                Staff(id)
                                             }
                                             EntityType.ANIME -> {
-                                                DetailsNavRoute.AnimeDetails(id)
+                                                AnimeDetails(id)
                                             }
                                             EntityType.MANGA, EntityType.RANOBE -> {
-                                                DetailsNavRoute.MangaDetails(id)
+                                                MangaDetails(id)
                                             }
-                                            EntityType.COMMENT -> {
-                                                DetailsNavRoute.Comments(CommentsScreenMode.COMMENT, id, null)
+                                            EntityType.COMMENT_REPLY, EntityType.COMMENT_TREE -> {
+                                                Comments(
+                                                    screenMode = when (entityType) {
+                                                        EntityType.COMMENT_REPLY -> CommentsScreenMode.REPLY
+                                                        EntityType.COMMENT_TREE -> CommentsScreenMode.TREE
+                                                    },
+                                                    id = id,
+                                                    threadHeader = null
+                                                )
                                             }
                                         }
 

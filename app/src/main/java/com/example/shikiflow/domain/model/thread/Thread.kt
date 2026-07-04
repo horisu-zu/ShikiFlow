@@ -16,4 +16,21 @@ data class Thread(
     val lastRepliedAt: Instant?,
     val createdBy: User?,
     val createdAt: Instant
-)
+) {
+    companion object {
+        fun createEmpty(): Thread {
+            return Thread(
+                id = 0,
+                title = "",
+                body = null,
+                categories = emptyList(),
+                viewCount = 0,
+                replyCount = 0,
+                lastReplyUser = null,
+                lastRepliedAt = null,
+                createdBy = null,
+                createdAt = Instant.DISTANT_PAST
+            )
+        }
+    }
+}

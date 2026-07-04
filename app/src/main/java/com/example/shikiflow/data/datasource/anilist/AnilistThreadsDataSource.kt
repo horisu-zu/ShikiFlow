@@ -15,7 +15,6 @@ import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.type.LikeableType
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.mediator.MediaTracksMediator
 import com.example.shikiflow.data.local.mediator.ThreadCommentsMediator
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort

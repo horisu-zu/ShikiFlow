@@ -54,6 +54,8 @@ import com.example.shikiflow.presentation.screen.main.details.common.ThreadItem
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadItemPlaceholder
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.social.UserSocialViewModel
+import com.example.shikiflow.utils.PagingUtils.fetched
+import com.example.shikiflow.utils.PagingUtils.isLoading
 import kotlinx.coroutines.launch
 
 @Composable
@@ -175,7 +177,7 @@ fun SocialSection(
                                 .fillMaxSize()
                                 .padding(top = paddingValues.calculateTopPadding())
                         ) {
-                            if (socialItems.loadState.refresh is LoadState.Loading) {
+                            if (socialItems.isLoading()) {
                                 items(24) { index ->
                                     when (category) {
                                         SocialCategory.THREADS -> {
@@ -192,7 +194,7 @@ fun SocialSection(
                                         }
                                     }
                                 }
-                            } else if (socialItems.loadState.refresh is LoadState.NotLoading) {
+                            } else if (socialItems.fetched()) {
                                 items(socialItems.itemCount) { index ->
                                     socialItems[index]?.let { item ->
                                         when(item) {
@@ -252,11 +254,14 @@ fun SocialSection(
                                                             EntityType.MANGA, EntityType.RANOBE -> {
                                                                 DetailsNavRoute.MangaDetails(id)
                                                             }
-                                                            EntityType.COMMENT -> {
+                                                            EntityType.COMMENT_REPLY, EntityType.COMMENT_TREE -> {
                                                                 DetailsNavRoute.Comments(
-                                                                    screenMode = CommentsScreenMode.COMMENT,
-                                                                    threadHeader = item.thread,
-                                                                    id = id
+                                                                    screenMode = when (entityType) {
+                                                                        EntityType.COMMENT_REPLY -> CommentsScreenMode.REPLY
+                                                                        EntityType.COMMENT_TREE -> CommentsScreenMode.TREE
+                                                                    },
+                                                                    id = id,
+                                                                    threadHeader = null
                                                                 )
                                                             }
                                                         }

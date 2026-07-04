@@ -14,6 +14,8 @@ interface CommentRepository {
         limit: Int = 30,
     ): Result<List<Comment>>
 
+    fun observeComments(commentsIds: Set<Int>): Flow<List<Comment>>
+
     suspend fun getCommentById(commentId: Int): Comment
 
     fun getPaginatedComments(

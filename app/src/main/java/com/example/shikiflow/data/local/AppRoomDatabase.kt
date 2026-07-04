@@ -15,20 +15,24 @@ import com.example.shikiflow.data.local.entity.keys.RemoteKey
 import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
 import com.example.shikiflow.data.local.entity.thread_comment.ThreadCommentEntity
+import com.example.shikiflow.data.local.entity.thread_comment.ThreadEntity
 import com.example.shikiflow.data.local.entity.thread_comment.UserShortEntity
 
 @Database(
-    version = 3,
+    version = 5,
     entities = [
         MediaTrackEntity::class,
         MediaShortEntity::class,
         ThreadCommentEntity::class,
         UserShortEntity::class,
+        ThreadEntity::class,
         RemoteKey::class
     ],
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4),
+        AutoMigration(from = 4, to = 5)
     ],
     exportSchema = true
 )

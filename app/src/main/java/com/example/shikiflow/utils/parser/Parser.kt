@@ -138,7 +138,7 @@ object Parser {
                             val username = mention.selectFirst("span")?.text() ?: ""
                             val commentId = mention.attr("href").substringAfter("/comments/")
 
-                            pushStringAnnotation(EntityType.COMMENT.name, commentId)
+                            pushStringAnnotation(EntityType.COMMENT_REPLY.name, commentId)
                             withStyle(SpanStyle(color = linkColor)) {
                                 append("@$username")
                             }
@@ -225,7 +225,7 @@ object Parser {
 
                     val annotationTag = when {
                         entityData != null -> entityData.type.name
-                        node.hasClass("b-mention") -> EntityType.COMMENT.name
+                        node.hasClass("b-mention") -> EntityType.COMMENT_REPLY.name
                         node.tagName() == "a" -> "URL_LINK"
                         else -> null
                     }

@@ -10,23 +10,22 @@ import com.apollographql.apollo.exception.ApolloHttpException
 import com.example.shikiflow.data.local.AppRoomDatabase
 import com.example.shikiflow.data.local.entity.keys.RemoteKey
 import com.example.shikiflow.data.local.entity.thread_comment.CommentEntity
-import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.allSenders
-import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.toEntityList
+import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.toEntity
 import com.example.shikiflow.domain.model.comment.ALComment
-import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.user.social.ThreadComment
 import org.json.JSONObject
 
 @OptIn(ExperimentalPagingApi::class)
-class ThreadCommentsMediator(
+class UserCommentsMediator(
     private val appRoomDatabase: AppRoomDatabase,
-    private val method: suspend (Int, Int) -> Result<List<Comment>>,
-    private val topicId: Int
+    private val method: suspend (Int, Int) -> Result<List<ThreadComment>>,
+    private val senderId: Int
 ): RemoteMediator<Int, CommentEntity>() {
 
     private val threadCommentsDao = appRoomDatabase.threadCommentsDao()
     private val remoteKeysDao = appRoomDatabase.remoteKeysDao()
 
-    private val queryKey = "thread_$topicId"
+    private val queryKey = "sender_$senderId"
 
     override suspend fun load(
         loadType: LoadType,
@@ -49,22 +48,22 @@ class ThreadCommentsMediator(
             onSuccess = { data ->
                 val endOfPaginationReached = data.size < state.config.pageSize
 
-                val comments = data.mapNotNull { comment ->
-                    if (comment is ALComment) {
-                        comment.toEntityList(topicId)
+                val comments = data.mapNotNull { userSocial ->
+                    if (userSocial.comment is ALComment) {
+                        userSocial.comment.toEntity(userSocial.thread.id)
                     } else null
-                }.flatten()
+                }
 
-                val users = data.mapNotNull { comment ->
-                    if (comment is ALComment) {
-                        comment.allSenders()
-                    } else null
-                }.flatten()
+                val threads = data.map { userSocial ->
+                    userSocial.thread.toEntity()
+                }
+
+                val user = data.first().comment.sender?.toEntity()
 
                 appRoomDatabase.withTransaction {
                     if (loadType == LoadType.REFRESH) {
                         remoteKeysDao.delete(queryKey)
-                        threadCommentsDao.deleteCommentsByThreadId(topicId)
+                        threadCommentsDao.deleteCommentsBySender(senderId)
                     }
 
                     remoteKeysDao.insert(
@@ -76,7 +75,8 @@ class ThreadCommentsMediator(
                     )
 
                     threadCommentsDao.insertAllComments(comments)
-                    threadCommentsDao.insertAllUsers(users)
+                    threadCommentsDao.insertAllThreads(threads)
+                    user?.let { threadCommentsDao.insertUser(user) }
                 }
 
                 MediatorResult.Success(endOfPaginationReached)

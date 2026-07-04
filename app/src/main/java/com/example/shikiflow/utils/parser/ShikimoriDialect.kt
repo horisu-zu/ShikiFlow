@@ -98,7 +98,7 @@ class ShikimoriDialect: HTMLDialect {
                 val username = mention.selectFirst("span")?.text() ?: ""
                 val commentId = mention.attr("href").substringAfter("/comments/")
 
-                pushStringAnnotation(EntityType.COMMENT.name, commentId)
+                pushStringAnnotation(EntityType.COMMENT_REPLY.name, commentId)
                 withStyle(SpanStyle(color = linkColor)) {
                     append("@$username")
                 }
@@ -148,7 +148,7 @@ class ShikimoriDialect: HTMLDialect {
 
         return when {
             entity != null -> entity.type.name to entity.id
-            node.hasClass("b-mention") -> EntityType.COMMENT.name to node.attr("href")
+            node.hasClass("b-mention") -> EntityType.COMMENT_REPLY.name to node.attr("href")
                 .substringAfter("/comments/")
             node.tagName() == "a" ->
                 "URL_LINK" to (

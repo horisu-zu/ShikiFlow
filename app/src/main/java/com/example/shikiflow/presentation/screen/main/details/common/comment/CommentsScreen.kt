@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -41,6 +42,7 @@ import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
 import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
+import com.example.shikiflow.presentation.viewmodel.comment.tree.CommentTreeViewModel
 import com.example.shikiflow.utils.PagingUtils.fetched
 import com.example.shikiflow.utils.PagingUtils.isLoading
 
@@ -80,10 +82,22 @@ fun CommentsScreen(
                         }
                     )
                 }
-                CommentsScreenMode.COMMENT -> {
-                    CommentThreadSection(
+                CommentsScreenMode.REPLY -> {
+                    CommentWithRepliesSection(
                         commentId = id,
                         commentViewModel = commentViewModel,
+                        contentPadding = contentPadding,
+                        onEntityClick = { entityType, id ->
+                            navOptions.navigateByEntity(entityType, id)
+                        },
+                        onUserClick = { user ->
+                            navOptions.navigateToUserProfile(user)
+                        }
+                    )
+                }
+                CommentsScreenMode.TREE -> {
+                    CommentTreeSection(
+                        commentId = id,
                         contentPadding = contentPadding,
                         onEntityClick = { entityType, id ->
                             navOptions.navigateByEntity(entityType, id)
@@ -146,7 +160,15 @@ private fun TopicCommentsSection(
                     }
                 }
 
-                if(commentItems.fetched()) {
+                if (commentItems.isLoading()) {
+                    items(12) { index ->
+                        CommentItemPlaceholder(
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                            itemIndex = index,
+                            maxValue = 4
+                        )
+                    }
+                } else if(commentItems.fetched()) {
                     items(commentItems.itemCount) { index ->
                         commentItems[index]?.let { comment ->
                             CommentItem(
@@ -155,18 +177,9 @@ private fun TopicCommentsSection(
                                 onUserClick = onUserClick,
                                 onLikeToggle = { commentId ->
                                     commentViewModel.toggleLike(commentId)
-                                },
-                                modifier = Modifier
+                                }
                             )
                         }
-                    }
-                } else if (commentItems.isLoading()) {
-                    items(12) { index ->
-                        CommentItemPlaceholder(
-                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                            itemIndex = index,
-                            maxValue = 4
-                        )
                     }
                 }
 
@@ -206,7 +219,7 @@ private fun TopicCommentsSection(
 }
 
 @Composable
-private fun CommentThreadSection(
+private fun CommentWithRepliesSection(
     commentId: Int,
     commentViewModel: CommentViewModel,
     contentPadding: PaddingValues,
@@ -227,11 +240,10 @@ private fun CommentThreadSection(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             if(repliesUiState.isLoading) {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
+                items(count = 3) { index ->
+                    CommentItemPlaceholder(
+                        itemIndex = index
+                    )
                 }
             } else if(repliesUiState.errorMessage != null) {
                 item {
@@ -275,12 +287,13 @@ private fun CommentsMapSection(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(12.dp))
             .background(
                 color = when(title) {
                     CommentType.OP -> MaterialTheme.colorScheme.background
-                        else -> MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f)
+                    else -> MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.5f)
                 }
             )
             .padding(horizontal = 8.dp, vertical = 12.dp),
@@ -310,6 +323,46 @@ private fun CommentsMapSection(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun CommentTreeSection(
+    commentId: Int,
+    contentPadding: PaddingValues,
+    onEntityClick: (EntityType, Int) -> Unit,
+    onUserClick: (User) -> Unit,
+    modifier: Modifier = Modifier,
+    commentTreeViewModel: CommentTreeViewModel = hiltViewModel()
+) {
+    val comments by commentTreeViewModel.comments.collectAsStateWithLifecycle()
+
+    DisposableEffect(commentId) {
+        commentTreeViewModel.addCommentId(commentId)
+
+        onDispose {
+            commentTreeViewModel.removeCommentId(commentId)
+        }
+    }
+
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = contentPadding,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        comments[commentId]?.let { comment ->
+            item {
+                CommentItem(
+                    comment = comment,
+                    onEntityClick = onEntityClick,
+                    onUserClick = onUserClick,
+                    onLikeToggle = { commentId ->
+                        commentTreeViewModel.toggleLike(commentId)
+                    },
+                    modifier = modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }

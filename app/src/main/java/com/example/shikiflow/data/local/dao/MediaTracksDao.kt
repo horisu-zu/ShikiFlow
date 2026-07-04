@@ -65,6 +65,7 @@ interface MediaTracksDao {
     @Update
     suspend fun updateTrack(track: MediaTrackEntity)
 
+    @Transaction
     @Query("""
         SELECT * FROM media_track
         INNER JOIN media_short ON media_track.mediaId = media_short.id
@@ -89,6 +90,7 @@ interface MediaTracksDao {
     @RawQuery(observedEntities = [MediaTrackDto::class, MediaShortEntity::class])
     fun browseMediaTracks(query: RoomRawQuery): PagingSource<Int, MediaTrackDto>
 
+    @Transaction
     @Query("""
         SELECT * FROM media_track
         INNER JOIN media_short ON media_track.mediaId = media_short.id
