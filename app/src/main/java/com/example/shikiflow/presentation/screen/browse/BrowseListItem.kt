@@ -126,7 +126,7 @@ fun BrowseListItem(
                         CardItem(
                             item = genre.preferred(titleType),
                             style = MaterialTheme.typography.labelSmall,
-                            modifier = Modifier.clip(RoundedCornerShape(12.dp))
+                            modifier = Modifier.clip(RoundedCornerShape(percent = 40))
                         )
                     }
                 }
@@ -199,9 +199,9 @@ fun BrowseListItemPlaceholder(
                 repeat(times = maxValue - indexValue + 1) { index ->
                     Box(
                         modifier = Modifier
-                            .width(36.dp * (maxValue - index))
+                            .width(24.dp + 12.dp * (maxValue - index))
                             .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp + 12.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(RoundedCornerShape(percent = 40))
                             .shimmerEffect()
                     )
                 }

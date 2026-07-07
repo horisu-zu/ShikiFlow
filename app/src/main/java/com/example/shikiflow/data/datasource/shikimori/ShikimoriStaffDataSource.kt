@@ -30,7 +30,7 @@ import com.example.shikiflow.domain.model.sort.StaffType
 import com.example.shikiflow.domain.model.staff.StaffShort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow

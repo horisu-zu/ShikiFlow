@@ -5,7 +5,7 @@ import coil3.network.HttpException
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.repository.CommentRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.parser.HTMLParser
 import com.example.shikiflow.utils.parser.ShikimoriDialect
 import kotlinx.coroutines.async

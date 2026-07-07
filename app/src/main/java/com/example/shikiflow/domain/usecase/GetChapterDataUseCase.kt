@@ -4,7 +4,7 @@ import coil3.network.HttpException
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata.Companion.toDomain
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

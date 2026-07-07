@@ -18,7 +18,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.repository.UserRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.ThemeMode
 import com.example.shikiflow.worker.MediaTracksScheduler
 import com.materialkolor.PaletteStyle

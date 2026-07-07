@@ -4,7 +4,9 @@ import com.apollographql.apollo.api.ApolloResponse
 import com.apollographql.apollo.api.Operation
 import com.apollographql.apollo.exception.ApolloHttpException
 import com.apollographql.apollo.exception.CacheMissException
-import com.example.shikiflow.utils.DataResult
+import com.example.graphql.anilist.fragment.CommonPage
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
 import org.json.JSONObject
 
@@ -82,6 +85,52 @@ abstract class BaseNetworkRepository {
         }
         .onStart { emit(DataResult.Loading) }
         .catch { emit(DataResult.Error(message = it.message ?: "Unknown Error")) }
+
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun <D : Operation.Data, R> Flow<ApolloResponse<D>>.asPagedResult(
+        page: (D) -> CommonPage?,
+        transform: (D) -> List<R>
+    ) = this
+        .mapLatest { response ->
+            when {
+                response.data != null -> {
+                    val commonPage = page(response.data!!)
+
+                    PagedResult.Success(
+                        list = transform(response.data!!),
+                        currentPage = commonPage?.currentPage,
+                        hasNextPage = commonPage?.hasNextPage == true,
+                    )
+                }
+
+                response.hasErrors() -> {
+                    val errorMessage = response.errors?.joinToString { it.message } ?: "Unknown Error"
+
+                    PagedResult.Error(message = errorMessage)
+                }
+
+                response.exception != null -> {
+                    val errorMessage = when (val ex = response.exception) {
+                        is ApolloHttpException -> {
+                            val body = ex.body?.readUtf8() ?: ""
+
+                            JSONObject(body)
+                                .getJSONArray("errors")
+                                .getJSONObject(0)
+                                .getString("message")
+                        }
+                        else -> ex?.message ?: "Unknown Error"
+                    }
+
+                    PagedResult.Error(message = errorMessage)
+                }
+
+                else -> PagedResult.Loading
+            }
+        }
+        .onStart { emit(PagedResult.Loading) }
+        .catch { emit(PagedResult.Error(message = it.message ?: "Unknown Error")) }
 
     fun <T : Operation.Data> ApolloResponse<T>.toResult(): Result<T> {
         if (hasErrors()) {

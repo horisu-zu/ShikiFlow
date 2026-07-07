@@ -4,7 +4,6 @@ import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
@@ -34,8 +33,6 @@ import com.example.graphql.anilist.UserThreadCommentsQuery
 import com.example.graphql.anilist.UserThreadsQuery
 import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.shikiflow.data.datasource.UserDataSource
-import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.mediator.UserCommentsMediator
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toShortUserMediaRate
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
@@ -51,7 +48,6 @@ import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toUserSetting
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toAnilistType
 import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.toAnilistFormat
 import com.example.shikiflow.data.mapper.common.TitleTypeMapper.toAnilistType
-import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.toUserSocial
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.common.ScoreFormat
@@ -74,19 +70,18 @@ import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.social.Follower
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.Thread
-import com.example.shikiflow.domain.model.user.social.ThreadComment
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import kotlin.let
 
 class AnilistUserDataSource @Inject constructor(
-    @param:AnilistApollo private val apolloClient: ApolloClient,
-    private val appRoomDatabase: AppRoomDatabase
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): UserDataSource, BaseNetworkRepository() {
 
     override fun fetchCurrentUser(): Flow<DataResult<User>> {
@@ -382,53 +377,31 @@ class AnilistUserDataSource @Inject constructor(
     @OptIn(ExperimentalPagingApi::class)
     override fun getUserSocial(
         userId: Int,
-        socialCategory: SocialCategory
-    ): Flow<PagingData<UserSocial>> {
-        return when (socialCategory) {
-            SocialCategory.COMMENTS -> {
-                Pager(
-                    config = PagingConfig(
-                        pageSize = 15,
-                        enablePlaceholders = true,
-                        prefetchDistance = 5,
-                        initialLoadSize = 15
-                    ),
-                    remoteMediator = UserCommentsMediator(
-                        appRoomDatabase = appRoomDatabase,
-                        method = { page, limit ->
-                            getUserThreadComments(userId, page, limit) as Result<List<ThreadComment>>
-                        },
-                        senderId = userId
-                    ),
-                    pagingSourceFactory = { appRoomDatabase.threadCommentsDao().getCommentsBySender(userId) }
-                ).flow.map { pagingData ->
-                    pagingData.map { commentEntity ->
-                        commentEntity.toUserSocial()
-                    }
-                }
-            }
-            else -> {
-                Pager(
-                    config = PagingConfig(
-                        pageSize = 18,
-                        enablePlaceholders = true,
-                        prefetchDistance = 9,
-                        initialLoadSize = 18
-                    ),
-                    pagingSourceFactory = {
-                        GenericPagingSource(
-                            method = { page, limit ->
-                                when(socialCategory) {
-                                    SocialCategory.FOLLOWINGS -> getUserFollowings(userId, page, limit)
-                                    SocialCategory.FOLLOWERS -> getUserFollowers(userId, page, limit)
-                                    SocialCategory.THREADS -> getUserThreads(userId, page, limit)
-                                }
-                            }
-                        )
-                    }
-                ).flow
-            }
+        socialCategory: SocialCategory,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<UserSocial>> = flow {
+        emit(PagedResult.Loading)
+
+        val result = when (socialCategory) {
+            SocialCategory.FOLLOWINGS -> getUserFollowings(userId, page, limit)
+            SocialCategory.FOLLOWERS -> getUserFollowers(userId, page, limit)
+            SocialCategory.THREADS -> getUserThreads(userId, page, limit)
+            SocialCategory.COMMENTS -> getUserThreadComments(userId, page, limit)
         }
+
+        result.fold(
+            onSuccess = { data ->
+                emit(PagedResult.Success(
+                    list = data,
+                    currentPage = page,
+                    hasNextPage = data.size == limit
+                ))
+            },
+            onFailure = { throwable ->
+                emit(PagedResult.Error(throwable.message ?: "Unknown Error"))
+            }
+        )
     }
 
     suspend fun getUserFollowings(

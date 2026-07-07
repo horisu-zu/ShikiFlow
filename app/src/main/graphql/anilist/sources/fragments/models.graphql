@@ -634,3 +634,8 @@ fragment MediaTitle on MediaTitle {
     romaji
     native
 }
+
+fragment CommonPage on PageInfo {
+    currentPage
+    hasNextPage
+}

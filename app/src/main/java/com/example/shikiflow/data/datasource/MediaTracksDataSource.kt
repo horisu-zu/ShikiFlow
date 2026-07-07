@@ -7,7 +7,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 
 interface MediaTracksDataSource {
     suspend fun getTracksLibrary(

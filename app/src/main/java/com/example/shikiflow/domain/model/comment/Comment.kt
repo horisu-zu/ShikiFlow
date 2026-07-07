@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.comment
 
+import androidx.compose.ui.util.fastForEach
 import com.example.shikiflow.domain.model.user.User
 import kotlin.time.Instant
 
@@ -26,4 +27,31 @@ data class ALComment(
     val childComments: List<ALComment>,
     val likesCount: Int,
     val isLiked: Boolean
-): Comment
+): Comment {
+    companion object {
+        fun ALComment.findComment(commentId: Int): ALComment? {
+            if (id == commentId) return this
+
+            childComments.fastForEach { childComment ->
+                childComment.findComment(commentId)?.let { return it }
+            }
+
+            return null
+        }
+
+        fun ALComment.updateComment(
+            commentId: Int,
+            transform: (ALComment) -> ALComment
+        ): ALComment {
+            if (id == commentId) return transform(this)
+
+            val updatedChildComments = childComments.map { childComment ->
+                childComment.updateComment(commentId, transform)
+            }
+
+            return copy(
+                childComments = updatedChildComments
+            )
+        }
+    }
+}

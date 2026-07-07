@@ -10,29 +10,20 @@ import com.example.shikiflow.data.local.converter.ListConverter
 import com.example.shikiflow.data.local.converter.MediaTitleConverter
 import com.example.shikiflow.data.local.dao.MediaTracksDao
 import com.example.shikiflow.data.local.dao.RemoteKeysDao
-import com.example.shikiflow.data.local.dao.ThreadCommentsDao
 import com.example.shikiflow.data.local.entity.keys.RemoteKey
 import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
-import com.example.shikiflow.data.local.entity.thread_comment.ThreadCommentEntity
-import com.example.shikiflow.data.local.entity.thread_comment.ThreadEntity
-import com.example.shikiflow.data.local.entity.thread_comment.UserShortEntity
 
 @Database(
-    version = 5,
+    version = 3,
     entities = [
         MediaTrackEntity::class,
         MediaShortEntity::class,
-        ThreadCommentEntity::class,
-        UserShortEntity::class,
-        ThreadEntity::class,
         RemoteKey::class
     ],
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
-        AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4),
-        AutoMigration(from = 4, to = 5)
+        AutoMigration(from = 2, to = 3)
     ],
     exportSchema = true
 )
@@ -44,6 +35,5 @@ import com.example.shikiflow.data.local.entity.thread_comment.UserShortEntity
 )
 abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun mediaTracksDao(): MediaTracksDao
-    abstract fun threadCommentsDao(): ThreadCommentsDao
     abstract fun remoteKeysDao(): RemoteKeysDao
 }

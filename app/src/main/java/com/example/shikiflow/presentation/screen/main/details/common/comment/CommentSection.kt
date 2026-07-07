@@ -109,6 +109,7 @@ fun CommentSection(
                         onEntityClick = onEntityClick,
                         onUserClick = onUserClick,
                         onLikeToggle = { /**/ },
+                        onCommentSelect = { /**/ },
                         modifier = Modifier
                     )
                 }

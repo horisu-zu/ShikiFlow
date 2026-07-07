@@ -10,20 +10,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -36,8 +37,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
@@ -49,13 +48,14 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
+import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
+import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadItem
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadItemPlaceholder
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.social.UserSocialViewModel
-import com.example.shikiflow.utils.PagingUtils.fetched
-import com.example.shikiflow.utils.PagingUtils.isLoading
+import com.example.shikiflow.utils.LazyListUtils.onBottomReached
 import kotlinx.coroutines.launch
 
 @Composable
@@ -68,10 +68,10 @@ fun SocialSection(
     navOptions: ProfileNavOptions,
     userSocialViewModel: UserSocialViewModel = hiltViewModel()
 ) {
-    val params by userSocialViewModel.params.collectAsStateWithLifecycle()
+    val uiState by userSocialViewModel.uiState.collectAsStateWithLifecycle()
 
     val pagerState = rememberPagerState(
-        initialPage = params.currentCategory?.let { socialCategory ->
+        initialPage = uiState.currentCategory?.let { socialCategory ->
             socialCategories.indexOf(socialCategory).let { index ->
                 if(index != -1) index else 0
             }
@@ -79,6 +79,7 @@ fun SocialSection(
         pageCount = { socialCategories.size }
     )
     val scope = rememberCoroutineScope()
+    val exoPlayerCache = rememberExoPlayerCache()
     val resources = LocalResources.current
 
     LaunchedEffect(userId) {
@@ -99,7 +100,7 @@ fun SocialSection(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 itemsIndexed(socialCategories) { index, socialCategory ->
-                    val isSelected = params.currentCategory == socialCategory
+                    val isSelected = uiState.currentCategory == socialCategory
 
                     FilterChip(
                         selected = isSelected,
@@ -132,15 +133,22 @@ fun SocialSection(
             }
         }
     ) { paddingValues ->
-        HorizontalPager(
-            state = pagerState
-        ) { page ->
-            val category = socialCategories[page]
-            val socialItems = userSocialViewModel.userSocialItems[category]
-                ?.collectAsLazyPagingItems() ?: return@HorizontalPager
+        CompositionLocalProvider(LocalExoPlayerCache provides exoPlayerCache) {
+            HorizontalPager(
+                state = pagerState
+            ) { page ->
+                val category = socialCategories[page]
+                val categoryState = uiState.categories[category] ?: return@HorizontalPager
+                val lazyGridState = rememberLazyGridState()
 
-            when(socialItems.loadState.refresh) {
-                is LoadState.Error -> {
+                if (!categoryState.isLoading) {
+                    lazyGridState.onBottomReached(
+                        buffer = 6,
+                        onLoadMore = { userSocialViewModel.onLoadMore(category) }
+                    )
+                }
+
+                if (categoryState.errorMessage != null && categoryState.items.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -148,21 +156,21 @@ fun SocialSection(
                         ErrorItem(
                             message = stringResource(R.string.common_error),
                             buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { socialItems.refresh() }
+                            onButtonClick = { userSocialViewModel.refresh(category) }
                         )
                     }
-                }
-                else -> {
+                } else {
                     PullToRefreshCustomBox(
                         enabled = isRefreshEnabled,
-                        isRefreshing = socialItems.loadState.refresh is LoadState.Loading,
+                        isRefreshing = categoryState.isRefreshing,
                         onRefresh = {
                             onRefresh()
-                            socialItems.refresh()
+                            userSocialViewModel.refresh(category)
                         }
                     ) {
                         LazyVerticalGrid(
-                            columns = when(category) {
+                            state = lazyGridState,
+                            columns = when (category) {
                                 SocialCategory.FOLLOWINGS,
                                 SocialCategory.FOLLOWERS -> GridCells.Adaptive(180.dp)
                                 else -> GridCells.Fixed(1)
@@ -177,7 +185,81 @@ fun SocialSection(
                                 .fillMaxSize()
                                 .padding(top = paddingValues.calculateTopPadding())
                         ) {
-                            if (socialItems.isLoading()) {
+                            items(categoryState.items) { item ->
+                                when (item) {
+                                    is Follower -> {
+                                        UserSocialItem(
+                                            user = item.data,
+                                            modifier = Modifier
+                                                .clip(RoundedCornerShape(12.dp))
+                                                .clickable {
+                                                    navOptions.navigateToProfile(item.data)
+                                                }
+                                                .padding(horizontal = 8.dp, vertical = 6.dp)
+                                        )
+                                    }
+                                    is Thread -> {
+                                        ThreadItem(
+                                            threadData = item.data,
+                                            resources = resources,
+                                            onThreadClick = { id ->
+                                                val navRoute = DetailsNavRoute.Comments(
+                                                    screenMode = CommentsScreenMode.TOPIC,
+                                                    threadHeader = item.data,
+                                                    id = id
+                                                )
+
+                                                navOptions.navigateToDetails(navRoute)
+                                            },
+                                            modifier = Modifier.fillMaxWidth()
+                                        )
+                                    }
+                                    is ThreadComment -> {
+                                        ThreadCommentItem(
+                                            threadComment = item,
+                                            onThreadClick = {
+                                                val navRoute = DetailsNavRoute.Comments(
+                                                    screenMode = CommentsScreenMode.TOPIC,
+                                                    threadHeader = item.thread,
+                                                    id = item.thread.id
+                                                )
+
+                                                navOptions.navigateToDetails(navRoute)
+                                            },
+                                            onLikeToggle = { commentId ->
+                                                userSocialViewModel.toggleCommentLike(commentId)
+                                            },
+                                            onEntityClick = { entityType, id ->
+                                                val detailsNavRoute = when (entityType) {
+                                                    EntityType.CHARACTER -> {
+                                                        DetailsNavRoute.CharacterDetails(id)
+                                                    }
+                                                    EntityType.PERSON -> {
+                                                        DetailsNavRoute.Staff(id)
+                                                    }
+                                                    EntityType.ANIME -> {
+                                                        DetailsNavRoute.AnimeDetails(id)
+                                                    }
+                                                    EntityType.MANGA, EntityType.RANOBE -> {
+                                                        DetailsNavRoute.MangaDetails(id)
+                                                    }
+                                                    EntityType.COMMENT_REPLY -> {
+                                                        DetailsNavRoute.Comments(
+                                                            screenMode = CommentsScreenMode.REPLY,
+                                                            id = id,
+                                                            threadHeader = null
+                                                        )
+                                                    }
+                                                }
+
+                                                navOptions.navigateToDetails(detailsNavRoute)
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (categoryState.isLoading) {
                                 items(24) { index ->
                                     when (category) {
                                         SocialCategory.THREADS -> {
@@ -189,107 +271,26 @@ fun SocialSection(
                                         else -> {
                                             UserSocialItemPlaceholder(
                                                 index = index,
-                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp)
+                                                modifier = Modifier.padding(
+                                                    horizontal = 8.dp,
+                                                    vertical = 6.dp
+                                                )
                                             )
                                         }
                                     }
                                 }
-                            } else if (socialItems.fetched()) {
-                                items(socialItems.itemCount) { index ->
-                                    socialItems[index]?.let { item ->
-                                        when(item) {
-                                            is Follower -> {
-                                                UserSocialItem(
-                                                    user = item.data,
-                                                    modifier = Modifier
-                                                        .clip(RoundedCornerShape(12.dp))
-                                                        .clickable {
-                                                            navOptions.navigateToProfile(item.data)
-                                                        }
-                                                        .padding(horizontal = 8.dp, vertical = 6.dp)
-                                                )
-                                            }
-                                            is Thread -> {
-                                                ThreadItem(
-                                                    threadData = item.data,
-                                                    resources = resources,
-                                                    onThreadClick = { id ->
-                                                        val navRoute = DetailsNavRoute.Comments(
-                                                            screenMode = CommentsScreenMode.TOPIC,
-                                                            threadHeader = item.data,
-                                                            id = id
-                                                        )
-
-                                                        navOptions.navigateToDetails(navRoute)
-                                                    },
-                                                    modifier = Modifier.fillMaxWidth()
-                                                )
-                                            }
-                                            is ThreadComment -> {
-                                                ThreadCommentItem(
-                                                    threadComment = item,
-                                                    onThreadClick = {
-                                                        val navRoute = DetailsNavRoute.Comments(
-                                                            screenMode = CommentsScreenMode.TOPIC,
-                                                            threadHeader = item.thread,
-                                                            id = item.thread.id
-                                                        )
-
-                                                        navOptions.navigateToDetails(navRoute)
-                                                    },
-                                                    onLikeToggle = { commentId ->
-                                                        userSocialViewModel.toggleCommentLike(commentId)
-                                                    },
-                                                    onEntityClick = { entityType, id ->
-                                                        val detailsNavRoute = when (entityType) {
-                                                            EntityType.CHARACTER -> {
-                                                                DetailsNavRoute.CharacterDetails(id)
-                                                            }
-                                                            EntityType.PERSON -> {
-                                                                DetailsNavRoute.Staff(id)
-                                                            }
-                                                            EntityType.ANIME -> {
-                                                                DetailsNavRoute.AnimeDetails(id)
-                                                            }
-                                                            EntityType.MANGA, EntityType.RANOBE -> {
-                                                                DetailsNavRoute.MangaDetails(id)
-                                                            }
-                                                            EntityType.COMMENT_REPLY, EntityType.COMMENT_TREE -> {
-                                                                DetailsNavRoute.Comments(
-                                                                    screenMode = when (entityType) {
-                                                                        EntityType.COMMENT_REPLY -> CommentsScreenMode.REPLY
-                                                                        EntityType.COMMENT_TREE -> CommentsScreenMode.TREE
-                                                                    },
-                                                                    id = id,
-                                                                    threadHeader = null
-                                                                )
-                                                            }
-                                                        }
-
-                                                        navOptions.navigateToDetails(detailsNavRoute)
-                                                    }
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                if (socialItems.loadState.append is LoadState.Loading) {
+                            } else if (categoryState.errorMessage != null) {
+                                item {
                                     Box(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) { CircularProgressIndicator() }
-                                } else if (socialItems.loadState.append is LoadState.Error) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 8.dp),
                                         contentAlignment = Alignment.Center
                                     ) {
                                         ErrorItem(
                                             message = stringResource(R.string.common_error),
                                             buttonLabel = stringResource(R.string.common_retry),
-                                            onButtonClick = { socialItems.retry() }
+                                            onButtonClick = { userSocialViewModel.retry(category) }
                                         )
                                     }
                                 }

@@ -7,7 +7,7 @@ import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.UserStatsSectionType
 import com.example.shikiflow.presentation.UiStateViewModel
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged

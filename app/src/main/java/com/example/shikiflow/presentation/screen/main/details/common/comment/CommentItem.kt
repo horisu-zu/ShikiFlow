@@ -59,6 +59,7 @@ fun CommentItem(
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
     onLikeToggle: (Int) -> Unit,
+    onCommentSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     secondBackgroundColor: Color = MaterialTheme.colorScheme.background
@@ -79,6 +80,7 @@ fun CommentItem(
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
                 onLikeToggle = onLikeToggle,
+                onCommentSelect = onCommentSelect,
                 modifier = modifier,
                 firstBackgroundColor = backgroundColor,
                 secondBackgroundColor = secondBackgroundColor
@@ -146,6 +148,7 @@ private fun AnilistCommentTree(
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
     onLikeToggle: (Int) -> Unit,
+    onCommentSelect: (Int) -> Unit,
     firstBackgroundColor: Color,
     secondBackgroundColor: Color,
     modifier: Modifier = Modifier,
@@ -178,6 +181,7 @@ private fun AnilistCommentTree(
                     onEntityClick = onEntityClick,
                     onUserClick = onUserClick,
                     onLikeToggle = onLikeToggle,
+                    onCommentSelect = onCommentSelect,
                     firstBackgroundColor = firstBackgroundColor,
                     secondBackgroundColor = secondBackgroundColor
                 )
@@ -187,7 +191,7 @@ private fun AnilistCommentTree(
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(percent = 32))
-                        .clickable { onEntityClick(EntityType.COMMENT_TREE,commentData.id) }
+                        .clickable { onCommentSelect(commentData.id) }
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                         .padding(horizontal = 8.dp, vertical = 6.dp),
                     contentAlignment = Alignment.CenterEnd

@@ -161,12 +161,9 @@ fun DetailsNavigator(
                 EntityType.MANGA, EntityType.RANOBE -> {
                     navigateToMangaDetails(id)
                 }
-                EntityType.COMMENT_REPLY, EntityType.COMMENT_TREE -> {
+                EntityType.COMMENT_REPLY -> {
                     navigateToComments(
-                        screenMode = when (entityType) {
-                            EntityType.COMMENT_REPLY -> CommentsScreenMode.REPLY
-                            EntityType.COMMENT_TREE -> CommentsScreenMode.TREE
-                        },
+                        screenMode = CommentsScreenMode.REPLY,
                         id = id,
                         threadHeader = null
                     )

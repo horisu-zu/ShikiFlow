@@ -5,7 +5,7 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.UiStateViewModel
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -34,12 +34,12 @@ class ProfileViewModel @Inject constructor(
                 state.user != null
             }
             .distinctUntilChanged { old, new ->
-                old.user?.id == new.user?.id && !new.isRefreshing
+                old.user?.id == new.user?.id && !new.isRefreshingStats
             }
             .flatMapLatest { state ->
                 flow {
                     emit(DataResult.Loading)
-                    emit(userRepository.getUserStatsCategories(state.user!!.id, state.isRefreshing))
+                    emit(userRepository.getUserStatsCategories(state.user!!.id, state.isRefreshingStats))
                 }
             }
             .onEach { result ->
@@ -48,7 +48,7 @@ class ProfileViewModel @Inject constructor(
                         DataResult.Loading -> {
                             state.copy(
                                 isLoading = true,
-                                isRefreshing = false,
+                                isRefreshingStats = false,
                                 errorMessage = null
                             )
                         }
@@ -70,45 +70,45 @@ class ProfileViewModel @Inject constructor(
 
         mutableUiState
             .filter { state ->
-                state.user != null && state.authType != null
+                state.currentUser != null && state.authType != null &&
+                state.user?.id == state.currentUser.id
             }
             .distinctUntilChanged { old, new ->
-                old.user?.id == new.user?.id && !new.isRefreshing
-            }
-            .filter { state ->
-                state.user == state.currentUser
+                old.user?.id == new.user?.id && !new.isRefreshingProfile
             }
             .flatMapLatest { state ->
                 userRepository.fetchCurrentUser(state.authType!!)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
-                    if(result is DataResult.Success) {
-                        settingsRepository.saveUserData(result.data, state.authType!!)
+                    when (result) {
+                        is DataResult.Loading -> {
+                            state.copy(isRefreshingProfile = false)
+                        }
+                        is DataResult.Success -> {
+                            settingsRepository.saveUserData(result.data, state.authType!!)
 
-                        state
-                    } else {
-                        result.toUiState()
+                            state
+                        }
+                        else -> state
                     }
                 }
             }.launchIn(viewModelScope)
 
         mutableUiState
             .filter { state ->
-                state.user != null && state.user.isFollowing == null && state.user != state.currentUser
+                state.user != null && state.userFollow?.isFollowing == null && state.user != state.currentUser
             }
             .distinctUntilChanged { old, new ->
-                old.user?.id == new.user?.id && !new.isRefreshing
+                old.user?.id == new.user?.id
             }
             .onEach { state ->
                 userRepository.getFollow(state.user?.id!!).let { result ->
                     if(result is DataResult.Success) {
                         mutableUiState.update { state ->
                             state.copy(
-                                user = state.user?.copy(
-                                    isFollowing = result.data.isFollowing,
-                                    isFollower = result.data.isFollower
-                                )
+                                userFollow = result.data,
+                                isRefreshingProfile = false
                             )
                         }
                     }
@@ -154,7 +154,8 @@ class ProfileViewModel @Inject constructor(
     fun onRefresh() {
         mutableUiState.update { state ->
             state.copy(
-                isRefreshing = true
+                isRefreshingProfile = true,
+                isRefreshingStats = true
             )
         }
     }
@@ -165,7 +166,7 @@ class ProfileViewModel @Inject constructor(
                 if(result is DataResult.Success) {
                     mutableUiState.update { state ->
                         state.copy(
-                            user = state.user?.copy(
+                            userFollow = state.userFollow?.copy(
                                 isFollowing = result.data
                             )
                         )

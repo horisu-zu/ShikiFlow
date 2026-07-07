@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation
 
 import androidx.lifecycle.ViewModel
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

@@ -87,6 +87,7 @@ fun ProfileScreenContent(
         topBar = {
             ProfileAppBar(
                 userData = uiState.user,
+                userFollow = uiState.userFollow,
                 authType = uiState.authType,
                 isCurrentUser = isCurrentUser,
                 scrollBehavior = scrollBehavior,

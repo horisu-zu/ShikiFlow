@@ -3,7 +3,7 @@ package com.example.shikiflow.domain.usecase
 import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

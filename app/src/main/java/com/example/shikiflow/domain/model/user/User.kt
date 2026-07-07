@@ -11,8 +11,6 @@ data class User(
     val nickname: String = "",
     val lastOnlineAt: Instant? = null,
     val profileBannerUrl: String? = null,
-    val isFollowing: Boolean? = null,
-    val isFollower: Boolean? = null,
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10
 )
 

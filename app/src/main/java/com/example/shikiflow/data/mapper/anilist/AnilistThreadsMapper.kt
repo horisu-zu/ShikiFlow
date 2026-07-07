@@ -89,7 +89,7 @@ object AnilistThreadsMapper {
                 id = user?.id ?: 0,
                 nickname = user?.name ?: "",
                 avatarUrl = user?.avatar?.large ?: "",
-                profileBannerUrl = user?.bannerImage ?: ""
+                profileBannerUrl = user?.bannerImage
             ),
             childComments = childComments.parseChildComments().map { it.toDomain() },
             likesCount = likeCount,
@@ -106,7 +106,7 @@ object AnilistThreadsMapper {
                 id = user?.id ?: 0,
                 nickname = user?.name ?: "",
                 avatarUrl = user?.avatar?.large ?: "",
-                profileBannerUrl = user?.bannerImage ?: ""
+                profileBannerUrl = user?.bannerImage
             ),
             childComments = childComments.parseChildComments().map { it.toDomain() },
             likesCount = likeCount,

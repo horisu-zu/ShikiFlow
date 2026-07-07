@@ -1,21 +1,19 @@
 package com.example.shikiflow.presentation.viewmodel.comment
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.cachedIn
+import com.example.shikiflow.domain.model.comment.ALComment
+import com.example.shikiflow.domain.model.comment.ALComment.Companion.findComment
+import com.example.shikiflow.domain.model.comment.ALComment.Companion.updateComment
 import com.example.shikiflow.domain.repository.CommentRepository
-import com.example.shikiflow.domain.usecase.GetCommentTopicUseCase
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.presentation.PagedUiStateViewModel
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,93 +22,108 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CommentViewModel @Inject constructor(
-    private val getCommentTopicUseCase: GetCommentTopicUseCase,
     private val commentsRepository: CommentRepository
-): ViewModel() {
+): PagedUiStateViewModel<CommentsUiState>() {
 
-    private val _uiState = MutableStateFlow(CommentsUiState())
-    val uiState = _uiState.asStateFlow()
-
-    val comments = _uiState
-        .filter { state ->
-            state.topicId != null
-        }
-        .distinctUntilChangedBy { state ->
-            state.topicId
-        }
-        .flatMapLatest { state ->
-            commentsRepository.getPaginatedComments(state.topicId!!)
-        }.cachedIn(viewModelScope)
+    override val initialState = CommentsUiState()
 
     init {
-        _uiState
+        mutableUiState
             .filter { state ->
-                state.commentId != null
+                state.hasNextPage && state.topicId != null
             }
             .distinctUntilChanged { old, new ->
-                old.commentId == new.commentId && new.repliesMap[new.commentId]?.isRefreshing == false
-            }
-            .filter { state ->
-                state.repliesMap[state.commentId]?.commentsMap?.isNotEmpty() != true
+                old.page == new.page && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                getCommentTopicUseCase(state.commentId!!)
-                    .map { result -> state.commentId to result }
+                commentsRepository.getThreadComments(state.topicId!!, state.page)
             }
-            .onEach { (commentId, result) ->
-                _uiState.update { state ->
-                    val currentState = state.repliesMap[commentId] ?: RepliesUiState()
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    if (result is PagedResult.Success) {
+                        if (state.page == 1) state.comments.clear()
+                        state.comments.addAll(result.list)
 
-                    val newState = when (result) {
-                        is DataResult.Loading -> currentState.copy(
-                            isLoading = true,
-                            errorMessage = null
-                        )
-                        is DataResult.Success -> currentState.copy(
+                        state.copy(
                             isLoading = false,
-                            commentsMap = result.data
+                            hasNextPage = result.hasNextPage
                         )
-                        is DataResult.Error -> currentState.copy(
-                            isLoading = false,
-                            errorMessage = result.message
+                    } else {
+                        result.toUiState().copy(
+                            hasNextPage = false,
+                            isRefreshing = false
                         )
                     }
-
-                    state.copy(
-                        repliesMap = state.repliesMap + (commentId to newState)
-                    )
                 }
             }.launchIn(viewModelScope)
     }
 
     fun setTopicId(topicId: Int) {
-        _uiState.update { state ->
+        mutableUiState.update { state ->
             state.copy(topicId = topicId)
         }
     }
 
-    fun setCommentId(commentId: Int) {
-        _uiState.update { state ->
-            state.copy(commentId = commentId)
+    fun selectComment(commentId: Int) {
+        mutableUiState.update { state ->
+            state.copy(
+                navState = state.navState + commentId
+            )
+        }
+    }
+
+    fun removeCommentFromStack() {
+        mutableUiState.update { state ->
+            state.copy(
+                navState = state.navState.dropLast(1)
+            )
         }
     }
 
     fun toggleLike(commentId: Int) {
         viewModelScope.launch {
-            commentsRepository.toggleCommentLike(commentId)
+            commentsRepository.toggleCommentLike(commentId).let { result ->
+                if (result is DataResult.Success) {
+                    val responseComment = result.data as ALComment
+
+                    mutableUiState.update { state ->
+                        val index = state.comments.indexOfFirst { comment ->
+                            (comment as ALComment).findComment(responseComment.id) != null
+                        }
+
+                        if (index != -1) {
+                            val root = state.comments[index] as ALComment
+
+                            state.comments[index] = root.updateComment(commentId) { comment ->
+                                comment.copy(
+                                    likesCount = responseComment.likesCount,
+                                    isLiked = responseComment.isLiked
+                                )
+                            }
+                        }
+
+                        state
+                    }
+                }
+            }
         }
     }
 
     fun onRefresh() {
-        _uiState.update { state ->
-            val commentId = state.commentId ?: return@update state
-
+        mutableUiState.update { state ->
             state.copy(
-                repliesMap = state.repliesMap.toMutableMap().apply {
-                    this[commentId] = this[commentId]?.copy(
-                        isRefreshing = true
-                    ) ?: return@update state
-                }
+                page = 1,
+                isRefreshing = true,
+                hasNextPage = true
+            )
+        }
+    }
+
+    fun onRetry() {
+        mutableUiState.update { state ->
+            state.copy(
+                isRefreshing = true,
+                hasNextPage = true
             )
         }
     }

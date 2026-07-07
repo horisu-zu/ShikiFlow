@@ -1,10 +1,6 @@
 package com.example.shikiflow.data.datasource.anilist
 
 import androidx.paging.ExperimentalPagingApi
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.map
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
@@ -14,53 +10,46 @@ import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.type.LikeableType
 import com.example.shikiflow.data.datasource.CommentsDataSource
-import com.example.shikiflow.data.local.AppRoomDatabase
-import com.example.shikiflow.data.local.mediator.ThreadCommentsMediator
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
-import com.example.shikiflow.data.mapper.local.ThreadCommentMapper.toTree
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class AnilistThreadsDataSource @Inject constructor(
-    @param:AnilistApollo private val apolloClient: ApolloClient,
-    private val appRoomDatabase: AppRoomDatabase
+    @param:AnilistApollo private val apolloClient: ApolloClient
 ): CommentsDataSource, BaseNetworkRepository() {
+    override fun getThreadComments(
+        topicId: Int,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<Comment>> {
+        val topicCommentsQuery = TopicCommentsQuery(
+            threadId = topicId,
+            page = page,
+            perPage = limit
+        )
 
-    override fun getPaginatedComments(topicId: Int): Flow<PagingData<Comment>> {
-        val threadCommentsDao = appRoomDatabase.threadCommentsDao()
+        val commentsResponse = apolloClient.query(topicCommentsQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .toFlow()
 
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 15
-            ),
-            remoteMediator = ThreadCommentsMediator(
-                appRoomDatabase = appRoomDatabase,
-                method = { page, limit ->
-                    getComments(topicId, page, limit)
-                },
-                topicId = topicId
-            ),
-            pagingSourceFactory = { threadCommentsDao.getCommentsByThreadId(topicId) }
-        ).flow.map { pagingData ->
-            pagingData.map { rootComment ->
-                val subtree = threadCommentsDao.getSubtree(rootComment.comment.id)
-
-                subtree.toTree(rootId = rootComment.comment.id)
-            }
+        return commentsResponse.asPagedResult(
+            page = { it.Page?.pageInfo?.commonPage }
+        ) { data ->
+            data.Page
+                ?.threadComments
+                ?.mapNotNull { it?.toDomain() }
+                ?: emptyList()
         }
     }
 

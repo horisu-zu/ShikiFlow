@@ -5,27 +5,29 @@ import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 
 interface CommentRepository {
+    fun getThreadComments(
+        topicId: Int,
+        page: Int,
+        limit: Int = 15
+    ): Flow<PagedResult<Comment>>
+
     suspend fun getComments(
         topicId: Int,
         page: Int = 1,
         limit: Int = 30,
     ): Result<List<Comment>>
 
-    fun observeComments(commentsIds: Set<Int>): Flow<List<Comment>>
-
     suspend fun getCommentById(commentId: Int): Comment
-
-    fun getPaginatedComments(
-        topicId: Int
-    ): Flow<PagingData<Comment>>
 
     fun getPaginatedThreads(
         mediaId: Int,
         threadSort: Sort<ThreadType>
     ): Flow<PagingData<Thread>>
 
-    suspend fun toggleCommentLike(commentId: Int)
+    suspend fun toggleCommentLike(commentId: Int): DataResult<Comment>
 }

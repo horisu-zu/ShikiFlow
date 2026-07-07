@@ -23,7 +23,8 @@ import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
@@ -48,7 +49,12 @@ interface UserRepository {
         isRefresh: Boolean
     ): DataResult<UserStatsCategories>
 
-    fun getUserSocial(userId: Int, socialCategory: SocialCategory): Flow<PagingData<UserSocial>>
+    fun getUserSocial(
+        userId: Int,
+        socialCategory: SocialCategory,
+        page: Int,
+        limit: Int = 18
+    ): Flow<PagedResult<UserSocial>>
 
     fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
 

@@ -8,7 +8,7 @@ import com.example.shikiflow.domain.model.review.ReviewShort
 import com.example.shikiflow.domain.model.sort.ReviewType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface ReviewDataSource {

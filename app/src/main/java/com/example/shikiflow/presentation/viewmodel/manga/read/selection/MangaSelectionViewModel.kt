@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.manga.read.selection
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.usecase.GetMangaDexUseCase
 import com.example.shikiflow.presentation.UiStateViewModel
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -4,7 +4,7 @@ import android.util.Log
 import coil3.network.HttpException
 import com.example.shikiflow.domain.model.mangadex.manga.MangaData
 import com.example.shikiflow.domain.repository.MangaDexRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

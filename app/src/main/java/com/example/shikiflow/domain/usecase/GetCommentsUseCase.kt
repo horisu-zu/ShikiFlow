@@ -2,7 +2,7 @@ package com.example.shikiflow.domain.usecase
 
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.repository.CommentRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

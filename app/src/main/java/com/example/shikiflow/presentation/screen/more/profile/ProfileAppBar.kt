@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.lerp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.presentation.common.DynamicTopAppBar
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
@@ -55,6 +56,7 @@ import com.example.shikiflow.presentation.common.shimmerEffect
 @Composable
 fun ProfileAppBar(
     userData: User?,
+    userFollow: UserFollow?,
     authType: AuthType?,
     isCurrentUser: Boolean,
     scrollBehavior: TopAppBarScrollBehavior,
@@ -92,6 +94,7 @@ fun ProfileAppBar(
                         )
                 )
             }
+
             userData?.let {
                 Row(
                     modifier = Modifier
@@ -105,6 +108,7 @@ fun ProfileAppBar(
                 ) {
                     UserComponent(
                         userData = userData,
+                        userFollow = userFollow,
                         imageType = ImageType.Custom(
                             width = lerp(108.dp, 60.dp, progress),
                             aspectRatio = 1f,
@@ -147,15 +151,15 @@ fun ProfileAppBar(
                         }
                     } else if(authType == AuthType.ANILIST) {
                         UserFollowComponent(
-                            isFollowing = userData.isFollowing,
+                            isFollowing = userFollow?.isFollowing,
                             modifier = Modifier
                                 .align(Alignment.Bottom)
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(MaterialTheme.colorScheme.secondaryContainer)
                                 .then(
-                                    if (userData.isFollowing == null) {
+                                    if (userFollow?.isFollowing == null) {
                                         Modifier.shimmerEffect()
-                                    } else Modifier.clickable { onToggleFollow(userData.isFollowing) }
+                                    } else Modifier.clickable { onToggleFollow(userFollow.isFollowing) }
                                 )
                                 .padding(horizontal = 8.dp, vertical = 4.dp)
                         )
@@ -169,6 +173,7 @@ fun ProfileAppBar(
 @Composable
 private fun UserComponent(
     userData: User,
+    userFollow: UserFollow?,
     imageType: ImageType,
     backgroundColor: Color,
     isScrolled: Boolean,
@@ -188,7 +193,7 @@ private fun UserComponent(
         Column(
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            if(userData.isFollower == true) {
+            if(userFollow?.isFollower == true) {
                 AnimatedVisibility(
                     visible = !isScrolled,
                     enter = fadeIn(),

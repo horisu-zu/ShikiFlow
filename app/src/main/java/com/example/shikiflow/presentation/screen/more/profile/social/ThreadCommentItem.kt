@@ -56,6 +56,7 @@ fun ThreadCommentItem(
                     modifier = Modifier.weight(1f)
                 )
             }
+
             ThreadStatsItem(
                 viewCount = threadComment.thread.viewCount,
                 replyCount = threadComment.thread.replyCount,
@@ -72,6 +73,7 @@ fun ThreadCommentItem(
             comment = threadComment.comment,
             onEntityClick = onEntityClick,
             onUserClick = { /**/ },
+            onCommentSelect = { /**/ },
             onLikeToggle = onLikeToggle,
             backgroundColor = MaterialTheme.colorScheme.background
         )

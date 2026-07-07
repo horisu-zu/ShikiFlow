@@ -12,7 +12,7 @@ import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {

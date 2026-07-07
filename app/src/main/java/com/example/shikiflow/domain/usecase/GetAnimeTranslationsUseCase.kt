@@ -4,7 +4,7 @@ import coil3.network.HttpException
 import com.example.shikiflow.domain.model.kodik.KodikAnime
 import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.TranslationFilter
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

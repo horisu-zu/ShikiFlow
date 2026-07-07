@@ -14,7 +14,6 @@ import com.example.graphql.shikimori.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
@@ -41,7 +40,8 @@ import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import jakarta.inject.Inject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -177,23 +177,26 @@ class ShikimoriUserDataSource @Inject constructor(
 
     override fun getUserSocial(
         userId: Int,
-        socialCategory: SocialCategory
-    ): Flow<PagingData<UserSocial>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 18,
-                enablePlaceholders = true,
-                prefetchDistance = 9,
-                initialLoadSize = 18
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource(
-                    method = { page, limit ->
-                        getUserFriends(userId, page, limit)
-                    }
-                )
+        socialCategory: SocialCategory,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<UserSocial>> = flow {
+        emit(PagedResult.Loading)
+
+        val result = getUserFriends(userId, page, limit)
+
+        result.fold(
+            onSuccess = { data ->
+                emit(PagedResult.Success(
+                    list = data,
+                    currentPage = page,
+                    hasNextPage = data.size == limit
+                ))
+            },
+            onFailure = { throwable ->
+                emit(PagedResult.Error(throwable.message ?: "Unknown Error"))
             }
-        ).flow
+        )
     }
 
     override suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate> {

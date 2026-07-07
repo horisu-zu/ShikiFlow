@@ -32,7 +32,8 @@ import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
@@ -141,10 +142,12 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getUserSocial(
         userId: Int,
-        socialCategory: SocialCategory
-    ): Flow<PagingData<UserSocial>> {
+        socialCategory: SocialCategory,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<UserSocial>> {
         return withSource(dataSource) { dataSource ->
-            dataSource.getUserSocial(userId, socialCategory)
+            dataSource.getUserSocial(userId, socialCategory, page, limit)
         }
     }
 

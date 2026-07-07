@@ -1,5 +1,13 @@
 package com.example.shikiflow.presentation.screen.main.details.common.comment
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,16 +19,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +39,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.comment.ALComment
+import com.example.shikiflow.domain.model.comment.ALComment.Companion.findComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
@@ -42,17 +53,16 @@ import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
 import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
-import com.example.shikiflow.presentation.viewmodel.comment.tree.CommentTreeViewModel
-import com.example.shikiflow.utils.PagingUtils.fetched
-import com.example.shikiflow.utils.PagingUtils.isLoading
+import com.example.shikiflow.presentation.viewmodel.comment.reply.CommentRepliesViewModel
+import com.example.shikiflow.utils.LazyListUtils.onBottomReached
+import kotlinx.coroutines.FlowPreview
 
 @Composable
 fun CommentsScreen(
     threadHeader: Thread?,
     screenMode: CommentsScreenMode,
     id: Int,
-    navOptions: MediaNavOptions,
-    commentViewModel: CommentViewModel = hiltViewModel()
+    navOptions: MediaNavOptions
 ) {
     val exoPlayerCache = rememberExoPlayerCache()
 
@@ -72,7 +82,6 @@ fun CommentsScreen(
                     TopicCommentsSection(
                         topicId = id,
                         threadHeader = threadHeader,
-                        commentViewModel = commentViewModel,
                         contentPadding = contentPadding,
                         onEntityClick = { entityType, id ->
                             navOptions.navigateByEntity(entityType, id)
@@ -85,19 +94,6 @@ fun CommentsScreen(
                 CommentsScreenMode.REPLY -> {
                     CommentWithRepliesSection(
                         commentId = id,
-                        commentViewModel = commentViewModel,
-                        contentPadding = contentPadding,
-                        onEntityClick = { entityType, id ->
-                            navOptions.navigateByEntity(entityType, id)
-                        },
-                        onUserClick = { user ->
-                            navOptions.navigateToUserProfile(user)
-                        }
-                    )
-                }
-                CommentsScreenMode.TREE -> {
-                    CommentTreeSection(
-                        commentId = id,
                         contentPadding = contentPadding,
                         onEntityClick = { entityType, id ->
                             navOptions.navigateByEntity(entityType, id)
@@ -112,103 +108,165 @@ fun CommentsScreen(
     }
 }
 
+@OptIn(FlowPreview::class)
 @Composable
 private fun TopicCommentsSection(
     topicId: Int,
     threadHeader: Thread?,
-    commentViewModel: CommentViewModel,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    commentViewModel: CommentViewModel = hiltViewModel()
 ) {
-    val commentItems = commentViewModel.comments.collectAsLazyPagingItems()
+    val uiState by commentViewModel.uiState.collectAsStateWithLifecycle()
+    val lazyListState = rememberLazyListState()
+
+    if (!uiState.isLoading) {
+        lazyListState.onBottomReached(
+            buffer = 5,
+            onLoadMore = { commentViewModel.onLoadMore() }
+        )
+    }
 
     LaunchedEffect(topicId) {
         commentViewModel.setTopicId(topicId)
     }
 
-    LazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        when (commentItems.loadState.refresh) {
-            is LoadState.Error -> {
-                item {
-                    Box(
-                        modifier = Modifier.fillParentMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        ErrorItem(
-                            message = stringResource(R.string.common_error),
-                            buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { commentItems.refresh() }
-                        )
-                    }
-                }
-            }
-            else -> {
-                threadHeader?.let { header ->
-                    item {
-                        ThreadHeaderItem(
-                            threadHeader = header,
-                            onEntityClick = onEntityClick,
-                            onUserClick = onUserClick,
-                            modifier = Modifier
-                        )
-                    }
-                }
+    BackHandler(enabled = uiState.navState.isNotEmpty()) {
+        commentViewModel.removeCommentFromStack()
+    }
 
-                if (commentItems.isLoading()) {
-                    items(12) { index ->
-                        CommentItemPlaceholder(
-                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                            itemIndex = index,
-                            maxValue = 4
-                        )
-                    }
-                } else if(commentItems.fetched()) {
-                    items(commentItems.itemCount) { index ->
-                        commentItems[index]?.let { comment ->
-                            CommentItem(
-                                comment = comment,
-                                onEntityClick = onEntityClick,
-                                onUserClick = onUserClick,
-                                onLikeToggle = { commentId ->
-                                    commentViewModel.toggleLike(commentId)
-                                }
+    AnimatedContent(
+        targetState = uiState.navState,
+        transitionSpec = {
+            if (targetState.size > initialState.size) {
+                slideInHorizontally(
+                    initialOffsetX = { it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                ) togetherWith slideOutHorizontally(
+                    targetOffsetX = { -it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            } else {
+                slideInHorizontally(
+                    initialOffsetX = { -it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                ) togetherWith slideOutHorizontally(
+                    targetOffsetX = { it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioNoBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
+            } using SizeTransform(clip = false)
+        },
+    ) { navState ->
+        val targetId = remember(navState) {
+            navState.lastOrNull()
+        }
+
+        if (targetId != null) {
+            val comment = uiState.comments.firstNotNullOfOrNull { root ->
+                (root as ALComment).findComment(targetId)
+            }
+
+            comment?.let {
+                CommentItem(
+                    comment = comment,
+                    onEntityClick = onEntityClick,
+                    onUserClick = onUserClick,
+                    onLikeToggle = { commentId ->
+                        commentViewModel.toggleLike(commentId)
+                    },
+                    onCommentSelect = { commentId ->
+                        commentViewModel.selectComment(commentId)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .padding(contentPadding)
+                )
+            }
+        } else {
+            LazyColumn(
+                state = lazyListState,
+                modifier = modifier.fillMaxWidth(),
+                contentPadding = contentPadding,
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (uiState.errorMessage != null && uiState.comments.isEmpty()) {
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            ErrorItem(
+                                message = stringResource(R.string.common_error),
+                                buttonLabel = stringResource(R.string.common_retry),
+                                onButtonClick = { commentViewModel.onRefresh() }
                             )
                         }
                     }
-                }
-
-                commentItems.apply {
-                    when {
-                        loadState.append is LoadState.Error -> {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    ErrorItem(
-                                        message = stringResource(R.string.common_error),
-                                        buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { commentItems.retry() }
-                                    )
-                                }
-                            }
+                } else {
+                    threadHeader?.let { header ->
+                        item {
+                            ThreadHeaderItem(
+                                threadHeader = header,
+                                onEntityClick = onEntityClick,
+                                onUserClick = onUserClick,
+                                modifier = Modifier
+                            )
                         }
-                        loadState.append is LoadState.Loading -> {
-                            item {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(vertical = 8.dp),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
+                    }
+
+                    items(
+                        items = uiState.comments,
+                        contentType = { it }
+                    ) { comment ->
+                        CommentItem(
+                            comment = comment,
+                            onEntityClick = onEntityClick,
+                            onUserClick = onUserClick,
+                            onLikeToggle = { commentId ->
+                                commentViewModel.toggleLike(commentId)
+                            },
+                            onCommentSelect = { commentId ->
+                                commentViewModel.selectComment(commentId)
+                            }
+                        )
+                    }
+
+                    if (uiState.isLoading) {
+                        items(12) { index ->
+                            CommentItemPlaceholder(
+                                backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                                itemIndex = index,
+                                maxValue = 4
+                            )
+                        }
+                    } else if (uiState.errorMessage != null) {
+                        item {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 8.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { commentViewModel.onRetry() }
+                                )
                             }
                         }
                     }
@@ -221,16 +279,16 @@ private fun TopicCommentsSection(
 @Composable
 private fun CommentWithRepliesSection(
     commentId: Int,
-    commentViewModel: CommentViewModel,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    commentRepliesViewModel: CommentRepliesViewModel = hiltViewModel()
 ) {
-    val commentsState by commentViewModel.uiState.collectAsStateWithLifecycle()
+    val commentsState by commentRepliesViewModel.uiState.collectAsStateWithLifecycle()
 
     LaunchedEffect(commentId) {
-        commentViewModel.setCommentId(commentId)
+        commentRepliesViewModel.setCommentId(commentId)
     }
 
     commentsState.repliesMap[commentId]?.let { repliesUiState ->
@@ -254,7 +312,7 @@ private fun CommentWithRepliesSection(
                         ErrorItem(
                             message = repliesUiState.errorMessage,
                             buttonLabel = stringResource(R.string.common_retry),
-                            onButtonClick = { commentViewModel.onRefresh() }
+                            onButtonClick = { commentRepliesViewModel.onRefresh() }
                         )
                     }
                 }
@@ -265,10 +323,7 @@ private fun CommentWithRepliesSection(
                             title = commentType,
                             comments = comments,
                             onEntityClick = onEntityClick,
-                            onUserClick = onUserClick,
-                            onLikeToggle = { commentId ->
-                                commentViewModel.toggleLike(commentId)
-                            }
+                            onUserClick = onUserClick
                         )
                     }
                 }
@@ -283,7 +338,6 @@ private fun CommentsMapSection(
     comments: List<Comment>,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
-    onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -318,51 +372,12 @@ private fun CommentsMapSection(
                 comment = comment,
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
-                onLikeToggle = onLikeToggle,
+                onLikeToggle = { /**/ }, //Shouldn't happen as it's Shikimori API only section
+                onCommentSelect = { /**/ },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
             )
-        }
-    }
-}
-
-@Composable
-private fun CommentTreeSection(
-    commentId: Int,
-    contentPadding: PaddingValues,
-    onEntityClick: (EntityType, Int) -> Unit,
-    onUserClick: (User) -> Unit,
-    modifier: Modifier = Modifier,
-    commentTreeViewModel: CommentTreeViewModel = hiltViewModel()
-) {
-    val comments by commentTreeViewModel.comments.collectAsStateWithLifecycle()
-
-    DisposableEffect(commentId) {
-        commentTreeViewModel.addCommentId(commentId)
-
-        onDispose {
-            commentTreeViewModel.removeCommentId(commentId)
-        }
-    }
-
-    LazyColumn(
-        modifier = modifier.fillMaxWidth(),
-        contentPadding = contentPadding,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        comments[commentId]?.let { comment ->
-            item {
-                CommentItem(
-                    comment = comment,
-                    onEntityClick = onEntityClick,
-                    onUserClick = onUserClick,
-                    onLikeToggle = { commentId ->
-                        commentTreeViewModel.toggleLike(commentId)
-                    },
-                    modifier = modifier.fillMaxWidth()
-                )
-            }
         }
     }
 }

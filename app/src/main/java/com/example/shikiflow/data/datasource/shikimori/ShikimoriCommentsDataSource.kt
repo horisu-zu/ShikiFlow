@@ -1,18 +1,16 @@
 package com.example.shikiflow.data.datasource.shikimori
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import com.example.shikiflow.data.datasource.CommentsDataSource
-import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCommentsMapper.toDomain
 import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -20,22 +18,30 @@ import javax.inject.Inject
 class ShikimoriCommentsDataSource @Inject constructor(
     private val commentApi: CommentApi
 ): CommentsDataSource {
-    override fun getPaginatedComments(topicId: Int): Flow<PagingData<Comment>> {
-        return Pager(
-            config = PagingConfig(
-                pageSize = 15,
-                enablePlaceholders = true,
-                prefetchDistance = 5,
-                initialLoadSize = 15
-            ),
-            pagingSourceFactory = {
-                GenericPagingSource(
-                    method = { page, limit ->
-                        getComments(topicId, page, limit)
-                    }
-                )
-            }
-        ).flow
+    override fun getThreadComments(
+        topicId: Int,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<Comment>> = flow {
+        try {
+            val response = commentApi.getComments(
+                commentableId = topicId,
+                page = page,
+                limit = limit
+            ).map { comment ->
+                comment.toDomain()
+            }.take(limit)
+
+            emit(PagedResult.Success(
+                list = response,
+                currentPage = page,
+                hasNextPage = response.size == limit
+            ))
+        } catch (e: IOException) {
+            emit(PagedResult.Error("${e.message}: Missing Internet Connection"))
+        } catch (e: HttpException) {
+            emit(PagedResult.Error(e.message ?: "Unknown Error"))
+        }
     }
 
     override suspend fun getComments(

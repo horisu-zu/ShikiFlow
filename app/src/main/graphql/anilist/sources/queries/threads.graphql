@@ -37,6 +37,9 @@ query TopicComments(
             likeCount
             isLiked
         }
+        pageInfo {
+            ...CommonPage
+        }
     }
 }
 

@@ -1,15 +1,19 @@
 package com.example.shikiflow.data.datasource
 
-import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 
 interface CommentsDataSource {
-    fun getPaginatedComments(topicId: Int): Flow<PagingData<Comment>>
+    fun getThreadComments(
+        topicId: Int,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<Comment>>
 
     suspend fun getComments(
         topicId: Int,

@@ -12,7 +12,7 @@ import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.presentation.viewmodel.manga.tracks.MediaTracksParams
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow

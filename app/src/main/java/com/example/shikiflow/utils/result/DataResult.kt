@@ -1,4 +1,4 @@
-package com.example.shikiflow.utils
+package com.example.shikiflow.utils.result
 
 sealed interface DataResult<out T> {
     data object Loading : DataResult<Nothing>

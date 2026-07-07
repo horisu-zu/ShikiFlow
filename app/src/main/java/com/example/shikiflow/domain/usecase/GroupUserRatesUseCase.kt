@@ -7,7 +7,7 @@ import com.example.shikiflow.domain.model.user.MediaComparison
 import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.UserRepository
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow

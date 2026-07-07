@@ -2,11 +2,13 @@ package com.example.shikiflow.presentation.viewmodel.user.profile
 
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.presentation.UiState
 
 data class ProfileUiState(
     val user: User? = null,
+    val userFollow: UserFollow? = null,
     val currentUser: User? = null,
     val userStatsCategories: UserStatsCategories = UserStatsCategories(),
     val authType: AuthType? = null,
@@ -14,7 +16,8 @@ data class ProfileUiState(
 
     override val errorMessage: String? = null,
     override val isLoading: Boolean = true,
-    val isRefreshing: Boolean = false
+    val isRefreshingStats: Boolean = false,
+    val isRefreshingProfile: Boolean = false
 ) : UiState() {
     override fun setError(value: String?) = copy(errorMessage = value)
     override fun setLoading(value: Boolean) = copy(isLoading = value)

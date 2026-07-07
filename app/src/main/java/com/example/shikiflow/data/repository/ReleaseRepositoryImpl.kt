@@ -9,7 +9,7 @@ import com.example.shikiflow.di.annotations.GithubOkHttpClient
 import com.example.shikiflow.domain.model.common.GithubRelease
 import com.example.shikiflow.domain.repository.ReleaseRepository
 import com.example.shikiflow.presentation.viewmodel.more.about.UpdateState
-import com.example.shikiflow.utils.DataResult
+import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
