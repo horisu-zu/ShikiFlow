@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.browse
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -86,7 +87,9 @@ fun BrowseGridItemPlaceholder(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Box(
@@ -94,7 +97,7 @@ fun BrowseGridItemPlaceholder(
                 .fillMaxWidth()
                 .aspectRatio(2f / 2.85f)
                 .clip(RoundedCornerShape(12.dp))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -102,7 +105,7 @@ fun BrowseGridItemPlaceholder(
                 .fillMaxWidth()
                 .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Row(
@@ -115,7 +118,7 @@ fun BrowseGridItemPlaceholder(
                         .weight(1f)
                         .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 if(index != 1) {

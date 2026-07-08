@@ -50,6 +50,7 @@ fun TextWithDivider(
 @Composable
 fun TextWithDividerPlaceholder(
     modifier: Modifier = Modifier,
+    textWidth: Dp = 120.dp,
     style: TextStyle = MaterialTheme.typography.titleMedium,
     thickness: Dp = 6.dp
 ) {
@@ -68,7 +69,7 @@ fun TextWithDividerPlaceholder(
 
         Box(
             modifier = Modifier
-                .width(120.dp)
+                .width(textWidth)
                 .height(style.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
                 .shimmerEffect()

@@ -75,7 +75,6 @@ class UserSocialViewModel @Inject constructor(
                         }
                         is PagedResult.Success -> {
                             val categoryState = state.categories.getValue(category)
-                            if (categoryState.page == 1) categoryState.items.clear()
                             categoryState.items.addAll(result.list)
 
                             state.updateCategory(category) { category ->
@@ -105,6 +104,8 @@ class UserSocialViewModel @Inject constructor(
     fun refresh(socialCategory: SocialCategory) {
         _uiState.update { state ->
             state.updateCategory(socialCategory) { category ->
+                category.items.clear()
+
                 category.copy(
                     page = 1,
                     isRefreshing = true,

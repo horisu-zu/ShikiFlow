@@ -23,6 +23,8 @@ class ShikimoriCommentsDataSource @Inject constructor(
         page: Int,
         limit: Int
     ): Flow<PagedResult<Comment>> = flow {
+        emit(PagedResult.Loading)
+
         try {
             val response = commentApi.getComments(
                 commentableId = topicId,

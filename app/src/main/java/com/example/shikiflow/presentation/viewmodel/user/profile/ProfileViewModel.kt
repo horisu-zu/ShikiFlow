@@ -9,6 +9,7 @@ import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -99,9 +100,7 @@ class ProfileViewModel @Inject constructor(
             .filter { state ->
                 state.user != null && state.userFollow?.isFollowing == null && state.user != state.currentUser
             }
-            .distinctUntilChanged { old, new ->
-                old.user?.id == new.user?.id
-            }
+            .distinctUntilChangedBy { state -> state.user?.id }
             .onEach { state ->
                 userRepository.getFollow(state.user?.id!!).let { result ->
                     if(result is DataResult.Success) {

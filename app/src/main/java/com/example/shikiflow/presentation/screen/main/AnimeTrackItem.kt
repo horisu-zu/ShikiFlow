@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -168,7 +169,9 @@ fun AnimeTrackItemPlaceholder(
     val imageType = ImageType.Poster()
 
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
         verticalAlignment = Alignment.Top
     ) {
@@ -177,7 +180,7 @@ fun AnimeTrackItemPlaceholder(
                 .width(imageType.width)
                 .aspectRatio(imageType.aspectRatio)
                 .clip(imageType.shape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Column(
@@ -189,7 +192,7 @@ fun AnimeTrackItemPlaceholder(
                     .width(120.dp / 1.5f * (maxValue - indexValue + 1))
                     .height(MaterialTheme.typography.labelLarge.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Row(
@@ -202,7 +205,7 @@ fun AnimeTrackItemPlaceholder(
                             .width(48.dp)
                             .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
 
                     if(index != 3) {
@@ -222,7 +225,7 @@ fun AnimeTrackItemPlaceholder(
                     .fillMaxWidth()
                     .height(4.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

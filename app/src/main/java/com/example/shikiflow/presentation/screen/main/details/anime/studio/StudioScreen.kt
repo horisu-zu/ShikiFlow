@@ -209,6 +209,7 @@ fun StudioScreen(
                     ),
                     scrollBehavior = scrollBehavior
                 )
+
                 authType?.let {
                     if(authType == AuthType.SHIKIMORI) {
                         SearchPanel(
@@ -223,6 +224,7 @@ fun StudioScreen(
                         )
                     }
                 }
+
                 HorizontalDivider()
             }
         }

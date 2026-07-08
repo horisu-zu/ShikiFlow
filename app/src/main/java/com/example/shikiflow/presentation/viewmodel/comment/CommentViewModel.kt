@@ -41,7 +41,6 @@ class CommentViewModel @Inject constructor(
             .onEach { result ->
                 mutableUiState.update { state ->
                     if (result is PagedResult.Success) {
-                        if (state.page == 1) state.comments.clear()
                         state.comments.addAll(result.list)
 
                         state.copy(
@@ -111,6 +110,8 @@ class CommentViewModel @Inject constructor(
 
     fun onRefresh() {
         mutableUiState.update { state ->
+            state.comments.clear()
+
             state.copy(
                 page = 1,
                 isRefreshing = true,

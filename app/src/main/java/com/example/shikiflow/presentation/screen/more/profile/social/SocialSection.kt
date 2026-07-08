@@ -141,7 +141,7 @@ fun SocialSection(
                 val categoryState = uiState.categories[category] ?: return@HorizontalPager
                 val lazyGridState = rememberLazyGridState()
 
-                if (!categoryState.isLoading) {
+                if (!categoryState.isLoading && !categoryState.isRefreshing) {
                     lazyGridState.onBottomReached(
                         buffer = 6,
                         onLoadMore = { userSocialViewModel.onLoadMore(category) }

@@ -15,9 +15,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Dp
 import androidx.core.view.WindowCompat
@@ -25,7 +29,9 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 
 @Composable
-fun Modifier.shimmerEffect(): Modifier {
+fun Modifier.shimmerEffect(
+    overContent: Boolean = false
+): Modifier {
     val colors = listOf(
         colorScheme.surfaceContainerHighest,
         colorScheme.surfaceContainerHigh,
@@ -47,14 +53,30 @@ fun Modifier.shimmerEffect(): Modifier {
         )
     )
 
-    return drawBehind {
-        drawRect(
-            brush = Brush.linearGradient(
-                colors = colors,
-                start = Offset(startOffsetX, 0f),
-                end = Offset(startOffsetX + size.width, size.height)
+    return if (overContent) {
+        graphicsLayer(compositingStrategy = CompositingStrategy.Offscreen)
+            .drawWithContent {
+                drawContent()
+
+                drawRect(
+                    brush = Brush.linearGradient(
+                        colors = colors,
+                        start = Offset(startOffsetX, 0f),
+                        end = Offset(startOffsetX + size.width, size.height)
+                    ),
+                    blendMode = BlendMode.SrcAtop
+                )
+            }
+    } else {
+        drawBehind {
+            drawRect(
+                brush = Brush.linearGradient(
+                    colors = colors,
+                    start = Offset(startOffsetX, 0f),
+                    end = Offset(startOffsetX + size.width, size.height)
+                )
             )
-        )
+        }
     }
 }
 

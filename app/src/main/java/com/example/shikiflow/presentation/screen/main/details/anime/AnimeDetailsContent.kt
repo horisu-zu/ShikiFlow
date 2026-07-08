@@ -116,6 +116,7 @@ fun AnimeDetailsContent(
                 onToggleFavorite = onToggleFavorite
             )
         }
+
         if(!animeDetails.descriptionHtml.isHTMLStringBlank()) {
             item {
                 ExpandableText(
@@ -129,6 +130,7 @@ fun AnimeDetailsContent(
                 )
             }
         }
+
         if(animeDetails.genres.isNotEmpty()) {
             item {
                 Column(
@@ -138,6 +140,7 @@ fun AnimeDetailsContent(
                     TextWithDivider(
                         text = stringResource(R.string.user_stats_section_genres)
                     )
+
                     SnapFlingLazyRow(
                         snapPosition = SnapPosition.Start,
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
@@ -155,6 +158,7 @@ fun AnimeDetailsContent(
                 }
             }
         }
+
         if(animeDetails.tags.isNotEmpty()) {
             item {
                 Column(
@@ -164,6 +168,7 @@ fun AnimeDetailsContent(
                     TextWithDivider(
                         text = stringResource(R.string.user_stats_section_tags)
                     )
+
                     SnapFlingLazyRow(
                         snapPosition = SnapPosition.Start,
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
@@ -199,6 +204,7 @@ fun AnimeDetailsContent(
                         TextWithDivider(
                             text = stringResource(R.string.details_characters)
                         )
+
                         IconButton(
                             onClick = {
                                 mediaNavOptions.navigateToMediaCharacters(
@@ -207,7 +213,7 @@ fun AnimeDetailsContent(
                                     mediaType = MediaType.ANIME
                                 )
                             },
-                            modifier = Modifier.size(24.dp),
+                            modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -215,6 +221,7 @@ fun AnimeDetailsContent(
                             )
                         }
                     }
+
                     SnapFlingLazyRow(
                         snapPosition = SnapPosition.Start,
                         modifier = Modifier
@@ -232,6 +239,7 @@ fun AnimeDetailsContent(
                                 imageType = imageType
                             )
                         }
+
                         if(animeDetails.characters.hasNextPage) {
                             item {
                                 PaginatedListNavigateIcon(
@@ -253,6 +261,7 @@ fun AnimeDetailsContent(
                 }
             }
         }
+
         if(animeDetails.relatedMedia.isNotEmpty()) {
             item {
                 RelatedSection(
@@ -268,6 +277,7 @@ fun AnimeDetailsContent(
                 )
             }
         }
+
         if(animeDetails.screenshots.isNotEmpty()) {
             item {
                 ScreenshotSection(
@@ -279,6 +289,7 @@ fun AnimeDetailsContent(
                 )
             }
         }
+
         if(animeDetails.staffList.isNotEmpty()) {
             item {
                 StaffSection(
@@ -297,6 +308,7 @@ fun AnimeDetailsContent(
                 )
             }
         }
+
         item {
             AnimeShortInfoSection(
                 animeDetails = animeDetails,
@@ -306,9 +318,11 @@ fun AnimeDetailsContent(
                 modifier = Modifier.fillMaxWidth()
             )
         }
+
         item {
             HorizontalDivider()
         }
+
         item {
             MediaDetailsNavComponent(
                 authType = currentAuthType,
@@ -327,9 +341,11 @@ fun AnimeDetailsContent(
                 }
             )
         }
+
         item {
             HorizontalDivider()
         }
+
         if(animeDetails.reviews.entries.isNotEmpty()) {
             item {
                 ReviewsSection(
@@ -344,6 +360,7 @@ fun AnimeDetailsContent(
                 )
             }
         }
+
         if(animeDetails.mediaFollowings.entries.isNotEmpty()) {
             item {
                 MediaFollowingsSection(
@@ -358,6 +375,7 @@ fun AnimeDetailsContent(
                 )
             }
         }
+
         item {
             MediaStatsComponent(
                 mediaType = animeDetails.mediaType,
@@ -367,6 +385,7 @@ fun AnimeDetailsContent(
                 statusesStats = animeDetails.statusesStats
             )
         }
+
         animeDetails.threadId?.let { threadId ->
             item {
                 CommentSection(
@@ -388,6 +407,7 @@ fun AnimeDetailsContent(
             }
         }
     }
+
     if(rateBottomSheet) {
         UserRateBottomSheet(
             userRate = animeDetails.toUiModel(userRate),
@@ -400,8 +420,7 @@ fun AnimeDetailsContent(
             },
             onDelete = { entryId -> onDeleteUserRate(entryId) }
         )
-    }
-    if(showRelatedBottomSheet) {
+    } else if(showRelatedBottomSheet) {
         RelatedBottomSheet(
             relatedItems = animeDetails.relatedMedia,
             onItemClick = { id, mediaType ->

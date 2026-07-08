@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
-import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -12,17 +11,22 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,12 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
@@ -48,6 +51,7 @@ import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.pre
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.track.media.MediaUserTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.WindowSize
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.UserRateIconProvider.icon
 import com.example.shikiflow.presentation.common.StarScore
@@ -84,18 +88,28 @@ fun AnimeDetailsHeader(
     onToggleFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val orientation = LocalConfiguration.current.orientation
-    val isLandscape = orientation == Configuration.ORIENTATION_LANDSCAPE
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
 
-    Box(modifier = modifier.fillMaxWidth()) {
+    val windowSize by remember(windowSizeClass) {
+        derivedStateOf {
+            WindowSize.from(windowSizeClass)
+        }
+    }
+
+    Box(
+        modifier = modifier.fillMaxWidth()
+    ) {
         BaseImage(
-            model = if(!isLandscape) animeDetails.coverImageUrl
+            model = if(windowSize == WindowSize.COMPACT) animeDetails.coverImageUrl
                 else animeDetails.bannerImageUrl ?: animeDetails.coverImageUrl,
             imageType = ImageType.Poster(
                 width = Int.MAX_VALUE.dp,
                 shape = RoundedCornerShape(0.dp),
-                aspectRatio = if(!isLandscape) 2f / 2.85f
-                    else 2.25f
+                aspectRatio = when (windowSize) {
+                    WindowSize.COMPACT -> 2f / 2.85f
+                    WindowSize.MEDIUM -> 24f / 9f
+                    WindowSize.EXPANDED -> 32f / 9f
+                }
             ),
             modifier = Modifier
                 .ignoreHorizontalParentPadding(horizontalPadding)
@@ -113,7 +127,7 @@ fun AnimeDetailsHeader(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.Bottom
         ) {
-            if(isLandscape) {
+            if(windowSize != WindowSize.COMPACT) {
                 BaseImage(
                     model = animeDetails.coverImageUrl,
                     imageType = ImageType.Poster(
@@ -121,9 +135,10 @@ fun AnimeDetailsHeader(
                     )
                 )
             }
+
             Column {
-                if (animeDetails.status != MediaStatus.ANNOUNCED && animeDetails.score != null
-                    && animeDetails.score != 0.0f
+                if (animeDetails.status != MediaStatus.ANNOUNCED && animeDetails.score != null &&
+                    animeDetails.score != 0.0f
                 ) {
                     ScoreItem(
                         score = animeDetails.score,
@@ -154,6 +169,7 @@ fun AnimeDetailsHeader(
                             }
                         )
                     }
+
                     item {
                         if(animeDetails.totalCount == 1 && animeDetails.durationMins != null && animeDetails.durationMins != 0) {
                             val (hours, minutes) = animeDetails.durationMins.calculateDuration()
@@ -189,6 +205,7 @@ fun AnimeDetailsHeader(
                             )
                         }
                     }
+
                     animeDetails.ageRating?.let { ageRating ->
                         item {
                             ShortInfoItem(
@@ -197,6 +214,7 @@ fun AnimeDetailsHeader(
                             )
                         }
                     }
+
                     if(animeDetails.status == MediaStatus.ONGOING) {
                         item {
                             val isAiring = animeDetails.nextEpisodeAt?.isAiring(
@@ -265,9 +283,40 @@ fun ScoreItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         StarScore(score = score)
+
         Text(
             text = score.toString(),
-            fontSize = 14.sp
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
+}
+
+@Composable
+fun ScoreItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Row {
+            repeat(5) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .width(32.dp)
+                .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -285,9 +334,39 @@ fun ShortInfoItem(
             color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.labelMedium
         )
+
         Text(
             text = infoItem,
             style = MaterialTheme.typography.labelMedium
+        )
+    }
+}
+
+@Composable
+fun ShortInfoItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val indexValue = itemIndex % 3 + 1
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(32.dp + indexValue * 4.dp)
+                .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Box(
+            modifier = Modifier
+                .width(64.dp - indexValue * 6.dp)
+                .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -347,12 +426,14 @@ private fun UserStatusItem(
                 modifier = Modifier.size(24.dp),
                 tint = MaterialTheme.colorScheme.surface
             )
+
             Text(
                 text = text,
                 inlineContent = inlineContent,
                 style = style
             )
         }
+
         if(authType == AuthType.SHIKIMORI) {
             HeaderButton(
                 onClick = onPlayClick

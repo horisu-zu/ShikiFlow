@@ -170,6 +170,7 @@ fun AnimeTrackGridItemPlaceholder(
         modifier = Modifier
             .clip(shape = RoundedCornerShape(clipPercent))
             .background(MaterialTheme.colorScheme.surfaceContainer)
+            .shimmerEffect(overContent = true)
             .then(modifier),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
@@ -183,7 +184,7 @@ fun AnimeTrackGridItemPlaceholder(
                         bottomEndPercent = clipPercent
                     )
                 )
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -192,14 +193,14 @@ fun AnimeTrackGridItemPlaceholder(
                 .padding(horizontal = clipPercent.dp)
                 .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(progressBarHeight)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

@@ -8,8 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -24,6 +25,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
@@ -34,6 +36,7 @@ import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.RelationKindMapper.displayValue
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun RelatedSection(
@@ -58,7 +61,7 @@ fun RelatedSection(
             Box(
                 modifier = Modifier
                     .size(16.dp)
-                    .clip(CircleShape)
+                    .clip(RoundedCornerShape(percent = 24))
                     .background(MaterialTheme.colorScheme.primary),
                 contentAlignment = Alignment.Center
             ) {
@@ -75,6 +78,7 @@ fun RelatedSection(
             if(relatedItems.size > 3) {
                 IconButton(
                     onClick = onArrowClick,
+                    shape = RoundedCornerShape(percent = 24),
                     modifier = Modifier.size(24.dp),
                 ) {
                     Icon(
@@ -84,6 +88,7 @@ fun RelatedSection(
                 }
             }
         }
+
         Column(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -106,7 +111,8 @@ fun RelatedItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
             .clip(RoundedCornerShape(8.dp))
             .clickable {
                 onItemClick(relatedMedia.id, relatedMedia.mediaType)
@@ -121,6 +127,7 @@ fun RelatedItem(
                 shape = RoundedCornerShape(8.dp)
             )
         )
+
         Column(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -130,6 +137,7 @@ fun RelatedItem(
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.labelMedium
             )
+
             relatedMedia.let { media ->
                 Text(
                     text = buildString {
@@ -142,6 +150,70 @@ fun RelatedItem(
                     style = MaterialTheme.typography.labelSmall.copy(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
                     )
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun RelatedItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val indexValue = itemIndex % 3 + 1
+    val imageType = ImageType.Square(
+        width = 48.dp,
+        shape = RoundedCornerShape(8.dp)
+    )
+
+    Row(
+        modifier = modifier.shimmerEffect(overContent = true),
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(imageType.width)
+                .clip(imageType.shape)
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(64.dp + indexValue * 12.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(36.dp - indexValue * 4.dp)
+                        .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+
+                Text(
+                    text = " ∙ ",
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                    )
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(36.dp + indexValue * 4.dp)
+                        .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }

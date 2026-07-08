@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -42,6 +43,7 @@ import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.StaffItem
+import com.example.shikiflow.presentation.screen.main.details.common.StaffItemPlaceholder
 import com.example.shikiflow.presentation.viewmodel.staff.media_staff.MediaStaffViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -82,12 +84,6 @@ fun MediaStaffScreen(
         }
     ) {
         when(mediaStaffItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
             is LoadState.Error -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -115,43 +111,54 @@ fun MediaStaffScreen(
                     horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                 ) {
-                    items(mediaStaffItems.itemCount) { index ->
-                        mediaStaffItems[index]?.let { staffShort ->
-                            StaffItem(
-                                staffShort = staffShort,
-                                titleType = titleType,
-                                onStaffClick = { staffId ->
-                                    navOptions.navigateToStaff(staffId)
-                                }
+                    if (mediaStaffItems.loadState.refresh is LoadState.Loading) {
+                        items(18) { index ->
+                            StaffItemPlaceholder(
+                                itemIndex = index,
+                                modifier = Modifier.fillMaxWidth()
                             )
                         }
-                    }
-                    mediaStaffItems.apply {
-                        if(loadState.append is LoadState.Loading) {
-                            item(
-                                span = { GridItemSpan(maxLineSpan) }
-                            ) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
-                            }
-                        } else if(loadState.append is LoadState.Error) {
-                            item(
-                                span = { GridItemSpan(maxLineSpan) }
-                            ) {
-                                ErrorItem(
-                                    message = stringResource(R.string.common_error),
-                                    showFace = false,
-                                    buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { mediaStaffItems.retry() }
+                    } else {
+                        items(mediaStaffItems.itemCount) { index ->
+                            mediaStaffItems[index]?.let { staffShort ->
+                                StaffItem(
+                                    staffShort = staffShort,
+                                    titleType = titleType,
+                                    onStaffClick = { staffId ->
+                                        navOptions.navigateToStaff(staffId)
+                                    }
                                 )
+                            }
+                        }
+
+                        mediaStaffItems.apply {
+                            if(loadState.append is LoadState.Loading) {
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) }
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
+                            } else if(loadState.append is LoadState.Error) {
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) }
+                                ) {
+                                    ErrorItem(
+                                        message = stringResource(R.string.common_error),
+                                        showFace = false,
+                                        buttonLabel = stringResource(R.string.common_retry),
+                                        onButtonClick = { mediaStaffItems.retry() }
+                                    )
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
         if(showBottomSheet) {
             SortBottomSheet(
                 config = SortConfig(

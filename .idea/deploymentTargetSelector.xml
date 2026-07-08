@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-07-07T09:14:08.107299600Z">
+        <DropdownSelection timestamp="2026-07-08T18:02:07.243198600Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\kosya\.android\avd\Medium_Phone.avd" />
@@ -38,6 +38,17 @@
       <SelectionState runConfigName="androidTest">
         <option name="selectionMode" value="DROPDOWN" />
         <DropdownSelection timestamp="2026-06-18T16:13:53.498654700Z">
+          <Target type="DEFAULT_BOOT">
+            <handle>
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\kosya\.android\avd\Medium_Phone.avd" />
+            </handle>
+          </Target>
+        </DropdownSelection>
+        <DialogSelection />
+      </SelectionState>
+      <SelectionState runConfigName="MediaDetailsContentPlaceholderPreview">
+        <option name="selectionMode" value="DROPDOWN" />
+        <DropdownSelection timestamp="2026-07-08T16:38:19.011177800Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\kosya\.android\avd\Medium_Phone.avd" />

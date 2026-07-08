@@ -3,18 +3,19 @@ package com.example.shikiflow.presentation.screen.main.details.common
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
@@ -40,6 +42,8 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun StaffSection(
@@ -113,6 +117,7 @@ fun StaffItem(
             model = staffShort.imageUrl,
             modifier = Modifier.width(96.dp)
         )
+
         Column(
             modifier = Modifier
                 .width(width)
@@ -125,6 +130,7 @@ fun StaffItem(
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
             FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
                 verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
@@ -137,9 +143,77 @@ fun StaffItem(
                         ),
                         textAlign = TextAlign.Center,
                         modifier = Modifier
-                            .clip(CircleShape)
+                            .clip(RoundedCornerShape(percent = 32))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
                             .padding(horizontal = 6.dp, vertical = 4.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StaffItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    imageType: ImageType = ImageType.Poster(),
+    itemWidth: Dp = Dp.Unspecified
+) {
+    val indexValue = itemIndex % 4 + 1
+
+    Row(
+        modifier = modifier
+            .height(IntrinsicSize.Max)
+            .shimmerEffect(overContent = true),
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(imageType.width)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Column(
+            modifier = Modifier
+                .width(itemWidth)
+                .padding(vertical = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(64.dp + indexValue * 12.dp)
+                        .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(96.dp - indexValue * 8.dp)
+                        .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+            ) {
+                repeat(indexValue % 2 + 1) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width(48.dp + indexValue * 16.dp - index * 8.dp)
+                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp + 8.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }

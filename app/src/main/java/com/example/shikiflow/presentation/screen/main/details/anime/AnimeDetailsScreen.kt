@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -25,9 +24,11 @@ import androidx.compose.ui.zIndex
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.FullScreenImageDialog
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
+import com.example.shikiflow.presentation.screen.main.details.common.MediaDetailsContentPlaceholder
 import com.example.shikiflow.presentation.viewmodel.anime.details.AnimeDetailsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
@@ -46,10 +47,9 @@ fun AnimeDetailsScreen(
 
     Scaffold { paddingValues ->
         if(uiState.isLoading && uiState.details == null) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
+            MediaDetailsContentPlaceholder(
+                mediaType = MediaType.ANIME
+            )
         } else if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),

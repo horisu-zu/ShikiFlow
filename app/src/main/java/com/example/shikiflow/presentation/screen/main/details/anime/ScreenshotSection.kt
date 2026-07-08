@@ -41,6 +41,7 @@ fun ScreenshotSection(
         TextWithDivider(
             text = stringResource(R.string.anime_details_screenshots)
         )
+
         SnapFlingLazyRow(
             modifier = Modifier
                 .ignoreHorizontalParentPadding(horizontalPadding)

@@ -30,6 +30,7 @@ import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.CardItem
+import com.example.shikiflow.presentation.common.CardItemPlaceholder
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter
@@ -197,12 +198,8 @@ fun BrowseListItemPlaceholder(
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)
             ) {
                 repeat(times = maxValue - indexValue + 1) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(24.dp + 12.dp * (maxValue - index))
-                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp + 12.dp)
-                            .clip(RoundedCornerShape(percent = 40))
-                            .shimmerEffect()
+                    CardItemPlaceholder(
+                        modifier = Modifier.width(24.dp + 12.dp * (maxValue - index))
                     )
                 }
             }

@@ -35,7 +35,6 @@ fun CommentSection(
     onTopicNavigate: (Int) -> Unit,
     onUserClick: (User) -> Unit,
     modifier: Modifier = Modifier,
-    commentsCount: Int? = null,
     commentSectionViewModel: CommentSectionViewModel = hiltViewModel(key = topicId.toString())
 ) {
     val uiState by commentSectionViewModel.uiState.collectAsStateWithLifecycle()
@@ -48,7 +47,44 @@ fun CommentSection(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically)
     ) {
-        if(uiState.errorMessage != null) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextWithDivider(
+                text = stringResource(id = R.string.details_comments),
+                modifier = Modifier.weight(1f)
+            )
+
+            IconButton(
+                onClick = { commentSectionViewModel.onRefresh() },
+                enabled = !uiState.isLoading
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Refresh the comments"
+                )
+            }
+
+            IconButton(
+                onClick = { onTopicNavigate(topicId) }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
+                    contentDescription = "Navigate to Topic Comments Screen"
+                )
+            }
+        }
+
+        if (uiState.isLoading) {
+            repeat(5) { index ->
+                CommentItemPlaceholder(
+                    backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                    itemIndex = index
+                )
+            }
+        } else if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -61,58 +97,15 @@ fun CommentSection(
                 )
             }
         } else {
-            if (uiState.isLoading) {
-                repeat(5) { index ->
-                    CommentItemPlaceholder(
-                        backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                        itemIndex = index
-                    )
-                }
-            } else if(uiState.comments.isNotEmpty()) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    TextWithDivider(
-                        text = buildString {
-                            append(stringResource(id = R.string.details_comments))
-                            commentsCount?.let { count ->
-                                append(stringResource(id = R.string.details_comments_count, count))
-                            }
-                        },
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    IconButton(
-                        onClick = { commentSectionViewModel.onRefresh() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Refresh the comments"
-                        )
-                    }
-
-                    IconButton(
-                        onClick = { onTopicNavigate(topicId) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                            contentDescription = "Navigate to Topic Comments Screen"
-                        )
-                    }
-                }
-
-                uiState.comments.forEach { comment ->
-                    CommentItem(
-                        comment = comment,
-                        onEntityClick = onEntityClick,
-                        onUserClick = onUserClick,
-                        onLikeToggle = { /**/ },
-                        onCommentSelect = { /**/ },
-                        modifier = Modifier
-                    )
-                }
+            uiState.comments.forEach { comment ->
+                CommentItem(
+                    comment = comment,
+                    onEntityClick = onEntityClick,
+                    onUserClick = onUserClick,
+                    onLikeToggle = { /**/ },
+                    onCommentSelect = { /**/ },
+                    modifier = Modifier
+                )
             }
         }
     }
