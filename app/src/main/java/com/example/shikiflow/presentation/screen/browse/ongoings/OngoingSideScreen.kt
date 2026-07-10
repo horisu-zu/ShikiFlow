@@ -228,12 +228,6 @@ private fun OngoingSideScreenContent(
             }
 
             when(calendarItems.loadState.refresh) {
-                is LoadState.Loading -> {
-                    Box(
-                        modifier = modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) { CircularProgressIndicator() }
-                }
                 is LoadState.Error -> {
                     val errorMessage = (calendarItems.loadState.refresh as LoadState.Error)
                         .error.message
@@ -260,46 +254,58 @@ private fun OngoingSideScreenContent(
                         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(calendarItems.itemCount) { index ->
-                            calendarItems[index]?.let { airingAnime ->
-                                AiringAnimeItem(
-                                    airingAnime = airingAnime,
-                                    titleType = preferredTitleType,
-                                    prevStatus = if(index >= columns)
-                                        calendarItems.peek(index - columns)?.let { airingAnime ->
-                                            airingAnime.airingAt.status(
-                                                duration = airingAnime.data.duration ?: 30.minutes
-                                            )
-                                        } else null,
-                                    nextStatus = if(index < calendarItems.itemCount - columns)
-                                        calendarItems.peek(index + columns)
-                                            ?.let { airingAnime ->
+                        if (calendarItems.loadState.refresh is LoadState.Loading) {
+                            val placeholderCount = 24
+
+                            items(placeholderCount) { index ->
+                                AiringAnimeItemPlaceholder(
+                                    itemIndex = index,
+                                    prevStatus = index >= columns,
+                                    nextStatus = index < placeholderCount - columns
+                                )
+                            }
+                        } else {
+                            items(calendarItems.itemCount) { index ->
+                                calendarItems[index]?.let { airingAnime ->
+                                    AiringAnimeItem(
+                                        airingAnime = airingAnime,
+                                        titleType = preferredTitleType,
+                                        prevStatus = if(index >= columns)
+                                            calendarItems.peek(index - columns)?.let { airingAnime ->
                                                 airingAnime.airingAt.status(
                                                     duration = airingAnime.data.duration ?: 30.minutes
                                                 )
                                             } else null,
-                                    onClick = onNavigate
-                                )
-                            }
-                        }
-
-                        calendarItems.apply {
-                            if (loadState.append is LoadState.Loading) {
-                                item {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) { CircularProgressIndicator() }
+                                        nextStatus = if(index < calendarItems.itemCount - columns)
+                                            calendarItems.peek(index + columns)
+                                                ?.let { airingAnime ->
+                                                    airingAnime.airingAt.status(
+                                                        duration = airingAnime.data.duration ?: 30.minutes
+                                                    )
+                                                } else null,
+                                        onClick = onNavigate
+                                    )
                                 }
                             }
-                            if (loadState.append is LoadState.Error) {
-                                item {
-                                    ErrorItem(
-                                        message = stringResource(R.string.common_error),
-                                        showFace = false,
-                                        buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { calendarItems.retry() }
-                                    )
+
+                            calendarItems.apply {
+                                if (loadState.append is LoadState.Loading) {
+                                    item {
+                                        Box(
+                                            modifier = Modifier.fillMaxSize(),
+                                            contentAlignment = Alignment.Center
+                                        ) { CircularProgressIndicator() }
+                                    }
+                                }
+                                if (loadState.append is LoadState.Error) {
+                                    item {
+                                        ErrorItem(
+                                            message = stringResource(R.string.common_error),
+                                            showFace = false,
+                                            buttonLabel = stringResource(R.string.common_retry),
+                                            onButtonClick = { calendarItems.retry() }
+                                        )
+                                    }
                                 }
                             }
                         }

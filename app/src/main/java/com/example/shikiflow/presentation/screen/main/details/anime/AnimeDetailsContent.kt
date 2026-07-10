@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -199,7 +198,8 @@ fun AnimeDetailsContent(
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
                         TextWithDivider(
                             text = stringResource(R.string.details_characters)
@@ -213,7 +213,8 @@ fun AnimeDetailsContent(
                                     mediaType = MediaType.ANIME
                                 )
                             },
-                            modifier = Modifier.size(24.dp)
+                            shape = RoundedCornerShape(percent = 24),
+                            modifier = Modifier.size(32.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -302,9 +303,7 @@ fun AnimeDetailsContent(
                         mediaNavOptions.navigateToStaff(staffId)
                     },
                     horizontalPadding = horizontalPadding,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .animateContentSize()
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

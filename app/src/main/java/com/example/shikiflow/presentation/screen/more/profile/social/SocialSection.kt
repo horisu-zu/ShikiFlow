@@ -270,7 +270,7 @@ fun SocialSection(
                                         }
                                         else -> {
                                             UserSocialItemPlaceholder(
-                                                index = index,
+                                                itemIndex = index,
                                                 modifier = Modifier.padding(
                                                     horizontal = 8.dp,
                                                     vertical = 6.dp

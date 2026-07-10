@@ -153,6 +153,7 @@ fun MangaDetailsContent(
                     TextWithDivider(
                         text = stringResource(R.string.user_stats_section_genres)
                     )
+
                     SnapFlingLazyRow(
                         snapPosition = SnapPosition.Start,
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
@@ -180,6 +181,7 @@ fun MangaDetailsContent(
                     TextWithDivider(
                         text = stringResource(R.string.user_stats_section_tags)
                     )
+
                     SnapFlingLazyRow(
                         snapPosition = SnapPosition.Start,
                         contentPadding = PaddingValues(horizontal = horizontalPadding),
@@ -216,6 +218,7 @@ fun MangaDetailsContent(
                         TextWithDivider(
                             text = stringResource(R.string.details_characters)
                         )
+
                         IconButton(
                             onClick = {
                                 mediaNavOptions.navigateToMediaCharacters(
@@ -224,7 +227,8 @@ fun MangaDetailsContent(
                                     mediaType = MediaType.MANGA
                                 )
                             },
-                            modifier = Modifier.size(24.dp),
+                            shape = RoundedCornerShape(percent = 24),
+                            modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -232,6 +236,7 @@ fun MangaDetailsContent(
                             )
                         }
                     }
+
                     SnapFlingLazyRow(
                         modifier = Modifier
                             .ignoreHorizontalParentPadding(horizontalPadding)
@@ -250,6 +255,7 @@ fun MangaDetailsContent(
                                 imageType = imageType
                             )
                         }
+
                         if(mangaDetails.characters.hasNextPage) {
                             item {
                                 PaginatedListNavigateIcon(
@@ -271,6 +277,7 @@ fun MangaDetailsContent(
                 }
             }
         }
+
         if(mangaDetails.relatedMedia.isNotEmpty()) {
             item {
                 RelatedSection(
@@ -285,6 +292,7 @@ fun MangaDetailsContent(
                 )
             }
         }
+
         if(mangaDetails.staffList.isNotEmpty()) {
             item {
                 StaffSection(
@@ -300,9 +308,11 @@ fun MangaDetailsContent(
                 )
             }
         }
+
         item {
             HorizontalDivider()
         }
+
         item {
             MediaDetailsNavComponent(
                 authType = authType,
@@ -321,9 +331,11 @@ fun MangaDetailsContent(
                 }
             )
         }
+
         item {
             HorizontalDivider()
         }
+
         if(mangaDetails.reviews.entries.isNotEmpty()) {
             item {
                 ReviewsSection(
@@ -338,6 +350,7 @@ fun MangaDetailsContent(
                 )
             }
         }
+
         if(mangaDetails.mediaFollowings.entries.isNotEmpty()) {
             item {
                 MediaFollowingsSection(
@@ -352,6 +365,7 @@ fun MangaDetailsContent(
                 )
             }
         }
+
         item {
             MediaStatsComponent(
                 mediaType = mangaDetails.mediaType,
@@ -361,6 +375,7 @@ fun MangaDetailsContent(
                 statusesStats = mangaDetails.statusesStats
             )
         }
+
         mangaDetails.threadId?.let { threadId ->
             item {
                 CommentSection(

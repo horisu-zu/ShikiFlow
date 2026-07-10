@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -51,6 +52,7 @@ import com.example.shikiflow.presentation.common.CardFace
 import com.example.shikiflow.presentation.common.FlipCard
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.TextWithDivider
+import com.example.shikiflow.presentation.common.TextWithDividerPlaceholder
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
@@ -119,7 +121,9 @@ fun <T : SingleMediaRole> CharacterMediaSection(
             )
 
             IconButton(
-                onClick = { cardFace = cardFace.next }
+                onClick = { cardFace = cardFace.next },
+                shape = RoundedCornerShape(percent = 24),
+                modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     painter = when (cardFace) {
@@ -131,7 +135,9 @@ fun <T : SingleMediaRole> CharacterMediaSection(
             }
 
             IconButton(
-                onClick = { onPaginatedNavigate() }
+                onClick = { onPaginatedNavigate() },
+                shape = RoundedCornerShape(percent = 24),
+                modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -162,6 +168,7 @@ fun <T : SingleMediaRole> CharacterMediaSection(
                     }
                 )
             }
+
             if(items.hasNextPage) {
                 item {
                     PaginatedListNavigateIcon(
@@ -304,5 +311,58 @@ fun PaginatedListNavigateIcon(
             contentDescription = "Navigate to Paginated Items Screen",
             modifier = Modifier.size(iconSize)
         )
+    }
+}
+
+@Composable
+fun CharacterMediaSectionPlaceholder(
+    modifier: Modifier = Modifier,
+    imageType: ImageType = ImageType.Poster(
+        shape = RoundedCornerShape(12.dp)
+    )
+) {
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextWithDividerPlaceholder()
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                repeat(2) {
+                    Box(
+                        modifier = Modifier
+                            .size(32.dp)
+                            .clip(RoundedCornerShape(percent = 24))
+                            .background(MaterialTheme.colorScheme.onSurface)
+                    )
+                }
+            }
+        }
+
+        LazyRow(
+            modifier = Modifier
+                .ignoreHorizontalParentPadding(12.dp)
+                .fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(count = 16) {
+                Box(
+                    modifier = Modifier
+                        .width(imageType.width)
+                        .aspectRatio(imageType.aspectRatio)
+                        .clip(imageType.shape)
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+        }
     }
 }

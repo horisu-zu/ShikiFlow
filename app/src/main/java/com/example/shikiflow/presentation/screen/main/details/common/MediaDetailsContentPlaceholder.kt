@@ -51,7 +51,7 @@ fun MediaDetailsContentPlaceholder(
    horizontalPadding: Dp = 12.dp
 ) {
     LazyColumn(
-        //userScrollEnabled = false,
+        userScrollEnabled = false,
         modifier = modifier.shimmerEffect(overContent = true),
         contentPadding = PaddingValues(
             start = horizontalPadding,
@@ -134,7 +134,7 @@ fun MediaDetailsContentPlaceholder(
 
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(percent = 24))
                             .background(MaterialTheme.colorScheme.onSurface)
                     )
@@ -177,7 +177,7 @@ fun MediaDetailsContentPlaceholder(
 
                     Box(
                         modifier = Modifier
-                            .size(16.dp)
+                            .size(20.dp)
                             .clip(RoundedCornerShape(percent = 24))
                             .background(MaterialTheme.colorScheme.onSurface)
                     )
@@ -186,7 +186,7 @@ fun MediaDetailsContentPlaceholder(
 
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(percent = 24))
                             .background(MaterialTheme.colorScheme.onSurface)
                     )
@@ -243,7 +243,7 @@ fun MediaDetailsContentPlaceholder(
 
                     Box(
                         modifier = Modifier
-                            .size(24.dp)
+                            .size(32.dp)
                             .clip(RoundedCornerShape(percent = 24))
                             .background(MaterialTheme.colorScheme.onSurface)
                     )

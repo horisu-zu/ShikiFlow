@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.roles
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -9,7 +10,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -28,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.example.shikiflow.R
@@ -45,6 +49,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 
@@ -59,12 +64,6 @@ fun MediaRolesContent(
     val preferredTitleType = LocalTitleTypeController.current
 
     when (mediaRoles.loadState.refresh) {
-        is LoadState.Loading -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        }
         is LoadState.Error -> {
             val errorMessage = (mediaRoles.loadState.refresh as LoadState.Error)
                 .error.message
@@ -102,68 +101,83 @@ fun MediaRolesContent(
                 horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
                 verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
             ) {
-                items(count = mediaRoles.itemCount) { index ->
-                    mediaRoles[index]?.let { mediaRole ->
-                        when(mediaRole) {
-                            is CharacterMediaRole -> {
-                                CharacterMediaRoleItem(
-                                    mediaRole = mediaRole,
-                                    titleType = preferredTitleType,
-                                    onMediaClick = { id, mediaType ->
-                                        when (mediaType) {
-                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                        }
-                                    }
-                                )
-                            }
-                            is StaffMediaRole -> {
-                                StaffMediaRoleItem(
-                                    mediaRole = mediaRole,
-                                    titleType = preferredTitleType,
-                                    onMediaClick = { id, mediaType ->
-                                        when (mediaType) {
-                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                        }
-                                    }
-                                )
-                            }
-                            is VoiceActorMediaRole -> {
-                                VoiceActorMediaRoleItem(
-                                    vaRole = mediaRole,
-                                    titleType = preferredTitleType,
-                                    onCharacterClick = { id ->
-                                        navOptions.navigateToCharacterDetails(id)
-                                    },
-                                    onMediaClick = { id, mediaType ->
-                                        when (mediaType) {
-                                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                                        }
-                                    }
-                                )
-                            }
-                        }
-                    }
-                }
-                mediaRoles.apply {
-                    if (loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) { CircularProgressIndicator() }
-                        }
-                    }
-                    if (loadState.append is LoadState.Error) {
-                        item(span = { GridItemSpan(maxLineSpan) }) {
-                            ErrorItem(
-                                message = stringResource(R.string.common_error),
-                                showFace = false,
-                                buttonLabel = stringResource(R.string.common_retry),
-                                onButtonClick = { mediaRoles.retry() }
+                if (mediaRoles.loadState.refresh is LoadState.Loading) {
+                    items(count = 18) { index ->
+                        if (roleType == RoleType.VA) {
+                            VoiceActorMediaRoleItemPlaceholder(
+                                itemIndex = index
                             )
+                        } else {
+                            MediaRoleItemPlaceholder(
+                                itemIndex = index
+                            )
+                        }
+                    }
+                } else {
+                    items(count = mediaRoles.itemCount) { index ->
+                        mediaRoles[index]?.let { mediaRole ->
+                            when(mediaRole) {
+                                is CharacterMediaRole -> {
+                                    CharacterMediaRoleItem(
+                                        mediaRole = mediaRole,
+                                        titleType = preferredTitleType,
+                                        onMediaClick = { id, mediaType ->
+                                            when (mediaType) {
+                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
+                                            }
+                                        }
+                                    )
+                                }
+                                is StaffMediaRole -> {
+                                    StaffMediaRoleItem(
+                                        mediaRole = mediaRole,
+                                        titleType = preferredTitleType,
+                                        onMediaClick = { id, mediaType ->
+                                            when (mediaType) {
+                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
+                                            }
+                                        }
+                                    )
+                                }
+                                is VoiceActorMediaRole -> {
+                                    VoiceActorMediaRoleItem(
+                                        vaRole = mediaRole,
+                                        titleType = preferredTitleType,
+                                        onCharacterClick = { id ->
+                                            navOptions.navigateToCharacterDetails(id)
+                                        },
+                                        onMediaClick = { id, mediaType ->
+                                            when (mediaType) {
+                                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
+                                            }
+                                        }
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    mediaRoles.apply {
+                        if (loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) { CircularProgressIndicator() }
+                            }
+                        }
+                        if (loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(maxLineSpan) }) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    showFace = false,
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { mediaRoles.retry() }
+                                )
+                            }
                         }
                     }
                 }
@@ -239,6 +253,7 @@ private fun StaffMediaRoleItem(
             coverWidth = 96.dp,
             cornerShape = cornerShape
         )
+
         Column(
             modifier = Modifier.padding(vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
@@ -247,6 +262,7 @@ private fun StaffMediaRoleItem(
                 text = mediaRole.shortMedia.title.preferred(titleType),
                 style = MaterialTheme.typography.labelMedium
             )
+
             Column(
                 verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
             ) {
@@ -262,6 +278,50 @@ private fun StaffMediaRoleItem(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun MediaRoleItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    imageType: ImageType = ImageType.Poster(),
+    maxValue: Int = 3
+) {
+    val indexValue = itemIndex % maxValue + 1
+
+    Row(
+        modifier = modifier.shimmerEffect(overContent = true),
+        horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(imageType.width)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Column(
+            modifier = Modifier.padding(vertical = 2.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(96.dp + indexValue * 16.dp - itemIndex * 4.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(80.dp + indexValue * 12.dp - maxValue * 6.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
         }
     }
 }
@@ -340,6 +400,70 @@ private fun VoiceActorMediaRoleItem(
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.width(imageWidth - 6.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun VoiceActorMediaRoleItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    maxValue: Int = 3,
+    imageType: ImageType = ImageType.Poster()
+) {
+    val indexValue = itemIndex % maxValue + 1
+
+    Row(
+        modifier = modifier.shimmerEffect(overContent = true),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(imageType.width)
+                    .aspectRatio(imageType.aspectRatio)
+                    .clip(imageType.shape)
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(imageType.width - 6.dp)
+                    .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+        }
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        ) {
+            repeat((maxValue - indexValue).coerceAtLeast(1)) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .width(imageType.width)
+                            .aspectRatio(imageType.aspectRatio)
+                            .clip(imageType.shape)
+                            .background(MaterialTheme.colorScheme.onSurface)
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .width(imageType.width - 6.dp)
+                            .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }

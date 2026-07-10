@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.character
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,8 +9,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -38,6 +41,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -49,7 +53,9 @@ import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.image.BaseImage
+import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.CharacterRoleMapper.displayValue
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.character.media.MediaCharactersViewModel
@@ -106,12 +112,6 @@ fun MediaCharactersScreen(
         }
     ) { paddingValues ->
         when (mediaCharacterItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) { CircularProgressIndicator() }
-            }
             is LoadState.Error -> {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -139,60 +139,84 @@ fun MediaCharactersScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
                 ) {
-                    items(
-                        count = mediaCharacterItems.itemCount,
-                        key = mediaCharacterItems.itemKey { it.mediaCharacter.id }
-                    ) { index ->
-                        val mediaCharacterShort = mediaCharacterItems[index] ?: return@items
+                    if (mediaCharacterItems.loadState.refresh is LoadState.Loading) {
+                        items(18) { index ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .shimmerEffect(overContent = true),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                MediaCharacterItemPlaceholder(
+                                    itemIndex = index,
+                                    leftToRight = true,
+                                    modifier = Modifier.weight(1f)
+                                )
 
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            MediaCharacterItem(
-                                mediaPerson = mediaCharacterShort.mediaCharacter,
-                                role = stringResource(id = mediaCharacterShort.role.displayValue()),
-                                titleType = titleType,
-                                leftToRight = true,
-                                onItemClick = { characterId ->
-                                    navOptions.navigateToCharacterDetails(characterId)
-                                },
-                                modifier = Modifier.weight(1f)
-                            )
-                            mediaCharacterShort.mediaPerson?.let { va ->
-                                MediaCharacterItem(
-                                    mediaPerson = va,
-                                    titleType = titleType,
+                                MediaCharacterItemPlaceholder(
+                                    itemIndex = index,
                                     leftToRight = false,
-                                    onItemClick = { personId ->
-                                        navOptions.navigateToStaff(personId)
-                                    },
                                     modifier = Modifier.weight(1f)
                                 )
                             }
                         }
-                    }
+                    } else {
+                        items(
+                            count = mediaCharacterItems.itemCount,
+                            key = mediaCharacterItems.itemKey { it.mediaCharacter.id }
+                        ) { index ->
+                            val mediaCharacterShort = mediaCharacterItems[index] ?: return@items
 
-                    mediaCharacterItems.apply {
-                        if(loadState.append is LoadState.Loading) {
-                            item(
-                                span = { GridItemSpan(maxLineSpan) }
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
-                            }
-                        } else if(loadState.append is LoadState.Error) {
-                            item(
-                                span = { GridItemSpan(maxLineSpan) }
-                            ) {
-                                ErrorItem(
-                                    message = stringResource(R.string.common_error),
-                                    showFace = false,
-                                    buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { mediaCharacterItems.retry() }
+                                MediaCharacterItem(
+                                    mediaPerson = mediaCharacterShort.mediaCharacter,
+                                    role = stringResource(id = mediaCharacterShort.role.displayValue()),
+                                    titleType = titleType,
+                                    leftToRight = true,
+                                    onItemClick = { characterId ->
+                                        navOptions.navigateToCharacterDetails(characterId)
+                                    },
+                                    modifier = Modifier.weight(1f)
                                 )
+
+                                mediaCharacterShort.mediaPerson?.let { va ->
+                                    MediaCharacterItem(
+                                        mediaPerson = va,
+                                        titleType = titleType,
+                                        leftToRight = false,
+                                        onItemClick = { personId ->
+                                            navOptions.navigateToStaff(personId)
+                                        },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                }
+                            }
+                        }
+
+                        mediaCharacterItems.apply {
+                            if(loadState.append is LoadState.Loading) {
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) }
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) { CircularProgressIndicator() }
+                                }
+                            } else if(loadState.append is LoadState.Error) {
+                                item(
+                                    span = { GridItemSpan(maxLineSpan) }
+                                ) {
+                                    ErrorItem(
+                                        message = stringResource(R.string.common_error),
+                                        showFace = false,
+                                        buttonLabel = stringResource(R.string.common_retry),
+                                        onButtonClick = { mediaCharacterItems.retry() }
+                                    )
+                                }
                             }
                         }
                     }
@@ -223,6 +247,7 @@ private fun MediaCharacterItem(
                 modifier = Modifier.width(96.dp)
             )
         }
+
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
@@ -234,6 +259,7 @@ private fun MediaCharacterItem(
                     textAlign = if(leftToRight) TextAlign.Start else TextAlign.End
                 )
             )
+
             role?.let {
                 Text(
                     text = role,
@@ -247,10 +273,76 @@ private fun MediaCharacterItem(
                 )
             }
         }
+
         if(!leftToRight) {
             BaseImage(
                 model = mediaPerson.imageUrl,
                 modifier = Modifier.width(96.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun MediaCharacterItemPlaceholder(
+    itemIndex: Int,
+    leftToRight: Boolean,
+    modifier: Modifier = Modifier,
+    imageType: ImageType = ImageType.Poster()
+) {
+    val indexValue = itemIndex % 3 + 1
+
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if(leftToRight) {
+            Box(
+                modifier = Modifier
+                    .width(imageType.width)
+                    .aspectRatio(imageType.aspectRatio)
+                    .clip(imageType.shape)
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+        }
+
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            horizontalAlignment = if(leftToRight) Alignment.Start else Alignment.End
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                repeat(2) { index ->
+                    Box(
+                        modifier = Modifier
+                            .width(36.dp + indexValue * 6.dp - index * 12.dp)
+                            .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                            .clip(RoundedCornerShape(percent = 32))
+                            .background(MaterialTheme.colorScheme.onSurface)
+                    )
+                }
+            }
+
+            if (leftToRight) {
+                Box(
+                    modifier = Modifier
+                        .width(32.dp + indexValue * 8.dp)
+                        .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+        }
+
+        if(!leftToRight) {
+            Box(
+                modifier = Modifier
+                    .width(imageType.width)
+                    .aspectRatio(imageType.aspectRatio)
+                    .clip(imageType.shape)
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

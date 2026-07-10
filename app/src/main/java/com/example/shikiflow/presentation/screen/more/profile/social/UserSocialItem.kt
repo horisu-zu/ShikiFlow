@@ -54,10 +54,10 @@ fun UserSocialItem(
 
 @Composable
 fun UserSocialItemPlaceholder(
-    index: Int,
+    itemIndex: Int,
     modifier: Modifier = Modifier
 ) {
-    val indexValue = index % 3 + 1
+    val indexValue = itemIndex % 3 + 1
     val imageType = ImageType.Square(
         width = 48.dp,
         shape = RoundedCornerShape(18)

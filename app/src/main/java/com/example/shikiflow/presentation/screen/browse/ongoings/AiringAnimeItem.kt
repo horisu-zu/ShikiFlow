@@ -6,11 +6,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.compose.ui.zIndex
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.anime.AiringAnime
@@ -41,6 +44,7 @@ import com.example.shikiflow.presentation.common.PulseIndicator
 import com.example.shikiflow.presentation.common.VerticalGradientDivider
 import com.example.shikiflow.presentation.common.mappers.ColorMapper.lerp
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.color
 import com.example.shikiflow.presentation.screen.browse.ongoings.AiringStatus.Companion.status
 import com.materialkolor.ktx.harmonize
@@ -217,6 +221,109 @@ private fun AiringStatusIcon(
                     .background(backgroundColor, CircleShape)
                     .padding(all = 8.dp)
                     .background(itemColor, CircleShape)
+            )
+        }
+    }
+}
+
+@Composable
+fun AiringAnimeItemPlaceholder(
+    itemIndex: Int,
+    prevStatus: Boolean,
+    nextStatus: Boolean,
+    modifier: Modifier = Modifier
+) {
+    val coverWidth = 96.dp
+    val clip = 12.dp
+    val dividerWidth = 4.dp
+    val indexValue = itemIndex % 4 + 1
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(coverWidth * 3f / 2f)
+            .shimmerEffect(overContent = true),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            val background = MaterialTheme.colorScheme.background
+
+            VerticalGradientDivider(
+                thickness = dividerWidth,
+                colors = when (prevStatus) {
+                    true -> listOf(background, background)
+                    else -> null
+                },
+                fadeEdge = FadeEdge.TOP,
+                modifier = Modifier
+                    .weight(1f)
+                    .zIndex(-1f)
+            )
+
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(background, CircleShape)
+            )
+
+            VerticalGradientDivider(
+                thickness = dividerWidth,
+                colors = when (nextStatus) {
+                    true -> listOf(background, background)
+                    else -> null
+                },
+                fadeEdge = FadeEdge.BOTTOM,
+                modifier = Modifier
+                    .weight(3f)
+                    .zIndex(-1f)
+            )
+        }
+
+        Row(
+            modifier = Modifier.weight(1f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .width(96.dp)
+                        .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .width(80.dp + indexValue * 24.dp - itemIndex * 4.dp)
+                        .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+
+                Box(
+                    modifier = Modifier
+                        .padding(top = 2.dp)
+                        .width(120.dp)
+                        .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .width(coverWidth)
+                    .aspectRatio(2f / 2.85f)
+                    .clip(RoundedCornerShape(clip))
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

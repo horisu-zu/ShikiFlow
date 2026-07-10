@@ -390,7 +390,7 @@ private fun SearchBarContent(
                     }
                 }
 
-                if(searchParams.searchType == SearchType.MEDIA && authType != null) {
+                if (searchParams.searchType == SearchType.MEDIA && authType != null) {
                     item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                         BrowseSearchFilters(
                             horizontalPadding = horizontalPadding,
@@ -402,7 +402,7 @@ private fun SearchBarContent(
                     }
                 }
 
-                if(browseItems.loadState.refresh is LoadState.Error) {
+                if (browseItems.loadState.refresh is LoadState.Error) {
                     item(span = { GridItemSpan(maxCurrentLineSpan) }) {
                         Box(
                             modifier = Modifier
@@ -417,10 +417,10 @@ private fun SearchBarContent(
                             )
                         }
                     }
-                } else if(browseItems.loadState.refresh is LoadState.NotLoading) {
+                } else if (browseItems.loadState.refresh is LoadState.NotLoading) {
                     items(browseItems.itemCount) { index ->
                         browseItems[index]?.let { browseItem ->
-                            when(browseItem) {
+                            when (browseItem) {
                                 is BrowseMedia -> {
                                     BrowseGridItem(
                                         browseItem = browseItem,

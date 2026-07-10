@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -42,7 +43,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
@@ -86,6 +86,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.ToggleFavoriteButton
 import com.example.shikiflow.presentation.common.SnapFlingLazyRow
+import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.screen.main.details.character.CharacterMediaSection
@@ -145,7 +146,8 @@ fun StaffScreen(
                     },
                     navigationIcon = {
                         IconButton(
-                            onClick = { navOptions.navigateBack() }
+                            onClick = { navOptions.navigateBack() },
+                            shape = RoundedCornerShape(percent = 24)
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
@@ -173,11 +175,23 @@ fun StaffScreen(
             }
         }
     ) { paddingValues ->
+        val gridCells = GridCells.Adaptive(300.dp)
+        val horizontalPadding = 12.dp
+        val contentPaddingValues = PaddingValues(
+            start = horizontalPadding,
+            end = horizontalPadding,
+            top = 8.dp,
+            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        )
+
         if(staffUiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
+            StaffScreenContentPlaceholder(
+                columns = gridCells,
+                paddingValues = contentPaddingValues,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(top = paddingValues.calculateTopPadding())
+            )
         } else if(staffUiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -191,20 +205,13 @@ fun StaffScreen(
             }
         } else {
             staffUiState.staffDetails?.let { details ->
-                val horizontalPadding = 12.dp
-
                 LazyVerticalGrid(
                     state = lazyGridState,
-                    columns = GridCells.Adaptive(300.dp),
+                    columns = gridCells,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = paddingValues.calculateTopPadding()),
-                    contentPadding = PaddingValues(
-                        start = horizontalPadding,
-                        end = horizontalPadding,
-                        top = 8.dp,
-                        bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-                    ),
+                    contentPadding = contentPaddingValues,
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
                 ) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
@@ -215,9 +222,11 @@ fun StaffScreen(
                             staffRoles = details.shortRoles
                         )
                     }
+
                     details.attributes?.let { attributes ->
                         StaffAttributes(attributes)
                     }
+
                     if(!details.description.isHTMLStringBlank()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             ExpandableText(
@@ -230,6 +239,7 @@ fun StaffScreen(
                             )
                         }
                     }
+
                     if(details.staffCharacterRoles.entries.isNotEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             VoiceActorRolesSection(
@@ -257,6 +267,7 @@ fun StaffScreen(
                             )
                         }
                     }
+
                     if(details.staffAnimeRoles.entries.isNotEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
@@ -284,6 +295,7 @@ fun StaffScreen(
                             )
                         }
                     }
+
                     if(details.staffMangaRoles.entries.isNotEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
@@ -311,6 +323,7 @@ fun StaffScreen(
                             )
                         }
                     }
+
                     details.topicId?.let { topicId ->
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CommentSection(
@@ -497,12 +510,15 @@ private fun VoiceActorRolesSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
+            TextWithDivider(
                 text = stringResource(R.string.staff_va_roles_label),
                 style = MaterialTheme.typography.titleMedium
             )
+
             IconButton(
-                onClick = { onPaginatedNavigate() }
+                onClick = { onPaginatedNavigate() },
+                shape = RoundedCornerShape(percent = 24),
+                modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -510,6 +526,7 @@ private fun VoiceActorRolesSection(
                 )
             }
         }
+
         SnapFlingLazyRow(
             modifier = Modifier
                 .ignoreHorizontalParentPadding(horizontalPadding)
@@ -528,6 +545,7 @@ private fun VoiceActorRolesSection(
                     imageType = imageType
                 )
             }
+
             if(characterRoles.hasNextPage) {
                 item {
                     PaginatedListNavigateIcon(

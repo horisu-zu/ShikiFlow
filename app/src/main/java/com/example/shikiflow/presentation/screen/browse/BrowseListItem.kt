@@ -145,7 +145,9 @@ fun BrowseListItemPlaceholder(
     val indexValue = itemIndex % maxValue + 1
 
     Row(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.Top
     ) {
@@ -154,7 +156,7 @@ fun BrowseListItemPlaceholder(
                 .width(96.dp)
                 .aspectRatio(2f / 2.85f)
                 .clip(RoundedCornerShape(12.dp))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Column(
@@ -166,7 +168,7 @@ fun BrowseListItemPlaceholder(
                     .width(80.dp * (maxValue - indexValue + 1))
                     .height(MaterialTheme.typography.labelLarge.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Row(
@@ -179,7 +181,7 @@ fun BrowseListItemPlaceholder(
                             .width(64.dp)
                             .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
 
                     if(index != indexValue - 1) {

@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -122,12 +121,24 @@ fun CharacterDetailsScreen(
             }
         },
         modifier = Modifier.fillMaxSize()
-    ) { innerPadding ->
+    ) { paddingValues ->
+        val horizontalPadding = 12.dp
+        val columns = GridCells.Adaptive(180.dp)
+        val contentPaddingValues = PaddingValues(
+            start = horizontalPadding,
+            end = horizontalPadding,
+            top = 8.dp,
+            bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+        )
+
         if(uiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize().padding(innerPadding),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
+            CharacterDetailsContentPlaceholder(
+                paddingValues = contentPaddingValues,
+                columns = columns,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            )
         } else if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
@@ -142,21 +153,19 @@ fun CharacterDetailsScreen(
             }
         } else {
             uiState.details?.let { characterDetails ->
-                val horizontalPadding = 12.dp
-
                 LazyVerticalGrid(
                     state = lazyGridState,
-                    columns = GridCells.Adaptive(180.dp),
+                    columns = columns,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = innerPadding.calculateTopPadding()),
+                        .padding(top = paddingValues.calculateTopPadding()),
                     contentPadding = PaddingValues(
                         start = horizontalPadding,
                         end = horizontalPadding,
                         top = 8.dp,
                         bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
                     ),
-                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                 ) {
                     item(span = { GridItemSpan(maxLineSpan) }) {
                         CharacterTitleSection(
@@ -165,9 +174,11 @@ fun CharacterDetailsScreen(
                             nativeName = characterDetails.fullName.native
                         )
                     }
+
                     characterDetails.attributes?.let { attributes ->
                         StaffAttributes(attributes)
                     }
+
                     if(!characterDetails.description.isHTMLStringBlank()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             RichTextRenderer(
@@ -179,6 +190,7 @@ fun CharacterDetailsScreen(
                             )
                         }
                     }
+
                     if(!characterDetails.voiceActors.isEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             Column(
@@ -209,6 +221,7 @@ fun CharacterDetailsScreen(
                             }
                         }
                     }
+
                     if(characterDetails.animeRoles.entries.isNotEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
@@ -233,6 +246,7 @@ fun CharacterDetailsScreen(
                             )
                         }
                     }
+
                     if(characterDetails.mangaRoles.entries.isNotEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CharacterMediaSection(
@@ -257,6 +271,7 @@ fun CharacterDetailsScreen(
                             )
                         }
                     }
+
                     characterDetails.topicId?.let { topicId ->
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CommentSection(

@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.common
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -60,14 +61,17 @@ fun StaffSection(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             TextWithDivider(
                 text = stringResource(R.string.staff_title)
             )
+
             IconButton(
                 onClick = { onMediaStaffClick() },
-                modifier = Modifier.size(24.dp),
+                modifier = Modifier.size(32.dp),
+                shape = RoundedCornerShape(percent = 24)
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -79,7 +83,8 @@ fun StaffSection(
         SnapFlingLazyRow(
             modifier = Modifier
                 .ignoreHorizontalParentPadding(horizontalPadding)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .animateContentSize(),
             contentPadding = PaddingValues(horizontal = horizontalPadding),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
