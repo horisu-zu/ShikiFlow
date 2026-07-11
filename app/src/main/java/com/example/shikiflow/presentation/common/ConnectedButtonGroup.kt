@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import com.example.shikiflow.utils.toIcon
 
@@ -33,6 +34,7 @@ fun <T> ConnectedButtonGroup(
     onItemSelection: (Int) -> Unit,
     modifier: Modifier = Modifier,
     showText: Boolean = false,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     iconSize: Dp = IconButtonDefaults.smallIconSize,
     contentPadding: PaddingValues = ButtonDefaults.ExtraSmallContentPadding
 ) {
@@ -70,7 +72,7 @@ fun <T> ConnectedButtonGroup(
 
                     Text(
                         text = stringResource(id = item.titleRes),
-                        style = MaterialTheme.typography.bodyMedium,
+                        style = textStyle,
                         maxLines = 1
                     )
                 }

@@ -261,7 +261,8 @@ fun ThreadItemPlaceholder(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
         Row(
@@ -286,7 +287,7 @@ fun ThreadItemPlaceholder(
                             .width(itemWidth)
                             .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
@@ -304,7 +305,7 @@ fun ThreadItemPlaceholder(
                             .width(32.dp + index * 8.dp)
                             .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
@@ -323,7 +324,7 @@ fun ThreadItemPlaceholder(
                 modifier = Modifier
                     .size(avatarImageType.width)
                     .clip(avatarImageType.shape)
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
@@ -331,7 +332,7 @@ fun ThreadItemPlaceholder(
                     .width(96.dp + itemIndex * 12.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

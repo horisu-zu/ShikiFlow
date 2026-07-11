@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.profile.social
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -40,6 +41,7 @@ fun UserSocialItem(
                 shape = RoundedCornerShape(18)
             )
         )
+
         Text(
             text = user.nickname,
             style = MaterialTheme.typography.bodySmall.copy(
@@ -64,7 +66,7 @@ fun UserSocialItemPlaceholder(
     )
 
     Row(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -72,7 +74,7 @@ fun UserSocialItemPlaceholder(
             modifier = Modifier
                 .size(imageType.width)
                 .clip(imageType.shape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -80,7 +82,7 @@ fun UserSocialItemPlaceholder(
                 .width(36.dp + indexValue * 12.dp)
                 .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

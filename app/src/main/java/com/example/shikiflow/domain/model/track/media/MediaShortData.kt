@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.model.track.media
 
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.MediaFormat
@@ -27,5 +28,6 @@ data class MediaShortData(
     val releasedOn: Date?,
     val poster: Poster?,
     val genres: List<Genre>,
+    val tags: List<MediaTagEnum>,
     val studios: List<String>?
 )

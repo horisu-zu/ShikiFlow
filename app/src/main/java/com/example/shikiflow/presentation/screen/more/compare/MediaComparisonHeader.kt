@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.compare
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -106,6 +107,7 @@ fun MediaComparisonHeader(
                 )
             }
         }
+
         HorizontalDivider()
     }
 }
@@ -117,7 +119,8 @@ fun MediaComparisonHeaderPlaceholder(
     Row(
         modifier = modifier
             .height(IntrinsicSize.Min)
-            .padding(horizontal = 12.dp, vertical = 12.dp),
+            .padding(horizontal = 12.dp, vertical = 12.dp)
+            .shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -129,7 +132,7 @@ fun MediaComparisonHeaderPlaceholder(
                     .width(128.dp)
                     .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -148,7 +151,7 @@ fun MediaComparisonHeaderPlaceholder(
                     .width(48.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -167,7 +170,7 @@ fun MediaComparisonHeaderPlaceholder(
                     .width(48.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

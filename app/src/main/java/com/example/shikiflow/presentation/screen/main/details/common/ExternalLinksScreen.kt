@@ -159,7 +159,8 @@ private fun LinkItemPlaceholder(
             .height(IntrinsicSize.Min)
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -174,7 +175,7 @@ private fun LinkItemPlaceholder(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(RoundedCornerShape(percent = 16))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -183,7 +184,7 @@ private fun LinkItemPlaceholder(
                 .width(144.dp - itemIndex * 16.dp)
                 .height(MaterialTheme.typography.bodyLarge.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

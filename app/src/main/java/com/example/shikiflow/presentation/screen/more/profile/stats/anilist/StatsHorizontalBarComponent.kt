@@ -1,12 +1,12 @@
 package com.example.shikiflow.presentation.screen.more.profile.stats.anilist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -61,7 +61,7 @@ fun StatsHorizontalBarComponentPlaceholder(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TextWithDividerPlaceholder()
@@ -98,7 +98,7 @@ fun StatsHorizontalBarPlaceholder(
                             .fillMaxWidth()
                             .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp + 12.dp)
                             .clip(RoundedCornerShape(8.dp))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
 
                     Box(
@@ -106,7 +106,7 @@ fun StatsHorizontalBarPlaceholder(
                             .fillMaxWidth(0.6f)
                             .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
@@ -118,7 +118,7 @@ fun StatsHorizontalBarPlaceholder(
                 .fillMaxWidth()
                 .height(barType.barHeight)
                 .clip(barType.barShape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

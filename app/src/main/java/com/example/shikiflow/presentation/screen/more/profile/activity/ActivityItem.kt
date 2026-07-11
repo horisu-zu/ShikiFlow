@@ -147,7 +147,7 @@ fun ListActivityItemPlaceholder(
     val indexValue = itemIndex % maxValue + 1
 
     Row(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
     ) {
         Box(
@@ -155,7 +155,7 @@ fun ListActivityItemPlaceholder(
                 .width(imageType.width)
                 .aspectRatio(imageType.aspectRatio)
                 .clip(imageType.shape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Column(
@@ -167,7 +167,7 @@ fun ListActivityItemPlaceholder(
                     .width(120.dp)
                     .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
@@ -175,7 +175,7 @@ fun ListActivityItemPlaceholder(
                     .width(80.dp * (maxValue - indexValue + 1))
                     .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
@@ -184,7 +184,7 @@ fun ListActivityItemPlaceholder(
                     .width(120.dp * indexValue)
                     .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }
@@ -219,6 +219,7 @@ fun TextActivityItem(
                     shape = RoundedCornerShape(8.dp)
                 )
             )
+
             Text(
                 text = textActivity.user.nickname,
                 style = MaterialTheme.typography.labelMedium.copy(
@@ -231,6 +232,7 @@ fun TextActivityItem(
                     .weight(1f, fill = false)
                     .padding(start = 8.dp)
             )
+
             Text(
                 text = " · ${convertInstantToString(LocalResources.current, textActivity.createdAt)}",
                 style = MaterialTheme.typography.labelMedium.copy(
@@ -281,6 +283,7 @@ fun MessageActivityItem(
                         shape = RoundedCornerShape(8.dp)
                     )
                 )
+
                 Text(
                     text = messageActivity.messenger.nickname,
                     style = MaterialTheme.typography.labelMedium.copy(
@@ -293,6 +296,7 @@ fun MessageActivityItem(
                         .weight(1f, fill = false)
                         .padding(start = 8.dp)
                 )
+
                 Text(
                     text = " · ${convertInstantToString(LocalResources.current, messageActivity.createdAt)}",
                     style = MaterialTheme.typography.labelMedium.copy(

@@ -9,14 +9,22 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
@@ -24,28 +32,30 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
+import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.TracksFilterType
 import com.example.shikiflow.presentation.screen.main.TracksFilterType.Companion.tabRowItem
+import com.example.shikiflow.utils.IconResource
 
 data class SortConfig<T : SortType>(
     val options: List<T>,
@@ -80,22 +90,19 @@ fun <T : SortType> SortBottomSheet(
 @Composable
 fun TracksSortBottomSheet(
     authType: AuthType,
-    currentFilterType: TracksFilterType,
+    filterType: TracksFilterType,
     config: SortConfig<UserRateType>,
-    selectedGenres: List<Genre> = emptyList(),
+    selectedGenres: List<Genre>,
+    selectedTags: List<MediaTagEnum>,
     onFilterTypeChange: (TracksFilterType) -> Unit,
     onGenreChange: (Genre) -> Unit,
+    onTagChange: (MediaTagEnum) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var filterType by remember { mutableStateOf(currentFilterType) }
     val sheetState = rememberBottomSheetState(
         initialValue = SheetValue.Hidden,
         enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
     )
-
-    LaunchedEffect(filterType) {
-        onFilterTypeChange(filterType)
-    }
 
     ModalBottomSheet(
         sheetState = sheetState,
@@ -114,9 +121,11 @@ fun TracksSortBottomSheet(
                 },
                 selectedIndex = filterType.ordinal,
                 onItemSelection = { index ->
-                    filterType = TracksFilterType.entries[index]
+                    onFilterTypeChange(TracksFilterType.entries[index])
                 },
-                showText = true
+                showText = true,
+                textStyle = MaterialTheme.typography.bodySmall,
+                iconSize = IconButtonDefaults.extraSmallIconSize
             )
 
             AnimatedContent(
@@ -132,6 +141,13 @@ fun TracksSortBottomSheet(
                             authType = authType,
                             selectedGenres = selectedGenres,
                             onGenreClick = onGenreChange
+                        )
+                    }
+                    TracksFilterType.TAGS -> {
+                        TagsComponent(
+                            authType = authType,
+                            selectedTags = selectedTags,
+                            onTagClick = onTagChange
                         )
                     }
                 }
@@ -167,6 +183,7 @@ private fun <T : SortType> SortByComponent(
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
+
         config.options.forEach { sortType ->
             SortItem(
                 sortType = sortType,
@@ -192,22 +209,129 @@ private fun GenresComponent(
     onGenreClick: (Genre) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val genres = remember(authType) {
+    val resources = LocalResources.current
+    val textFieldState = rememberTextFieldState()
+
+    val genreEntries = remember(textFieldState.text) {
         Genre.entries
+            .filter { authType in it.supportedBy }
             .filter { genre ->
-                authType in genre.supportedBy
+                resources.getString(genre.displayValue())
+                    .contains(textFieldState.text, ignoreCase = true)
             }
     }
 
-    LazyColumn(
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 160.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
         modifier = modifier
     ) {
-        items(genres) { genre ->
+        stickyHeader {
+            BasicTextField(
+                state = textFieldState,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                decorator = { innerTextField ->
+                    Box {
+                        if(textFieldState.text.isEmpty()) {
+                            TextWithIcon(
+                                text = stringResource(R.string.browse_search_tag_search_label),
+                                iconResources = listOf(
+                                    IconResource.Vector(imageVector = Icons.Default.Search)
+                                ),
+                                placeIconAtTheBeginning = true,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        innerTextField()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(percent = 16))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
+        }
+
+        items(genreEntries) { genre ->
             CheckboxItem(
                 label = stringResource(genre.displayValue()),
                 isSelected = selectedGenres.contains(genre),
                 onToggle = { onGenreClick(genre) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun TagsComponent(
+    authType: AuthType,
+    selectedTags: List<MediaTagEnum>,
+    onTagClick: (MediaTagEnum) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val resources = LocalResources.current
+    val textFieldState = rememberTextFieldState()
+
+    val tagEntries = remember(textFieldState.text) {
+        MediaTagEnum.entries
+            .filter { authType in it.supportedBy }
+            .filter { genre ->
+                resources.getString(genre.displayValue())
+                    .contains(textFieldState.text, ignoreCase = true)
+            }
+    }
+
+    LazyVerticalGrid(
+        columns = GridCells.Adaptive(minSize = 160.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+        modifier = modifier
+    ) {
+        stickyHeader {
+            BasicTextField(
+                state = textFieldState,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                lineLimits = TextFieldLineLimits.SingleLine,
+                decorator = { innerTextField ->
+                    Box {
+                        if(textFieldState.text.isEmpty()) {
+                            TextWithIcon(
+                                text = stringResource(R.string.browse_search_tag_search_label),
+                                iconResources = listOf(
+                                    IconResource.Vector(imageVector = Icons.Default.Search)
+                                ),
+                                placeIconAtTheBeginning = true,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        innerTextField()
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(percent = 16))
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
+            )
+        }
+
+        items(tagEntries) { tag ->
+            CheckboxItem(
+                label = stringResource(tag.displayValue()),
+                isSelected = selectedTags.contains(tag),
+                onToggle = { onTagClick(tag) },
                 modifier = Modifier.fillMaxWidth()
             )
         }

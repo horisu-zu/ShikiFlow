@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.anime.tracks.search
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -12,6 +13,11 @@ import com.example.shikiflow.presentation.screen.main.TracksFilterType
 
 data class TracksParams(
     val authType: AuthType? = null,
+    val filters: TracksFilters = TracksFilters(),
+    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10
+)
+
+data class TracksFilters(
     val query: String = "",
     val userRateStatus: UserRateStatus? = null,
     val mediaType: MediaType? = null,
@@ -21,5 +27,5 @@ data class TracksParams(
     ),
     val currentFilterType: TracksFilterType = TracksFilterType.SORT,
     val genres: List<Genre> = emptyList(),
-    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10
+    val tags: List<MediaTagEnum> = emptyList(),
 )

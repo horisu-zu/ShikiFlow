@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.local.entity.mediatrack
 
+import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -7,6 +8,7 @@ import com.example.shikiflow.data.local.entity.PosterEntity
 import com.example.shikiflow.data.local.entity.ReleaseDateEntity
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaStatus
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -34,5 +36,7 @@ data class MediaShortEntity(
     @Embedded(prefix = "poster")
     val poster: PosterEntity?,
     val genres: List<Genre>,
+    @ColumnInfo(defaultValue = "[]")
+    val tags: List<MediaTagEnum>,
     val studios: List<String>?
 )

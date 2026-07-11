@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -29,7 +30,8 @@ interface MediaTracksRepository {
         mediaType: MediaType,
         userRateStatus: UserRateStatus?,
         sort: Sort<UserRateType>,
-        genres: List<Genre> = emptyList()
+        genres: List<Genre> = emptyList(),
+        tags: List<MediaTagEnum> = emptyList()
     ): Flow<PagingData<MediaTrack>>
 
     suspend fun getShortUserMediaRates(

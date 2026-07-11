@@ -17,7 +17,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
@@ -33,9 +32,6 @@ class BrowseSearchViewModel @Inject constructor(
     private val userRepository: UserRepository,
     settingsRepository: SettingsRepository
 ): ViewModel(), BrowseSearchEvent {
-
-    private val _query = MutableStateFlow("")
-
     private val _params = MutableStateFlow(BrowseSearchParams())
     val params = _params.asStateFlow()
 
@@ -46,16 +42,7 @@ class BrowseSearchViewModel @Inject constructor(
             initialValue = null
         )
 
-    val browseItems = combine(
-        _params,
-        _query
-    ) { params, query ->
-        params.copy(
-            mediaBrowseOptions = params.mediaBrowseOptions.copy(
-                name = query
-            )
-        )
-    }
+    val browseItems = _params
         .distinctUntilChanged { old, new ->
             old.mediaBrowseOptions == new.mediaBrowseOptions && old.searchType == new.searchType
         }
@@ -113,6 +100,12 @@ class BrowseSearchViewModel @Inject constructor(
     }
 
     override fun onQueryChange(query: String) {
-        _query.update { query }
+        _params.update { params ->
+            params.copy(
+                mediaBrowseOptions = params.mediaBrowseOptions.copy(
+                    name = query
+                )
+            )
+        }
     }
 }

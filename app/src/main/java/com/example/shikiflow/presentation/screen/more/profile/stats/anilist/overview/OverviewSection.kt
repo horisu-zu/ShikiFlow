@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Done
@@ -35,6 +35,7 @@ import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.color
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.ShortStatsOverview
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.ShortStatsOverviewItemPlaceholder
@@ -102,10 +103,11 @@ fun OverviewSection(
                             )
                         }
                     }
+
                     if(!isCurrentUser) {
                         Row(
                             modifier = Modifier
-                                .clip(CircleShape)
+                                .clip(RoundedCornerShape(percent = 32))
                                 .clickable { onCompareClick() }
                                 .padding(start = 8.dp, top = 4.dp, bottom = 4.dp),
                             horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
@@ -265,7 +267,9 @@ fun LazyListScope.OverviewSectionPlaceholder(
     item {
         MediaTypeListPlaceholder(
             isCurrentUser = isCurrentUser,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .shimmerEffect(overContent = true)
         )
     }
 
@@ -274,7 +278,9 @@ fun LazyListScope.OverviewSectionPlaceholder(
             maxItemsInEachRow = 3,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .shimmerEffect(overContent = true)
         ) {
             repeat(6) { index ->
                 ShortStatsOverviewItemPlaceholder(
@@ -287,11 +293,14 @@ fun LazyListScope.OverviewSectionPlaceholder(
 
     items(count = 2) { index ->
         StatsVerticalChartComponentPlaceholder(
-            itemIndex = index
+            itemIndex = index,
+            modifier = Modifier.shimmerEffect(overContent = true)
         )
     }
 
     items(count = 2) {
-        StatsHorizontalBarComponentPlaceholder()
+        StatsHorizontalBarComponentPlaceholder(
+            modifier = Modifier.shimmerEffect(overContent = true)
+        )
     }
 }

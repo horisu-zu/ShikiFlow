@@ -54,6 +54,9 @@ fragment MediaShort on Media {
         }
     }
     genres
+    tags {
+        name
+    }
     coverImage { ...MediaCoverShort }
 }
 
@@ -419,6 +422,11 @@ fragment ALRateEntryShort on MediaList {
         }
         coverImage {
             large
+        }
+        synonyms
+        genres
+        tags {
+            name
         }
     }
 }

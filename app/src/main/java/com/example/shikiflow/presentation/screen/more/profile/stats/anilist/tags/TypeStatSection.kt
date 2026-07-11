@@ -243,7 +243,8 @@ fun TypeStatItemPlaceholder(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Row(
@@ -256,14 +257,14 @@ fun TypeStatItemPlaceholder(
                     .width(72.dp + 24.dp * indexValue)
                     .height(MaterialTheme.typography.titleLarge.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 

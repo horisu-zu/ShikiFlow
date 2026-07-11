@@ -130,7 +130,7 @@
     <string name="browse_search_label_media">Медиа</string>
     <string name="browse_search_label_format">Формат</string>
     <string name="browse_search_label_status">Статус</string>
-    <string name="browse_search_label_sort_by">Сортировать по</string>
+    <string name="browse_search_label_sort_by">Сортировка</string>
     <string name="browse_search_label_age_rating">Рейтинг</string>
     <string name="browse_search_label_genre">Жанры</string>
     <string name="browse_search_label_season_year">Год</string>

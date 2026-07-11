@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -65,16 +67,18 @@ class TracksSearchViewModel @Inject constructor(
     }
 
     val animeTracksItems = _params
-        .filter { params ->
-            params.mediaType != null
+        .map { it.filters }
+        .filter { filters ->
+            filters.mediaType != null
         }
-        .flatMapLatest { params ->
+        .flatMapLatest { filters ->
             mediaTracksRepository.browseMediaTracks(
-                mediaType = params.mediaType!!,
-                title = params.query,
-                userRateStatus = params.userRateStatus,
-                sort = params.sort,
-                genres = params.genres
+                mediaType = filters.mediaType!!,
+                title = filters.query,
+                userRateStatus = filters.userRateStatus,
+                sort = filters.sort,
+                genres = filters.genres,
+                tags = filters.tags
             )
         }.cachedIn(viewModelScope)
 
@@ -133,28 +137,53 @@ class TracksSearchViewModel @Inject constructor(
     }
 
     fun setRateStatus(userRateStatus: UserRateStatus?) {
-        _params.update { state ->
-            state.copy(userRateStatus = userRateStatus)
+        _params.update { params ->
+            params.copy(
+                filters = params.filters.copy(
+                    userRateStatus = userRateStatus
+                )
+            )
         }
     }
 
     fun setMediaType(mediaType: MediaType) {
         _params.update { params ->
-            params.copy(mediaType = mediaType)
+            params.copy(
+                filters = params.filters.copy(
+                    mediaType = mediaType
+                )
+            )
         }
     }
 
     fun setSort(sort: Sort<UserRateType>) {
         _params.update { params ->
-            params.copy(sort = sort)
+            params.copy(
+                filters = params.filters.copy(
+                    sort = sort
+                )
+            )
         }
     }
 
     fun setGenre(genre: Genre) {
         _params.update { params ->
             params.copy(
-                genres = if(params.genres.contains(genre)) params.genres - genre
-                    else params.genres + genre
+                filters = params.filters.copy(
+                    genres = if(params.filters.genres.contains(genre)) params.filters.genres - genre
+                        else params.filters.genres + genre
+                )
+            )
+        }
+    }
+
+    fun setTag(tag: MediaTagEnum) {
+        _params.update { params ->
+            params.copy(
+                filters = params.filters.copy(
+                    tags = if(params.filters.tags.contains(tag)) params.filters.tags - tag
+                        else params.filters.tags + tag
+                )
             )
         }
     }
@@ -162,7 +191,9 @@ class TracksSearchViewModel @Inject constructor(
     fun setFilterType(filterType: TracksFilterType) {
         _params.update { params ->
             params.copy(
-                currentFilterType = filterType
+                filters = params.filters.copy(
+                    currentFilterType = filterType
+                )
             )
         }
     }
@@ -170,7 +201,17 @@ class TracksSearchViewModel @Inject constructor(
     fun onQueryChange(newQuery: String) {
         _params.update { params ->
             params.copy(
-                query = newQuery
+                filters = params.filters.copy(
+                    query = newQuery
+                )
+            )
+        }
+    }
+
+    fun clearFilters() {
+        _params.update { params ->
+            params.copy(
+                filters = TracksFilters()
             )
         }
     }

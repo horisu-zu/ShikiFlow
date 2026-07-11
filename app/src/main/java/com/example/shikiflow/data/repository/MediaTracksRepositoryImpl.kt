@@ -20,6 +20,7 @@ import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.Genre
+import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.UserRateType
@@ -131,7 +132,8 @@ class MediaTracksRepositoryImpl @Inject constructor(
         mediaType: MediaType,
         userRateStatus: UserRateStatus?,
         sort: Sort<UserRateType>,
-        genres: List<Genre>
+        genres: List<Genre>,
+        tags: List<MediaTagEnum>
     ): Flow<PagingData<MediaTrack>> {
         val mediaShortPrefix = "media_short"
         val column = when (sort.type) {
@@ -151,33 +153,44 @@ class MediaTracksRepositoryImpl @Inject constructor(
         val whereTitle  = if (title.isNotBlank()) "AND (name LIKE ? OR synonyms LIKE ?)" else ""
         val whereGenres = if (genres.isNotEmpty()) {
             "AND (" + genres.joinToString(" OR ") {
-                "media_short.genres LIKE ?"
+                "$mediaShortPrefix.genres LIKE ?"
+            } + ")"
+        } else ""
+        val whereTags = if (tags.isNotEmpty()) {
+            "AND (" + tags.joinToString(" OR ") {
+                "$mediaShortPrefix.tags LIKE ?"
             } + ")"
         } else ""
 
         val query = RoomRawQuery(
             sql = """
                 SELECT * FROM media_track
-                INNER JOIN media_short ON media_track.mediaId = media_short.id
-                WHERE media_short.mediaType = ?
+                INNER JOIN $mediaShortPrefix ON media_track.mediaId = $mediaShortPrefix.id
+                WHERE $mediaShortPrefix.mediaType = ?
                 $whereStatus
                 $whereTitle
                 $whereGenres
+                $whereTags
                 ORDER BY $sortOption
             """.trimIndent(),
             onBindStatement = { stmt ->
-                var index = 1
+                var index = 0
 
-                stmt.bindText(index++, mediaType.name)
-                if (userRateStatus != null) stmt.bindText(index++, userRateStatus.name)
+                stmt.bindText(++index, mediaType.name)
+                if (userRateStatus != null) stmt.bindText(++index, userRateStatus.name)
                 if (title.isNotBlank()) {
                     val like = "%$title%"
-                    stmt.bindText(index++, like)
-                    stmt.bindText(index++, like)
+                    stmt.bindText(++index, like)
+                    stmt.bindText(++index, like)
                 }
                 if (genres.isNotEmpty()) {
                     genres.forEach { genre ->
-                        stmt.bindText(index++, "%${genre.name}%")
+                        stmt.bindText(++index, "%${genre.name}%")
+                    }
+                }
+                if (tags.isNotEmpty()) {
+                    tags.forEach { tag ->
+                        stmt.bindText(++index, "%${tag.name}%")
                     }
                 }
             }

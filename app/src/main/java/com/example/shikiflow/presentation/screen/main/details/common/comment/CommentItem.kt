@@ -354,6 +354,7 @@ private fun CommentUserItem(
                     width = 24.dp
                 )
             )
+
             Text(
                 text = userData.nickname,
                 style = MaterialTheme.typography.labelMedium.copy(
@@ -365,6 +366,7 @@ private fun CommentUserItem(
                 modifier = Modifier.weight(1f, fill = false)
             )
         }
+
         Text(
             text = "· ${formatInstant(commentInstant, includeTime = true)}",
             style = MaterialTheme.typography.labelMedium.copy(
@@ -388,12 +390,13 @@ fun CommentItemPlaceholder(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(backgroundColor)
-            .padding(all = 12.dp),
+            .padding(all = 12.dp)
+            .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             val avatarImageType = ImageType.Square(
@@ -405,7 +408,7 @@ fun CommentItemPlaceholder(
                 modifier = Modifier
                     .size(avatarImageType.width)
                     .clip(avatarImageType.shape)
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
@@ -413,7 +416,7 @@ fun CommentItemPlaceholder(
                     .width(72.dp + itemIndex * 16.dp)
                     .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Text(
@@ -426,7 +429,7 @@ fun CommentItemPlaceholder(
                     .width(96.dp)
                     .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -447,7 +450,7 @@ fun CommentItemPlaceholder(
                         .width(itemWidth)
                         .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }

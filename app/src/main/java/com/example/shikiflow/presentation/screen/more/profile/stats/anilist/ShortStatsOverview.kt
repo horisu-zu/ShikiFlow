@@ -25,7 +25,6 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.iconResource
-import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -111,7 +110,7 @@ fun ShortStatsOverviewItemPlaceholder(
                 .fillMaxWidth()
                 .height(44.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -120,7 +119,7 @@ fun ShortStatsOverviewItemPlaceholder(
                 .width(36.dp + indexValue * 12.dp)
                 .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -128,7 +127,7 @@ fun ShortStatsOverviewItemPlaceholder(
                 .width(24.dp + indexValue * 12.dp)
                 .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

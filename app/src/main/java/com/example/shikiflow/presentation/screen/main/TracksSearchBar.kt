@@ -75,7 +75,7 @@ fun TracksSearchBar(
     val clip = 12.dp
     val animatedHorizontalPadding by animateDpAsState(
         targetValue = if (isSearchActive) 8.dp
-        else 0.dp
+            else 0.dp
     )
 
     val itemsBackgroundColor = when(isSearchActive) {

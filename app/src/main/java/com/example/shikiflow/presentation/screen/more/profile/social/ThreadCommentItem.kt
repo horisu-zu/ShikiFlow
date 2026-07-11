@@ -95,7 +95,9 @@ fun ThreadCommentItemPlaceholder(
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .shimmerEffect(overContent = true),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Column(
@@ -108,7 +110,7 @@ fun ThreadCommentItemPlaceholder(
                             .fillMaxWidth(fraction = 0.9f - 0.2f * index)
                             .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
@@ -122,7 +124,7 @@ fun ThreadCommentItemPlaceholder(
                             .width(48.dp)
                             .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }

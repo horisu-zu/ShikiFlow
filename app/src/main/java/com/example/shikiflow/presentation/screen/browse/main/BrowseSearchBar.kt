@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -51,7 +53,6 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.SearchBarValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.animateFloatingActionButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberSearchBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -69,12 +70,12 @@ import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.browse.Browse
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
@@ -92,7 +93,10 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.more.profile.social.UserSocialItem
 import com.example.shikiflow.presentation.viewmodel.browse.search.BrowseSearchViewModel
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
+import com.example.shikiflow.presentation.common.shimmerEffect
+import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.presentation.screen.more.profile.social.UserSocialItemPlaceholder
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
@@ -212,7 +216,7 @@ fun BrowseSearchBar(
             ),
             modifier = Modifier
                 .background(
-                    color = if(!isAtMainTop) {
+                    color = if (!isAtMainTop) {
                         MaterialTheme.colorScheme.surfaceContainer
                     } else MaterialTheme.colorScheme.background
                 )
@@ -293,6 +297,12 @@ private fun SearchBarContent(
         }
     }
 
+    LaunchedEffect(browseItems.loadState) {
+        if(browseItems.loadState.refresh is LoadState.NotLoading) {
+            lazyGridState.animateScrollToItem(0)
+        }
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
@@ -318,167 +328,178 @@ private fun SearchBarContent(
         contentWindowInsets = WindowInsets(0),
         modifier = modifier
     ) { paddingValues ->
-        PullToRefreshBox(
-            isRefreshing = browseItems.loadState.refresh is LoadState.Loading,
-            enabled = false,
-            onRefresh = { browseItems.refresh() },
+        LazyVerticalGrid(
+            state = lazyGridState,
+            columns = when (searchParams.searchType) {
+                SearchType.USER -> GridCells.Adaptive(180.dp)
+                else -> GridCells.Adaptive(108.dp)
+            },
+            contentPadding = PaddingValues(
+                start = horizontalPadding,
+                end = horizontalPadding,
+                bottom = WindowInsets.navigationBars
+                    .asPaddingValues()
+                    .calculateBottomPadding() + 56.dp
+            ),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = when (searchParams.searchType) {
-                    SearchType.USER -> GridCells.Adaptive(180.dp)
-                    else -> GridCells.Adaptive(108.dp)
-                },
-                contentPadding = PaddingValues(
-                    start = horizontalPadding,
-                    end = horizontalPadding,
-                    bottom = WindowInsets.navigationBars
-                        .asPaddingValues()
-                        .calculateBottomPadding() + 56.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                stickyHeader {
-                    SnapFlingLazyRow(
-                        modifier = Modifier
-                            .ignoreHorizontalParentPadding(horizontalPadding)
-                            .fillMaxWidth()
-                            .clip(
-                                shape = RoundedCornerShape(
-                                    bottomStart = 16.dp,
-                                    bottomEnd = 16.dp
-                                )
+            stickyHeader {
+                SnapFlingLazyRow(
+                    modifier = Modifier
+                        .ignoreHorizontalParentPadding(horizontalPadding)
+                        .fillMaxWidth()
+                        .clip(
+                            shape = RoundedCornerShape(
+                                bottomStart = 16.dp,
+                                bottomEnd = 16.dp
                             )
-                            .background(
-                                color = MaterialTheme.colorScheme.surfaceContainer
-                            )
-                            .padding(vertical = 4.dp),
-                        contentPadding = PaddingValues(horizontal = horizontalPadding),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(SearchType.entries) { searchType ->
-                            val isSelected = searchParams.searchType == searchType
+                        )
+                        .background(
+                            color = MaterialTheme.colorScheme.surfaceContainer
+                        )
+                        .padding(vertical = 4.dp),
+                    contentPadding = PaddingValues(horizontal = horizontalPadding),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(SearchType.entries) { searchType ->
+                        val isSelected = searchParams.searchType == searchType
 
-                            FilterChip(
-                                selected = isSelected,
-                                onClick = {
-                                    searchViewModel.setSearchType(searchType)
-                                },
-                                label = {
-                                    Text(
-                                        text = stringResource(id = searchType.displayValue())
+                        FilterChip(
+                            selected = isSelected,
+                            onClick = {
+                                searchViewModel.setSearchType(searchType)
+                            },
+                            label = {
+                                Text(
+                                    text = stringResource(id = searchType.displayValue())
+                                )
+                            },
+                            leadingIcon = if (isSelected) {
+                                {
+                                    Icon(
+                                        imageVector = Icons.Default.Done,
+                                        contentDescription = null
                                     )
-                                },
-                                leadingIcon = if (isSelected) {
-                                    {
-                                        Icon(
-                                            imageVector = Icons.Default.Done,
-                                            contentDescription = null
-                                        )
-                                    }
-                                } else { null },
-                                colors = FilterChipDefaults.filterChipColors(
-                                    containerColor = MaterialTheme.colorScheme.background
-                                )
+                                }
+                            } else { null },
+                            colors = FilterChipDefaults.filterChipColors(
+                                containerColor = MaterialTheme.colorScheme.background
                             )
-                        }
-                    }
-                }
-
-                if (searchParams.searchType == SearchType.MEDIA && authType != null) {
-                    item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                        BrowseSearchFilters(
-                            horizontalPadding = horizontalPadding,
-                            authType = authType ?: AuthType.ANILIST,
-                            searchOptions = searchParams.mediaBrowseOptions,
-                            showFilters = searchParams.showFilters,
-                            event = searchViewModel
                         )
                     }
                 }
+            }
 
-                if (browseItems.loadState.refresh is LoadState.Error) {
-                    item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(configuration.containerDpSize.height * 0.8f),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            ErrorItem(
-                                message = stringResource(R.string.b_mss_error),
-                                buttonLabel = stringResource(id = R.string.common_retry),
-                                onButtonClick = { browseItems.refresh() }
+            if (searchParams.searchType == SearchType.MEDIA && authType != null) {
+                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                    BrowseSearchFilters(
+                        horizontalPadding = horizontalPadding,
+                        authType = authType!!,
+                        searchOptions = searchParams.mediaBrowseOptions,
+                        showFilters = searchParams.showFilters,
+                        event = searchViewModel
+                    )
+                }
+            }
+
+            if (browseItems.loadState.refresh is LoadState.Error) {
+                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(configuration.containerDpSize.height * 0.8f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        ErrorItem(
+                            message = stringResource(R.string.b_mss_error),
+                            buttonLabel = stringResource(id = R.string.common_retry),
+                            onButtonClick = { browseItems.refresh() }
+                        )
+                    }
+                }
+            } else if (browseItems.loadState.refresh is LoadState.Loading && authType != null) {
+                items(count = 24) { index ->
+                    when (searchParams.searchType) {
+                        SearchType.MEDIA -> {
+                            BrowseGridItemPlaceholder()
+                        }
+                        SearchType.CHARACTER, SearchType.STAFF -> {
+                            MediaPersonItemPlaceholder(
+                                itemIndex = index
+                            )
+                        }
+                        SearchType.USER -> {
+                            UserSocialItemPlaceholder(
+                                itemIndex = index
                             )
                         }
                     }
-                } else if (browseItems.loadState.refresh is LoadState.NotLoading) {
-                    items(browseItems.itemCount) { index ->
-                        browseItems[index]?.let { browseItem ->
-                            when (browseItem) {
-                                is BrowseMedia -> {
-                                    BrowseGridItem(
-                                        browseItem = browseItem,
-                                        titleType = preferredTitleType,
-                                        onItemClick = { _, _ ->
-                                            onNavigate(browseItem)
-                                        }
-                                    )
-                                }
-                                is Browse.Character -> {
-                                    MediaPersonItem(
-                                        mediaPerson = browseItem.data,
-                                        titleType = preferredTitleType,
-                                        onItemClick = { _ ->
-                                            onNavigate(browseItem)
-                                        }
-                                    )
-                                }
-                                is Browse.Staff -> {
-                                    MediaPersonItem(
-                                        mediaPerson = browseItem.data,
-                                        titleType = preferredTitleType,
-                                        onItemClick = { _ ->
-                                            onNavigate(browseItem)
-                                        }
-                                    )
-                                }
-                                is Browse.User -> {
-                                    UserSocialItem(
-                                        user = browseItem.data,
-                                        modifier = Modifier
-                                            .clip(RoundedCornerShape(12.dp))
-                                            .clickable { onNavigate(browseItem) }
-                                            .padding(horizontal = 8.dp, vertical = 6.dp)
-                                    )
-                                }
+                }
+            } else if (browseItems.loadState.refresh is LoadState.NotLoading) {
+                items(browseItems.itemCount) { index ->
+                    browseItems[index]?.let { browseItem ->
+                        when (browseItem) {
+                            is BrowseMedia -> {
+                                BrowseGridItem(
+                                    browseItem = browseItem,
+                                    titleType = preferredTitleType,
+                                    onItemClick = { _, _ ->
+                                        onNavigate(browseItem)
+                                    }
+                                )
+                            }
+                            is Browse.Character -> {
+                                MediaPersonItem(
+                                    mediaPerson = browseItem.data,
+                                    titleType = preferredTitleType,
+                                    onItemClick = { _ ->
+                                        onNavigate(browseItem)
+                                    }
+                                )
+                            }
+                            is Browse.Staff -> {
+                                MediaPersonItem(
+                                    mediaPerson = browseItem.data,
+                                    titleType = preferredTitleType,
+                                    onItemClick = { _ ->
+                                        onNavigate(browseItem)
+                                    }
+                                )
+                            }
+                            is Browse.User -> {
+                                UserSocialItem(
+                                    user = browseItem.data,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .clickable { onNavigate(browseItem) }
+                                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                                )
                             }
                         }
                     }
+                }
 
-                    item(span = { GridItemSpan(maxCurrentLineSpan) }) {
-                        browseItems.apply {
-                            if (loadState.append is LoadState.Loading) {
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.Center
-                                ) { CircularProgressIndicator() }
-                            } else if (loadState.append is LoadState.Error) {
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    ErrorItem(
-                                        message = stringResource(R.string.common_error),
-                                        buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { browseItems.retry() }
-                                    )
-                                }
+                item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+                    browseItems.apply {
+                        if (loadState.append is LoadState.Loading) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) { CircularProgressIndicator() }
+                        } else if (loadState.append is LoadState.Error) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                ErrorItem(
+                                    message = stringResource(R.string.common_error),
+                                    buttonLabel = stringResource(R.string.common_retry),
+                                    onButtonClick = { browseItems.retry() }
+                                )
                             }
                         }
                     }
@@ -498,7 +519,8 @@ private fun MediaPersonItem(
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
-            .clickable { onItemClick(mediaPerson.id) }
+            .clickable { onItemClick(mediaPerson.id) },
+        verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         BaseImage(
             model = mediaPerson.imageUrl,
@@ -510,10 +532,40 @@ private fun MediaPersonItem(
         Text(
             text = mediaPerson.fullName.preferred(titleType),
             style = MaterialTheme.typography.labelMedium,
-            modifier = Modifier.padding(
-                horizontal = 4.dp,
-                vertical = 2.dp
-            )
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+    }
+}
+
+@Composable
+private fun MediaPersonItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier,
+    imageType: ImageType = ImageType.Poster(
+        width = Int.MAX_VALUE.dp
+    )
+) {
+    val indexValue = itemIndex % 3 + 1
+
+    Column(
+        modifier = modifier.shimmerEffect(overContent = true),
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(imageType.width)
+                .aspectRatio(imageType.aspectRatio)
+                .clip(imageType.shape)
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Box(
+            modifier = Modifier
+                .width(56.dp + indexValue * 8.dp)
+                .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .padding(horizontal = 4.dp)
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

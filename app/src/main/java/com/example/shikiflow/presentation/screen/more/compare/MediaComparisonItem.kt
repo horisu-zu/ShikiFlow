@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.compare
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -156,7 +157,8 @@ fun MediaComparisonItemPlaceholder(
     Row(
         modifier = modifier
             .height(IntrinsicSize.Max)
-            .padding(all = 12.dp),
+            .padding(all = 12.dp)
+            .shimmerEffect(overContent = true),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
     ) {
@@ -172,7 +174,7 @@ fun MediaComparisonItemPlaceholder(
                     .width(48.dp)
                     .aspectRatio(imageType.aspectRatio)
                     .clip(imageType.shape)
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
@@ -180,7 +182,7 @@ fun MediaComparisonItemPlaceholder(
                     .width(48.dp * indexValue)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -199,7 +201,7 @@ fun MediaComparisonItemPlaceholder(
                     .width(24.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -218,7 +220,7 @@ fun MediaComparisonItemPlaceholder(
                     .width(24.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

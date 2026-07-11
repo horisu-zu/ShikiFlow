@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.profile.stats.anilist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,7 +85,7 @@ fun StatsVerticalChartComponentPlaceholder(
     chartMode: BarsChartMode.FillWidth = BarsChartMode.FillWidth()
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TextWithDividerPlaceholder()
@@ -124,7 +126,7 @@ fun StatsVerticalChartPlaceholder(
                         .fillMaxWidth(0.6f)
                         .height(18.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 Box(
@@ -133,7 +135,7 @@ fun StatsVerticalChartPlaceholder(
                         .height(ratio * 160.dp)
                         .weight(1f, fill = false)
                         .clip(RoundedCornerShape(8.dp))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 Box(
@@ -141,7 +143,7 @@ fun StatsVerticalChartPlaceholder(
                         .fillMaxWidth(0.4f)
                         .height(18.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }

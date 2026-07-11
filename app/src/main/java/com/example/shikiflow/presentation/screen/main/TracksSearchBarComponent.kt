@@ -229,6 +229,7 @@ fun TracksSearchBarComponent(
                             }
                         }
                     }
+
                     trackItems.apply {
                         when {
                             loadState.append is LoadState.Error -> {
@@ -289,21 +290,25 @@ fun TracksSearchBarComponent(
                 if(showBottomSheet && tracksParams.authType != null) {
                     TracksSortBottomSheet(
                         authType = tracksParams.authType!!,
-                        currentFilterType = tracksParams.currentFilterType,
+                        filterType = tracksParams.filters.currentFilterType,
                         config = SortConfig(
                             options = UserRateType.entries,
-                            selected = tracksParams.sort,
+                            selected = tracksParams.filters.sort,
                             onSortChange = { userRateSort ->
                                 tracksViewModel.setSort(userRateSort)
                             }
                         ),
-                        selectedGenres = tracksParams.genres,
+                        selectedGenres = tracksParams.filters.genres,
+                        selectedTags = tracksParams.filters.tags,
                         onDismiss = { showBottomSheet = false },
                         onFilterTypeChange = { filterType ->
                             tracksViewModel.setFilterType(filterType)
                         },
                         onGenreChange = { genre ->
                             tracksViewModel.setGenre(genre)
+                        },
+                        onTagChange = { tag ->
+                            tracksViewModel.setTag(tag)
                         }
                     )
                 }

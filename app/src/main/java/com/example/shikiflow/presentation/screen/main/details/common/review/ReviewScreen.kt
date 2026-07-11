@@ -461,7 +461,8 @@ private fun ReviewHeaderPlaceholder(
                     else -> 3.2f
                 }
             )
-            .clip(RoundedCornerShape(percent = 8)),
+            .clip(RoundedCornerShape(percent = 8))
+            .shimmerEffect(overContent = true),
         contentAlignment = Alignment.Center
     ) {
         Box(
@@ -469,7 +470,7 @@ private fun ReviewHeaderPlaceholder(
                 .width(288.dp)
                 .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp + 24.dp)
                 .clip(RoundedCornerShape(percent = 24))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -479,7 +480,7 @@ private fun ReviewHeaderPlaceholder(
                 .width(96.dp)
                 .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp * 2 + 8.dp)
                 .clip(RoundedCornerShape(percent = 16))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         ReviewRatingItemPlaceholder(
@@ -495,7 +496,7 @@ private fun ReviewHeaderPlaceholder(
                 .width(64.dp)
                 .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp + 12.dp)
                 .clip(RoundedCornerShape(percent = 16))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
@@ -508,7 +509,7 @@ private fun ReviewBodyPlaceholder(
     val imageType = ImageType.Screenshot()
 
     Column(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top)
     ) {
         HorizontalDivider(modifier = Modifier.fillMaxWidth())
@@ -529,7 +530,7 @@ private fun ReviewBodyPlaceholder(
                         .width(itemWidth)
                         .height(textStyle.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
@@ -540,7 +541,7 @@ private fun ReviewBodyPlaceholder(
                 .padding(horizontal = 48.dp)
                 .aspectRatio(imageType.aspectRatio)
                 .clip(imageType.shape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         FlowRow(
@@ -559,7 +560,7 @@ private fun ReviewBodyPlaceholder(
                         .width(itemWidth)
                         .height(textStyle.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
@@ -571,7 +572,7 @@ private fun ReviewScoreComponentPlaceholder(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -591,7 +592,7 @@ private fun ReviewScoreComponentPlaceholder(
                     .width(64.dp)
                     .height(MaterialTheme.typography.titleLarge.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Column(
@@ -606,7 +607,7 @@ private fun ReviewScoreComponentPlaceholder(
                         .width(32.dp)
                         .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 HorizontalDivider(
@@ -618,7 +619,7 @@ private fun ReviewScoreComponentPlaceholder(
                         .width(32.dp)
                         .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
@@ -635,7 +636,8 @@ private fun ReviewUserScorePlaceholder(
         modifier = modifier
             .clip(RoundedCornerShape(percent = 32))
             .background(MaterialTheme.colorScheme.surfaceContainer.copy(alpha = 0.7f))
-            .padding(all = 12.dp),
+            .padding(all = 12.dp)
+            .shimmerEffect(overContent = true),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -643,7 +645,7 @@ private fun ReviewUserScorePlaceholder(
             modifier = Modifier
                 .size(32.dp)
                 .clip(RoundedCornerShape(percent = 24))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -651,7 +653,7 @@ private fun ReviewUserScorePlaceholder(
                 .width(32.dp)
                 .height(MaterialTheme.typography.titleSmall.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

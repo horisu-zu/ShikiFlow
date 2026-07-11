@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.common
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -64,7 +65,7 @@ fun TextWithDividerPlaceholder(
                 .width(thickness)
                 .fillMaxHeight()
                 .clip(CircleShape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -72,7 +73,7 @@ fun TextWithDividerPlaceholder(
                 .width(textWidth)
                 .height(style.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }

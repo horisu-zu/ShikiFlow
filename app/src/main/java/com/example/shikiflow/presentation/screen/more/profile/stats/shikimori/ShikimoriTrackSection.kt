@@ -129,6 +129,7 @@ private fun ShikimoriTrackSectionContent(
                     )
                 }
             }
+
             if(!isCurrentUser) {
                 Row(
                     modifier = Modifier
@@ -171,7 +172,7 @@ private fun ShikimoriTrackSectionPlaceholder(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier,
+        modifier = modifier.shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
        MediaTypeListPlaceholder(
@@ -207,7 +208,7 @@ fun MediaTypeListPlaceholder(
                         .width(96.dp)
                         .height(36.dp)
                         .clip(RoundedCornerShape(percent = 24))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
@@ -217,8 +218,8 @@ fun MediaTypeListPlaceholder(
                 modifier = Modifier
                     .width(96.dp)
                     .height(36.dp)
-                    .clip(CircleShape)
-                    .shimmerEffect()
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }
@@ -237,15 +238,18 @@ private fun ShikimoriTypeItemPlaceholder(
             modifier = Modifier
                 .size(48.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
-        Column {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
             Box(
                 modifier = Modifier
                     .width(48.dp)
                     .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Box(
@@ -253,6 +257,7 @@ private fun ShikimoriTypeItemPlaceholder(
                     .width(32.dp)
                     .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }
@@ -271,7 +276,7 @@ private fun ShikimoriHorizontalStatsPlaceholder(
                 .fillMaxWidth()
                 .height(12.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         FlowRow(
@@ -291,7 +296,7 @@ private fun ShikimoriHorizontalStatsPlaceholder(
                         modifier = Modifier
                             .size(12.dp)
                             .clip(RoundedCornerShape(percent = 24))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
 
                     Box(
@@ -299,7 +304,7 @@ private fun ShikimoriHorizontalStatsPlaceholder(
                             .width(64.dp + indexValue * 16.dp)
                             .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
-                            .shimmerEffect()
+                            .background(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
@@ -328,7 +333,7 @@ private fun ShikimoriVerticalStatsPlaceholder(
                     .width(48.dp)
                     .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Text(
@@ -341,7 +346,7 @@ private fun ShikimoriVerticalStatsPlaceholder(
                     .width(36.dp)
                     .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Text(

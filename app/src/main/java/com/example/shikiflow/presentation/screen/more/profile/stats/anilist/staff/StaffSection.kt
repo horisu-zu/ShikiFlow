@@ -272,7 +272,8 @@ private fun StaffStatItemPlaceholder(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(all = 12.dp),
+            .padding(all = 12.dp)
+            .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(
@@ -289,7 +290,7 @@ private fun StaffStatItemPlaceholder(
                         .width(64.dp + indexValue * 12.dp)
                         .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 Box(
@@ -297,7 +298,7 @@ private fun StaffStatItemPlaceholder(
                         .width(96.dp - indexValue * 8.dp)
                         .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
 
@@ -305,7 +306,7 @@ private fun StaffStatItemPlaceholder(
                 modifier = Modifier
                     .size(24.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
 
@@ -322,7 +323,7 @@ private fun StaffStatItemPlaceholder(
                     .width(imageType.width)
                     .aspectRatio(imageType.aspectRatio)
                     .clip(imageType.shape)
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
 
             Column(
@@ -338,7 +339,7 @@ private fun StaffStatItemPlaceholder(
                                 .width(24.dp + 12.dp * index)
                                 .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
                                 .clip(RoundedCornerShape(percent = 32))
-                                .shimmerEffect()
+                                .background(MaterialTheme.colorScheme.onSurface)
                         )
 
                         Box(
@@ -346,7 +347,7 @@ private fun StaffStatItemPlaceholder(
                                 .width(48.dp + 16.dp * index)
                                 .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                                 .clip(RoundedCornerShape(percent = 32))
-                                .shimmerEffect()
+                                .background(MaterialTheme.colorScheme.onSurface)
                         )
                     }
                 }

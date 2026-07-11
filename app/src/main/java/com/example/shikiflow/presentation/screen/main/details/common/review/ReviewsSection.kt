@@ -182,7 +182,8 @@ fun ReviewShortItemPlaceholder(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .padding(all = 12.dp),
+            .padding(all = 12.dp)
+            .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         Row(
@@ -199,7 +200,7 @@ fun ReviewShortItemPlaceholder(
                     modifier = Modifier
                         .size(imageType.width)
                         .clip(imageType.shape)
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
 
                 Box(
@@ -207,7 +208,7 @@ fun ReviewShortItemPlaceholder(
                         .width(32.dp + itemIndexValue * 8.dp)
                         .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
 
@@ -232,7 +233,7 @@ fun ReviewShortItemPlaceholder(
                         .width(itemWidth)
                         .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
                         .clip(RoundedCornerShape(percent = 32))
-                        .shimmerEffect()
+                        .background(MaterialTheme.colorScheme.onSurface)
                 )
             }
         }
@@ -268,7 +269,9 @@ private fun ReviewStatsItemPlaceholder(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.height(IntrinsicSize.Min),
+        modifier = modifier
+            .height(IntrinsicSize.Min)
+            .shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.End),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -307,7 +310,6 @@ private fun ReviewScoreItemPlaceholder(
         modifier = modifier
             .size(24.dp)
             .clip(RoundedCornerShape(percent = 24))
-            .shimmerEffect()
     )
 }
 
@@ -364,7 +366,7 @@ fun ReviewRatingItemPlaceholder(
                 .width(48.dp)
                 .height(textStyle.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Icon(

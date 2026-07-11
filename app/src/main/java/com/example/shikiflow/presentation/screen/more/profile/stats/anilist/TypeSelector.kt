@@ -34,7 +34,6 @@ import com.example.shikiflow.presentation.common.SnapFlingLazyRow
 import com.example.shikiflow.presentation.common.mappers.ProfileMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.profile.stats.StatsBarType
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
-import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun TypeSelector(
@@ -116,7 +115,7 @@ fun TypeSelectorPlaceholder(
                     .width(48.dp + index * 12.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp + 8.dp)
                     .clip(RoundedCornerShape(percent = 32))
-                    .shimmerEffect()
+                    .background(MaterialTheme.colorScheme.onSurface)
             )
         }
     }

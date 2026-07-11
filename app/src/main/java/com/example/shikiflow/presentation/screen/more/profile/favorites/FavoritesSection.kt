@@ -243,8 +243,7 @@ private fun FavoriteItem(
     Column(
         modifier = modifier
             .clip(imageType.shape)
-            .clickable { onItemClick(userFavorite.id) },
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+            .clickable { onItemClick(userFavorite.id) }
     ) {
         BaseImage(
             model = userFavorite.imageUrl,
@@ -256,11 +255,7 @@ private fun FavoriteItem(
             style = MaterialTheme.typography.labelSmall,
             overflow = TextOverflow.Ellipsis,
             maxLines = 2,
-            modifier = Modifier.padding(
-                start = 4.dp,
-                end = 4.dp,
-                bottom = 4.dp
-            )
+            modifier = Modifier.padding(all = 4.dp)
         )
     }
 }
@@ -272,15 +267,14 @@ private fun FavoriteItemPlaceholder(
     val imageType = ImageType.Poster(width = Int.MAX_VALUE.dp)
 
     Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+        modifier = modifier.shimmerEffect(overContent = true)
     ) {
         Box(
             modifier = Modifier
                 .width(imageType.width)
                 .aspectRatio(imageType.aspectRatio)
                 .clip(imageType.shape)
-                .shimmerEffect()
+                .background(MaterialTheme.colorScheme.onSurface)
         )
 
         Box(
@@ -288,11 +282,8 @@ private fun FavoriteItemPlaceholder(
                 .fillMaxWidth()
                 .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .padding(
-                    start = 4.dp,
-                    end = 4.dp,
-                    bottom = 4.dp
-                )
+                .padding(all = 4.dp)
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
