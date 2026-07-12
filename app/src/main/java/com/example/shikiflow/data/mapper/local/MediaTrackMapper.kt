@@ -108,10 +108,13 @@ object MediaTrackMapper {
         return ShortUserMediaRate(
             id = media.id,
             title = media.name,
+            synonyms = media.synonyms ?: emptyList(),
             imageUrl = media.poster?.originalUrl ?: "",
             score = track.score,
             status = track.status,
-            progress = track.progress
+            progress = track.progress,
+            genres = media.genres,
+            tags = media.tags
         )
     }
 }

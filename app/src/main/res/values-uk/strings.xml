@@ -399,6 +399,8 @@
     <string name="compare_label">Порівняння оцінок користувачів</string>
     <string name="compare_unique_rates">Унікальні оцінки %1$s\ </string>f
     <string name="compare_shared_rates">Спільні оцінки</string>
+    <string name="compare_title_search_label">Пошук за назвою…</string>
+    <string name="compare_score_range">Діапазон оцінок %1$s</string>
 
     <string name="translation_chapter_label">Розділ %1$s — %2$s</string>
 

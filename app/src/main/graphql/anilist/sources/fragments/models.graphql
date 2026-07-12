@@ -413,7 +413,7 @@ fragment ALPageInfoShort on PageInfo {
 
 fragment ALRateEntryShort on MediaList {
     mediaId
-    ...Score
+    score(format: POINT_100)
     status
     progress
     media {

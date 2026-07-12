@@ -9,6 +9,7 @@ import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -30,6 +32,31 @@ class CompareScreenViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CompareScreenUiState())
     val uiState = _uiState.asStateFlow()
 
+    val authType = settingsRepository.authTypeFlow
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = null
+        )
+
+    /*val items = _uiState
+        .distinctUntilChangedBy { it.filters }
+        .onEach { state ->
+            state.mediaUiState.entries
+                .forEach { mediaUiState ->
+                    mediaUiState.value.userRates.mapValues { (mediaType, userRates) ->
+                        userRates.filterEntries(
+                            filters = state.filters
+                        )
+                    }
+                }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000L),
+            initialValue = emptyList<MediaComparison>()
+        )*/
+
     fun setData(targetUserId: Int, mediaType: MediaType) {
         _uiState.update { state ->
             state.copy(
@@ -42,6 +69,14 @@ class CompareScreenViewModel @Inject constructor(
     fun onRefresh(mediaType: MediaType) {
         updateMediaState(mediaType) { state ->
             state.copy(isRefreshing = true)
+        }
+    }
+
+    fun setFilters(filters: CompareMediaFilters) {
+        _uiState.update { state ->
+            state.copy(
+                filters = filters
+            )
         }
     }
 

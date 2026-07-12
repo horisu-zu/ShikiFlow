@@ -1,7 +1,6 @@
 package com.example.shikiflow.presentation.common
 
 import android.os.Build
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -261,6 +260,7 @@ private fun SheetHeader(
                 shape = RoundedCornerShape(8.dp)
             )
         )
+
         Column(
             verticalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.weight(1f)
@@ -278,6 +278,7 @@ private fun SheetHeader(
                 maxLines = 1
             )
         }
+
         IconButton(onClick = onDismiss) {
             Icon(
                 imageVector = Icons.Default.Clear,
@@ -450,10 +451,6 @@ private fun SmileyScore(
     onScoreChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LaunchedEffect(score) {
-        Log.d("SmileyScore", "Score: $score")
-    }
-
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
@@ -516,6 +513,7 @@ private fun ProgressColumn(
             canIncrement = userRate.progress < userRate.totalCount,
             canDecrement = userRate.progress > 0
         )
+
         if(!isAnime) {
             ProgressCard(
                 title = stringResource(R.string.details_volumes),
@@ -526,6 +524,7 @@ private fun ProgressColumn(
                 canDecrement = userRate.progressVolumes > 0
             )
         }
+
         ProgressCard(
             title = rewatchTitle,
             count = userRate.rewatches,

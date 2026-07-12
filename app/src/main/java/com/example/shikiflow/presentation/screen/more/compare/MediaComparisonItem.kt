@@ -30,7 +30,6 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.domain.model.user.MediaComparison
-import com.example.shikiflow.domain.model.user.ShortUserRateData
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.displayValue
@@ -43,8 +42,6 @@ fun MediaComparisonItem(
     mediaItem: MediaComparison,
     mediaType: MediaType,
     titleType: PreferredTitleType,
-    currentUserScore: ShortUserRateData?,
-    targetUserScore: ShortUserRateData?,
     comparisonType: ComparisonType,
     scoreFormat: ScoreFormat?,
     onItemClick: (Int) -> Unit,
@@ -60,7 +57,7 @@ fun MediaComparisonItem(
         Row(
             modifier = Modifier
                 .weight(2f)
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .clickable { onItemClick(mediaItem.id) },
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
@@ -68,8 +65,12 @@ fun MediaComparisonItem(
             BaseImage(
                 model = mediaItem.imageUrl,
                 contentDescription = "Media Image",
-                imageType = ImageType.Poster(width = 48.dp)
+                imageType = ImageType.Poster(
+                    width = 48.dp,
+                    shape = RoundedCornerShape(8.dp)
+                )
             )
+
             mediaItem.title?.let { mediaTitle ->
                 Text(
                     text = mediaTitle.preferred(titleType),
@@ -88,19 +89,16 @@ fun MediaComparisonItem(
 
         if(comparisonType != ComparisonType.TARGET_USER_ONLY) {
             Text(
-                text = if(
-                    currentUserScore?.status == UserRateStatus.COMPLETED ||
-                    currentUserScore?.status == UserRateStatus.WATCHING
-                ) {
-                    when(currentUserScore.userScore) {
+                text = if(mediaItem.currentUserScore?.status == UserRateStatus.COMPLETED) {
+                    when(mediaItem.currentUserScore.userScore) {
                         0 -> { "-" }
                         else -> scoreFormat?.displayValue(
-                            score = scoreFormat.formatValue(currentUserScore.userScore.toFloat())
-                        ) ?: currentUserScore.userScore.toString()
+                            score = scoreFormat.formatValue(mediaItem.currentUserScore.userScore.toFloat())
+                        ) ?: mediaItem.currentUserScore.userScore.toString()
                     }
                 } else {
                     stringResource(
-                        id = (currentUserScore?.status ?: UserRateStatus.PLANNED).mapStatus(
+                        id = (mediaItem.currentUserScore?.status ?: UserRateStatus.PLANNED).mapStatus(
                             mediaType = mediaType
                         )
                     )
@@ -122,18 +120,18 @@ fun MediaComparisonItem(
         if(comparisonType != ComparisonType.CURRENT_USER_ONLY) {
             Text(
                 text = if(
-                    targetUserScore?.status == UserRateStatus.COMPLETED ||
-                    targetUserScore?.status == UserRateStatus.WATCHING
+                    mediaItem.targetUserScore?.status == UserRateStatus.COMPLETED ||
+                    mediaItem.targetUserScore?.status == UserRateStatus.WATCHING
                 ) {
-                    when(targetUserScore.userScore) {
+                    when(mediaItem.targetUserScore.userScore) {
                         0 -> { "-" }
                         else -> scoreFormat?.displayValue(
-                            ScoreFormat.POINT_10_DECIMAL.formatValue(targetUserScore.userScore.toFloat())
-                        ) ?: targetUserScore.userScore.toString()
+                            scoreFormat.formatValue(mediaItem.targetUserScore.userScore.toFloat())
+                        ) ?: mediaItem.targetUserScore.userScore.toString()
                     }
                 } else {
                     stringResource(
-                        id = (targetUserScore?.status ?:  UserRateStatus.PLANNED).mapStatus(
+                        id = (mediaItem.targetUserScore?.status ?:  UserRateStatus.PLANNED).mapStatus(
                             mediaType = mediaType
                         )
                     )

@@ -18,7 +18,7 @@ Kotlin - Jetpack Compose - MVVM - Hilt - Room - GraphQL (Apollo) - Coil - ExoPla
   </tr>
   <tr>
     <th width="33.3%">Anime Tracks</th>
-    <th width="33.3%">Details Page</th>
+    <th width="33.3%">Media Details</th>
     <th width="33.3%">Manga Tracks</th>
   </tr>
   <tr>
@@ -30,6 +30,16 @@ Kotlin - Jetpack Compose - MVVM - Hilt - Room - GraphQL (Apollo) - Coil - ExoPla
     <th>AniList Browse Main</th>
     <th>Ongoings Calendar</th>
     <th>AniList Profile</th>
+  </tr>
+  <tr>
+    <td><img src="screenshots/shikimori_browse_main_page_shikiflow.jpg"></td>
+    <td><img src="screenshots/compare_media_page_shikiflow.jpg"></td>
+    <td><img src="screenshots/shikimori_profile_page_shikiflow.jpg"></td>
+  </tr>
+  <tr>
+    <th>Shikimori Browse Main</th>
+    <th>Compare User Rate</th>
+    <th>Shikimori Profile</th>
   </tr>
 </table>
 

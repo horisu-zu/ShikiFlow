@@ -9,7 +9,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,8 +17,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -36,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -137,14 +133,14 @@ fun TracksSortBottomSheet(
                         SortByComponent(config)
                     }
                     TracksFilterType.GENRES -> {
-                        GenresComponent(
+                        GenresFilterComponent(
                             authType = authType,
                             selectedGenres = selectedGenres,
                             onGenreClick = onGenreChange
                         )
                     }
                     TracksFilterType.TAGS -> {
-                        TagsComponent(
+                        TagsFilterComponent(
                             authType = authType,
                             selectedTags = selectedTags,
                             onTagClick = onTagChange
@@ -203,7 +199,7 @@ private fun <T : SortType> SortByComponent(
 }
 
 @Composable
-private fun GenresComponent(
+fun GenresFilterComponent(
     authType: AuthType,
     selectedGenres: List<Genre>,
     onGenreClick: (Genre) -> Unit,
@@ -227,28 +223,19 @@ private fun GenresComponent(
         modifier = modifier
     ) {
         stickyHeader {
-            BasicTextField(
-                state = textFieldState,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                lineLimits = TextFieldLineLimits.SingleLine,
-                decorator = { innerTextField ->
-                    Box {
-                        if(textFieldState.text.isEmpty()) {
-                            TextWithIcon(
-                                text = stringResource(R.string.browse_search_tag_search_label),
-                                iconResources = listOf(
-                                    IconResource.Vector(imageVector = Icons.Default.Search)
-                                ),
-                                placeIconAtTheBeginning = true,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-
-                        innerTextField()
+            CustomTextField(
+                textFieldState = textFieldState,
+                placeholder = {
+                    if(textFieldState.text.isEmpty()) {
+                        TextWithIcon(
+                            text = stringResource(R.string.browse_search_tag_search_label),
+                            iconResources = listOf(
+                                IconResource.Vector(imageVector = Icons.Default.Search)
+                            ),
+                            placeIconAtTheBeginning = true,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 },
                 modifier = Modifier
@@ -271,7 +258,7 @@ private fun GenresComponent(
 }
 
 @Composable
-private fun TagsComponent(
+fun TagsFilterComponent(
     authType: AuthType,
     selectedTags: List<MediaTagEnum>,
     onTagClick: (MediaTagEnum) -> Unit,
@@ -295,28 +282,19 @@ private fun TagsComponent(
         modifier = modifier
     ) {
         stickyHeader {
-            BasicTextField(
-                state = textFieldState,
-                textStyle = MaterialTheme.typography.bodyLarge.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                lineLimits = TextFieldLineLimits.SingleLine,
-                decorator = { innerTextField ->
-                    Box {
-                        if(textFieldState.text.isEmpty()) {
-                            TextWithIcon(
-                                text = stringResource(R.string.browse_search_tag_search_label),
-                                iconResources = listOf(
-                                    IconResource.Vector(imageVector = Icons.Default.Search)
-                                ),
-                                placeIconAtTheBeginning = true,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-
-                        innerTextField()
+            CustomTextField(
+                textFieldState = textFieldState,
+                placeholder = {
+                    if(textFieldState.text.isEmpty()) {
+                        TextWithIcon(
+                            text = stringResource(R.string.browse_search_tag_search_label),
+                            iconResources = listOf(
+                                IconResource.Vector(imageVector = Icons.Default.Search)
+                            ),
+                            placeIconAtTheBeginning = true,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 },
                 modifier = Modifier

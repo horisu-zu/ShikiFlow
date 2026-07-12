@@ -398,6 +398,8 @@
     <string name="compare_label">Сравнение оценок пользователей</string>
     <string name="compare_unique_rates">Уникальные оценки %1$s</string>
     <string name="compare_shared_rates">Общие оценки</string>
+    <string name="compare_title_search_label">Поиск по названию…</string>
+    <string name="compare_score_range">Диапазон оценок %1$s</string>
 
     <string name="translation_chapter_label">Глава %1$s — %2$s</string>
 

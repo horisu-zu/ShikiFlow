@@ -3,7 +3,6 @@ package com.example.shikiflow.presentation.screen.browse.main
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,8 +11,6 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -33,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
@@ -46,6 +42,7 @@ import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.search.MediaBrowseOptions
 import com.example.shikiflow.presentation.common.CheckboxItem
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
+import com.example.shikiflow.presentation.common.CustomTextField
 import com.example.shikiflow.presentation.common.TextWithIcon
 import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
@@ -130,32 +127,24 @@ fun GenreBottomSheet(
             }
 
             stickyHeader {
-                BasicTextField(
-                    state = textFieldState,
-                    textStyle = MaterialTheme.typography.bodyLarge.copy(
-                        color = MaterialTheme.colorScheme.onSurface
-                    ),
-                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                    lineLimits = TextFieldLineLimits.SingleLine,
-                    decorator = { innerTextField ->
-                        Box {
-                            if(textFieldState.text.isEmpty()) {
-                                TextWithIcon(
-                                    text = stringResource(
-                                        id = when(genreType) {
-                                            GenreType.GENRE -> R.string.browse_search_genre_search_label
-                                            GenreType.TAG -> R.string.browse_search_tag_search_label
-                                        }
-                                    ),
-                                    iconResources = listOf(
-                                        IconResource.Vector(imageVector = Icons.Default.Search)
-                                    ),
-                                    placeIconAtTheBeginning = true,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                            innerTextField()
+                CustomTextField(
+                    textFieldState = textFieldState,
+                    placeholder = {
+                        if(textFieldState.text.isEmpty()) {
+                            TextWithIcon(
+                                text = stringResource(
+                                    id = when(genreType) {
+                                        GenreType.GENRE -> R.string.browse_search_genre_search_label
+                                        GenreType.TAG -> R.string.browse_search_tag_search_label
+                                    }
+                                ),
+                                iconResources = listOf(
+                                    IconResource.Vector(imageVector = Icons.Default.Search)
+                                ),
+                                placeIconAtTheBeginning = true,
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
                     },
                     modifier = Modifier

@@ -23,28 +23,28 @@ import kotlin.time.Instant
 object ShikimoriRateMapper {
     fun ShikiShortUserRateResponse.toDomain(): UserRate {
         return UserRate(
-            id = this.id.toInt(),
-            status = UserRateStatusEnum.valueOf(this.status).toDomain(),
-            score = this.score,
-            mediaType = this.shikiTargetType.toMediaType()
+            id = id.toInt(),
+            status = UserRateStatusEnum.valueOf(status).toDomain(),
+            score = score,
+            mediaType = shikiTargetType.toMediaType()
         )
     }
 
     fun ShikiUserRateResponse.toDomain(mediaType: MediaType): UserMediaRate {
         return UserMediaRate(
-            rateId = this.id.toInt(),
-            mediaId = this.targetId.toInt(),
-            rateStatus = UserRateStatusEnum.valueOf(this.status).toDomain(),
+            rateId = id.toInt(),
+            mediaId = targetId.toInt(),
+            rateStatus = UserRateStatusEnum.valueOf(status).toDomain(),
             progress = when(mediaType) {
-                MediaType.ANIME -> this.episodes
-                MediaType.MANGA -> this.chapters
+                MediaType.ANIME -> episodes
+                MediaType.MANGA -> chapters
             } ?: 0,
-            progressVolumes = this.volumes ?: 0,
-            repeat = this.rewatches,
-            textNotes = this.text,
+            progressVolumes = volumes ?: 0,
+            repeat = rewatches,
+            textNotes = text,
             score = score.times(10),
-            createdAt = Instant.parse(this.createdAt),
-            updatedAt = Instant.parse(this.updatedAt)
+            createdAt = Instant.parse(createdAt),
+            updatedAt = Instant.parse(updatedAt)
         )
     }
 
@@ -54,20 +54,26 @@ object ShikimoriRateMapper {
                 ShortUserMediaRate(
                     id = anime.id.toInt(),
                     title = anime.name.toDomainTitle(anime.name, anime.russian, null),
+                    synonyms = emptyList(),
                     imageUrl = "${BuildConfig.SHIKI_BASE_URL}${anime.image.x96}",
-                    score = score,
+                    score = score * 10,
                     status = status.toDomain(),
-                    progress = anime.episodes
+                    progress = anime.episodes,
+                    genres = emptyList(),
+                    tags = emptyList()
                 )
             }
             is ShikiShortUserRate.ShikiShortMangaRate -> {
                 ShortUserMediaRate(
                     id = manga.id.toInt(),
                     title = manga.name.toDomainTitle(manga.name, manga.russian, null),
+                    synonyms = emptyList(),
                     imageUrl = "${BuildConfig.SHIKI_BASE_URL}${manga.image.x96}",
-                    score = score,
+                    score = score * 10,
                     status = status.toDomain(),
-                    progress = manga.chapters
+                    progress = manga.chapters,
+                    genres = emptyList(),
+                    tags = emptyList()
                 )
             }
         }

@@ -9,39 +9,41 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.retain.retain
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.mappers.MediaComparisonMapper.filterEntries
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
-import com.example.shikiflow.presentation.viewmodel.user.compare.CompareScreenViewModel
+import com.example.shikiflow.presentation.viewmodel.user.compare.CompareScreenUiState
 
 @Composable
 fun CompareScreenContent(
     mediaType: MediaType,
     targetUser: User,
+    uiState: CompareScreenUiState,
     onMediaItemClick: (Int, MediaType) -> Unit,
-    compareScreenViewModel: CompareScreenViewModel = hiltViewModel()
+    onRefresh: () -> Unit
 ) {
     val preferredTitleType = LocalTitleTypeController.current
-    val uiState by compareScreenViewModel.uiState.collectAsStateWithLifecycle()
     val showState = rememberSaveable {
         ComparisonType.entries.associateWith { mutableStateOf(true) }
     }
 
-    LaunchedEffect(mediaType) {
-        compareScreenViewModel.setData(targetUser.id, mediaType)
+    //well, it's not exactly clean (sorting huge, non-paginated lists in the UI)
+    val userRates = retain(uiState.filters, uiState.mediaUiState[uiState.mediaType], uiState.scoreFormat) {
+        uiState.mediaUiState[mediaType]?.userRates?.mapValues { (_, media) ->
+            media.filterEntries(uiState.filters, uiState.scoreFormat ?: ScoreFormat.POINT_10)
+        } ?: emptyMap()
     }
 
     Box {
@@ -53,13 +55,13 @@ fun CompareScreenContent(
                 ErrorItem(
                     message = uiState.mediaUiState[mediaType]?.errorMessage ?: stringResource(R.string.common_error),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { compareScreenViewModel.onRefresh(mediaType) }
+                    onButtonClick = { onRefresh() }
                 )
             }
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 8.dp)
+                contentPadding = PaddingValues(bottom = 56.dp) //FAB size
             ) {
                 if(uiState.mediaUiState[mediaType]?.isLoading == true) {
                     stickyHeader {
@@ -73,44 +75,45 @@ fun CompareScreenContent(
                         )
                     }
                 } else if(uiState.mediaUiState[mediaType]?.userRates != null) {
-                    uiState.mediaUiState[mediaType]?.userRates?.forEach { (comparisonType, media) ->
-                        stickyHeader {
-                            MediaComparisonHeader(
-                                currentUserNickname = uiState.currentUser?.nickname ?: "",
-                                targetUserNickname = targetUser.nickname,
-                                count = media.size,
-                                comparisonType = comparisonType,
-                                onClick = {
-                                    showState[comparisonType]?.value = !(showState[comparisonType]?.value ?: true)
-                                },
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surfaceContainer)
-                                    .animateItem()
-                            )
-                        }
-                        if(showState[comparisonType]?.value == true) {
-                            items(
-                                count = media.size,
-                                key = { index -> media[index].id }
-                            ) { index ->
-                                MediaComparisonItem(
-                                    mediaItem = media[index],
-                                    mediaType = mediaType,
-                                    titleType = preferredTitleType,
-                                    currentUserScore = media[index].currentUserScore,
-                                    targetUserScore = media[index].targetUserScore,
+                    userRates.forEach { (comparisonType, media) ->
+                        if (media.isNotEmpty()) {
+                            stickyHeader {
+                                MediaComparisonHeader(
+                                    currentUserNickname = uiState.currentUser?.nickname ?: "",
+                                    targetUserNickname = targetUser.nickname,
+                                    count = media.size,
                                     comparisonType = comparisonType,
-                                    scoreFormat = uiState.scoreFormat,
-                                    onItemClick = { mediaId ->
-                                        onMediaItemClick(mediaId, mediaType)
+                                    onClick = {
+                                        showState[comparisonType]?.value = !(showState[comparisonType]?.value ?: true)
                                     },
                                     modifier = Modifier
-                                        .fillMaxWidth()
+                                        .background(MaterialTheme.colorScheme.surfaceContainer)
                                         .animateItem()
                                 )
+                            }
 
-                                if(index != media.lastIndex) {
-                                    HorizontalDivider()
+                            if(showState[comparisonType]?.value == true) {
+                                items(
+                                    count = media.size,
+                                    key = { index -> media[index].id }
+                                ) { index ->
+                                    MediaComparisonItem(
+                                        mediaItem = media[index],
+                                        mediaType = mediaType,
+                                        titleType = preferredTitleType,
+                                        comparisonType = comparisonType,
+                                        scoreFormat = uiState.scoreFormat,
+                                        onItemClick = { mediaId ->
+                                            onMediaItemClick(mediaId, mediaType)
+                                        },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .animateItem()
+                                    )
+
+                                    if(index != media.lastIndex) {
+                                        HorizontalDivider()
+                                    }
                                 }
                             }
                         }

@@ -52,6 +52,7 @@ class GroupUserRatesUseCase @Inject constructor(
                 MediaComparison(
                     id = mediaId,
                     title = (currentUserRate ?: targetUserRate)?.title,
+                    synonyms = (currentUserRate ?: targetUserRate)?.synonyms ?: emptyList(),
                     imageUrl = (currentUserRate ?: targetUserRate)?.imageUrl,
                     currentUserScore = currentUserRate?.let { userRate ->
                         ShortUserRateData(
@@ -64,7 +65,9 @@ class GroupUserRatesUseCase @Inject constructor(
                             userScore = userRate.score,
                             status = userRate.status
                         )
-                    }
+                    },
+                    genres = (currentUserRate ?: targetUserRate)?.genres ?: emptyList(),
+                    tags = (currentUserRate ?: targetUserRate)?.tags ?: emptyList()
                 )
             }
 

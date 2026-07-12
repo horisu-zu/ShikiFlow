@@ -431,6 +431,8 @@ f
     <string name="compare_label">Compare User Rates</string>
     <string name="compare_unique_rates">%1$s\'s Unique Rates</string>
     <string name="compare_shared_rates">Shared Rates</string>
+    <string name="compare_title_search_label">Search By Title…</string>
+    <string name="compare_score_range">%1$s\'s Score Range</string>
 
     <string name="translation_chapter_label">Chapter %1$s — %2$s</string>
 
