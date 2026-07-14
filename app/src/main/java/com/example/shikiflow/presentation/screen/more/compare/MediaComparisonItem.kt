@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
@@ -119,10 +120,7 @@ fun MediaComparisonItem(
 
         if(comparisonType != ComparisonType.CURRENT_USER_ONLY) {
             Text(
-                text = if(
-                    mediaItem.targetUserScore?.status == UserRateStatus.COMPLETED ||
-                    mediaItem.targetUserScore?.status == UserRateStatus.WATCHING
-                ) {
+                text = if(mediaItem.targetUserScore?.status == UserRateStatus.COMPLETED) {
                     when(mediaItem.targetUserScore.userScore) {
                         0 -> { "-" }
                         else -> scoreFormat?.displayValue(
@@ -177,7 +175,7 @@ fun MediaComparisonItemPlaceholder(
 
             Box(
                 modifier = Modifier
-                    .width(48.dp * indexValue)
+                    .width(64.dp + indexValue * 12.dp)
                     .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
                     .background(MaterialTheme.colorScheme.onSurface)

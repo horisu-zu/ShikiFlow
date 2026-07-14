@@ -33,13 +33,13 @@ class CharacterRepositoryImpl @Inject constructor(
 
     private val dataSource = settingsRepository.authTypeFlow
         .filterNotNull()
+        .distinctUntilChanged()
         .map { authType ->
             when(authType) {
                 AuthType.SHIKIMORI -> shikimoriDataSource
                 AuthType.ANILIST -> anilistDataSource
             }
         }
-        .distinctUntilChanged()
 
     override suspend fun getCharacterDetails(
         characterId: Int

@@ -2,7 +2,6 @@ package com.example.shikiflow.presentation.screen.main.details
 
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.screen.NavOptions
@@ -30,7 +29,7 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToThreads(mediaId: Int)
 
-    fun navigateToComments(screenMode: CommentsScreenMode, id: Int, threadHeader: Thread? = null)
+    fun navigateToComments(screenMode: CommentsScreenMode, id: Int)
 
     fun navigateToAnimeWatch(title: String, shikimoriId: Int, completedEpisodes: Int)
 

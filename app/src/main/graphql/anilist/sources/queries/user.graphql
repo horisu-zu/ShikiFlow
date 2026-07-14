@@ -293,7 +293,7 @@ query UserThreads(
 ) {
     Page(page: $page, perPage: $limit) {
         threads(userId: $userId, sort: [ID_DESC]) {
-            ...ALThread
+            ...ALThreadShort
         }
     }
 }

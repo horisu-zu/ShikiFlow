@@ -205,7 +205,6 @@ fun SocialSection(
                                             onThreadClick = { id ->
                                                 val navRoute = DetailsNavRoute.Comments(
                                                     screenMode = CommentsScreenMode.TOPIC,
-                                                    threadHeader = item.data,
                                                     id = id
                                                 )
 
@@ -220,7 +219,6 @@ fun SocialSection(
                                             onThreadClick = {
                                                 val navRoute = DetailsNavRoute.Comments(
                                                     screenMode = CommentsScreenMode.TOPIC,
-                                                    threadHeader = item.thread,
                                                     id = item.thread.id
                                                 )
 
@@ -246,8 +244,7 @@ fun SocialSection(
                                                     EntityType.COMMENT_REPLY -> {
                                                         DetailsNavRoute.Comments(
                                                             screenMode = CommentsScreenMode.REPLY,
-                                                            id = id,
-                                                            threadHeader = null
+                                                            id = id
                                                         )
                                                     }
                                                 }

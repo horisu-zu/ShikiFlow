@@ -6,8 +6,16 @@ query MediaThreads(
 ) {
     Page(page: $page, perPage: $perPage) {
         threads(mediaCategoryId: $mediaId, sort: [$sort]) {
-            ...ALThread
+            ...ALThreadShort
         }
+    }
+}
+
+query MediaThread(
+    $threadId: Int!
+) {
+    Thread(id: $threadId) {
+        ...ALThread
     }
 }
 

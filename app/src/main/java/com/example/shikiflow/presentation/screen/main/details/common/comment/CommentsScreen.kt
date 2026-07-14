@@ -40,13 +40,13 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.findComment
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
@@ -59,7 +59,6 @@ import kotlinx.coroutines.FlowPreview
 
 @Composable
 fun CommentsScreen(
-    threadHeader: Thread?,
     screenMode: CommentsScreenMode,
     id: Int,
     navOptions: MediaNavOptions
@@ -81,7 +80,6 @@ fun CommentsScreen(
                 CommentsScreenMode.TOPIC -> {
                     TopicCommentsSection(
                         topicId = id,
-                        threadHeader = threadHeader,
                         contentPadding = contentPadding,
                         onEntityClick = { entityType, id ->
                             navOptions.navigateByEntity(entityType, id)
@@ -112,7 +110,6 @@ fun CommentsScreen(
 @Composable
 private fun TopicCommentsSection(
     topicId: Int,
-    threadHeader: Thread?,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
@@ -186,7 +183,7 @@ private fun TopicCommentsSection(
                     onEntityClick = onEntityClick,
                     onUserClick = onUserClick,
                     onLikeToggle = { commentId ->
-                        commentViewModel.toggleLike(commentId)
+                        commentViewModel.toggleCommentLike(commentId)
                     },
                     onCommentSelect = { commentId ->
                         commentViewModel.selectComment(commentId)
@@ -202,8 +199,15 @@ private fun TopicCommentsSection(
                 state = lazyListState,
                 modifier = modifier.fillMaxWidth(),
                 contentPadding = contentPadding,
+                userScrollEnabled = !(uiState.isLoading && uiState.comments.isEmpty()),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                val showInitPlaceholders = when (uiState.authType) {
+                    null -> true
+                    AuthType.ANILIST -> uiState.thread == null
+                    else -> uiState.comments.isEmpty()
+                }
+
                 if (uiState.errorMessage != null && uiState.comments.isEmpty()) {
                     item {
                         Box(
@@ -217,13 +221,28 @@ private fun TopicCommentsSection(
                             )
                         }
                     }
+                } else if (uiState.isLoading && showInitPlaceholders) {
+                    item {
+                        ThreadHeaderItemPlaceholder()
+                    }
+
+                    items(count = 12) { index ->
+                        CommentItemPlaceholder(
+                            backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
+                            itemIndex = index,
+                            maxValue = 4
+                        )
+                    }
                 } else {
-                    threadHeader?.let { header ->
+                    uiState.thread?.let { threadHeader ->
                         item {
                             ThreadHeaderItem(
-                                threadHeader = header,
+                                threadHeader = threadHeader,
                                 onEntityClick = onEntityClick,
                                 onUserClick = onUserClick,
+                                onLikeToggle = { threadId ->
+                                    commentViewModel.toggleThreadLike(threadId)
+                                },
                                 modifier = Modifier
                             )
                         }
@@ -231,14 +250,14 @@ private fun TopicCommentsSection(
 
                     items(
                         items = uiState.comments,
-                        contentType = { it }
+                        key = { comment -> comment.id }
                     ) { comment ->
                         CommentItem(
                             comment = comment,
                             onEntityClick = onEntityClick,
                             onUserClick = onUserClick,
                             onLikeToggle = { commentId ->
-                                commentViewModel.toggleLike(commentId)
+                                commentViewModel.toggleCommentLike(commentId)
                             },
                             onCommentSelect = { commentId ->
                                 commentViewModel.selectComment(commentId)
@@ -247,11 +266,10 @@ private fun TopicCommentsSection(
                     }
 
                     if (uiState.isLoading) {
-                        items(12) { index ->
+                        items(3) { index ->
                             CommentItemPlaceholder(
                                 backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                                itemIndex = index,
-                                maxValue = 4
+                                itemIndex = index
                             )
                         }
                     } else if (uiState.errorMessage != null) {

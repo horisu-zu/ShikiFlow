@@ -2,7 +2,6 @@ package com.example.shikiflow.presentation.screen.main.details
 
 import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
-import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.serialization.Serializable
 
@@ -41,8 +40,7 @@ sealed interface DetailsNavRoute : NavKey {
     @Serializable
     data class Comments(
         val screenMode: CommentsScreenMode,
-        val id: Int,
-        val threadHeader: Thread?
+        val id: Int
     ) : DetailsNavRoute
     
     @Serializable

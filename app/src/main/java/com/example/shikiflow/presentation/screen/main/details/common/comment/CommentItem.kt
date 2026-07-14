@@ -220,59 +220,29 @@ private fun AnilistCommentItem(
     onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val likeTint by animateColorAsState(
-        targetValue = if(commentData.isLiked) MaterialTheme.colorScheme.error
-            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessMediumLow
-        )
-    )
-
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Row(
-            modifier = Modifier,
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             commentData.sender?.let { sender ->
                 CommentUserItem(
                     userData = sender,
                     commentInstant = commentData.dateTime,
-                    onUserClick = onUserClick,
-                    modifier = Modifier.weight(1f)
+                    onUserClick = onUserClick
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(percent = 32))
-                    .clickable { onLikeToggle(commentData.id) }
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
-                    .animateContentSize(),
-                horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if(commentData.likesCount > 0) {
-                    DigitCounter(
-                        count = commentData.likesCount,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            color = likeTint,
-                            fontWeight = FontWeight.Medium
-                        )
-                    )
-                }
-
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Likes Count",
-                    tint = likeTint,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
+            CommentLikeComponent(
+                likesCount = commentData.likesCount,
+                isLiked = commentData.isLiked,
+                onLikeToggle = { onLikeToggle(commentData.id) },
+                modifier = Modifier.weight(1f, fill = false)
+            )
         }
 
         RichTextRenderer(
@@ -288,6 +258,7 @@ fun ThreadHeaderItem(
     threadHeader: Thread,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
+    onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -297,32 +268,142 @@ fun ThreadHeaderItem(
             .padding(all = 12.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
-        threadHeader.title?.let { threadTitle ->
-            Box(
-                modifier = Modifier.fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(horizontal = 8.dp, vertical = 6.dp)
-            ) {
+        Text(
+            text = threadHeader.title,
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .padding(horizontal = 8.dp, vertical = 6.dp)
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+        ) {
+            threadHeader.categories.forEach { category ->
                 Text(
-                    text = threadTitle,
-                    style = MaterialTheme.typography.titleMedium
+                    text = category,
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontWeight = FontWeight.Medium
+                    ),
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.background)
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
                 )
             }
         }
-        threadHeader.createdBy?.let { threadAuthor ->
-            CommentUserItem(
-                userData = threadAuthor,
-                commentInstant = threadHeader.createdAt,
-                onUserClick = onUserClick
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            threadHeader.createdBy?.let { threadAuthor ->
+                CommentUserItem(
+                    userData = threadAuthor,
+                    commentInstant = threadHeader.createdAt,
+                    onUserClick = onUserClick
+                )
+            }
+
+            CommentLikeComponent(
+                likesCount = threadHeader.likeCount,
+                isLiked = threadHeader.isLiked,
+                onLikeToggle = { onLikeToggle(threadHeader.id) },
+                modifier = Modifier.weight(1f, fill = false)
             )
         }
-        threadHeader.body?.let { headerBody ->
+
+        if (threadHeader.body.isNotEmpty()) {
             RichTextRenderer(
-                htmlText = headerBody,
+                htmlText = threadHeader.body,
                 style = MaterialTheme.typography.bodySmall,
                 onEntityClick = { type, id -> onEntityClick(type, id) }
             )
+        }
+    }
+}
+
+@Composable
+fun ThreadHeaderItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .padding(all = 12.dp)
+            .shimmerEffect(overContent = true),
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp + 12.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.background)
+        )
+
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
+        ) {
+            repeat(3) { index ->
+                val indexValue = index % 2
+
+                Box(
+                    modifier = Modifier
+                        .width(64.dp - indexValue * 16.dp)
+                        .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp + 8.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            CommentUserItemPlaceholder(
+                itemIndex = 1,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(48.dp)
+                    .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp + 12.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+        }
+
+        FlowRow(
+            maxLines = 6,
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            repeat(40) { index ->
+                val indexValue = index % 8 + 1
+                val itemWidth = when (indexValue <= 4) {
+                    true -> 40.dp + indexValue * 12.dp
+                    false -> 80.dp - indexValue * 6.dp
+                }
+
+                Box(
+                    modifier = Modifier
+                        .width(itemWidth)
+                        .height(MaterialTheme.typography.bodySmall.lineHeight.value.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
         }
     }
 }
@@ -394,44 +475,10 @@ fun CommentItemPlaceholder(
             .shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val avatarImageType = ImageType.Square(
-                width = 24.dp,
-                shape = RoundedCornerShape(percent = 16)
-            )
-
-            Box(
-                modifier = Modifier
-                    .size(avatarImageType.width)
-                    .clip(avatarImageType.shape)
-                    .background(MaterialTheme.colorScheme.onSurface)
-            )
-
-            Box(
-                modifier = Modifier
-                    .width(72.dp + itemIndex * 16.dp)
-                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
-                    .clip(RoundedCornerShape(percent = 32))
-                    .background(MaterialTheme.colorScheme.onSurface)
-            )
-
-            Text(
-                text = "·",
-                style = MaterialTheme.typography.labelMedium
-            )
-
-            Box(
-                modifier = Modifier
-                    .width(96.dp)
-                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
-                    .clip(RoundedCornerShape(percent = 32))
-                    .background(MaterialTheme.colorScheme.onSurface)
-            )
-        }
+        CommentUserItemPlaceholder(
+            itemIndex = itemIndex,
+            modifier = Modifier.fillMaxWidth()
+        )
 
         FlowRow(
             maxLines = 4,
@@ -454,5 +501,94 @@ fun CommentItemPlaceholder(
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun CommentLikeComponent(
+    likesCount: Int,
+    isLiked: Boolean,
+    onLikeToggle: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val likeTint by animateColorAsState(
+        targetValue = if(isLiked) MaterialTheme.colorScheme.error
+            else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        )
+    )
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(percent = 32))
+            .clickable { onLikeToggle() }
+            .padding(horizontal = 8.dp, vertical = 6.dp)
+            .animateContentSize(),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if(likesCount > 0) {
+            DigitCounter(
+                count = likesCount,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = likeTint,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+        }
+
+        Icon(
+            imageVector = Icons.Default.Favorite,
+            contentDescription = "Likes Count",
+            tint = likeTint,
+            modifier = Modifier.size(16.dp)
+        )
+    }
+}
+
+@Composable
+private fun CommentUserItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val avatarImageType = ImageType.Square(
+            width = 24.dp,
+            shape = RoundedCornerShape(percent = 16)
+        )
+
+        Box(
+            modifier = Modifier
+                .size(avatarImageType.width)
+                .clip(avatarImageType.shape)
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Box(
+            modifier = Modifier
+                .width(72.dp + itemIndex * 16.dp)
+                .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Text(
+            text = "·",
+            style = MaterialTheme.typography.labelMedium
+        )
+
+        Box(
+            modifier = Modifier
+                .width(96.dp)
+                .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
     }
 }

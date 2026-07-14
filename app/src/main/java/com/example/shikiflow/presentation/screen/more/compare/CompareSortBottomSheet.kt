@@ -124,8 +124,8 @@ fun CompareSortBottomSheet(
                 }
             )
 
-            //Worth noting that Shikimori API response doesn't provide genres or tags
-            //for target user's rates, but I decided to keep these filter options anyway
+            //Shikimori API response doesn't provide genres or tags for target user's rates,
+            //but I decided to keep these filter options anyway
             ConnectedButtonGroup(
                 items = GenreType.entries.map { genreType ->
                     genreType.tabRowItem()

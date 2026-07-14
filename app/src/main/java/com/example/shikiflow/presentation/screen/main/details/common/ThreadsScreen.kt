@@ -50,7 +50,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.sort.ThreadType
-import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SortBottomSheet
@@ -99,6 +99,7 @@ fun ThreadsScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
+            userScrollEnabled = threadsState.loadState.refresh is LoadState.NotLoading,
             contentPadding = PaddingValues(
                 start = 12.dp,
                 end = 12.dp,
@@ -141,7 +142,6 @@ fun ThreadsScreen(
                                 onThreadClick = { id ->
                                     navOptions.navigateToComments(
                                         screenMode = CommentsScreenMode.TOPIC,
-                                        threadHeader = threadData,
                                         id = id
                                     )
                                 },
@@ -149,6 +149,7 @@ fun ThreadsScreen(
                             )
                         }
                     }
+
                     threadsState.apply {
                         when {
                             loadState.append is LoadState.Error -> {
@@ -200,7 +201,7 @@ fun ThreadsScreen(
 
 @Composable
 fun ThreadItem(
-    threadData: Thread,
+    threadData: ThreadShort,
     resources: Resources,
     onThreadClick: (Int) -> Unit,
     modifier: Modifier = Modifier

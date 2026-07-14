@@ -1,17 +1,23 @@
 package com.example.shikiflow.data.mapper.anilist
 
 import android.util.Log
+import com.example.graphql.anilist.ToggleLikeMutation
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.graphql.anilist.fragment.ALThread
 import com.example.graphql.anilist.fragment.ALThreadComment
 import com.example.graphql.anilist.fragment.ALThreadCommentWithHeader
+import com.example.graphql.anilist.fragment.ALThreadShort
+import com.example.graphql.anilist.type.LikeableType as ALLikeableType
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.thread.Like
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.graphql.anilist.type.ThreadSort as ALThreadSort
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.social.ThreadComment
@@ -53,18 +59,29 @@ object AnilistThreadsMapper {
         }
     }
 
-    fun ALThread.toDomain(): Thread {
+    fun ALThread.toDomainThread(): Thread {
         return Thread(
             id = id,
-            title = title,
-            body = body,
+            title = title ?: "",
+            body = body ?: "",
             categories = categories?.mapNotNull { it?.name } ?: emptyList(),
+            viewCount = viewCount ?: 0,
+            likeCount = likeCount,
+            replyCount = replyCount ?: 0,
+            isLiked = isLiked ?: false,
+            createdBy = user?.aLUserShort?.toDomainUser(),
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
+        )
+    }
+
+    fun ALThreadShort.toDomainThread(): ThreadShort {
+        return ThreadShort(
+            id = id,
+            title = title ?: "",
             viewCount = viewCount ?: 0,
             replyCount = replyCount ?: 0,
             lastReplyUser = replyUser?.aLUserShort?.toDomainUser(),
-            lastRepliedAt = Instant.fromEpochSeconds(repliedAt?.toLong() ?: 0L),
-            createdBy = user?.aLUserShort?.toDomainUser(),
-            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
+            lastRepliedAt = Instant.fromEpochSeconds(repliedAt?.toLong() ?: 0L)
         )
     }
 
@@ -115,9 +132,9 @@ object AnilistThreadsMapper {
     }
 
     fun ALThreadCommentWithHeader.toDomain(): ThreadComment? {
-        return thread?.aLThread?.let { alThread ->
+        return thread?.aLThreadShort?.let { alThread ->
             ThreadComment(
-                thread = alThread.toDomain(),
+                thread = alThread.toDomainThread(),
                 comment = ALComment(
                     id = id,
                     commentBody = comment ?: "",
@@ -180,6 +197,38 @@ object AnilistThreadsMapper {
         } catch (e: Exception) {
             Log.e("AnilistThreadsMapper", "Error: $e")
             emptyList()
+        }
+    }
+
+    fun ToggleLikeMutation.ToggleLikeV2.toDomainLike(): Like {
+        val isLiked = onThreadComment?.aLThreadComment?.isLiked ?:
+            onThread?.aLThread?.isLiked
+
+        val likeCount = onThreadComment?.aLThreadComment?.likeCount
+            ?: onThread?.aLThread?.likeCount
+
+        return Like(
+            isLiked = isLiked ?: false,
+            likeCount = likeCount ?: 0
+        )
+    }
+
+    fun LikeableType.toALType(): ALLikeableType {
+        return when (this) {
+            LikeableType.COMMENT -> ALLikeableType.THREAD_COMMENT
+            LikeableType.THREAD -> ALLikeableType.THREAD
+            LikeableType.ACTIVITY -> ALLikeableType.ACTIVITY
+            LikeableType.ACTIVITY_REPLY -> ALLikeableType.ACTIVITY_REPLY
+        }
+    }
+
+    fun ALLikeableType.toDomainType(): LikeableType {
+        return when (this) {
+            ALLikeableType.THREAD_COMMENT -> LikeableType.COMMENT
+            ALLikeableType.THREAD -> LikeableType.THREAD
+            ALLikeableType.ACTIVITY -> LikeableType.ACTIVITY
+            ALLikeableType.ACTIVITY_REPLY -> LikeableType.ACTIVITY_REPLY
+            else -> LikeableType.COMMENT
         }
     }
 }

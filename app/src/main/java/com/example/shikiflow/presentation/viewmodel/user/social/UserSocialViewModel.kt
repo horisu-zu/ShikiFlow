@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.user.social
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.comment.ALComment
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.ThreadComment
 import com.example.shikiflow.domain.repository.CommentRepository
@@ -138,23 +139,23 @@ class UserSocialViewModel @Inject constructor(
 
     fun toggleCommentLike(commentId: Int) {
         viewModelScope.launch {
-            commentRepository.toggleCommentLike(commentId).let { result ->
+            commentRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
                 if (result is DataResult.Success) {
                     _uiState.update { state ->
                         val items = state.categories.getValue(SocialCategory.COMMENTS).items
                         val index = items.indexOfFirst { userSocial ->
-                            userSocial is ThreadComment && userSocial.comment.id == result.data.id
+                            userSocial is ThreadComment && userSocial.comment.id == commentId
                         }
 
                         if (index != -1) {
                             val threadComment = items[index] as ThreadComment
                             if (threadComment.comment is ALComment) {
-                                val responseComment = result.data as ALComment
+                                val response = result.data
 
                                 items[index] = threadComment.copy(
                                     comment = threadComment.comment.copy(
-                                        likesCount = responseComment.likesCount,
-                                        isLiked = responseComment.isLiked
+                                        likesCount = response.likeCount,
+                                        isLiked = response.isLiked
                                     )
                                 )
                             }

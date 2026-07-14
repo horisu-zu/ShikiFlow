@@ -37,13 +37,13 @@ class MediaRepositoryImpl @Inject constructor(
 
     private val dataSource = settingsRepository.authTypeFlow
         .filterNotNull()
+        .distinctUntilChanged()
         .map { authType ->
             when(authType) {
                 AuthType.SHIKIMORI -> shikimoriDataSource
                 AuthType.ANILIST -> anilistDataSource
             }
         }
-        .distinctUntilChanged()
 
     override fun getMediaDetails(
         id: Int?,

@@ -540,15 +540,24 @@ fragment ALThread on Thread {
         name
     }
     viewCount
+    likeCount
+    replyCount
+    isLiked
+    user {
+        ...ALUserShort
+    }
+    createdAt
+}
+
+fragment ALThreadShort on Thread {
+    id
+    title
+    viewCount
     replyCount
     replyUser {
         ...ALUserShort
     }
     repliedAt
-    user {
-        ...ALUserShort
-    }
-    createdAt
 }
 
 fragment ALThreadHeader on Thread {
@@ -578,7 +587,7 @@ fragment ALThreadComment on ThreadComment {
 fragment ALThreadCommentWithHeader on ThreadComment {
     id
     thread {
-        ...ALThread
+        ...ALThreadShort
     }
     user {
         ...ALUserShort

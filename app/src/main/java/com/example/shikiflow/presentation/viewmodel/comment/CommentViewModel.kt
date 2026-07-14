@@ -1,17 +1,22 @@
 package com.example.shikiflow.presentation.viewmodel.comment
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.findComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.updateComment
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.repository.CommentRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -22,7 +27,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CommentViewModel @Inject constructor(
-    private val commentsRepository: CommentRepository
+    private val commentsRepository: CommentRepository,
+    private val settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<CommentsUiState>() {
 
     override val initialState = CommentsUiState()
@@ -44,7 +50,8 @@ class CommentViewModel @Inject constructor(
                         state.comments.addAll(result.list)
 
                         state.copy(
-                            isLoading = false,
+                            isLoading = if (state.thread != null && state.authType == AuthType.ANILIST) false
+                                else state.isLoading,
                             hasNextPage = result.hasNextPage
                         )
                     } else {
@@ -53,6 +60,46 @@ class CommentViewModel @Inject constructor(
                             isRefreshing = false
                         )
                     }
+                }
+            }.launchIn(viewModelScope)
+
+        mutableUiState
+            .filter { state ->
+                state.authType == AuthType.ANILIST && state.topicId != null
+            }
+            .distinctUntilChangedBy { state -> state.topicId }
+            .flatMapLatest { state ->
+                commentsRepository.getThread(state.topicId!!)
+            }.onEach { result ->
+                mutableUiState
+                    .update { state ->
+                        when (result) {
+                            is DataResult.Success -> {
+                                state.copy(
+                                    isLoading = if (state.comments.isNotEmpty()) false
+                                        else state.isLoading,
+                                    thread = result.data
+                                )
+                            }
+                            is DataResult.Error -> {
+                                state.copy(
+                                    isLoading = false,
+                                    errorMessage = result.message
+                                )
+                            }
+                            else -> state
+                        }
+                    }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { authType ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        authType = authType
+                    )
                 }
             }.launchIn(viewModelScope)
     }
@@ -79,15 +126,15 @@ class CommentViewModel @Inject constructor(
         }
     }
 
-    fun toggleLike(commentId: Int) {
+    fun toggleCommentLike(commentId: Int) {
         viewModelScope.launch {
-            commentsRepository.toggleCommentLike(commentId).let { result ->
+            commentsRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
                 if (result is DataResult.Success) {
-                    val responseComment = result.data as ALComment
+                    val response = result.data
 
                     mutableUiState.update { state ->
                         val index = state.comments.indexOfFirst { comment ->
-                            (comment as ALComment).findComment(responseComment.id) != null
+                            (comment as ALComment).findComment(commentId) != null
                         }
 
                         if (index != -1) {
@@ -95,13 +142,32 @@ class CommentViewModel @Inject constructor(
 
                             state.comments[index] = root.updateComment(commentId) { comment ->
                                 comment.copy(
-                                    likesCount = responseComment.likesCount,
-                                    isLiked = responseComment.isLiked
+                                    likesCount = response.likeCount,
+                                    isLiked = response.isLiked
                                 )
                             }
                         }
 
                         state
+                    }
+                }
+            }
+        }
+    }
+
+    fun toggleThreadLike(threadId: Int) {
+        viewModelScope.launch {
+            commentsRepository.toggleLike(threadId, LikeableType.THREAD).let { result ->
+                if (result is DataResult.Success) {
+                    val response = result.data
+
+                    mutableUiState.update { state ->
+                        state.copy(
+                            thread = state.thread?.copy(
+                                isLiked = response.isLiked,
+                                likeCount = response.likeCount
+                            )
+                        )
                     }
                 }
             }

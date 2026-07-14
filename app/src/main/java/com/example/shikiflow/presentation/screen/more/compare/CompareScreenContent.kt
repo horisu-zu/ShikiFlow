@@ -61,7 +61,7 @@ fun CompareScreenContent(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(bottom = 56.dp) //FAB size
+                contentPadding = PaddingValues(bottom = 84.dp)
             ) {
                 if(uiState.mediaUiState[mediaType]?.isLoading == true) {
                     stickyHeader {
@@ -111,9 +111,7 @@ fun CompareScreenContent(
                                             .animateItem()
                                     )
 
-                                    if(index != media.lastIndex) {
-                                        HorizontalDivider()
-                                    }
+                                    HorizontalDivider()
                                 }
                             }
                         }

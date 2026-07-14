@@ -4,20 +4,26 @@ import androidx.paging.ExperimentalPagingApi
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
+import com.example.graphql.anilist.MediaThreadQuery
 import com.example.graphql.anilist.MediaThreadsQuery
 import com.example.graphql.anilist.ToggleLikeMutation
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
-import com.example.graphql.anilist.type.LikeableType
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toALType
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainLike
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
+import com.example.shikiflow.domain.model.thread.Like
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.thread.Thread
+import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
@@ -94,12 +100,25 @@ class AnilistThreadsDataSource @Inject constructor(
         } ?: throw Exception(response.exception)
     }
 
+    override fun getThread(threadId: Int): Flow<DataResult<Thread>> {
+        val threadQuery = MediaThreadQuery(threadId = threadId)
+
+        val response = apolloClient.query(threadQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .toFlow()
+
+        return response.asDataResult { data ->
+            data.Thread?.aLThread?.toDomainThread()
+                ?: throw IllegalStateException("No data returned from Thread Query")
+        }
+    }
+
     override suspend fun getMediaThreads(
         mediaId: Int,
         page: Int,
         limit: Int,
         threadSort: Sort<ThreadType>
-    ): Result<List<Thread>> {
+    ): Result<List<ThreadShort>> {
         val threadsQuery = MediaThreadsQuery(
             mediaId = mediaId,
             page = page,
@@ -114,15 +133,18 @@ class AnilistThreadsDataSource @Inject constructor(
         return response.toResult().map { data ->
             data.Page
                 ?.threads
-                ?.mapNotNull { it?.aLThread?.toDomain() }
+                ?.mapNotNull { it?.aLThreadShort?.toDomainThread() }
                 ?: emptyList()
         }
     }
 
-    override suspend fun toggleCommentLike(commentId: Int): DataResult<Comment> {
+    override suspend fun toggleLike(
+        id: Int,
+        likeableType: LikeableType
+    ): DataResult<Like> {
         val likeMutation = ToggleLikeMutation(
-            likeableId = commentId,
-            type = LikeableType.THREAD_COMMENT
+            likeableId = id,
+            type = likeableType.toALType()
         )
 
         val response = apolloClient.mutation(likeMutation)
@@ -130,8 +152,8 @@ class AnilistThreadsDataSource @Inject constructor(
             .execute()
 
         return response.asDataResult { data ->
-            data.ToggleLikeV2?.onThreadComment?.aLThreadComment?.toDomain()
-                ?: throw NoSuchElementException("No Comment with ID: $commentId")
+            data.ToggleLikeV2?.toDomainLike()
+                ?: throw NoSuchElementException("No Comment with ID: $id")
         }
     }
 }

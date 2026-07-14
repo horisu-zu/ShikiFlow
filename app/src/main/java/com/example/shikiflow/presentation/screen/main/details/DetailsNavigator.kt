@@ -19,7 +19,6 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.presentation.common.scene.BottomSheetSceneStrategy
@@ -95,10 +94,9 @@ fun DetailsNavigator(
 
         override fun navigateToComments(
             screenMode: CommentsScreenMode,
-            id: Int,
-            threadHeader: Thread?
+            id: Int
         ) {
-            detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id, threadHeader))
+            detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id))
         }
 
         override fun navigateToStaff(staffId: Int) {
@@ -164,8 +162,7 @@ fun DetailsNavigator(
                 EntityType.COMMENT_REPLY -> {
                     navigateToComments(
                         screenMode = CommentsScreenMode.REPLY,
-                        id = id,
-                        threadHeader = null
+                        id = id
                     )
                 }
             }
@@ -243,7 +240,6 @@ fun DetailsNavigator(
             }
             entry<DetailsNavRoute.Comments> { route ->
                 CommentsScreen(
-                    threadHeader = route.threadHeader,
                     screenMode = route.screenMode,
                     id = route.id,
                     navOptions = options

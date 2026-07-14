@@ -36,6 +36,7 @@ import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toShortUserMediaRate
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
@@ -468,8 +469,8 @@ class AnilistUserDataSource @Inject constructor(
                 ?.threads
                 ?.let { list ->
                     list.mapNotNull { user ->
-                        user?.aLThread?.let { alThread ->
-                            Thread(alThread.toDomain())
+                        user?.aLThreadShort?.let { alThread ->
+                            Thread(alThread.toDomainThread())
                         }
                     }
                 } ?: emptyList()

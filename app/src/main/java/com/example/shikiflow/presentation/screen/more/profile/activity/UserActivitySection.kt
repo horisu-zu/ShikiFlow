@@ -142,8 +142,7 @@ fun UserActivitySection(
                                             EntityType.COMMENT_REPLY -> {
                                                 DetailsNavRoute.Comments(
                                                     screenMode = CommentsScreenMode.REPLY,
-                                                    id = id,
-                                                    threadHeader = null
+                                                    id = id
                                                 )
                                             }
                                         }
