@@ -83,6 +83,7 @@ fun UserActivitySection(
             else -> {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(300.dp),
+                    userScrollEnabled = userActivityItems.loadState.refresh !is LoadState.Loading,
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                     contentPadding = PaddingValues(

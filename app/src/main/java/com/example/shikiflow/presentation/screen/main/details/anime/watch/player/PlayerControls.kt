@@ -17,8 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.toIcon
 
@@ -26,10 +28,12 @@ import com.example.shikiflow.utils.toIcon
 fun PlayerControls(
     isPlaying: Boolean,
     isLoading: Boolean,
+    errorMessage: String?,
     isPreviousAvailable: Boolean,
     isNextAvailable: Boolean,
     onPlay: () -> Unit,
     onSeekToEpisode: (Int) -> Unit,
+    onRetry: () -> Unit,
     showControls: Boolean,
     modifier: Modifier = Modifier
 ) {
@@ -38,7 +42,7 @@ fun PlayerControls(
         horizontalArrangement = Arrangement.spacedBy(36.dp, Alignment.CenterHorizontally)
     ) {
         ControlButton(
-            visible = showControls,
+            visible = showControls && errorMessage == null,
             enabled = isPreviousAvailable,
             onClick = { onSeekToEpisode(-1) }
         ) {
@@ -49,9 +53,16 @@ fun PlayerControls(
                 tint = Color.White.copy(alpha = if(isPreviousAvailable) 1f else 0.35f)
             )
         }
+
         if(isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(48.dp)
+            )
+        } else if (errorMessage != null) {
+            ErrorItem(
+                message = errorMessage,
+                buttonLabel = stringResource(R.string.common_retry),
+                onButtonClick = { onRetry() }
             )
         } else {
             ControlButton(
@@ -68,8 +79,9 @@ fun PlayerControls(
                 )
             }
         }
+
         ControlButton(
-            visible = showControls,
+            visible = showControls && errorMessage == null,
             enabled = isNextAvailable,
             onClick = { onSeekToEpisode(1) }
         ) {

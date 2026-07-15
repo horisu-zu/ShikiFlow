@@ -73,6 +73,7 @@ fun StaffSection(
 
     LazyVerticalGrid(
         columns = GridCells.Adaptive(300.dp),
+        userScrollEnabled = !isLoading,
         modifier = modifier,
         contentPadding = PaddingValues(
             start = horizontalPadding,

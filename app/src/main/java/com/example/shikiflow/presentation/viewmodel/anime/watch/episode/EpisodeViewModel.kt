@@ -157,6 +157,17 @@ class EpisodeViewModel @Inject constructor(
         loadUrl(url, resetPosition = false)
     }
 
+    override fun onRetry() {
+        _uiState.update { state ->
+            state.copy(
+                kodikEpisodeUiState = state.kodikEpisodeUiState.copy(
+                    errorMessage = null,
+                    isRefreshing = true
+                )
+            )
+        }
+    }
+
     private fun setupPlayerListener() {
         val listener = object : Player.Listener {
             override fun onIsPlayingChanged(isPlaying: Boolean) {

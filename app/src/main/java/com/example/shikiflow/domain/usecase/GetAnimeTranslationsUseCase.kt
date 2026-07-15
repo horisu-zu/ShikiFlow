@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.usecase
 
 import coil3.network.HttpException
 import com.example.shikiflow.domain.model.kodik.KodikAnime
+import com.example.shikiflow.domain.model.kodik.TranslationType
 import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.presentation.screen.main.details.anime.watch.TranslationFilter
 import com.example.shikiflow.utils.result.DataResult
@@ -24,8 +25,8 @@ class GetAnimeTranslationsUseCase @Inject constructor(
 
             val mappedResponse = mapOf(
                 TranslationFilter.ALL to sortedResponse,
-                TranslationFilter.VOICE to sortedResponse.filter { it.translation.type == "voice" },
-                TranslationFilter.SUBTITLE to sortedResponse.filter { it.translation.type == "subtitles" }
+                TranslationFilter.VOICE to sortedResponse.filter { it.translation.type == TranslationType.DUB },
+                TranslationFilter.SUBTITLE to sortedResponse.filter { it.translation.type == TranslationType.SUBTITLE }
             )
 
             emit(DataResult.Success(mappedResponse))

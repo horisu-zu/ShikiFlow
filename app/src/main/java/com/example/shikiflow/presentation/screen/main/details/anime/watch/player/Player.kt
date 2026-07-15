@@ -117,30 +117,32 @@ fun Player(
                 )
             }
     ) {
-        AndroidView(
-            factory = {
-                PlayerView(context).apply {
-                    useController = false
-                }
-            },
-            update = { view ->
-                view.player = player
-                view.resizeMode = if (isFit) {
-                    AspectRatioFrameLayout.RESIZE_MODE_FIT
-                } else {
-                    AspectRatioFrameLayout.RESIZE_MODE_ZOOM
-                }
-            },
-            onRelease = { view ->
-                view.player = null
-            },
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-        )
+        if (episodeUiState.errorMessage == null) {
+            AndroidView(
+                factory = {
+                    PlayerView(context).apply {
+                        useController = false
+                    }
+                },
+                update = { view ->
+                    view.player = player
+                    view.resizeMode = if (isFit) {
+                        AspectRatioFrameLayout.RESIZE_MODE_FIT
+                    } else {
+                        AspectRatioFrameLayout.RESIZE_MODE_ZOOM
+                    }
+                },
+                onRelease = { view ->
+                    view.player = null
+                },
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black)
+            )
+        }
 
         AnimatedVisibility(
-            visible = showControls,
+            visible = showControls && episodeUiState.errorMessage == null,
             enter = fadeIn() + slideInVertically(
                 animationSpec = spring(
                     stiffness = Spring.StiffnessMedium,
@@ -182,18 +184,20 @@ fun Player(
         PlayerControls(
             isPlaying = playerState.isPlaying,
             isLoading = isLoading,
+            errorMessage = episodeUiState.errorMessage,
             isPreviousAvailable = episodeData.episodeNum > 1,
             isNextAvailable = episodeData.episodeNum < episodesRange.last,
             onSeekToEpisode = { offset ->
                 onSeekToEpisode(episodeData.episodeNum + offset)
             },
             onPlay = { playerEvent.onPlayToggle() },
+            onRetry = { playerEvent.onRetry() },
             showControls = showControls,
             modifier = Modifier.align(Alignment.Center)
         )
 
         AnimatedVisibility(
-            visible = showControls,
+            visible = showControls && episodeUiState.errorMessage == null,
             enter = fadeIn() + slideInVertically(
                 animationSpec = spring(
                     stiffness = Spring.StiffnessMedium,

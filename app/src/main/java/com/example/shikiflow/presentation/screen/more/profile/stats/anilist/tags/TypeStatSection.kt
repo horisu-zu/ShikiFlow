@@ -68,6 +68,7 @@ fun <T> TypeStatSection(
 ) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(240.dp),
+        userScrollEnabled = !isLoading,
         modifier = modifier,
         contentPadding = PaddingValues(
             start = horizontalPadding,

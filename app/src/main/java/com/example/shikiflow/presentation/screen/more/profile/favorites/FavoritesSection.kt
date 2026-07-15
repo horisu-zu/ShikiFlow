@@ -144,7 +144,7 @@ fun FavoritesSection(
                 }
                 else -> {
                     PullToRefreshCustomBox(
-                        isRefreshing = userFavoriteItems.loadState.refresh is LoadState.Loading,
+                        isRefreshing = false,
                         enabled = isRefreshEnabled,
                         onRefresh = {
                             onRefresh()
@@ -156,6 +156,7 @@ fun FavoritesSection(
                     ) {
                         LazyVerticalGrid(
                             columns = GridCells.Adaptive(108.dp),
+                            userScrollEnabled = userFavoriteItems.loadState.refresh !is LoadState.Loading,
                             verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             contentPadding = PaddingValues(

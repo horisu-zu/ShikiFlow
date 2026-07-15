@@ -127,6 +127,7 @@ fun MediaCharactersScreen(
             else -> {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(360.dp),
+                    userScrollEnabled = mediaCharacterItems.loadState.refresh !is LoadState.Loading,
                     contentPadding = PaddingValues(
                         start = 12.dp,
                         end = 12.dp,

@@ -5,4 +5,5 @@ interface PlayerEvent {
     fun onSeek(milliseconds: Long)
     fun onSeekTo(positionMs: Long)
     fun onQualityChange(quality: String)
+    fun onRetry()
 }

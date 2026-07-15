@@ -99,6 +99,7 @@ fun MediaStaffScreen(
             else -> {
                 LazyVerticalGrid(
                     columns = GridCells.Adaptive(240.dp),
+                    userScrollEnabled = mediaStaffItems.loadState.refresh !is LoadState.Loading,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),

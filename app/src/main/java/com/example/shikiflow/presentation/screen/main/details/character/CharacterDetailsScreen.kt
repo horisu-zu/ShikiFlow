@@ -117,6 +117,7 @@ fun CharacterDetailsScreen(
                             else MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
+
                 HorizontalDivider()
             }
         },

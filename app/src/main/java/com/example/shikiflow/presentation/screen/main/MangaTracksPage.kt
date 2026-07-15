@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.screen.main
 
-import android.util.Log
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -77,10 +76,6 @@ fun MangaTracksPage(
         }
     }
 
-    LaunchedEffect(mangaTrackItems.loadState) {
-        Log.d("MangaTracksPage", "Load State: ${mangaTrackItems.loadState}")
-    }
-
     LaunchedEffect(isCurrentPage, isAtTop) {
         if(isCurrentPage) {
             onIsAtTopChange(isAtTop)
@@ -112,6 +107,7 @@ fun MangaTracksPage(
             ) {
                 LazyVerticalGrid(
                     state = lazyGridState,
+                    userScrollEnabled = mangaTrackItems.loadState.refresh !is LoadState.Loading,
                     columns = GridCells.Adaptive(120.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.Top),

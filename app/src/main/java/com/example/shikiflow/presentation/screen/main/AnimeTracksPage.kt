@@ -168,6 +168,7 @@ private fun AnimeTracksListComponent(
 
     LazyColumn(
         state = lazyListState,
+        userScrollEnabled = trackItems.loadState.refresh !is LoadState.Loading,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(
             horizontal = 12.dp,
@@ -245,6 +246,7 @@ private fun AnimeTracksGridComponent(
     LazyVerticalGrid(
         state = lazyGridState,
         columns = GridCells.Adaptive(180.dp),
+        userScrollEnabled = trackItems.loadState.refresh !is LoadState.Loading,
         modifier = modifier.fillMaxSize(),
         contentPadding = PaddingValues(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),

@@ -227,21 +227,21 @@ private fun AnilistCommentItem(
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             commentData.sender?.let { sender ->
                 CommentUserItem(
                     userData = sender,
                     commentInstant = commentData.dateTime,
-                    onUserClick = onUserClick
+                    onUserClick = onUserClick,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
             CommentLikeComponent(
                 likesCount = commentData.likesCount,
                 isLiked = commentData.isLiked,
-                onLikeToggle = { onLikeToggle(commentData.id) },
-                modifier = Modifier.weight(1f, fill = false)
+                onLikeToggle = { onLikeToggle(commentData.id) }
             )
         }
 
@@ -299,22 +299,22 @@ fun ThreadHeaderItem(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
             threadHeader.createdBy?.let { threadAuthor ->
                 CommentUserItem(
                     userData = threadAuthor,
                     commentInstant = threadHeader.createdAt,
-                    onUserClick = onUserClick
+                    onUserClick = onUserClick,
+                    modifier = Modifier.weight(1f)
                 )
             }
 
             CommentLikeComponent(
                 likesCount = threadHeader.likeCount,
                 isLiked = threadHeader.isLiked,
-                onLikeToggle = { onLikeToggle(threadHeader.id) },
-                modifier = Modifier.weight(1f, fill = false)
+                onLikeToggle = { onLikeToggle(threadHeader.id) }
             )
         }
 
@@ -421,6 +421,7 @@ private fun CommentUserItem(
     ) {
         Row(
             modifier = Modifier
+                .weight(1f, fill = false)
                 .offset(x = (-4).dp)
                 .clip(RoundedCornerShape(percent = 32))
                 .clickable { onUserClick(userData) }

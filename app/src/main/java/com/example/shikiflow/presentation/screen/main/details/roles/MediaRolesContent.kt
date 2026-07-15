@@ -87,6 +87,7 @@ fun MediaRolesContent(
                         else -> 240.dp
                     }
                 ),
+                userScrollEnabled = mediaRoles.loadState.refresh !is LoadState.Loading,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding()),

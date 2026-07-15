@@ -175,6 +175,7 @@ fun SocialSection(
                                 SocialCategory.FOLLOWERS -> GridCells.Adaptive(180.dp)
                                 else -> GridCells.Fixed(1)
                             },
+                            userScrollEnabled = !(categoryState.isLoading && categoryState.items.isEmpty()),
                             verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
                             horizontalArrangement = Arrangement.spacedBy(6.dp),
                             contentPadding = PaddingValues(

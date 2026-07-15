@@ -66,6 +66,7 @@ fun PlayerTopComponent(
                 tint = Color.White
             )
         }
+
         Column(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
@@ -79,6 +80,7 @@ fun PlayerTopComponent(
                     color = Color.White
                 )
             )
+
             Text(
                 text = translationGroup,
                 maxLines = 1,
@@ -88,6 +90,7 @@ fun PlayerTopComponent(
                 )
             )
         }
+
         qualityData?.let {
             if(episodesList.size > 1) {
                 PlayerDropdown(
@@ -96,11 +99,12 @@ fun PlayerTopComponent(
                         stringResource(R.string.media_item_episode, epNum)
                     },
                     onValueChange = { index ->
-                        onEpisodeChange(index)
+                        onEpisodeChange(index + 1)
                     },
                     onExpand = onExpand
                 )
             }
+
             PlayerDropdown(
                 label = "${currentQuality}P",
                 values = qualityData.map { "${it}P" },
@@ -140,7 +144,8 @@ private fun PlayerDropdown(
                 .clickable {
                     dropdownExpanded = true
                     onExpand(true)
-                }.padding(horizontal = 8.dp, vertical = 4.dp),
+                }
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -150,12 +155,14 @@ private fun PlayerDropdown(
                     color = Color.White
                 )
             )
+
             Icon(
                 imageVector = Icons.Default.KeyboardArrowDown,
                 contentDescription = "Expand Dropdown",
                 tint = Color.White
             )
         }
+
         DropdownMenu(
             scrollState = scrollState,
             expanded = dropdownExpanded,

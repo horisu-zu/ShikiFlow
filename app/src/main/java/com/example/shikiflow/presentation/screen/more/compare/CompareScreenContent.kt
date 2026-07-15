@@ -61,6 +61,7 @@ fun CompareScreenContent(
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
+                userScrollEnabled = uiState.mediaUiState[mediaType]?.isLoading == false,
                 contentPadding = PaddingValues(bottom = 84.dp)
             ) {
                 if(uiState.mediaUiState[mediaType]?.isLoading == true) {

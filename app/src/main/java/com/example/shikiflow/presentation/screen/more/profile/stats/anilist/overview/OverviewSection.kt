@@ -58,6 +58,7 @@ fun OverviewSection(
 ) {
     LazyColumn(
         modifier = modifier,
+        userScrollEnabled = !uiState.isLoading,
         contentPadding = PaddingValues(
             start = horizontalPadding,
             end = horizontalPadding,
