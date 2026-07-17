@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.manga.read
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,8 +11,10 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,11 +45,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.mangadex.chapter_metadata.ChapterMetadata
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithIcon
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.viewmodel.manga.read.translations.MangaChapterTranslationViewModel
 import com.example.shikiflow.utils.FlagConverter
 import com.example.shikiflow.utils.IconResource
@@ -112,12 +116,7 @@ fun ChapterTranslationsScreen(
             }
         }, modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        if(uiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(uiState.errorMessage != null) {
+        if(uiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -142,17 +141,25 @@ fun ChapterTranslationsScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                uiState.chapterTranslations.let { chapterTranslations ->
-                    items(chapterTranslations.size) { index ->
+                if (uiState.isLoading) {
+                    items(count = 24) { index ->
+                        ChapterTranslationItemPlaceholder(
+                            itemIndex = index,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else if (uiState.chapterTranslations.isNotEmpty()) {
+                    items(uiState.chapterTranslations.size) { index ->
                         ChapterTranslationItem(
-                            mangaDexChapter = chapterTranslations[index],
+                            mangaDexChapter = uiState.chapterTranslations[index],
                             onTranslationClick = { chapterUiData ->
-                                chapterTranslations[index].externalUrl?.let { externalUrl ->
+                                uiState.chapterTranslations[index].externalUrl?.let { externalUrl ->
                                     WebIntent.openUrlCustomTab(context, externalUrl)
                                 } ?: navOptions.navigateToChapter(
                                     chapterUiData = chapterUiData
                                 )
-                            }
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
@@ -168,7 +175,7 @@ private fun ChapterTranslationItem(
     modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable { onTranslationClick(
                 ChapterUiData(
@@ -186,12 +193,13 @@ private fun ChapterTranslationItem(
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = FlagConverter.getFlag(mangaDexChapter.translatedLanguage),
                 style = MaterialTheme.typography.titleMedium
             )
+
             Text(
                 text = if(!mangaDexChapter.title.isNullOrEmpty()) mangaDexChapter.title
                     else stringResource(R.string.chapter_short_title, mangaDexChapter.chapterNumber ?: "?"),
@@ -202,6 +210,7 @@ private fun ChapterTranslationItem(
                 overflow = TextOverflow.Ellipsis
             )
         }
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
@@ -238,6 +247,69 @@ private fun ChapterTranslationItem(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ChapterTranslationItemPlaceholder(
+    itemIndex: Int,
+    modifier: Modifier = Modifier
+) {
+    val indexValue = itemIndex % 4 + 1
+    val labelWidth = when (indexValue <= 2) {
+        true -> 64.dp + indexValue * 4.dp
+        false -> 72.dp - indexValue * 4.dp
+    }
+
+    Column(
+        modifier = modifier
+            .shimmerEffect(overContent = true)
+            .padding(horizontal = 6.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(24.dp)
+                    .height(MaterialTheme.typography.titleMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(labelWidth)
+                    .height(MaterialTheme.typography.bodyLarge.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier
+                    .width(16.dp)
+                    .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+
+            Box(
+                modifier = Modifier
+                    .width(120.dp - indexValue * 8.dp)
+                    .height(MaterialTheme.typography.bodyMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
         }
     }
 }

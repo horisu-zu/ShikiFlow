@@ -23,6 +23,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.browse.BrowseMedia
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -165,7 +166,7 @@ fun BrowseListItemPlaceholder(
         ) {
             Box(
                 modifier = Modifier
-                    .width(80.dp * (maxValue - indexValue + 1))
+                    .width(120.dp + indexValue * 24.dp)
                     .height(MaterialTheme.typography.labelLarge.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
                     .background(MaterialTheme.colorScheme.onSurface)

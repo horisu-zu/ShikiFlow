@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -189,7 +190,7 @@ fun AnimeTrackItemPlaceholder(
         ) {
             Box(
                 modifier = Modifier
-                    .width(120.dp / 1.5f * (maxValue - indexValue + 1))
+                    .width(120.dp + indexValue * 24.dp)
                     .height(MaterialTheme.typography.labelLarge.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
                     .background(MaterialTheme.colorScheme.onSurface)

@@ -315,7 +315,8 @@ private fun AnimeTranslationItem(
 
         Text(
             text = stringResource(R.string.episodes, kodikAnime.episodesCount ?: 1),
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.padding(end = 8.dp)
         )
     }
 }
@@ -346,8 +347,8 @@ private fun AnimeTranslationItemPlaceholder(
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
         ) {
             val labelWidth = when (itemIndex <= 2) {
-                true -> 72.dp + indexValue * 12.dp
-                false -> 96.dp - indexValue * 16.dp
+                true -> 84.dp + indexValue * 12.dp
+                false -> 108.dp - indexValue * 16.dp
             }
 
             Box(
@@ -360,7 +361,7 @@ private fun AnimeTranslationItemPlaceholder(
 
             Box(
                 modifier = Modifier
-                    .width(80.dp)
+                    .width(96.dp)
                     .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                     .clip(RoundedCornerShape(percent = 32))
                     .background(MaterialTheme.colorScheme.onSurface)

@@ -17,18 +17,18 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
@@ -63,6 +63,7 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.viewmodel.manga.read.chapters.MangaChaptersViewModel
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.SortDirection.Companion.changeDirection
+import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter.parseChapterNumber
 import kotlinx.coroutines.launch
 
@@ -188,12 +189,7 @@ fun MangaChaptersScreen(
         },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
-        if(chaptersUiState.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) { CircularProgressIndicator() }
-        } else if(chaptersUiState.errorMessage != null) {
+        if(chaptersUiState.errorMessage != null) {
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
@@ -205,7 +201,7 @@ fun MangaChaptersScreen(
                 )
             }
         } else {
-            val sortedChapters = remember(chaptersUiState.sortDirection) {
+            val sortedChapters = remember(chaptersUiState.sortDirection, chaptersUiState.chaptersMap) {
                 val baseList = chaptersUiState.chaptersMap.keys.toList()
                 when(chaptersUiState.sortDirection) {
                     SortDirection.ASCENDING -> baseList
@@ -228,28 +224,37 @@ fun MangaChaptersScreen(
                 ),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                items(
-                    items = sortedChapters,
-                    key = { chapterNumber -> "${chaptersUiState.sortDirection}_$chapterNumber" }
-                ) { chapterNumber ->
-                    val chapterNum = parseChapterNumber(chapterNumber)
+                if (chaptersUiState.isLoading) {
+                    items(count = 32) {
+                        MediaItemPlaceholder(
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                } else {
+                    items(
+                        items = sortedChapters,
+                        key = { chapterNumber -> "${chaptersUiState.sortDirection}_$chapterNumber" }
+                    ) { chapterNumber ->
+                        val chapterNum = parseChapterNumber(chapterNumber)
 
-                    MediaItem(
-                        mediaNumber = chapterNumber,
-                        onItemClick = {
-                            val chapterIds = chaptersUiState.chaptersMap[chapterNumber] ?: emptyList()
+                        MediaItem(
+                            mediaNumber = chapterNumber,
+                            onItemClick = {
+                                val chapterIds = chaptersUiState.chaptersMap[chapterNumber] ?: emptyList()
 
-                            navOptions.navigateToChapterTranslations(
-                                chapterTranslationIds = chapterIds,
-                                chapterNumber = chapterNumber
-                            )
-                        },
-                        mediaType = MediaType.MANGA,
-                        isCompleted = when {
-                            chaptersUiState.completedChapters <= 0 -> false
-                            else -> chapterNum <= chaptersUiState.completedChapters
-                        }
-                    )
+                                navOptions.navigateToChapterTranslations(
+                                    chapterTranslationIds = chapterIds,
+                                    chapterNumber = chapterNumber
+                                )
+                            },
+                            mediaType = MediaType.MANGA,
+                            isCompleted = when {
+                                chaptersUiState.completedChapters <= 0 -> false
+                                else -> chapterNum <= chaptersUiState.completedChapters
+                            },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
@@ -265,33 +270,62 @@ fun MediaItem(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp))
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
             .clickable { onItemClick() }
             .padding(horizontal = 6.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        val mediaTypeText = when(mediaType) {
-            MediaType.ANIME -> stringResource(id = R.string.media_item_episode, mediaNumber)
-            MediaType.MANGA -> stringResource(id = R.string.media_item_chapter, mediaNumber)
-        }
-
         if(isCompleted) {
             Icon(
                 imageVector = Icons.Default.Check,
                 tint = MaterialTheme.colorScheme.onPrimary,
                 contentDescription = "Completed Chapter/Episode",
-                modifier = Modifier.size(24.dp)
-                    .clip(CircleShape)
+                modifier = Modifier
+                    .size(24.dp)
+                    .clip(RoundedCornerShape(percent = 24))
                     .background(MaterialTheme.colorScheme.primary)
                     .padding(4.dp)
             )
         }
+
         Text(
-            text = mediaTypeText,
+            text = when(mediaType) {
+                MediaType.ANIME -> stringResource(id = R.string.media_item_episode, mediaNumber)
+                MediaType.MANGA -> stringResource(id = R.string.media_item_chapter, mediaNumber)
+            },
             style = MaterialTheme.typography.bodyLarge.copy(
                 fontWeight = FontWeight.SemiBold
             )
+        )
+    }
+}
+
+@Composable
+private fun MediaItemPlaceholder(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .shimmerEffect(overContent = true)
+            .padding(horizontal = 6.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(24.dp)
+                .clip(RoundedCornerShape(percent = 24))
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
+
+        Box(
+            modifier = Modifier
+                .width(96.dp)
+                .height(MaterialTheme.typography.bodyLarge.lineHeight.value.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
         )
     }
 }
