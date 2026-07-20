@@ -8,12 +8,16 @@ import com.example.shikiflow.data.datasource.dto.ShikiUserRateResponse
 import com.example.shikiflow.data.datasource.dto.ShikiUserFavoritesResponse
 import com.example.shikiflow.data.datasource.dto.media.ShikiShortUserRate
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUser
+import com.example.shikiflow.data.datasource.dto.media.ShikiImageUploadResponse
 import com.example.shikiflow.data.datasource.dto.user.ShikiUserShort
+import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -97,4 +101,11 @@ interface UserApi {
     suspend fun deleteFriend(
         @Path("id") userId: Long
     )
+
+    @Multipart
+    @POST("/api/user_images")
+    suspend fun uploadImage(
+        @Part image: MultipartBody.Part,
+        @Part("linked_type") linkedType: String = "Comment"
+    ): ShikiImageUploadResponse
 }

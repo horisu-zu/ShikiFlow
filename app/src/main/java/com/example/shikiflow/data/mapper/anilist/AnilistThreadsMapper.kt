@@ -89,6 +89,7 @@ object AnilistThreadsMapper {
         return ALComment(
             id = id,
             commentBody = comment ?: "",
+            markdownBody = markdownBody ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = user?.aLUserShort?.toDomainUser(),
             childComments = childComments.parseChildComments().map { it.toDomain() },
@@ -101,6 +102,7 @@ object AnilistThreadsMapper {
         return ALComment(
             id = id,
             commentBody = comment ?: "",
+            markdownBody = markdownBody ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
                 id = user?.id ?: 0,
@@ -118,6 +120,7 @@ object AnilistThreadsMapper {
         return ALComment(
             id = id,
             commentBody = comment ?: "",
+            markdownBody = markdownBody ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
             sender = User(
                 id = user?.id ?: 0,
@@ -138,6 +141,7 @@ object AnilistThreadsMapper {
                 comment = ALComment(
                     id = id,
                     commentBody = comment ?: "",
+                    markdownBody = "",
                     dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
                     sender = user?.aLUserShort?.toDomainUser(),
                     childComments = emptyList(),
@@ -173,6 +177,7 @@ object AnilistThreadsMapper {
                 TopicCommentsQuery.ThreadComment(
                     id = map["id"] as? Int ?: 0,
                     comment = map["comment"] as? String,
+                    markdownBody = map["markdownBody"] as? String,
                     createdAt = (map["createdAt"] as? Number)?.toInt() ?: 0,
                     user = (map["user"] as? Map<*, *>)?.let { userMap ->
                         TopicCommentsQuery.User(

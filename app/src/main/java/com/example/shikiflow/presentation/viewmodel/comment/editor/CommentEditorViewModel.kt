@@ -1,0 +1,133 @@
+package com.example.shikiflow.presentation.viewmodel.comment.editor
+
+import android.content.Context
+import android.net.Uri
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.comment.CommentableType
+import com.example.shikiflow.domain.model.comment.MarkdownFormat
+import com.example.shikiflow.domain.repository.CommentRepository
+import com.example.shikiflow.domain.repository.MediaUploaderRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.result.DataResult
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+@HiltViewModel
+class CommentEditorViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
+    private val settingsRepository: SettingsRepository,
+    private val commentRepository: CommentRepository,
+    private val mediaUploaderRepository: MediaUploaderRepository
+): ViewModel() {
+
+    private val _uiState = MutableStateFlow(CommentEditorUiState())
+    val uiState = _uiState.asStateFlow()
+
+    init {
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { authType ->
+                _uiState.update { state ->
+                    state.copy(
+                        authType = authType
+                    )
+                }
+            }.launchIn(viewModelScope)
+    }
+
+    fun setInitialData(
+        threadId: Int,
+        commentId: Int?,
+        commentBody: String?,
+        parentCommentId: Int?
+    ) {
+        _uiState.update { state ->
+            state.copy(
+                threadId = threadId,
+                commentId = commentId,
+                commentBody = commentBody,
+                parentCommentId = parentCommentId
+            )
+        }
+    }
+
+    fun publishComment(
+        commentId: Int?,
+        topicId: Int,
+        parentCommentId: Int?,
+        commentBody: String,
+        isOfftopic: Boolean = false
+    ) {
+        viewModelScope.launch {
+            commentRepository.publishComment(
+                id = commentId,
+                topicId = topicId,
+                commentableType = CommentableType.TOPIC,
+                parentCommentId = parentCommentId,
+                commentBody = commentBody,
+                isOfftopic = isOfftopic
+            )
+        }
+    }
+
+    fun toggleOfftopic() {
+        _uiState.update { state ->
+            state.copy(
+                isOfftopic = !state.isOfftopic
+            )
+        }
+    }
+
+    fun attachMedia(uri: Uri, format: MarkdownFormat) {
+        val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
+
+        viewModelScope.launch {
+            _uiState.update { state ->
+                state.copy(
+                    uploadMediaState = UploadMediaState.Uploading(0f)
+                )
+            }
+
+            val result = mediaUploaderRepository.upload(
+                uri = uri,
+                mime = mime,
+                onProgress = { progress ->
+                    _uiState.update { state ->
+                        state.copy(
+                            uploadMediaState = UploadMediaState.Uploading(progress)
+                        )
+                    }
+                }
+            )
+
+            _uiState.update { state ->
+                state.copy(
+                    uploadMediaState = when (result) {
+                        is DataResult.Success -> UploadMediaState.Success(result.data, format)
+                        is DataResult.Error -> UploadMediaState.Error(result.message)
+                        else -> state.uploadMediaState
+                    }
+                )
+            }
+        }
+    }
+
+    fun resetUploadState() {
+        _uiState.update { state ->
+            state.copy(
+                uploadMediaState = UploadMediaState.Idle
+            )
+        }
+    }
+}

@@ -2,6 +2,7 @@ package com.example.shikiflow.domain.repository
 
 import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Like
@@ -38,4 +39,13 @@ interface CommentRepository {
         id: Int,
         likeableType: LikeableType
     ): DataResult<Like>
+
+    suspend fun publishComment(
+        id: Int?,
+        topicId: Int,
+        commentableType: CommentableType,
+        parentCommentId: Int?,
+        commentBody: String,
+        isOfftopic: Boolean
+    ): DataResult<Comment>
 }

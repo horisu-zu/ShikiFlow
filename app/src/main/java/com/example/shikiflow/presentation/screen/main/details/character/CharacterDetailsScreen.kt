@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.staff.StaffName.Companion.preferred
 import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.presentation.screen.main.details.RoleType
@@ -277,18 +276,7 @@ fun CharacterDetailsScreen(
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CommentSection(
                                 topicId = topicId,
-                                onTopicNavigate = {
-                                    navOptions.navigateToComments(
-                                        screenMode = CommentsScreenMode.TOPIC,
-                                        id = topicId
-                                    )
-                                },
-                                onEntityClick = { entityType, id ->
-                                    navOptions.navigateByEntity(entityType, id)
-                                },
-                                onUserClick = { user ->
-                                    navOptions.navigateToUserProfile(user)
-                                }
+                                navOptions = navOptions
                             )
                         }
                     }

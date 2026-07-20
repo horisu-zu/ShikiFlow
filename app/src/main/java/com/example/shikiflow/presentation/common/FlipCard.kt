@@ -35,13 +35,17 @@ fun FlipCard(
             stiffness = Spring.StiffnessLow
         )
     )
+    val isSettled = CardFace.entries.map { it.angle }.any { it == rotation.value }
 
     Box(
-        modifier = modifier
-            .graphicsLayer {
-                rotationY = rotation.value
-                cameraDistance = 12f * density
+        modifier = modifier.then(
+            if (isSettled) { Modifier } else {
+                Modifier.graphicsLayer {
+                    rotationY = rotation.value
+                    cameraDistance = 12f * density
+                }
             }
+        )
     ) {
         if (rotation.value <= 90f) {
             Box(
@@ -53,9 +57,11 @@ fun FlipCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .graphicsLayer {
-                        rotationY = 180f
-                    }
+                    .then(
+                        if (isSettled) { Modifier } else {
+                            Modifier.graphicsLayer { rotationY = 180f }
+                        }
+                    )
             ) {
                 back()
             }

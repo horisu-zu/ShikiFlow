@@ -5,6 +5,7 @@ import com.example.shikiflow.presentation.UiState
 
 data class CommentSectionUiState(
     val topicId: Int? = null,
+    val currentUserId: Int? = null,
     val commentsCount: Int? = null,
     val comments: List<Comment> = emptyList(),
 

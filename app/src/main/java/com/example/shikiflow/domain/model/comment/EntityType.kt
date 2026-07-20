@@ -11,7 +11,8 @@ enum class EntityType {
     ANIME,
     MANGA,
     RANOBE,
-    COMMENT_REPLY;
+    COMMENT_REPLY,
+    REVIEW;
 
     companion object {
         fun String.getAnilistEntityType(): EntityType? {
@@ -20,6 +21,7 @@ enum class EntityType {
                 "manga" -> MANGA
                 "character" -> CHARACTER
                 "staff" -> PERSON
+                "review" -> REVIEW
                 else -> null
             }
         }

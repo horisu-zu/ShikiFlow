@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
@@ -236,20 +238,22 @@ private fun UpdateProgressBar(
                 text = stringResource(R.string.release_notes_updating),
                 style = MaterialTheme.typography.labelLarge
             )
+
             Text(
                 text = buildString {
                     append((updateState.progress * 100).toInt())
                     append("%")
                 },
                 style = MaterialTheme.typography.labelMedium.copy(
+                    textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 modifier = Modifier
+                    .width(48.dp)
                     .clip(RoundedCornerShape(percent = 32))
                     .background(MaterialTheme.colorScheme.primaryContainer)
                     .padding(horizontal = 8.dp, vertical = 6.dp)
-                    .animateContentSize()
             )
         }
 

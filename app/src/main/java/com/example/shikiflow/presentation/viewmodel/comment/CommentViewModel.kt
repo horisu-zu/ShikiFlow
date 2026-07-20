@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -51,6 +52,7 @@ class CommentViewModel @Inject constructor(
 
                         state.copy(
                             isLoading = if (state.thread != null && state.authType == AuthType.ANILIST) false
+                                else if (state.authType == AuthType.SHIKIMORI) false
                                 else state.isLoading,
                             hasNextPage = result.hasNextPage
                         )
@@ -99,6 +101,18 @@ class CommentViewModel @Inject constructor(
                 mutableUiState.update { state ->
                     state.copy(
                         authType = authType
+                    )
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .filterNotNull()
+            .map { it.id }
+            .distinctUntilChanged()
+            .onEach { currentUserId ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        currentUserId = currentUserId
                     )
                 }
             }.launchIn(viewModelScope)

@@ -25,9 +25,9 @@ import com.example.shikiflow.utils.toIcon
 @OptIn(ExperimentalFoundationStyleApi::class)
 @Composable
 fun Button(
+    label: String,
     modifier: Modifier = Modifier,
     icon: IconResource? = null,
-    label: String = "Confirm operation",
     containerColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
     onClick: () -> Unit,
     enabled: Boolean = true,
@@ -55,12 +55,14 @@ fun Button(
                     size(24.dp)
                 }
             )
+
             Spacer(
                 Modifier.styleable(styleState) {
                     size(ButtonDefaults.IconSpacing)
                 }
             )
         }
+
         Text(
             text = label,
             fontWeight = FontWeight.Medium,

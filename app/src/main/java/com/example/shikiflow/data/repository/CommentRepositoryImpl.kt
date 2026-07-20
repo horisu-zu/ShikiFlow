@@ -9,6 +9,7 @@ import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.di.annotations.Shikimori
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Like
@@ -105,6 +106,26 @@ class CommentRepositoryImpl @Inject constructor(
     ): DataResult<Like> {
         return withSourceSuspend(dataSource) { dataSource ->
             dataSource.toggleLike(id, likeableType)
+        }
+    }
+
+    override suspend fun publishComment(
+        id: Int?,
+        topicId: Int,
+        commentableType: CommentableType,
+        parentCommentId: Int?,
+        commentBody: String,
+        isOfftopic: Boolean
+    ): DataResult<Comment> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.publishComment(
+                id = id,
+                topicId = topicId,
+                commentableType = commentableType,
+                parentCommentId = parentCommentId,
+                commentBody = commentBody,
+                isOfftopic = isOfftopic
+            )
         }
     }
 }

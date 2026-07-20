@@ -73,7 +73,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.presentation.screen.main.details.MediaRolesType
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.presentation.screen.main.details.RoleType
@@ -328,18 +327,7 @@ fun StaffScreen(
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             CommentSection(
                                 topicId = topicId,
-                                onEntityClick = { entityType, id ->
-                                    navOptions.navigateByEntity(entityType, id)
-                                },
-                                onTopicNavigate = { topicId ->
-                                    navOptions.navigateToComments(
-                                        screenMode = CommentsScreenMode.TOPIC,
-                                        id = topicId
-                                    )
-                                },
-                                onUserClick = { user ->
-                                    navOptions.navigateToUserProfile(user)
-                                }
+                                navOptions = navOptions
                             )
                         }
                     }

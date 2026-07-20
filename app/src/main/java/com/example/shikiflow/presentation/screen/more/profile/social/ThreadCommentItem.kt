@@ -47,15 +47,13 @@ fun ThreadCommentItem(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            threadComment.thread.title?.let { threadTitle ->
-                Text(
-                    text = threadTitle,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
-                )
-            }
+            Text(
+                text = threadComment.thread.title,
+                style = MaterialTheme.typography.titleSmall,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
 
             ThreadStatsItem(
                 viewCount = threadComment.thread.viewCount,
@@ -71,6 +69,7 @@ fun ThreadCommentItem(
 
         CommentItem(
             comment = threadComment.comment,
+            currentUserId = 0,
             onEntityClick = onEntityClick,
             onUserClick = { /**/ },
             onCommentSelect = { /**/ },

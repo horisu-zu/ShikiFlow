@@ -91,6 +91,7 @@ fun MangaSelectionScreen(
                     },
                     navigationIcon = {
                         IconButton(
+                            shape = RoundedCornerShape(percent = 24),
                             onClick = { navOptions.navigateBack() }
                         ) {
                             Icon(

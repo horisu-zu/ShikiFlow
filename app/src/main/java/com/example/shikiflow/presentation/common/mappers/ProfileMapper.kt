@@ -37,10 +37,10 @@ object ProfileMapper {
             FavoriteCategory.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
             FavoriteCategory.CHARACTER -> IconResource.Drawable(R.drawable.ic_character)
             FavoriteCategory.STAFF -> IconResource.Vector(Icons.Default.Person)
-            FavoriteCategory.STUDIO -> IconResource.Drawable(R.drawable.ic_film_camera)
+            FavoriteCategory.STUDIO -> IconResource.Drawable(R.drawable.ic_videocam)
             FavoriteCategory.SEYU -> IconResource.Drawable(R.drawable.ic_microphone)
             FavoriteCategory.MANGAKA -> IconResource.Drawable(R.drawable.ic_drawing)
-            FavoriteCategory.PRODUCER -> IconResource.Drawable(R.drawable.ic_film_camera)
+            FavoriteCategory.PRODUCER -> IconResource.Drawable(R.drawable.ic_videocam)
             FavoriteCategory.OTHER_PERSON -> IconResource.Vector(Icons.Default.Person)
         }
     }

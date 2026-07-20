@@ -1,0 +1,15 @@
+mutation PublishThreadComment(
+    $id: Int,
+    $threadId: Int!,
+    $parentCommentId: Int,
+    $commentBody: String!
+) {
+    SaveThreadComment(
+        id: $id,
+        threadId: $threadId,
+        parentCommentId: $parentCommentId,
+        comment: $commentBody
+    ) {
+        ...ALThreadComment
+    }
+}

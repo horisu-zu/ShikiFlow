@@ -8,9 +8,11 @@ import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MediaRepositoryImpl
 import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
+import com.example.shikiflow.data.repository.MediaUploaderRepositoryImpl
 import com.example.shikiflow.data.repository.ReviewRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
+import com.example.shikiflow.data.uploader.MediaUploader
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
@@ -19,6 +21,7 @@ import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.example.shikiflow.domain.repository.MediaUploaderRepository
 import com.example.shikiflow.domain.repository.ReviewRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.UserRepository
@@ -97,4 +100,10 @@ interface RepositoryModule {
     fun bindKodikRepository(
         impl: KodikRepositoryImpl
     ): KodikRepository
+
+    @Binds
+    @Singleton
+    fun bindMediaUploader(
+        impl: MediaUploaderRepositoryImpl
+    ): MediaUploaderRepository
 }

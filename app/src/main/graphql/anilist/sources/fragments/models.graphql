@@ -578,6 +578,7 @@ fragment ALThreadComment on ThreadComment {
         ...ALUserShort
     }
     comment(asHtml: true)
+    markdownBody: comment(asHtml: false)
     createdAt
     childComments
     likeCount

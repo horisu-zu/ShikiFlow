@@ -10,14 +10,14 @@ import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
 import org.json.JSONObject
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -148,11 +148,12 @@ abstract class BaseNetworkRepository {
         flow: Flow<S>,
         block: (S) -> Flow<T>
     ): Flow<T> {
-        return flow {
-            val dataSource = flow.filterNotNull().first()
-
-            emitAll(block(dataSource))
-        }
+        return flow
+            .filterNotNull()
+            .take(1)
+            .flatMapConcat { dataSource ->
+                block(dataSource)
+            }
     }
 
     suspend fun <S, T> withSourceSuspend(

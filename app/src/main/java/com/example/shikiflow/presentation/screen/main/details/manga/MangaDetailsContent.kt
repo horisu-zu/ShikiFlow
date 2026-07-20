@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.data.mapper.local.MediaShortMapper.toShortData
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaDetails
@@ -380,18 +379,7 @@ fun MangaDetailsContent(
             item {
                 CommentSection(
                     topicId = threadId,
-                    onEntityClick = { entityType, id ->
-                        mediaNavOptions.navigateByEntity(entityType, id)
-                    },
-                    onTopicNavigate = { topicId ->
-                        mediaNavOptions.navigateToComments(
-                            screenMode = CommentsScreenMode.TOPIC,
-                            id = topicId
-                        )
-                    },
-                    onUserClick = { user ->
-                        mediaNavOptions.navigateToUserProfile(user)
-                    },
+                    navOptions = mediaNavOptions,
                     modifier = Modifier.fillMaxWidth()
                 )
             }

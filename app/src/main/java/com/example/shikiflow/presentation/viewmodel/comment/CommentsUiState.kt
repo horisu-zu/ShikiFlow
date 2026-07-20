@@ -10,6 +10,7 @@ import com.example.shikiflow.presentation.PagedUiState
 data class CommentsUiState(
     val topicId: Int? = null,
     val authType: AuthType? = null,
+    val currentUserId: Int? = null,
     val thread: Thread? = null,
     val comments: SnapshotStateList<Comment> = mutableStateListOf(),
     val navState: List<Int> = emptyList(),

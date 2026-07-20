@@ -65,3 +65,11 @@ annotation class GithubRetrofit
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class KodikRetrofit
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class CatBoxMediaUploader
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ShikimoriMediaUploader

@@ -195,12 +195,6 @@ private fun MediaRoleItem(
     onCardFaceChange: (CardFace) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var cardFace by retain(cardFace) { mutableStateOf(cardFace) }
-
-    LaunchedEffect(cardFace) {
-        onCardFaceChange(cardFace)
-    }
-
     FlipCard(
         cardFace = cardFace,
         modifier = modifier
@@ -208,7 +202,7 @@ private fun MediaRoleItem(
             .clip(imageType.shape)
             .combinedClickable(
                 onClick = { onItemClick(mediaItem.shortMedia.id) },
-                onLongClick = { cardFace = cardFace.next }
+                onLongClick = { onCardFaceChange(cardFace.next) }
             ),
         front = {
             BrowseCoverItem(

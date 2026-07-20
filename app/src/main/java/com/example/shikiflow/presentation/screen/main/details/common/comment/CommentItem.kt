@@ -20,8 +20,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -56,11 +59,14 @@ import kotlin.time.Instant
 @Composable
 fun CommentItem(
     comment: Comment,
+    currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
     onLikeToggle: (Int) -> Unit,
     onCommentSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onReplyClick: (() -> Unit)? = null,
+    onEditClick: (() -> Unit)? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     secondBackgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
@@ -68,8 +74,11 @@ fun CommentItem(
         is ShikiComment -> {
             ShikimoriCommentItem(
                 commentData = comment,
+                currentUserId = currentUserId,
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
+                onReplyClick = onReplyClick,
+                onEditClick = onEditClick,
                 modifier = modifier,
                 backgroundColor = backgroundColor
             )
@@ -77,10 +86,13 @@ fun CommentItem(
         is ALComment -> {
             AnilistCommentTree(
                 commentData = comment,
+                currentUserId = currentUserId,
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
                 onLikeToggle = onLikeToggle,
                 onCommentSelect = onCommentSelect,
+                onReplyClick = onReplyClick,
+                onEditClick = onEditClick,
                 modifier = modifier,
                 firstBackgroundColor = backgroundColor,
                 secondBackgroundColor = secondBackgroundColor
@@ -92,10 +104,13 @@ fun CommentItem(
 @Composable
 private fun ShikimoriCommentItem(
     commentData: ShikiComment,
+    currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
+    onReplyClick: (() -> Unit)?,
+    onEditClick: (() -> Unit)?
 ) {
     Column(
         modifier = modifier
@@ -116,6 +131,34 @@ private fun ShikimoriCommentItem(
                     onUserClick = onUserClick,
                     modifier = Modifier.weight(1f)
                 )
+            }
+
+            onReplyClick?.let {
+                IconButton(
+                    onClick = onReplyClick,
+                    shape = RoundedCornerShape(percent = 24),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_reply),
+                        contentDescription = "Reply to Comment",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            if (commentData.sender?.id == currentUserId && onEditClick != null) {
+                IconButton(
+                    onClick = onEditClick,
+                    shape = RoundedCornerShape(percent = 24),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Comment",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
             }
 
             if(commentData.isOfftopic) {
@@ -145,6 +188,7 @@ private fun ShikimoriCommentItem(
 @Composable
 private fun AnilistCommentTree(
     commentData: ALComment,
+    currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
     onLikeToggle: (Int) -> Unit,
@@ -152,7 +196,9 @@ private fun AnilistCommentTree(
     firstBackgroundColor: Color,
     secondBackgroundColor: Color,
     modifier: Modifier = Modifier,
-    depth: Int = 0
+    depth: Int = 0,
+    onReplyClick: (() -> Unit)?,
+    onEditClick: (() -> Unit)?
 ) {
     val backgroundColor = when(depth % 2) {
         0 -> firstBackgroundColor
@@ -168,20 +214,26 @@ private fun AnilistCommentTree(
     ) {
         AnilistCommentItem(
             commentData = commentData,
+            currentUserId = currentUserId,
             onEntityClick = onEntityClick,
             onUserClick = onUserClick,
-            onLikeToggle = onLikeToggle
+            onLikeToggle = onLikeToggle,
+            onReplyClick = onReplyClick,
+            onEditClick = onEditClick
         )
 
         if(depth <= 2) {
             commentData.childComments.forEach { childComment ->
                 AnilistCommentTree(
                     commentData = childComment,
+                    currentUserId = currentUserId,
                     depth = depth + 1,
                     onEntityClick = onEntityClick,
                     onUserClick = onUserClick,
                     onLikeToggle = onLikeToggle,
                     onCommentSelect = onCommentSelect,
+                    onReplyClick = onReplyClick,
+                    onEditClick = onEditClick,
                     firstBackgroundColor = firstBackgroundColor,
                     secondBackgroundColor = secondBackgroundColor
                 )
@@ -215,10 +267,13 @@ private fun AnilistCommentTree(
 @Composable
 private fun AnilistCommentItem(
     commentData: ALComment,
+    currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
     onUserClick: (User) -> Unit,
     onLikeToggle: (Int) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onReplyClick: (() -> Unit)?,
+    onEditClick: (() -> Unit)?
 ) {
     Column(
         modifier = modifier,
@@ -238,11 +293,39 @@ private fun AnilistCommentItem(
                 )
             }
 
-            CommentLikeComponent(
-                likesCount = commentData.likesCount,
-                isLiked = commentData.isLiked,
-                onLikeToggle = { onLikeToggle(commentData.id) }
-            )
+            onReplyClick?.let {
+                IconButton(
+                    onClick = onReplyClick,
+                    shape = RoundedCornerShape(percent = 24),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_reply),
+                        contentDescription = "Reply to Comment",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            if (commentData.sender?.id == currentUserId && onEditClick != null) {
+                IconButton(
+                    onClick = onEditClick,
+                    shape = RoundedCornerShape(percent = 24),
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Edit,
+                        contentDescription = "Edit Comment",
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            } else {
+                CommentLikeComponent(
+                    likesCount = commentData.likesCount,
+                    isLiked = commentData.isLiked,
+                    onLikeToggle = { onLikeToggle(commentData.id) }
+                )
+            }
         }
 
         RichTextRenderer(

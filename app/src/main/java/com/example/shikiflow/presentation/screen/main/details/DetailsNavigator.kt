@@ -33,6 +33,7 @@ import com.example.shikiflow.presentation.screen.main.details.character.MediaCha
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadsScreen
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentEditorScreen
 import com.example.shikiflow.presentation.screen.main.details.common.followings.MediaFollowingsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.review.MediaReviewsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewScreen
@@ -49,7 +50,7 @@ fun DetailsNavigator(
     val detailsBackstack = rememberNavBackStack(detailsNavRoute)
     val bottomSheetStrategy = remember { BottomSheetSceneStrategy<NavKey>() }
 
-    val options = object : MediaNavOptions {
+    val navOptions = object : MediaNavOptions {
         override fun navigateToCharacterDetails(characterId: Int) {
             detailsBackstack.add(DetailsNavRoute.CharacterDetails(characterId))
         }
@@ -92,11 +93,17 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.Threads(mediaId))
         }
 
-        override fun navigateToComments(
-            screenMode: CommentsScreenMode,
-            id: Int
-        ) {
+        override fun navigateToComments(screenMode: CommentsScreenMode, id: Int) {
             detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id))
+        }
+
+        override fun navigateToCommentEditor(
+            threadId: Int,
+            commentId: Int?,
+            commentBody: String?,
+            parentCommentId: Int?
+        ) {
+            detailsBackstack.add(DetailsNavRoute.CommentEditor(threadId, commentId, commentBody, parentCommentId))
         }
 
         override fun navigateToStaff(staffId: Int) {
@@ -165,6 +172,9 @@ fun DetailsNavigator(
                         id = id
                     )
                 }
+                EntityType.REVIEW -> {
+                    navigateToReview(id)
+                }
             }
         }
 
@@ -178,24 +188,24 @@ fun DetailsNavigator(
     NavDisplay(
         backStack = detailsBackstack,
         sceneStrategies = listOf(bottomSheetStrategy),
-        onBack = { options.navigateBack() },
+        onBack = { navOptions.navigateBack() },
         entryProvider = entryProvider {
             entry<DetailsNavRoute.AnimeDetails> { route ->
                 AnimeDetailsScreen(
                     id = route.id,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.MangaDetails> { route ->
                 MangaDetailsScreen(
                     id = route.id,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.CharacterDetails> { route ->
                 CharacterDetailsScreen(
                     characterId = route.characterId,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.SimilarMedia>(
@@ -206,10 +216,10 @@ fun DetailsNavigator(
                     mediaId = route.id,
                     mediaType = route.mediaType,
                     onMediaNavigate = { id, mediaType ->
-                        options.navigateBack().let {
+                        navOptions.navigateBack().let {
                             when (mediaType) {
-                                MediaType.ANIME -> options.navigateToAnimeDetails(id)
-                                MediaType.MANGA -> options.navigateToMangaDetails(id)
+                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
                             }
                         }
                     }
@@ -229,33 +239,43 @@ fun DetailsNavigator(
                     mangaId = route.trackerMangaId,
                     malId = route.malId,
                     title = route.title,
-                    onNavigateBack = { options.navigateBack() }
+                    onNavigateBack = { navOptions.navigateBack() }
                 )
             }
             entry<DetailsNavRoute.Threads> { route ->
                 ThreadsScreen(
                     mediaId = route.mediaId,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.Comments> { route ->
                 CommentsScreen(
                     screenMode = route.screenMode,
                     id = route.id,
-                    navOptions = options
+                    navOptions = navOptions
+                )
+            }
+            entry<DetailsNavRoute.CommentEditor>(
+                metadata = BottomSheetSceneStrategy.bottomSheet()
+            ) { route ->
+                CommentEditorScreen(
+                    threadId = route.threadId,
+                    commentId = route.commentId,
+                    commentBody = route.commentBody,
+                    parentCommentId = route.parentCommentId
                 )
             }
             entry<DetailsNavRoute.Staff> { route ->
                 StaffScreen(
                     staffId = route.staffId,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.MediaStaff> { route ->
                 MediaStaffScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.AnimeWatch> { route ->
@@ -263,16 +283,16 @@ fun DetailsNavigator(
                     title = route.title,
                     shikimoriId = route.shikimoriId,
                     completedEpisodes = route.completedEpisodes,
-                    onNavigateBack = { options.navigateBack() }
+                    onNavigateBack = { navOptions.navigateBack() }
                 )
             }
             entry<DetailsNavRoute.Studio> { route ->
                 StudioScreen(
                     id = route.id,
                     studioName = route.studioName,
-                    onNavigateBack = { options.navigateBack() },
+                    onNavigateBack = { navOptions.navigateBack() },
                     onMediaNavigate = { animeId ->
-                        options.navigateToAnimeDetails(animeId)
+                        navOptions.navigateToAnimeDetails(animeId)
                     }
                 )
             }
@@ -281,7 +301,7 @@ fun DetailsNavigator(
                     mediaId = route.mediaId,
                     mediaTitle = route.mediaTitle,
                     mediaType = route.mediaType,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.MediaRoles> { route ->
@@ -289,27 +309,27 @@ fun DetailsNavigator(
                     id = route.id,
                     mediaRolesType = route.mediaRolesType,
                     roleTypes = route.roleTypes,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.MediaReviews> { route ->
                 MediaReviewsScreen(
                     mediaId = route.mediaId,
                     mediaType = route.mediaType,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.Review> { route ->
                 ReviewScreen(
                     reviewId = route.id,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.MediaFollowings> { route ->
                 MediaFollowingsScreen(
                     mediaId = route.mediaId,
                     totalCount = route.totalCount,
-                    navOptions = options
+                    navOptions = navOptions
                 )
             }
         },

@@ -7,6 +7,7 @@ import kotlin.time.Instant
 sealed interface Comment {
     val id: Int
     val commentBody: String
+    val markdownBody: String
     val dateTime: Instant
     val sender: User?
 }
@@ -14,6 +15,7 @@ sealed interface Comment {
 data class ShikiComment(
     override val id: Int,
     override val commentBody: String,
+    override val markdownBody: String,
     override val dateTime: Instant,
     override val sender: User?,
     val isOfftopic: Boolean
@@ -22,6 +24,7 @@ data class ShikiComment(
 data class ALComment(
     override val id: Int,
     override val commentBody: String,
+    override val markdownBody: String,
     override val dateTime: Instant,
     override val sender: User?,
     val childComments: List<ALComment>,

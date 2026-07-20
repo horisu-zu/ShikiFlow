@@ -24,6 +24,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -68,7 +72,22 @@ fun CommentsScreen(
     CompositionLocalProvider(
         LocalExoPlayerCache provides exoPlayerCache
     ) {
-        Scaffold { paddingValues ->
+        Scaffold(
+            floatingActionButton = {
+                if (screenMode == CommentsScreenMode.TOPIC) {
+                    FloatingActionButton(
+                        onClick = { navOptions.navigateToCommentEditor(threadId = id) },
+                        containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Navigate to the Comment Editor"
+                        )
+                    }
+                }
+            }
+        ) { paddingValues ->
             val contentPadding = PaddingValues(
                 start = 12.dp,
                 end = 12.dp,
@@ -86,6 +105,19 @@ fun CommentsScreen(
                         },
                         onUserClick = { user ->
                             navOptions.navigateToUserProfile(user)
+                        },
+                        onReplyClick = { parentCommentId ->
+                            navOptions.navigateToCommentEditor(
+                                threadId = id,
+                                parentCommentId = parentCommentId
+                            )
+                        },
+                        onEditClick = { commentId, commentBody ->
+                            navOptions.navigateToCommentEditor(
+                                threadId = id,
+                                commentId = commentId,
+                                commentBody = commentBody
+                            )
                         }
                     )
                 }
@@ -113,6 +145,8 @@ private fun TopicCommentsSection(
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
     onUserClick: (User) -> Unit,
+    onReplyClick: (Int?) -> Unit,
+    onEditClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier,
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
@@ -180,6 +214,7 @@ private fun TopicCommentsSection(
             comment?.let {
                 CommentItem(
                     comment = comment,
+                    currentUserId = uiState.currentUserId ?: 0,
                     onEntityClick = onEntityClick,
                     onUserClick = onUserClick,
                     onLikeToggle = { commentId ->
@@ -187,6 +222,10 @@ private fun TopicCommentsSection(
                     },
                     onCommentSelect = { commentId ->
                         commentViewModel.selectComment(commentId)
+                    },
+                    onReplyClick = { onReplyClick(comment.id) },
+                    onEditClick = {
+                        onEditClick(comment.id, comment.markdownBody)
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -254,6 +293,7 @@ private fun TopicCommentsSection(
                     ) { comment ->
                         CommentItem(
                             comment = comment,
+                            currentUserId = uiState.currentUserId ?: 0,
                             onEntityClick = onEntityClick,
                             onUserClick = onUserClick,
                             onLikeToggle = { commentId ->
@@ -261,6 +301,10 @@ private fun TopicCommentsSection(
                             },
                             onCommentSelect = { commentId ->
                                 commentViewModel.selectComment(commentId)
+                            },
+                            onReplyClick = { onReplyClick(comment.id) },
+                            onEditClick = {
+                                onEditClick(comment.id, comment.markdownBody)
                             }
                         )
                     }
@@ -385,9 +429,11 @@ private fun CommentsMapSection(
                 )
             }
         }
+
         comments.forEach { comment ->
             CommentItem(
                 comment = comment,
+                currentUserId = 0,
                 onEntityClick = onEntityClick,
                 onUserClick = onUserClick,
                 onLikeToggle = { /**/ }, //Shouldn't happen as it's Shikimori API only section

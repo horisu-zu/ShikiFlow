@@ -248,6 +248,9 @@ fun SocialSection(
                                                             id = id
                                                         )
                                                     }
+                                                    EntityType.REVIEW -> {
+                                                        DetailsNavRoute.Review(id)
+                                                    }
                                                 }
 
                                                 navOptions.navigateToDetails(detailsNavRoute)

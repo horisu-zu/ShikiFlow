@@ -1,7 +1,12 @@
 package com.example.shikiflow.data.remote
 
+import com.example.shikiflow.data.datasource.dto.comment.ShikiCreateComment
+import com.example.shikiflow.data.datasource.dto.comment.ShikiUpdateComment
 import com.example.shikiflow.data.datasource.dto.comment.ShikimoriCommentItem
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -19,5 +24,16 @@ interface CommentApi {
     @GET("/api/comments/{id}")
     suspend fun getCommentById(
         @Path("id") commentId: String
+    ): ShikimoriCommentItem
+
+    @POST("/api/comments")
+    suspend fun createComment(
+        @Body comment: ShikiCreateComment
+    ): ShikimoriCommentItem
+
+    @PUT("/api/comments/{id}")
+    suspend fun updateComment(
+        @Path("id") commentId: String,
+        @Body comment: ShikiUpdateComment
     ): ShikimoriCommentItem
 }

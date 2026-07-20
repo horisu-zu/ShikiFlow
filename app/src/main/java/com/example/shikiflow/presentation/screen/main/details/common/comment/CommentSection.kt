@@ -22,18 +22,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithDivider
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.section.CommentSectionViewModel
 
 @Composable
 fun CommentSection(
     topicId: Int,
-    onEntityClick: (EntityType, Int) -> Unit,
-    onTopicNavigate: (Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    navOptions: MediaNavOptions,
     modifier: Modifier = Modifier,
     commentSectionViewModel: CommentSectionViewModel = hiltViewModel(key = topicId.toString())
 ) {
@@ -68,7 +66,7 @@ fun CommentSection(
             }
 
             IconButton(
-                onClick = { onTopicNavigate(topicId) }
+                onClick = { navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId) }
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
@@ -100,10 +98,28 @@ fun CommentSection(
             uiState.comments.forEach { comment ->
                 CommentItem(
                     comment = comment,
-                    onEntityClick = onEntityClick,
-                    onUserClick = onUserClick,
+                    currentUserId = uiState.currentUserId ?: 0,
+                    onEntityClick = { entityType, id ->
+                        navOptions.navigateByEntity(entityType, id)
+                    },
+                    onUserClick = { user ->
+                        navOptions.navigateToUserProfile(user)
+                    },
                     onLikeToggle = { /**/ },
                     onCommentSelect = { /**/ },
+                    onReplyClick = {
+                        navOptions.navigateToCommentEditor(
+                            threadId = topicId,
+                            parentCommentId = comment.id
+                        )
+                    },
+                    onEditClick = {
+                        navOptions.navigateToCommentEditor(
+                            threadId = topicId,
+                            commentId = comment.id,
+                            commentBody = comment.markdownBody
+                        )
+                    },
                     modifier = Modifier
                 )
             }

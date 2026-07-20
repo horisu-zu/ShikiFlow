@@ -146,6 +146,9 @@ fun UserActivitySection(
                                                     id = id
                                                 )
                                             }
+                                            EntityType.REVIEW -> {
+                                                DetailsNavRoute.Review(id)
+                                            }
                                         }
 
                                         navOptions.navigateToDetails(detailsNavRoute)

@@ -938,4 +938,7 @@
     <string name="score_format_5_point">5-бальна</string>
     <string name="score_format_3_point_smiley">3-бальна</string>
     <string name="settings_score_format">Система оцінювання</string>
+
+    <string name="comment_editor_text_placeholder">Текст коментаря…</string>
+    <string name="comment_editor_publish">Опублікувати</string>
 </resources>

@@ -2,10 +2,12 @@ package com.example.shikiflow.data.datasource.anilist
 
 import androidx.paging.ExperimentalPagingApi
 import com.apollographql.apollo.ApolloClient
+import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.MediaThreadQuery
 import com.example.graphql.anilist.MediaThreadsQuery
+import com.example.graphql.anilist.PublishThreadCommentMutation
 import com.example.graphql.anilist.ToggleLikeMutation
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
@@ -18,6 +20,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainLi
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Like
@@ -154,6 +157,31 @@ class AnilistThreadsDataSource @Inject constructor(
         return response.asDataResult { data ->
             data.ToggleLikeV2?.toDomainLike()
                 ?: throw NoSuchElementException("No Comment with ID: $id")
+        }
+    }
+
+    override suspend fun publishComment(
+        id: Int?,
+        topicId: Int,
+        commentableType: CommentableType,
+        parentCommentId: Int?,
+        commentBody: String,
+        isOfftopic: Boolean
+    ): DataResult<Comment> {
+        val publishMutation = PublishThreadCommentMutation(
+            id = Optional.presentIfNotNull(id),
+            threadId = topicId,
+            parentCommentId = Optional.presentIfNotNull(parentCommentId),
+            commentBody = commentBody
+        )
+
+        val response = apolloClient.mutation(publishMutation)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.asDataResult { data ->
+            data.SaveThreadComment?.aLThreadComment?.toDomain()
+                ?: throw NoSuchElementException("Couldn't Publish a Comment")
         }
     }
 }

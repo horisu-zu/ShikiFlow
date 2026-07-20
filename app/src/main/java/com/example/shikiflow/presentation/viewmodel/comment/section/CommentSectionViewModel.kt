@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.comment.section
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.GetCommentsUseCase
 import com.example.shikiflow.presentation.UiStateViewModel
 import com.example.shikiflow.utils.result.DataResult
@@ -8,8 +9,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
@@ -17,7 +20,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CommentSectionViewModel @Inject constructor(
-    private val getCommentsUseCase: GetCommentsUseCase
+    private val getCommentsUseCase: GetCommentsUseCase,
+    private val settingsRepository: SettingsRepository
 ): UiStateViewModel<CommentSectionUiState>() {
 
     override val initialState: CommentSectionUiState = CommentSectionUiState()
@@ -70,6 +74,18 @@ class CommentSectionViewModel @Inject constructor(
                             )
                         }
                     }
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .filterNotNull()
+            .map { it.id }
+            .distinctUntilChanged()
+            .onEach { currentUserId ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        currentUserId = currentUserId
+                    )
                 }
             }.launchIn(viewModelScope)
     }
