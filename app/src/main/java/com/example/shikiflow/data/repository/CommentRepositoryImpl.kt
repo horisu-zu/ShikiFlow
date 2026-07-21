@@ -128,4 +128,10 @@ class CommentRepositoryImpl @Inject constructor(
             )
         }
     }
+
+    override suspend fun deleteComment(commentId: Int): DataResult<Boolean> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.deleteComment(commentId)
+        }
+    }
 }

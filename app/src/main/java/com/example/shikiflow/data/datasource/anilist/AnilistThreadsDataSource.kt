@@ -5,6 +5,7 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
+import com.example.graphql.anilist.DeleteThreadCommentMutation
 import com.example.graphql.anilist.MediaThreadQuery
 import com.example.graphql.anilist.MediaThreadsQuery
 import com.example.graphql.anilist.PublishThreadCommentMutation
@@ -181,6 +182,21 @@ class AnilistThreadsDataSource @Inject constructor(
 
         return response.asDataResult { data ->
             data.SaveThreadComment?.aLThreadComment?.toDomain()
+                ?: throw NoSuchElementException("Couldn't Publish a Comment")
+        }
+    }
+
+    override suspend fun deleteComment(id: Int): DataResult<Boolean> {
+        val deleteMutation = DeleteThreadCommentMutation(
+            commentId = id
+        )
+
+        val response = apolloClient.mutation(deleteMutation)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.asDataResult { data ->
+            data.DeleteThreadComment?.deleted
                 ?: throw NoSuchElementException("Couldn't Publish a Comment")
         }
     }

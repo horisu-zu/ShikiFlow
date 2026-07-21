@@ -40,6 +40,7 @@ fun CustomDialog(
                 text = text,
                 modifier = Modifier.fillMaxWidth()
             )
+
             TextButton(
                 onClick = {
                     onConfirm()

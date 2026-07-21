@@ -12,9 +12,12 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -33,6 +36,9 @@ class CommentEditorViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CommentEditorUiState())
     val uiState = _uiState.asStateFlow()
 
+    private val _commentEvent = MutableSharedFlow<Boolean>()
+    val commentEvent = _commentEvent.asSharedFlow()
+
     init {
         settingsRepository.authTypeFlow
             .filterNotNull()
@@ -41,6 +47,45 @@ class CommentEditorViewModel @Inject constructor(
                 _uiState.update { state ->
                     state.copy(
                         authType = authType
+                    )
+                }
+            }.launchIn(viewModelScope)
+
+        _uiState
+            .filter { it.uri != null }
+            .distinctUntilChanged { old, new ->
+                old.uri == new.uri && !new.isRefreshingUpload
+            }
+            .onEach { state ->
+                val uri = state.uri!!
+                val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
+
+                _uiState.update { state ->
+                    state.copy(
+                        uploadMediaState = UploadMediaState.Uploading(0f),
+                        isRefreshingUpload = false
+                    )
+                }
+
+                val result = mediaUploaderRepository.upload(
+                    uri = uri,
+                    mime = mime,
+                    onProgress = { progress ->
+                        _uiState.update { state ->
+                            state.copy(
+                                uploadMediaState = UploadMediaState.Uploading(progress)
+                            )
+                        }
+                    }
+                )
+
+                _uiState.update { state ->
+                    state.copy(
+                        uploadMediaState = when (result) {
+                            is DataResult.Success -> UploadMediaState.Success(result.data, state.format!!)
+                            is DataResult.Error -> UploadMediaState.Error(result.message)
+                            else -> state.uploadMediaState
+                        }
                     )
                 }
             }.launchIn(viewModelScope)
@@ -77,6 +122,36 @@ class CommentEditorViewModel @Inject constructor(
                 parentCommentId = parentCommentId,
                 commentBody = commentBody,
                 isOfftopic = isOfftopic
+            ).let { result ->
+                if (result is DataResult.Success) {
+                    _commentEvent.emit(true)
+                }
+            }
+        }
+    }
+
+    fun deleteComment(commentId: Int) {
+        viewModelScope.launch {
+            commentRepository.deleteComment(commentId).let { result ->
+                if (result is DataResult.Success) {
+                    _commentEvent.emit(true)
+                }
+            }
+        }
+    }
+
+    fun setUri(uri: Uri) {
+        _uiState.update { state ->
+            state.copy(
+                uri = uri
+            )
+        }
+    }
+
+    fun setFormat(markdownFormat: MarkdownFormat) {
+        _uiState.update { state ->
+            state.copy(
+                format = markdownFormat
             )
         }
     }
@@ -89,43 +164,19 @@ class CommentEditorViewModel @Inject constructor(
         }
     }
 
-    fun attachMedia(uri: Uri, format: MarkdownFormat) {
-        val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
-
-        viewModelScope.launch {
-            _uiState.update { state ->
-                state.copy(
-                    uploadMediaState = UploadMediaState.Uploading(0f)
-                )
-            }
-
-            val result = mediaUploaderRepository.upload(
-                uri = uri,
-                mime = mime,
-                onProgress = { progress ->
-                    _uiState.update { state ->
-                        state.copy(
-                            uploadMediaState = UploadMediaState.Uploading(progress)
-                        )
-                    }
-                }
+    fun retryUpload() {
+        _uiState.update { state ->
+            state.copy(
+                isRefreshingUpload = true
             )
-
-            _uiState.update { state ->
-                state.copy(
-                    uploadMediaState = when (result) {
-                        is DataResult.Success -> UploadMediaState.Success(result.data, format)
-                        is DataResult.Error -> UploadMediaState.Error(result.message)
-                        else -> state.uploadMediaState
-                    }
-                )
-            }
         }
     }
 
     fun resetUploadState() {
         _uiState.update { state ->
             state.copy(
+                format = null,
+                uri = null,
                 uploadMediaState = UploadMediaState.Idle
             )
         }

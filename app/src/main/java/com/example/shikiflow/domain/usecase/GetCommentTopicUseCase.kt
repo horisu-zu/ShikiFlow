@@ -6,8 +6,7 @@ import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.utils.result.DataResult
-import com.example.shikiflow.utils.parser.HTMLParser
-import com.example.shikiflow.utils.parser.ShikimoriDialect
+import com.example.shikiflow.utils.parser_v2.RichTextParser
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -24,17 +23,15 @@ class GetCommentTopicUseCase @Inject constructor(
         try {
             emit(DataResult.Loading)
 
+            val parser = RichTextParser
             val originalResponse = commentRepository.getCommentById(commentId)
             val result = mutableMapOf(
                 CommentType.OP to listOf(originalResponse)
             )
 
-            val htmlParser = HTMLParser(strategy = ShikimoriDialect())
-            val convertedResponse = htmlParser.parseHtmlString(originalResponse.commentBody)
+            val response = parser.parse(originalResponse.commentBody)
+            val replyIds = parser.getReplies(response.blocks)
 
-            val replyIds = convertedResponse?.let {
-                htmlParser.getCommentStringAnnotations(convertedResponse)
-            } ?: emptyMap()
             Log.d("GetCommentUseCase", "Replies: $replyIds")
 
             coroutineScope {

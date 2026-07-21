@@ -121,7 +121,17 @@ class ShikimoriCommentsDataSource @Inject constructor(
                 )
             }
 
-            return DataResult.Success(response.toDomain())
+            DataResult.Success(response.toDomain())
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Unknown Error")
+        }
+    }
+
+    override suspend fun deleteComment(id: Int): DataResult<Boolean> {
+        return try {
+            commentApi.deleteComment(id.toString())
+
+            DataResult.Success(true)
         } catch (e: Exception) {
             DataResult.Error(e.message ?: "Unknown Error")
         }

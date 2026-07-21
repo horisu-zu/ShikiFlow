@@ -941,4 +941,6 @@
 
     <string name="comment_editor_text_placeholder">Текст комментария…</string>
     <string name="comment_editor_publish">Опубликовать</string>
+    <string name="comment_editor_update">Обновить</string>
+    <string name="comment_editor_media_upload_label">Загрузка медиа…</string>
 </resources>

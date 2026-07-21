@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.common
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.MaterialTheme
@@ -22,6 +23,7 @@ fun CustomTextField(
     cursorBrush: Brush = SolidColor(MaterialTheme.colorScheme.primary),
     lineLimits: TextFieldLineLimits = TextFieldLineLimits.SingleLine,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    inputTransformation: InputTransformation? = null,
     placeholder: @Composable () -> Unit
 ) {
     BasicTextField(
@@ -30,6 +32,7 @@ fun CustomTextField(
         cursorBrush = cursorBrush,
         lineLimits = lineLimits,
         keyboardOptions = keyboardOptions,
+        inputTransformation = inputTransformation,
         decorator = { innerTextField ->
             Box {
                 placeholder()

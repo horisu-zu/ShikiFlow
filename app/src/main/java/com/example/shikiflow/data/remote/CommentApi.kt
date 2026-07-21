@@ -4,9 +4,10 @@ import com.example.shikiflow.data.datasource.dto.comment.ShikiCreateComment
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUpdateComment
 import com.example.shikiflow.data.datasource.dto.comment.ShikimoriCommentItem
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -31,9 +32,14 @@ interface CommentApi {
         @Body comment: ShikiCreateComment
     ): ShikimoriCommentItem
 
-    @PUT("/api/comments/{id}")
+    @PATCH("/api/comments/{id}")
     suspend fun updateComment(
         @Path("id") commentId: String,
         @Body comment: ShikiUpdateComment
     ): ShikimoriCommentItem
+
+    @DELETE("/api/comments/{id}")
+    suspend fun deleteComment(
+        @Path("id") commentId: String
+    )
 }

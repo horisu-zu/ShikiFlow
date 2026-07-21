@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,10 @@ fun Button(
     modifier: Modifier = Modifier,
     icon: IconResource? = null,
     containerColor: Color = MaterialTheme.colorScheme.primary.copy(alpha = 0.75f),
+    style: TextStyle = MaterialTheme.typography.bodyMedium.copy(
+        textAlign = TextAlign.Center,
+        fontWeight = FontWeight.Medium
+    ),
     onClick: () -> Unit,
     enabled: Boolean = true,
     shape: Shape = RoundedCornerShape(8.dp)
@@ -65,8 +70,7 @@ fun Button(
 
         Text(
             text = label,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
+            style = style
         )
     }
 }

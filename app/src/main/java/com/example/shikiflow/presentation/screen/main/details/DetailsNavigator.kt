@@ -262,7 +262,8 @@ fun DetailsNavigator(
                     threadId = route.threadId,
                     commentId = route.commentId,
                     commentBody = route.commentBody,
-                    parentCommentId = route.parentCommentId
+                    parentCommentId = route.parentCommentId,
+                    navOptions = navOptions
                 )
             }
             entry<DetailsNavRoute.Staff> { route ->

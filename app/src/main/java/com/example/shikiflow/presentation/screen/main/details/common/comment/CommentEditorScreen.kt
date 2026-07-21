@@ -21,21 +21,26 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.insert
+import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -49,12 +54,13 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.AniListFormat
-import com.example.shikiflow.domain.model.comment.MarkdownFormat
 import com.example.shikiflow.domain.model.comment.ShikimoriFormat
 import com.example.shikiflow.presentation.common.Button
+import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.CustomTextField
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.mappers.MarkdownFormatMapper.iconResource
+import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEditorViewModel
 import com.example.shikiflow.presentation.viewmodel.comment.editor.UploadMediaState
 import com.example.shikiflow.utils.toIcon
@@ -66,16 +72,23 @@ fun CommentEditorScreen(
     commentId: Int?,
     commentBody: String?,
     parentCommentId: Int?,
+    navOptions: MediaNavOptions,
     commentEditorViewModel: CommentEditorViewModel = hiltViewModel()
 ) {
     val uiState by commentEditorViewModel.uiState.collectAsStateWithLifecycle()
     val textFieldState = rememberTextFieldState(
         initialText = commentBody ?: ""
     )
-    var format by remember { mutableStateOf<MarkdownFormat?>(null) }
+    val showDeleteDialog = remember { mutableStateOf(false) }
 
     LaunchedEffect(threadId, commentId, commentBody, parentCommentId) {
         commentEditorViewModel.setInitialData(threadId, commentId, commentBody, parentCommentId)
+    }
+
+    LaunchedEffect(Unit) {
+        commentEditorViewModel.commentEvent.collect {
+            navOptions.navigateBack()
+        }
     }
 
     LaunchedEffect(uiState.authType) {
@@ -93,7 +106,16 @@ fun CommentEditorScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        if (uri != null && format != null) commentEditorViewModel.attachMedia(uri, format!!)
+        if (uri != null) commentEditorViewModel.setUri(uri)
+    }
+
+    if (showDeleteDialog.value) {
+        CustomDialog(
+            onDismissRequest = { showDeleteDialog.value = false },
+            text = stringResource(R.string.comment_editor_delete_label),
+            confirmButtonText = stringResource(R.string.common_confirm),
+            onConfirm = { commentEditorViewModel.deleteComment(commentId!!) }
+        )
     }
 
     Column(
@@ -123,11 +145,26 @@ fun CommentEditorScreen(
                 )
             }
 
+            if (commentId != null) {
+                IconButton(
+                    shape = RoundedCornerShape(percent = 24),
+                    onClick = { showDeleteDialog.value = true }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        tint = MaterialTheme.colorScheme.error,
+                        contentDescription = "Delete Comment",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            }
+
             AnimatedVisibility(
                 visible = uiState.authType == AuthType.SHIKIMORI
             ) {
                 FilterChip(
                     selected = uiState.isOfftopic,
+                    enabled = commentId == null,
                     label = {
                         Text(
                             text = stringResource(R.string.comment_offtopic),
@@ -139,7 +176,10 @@ fun CommentEditorScreen(
             }
 
             Button(
-                label = stringResource(R.string.comment_editor_publish),
+                label = when (commentId) {
+                    null -> stringResource(R.string.comment_editor_publish)
+                    else -> stringResource(R.string.comment_editor_update)
+                },
                 shape = RoundedCornerShape(percent = 24),
                 onClick = {
                     commentEditorViewModel.publishComment(
@@ -172,6 +212,13 @@ fun CommentEditorScreen(
                 minHeightInLines = 6,
                 maxHeightInLines = 12
             ),
+            inputTransformation = InputTransformation.maxLength(
+                maxLength = when (uiState.authType) {
+                    AuthType.SHIKIMORI -> 4096
+                    AuthType.ANILIST -> 12000
+                    null -> Int.MAX_VALUE
+                }
+            ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 8.dp)
@@ -180,29 +227,6 @@ fun CommentEditorScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(all = 12.dp)
         )
-
-        AnimatedVisibility(
-            visible = uiState.uploadMediaState !is UploadMediaState.Idle
-        ) {
-            UploadMediaComponent(
-                state = uiState.uploadMediaState,
-                onSuccess = { value ->
-                    textFieldState.edit {
-                        val position = selection.end
-                        insert(index = position, value)
-
-                        selection = TextRange(position + value.length)
-                    }
-
-                    commentEditorViewModel.resetUploadState()
-                    format = null
-                },
-                onRetry = { /**/ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            )
-        }
 
         AnimatedVisibility(
             visible = uiState.authType != null
@@ -219,18 +243,19 @@ fun CommentEditorScreen(
                     AuthType.ANILIST -> AniListFormat.entries
                 }.forEach { markdownFormat ->
                     IconButton(
+                        enabled = uiState.format == null,
                         shape = RoundedCornerShape(percent = 24),
                         modifier = Modifier.size(32.dp),
                         onClick = {
                             when (markdownFormat) {
                                 AniListFormat.IMAGE, ShikimoriFormat.IMAGE -> {
-                                    format = markdownFormat
+                                    commentEditorViewModel.setFormat(markdownFormat)
                                     launcher.launch(
                                         input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                     )
                                 }
                                 AniListFormat.VIDEO -> {
-                                    format = markdownFormat
+                                    commentEditorViewModel.setFormat(markdownFormat)
                                     launcher.launch(
                                         input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
                                     )
@@ -266,6 +291,29 @@ fun CommentEditorScreen(
                 }
             }
         }
+
+        AnimatedVisibility(
+            visible = uiState.uploadMediaState !is UploadMediaState.Idle
+        ) {
+            UploadMediaComponent(
+                state = uiState.uploadMediaState,
+                onSuccess = { value ->
+                    textFieldState.edit {
+                        val position = selection.end
+                        insert(index = position, value)
+
+                        selection = TextRange(position + value.length)
+                    }
+
+                    commentEditorViewModel.resetUploadState()
+                },
+                onRetry = { commentEditorViewModel.retryUpload() },
+                onCancel = { commentEditorViewModel.resetUploadState() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            )
+        }
     }
 }
 
@@ -274,6 +322,7 @@ private fun UploadMediaComponent(
     state: UploadMediaState,
     onSuccess: (String) -> Unit,
     onRetry: () -> Unit,
+    onCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     LaunchedEffect(state) {
@@ -294,7 +343,7 @@ private fun UploadMediaComponent(
         },
         contentKey = { state ->
             when(state) {
-                UploadMediaState.Idle -> 0
+                is UploadMediaState.Idle -> 0
                 is UploadMediaState.Uploading -> 1
                 is UploadMediaState.Success -> 2
                 is UploadMediaState.Error -> 3
@@ -304,14 +353,15 @@ private fun UploadMediaComponent(
         when (state) {
             is UploadMediaState.Uploading -> {
                 Column(
-                    modifier = modifier
+                    modifier = modifier,
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = "Uploading Media...",
+                            text = stringResource(R.string.comment_editor_media_upload_label),
                             style = MaterialTheme.typography.labelLarge
                         )
 
@@ -340,10 +390,34 @@ private fun UploadMediaComponent(
                 }
             }
             is UploadMediaState.Error -> {
-                Text(
-                    text = state.message,
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                Column(
+                    modifier = modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+                ) {
+                    Text(
+                        text = state.message,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        TextButton(
+                            onClick = onCancel
+                        ) {
+                            Text(
+                                text = "Cancel",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                        Button(
+                            label = stringResource(R.string.common_retry),
+                            onClick = onRetry
+                        )
+                    }
+                }
             }
             else -> { /**/ }
         }

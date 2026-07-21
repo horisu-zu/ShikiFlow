@@ -48,4 +48,6 @@ interface CommentRepository {
         commentBody: String,
         isOfftopic: Boolean
     ): DataResult<Comment>
+
+    suspend fun deleteComment(commentId: Int): DataResult<Boolean>
 }
