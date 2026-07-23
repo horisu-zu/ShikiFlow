@@ -34,8 +34,11 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -60,34 +63,35 @@ import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.CustomTextField
 import com.example.shikiflow.presentation.common.ProgressBar
 import com.example.shikiflow.presentation.common.mappers.MarkdownFormatMapper.iconResource
-import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEditorViewModel
+import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
 import com.example.shikiflow.presentation.viewmodel.comment.editor.UploadMediaState
 import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommentEditorScreen(
+fun CommentEditorSheet(
     threadId: Int,
     commentId: Int?,
     commentBody: String?,
     parentCommentId: Int?,
-    navOptions: MediaNavOptions,
+    onDismiss: () -> Unit,
+    onEvent: (CommentEvent) -> Unit,
     commentEditorViewModel: CommentEditorViewModel = hiltViewModel()
 ) {
     val uiState by commentEditorViewModel.uiState.collectAsStateWithLifecycle()
     val textFieldState = rememberTextFieldState(
         initialText = commentBody ?: ""
     )
+    val sheetState = rememberBottomSheetState(
+        initialValue = SheetValue.Hidden,
+        enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
+    )
     val showDeleteDialog = remember { mutableStateOf(false) }
 
-    LaunchedEffect(threadId, commentId, commentBody, parentCommentId) {
-        commentEditorViewModel.setInitialData(threadId, commentId, commentBody, parentCommentId)
-    }
-
     LaunchedEffect(Unit) {
-        commentEditorViewModel.commentEvent.collect {
-            navOptions.navigateBack()
+        commentEditorViewModel.commentEvent.collect { event ->
+            onEvent(event)
         }
     }
 
@@ -118,201 +122,211 @@ fun CommentEditorScreen(
         )
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .imePadding()
+    ModalBottomSheet(
+        sheetState = sheetState,
+        dragHandle = null,
+        onDismissRequest = onDismiss
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (uiState.authType != null && textFieldState.text.isNotEmpty()) {
-                Text(
-                    text = buildString {
-                        append(textFieldState.text.length)
-                        append("/")
-                        append(
-                            when (uiState.authType!!) {
-                                AuthType.SHIKIMORI -> 4096
-                                AuthType.ANILIST -> 12000
-                            }
-                        )
-                    },
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-
-            if (commentId != null) {
-                IconButton(
-                    shape = RoundedCornerShape(percent = 24),
-                    onClick = { showDeleteDialog.value = true }
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        tint = MaterialTheme.colorScheme.error,
-                        contentDescription = "Delete Comment",
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            }
-
-            AnimatedVisibility(
-                visible = uiState.authType == AuthType.SHIKIMORI
-            ) {
-                FilterChip(
-                    selected = uiState.isOfftopic,
-                    enabled = commentId == null,
-                    label = {
-                        Text(
-                            text = stringResource(R.string.comment_offtopic),
-                            style = MaterialTheme.typography.bodyMedium
-                        )
-                    },
-                    onClick = { commentEditorViewModel.toggleOfftopic() }
-                )
-            }
-
-            Button(
-                label = when (commentId) {
-                    null -> stringResource(R.string.comment_editor_publish)
-                    else -> stringResource(R.string.comment_editor_update)
-                },
-                shape = RoundedCornerShape(percent = 24),
-                onClick = {
-                    commentEditorViewModel.publishComment(
-                        commentId = uiState.commentId,
-                        topicId = uiState.threadId!!,
-                        parentCommentId = uiState.parentCommentId,
-                        commentBody = textFieldState.text.toString(),
-                        isOfftopic = uiState.isOfftopic
-                    )
-                }
-            )
-        }
-
-        CustomTextField(
-            textFieldState = textFieldState,
-            textStyle = MaterialTheme.typography.bodyMedium.copy(
-                color = MaterialTheme.colorScheme.onSurface
-            ),
-            placeholder = {
-                if (textFieldState.text.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.comment_editor_text_placeholder),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                        )
-                    )
-                }
-            },
-            lineLimits = TextFieldLineLimits.MultiLine(
-                minHeightInLines = 6,
-                maxHeightInLines = 12
-            ),
-            inputTransformation = InputTransformation.maxLength(
-                maxLength = when (uiState.authType) {
-                    AuthType.SHIKIMORI -> 4096
-                    AuthType.ANILIST -> 12000
-                    null -> Int.MAX_VALUE
-                }
-            ),
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp)
-                .verticalScroll(rememberScrollState())
-                .clip(RoundedCornerShape(size = 16.dp))
-                .background(MaterialTheme.colorScheme.background)
-                .padding(all = 12.dp)
-        )
-
-        AnimatedVisibility(
-            visible = uiState.authType != null
+                .padding(
+                    top = 12.dp,
+                    start = 12.dp,
+                    end = 12.dp
+                )
+                .imePadding()
         ) {
-            FlowRow(
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (uiState.authType != null && textFieldState.text.isNotEmpty()) {
+                    Text(
+                        text = buildString {
+                            append(textFieldState.text.length)
+                            append("/")
+                            append(
+                                when (uiState.authType!!) {
+                                    AuthType.SHIKIMORI -> 4096
+                                    AuthType.ANILIST -> 12000
+                                }
+                            )
+                        },
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
+
+                if (commentId != null) {
+                    IconButton(
+                        shape = RoundedCornerShape(percent = 24),
+                        onClick = { showDeleteDialog.value = true }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            tint = MaterialTheme.colorScheme.error,
+                            contentDescription = "Delete Comment",
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = uiState.authType == AuthType.SHIKIMORI
+                ) {
+                    FilterChip(
+                        selected = uiState.isOfftopic,
+                        enabled = commentId == null,
+                        label = {
+                            Text(
+                                text = stringResource(R.string.comment_offtopic),
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        },
+                        onClick = { commentEditorViewModel.toggleOfftopic() }
+                    )
+                }
+
+                Button(
+                    label = when (commentId) {
+                        null -> stringResource(R.string.comment_editor_publish)
+                        else -> stringResource(R.string.comment_editor_update)
+                    },
+                    shape = RoundedCornerShape(percent = 24),
+                    onClick = {
+                        commentEditorViewModel.publishComment(
+                            commentId = commentId,
+                            topicId = threadId,
+                            parentCommentId = parentCommentId,
+                            commentBody = textFieldState.text.toString(),
+                            isOfftopic = uiState.isOfftopic
+                        )
+                    }
+                )
+            }
+
+            CustomTextField(
+                textFieldState = textFieldState,
+                textStyle = MaterialTheme.typography.bodyMedium.copy(
+                    color = MaterialTheme.colorScheme.onSurface
+                ),
+                placeholder = {
+                    if (textFieldState.text.isEmpty()) {
+                        Text(
+                            text = stringResource(R.string.comment_editor_text_placeholder),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                            )
+                        )
+                    }
+                },
+                lineLimits = TextFieldLineLimits.MultiLine(
+                    minHeightInLines = 6,
+                    maxHeightInLines = 12
+                ),
+                inputTransformation = InputTransformation.maxLength(
+                    maxLength = when (uiState.authType) {
+                        AuthType.SHIKIMORI -> 4096
+                        AuthType.ANILIST -> 12000
+                        null -> Int.MAX_VALUE
+                    }
+                ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                when (uiState.authType!!) {
-                    AuthType.SHIKIMORI -> ShikimoriFormat.entries
-                    AuthType.ANILIST -> AniListFormat.entries
-                }.forEach { markdownFormat ->
-                    IconButton(
-                        enabled = uiState.format == null,
-                        shape = RoundedCornerShape(percent = 24),
-                        modifier = Modifier.size(32.dp),
-                        onClick = {
-                            when (markdownFormat) {
-                                AniListFormat.IMAGE, ShikimoriFormat.IMAGE -> {
-                                    commentEditorViewModel.setFormat(markdownFormat)
-                                    launcher.launch(
-                                        input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                    )
-                                }
-                                AniListFormat.VIDEO -> {
-                                    commentEditorViewModel.setFormat(markdownFormat)
-                                    launcher.launch(
-                                        input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
-                                    )
-                                }
-                                else -> {
-                                    textFieldState.edit {
-                                        val position = selection.end
-                                        insert(index = position, markdownFormat.syntax)
+                    .padding(top = 8.dp)
+                    .verticalScroll(rememberScrollState())
+                    .clip(RoundedCornerShape(size = 16.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(all = 12.dp)
+            )
 
-                                        selection = when (markdownFormat) {
-                                            AniListFormat.QUOTE -> {
-                                                TextRange(position + markdownFormat.syntax.length)
-                                            }
-                                            AniListFormat.YOUTUBE -> {
-                                                TextRange(position + 8)
-                                            }
-                                            ShikimoriFormat.LIST -> {
-                                                TextRange(position + 9)
-                                            }
-                                            else -> {
-                                                TextRange(position + markdownFormat.syntax.length / 2)
+            AnimatedVisibility(
+                visible = uiState.authType != null
+            ) {
+                FlowRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    when (uiState.authType!!) {
+                        AuthType.SHIKIMORI -> ShikimoriFormat.entries
+                        AuthType.ANILIST -> AniListFormat.entries
+                    }.forEach { markdownFormat ->
+                        IconButton(
+                            enabled = uiState.format == null,
+                            shape = RoundedCornerShape(percent = 24),
+                            modifier = Modifier.size(32.dp),
+                            onClick = {
+                                when (markdownFormat) {
+                                    AniListFormat.IMAGE, ShikimoriFormat.IMAGE -> {
+                                        commentEditorViewModel.setFormat(markdownFormat)
+                                        launcher.launch(
+                                            input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                        )
+                                    }
+                                    AniListFormat.VIDEO -> {
+                                        commentEditorViewModel.setFormat(markdownFormat)
+                                        launcher.launch(
+                                            input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
+                                        )
+                                    }
+                                    else -> {
+                                        textFieldState.edit {
+                                            val position = selection.end
+                                            insert(index = position, markdownFormat.syntax)
+
+                                            selection = when (markdownFormat) {
+                                                AniListFormat.QUOTE -> {
+                                                    TextRange(position + markdownFormat.syntax.length)
+                                                }
+                                                AniListFormat.YOUTUBE -> {
+                                                    TextRange(position + 8)
+                                                }
+                                                ShikimoriFormat.LIST -> {
+                                                    TextRange(position + 9)
+                                                }
+                                                else -> {
+                                                    TextRange(position + markdownFormat.syntax.length / 2)
+                                                }
                                             }
                                         }
                                     }
                                 }
                             }
+                        ) {
+                            markdownFormat.iconResource().toIcon(
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
-                    ) {
-                        markdownFormat.iconResource().toIcon(
-                            modifier = Modifier.size(20.dp)
-                        )
                     }
                 }
             }
-        }
 
-        AnimatedVisibility(
-            visible = uiState.uploadMediaState !is UploadMediaState.Idle
-        ) {
-            UploadMediaComponent(
-                state = uiState.uploadMediaState,
-                onSuccess = { value ->
-                    textFieldState.edit {
-                        val position = selection.end
-                        insert(index = position, value)
+            AnimatedVisibility(
+                visible = uiState.uploadMediaState !is UploadMediaState.Idle
+            ) {
+                UploadMediaComponent(
+                    state = uiState.uploadMediaState,
+                    onSuccess = { value ->
+                        textFieldState.edit {
+                            val position = selection.end
+                            insert(index = position, value)
 
-                        selection = TextRange(position + value.length)
-                    }
+                            selection = TextRange(position + value.length)
+                        }
 
-                    commentEditorViewModel.resetUploadState()
-                },
-                onRetry = { commentEditorViewModel.retryUpload() },
-                onCancel = { commentEditorViewModel.resetUploadState() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-            )
+                        commentEditorViewModel.resetUploadState()
+                    },
+                    onRetry = { commentEditorViewModel.retryUpload() },
+                    onCancel = { commentEditorViewModel.resetUploadState() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp)
+                )
+            }
         }
     }
 }

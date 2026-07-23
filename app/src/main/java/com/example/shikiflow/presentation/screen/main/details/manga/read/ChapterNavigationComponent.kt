@@ -71,7 +71,8 @@ fun ChapterNavigationComponent(
         floatingActionButton = {
             FloatingToolbarDefaults.StandardFloatingActionButton(
                 onClick = onSheetOpenClick,
-                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                contentColor = MaterialTheme.colorScheme.onSurface
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.List,

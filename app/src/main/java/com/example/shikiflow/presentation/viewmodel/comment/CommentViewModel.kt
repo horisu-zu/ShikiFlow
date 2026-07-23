@@ -3,12 +3,15 @@ package com.example.shikiflow.presentation.viewmodel.comment
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.ALComment
+import com.example.shikiflow.domain.model.comment.ALComment.Companion.deleteComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.findComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.updateComment
+import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
+import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -185,6 +188,70 @@ class CommentViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun onEvent(event: CommentEvent) {
+        mutableUiState.update { state ->
+            when (event) {
+                is CommentEvent.Published -> when (event.comment) {
+                    is ALComment -> if (event.parentCommentId != null) {
+                        val index = state.comments.indexOfFirst { comment ->
+                            (comment as ALComment).findComment(event.parentCommentId) != null
+                        }
+
+                        if (index != -1) {
+                            val root = state.comments[index] as ALComment
+
+                            state.comments[index] = root.updateComment(event.parentCommentId) { comment ->
+                                comment.copy(childComments = comment.childComments + event.comment)
+                            }
+                        }
+                    } else state.comments.add(0, event.comment)
+
+                    is ShikiComment -> state.comments.add(0, event.comment)
+                }
+                is CommentEvent.Updated -> {
+                    when (val updatedComment = event.comment) {
+                        is ShikiComment -> {
+                            val index = state.comments.indexOfFirst { it.id == updatedComment.id }
+
+                            if (index != -1) {
+                                state.comments[index] = updatedComment
+                            }
+                        }
+                        is ALComment -> {
+                            val index = state.comments.indexOfFirst { comment ->
+                                comment is ALComment && comment.findComment(updatedComment.id) != null
+                            }
+
+                            if (index != -1) {
+                                val root = state.comments[index] as ALComment
+                                state.comments[index] = root.updateComment(updatedComment.id) { updatedComment }
+                            }
+                        }
+                    }
+                }
+                is CommentEvent.Deleted -> {
+                    val index = state.comments.indexOfFirst { comment ->
+                        if (comment is ALComment) {
+                            comment.findComment(event.commentId) != null
+                        } else comment.id == event.commentId
+                    }
+
+                    if (index != -1) {
+                        val comment = state.comments[index]
+
+                        if (comment is ALComment && comment.id != event.commentId) {
+                            state.comments[index] = comment.deleteComment(event.commentId)
+                        } else {
+                            state.comments.removeAt(index)
+                        }
+                    }
+                }
+            }
+
+            state
         }
     }
 

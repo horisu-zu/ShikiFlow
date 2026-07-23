@@ -31,13 +31,6 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToComments(screenMode: CommentsScreenMode, id: Int)
 
-    fun navigateToCommentEditor(
-        threadId: Int,
-        commentId: Int? = null,
-        commentBody: String? = null,
-        parentCommentId: Int? = null
-    )
-
     fun navigateToAnimeWatch(title: String, shikimoriId: Int, completedEpisodes: Int)
 
     fun navigateByEntity(entityType: EntityType, id: Int)

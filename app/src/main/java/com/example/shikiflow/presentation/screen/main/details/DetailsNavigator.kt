@@ -33,7 +33,6 @@ import com.example.shikiflow.presentation.screen.main.details.character.MediaCha
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ExternalLinksScreen
 import com.example.shikiflow.presentation.screen.main.details.common.ThreadsScreen
-import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentEditorScreen
 import com.example.shikiflow.presentation.screen.main.details.common.followings.MediaFollowingsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.review.MediaReviewsScreen
 import com.example.shikiflow.presentation.screen.main.details.common.review.ReviewScreen
@@ -95,15 +94,6 @@ fun DetailsNavigator(
 
         override fun navigateToComments(screenMode: CommentsScreenMode, id: Int) {
             detailsBackstack.add(DetailsNavRoute.Comments(screenMode, id))
-        }
-
-        override fun navigateToCommentEditor(
-            threadId: Int,
-            commentId: Int?,
-            commentBody: String?,
-            parentCommentId: Int?
-        ) {
-            detailsBackstack.add(DetailsNavRoute.CommentEditor(threadId, commentId, commentBody, parentCommentId))
         }
 
         override fun navigateToStaff(staffId: Int) {
@@ -252,17 +242,6 @@ fun DetailsNavigator(
                 CommentsScreen(
                     screenMode = route.screenMode,
                     id = route.id,
-                    navOptions = navOptions
-                )
-            }
-            entry<DetailsNavRoute.CommentEditor>(
-                metadata = BottomSheetSceneStrategy.bottomSheet()
-            ) { route ->
-                CommentEditorScreen(
-                    threadId = route.threadId,
-                    commentId = route.commentId,
-                    commentBody = route.commentBody,
-                    parentCommentId = route.parentCommentId,
                     navOptions = navOptions
                 )
             }

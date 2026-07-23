@@ -44,14 +44,6 @@ sealed interface DetailsNavRoute : NavKey {
     ) : DetailsNavRoute
 
     @Serializable
-    data class CommentEditor(
-        val threadId: Int,
-        val commentId: Int?,
-        val commentBody: String?,
-        val parentCommentId: Int?
-    ) : DetailsNavRoute
-
-    @Serializable
     data class Staff(val staffId: Int) : DetailsNavRoute
 
     @Serializable

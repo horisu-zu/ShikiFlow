@@ -21,7 +21,6 @@ import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainLi
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.comment.Comment
-import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Like
@@ -164,7 +163,6 @@ class AnilistThreadsDataSource @Inject constructor(
     override suspend fun publishComment(
         id: Int?,
         topicId: Int,
-        commentableType: CommentableType,
         parentCommentId: Int?,
         commentBody: String,
         isOfftopic: Boolean

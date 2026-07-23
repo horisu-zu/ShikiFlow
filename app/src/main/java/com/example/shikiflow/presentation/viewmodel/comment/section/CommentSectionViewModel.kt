@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.GetCommentsUseCase
 import com.example.shikiflow.presentation.UiStateViewModel
+import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
 import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -35,6 +36,20 @@ class CommentSectionViewModel @Inject constructor(
     fun onRefresh() {
         mutableUiState.update { state ->
             state.copy(isRefreshing = true)
+        }
+    }
+
+    fun onCommentEvent(commentEvent: CommentEvent) {
+        mutableUiState.update { state ->
+            state.copy(
+                comments = when (commentEvent) {
+                    is CommentEvent.Published -> state.comments + commentEvent.comment
+                    is CommentEvent.Updated -> state.comments.map { comment ->
+                        if (comment.id == commentEvent.comment.id) commentEvent.comment else comment
+                    }
+                    is CommentEvent.Deleted -> state.comments.filter { it.id != commentEvent.commentId }
+                }
+            )
         }
     }
 

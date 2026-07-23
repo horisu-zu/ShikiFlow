@@ -943,4 +943,5 @@
     <string name="comment_editor_publish">Опубликовать</string>
     <string name="comment_editor_update">Обновить</string>
     <string name="comment_editor_media_upload_label">Загрузка медиа…</string>
+    <string name="comment_editor_delete_label">Это действие необратимо. Вы уверены, что хотите удалить комментарий?</string>
 </resources>

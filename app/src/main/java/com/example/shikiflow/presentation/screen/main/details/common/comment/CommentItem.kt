@@ -65,8 +65,8 @@ fun CommentItem(
     onLikeToggle: (Int) -> Unit,
     onCommentSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onReplyClick: (() -> Unit)? = null,
-    onEditClick: (() -> Unit)? = null,
+    onReplyClick: ((Int) -> Unit)? = null,
+    onEditClick: ((Int, String) -> Unit)? = null,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     secondBackgroundColor: Color = MaterialTheme.colorScheme.background
 ) {
@@ -109,8 +109,8 @@ private fun ShikimoriCommentItem(
     onUserClick: (User) -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
-    onReplyClick: (() -> Unit)?,
-    onEditClick: (() -> Unit)?
+    onReplyClick: ((Int) -> Unit)?,
+    onEditClick: ((Int, String) -> Unit)?
 ) {
     Column(
         modifier = modifier
@@ -135,7 +135,7 @@ private fun ShikimoriCommentItem(
 
             onReplyClick?.let {
                 IconButton(
-                    onClick = onReplyClick,
+                    onClick = { onReplyClick(commentData.id) },
                     shape = RoundedCornerShape(percent = 24),
                     modifier = Modifier.size(32.dp)
                 ) {
@@ -149,7 +149,7 @@ private fun ShikimoriCommentItem(
 
             if (commentData.sender?.id == currentUserId && onEditClick != null) {
                 IconButton(
-                    onClick = onEditClick,
+                    onClick = { onEditClick(commentData.id, commentData.markdownBody) },
                     shape = RoundedCornerShape(percent = 24),
                     modifier = Modifier.size(32.dp)
                 ) {
@@ -197,8 +197,8 @@ private fun AnilistCommentTree(
     secondBackgroundColor: Color,
     modifier: Modifier = Modifier,
     depth: Int = 0,
-    onReplyClick: (() -> Unit)?,
-    onEditClick: (() -> Unit)?
+    onReplyClick: ((Int) -> Unit)?,
+    onEditClick: ((Int, String) -> Unit)?
 ) {
     val backgroundColor = when(depth % 2) {
         0 -> firstBackgroundColor
@@ -272,8 +272,8 @@ private fun AnilistCommentItem(
     onUserClick: (User) -> Unit,
     onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onReplyClick: (() -> Unit)?,
-    onEditClick: (() -> Unit)?
+    onReplyClick: ((Int) -> Unit)?,
+    onEditClick: ((Int, String) -> Unit)?
 ) {
     Column(
         modifier = modifier,
@@ -295,7 +295,7 @@ private fun AnilistCommentItem(
 
             onReplyClick?.let {
                 IconButton(
-                    onClick = onReplyClick,
+                    onClick = { onReplyClick(commentData.id) },
                     shape = RoundedCornerShape(percent = 24),
                     modifier = Modifier.size(32.dp)
                 ) {
@@ -309,7 +309,7 @@ private fun AnilistCommentItem(
 
             if (commentData.sender?.id == currentUserId && onEditClick != null) {
                 IconButton(
-                    onClick = onEditClick,
+                    onClick = { onEditClick(commentData.id, commentData.markdownBody) },
                     shape = RoundedCornerShape(percent = 24),
                     modifier = Modifier.size(32.dp)
                 ) {

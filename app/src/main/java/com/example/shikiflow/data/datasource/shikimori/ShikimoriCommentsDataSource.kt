@@ -4,10 +4,8 @@ import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.datasource.dto.comment.ShikiCreateComment
 import com.example.shikiflow.data.datasource.dto.comment.ShikiUpdateComment
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCommentsMapper.toDomain
-import com.example.shikiflow.data.mapper.shikimori.ShikimoriCommentsMapper.toShikiType
 import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.domain.model.comment.Comment
-import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.thread.Like
@@ -99,7 +97,6 @@ class ShikimoriCommentsDataSource @Inject constructor(
     override suspend fun publishComment(
         id: Int?,
         topicId: Int,
-        commentableType: CommentableType,
         parentCommentId: Int?,
         commentBody: String,
         isOfftopic: Boolean
@@ -115,7 +112,6 @@ class ShikimoriCommentsDataSource @Inject constructor(
                     comment = ShikiCreateComment(
                         body = commentBody,
                         commentableId = topicId,
-                        commentableType = commentableType.toShikiType(),
                         isOfftopic = isOfftopic
                     )
                 )

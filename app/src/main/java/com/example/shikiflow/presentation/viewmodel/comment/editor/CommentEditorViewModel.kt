@@ -4,7 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.comment.MarkdownFormat
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.MediaUploaderRepository
@@ -36,7 +35,7 @@ class CommentEditorViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(CommentEditorUiState())
     val uiState = _uiState.asStateFlow()
 
-    private val _commentEvent = MutableSharedFlow<Boolean>()
+    private val _commentEvent = MutableSharedFlow<CommentEvent>()
     val commentEvent = _commentEvent.asSharedFlow()
 
     init {
@@ -91,22 +90,6 @@ class CommentEditorViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun setInitialData(
-        threadId: Int,
-        commentId: Int?,
-        commentBody: String?,
-        parentCommentId: Int?
-    ) {
-        _uiState.update { state ->
-            state.copy(
-                threadId = threadId,
-                commentId = commentId,
-                commentBody = commentBody,
-                parentCommentId = parentCommentId
-            )
-        }
-    }
-
     fun publishComment(
         commentId: Int?,
         topicId: Int,
@@ -118,13 +101,18 @@ class CommentEditorViewModel @Inject constructor(
             commentRepository.publishComment(
                 id = commentId,
                 topicId = topicId,
-                commentableType = CommentableType.TOPIC,
                 parentCommentId = parentCommentId,
                 commentBody = commentBody,
                 isOfftopic = isOfftopic
             ).let { result ->
                 if (result is DataResult.Success) {
-                    _commentEvent.emit(true)
+                    val comment = result.data
+                    val event = when (commentId) {
+                        null -> CommentEvent.Published(comment, parentCommentId)
+                        else -> CommentEvent.Updated(comment)
+                    }
+
+                    _commentEvent.emit(event)
                 }
             }
         }
@@ -134,7 +122,7 @@ class CommentEditorViewModel @Inject constructor(
         viewModelScope.launch {
             commentRepository.deleteComment(commentId).let { result ->
                 if (result is DataResult.Success) {
-                    _commentEvent.emit(true)
+                    _commentEvent.emit(CommentEvent.Deleted(commentId))
                 }
             }
         }

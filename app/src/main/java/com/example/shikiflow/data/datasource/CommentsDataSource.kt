@@ -1,7 +1,6 @@
 package com.example.shikiflow.data.datasource
 
 import com.example.shikiflow.domain.model.comment.Comment
-import com.example.shikiflow.domain.model.comment.CommentableType
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.thread.Like
@@ -44,7 +43,6 @@ interface CommentsDataSource {
     suspend fun publishComment(
         id: Int?,
         topicId: Int,
-        commentableType: CommentableType,
         parentCommentId: Int?,
         commentBody: String,
         isOfftopic: Boolean

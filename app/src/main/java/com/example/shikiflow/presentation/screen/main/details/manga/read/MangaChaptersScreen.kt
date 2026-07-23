@@ -178,7 +178,8 @@ fun MangaChaptersScreen(
                             lazyListState.animateScrollToItem(lastCompletedIndex)
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,

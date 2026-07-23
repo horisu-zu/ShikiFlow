@@ -32,6 +32,7 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.BrowseCoverItem
 import com.example.shikiflow.presentation.common.CardItem
 import com.example.shikiflow.presentation.common.CardItemPlaceholder
+import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter
@@ -126,7 +127,7 @@ fun BrowseListItem(
                 ) {
                     browseItem.genres.forEach { genre ->
                         CardItem(
-                            item = genre.preferred(titleType),
+                            item = stringResource(genre.displayValue()),
                             style = MaterialTheme.typography.labelSmall,
                             modifier = Modifier.clip(RoundedCornerShape(percent = 40))
                         )

@@ -53,8 +53,8 @@ fun CompareScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { showBottomSheet.value = true },
-                containerColor = MaterialTheme.colorScheme.surfaceContainer,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_sort),

@@ -56,5 +56,13 @@ data class ALComment(
                 childComments = updatedChildComments
             )
         }
+
+        fun ALComment.deleteComment(commentId: Int): ALComment {
+            val filteredComments = childComments
+                .filterNot { it.id == commentId }
+                .map { it.deleteComment(commentId) }
+
+            return copy(childComments = filteredComments)
+        }
     }
 }

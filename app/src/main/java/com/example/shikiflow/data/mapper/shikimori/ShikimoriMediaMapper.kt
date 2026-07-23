@@ -32,7 +32,6 @@ import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaOrigin
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTag
-import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.Date
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -188,13 +187,8 @@ object ShikimoriMediaMapper {
             episodesAired = episodesAired,
             episodes = episodes,
             studios = studios.map { it.name },
-            genres = genres?.map { genre ->
-                MediaTitle(
-                    romaji = genre.name,
-                    english = null,
-                    russian = genre.russian,
-                    native = null
-                )
+            genres = genres?.mapNotNull { genre ->
+                GenreMapper.fromString(genre.name)
             } ?: emptyList()
         )
     }

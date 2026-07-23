@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 data class ShikiCreateComment(
     val body: String,
     @SerialName("commentable_id") val commentableId: Int,
-    @SerialName("commentable_type") val commentableType: String,
+    @SerialName("commentable_type") val commentableType: String = "Topic",
     @SerialName("is_offtopic") val isOfftopic: Boolean = false
 )
 

@@ -158,7 +158,9 @@ object AnilistMediaMapper {
                     studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.name }
                         ?: emptyList(),
                     genres = genres?.mapNotNull { genre ->
-                        genre?.toDomainTitle(null, null, null)
+                        genre?.let {
+                            GenreMapper.fromString(genre)
+                        }
                     } ?: emptyList()
                 )
             }
