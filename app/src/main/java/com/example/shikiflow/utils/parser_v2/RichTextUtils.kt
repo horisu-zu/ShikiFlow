@@ -101,6 +101,7 @@ fun List<RichTextInline>.extractPlainText(): String =
             is RichTextInline.Italic -> inline.children.extractPlainText()
             is RichTextInline.BoldItalic -> inline.children.extractPlainText()
             is RichTextInline.Strikethrough -> inline.children.extractPlainText()
+            is RichTextInline.Underline -> inline.children.extractPlainText()
             is RichTextInline.Link -> inline.children.extractPlainText()
             is RichTextInline.InlineCode -> inline.code
             is RichTextInline.LineBreak -> ""

@@ -52,6 +52,7 @@ import androidx.compose.ui.platform.UriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.LinkAnnotation.*
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
@@ -803,9 +804,17 @@ fun AnnotatedString.Builder.appendInlines(
                 appendInlines(inline.children, baseColor, linkColor, codeBackground)
             }
 
+            is RichTextInline.Underline -> withStyle(
+                SpanStyle(
+                    textDecoration = TextDecoration.Underline
+                )
+            ) {
+                appendInlines(inline.children, baseColor, linkColor, codeBackground)
+            }
+
             is RichTextInline.Link -> {
                 pushLink(
-                    LinkAnnotation.Url(
+                    Url(
                         inline.url,
                         TextLinkStyles(style = SpanStyle(color = linkColor))
                     )

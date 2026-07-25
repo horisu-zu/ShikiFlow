@@ -34,6 +34,7 @@ sealed interface RichTextInline {
     data class Italic(val children: List<RichTextInline>) : RichTextInline
     data class BoldItalic(val children: List<RichTextInline>) : RichTextInline
     data class Strikethrough(val children: List<RichTextInline>) : RichTextInline
+    data class Underline(val children: List<RichTextInline>) : RichTextInline
     data class Link(val url: String, val children: List<RichTextInline>) : RichTextInline
     data class InlineCode(val code: String) : RichTextInline
 }

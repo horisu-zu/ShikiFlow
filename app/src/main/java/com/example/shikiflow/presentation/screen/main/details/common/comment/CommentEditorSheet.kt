@@ -1,13 +1,19 @@
 package com.example.shikiflow.presentation.screen.main.details.common.comment
 
+import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -23,6 +29,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.InputTransformation
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.insert
 import androidx.compose.foundation.text.input.maxLength
 import androidx.compose.foundation.text.input.rememberTextFieldState
@@ -47,6 +54,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -57,12 +65,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.AniListFormat
+import com.example.shikiflow.domain.model.comment.MarkdownFormat
 import com.example.shikiflow.domain.model.comment.ShikimoriFormat
 import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.CustomTextField
+import com.example.shikiflow.presentation.common.ItemWithPopup
 import com.example.shikiflow.presentation.common.ProgressBar
+import com.example.shikiflow.presentation.common.RichTextRenderer
+import com.example.shikiflow.presentation.common.mappers.MarkdownFormatMapper
 import com.example.shikiflow.presentation.common.mappers.MarkdownFormatMapper.iconResource
+import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEditorUiState
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEditorViewModel
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
 import com.example.shikiflow.presentation.viewmodel.comment.editor.UploadMediaState
@@ -88,6 +101,7 @@ fun CommentEditorSheet(
         enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
     )
     val showDeleteDialog = remember { mutableStateOf(false) }
+    val showPreview = remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         commentEditorViewModel.commentEvent.collect { event ->
@@ -142,6 +156,21 @@ fun CommentEditorSheet(
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if (textFieldState.text.isNotBlank()) {
+                    TextButton(
+                        shape = RoundedCornerShape(percent = 24),
+                        onClick = { showPreview.value = !showPreview.value }
+                    ) {
+                        Text(
+                            text = when (showPreview.value) {
+                                true -> "Editor"
+                                false -> "Preview"
+                            },
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                }
+
                 if (uiState.authType != null && textFieldState.text.isNotEmpty()) {
                     Text(
                         text = buildString {
@@ -206,125 +235,279 @@ fun CommentEditorSheet(
                 )
             }
 
-            CustomTextField(
-                textFieldState = textFieldState,
-                textStyle = MaterialTheme.typography.bodyMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface
-                ),
-                placeholder = {
-                    if (textFieldState.text.isEmpty()) {
-                        Text(
-                            text = stringResource(R.string.comment_editor_text_placeholder),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+            AnimatedContent(
+                targetState = showPreview.value,
+                transitionSpec = {
+                    if (showPreview.value) {
+                        slideInHorizontally(
+                            initialOffsetX = { it },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        ) togetherWith slideOutHorizontally(
+                            targetOffsetX = { -it },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        )
+                    } else {
+                        slideInHorizontally(
+                            initialOffsetX = { -it },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMediumLow
+                            )
+                        ) togetherWith slideOutHorizontally(
+                            targetOffsetX = { it },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioNoBouncy,
+                                stiffness = Spring.StiffnessMediumLow
                             )
                         )
                     }
-                },
-                lineLimits = TextFieldLineLimits.MultiLine(
-                    minHeightInLines = 6,
-                    maxHeightInLines = 12
-                ),
-                inputTransformation = InputTransformation.maxLength(
-                    maxLength = when (uiState.authType) {
-                        AuthType.SHIKIMORI -> 4096
-                        AuthType.ANILIST -> 12000
-                        null -> Int.MAX_VALUE
-                    }
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .verticalScroll(rememberScrollState())
-                    .clip(RoundedCornerShape(size = 16.dp))
-                    .background(MaterialTheme.colorScheme.background)
-                    .padding(all = 12.dp)
-            )
+                }
+            ) { showPreview ->
+                if (showPreview) {
+                    RichTextRenderer(
+                        htmlText = textFieldState.text.toString(),
+                        onEntityClick = { _, _ -> /**/ },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp)
+                            .verticalScroll(rememberScrollState())
+                            .clip(RoundedCornerShape(size = 16.dp))
+                            .background(MaterialTheme.colorScheme.background)
+                            .padding(all = 12.dp)
+                    )
+                } else {
+                    CommentInputComponent(
+                        textFieldState = textFieldState,
+                        uiState = uiState,
+                        launcher = launcher,
+                        onSetFormat = { format ->
+                            commentEditorViewModel.setFormat(format)
+                        },
+                        onResetUploadState = { commentEditorViewModel.resetUploadState() },
+                        onRetryUpload = { commentEditorViewModel.retryUpload() },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        }
+    }
+}
 
-            AnimatedVisibility(
-                visible = uiState.authType != null
-            ) {
-                FlowRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp)
-                ) {
-                    when (uiState.authType!!) {
-                        AuthType.SHIKIMORI -> ShikimoriFormat.entries
-                        AuthType.ANILIST -> AniListFormat.entries
-                    }.forEach { markdownFormat ->
-                        IconButton(
-                            enabled = uiState.format == null,
-                            shape = RoundedCornerShape(percent = 24),
-                            modifier = Modifier.size(32.dp),
-                            onClick = {
-                                when (markdownFormat) {
-                                    AniListFormat.IMAGE, ShikimoriFormat.IMAGE -> {
-                                        commentEditorViewModel.setFormat(markdownFormat)
-                                        launcher.launch(
-                                            input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                        )
+@Composable
+private fun CommentInputComponent(
+    textFieldState: TextFieldState,
+    uiState: CommentEditorUiState,
+    launcher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>,
+    onSetFormat: (MarkdownFormat) -> Unit,
+    onResetUploadState: () -> Unit,
+    onRetryUpload: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+    ) {
+        CustomTextField(
+            textFieldState = textFieldState,
+            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            placeholder = {
+                if (textFieldState.text.isEmpty()) {
+                    Text(
+                        text = stringResource(R.string.comment_editor_text_placeholder),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                        )
+                    )
+                }
+            },
+            lineLimits = TextFieldLineLimits.MultiLine(
+                minHeightInLines = 6,
+                maxHeightInLines = 12
+            ),
+            inputTransformation = InputTransformation.maxLength(
+                maxLength = when (uiState.authType) {
+                    AuthType.SHIKIMORI -> 4096
+                    AuthType.ANILIST -> 12000
+                    null -> Int.MAX_VALUE
+                }
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp)
+                .verticalScroll(rememberScrollState())
+                .clip(RoundedCornerShape(size = 16.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .padding(all = 12.dp)
+        )
+
+        AnimatedVisibility(
+            visible = uiState.authType != null
+        ) {
+            EditorMarkdownComponent(
+                authType = uiState.authType!!,
+                formatSelected = uiState.format != null,
+                onFormatClick = { markdownFormat ->
+                    when (markdownFormat) {
+                        AniListFormat.IMAGE, ShikimoriFormat.IMAGE -> {
+                            onSetFormat(markdownFormat)
+                            launcher.launch(
+                                input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        }
+                        AniListFormat.VIDEO -> {
+                            onSetFormat(markdownFormat)
+                            launcher.launch(
+                                input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
+                            )
+                        }
+                        else -> {
+                            textFieldState.edit {
+                                val position = selection.end
+                                insert(index = position, markdownFormat.syntax)
+
+                                selection = when (markdownFormat) {
+                                    AniListFormat.QUOTE -> {
+                                        TextRange(position + markdownFormat.syntax.length)
                                     }
-                                    AniListFormat.VIDEO -> {
-                                        commentEditorViewModel.setFormat(markdownFormat)
-                                        launcher.launch(
-                                            input = PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.VideoOnly)
-                                        )
+                                    AniListFormat.YOUTUBE -> {
+                                        TextRange(position + 8)
+                                    }
+                                    ShikimoriFormat.LIST -> {
+                                        TextRange(position + 9)
                                     }
                                     else -> {
-                                        textFieldState.edit {
-                                            val position = selection.end
-                                            insert(index = position, markdownFormat.syntax)
-
-                                            selection = when (markdownFormat) {
-                                                AniListFormat.QUOTE -> {
-                                                    TextRange(position + markdownFormat.syntax.length)
-                                                }
-                                                AniListFormat.YOUTUBE -> {
-                                                    TextRange(position + 8)
-                                                }
-                                                ShikimoriFormat.LIST -> {
-                                                    TextRange(position + 9)
-                                                }
-                                                else -> {
-                                                    TextRange(position + markdownFormat.syntax.length / 2)
-                                                }
-                                            }
-                                        }
+                                        TextRange(position + markdownFormat.syntax.length / 2)
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            )
+        }
+
+        AnimatedVisibility(
+            visible = uiState.uploadMediaState !is UploadMediaState.Idle
+        ) {
+            UploadMediaComponent(
+                state = uiState.uploadMediaState,
+                onSuccess = { value ->
+                    textFieldState.edit {
+                        val position = selection.end
+                        insert(index = position, value)
+
+                        selection = TextRange(position + value.length)
+                    }
+
+                    onResetUploadState()
+                },
+                onRetry = onRetryUpload,
+                onCancel = onResetUploadState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun EditorMarkdownComponent(
+    authType: AuthType,
+    formatSelected: Boolean,
+    onFormatClick: (MarkdownFormat) -> Unit,
+
+) {
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        ItemWithPopup(
+            anchor = { onClick ->
+                IconButton(
+                    shape = RoundedCornerShape(percent = 24),
+                    onClick = onClick,
+                    modifier = Modifier.size(32.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_format_letter),
+                        contentDescription = "Format",
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            },
+            popupContent = {
+                val rowModifier = Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .padding(horizontal = 6.dp, vertical = 4.dp)
+
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(
+                            modifier = rowModifier,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
                         ) {
-                            markdownFormat.iconResource().toIcon(
-                                modifier = Modifier.size(20.dp)
-                            )
+                            MarkdownFormatMapper.listEntries(authType).forEach { markdownFormat ->
+                                IconButton(
+                                    enabled = !formatSelected,
+                                    shape = RoundedCornerShape(percent = 24),
+                                    modifier = Modifier.size(32.dp),
+                                    onClick = { onFormatClick(markdownFormat) }
+                                ) {
+                                    markdownFormat.iconResource().toIcon(
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        Row(
+                            modifier = rowModifier,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            MarkdownFormatMapper.formatEntries(authType).forEach { markdownFormat ->
+                                IconButton(
+                                    enabled = !formatSelected,
+                                    shape = RoundedCornerShape(percent = 24),
+                                    modifier = Modifier.size(32.dp),
+                                    onClick = { onFormatClick(markdownFormat) }
+                                ) {
+                                    markdownFormat.iconResource().toIcon(
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            }
                         }
                     }
                 }
             }
+        )
 
-            AnimatedVisibility(
-                visible = uiState.uploadMediaState !is UploadMediaState.Idle
+        MarkdownFormatMapper.remainingEntries(authType).forEach { markdownFormat ->
+            IconButton(
+                enabled = !formatSelected,
+                shape = RoundedCornerShape(percent = 24),
+                modifier = Modifier.size(32.dp),
+                onClick = { onFormatClick(markdownFormat) }
             ) {
-                UploadMediaComponent(
-                    state = uiState.uploadMediaState,
-                    onSuccess = { value ->
-                        textFieldState.edit {
-                            val position = selection.end
-                            insert(index = position, value)
-
-                            selection = TextRange(position + value.length)
-                        }
-
-                        commentEditorViewModel.resetUploadState()
-                    },
-                    onRetry = { commentEditorViewModel.retryUpload() },
-                    onCancel = { commentEditorViewModel.resetUploadState() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp)
+                markdownFormat.iconResource().toIcon(
+                    modifier = Modifier.size(20.dp)
                 )
             }
         }

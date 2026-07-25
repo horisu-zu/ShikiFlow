@@ -68,6 +68,7 @@ fun CommentSection(
             )
 
             IconButton(
+                shape = RoundedCornerShape(percent = 24),
                 onClick = { commentSectionViewModel.onRefresh() },
                 enabled = !uiState.isLoading
             ) {
@@ -78,6 +79,7 @@ fun CommentSection(
             }
 
             IconButton(
+                shape = RoundedCornerShape(percent = 24),
                 onClick = { navOptions.navigateToComments(CommentsScreenMode.TOPIC, topicId) }
             ) {
                 Icon(

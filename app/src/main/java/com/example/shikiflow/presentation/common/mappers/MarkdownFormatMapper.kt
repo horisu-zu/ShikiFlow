@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.common.mappers
 
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.AniListFormat
 import com.example.shikiflow.domain.model.comment.MarkdownFormat
 import com.example.shikiflow.domain.model.comment.ShikimoriFormat
@@ -12,6 +13,7 @@ object MarkdownFormatMapper {
             AniListFormat.BOLD, ShikimoriFormat.BOLD -> IconResource.Drawable(R.drawable.ic_format_bold)
             AniListFormat.ITALIC, ShikimoriFormat.ITALIC -> IconResource.Drawable(R.drawable.ic_format_italic)
             AniListFormat.STRIKETHROUGH, ShikimoriFormat.STRIKETHROUGH -> IconResource.Drawable(R.drawable.ic_format_strikethrough)
+            ShikimoriFormat.UNDERLINE -> IconResource.Drawable(R.drawable.ic_format_underline)
             AniListFormat.SPOILER, ShikimoriFormat.SPOILER -> IconResource.Drawable(R.drawable.ic_format_spoiler)
             AniListFormat.QUOTE, ShikimoriFormat.QUOTE -> IconResource.Drawable(R.drawable.ic_quote)
             AniListFormat.LINK, ShikimoriFormat.LINK -> IconResource.Drawable(R.drawable.ic_link)
@@ -21,7 +23,34 @@ object MarkdownFormatMapper {
             AniListFormat.ORDERED_LIST -> IconResource.Drawable(R.drawable.ic_format_ordered_list)
             AniListFormat.UNORDERED_LIST, ShikimoriFormat.LIST -> IconResource.Drawable(R.drawable.ic_format_list)
             AniListFormat.CODE, ShikimoriFormat.CODE -> IconResource.Drawable(R.drawable.ic_format_code)
-            ShikimoriFormat.UNDERSCORE -> IconResource.Drawable(R.drawable.ic_format_underscore)
+        }
+    }
+
+    fun formatEntries(authType: AuthType): List<MarkdownFormat> {
+        return when (authType) {
+            AuthType.SHIKIMORI -> listOf(
+                ShikimoriFormat.BOLD, ShikimoriFormat.ITALIC,
+                ShikimoriFormat.STRIKETHROUGH, ShikimoriFormat.UNDERLINE
+            )
+            AuthType.ANILIST -> listOf(
+                AniListFormat.BOLD, AniListFormat.ITALIC, AniListFormat.STRIKETHROUGH
+            )
+        }
+    }
+
+    fun listEntries(authType: AuthType): List<MarkdownFormat> {
+        return when (authType) {
+            AuthType.SHIKIMORI -> listOf(ShikimoriFormat.LIST)
+            AuthType.ANILIST -> listOf(AniListFormat.UNORDERED_LIST, AniListFormat.ORDERED_LIST)
+        }
+    }
+
+    fun remainingEntries(authType: AuthType): List<MarkdownFormat> {
+        return when (authType) {
+            AuthType.SHIKIMORI -> ShikimoriFormat.entries
+            AuthType.ANILIST -> AniListFormat.entries
+        }.filter { format ->
+            format !in formatEntries(authType) && format !in listEntries(authType)
         }
     }
 }

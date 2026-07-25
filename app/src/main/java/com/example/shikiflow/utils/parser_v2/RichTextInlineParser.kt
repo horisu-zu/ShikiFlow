@@ -128,6 +128,7 @@ internal class RichTextInlineParser(
                 ctx.emitBlock(RichTextBlock.Text(listOf(RichTextInline.Text("\u200B"))))
                 while (index < length && preparedText[index] == '\n') index++
                 lastAppend = index
+
                 continue
             }
 
@@ -136,6 +137,7 @@ internal class RichTextInlineParser(
                 ctx.appendText(preparedText[index + 1].toString())
                 index += 2
                 lastAppend = index
+
                 continue
             }
 
@@ -151,6 +153,7 @@ internal class RichTextInlineParser(
                         }
                         index = end + 3
                         lastAppend = index
+
                         continue
                     }
                 }
@@ -168,6 +171,7 @@ internal class RichTextInlineParser(
                     )
                     index = end + 1
                     lastAppend = index
+
                     continue
                 }
             }
@@ -183,6 +187,7 @@ internal class RichTextInlineParser(
                     }
                     index = match.range.last + 1
                     lastAppend = index
+
                     continue
                 }
             }
@@ -198,6 +203,7 @@ internal class RichTextInlineParser(
                     }
                     index = match.range.last + 1
                     lastAppend = index
+
                     continue
                 }
             }
@@ -223,6 +229,7 @@ internal class RichTextInlineParser(
                     }
                     index = match.range.last + 1
                     lastAppend = index
+
                     continue
                 }
             }
@@ -253,6 +260,7 @@ internal class RichTextInlineParser(
 
                     index = end + 3
                     lastAppend = index
+
                     continue
                 }
             }
@@ -273,6 +281,7 @@ internal class RichTextInlineParser(
                     ctx.appendInline(RichTextInline.Strikethrough(child))
                     index = end + marker.length
                     lastAppend = index
+
                     continue
                 }
             }
@@ -296,6 +305,7 @@ internal class RichTextInlineParser(
                         ctx.appendInline(RichTextInline.BoldItalic(child))
                         index = end + 3
                         lastAppend = index
+
                         continue
                     }
                 }
@@ -314,6 +324,7 @@ internal class RichTextInlineParser(
                         ctx.appendInline(RichTextInline.Bold(child))
                         index = end + 2
                         lastAppend = index
+
                         continue
                     }
                 }
@@ -329,6 +340,7 @@ internal class RichTextInlineParser(
                     ctx.appendInline(RichTextInline.Italic(child))
                     index = end + 1
                     lastAppend = index
+
                     continue
                 }
             }
@@ -353,6 +365,7 @@ internal class RichTextInlineParser(
                         )
                         index = closeParen + 1
                         lastAppend = index
+
                         continue
                     }
                 }
@@ -404,6 +417,7 @@ internal class RichTextInlineParser(
 
                         index = closeParen + 1
                         lastAppend = index
+
                         continue
                     }
                 }
@@ -439,6 +453,169 @@ internal class RichTextInlineParser(
                     )
                     index = match.range.last + 1
                     lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[b]", index)) {
+                val end = findBBCodeClose(preparedText, index + 3, "[b]", "[/b]")
+                if (end != -1) {
+                    flushPlain()
+                    val child = parseInlineOnly(preparedText.substring(index + 3, end), ctx.currentLinkUrl)
+                    ctx.appendInline(RichTextInline.Bold(child))
+                    index = end + 4
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[i]", index)) {
+                val end = findBBCodeClose(preparedText, index + 3, "[i]", "[/i]")
+                if (end != -1) {
+                    flushPlain()
+                    val child = parseInlineOnly(preparedText.substring(index + 3, end), ctx.currentLinkUrl)
+                    ctx.appendInline(RichTextInline.Italic(child))
+                    index = end + 4
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[s]", index)) {
+                val end = findBBCodeClose(preparedText, index + 3, "[s]", "[/s]")
+                if (end != -1) {
+                    flushPlain()
+                    val child = parseInlineOnly(preparedText.substring(index + 3, end), ctx.currentLinkUrl)
+                    ctx.appendInline(RichTextInline.Strikethrough(child))
+                    index = end + 4
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[u]", index)) {
+                val end = findBBCodeClose(preparedText, index + 3, "[u]", "[/u]")
+                if (end != -1) {
+                    flushPlain()
+                    val child = parseInlineOnly(preparedText.substring(index + 3, end), ctx.currentLinkUrl)
+                    ctx.appendInline(RichTextInline.Underline(child))
+                    index = end + 4
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[spoiler]", index)) {
+                val end = findBBCodeClose(preparedText, index + 9, "[spoiler]", "[/spoiler]")
+                if (end != -1) {
+                    flushPlain()
+                    ctx.flushText()
+                    val spoilerCtx = ctx.detached(
+                        align = ctx.align,
+                        currentLinkUrl = ctx.currentLinkUrl,
+                        listDepth = ctx.listDepth
+                    )
+                    parseInto(preparedText.substring(index + 9, end), spoilerCtx)
+                    spoilerCtx.flushText()
+                    ctx.emitBlock(
+                        RichTextBlock.Spoiler(
+                            label = "spoiler",
+                            children = spoilerCtx.blocks
+                        )
+                    )
+                    index = end + 10
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[code]", index)) {
+                val end = preparedText.indexOf("[/code]", index + 6)
+                if (end != -1) {
+                    flushPlain()
+                    ctx.flushText()
+                    val code = preparedText.substring(index + 6, end)
+                    if (code.isNotBlank()) {
+                        ctx.emitBlock(RichTextBlock.CodeBlock(code, ctx.align))
+                    }
+                    index = end + 7
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[quote]", index)) {
+                val end = findBBCodeClose(preparedText, index + 7, "[quote]", "[/quote]")
+                if (end != -1) {
+                    flushPlain()
+                    ctx.flushText()
+                    val quoteCtx = ctx.detached(
+                        align = ctx.align,
+                        currentLinkUrl = ctx.currentLinkUrl,
+                        listDepth = ctx.listDepth
+                    )
+                    parseInto(preparedText.substring(index + 7, end), quoteCtx)
+                    quoteCtx.flushText()
+                    ctx.emitBlock(RichTextBlock.Blockquote(
+                        senderNickname = null,
+                        senderAvatarUrl = null,
+                        children = quoteCtx.blocks)
+                    )
+                    index = end + 8
+                    lastAppend = index
+
+                    continue
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[url=", index)) {
+                val closeBracket = preparedText.indexOf(']', index + 5)
+                if (closeBracket != -1) {
+                    val end = preparedText.indexOf("[/url]", closeBracket + 1)
+                    if (end != -1) {
+                        flushPlain()
+                        val url = preparedText.substring(index + 5, closeBracket)
+                        val linkChildren = parseInlineOnly(
+                            preparedText.substring(closeBracket + 1, end),
+                            url
+                        )
+                        ctx.appendInline(RichTextInline.Link(url = url, children = linkChildren))
+                        index = end + 6
+                        lastAppend = index
+
+                        continue
+                    }
+                }
+            }
+
+            if (c == '[' && preparedText.startsWith("[img]", index)) {
+                val end = preparedText.indexOf("[/img]", index + 5)
+                if (end != -1) {
+                    flushPlain()
+                    ctx.flushText()
+                    val url = preparedText.substring(index + 5, end).trim()
+                    if (url.isNotBlank()) {
+                        ctx.emitBlock(
+                            RichTextBlock.Image(
+                                url = url,
+                                width = null,
+                                height = null,
+                                isPercent = false,
+                                linkUrl = ctx.currentLinkUrl,
+                                align = ctx.align
+                            )
+                        )
+                    }
+                    index = end + 6
+                    lastAppend = index
+
                     continue
                 }
             }
@@ -716,6 +893,26 @@ internal class RichTextInlineParser(
         return result
     }
 
+    private fun findBBCodeClose(text: String, from: Int, open: String, close: String): Int {
+        var depth = 1
+        var i = from
+        while (i < text.length) {
+            when {
+                open != close && text.startsWith(open, i) -> {
+                    depth++
+                    i += open.length
+                }
+                text.startsWith(close, i) -> {
+                    depth--
+                    if (depth == 0) return i
+                    i += close.length
+                }
+                else -> i++
+            }
+        }
+        return -1
+    }
+
     private fun findBalancedCloseBracket(text: String, openBracketIndex: Int): Int {
         var depth = 1
         var i = openBracketIndex + 1
@@ -745,7 +942,6 @@ internal class RichTextInlineParser(
                         '8' -> {
                             depth++; i += 2
                         }
-
                         '9' -> {
                             depth--; if (depth == 0) return i + 2; i += 2
                         }

@@ -10,7 +10,7 @@ enum class ShikimoriFormat(
     BOLD("[b][/b]"),
     ITALIC("[i][/i]"),
     STRIKETHROUGH("[s][/s]"),
-    UNDERSCORE("[u][/u]"),
+    UNDERLINE("[u][/u]"),
     SPOILER("[spoiler][/spoiler]"),
     QUOTE("[quote][/quote]"),
     LINK("[url=][/url]"),
