@@ -18,6 +18,7 @@ import com.example.graphql.anilist.fragment.ALUserStaff
 import com.example.graphql.anilist.fragment.ALUserStudios
 import com.example.graphql.anilist.fragment.ALUserTags
 import com.example.graphql.anilist.fragment.ALUserVoiceActors
+import com.example.graphql.anilist.type.LikeableType
 import com.example.graphql.anilist.type.MediaListStatus
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
@@ -47,12 +48,13 @@ import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.stats.Stat
 import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.user.ListActivity
-import com.example.shikiflow.domain.model.user.MessageActivity
-import com.example.shikiflow.domain.model.user.TextActivity
+import com.example.shikiflow.domain.model.user.activity.ListActivity
+import com.example.shikiflow.domain.model.user.activity.MessageActivity
+import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
@@ -95,7 +97,10 @@ object AnilistUserMapper {
             coverImage = media?.coverImage?.extraLarge ?: "",
             status = status.toUserRateStatus(),
             progress = progress?.toProgress() ?: emptyList(),
-            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
+            likeCount = likeCount,
+            replyCount = replyCount,
+            isLiked = isLiked
         )
     }
 
@@ -123,7 +128,10 @@ object AnilistUserMapper {
             id = id,
             text = text ?: "",
             user = user?.aLUserShort?.toDomainUser() ?: User(),
-            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
+            likeCount = likeCount,
+            replyCount = replyCount,
+            isLiked = isLiked
         )
     }
 
@@ -133,7 +141,10 @@ object AnilistUserMapper {
             text = message ?: "",
             messenger = messenger?.aLUserShort?.toDomainUser() ?: User(),
             recipient = recipient?.aLUserShort?.toDomainUser() ?: User(),
-            createdAt = Instant.fromEpochSeconds(createdAt.toLong())
+            createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
+            likeCount = likeCount,
+            replyCount = replyCount,
+            isLiked = isLiked
         )
     }
 
@@ -508,5 +519,12 @@ object AnilistUserMapper {
             preferredTitleType = options?.titleLanguage?.toDomainType() ?: PreferredTitleType.ROMAJI,
             scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
         )
+    }
+
+    fun ActivityType.toALType(): LikeableType {
+        return when (this) {
+            ActivityType.ACTIVITY -> LikeableType.ACTIVITY
+            ActivityType.REPLY -> LikeableType.ACTIVITY_REPLY
+        }
     }
 }

@@ -105,7 +105,7 @@ fun MediaStaffScreen(
                         top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding(),
                         bottom = WindowInsets.navigationBars
                             .asPaddingValues()
-                            .calculateBottomPadding() + 56.dp,
+                            .calculateBottomPadding() + 64.dp,
                         start = 12.dp,
                         end = 12.dp
                     ),

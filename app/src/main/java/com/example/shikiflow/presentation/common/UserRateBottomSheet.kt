@@ -181,6 +181,7 @@ fun UserRateBottomSheet(
                         onScoreChange = { selectedScore = it },
                         modifier = Modifier.fillMaxWidth()
                     )
+
                     ProgressColumn(
                         userRate = userRate.copy(
                             progress = progress,

@@ -320,7 +320,7 @@ private fun AnilistCommentItem(
                     )
                 }
             } else {
-                CommentLikeComponent(
+                LikeComponent(
                     likesCount = commentData.likesCount,
                     isLiked = commentData.isLiked,
                     onLikeToggle = { onLikeToggle(commentData.id) }
@@ -394,7 +394,7 @@ fun ThreadHeaderItem(
                 )
             }
 
-            CommentLikeComponent(
+            LikeComponent(
                 likesCount = threadHeader.likeCount,
                 isLiked = threadHeader.isLiked,
                 onLikeToggle = { onLikeToggle(threadHeader.id) }
@@ -492,11 +492,11 @@ fun ThreadHeaderItemPlaceholder(
 }
 
 @Composable
-private fun CommentUserItem(
+fun CommentUserItem(
     userData: User,
     commentInstant: Instant,
-    onUserClick: (User) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onUserClick: ((User) -> Unit)? = null
 ) {
     Row(
         modifier = modifier,
@@ -507,7 +507,11 @@ private fun CommentUserItem(
                 .weight(1f, fill = false)
                 .offset(x = (-4).dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .clickable { onUserClick(userData) }
+                .then(
+                    if (onUserClick != null) {
+                        Modifier.clickable { onUserClick(userData) }
+                    } else Modifier
+                )
                 .padding(horizontal = 4.dp, vertical = 2.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -589,7 +593,7 @@ fun CommentItemPlaceholder(
 }
 
 @Composable
-private fun CommentLikeComponent(
+fun LikeComponent(
     likesCount: Int,
     isLiked: Boolean,
     onLikeToggle: () -> Unit,

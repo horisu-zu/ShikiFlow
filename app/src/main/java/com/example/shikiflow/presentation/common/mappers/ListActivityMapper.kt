@@ -10,7 +10,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.ListActivity
+import com.example.shikiflow.domain.model.user.activity.ListActivity
 
 object ListActivityMapper {
     fun String.withStyledDigits(style: SpanStyle): AnnotatedString = buildAnnotatedString {

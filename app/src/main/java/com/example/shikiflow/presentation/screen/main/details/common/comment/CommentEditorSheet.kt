@@ -156,19 +156,18 @@ fun CommentEditorSheet(
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                if (textFieldState.text.isNotBlank()) {
-                    TextButton(
-                        shape = RoundedCornerShape(percent = 24),
-                        onClick = { showPreview.value = !showPreview.value }
-                    ) {
-                        Text(
-                            text = when (showPreview.value) {
-                                true -> "Editor"
-                                false -> "Preview"
-                            },
-                            style = MaterialTheme.typography.bodySmall
-                        )
-                    }
+                TextButton(
+                    enabled = textFieldState.text.isNotBlank(),
+                    shape = RoundedCornerShape(percent = 24),
+                    onClick = { showPreview.value = !showPreview.value }
+                ) {
+                    Text(
+                        text = when (showPreview.value) {
+                            true -> stringResource(R.string.comment_editor_edit_label)
+                            false -> stringResource(R.string.comment_editor_preview_label)
+                        },
+                        style = MaterialTheme.typography.bodySmall
+                    )
                 }
 
                 if (uiState.authType != null && textFieldState.text.isNotEmpty()) {
@@ -449,7 +448,7 @@ private fun EditorMarkdownComponent(
             popupContent = {
                 val rowModifier = Modifier
                     .clip(RoundedCornerShape(8.dp))
-                    .background(MaterialTheme.colorScheme.surfaceContainer)
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 6.dp, vertical = 4.dp)
 
                 Column(

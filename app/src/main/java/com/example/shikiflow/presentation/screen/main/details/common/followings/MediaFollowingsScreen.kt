@@ -94,7 +94,7 @@ fun MediaFollowingsScreen(
                         top = paddingValues.calculateTopPadding(),
                         bottom = WindowInsets.navigationBars
                             .asPaddingValues()
-                            .calculateBottomPadding() + 56.dp
+                            .calculateBottomPadding() + 64.dp
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.Top),
                     horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)

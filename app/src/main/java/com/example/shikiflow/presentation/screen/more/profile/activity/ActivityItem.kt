@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,31 +24,36 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.ListActivity
-import com.example.shikiflow.domain.model.user.MessageActivity
-import com.example.shikiflow.domain.model.user.TextActivity
-import com.example.shikiflow.domain.model.user.User
-import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.activity.ListActivity
+import com.example.shikiflow.domain.model.user.activity.MessageActivity
+import com.example.shikiflow.domain.model.user.activity.TextActivity
+import com.example.shikiflow.domain.model.user.activity.UserActivity
+import com.example.shikiflow.presentation.common.DigitCounter
 import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.description
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import com.example.shikiflow.presentation.common.shimmerEffect
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserItem
+import com.example.shikiflow.presentation.screen.main.details.common.comment.LikeComponent
 import com.example.shikiflow.utils.Converter.convertInstantToString
+import com.example.shikiflow.utils.IconResource
+import com.example.shikiflow.utils.toIcon
 
 @Composable
 fun ActivityItem(
     userActivity: UserActivity,
     titleType: PreferredTitleType,
     onListActivityClick: (MediaType, Int) -> Unit,
-    onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
+    onLikeToggle: () -> Unit,
+    onRepliesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when(userActivity) {
@@ -57,22 +62,26 @@ fun ActivityItem(
                 listActivity = userActivity,
                 titleType = titleType,
                 onListActivityClick = onListActivityClick,
+                onLikeToggle = onLikeToggle,
+                onRepliesClick = onRepliesClick,
                 modifier = modifier
             )
         }
         is MessageActivity -> {
             MessageActivityItem(
                 messageActivity = userActivity,
-                onUserClick = onUserClick,
                 onEntityClick = onEntityClick,
+                onLikeToggle = onLikeToggle,
+                onRepliesClick = onRepliesClick,
                 modifier = modifier
             )
         }
         is TextActivity -> {
             TextActivityItem(
                 textActivity = userActivity,
-                onUserClick = onUserClick,
                 onEntityClick = onEntityClick,
+                onLikeToggle = onLikeToggle,
+                onRepliesClick = onRepliesClick,
                 modifier = modifier
             )
         }
@@ -84,6 +93,8 @@ fun ListActivityItem(
     listActivity: ListActivity,
     titleType: PreferredTitleType,
     onListActivityClick: (MediaType, Int) -> Unit,
+    onLikeToggle: () -> Unit,
+    onRepliesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val imageType = ImageType.Poster()
@@ -98,7 +109,7 @@ fun ListActivityItem(
                     }
                 } else Modifier
             ),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
     ) {
         BaseImage(
             model = listActivity.coverImage,
@@ -106,7 +117,9 @@ fun ListActivityItem(
         )
 
         Column(
-            modifier = Modifier.padding(vertical = 2.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
@@ -134,6 +147,32 @@ fun ListActivityItem(
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
+
+        if (listActivity.likeCount != null && listActivity.isLiked != null && listActivity.replyCount != null) {
+            Column(
+                modifier = Modifier.padding(all = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+                horizontalAlignment = Alignment.End
+            ) {
+                LikeComponent(
+                    likesCount = listActivity.likeCount,
+                    isLiked = listActivity.isLiked,
+                    onLikeToggle = onLikeToggle,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                )
+
+                CounterItem(
+                    count = listActivity.replyCount,
+                    iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
+                    onClick = onRepliesClick,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                )
+            }
+        }
     }
 }
 
@@ -148,7 +187,7 @@ fun ListActivityItemPlaceholder(
 
     Row(
         modifier = modifier.shimmerEffect(overContent = true),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
     ) {
         Box(
             modifier = Modifier
@@ -159,7 +198,9 @@ fun ListActivityItemPlaceholder(
         )
 
         Column(
-            modifier = Modifier.padding(vertical = 2.dp),
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 2.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Box(
@@ -187,14 +228,30 @@ fun ListActivityItemPlaceholder(
                     .background(MaterialTheme.colorScheme.onSurface)
             )
         }
+
+        Column(
+            modifier = Modifier.padding(all = 6.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            horizontalAlignment = Alignment.End
+        ) {
+            repeat(2) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(RoundedCornerShape(percent = 32))
+                        .background(MaterialTheme.colorScheme.onSurface)
+                )
+            }
+        }
     }
 }
 
 @Composable
 fun TextActivityItem(
     textActivity: TextActivity,
-    onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
+    onLikeToggle: () -> Unit,
+    onRepliesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -205,41 +262,36 @@ fun TextActivityItem(
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
     ) {
         Row(
-            modifier = Modifier
-                .offset(x = (-4).dp)
-                .clip(CircleShape)
-                .clickable { onUserClick(textActivity.user) }
-                .padding(horizontal = 4.dp, vertical = 2.dp),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            BaseImage(
-                model = textActivity.user.avatarUrl,
-                imageType = ImageType.Square(
-                    width = 24.dp,
-                    shape = RoundedCornerShape(8.dp)
-                )
+            CommentUserItem(
+                userData = textActivity.user,
+                commentInstant = textActivity.createdAt,
+                modifier = Modifier.weight(1f)
             )
 
-            Text(
-                text = textActivity.user.nickname,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier
-                    .weight(1f, fill = false)
-                    .padding(start = 8.dp)
-            )
+            if (textActivity.likeCount != null && textActivity.isLiked != null
+                && textActivity.replyCount != null
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    LikeComponent(
+                        likesCount = textActivity.likeCount,
+                        isLiked = textActivity.isLiked,
+                        onLikeToggle = onLikeToggle
+                    )
 
-            Text(
-                text = " · ${convertInstantToString(LocalResources.current, textActivity.createdAt)}",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
-                ),
-                maxLines = 1
-            )
+                    CounterItem(
+                        count = textActivity.replyCount,
+                        iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
+                        onClick = onRepliesClick
+                    )
+                }
+            }
         }
 
         RichTextRenderer(
@@ -253,8 +305,9 @@ fun TextActivityItem(
 @Composable
 fun MessageActivityItem(
     messageActivity: MessageActivity,
-    onUserClick: (User) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
+    onLikeToggle: () -> Unit,
+    onRepliesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -269,41 +322,36 @@ fun MessageActivityItem(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
             Row(
-                modifier = Modifier
-                    .offset(x = (-4).dp)
-                    .clip(CircleShape)
-                    .clickable { onUserClick(messageActivity.messenger) }
-                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                BaseImage(
-                    model = messageActivity.messenger.avatarUrl,
-                    imageType = ImageType.Square(
-                        width = 24.dp,
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                CommentUserItem(
+                    userData = messageActivity.messenger,
+                    commentInstant = messageActivity.createdAt,
+                    modifier = Modifier.weight(1f)
                 )
 
-                Text(
-                    text = messageActivity.messenger.nickname,
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .weight(1f, fill = false)
-                        .padding(start = 8.dp)
-                )
+                if (messageActivity.likeCount != null && messageActivity.isLiked != null
+                    && messageActivity.replyCount != null
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        LikeComponent(
+                            likesCount = messageActivity.likeCount,
+                            isLiked = messageActivity.isLiked,
+                            onLikeToggle = onLikeToggle
+                        )
 
-                Text(
-                    text = " · ${convertInstantToString(LocalResources.current, messageActivity.createdAt)}",
-                    style = MaterialTheme.typography.labelMedium.copy(
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
-                    ),
-                    maxLines = 1
-                )
+                        CounterItem(
+                            count = messageActivity.replyCount,
+                            iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
+                            onClick = onRepliesClick
+                        )
+                    }
+                }
             }
 
             RichTextRenderer(
@@ -312,5 +360,39 @@ fun MessageActivityItem(
                 onEntityClick = onEntityClick
             )
         }
+    }
+}
+
+@Composable
+private fun CounterItem(
+    count: Int,
+    iconResource: IconResource,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val contentTint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(percent = 32))
+            .clickable { onClick() }
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if(count > 0) {
+            DigitCounter(
+                count = count,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = contentTint,
+                    fontWeight = FontWeight.Medium
+                )
+            )
+        }
+
+        iconResource.toIcon(
+            tint = contentTint,
+            modifier = Modifier.size(16.dp)
+        )
     }
 }

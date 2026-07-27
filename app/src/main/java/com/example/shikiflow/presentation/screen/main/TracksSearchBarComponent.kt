@@ -194,7 +194,7 @@ fun TracksSearchBarComponent(
                         top = 12.dp,
                         bottom = WindowInsets.navigationBars
                             .asPaddingValues()
-                            .calculateBottomPadding() + 56.dp //+FAB size
+                            .calculateBottomPadding() + 64.dp //+FAB size
                     ),
                     verticalArrangement = Arrangement.spacedBy(12.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),

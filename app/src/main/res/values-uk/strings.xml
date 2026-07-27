@@ -944,4 +944,6 @@
     <string name="comment_editor_update">Оновити</string>
     <string name="comment_editor_media_upload_label">Завантаження медіа…</string>
     <string name="comment_editor_delete_label">Ця дія незворотня. Ви впевнені, що хочете видалити цей коментар?</string>
+    <string name="comment_editor_edit_label">Редактор</string>
+    <string name="comment_editor_preview_label">Прев\'ю</string>
 </resources>

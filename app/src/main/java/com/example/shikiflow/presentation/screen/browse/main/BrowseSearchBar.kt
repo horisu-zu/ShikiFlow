@@ -339,7 +339,7 @@ private fun SearchBarContent(
                 end = horizontalPadding,
                 bottom = WindowInsets.navigationBars
                     .asPaddingValues()
-                    .calculateBottomPadding() + 56.dp
+                    .calculateBottomPadding() + 64.dp
             ),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),

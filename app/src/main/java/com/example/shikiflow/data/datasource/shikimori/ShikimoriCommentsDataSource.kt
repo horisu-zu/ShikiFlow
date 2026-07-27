@@ -16,6 +16,7 @@ import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -28,8 +29,6 @@ class ShikimoriCommentsDataSource @Inject constructor(
         page: Int,
         limit: Int
     ): Flow<PagedResult<Comment>> = flow {
-        emit(PagedResult.Loading)
-
         try {
             val response = commentApi.getComments(
                 commentableId = topicId,
@@ -49,7 +48,7 @@ class ShikimoriCommentsDataSource @Inject constructor(
         } catch (e: HttpException) {
             emit(PagedResult.Error(e.message ?: "Unknown Error"))
         }
-    }
+    }.onStart { emit(PagedResult.Loading) }
 
     override suspend fun getComments(
         topicId: Int,

@@ -13,19 +13,21 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
@@ -63,25 +65,22 @@ class UserRepositoryImpl @Inject constructor(
         }.fetchCurrentUser()
     }
 
-    override fun getUserHistory(
+    override fun getUserActivity(
         userId: Int,
-    ): Flow<PagingData<UserActivity>> {
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<UserActivity>> {
         return withSource(dataSource) { dataSource ->
-            Pager(
-                config = PagingConfig(
-                    pageSize = 20,
-                    enablePlaceholders = true,
-                    prefetchDistance = 5,
-                    initialLoadSize = 20
-                ),
-                pagingSourceFactory = {
-                    GenericPagingSource(
-                        method = { page, limit ->
-                            dataSource.getPaginatedHistory(userId, page, limit)
-                        }
-                    )
-                }
-            ).flow
+            dataSource.getUserActivity(userId, page, limit)
+        }
+    }
+
+    override suspend fun toggleLike(
+        id: Int,
+        type: ActivityType
+    ): DataResult<Like> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.toggleLike(id, type)
         }
     }
 

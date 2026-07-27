@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
@@ -13,12 +14,13 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
@@ -29,11 +31,16 @@ import kotlinx.coroutines.flow.Flow
 interface UserDataSource {
     fun fetchCurrentUser(): Flow<DataResult<User>>
 
-    suspend fun getPaginatedHistory(
+    fun getUserActivity(
         userId: Int,
-        page: Int?,
-        limit: Int?
-    ): Result<List<UserActivity>>
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<UserActivity>>
+
+    suspend fun toggleLike(
+        id: Int,
+        type: ActivityType
+    ): DataResult<Like>
 
     suspend fun getUserStatsCategories(
         userId: Int,

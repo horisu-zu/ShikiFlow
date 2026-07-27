@@ -85,7 +85,7 @@ fun ItemWithPopup(
                     Box(
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.background)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
                             .padding(horizontal = 6.dp, vertical = 4.dp)
                     ) {
                         popupContent()

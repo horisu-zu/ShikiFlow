@@ -206,11 +206,17 @@ object AnilistThreadsMapper {
     }
 
     fun ToggleLikeMutation.ToggleLikeV2.toDomainLike(): Like {
-        val isLiked = onThreadComment?.aLThreadComment?.isLiked ?:
-            onThread?.aLThread?.isLiked
+        val isLiked = onThreadComment?.isLiked
+            ?: onThread?.isLiked
+            ?: onListActivity?.isLiked
+            ?: onTextActivity?.isLiked
+            ?: onMessageActivity?.isLiked
 
-        val likeCount = onThreadComment?.aLThreadComment?.likeCount
-            ?: onThread?.aLThread?.likeCount
+        val likeCount = onThreadComment?.likeCount
+            ?: onThread?.likeCount
+            ?: onListActivity?.likeCount
+            ?: onTextActivity?.likeCount
+            ?: onMessageActivity?.likeCount
 
         return Like(
             isLiked = isLiked ?: false,

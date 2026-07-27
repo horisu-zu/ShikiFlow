@@ -7,19 +7,24 @@ mutation ToggleLike(
         type: $type
     ) {
         ... on ListActivity {
-            ...ALListActivity
+            likeCount
+            isLiked
         }
         ... on TextActivity {
-            ...ALTextActivity
+            likeCount
+            isLiked
         }
         ... on MessageActivity {
-            ...ALMessageActivity
+            likeCount
+            isLiked
         }
         ... on Thread {
-            ...ALThread
+            likeCount
+            isLiked
         }
         ... on ThreadComment {
-            ...ALThreadComment
+            likeCount
+            isLiked
         }
     }
 }

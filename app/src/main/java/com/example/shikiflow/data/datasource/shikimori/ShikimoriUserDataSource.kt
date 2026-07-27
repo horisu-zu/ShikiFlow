@@ -27,14 +27,16 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
-import com.example.shikiflow.domain.model.user.UserActivity
+import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
+import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.domain.model.user.social.Follower
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
@@ -48,6 +50,9 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
+import retrofit2.HttpException
+import java.io.IOException
 
 class ShikimoriUserDataSource @Inject constructor(
     @param:ShikimoriApollo private val apolloClient: ApolloClient,
@@ -63,24 +68,39 @@ class ShikimoriUserDataSource @Inject constructor(
             }
     }
 
-    override suspend fun getPaginatedHistory(
+    override fun getUserActivity(
         userId: Int,
-        page: Int?,
-        limit: Int?
-    ): Result<List<UserActivity>> {
-        return try {
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<UserActivity>> = flow<PagedResult<UserActivity>> {
+        try {
             val result = userApi.getUserHistory(
                 userId = userId.toLong(),
                 page = page,
                 limit = limit
-            ).map { response ->
+            ).take(limit).map { response ->
                 response.toDomain()
             }
 
-            Result.success(result)
-        } catch (e: Exception) {
-            Result.failure(e)
+            emit(
+                PagedResult.Success(
+                    list = result,
+                    currentPage = page,
+                    hasNextPage = result.size >= limit
+                )
+            )
+        } catch (e: IOException) {
+            emit(PagedResult.Error("${e.message}: Missing Internet Connection"))
+        } catch (e: HttpException) {
+            emit(PagedResult.Error(e.message ?: "Unknown Error"))
         }
+    }.onStart { emit(PagedResult.Loading) }
+
+    override suspend fun toggleLike(
+        id: Int,
+        type: ActivityType
+    ): DataResult<Like> {
+        TODO("Can not be implemented")
     }
 
     override suspend fun getUserStatsCategories(

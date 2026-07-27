@@ -231,6 +231,9 @@ fragment ALListActivity on ListActivity {
     status
     progress
     createdAt
+    likeCount
+    replyCount
+    isLiked
 }
 
 fragment ALTextActivity on TextActivity {
@@ -240,6 +243,9 @@ fragment ALTextActivity on TextActivity {
         ...ALUserShort
     }
     createdAt
+    likeCount
+    replyCount
+    isLiked
 }
 
 fragment ALMessageActivity on MessageActivity {
@@ -252,6 +258,9 @@ fragment ALMessageActivity on MessageActivity {
         ...ALUserShort
     }
     createdAt
+    likeCount
+    replyCount
+    isLiked
 }
 
 fragment ALRateEntry on MediaList {

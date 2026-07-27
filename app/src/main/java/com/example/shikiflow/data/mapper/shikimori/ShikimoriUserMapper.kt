@@ -19,7 +19,7 @@ import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
-import com.example.shikiflow.domain.model.user.ListActivity
+import com.example.shikiflow.domain.model.user.activity.ListActivity
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.fleeksoft.ksoup.Ksoup
