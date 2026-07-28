@@ -8,8 +8,6 @@ import com.example.shikiflow.data.remote.CommentApi
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.ThreadType
-import com.example.shikiflow.domain.model.thread.Like
-import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.shikiflow.utils.result.DataResult
@@ -86,10 +84,6 @@ class ShikimoriCommentsDataSource @Inject constructor(
         limit: Int,
         threadSort: Sort<ThreadType>
     ): Result<List<ThreadShort>> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun toggleLike(id: Int, likeableType: LikeableType): DataResult<Like> {
         TODO("Not yet implemented")
     }
 

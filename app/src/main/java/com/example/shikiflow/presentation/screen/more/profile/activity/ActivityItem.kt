@@ -53,8 +53,8 @@ fun ActivityItem(
     onListActivityClick: (MediaType, Int) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
-    onRepliesClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRepliesClick: (() -> Unit)? = null
 ) {
     when(userActivity) {
         is ListActivity -> {
@@ -94,8 +94,8 @@ fun ListActivityItem(
     titleType: PreferredTitleType,
     onListActivityClick: (MediaType, Int) -> Unit,
     onLikeToggle: () -> Unit,
-    onRepliesClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRepliesClick: (() -> Unit)? = null
 ) {
     val imageType = ImageType.Poster()
 
@@ -163,14 +163,16 @@ fun ListActivityItem(
                         .background(MaterialTheme.colorScheme.surfaceContainer)
                 )
 
-                CounterItem(
-                    count = listActivity.replyCount,
-                    iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
-                    onClick = onRepliesClick,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                )
+                onRepliesClick?.let {
+                    CounterItem(
+                        count = listActivity.replyCount,
+                        iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
+                        onClick = onRepliesClick,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                    )
+                }
             }
         }
     }
@@ -251,8 +253,8 @@ fun TextActivityItem(
     textActivity: TextActivity,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
-    onRepliesClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRepliesClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier
@@ -285,11 +287,13 @@ fun TextActivityItem(
                         onLikeToggle = onLikeToggle
                     )
 
-                    CounterItem(
-                        count = textActivity.replyCount,
-                        iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
-                        onClick = onRepliesClick
-                    )
+                    onRepliesClick?.let {
+                        CounterItem(
+                            count = textActivity.replyCount,
+                            iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
+                            onClick = onRepliesClick
+                        )
+                    }
                 }
             }
         }
@@ -307,8 +311,8 @@ fun MessageActivityItem(
     messageActivity: MessageActivity,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
-    onRepliesClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRepliesClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = modifier,
@@ -345,11 +349,13 @@ fun MessageActivityItem(
                             onLikeToggle = onLikeToggle
                         )
 
-                        CounterItem(
-                            count = messageActivity.replyCount,
-                            iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
-                            onClick = onRepliesClick
-                        )
+                        onRepliesClick?.let {
+                            CounterItem(
+                                count = messageActivity.replyCount,
+                                iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
+                                onClick = onRepliesClick
+                            )
+                        }
                     }
                 }
             }

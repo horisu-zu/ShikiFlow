@@ -8,6 +8,7 @@ import kotlin.time.Instant
 
 sealed interface UserActivity {
     val id: Int
+    val type: ActivityType
     val createdAt: Instant
     val likeCount: Int?
     val replyCount: Int?
@@ -16,6 +17,7 @@ sealed interface UserActivity {
 
 data class ListActivity(
     override val id: Int,
+    override val type: ActivityType = ActivityType.LIST,
     val mediaId: Int,
     val mediaType: MediaType?,
     val title: MediaTitle,
@@ -32,6 +34,7 @@ data class ListActivity(
 
 data class TextActivity(
     override val id: Int,
+    override val type: ActivityType = ActivityType.TEXT,
     val text: String,
     val user: User,
     override val createdAt: Instant,
@@ -42,6 +45,7 @@ data class TextActivity(
 
 data class MessageActivity(
     override val id: Int,
+    override val type: ActivityType = ActivityType.MESSAGE,
     val text: String,
     val messenger: User,
     val recipient: User,
@@ -50,6 +54,12 @@ data class MessageActivity(
     override val replyCount: Int? = null,
     override val isLiked: Boolean? = null
 ) : UserActivity
+
+enum class ActivityType {
+    LIST,
+    TEXT,
+    MESSAGE
+}
 
 object UserActivityMapper {
     fun UserActivity.updateLike(likeCount: Int?, isLiked: Boolean?): UserActivity =

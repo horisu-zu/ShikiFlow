@@ -11,8 +11,6 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
-import com.example.shikiflow.domain.model.thread.Like
-import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -96,15 +94,6 @@ class CommentRepositoryImpl @Inject constructor(
                     )
                 }
             ).flow
-        }
-    }
-
-    override suspend fun toggleLike(
-        id: Int,
-        likeableType: LikeableType
-    ): DataResult<Like> {
-        return withSourceSuspend(dataSource) { dataSource ->
-            dataSource.toggleLike(id, likeableType)
         }
     }
 

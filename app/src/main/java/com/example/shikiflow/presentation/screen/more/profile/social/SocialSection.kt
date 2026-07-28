@@ -39,7 +39,6 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
-import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.user.social.Follower
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.Thread
@@ -229,31 +228,7 @@ fun SocialSection(
                                                 userSocialViewModel.toggleCommentLike(commentId)
                                             },
                                             onEntityClick = { entityType, id ->
-                                                val detailsNavRoute = when (entityType) {
-                                                    EntityType.CHARACTER -> {
-                                                        DetailsNavRoute.CharacterDetails(id)
-                                                    }
-                                                    EntityType.PERSON -> {
-                                                        DetailsNavRoute.Staff(id)
-                                                    }
-                                                    EntityType.ANIME -> {
-                                                        DetailsNavRoute.AnimeDetails(id)
-                                                    }
-                                                    EntityType.MANGA, EntityType.RANOBE -> {
-                                                        DetailsNavRoute.MangaDetails(id)
-                                                    }
-                                                    EntityType.COMMENT_REPLY -> {
-                                                        DetailsNavRoute.Comments(
-                                                            screenMode = CommentsScreenMode.REPLY,
-                                                            id = id
-                                                        )
-                                                    }
-                                                    EntityType.REVIEW -> {
-                                                        DetailsNavRoute.Review(id)
-                                                    }
-                                                }
-
-                                                navOptions.navigateToDetails(detailsNavRoute)
+                                                navOptions.navigateByEntity(entityType, id)
                                             }
                                         )
                                     }

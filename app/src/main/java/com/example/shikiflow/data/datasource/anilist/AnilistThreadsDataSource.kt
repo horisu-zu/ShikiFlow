@@ -9,22 +9,17 @@ import com.example.graphql.anilist.DeleteThreadCommentMutation
 import com.example.graphql.anilist.MediaThreadQuery
 import com.example.graphql.anilist.MediaThreadsQuery
 import com.example.graphql.anilist.PublishThreadCommentMutation
-import com.example.graphql.anilist.ToggleLikeMutation
 import com.example.graphql.anilist.TopicCommentQuery
 import com.example.graphql.anilist.TopicCommentsQuery
 import com.example.shikiflow.data.datasource.CommentsDataSource
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.findComment
-import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toALType
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toAnilistThreadSort
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
-import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainLike
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.sort.Sort
-import com.example.shikiflow.domain.model.thread.Like
-import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -138,25 +133,6 @@ class AnilistThreadsDataSource @Inject constructor(
                 ?.threads
                 ?.mapNotNull { it?.aLThreadShort?.toDomainThread() }
                 ?: emptyList()
-        }
-    }
-
-    override suspend fun toggleLike(
-        id: Int,
-        likeableType: LikeableType
-    ): DataResult<Like> {
-        val likeMutation = ToggleLikeMutation(
-            likeableId = id,
-            type = likeableType.toALType()
-        )
-
-        val response = apolloClient.mutation(likeMutation)
-            .fetchPolicy(FetchPolicy.NetworkFirst)
-            .execute()
-
-        return response.asDataResult { data ->
-            data.ToggleLikeV2?.toDomainLike()
-                ?: throw NoSuchElementException("No Comment with ID: $id")
         }
     }
 

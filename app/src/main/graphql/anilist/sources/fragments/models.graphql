@@ -263,6 +263,18 @@ fragment ALMessageActivity on MessageActivity {
     isLiked
 }
 
+fragment ALActivityReply on ActivityReply {
+    id
+    text(asHtml: true)
+    markdownText: text
+    createdAt
+    user {
+        ...ALUserShort
+    }
+    likeCount
+    isLiked
+}
+
 fragment ALRateEntry on MediaList {
     id
     mediaId

@@ -17,12 +17,16 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.example.shikiflow.domain.model.comment.CommentsScreenMode
+import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
+import com.example.shikiflow.presentation.screen.more.profile.activity.reply.ActivityRepliesScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
@@ -59,6 +63,44 @@ fun ProfileNavigator(
                 mainNavOptions.navigateToDetails(detailsNavRoute)
             } ?: backstack.add(ProfileNavRoute.Details(detailsNavRoute))
         }
+
+        override fun navigateByEntity(
+            entityType: EntityType,
+            id: Int
+        ) {
+            val detailsNavRoute = when (entityType) {
+                EntityType.CHARACTER -> {
+                    DetailsNavRoute.CharacterDetails(id)
+                }
+                EntityType.PERSON -> {
+                    DetailsNavRoute.Staff(id)
+                }
+                EntityType.ANIME -> {
+                    DetailsNavRoute.AnimeDetails(id)
+                }
+                EntityType.MANGA, EntityType.RANOBE -> {
+                    DetailsNavRoute.MangaDetails(id)
+                }
+                EntityType.COMMENT_REPLY -> {
+                    DetailsNavRoute.Comments(
+                        screenMode = CommentsScreenMode.REPLY,
+                        id = id
+                    )
+                }
+                EntityType.REVIEW -> {
+                    DetailsNavRoute.Review(id)
+                }
+            }
+
+            navigateToDetails(detailsNavRoute)
+        }
+
+        override fun navigateToActivityReplies(
+            activityId: Int,
+            activityType: ActivityType
+        ) {
+            backstack.add(ProfileNavRoute.ActivityReplies(activityId, activityType))
+        }
     }
 
     NavDisplay(
@@ -80,6 +122,13 @@ fun ProfileNavigator(
             entry<ProfileNavRoute.MediaComparison> { route ->
                 CompareScreen(
                     targetUser = route.targetUser,
+                    navOptions = profileNavOptions
+                )
+            }
+            entry<ProfileNavRoute.ActivityReplies> { route ->
+                ActivityRepliesScreen(
+                    activityId = route.activityId,
+                    activityType = route.activityType,
                     navOptions = profileNavOptions
                 )
             }

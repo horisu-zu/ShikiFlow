@@ -10,6 +10,7 @@ import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
 import com.example.shikiflow.utils.result.DataResult
@@ -32,6 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CommentViewModel @Inject constructor(
     private val commentsRepository: CommentRepository,
+    private val userRepository: UserRepository,
     private val settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<CommentsUiState>() {
 
@@ -54,9 +56,7 @@ class CommentViewModel @Inject constructor(
                         state.comments.addAll(result.list)
 
                         state.copy(
-                            isLoading = if (state.thread != null && state.authType == AuthType.ANILIST) false
-                                else if (state.authType == AuthType.SHIKIMORI) false
-                                else state.isLoading,
+                            isLoading = false,
                             hasNextPage = result.hasNextPage
                         )
                     } else {
@@ -81,18 +81,21 @@ class CommentViewModel @Inject constructor(
                         when (result) {
                             is DataResult.Success -> {
                                 state.copy(
-                                    isLoading = if (state.comments.isNotEmpty()) false
-                                        else state.isLoading,
+                                    isLoadingThread = false,
                                     thread = result.data
                                 )
                             }
                             is DataResult.Error -> {
                                 state.copy(
-                                    isLoading = false,
+                                    isLoadingThread = false,
                                     errorMessage = result.message
                                 )
                             }
-                            else -> state
+                            else -> {
+                                state.copy(
+                                    isLoadingThread = true
+                                )
+                            }
                         }
                     }
             }.launchIn(viewModelScope)
@@ -145,7 +148,7 @@ class CommentViewModel @Inject constructor(
 
     fun toggleCommentLike(commentId: Int) {
         viewModelScope.launch {
-            commentsRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
+            userRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
                 if (result is DataResult.Success) {
                     val response = result.data
 
@@ -174,7 +177,7 @@ class CommentViewModel @Inject constructor(
 
     fun toggleThreadLike(threadId: Int) {
         viewModelScope.launch {
-            commentsRepository.toggleLike(threadId, LikeableType.THREAD).let { result ->
+            userRepository.toggleLike(threadId, LikeableType.THREAD).let { result ->
                 if (result is DataResult.Success) {
                     val response = result.data
 
@@ -255,7 +258,7 @@ class CommentViewModel @Inject constructor(
         }
     }
 
-    fun onRefresh() {
+    fun refresh() {
         mutableUiState.update { state ->
             state.comments.clear()
 
@@ -267,7 +270,7 @@ class CommentViewModel @Inject constructor(
         }
     }
 
-    fun onRetry() {
+    fun retry() {
         mutableUiState.update { state ->
             state.copy(
                 isRefreshing = true,

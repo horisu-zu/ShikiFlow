@@ -8,6 +8,7 @@ import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.thread.Like
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -22,7 +23,7 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
-import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import com.example.shikiflow.utils.result.DataResult
@@ -38,9 +39,19 @@ interface UserRepository {
         limit: Int = 20
     ): Flow<PagedResult<UserActivity>>
 
+    fun getSingleActivity(
+        activityId: Int
+    ): Flow<DataResult<UserActivity>>
+
+    fun getActivityReplies(
+        activityId: Int,
+        page: Int,
+        limit: Int = 15
+    ): Flow<PagedResult<ActivityReply>>
+
     suspend fun toggleLike(
         id: Int,
-        type: ActivityType
+        type: LikeableType
     ): DataResult<Like>
 
     fun getUserRates(userId: Int): Flow<DataResult<MediaTypeStats<OverviewStats>>>

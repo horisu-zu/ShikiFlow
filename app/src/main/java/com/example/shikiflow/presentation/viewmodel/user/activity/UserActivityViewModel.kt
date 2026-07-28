@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.user.activity
 
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
@@ -77,7 +77,7 @@ class UserActivityViewModel @Inject constructor(
 
     fun toggleLike(activityId: Int) {
         viewModelScope.launch {
-            userRepository.toggleLike(activityId, ActivityType.ACTIVITY).let { result ->
+            userRepository.toggleLike(activityId, LikeableType.ACTIVITY).let { result ->
                 if (result is DataResult.Success) {
                     mutableUiState.update { state ->
                         val like = result.data

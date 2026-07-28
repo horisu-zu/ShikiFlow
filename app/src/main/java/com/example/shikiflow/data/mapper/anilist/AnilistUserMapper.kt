@@ -1,6 +1,7 @@
 package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.UserStatsCategoriesQuery
+import com.example.graphql.anilist.fragment.ALActivityReply
 import com.example.graphql.anilist.fragment.ALFavoriteCharacterShort
 import com.example.graphql.anilist.fragment.ALFavoriteMediaShort
 import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
@@ -18,7 +19,6 @@ import com.example.graphql.anilist.fragment.ALUserStaff
 import com.example.graphql.anilist.fragment.ALUserStudios
 import com.example.graphql.anilist.fragment.ALUserTags
 import com.example.graphql.anilist.fragment.ALUserVoiceActors
-import com.example.graphql.anilist.type.LikeableType
 import com.example.graphql.anilist.type.MediaListStatus
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
@@ -54,7 +54,7 @@ import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.UserStatsCategories
-import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
@@ -146,6 +146,20 @@ object AnilistUserMapper {
             replyCount = replyCount,
             isLiked = isLiked
         )
+    }
+
+    fun ALActivityReply.toDomainReply(): ActivityReply? {
+        return user?.aLUserShort?.let { alUser ->
+            ActivityReply(
+                id = id,
+                body = text ?: "",
+                markdownBody = markdownText ?: "",
+                createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
+                sender = alUser.toDomainUser(),
+                likeCount = likeCount,
+                isLiked = isLiked ?: false
+            )
+        }
     }
 
     fun ALFavoriteMediaShort.toUserFavorite(favoriteCategory: FavoriteCategory) = UserFavorite(
@@ -519,12 +533,5 @@ object AnilistUserMapper {
             preferredTitleType = options?.titleLanguage?.toDomainType() ?: PreferredTitleType.ROMAJI,
             scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
         )
-    }
-
-    fun ActivityType.toALType(): LikeableType {
-        return when (this) {
-            ActivityType.ACTIVITY -> LikeableType.ACTIVITY
-            ActivityType.REPLY -> LikeableType.ACTIVITY_REPLY
-        }
     }
 }

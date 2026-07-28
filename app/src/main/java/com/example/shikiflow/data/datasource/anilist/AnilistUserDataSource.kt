@@ -8,8 +8,10 @@ import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
+import com.example.graphql.anilist.ActivityRepliesQuery
 import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.ShortUserRateQuery
+import com.example.graphql.anilist.SingleUserActivityQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
 import com.example.graphql.anilist.ToggleFollowMutation
 import com.example.graphql.anilist.ToggleLikeMutation
@@ -36,11 +38,12 @@ import com.example.graphql.anilist.UserVoiceActorsQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toShortUserMediaRate
+import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toALType
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainLike
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
-import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toALType
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainReply
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewStats
@@ -59,6 +62,7 @@ import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.thread.Like
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -72,7 +76,7 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
-import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.social.Follower
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.Thread
@@ -126,9 +130,51 @@ class AnilistUserDataSource @Inject constructor(
         }
     }
 
+    override fun getSingleActivity(
+        activityId: Int
+    ): Flow<DataResult<UserActivity>> {
+        val activityQuery = SingleUserActivityQuery(
+            activityId = activityId
+        )
+
+        val response = apolloClient.query(activityQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .toFlow()
+
+        return response.asDataResult { data ->
+            data.Activity?.let { activity ->
+                activity.onListActivity?.aLListActivity?.toDomain() ?:
+                activity.onMessageActivity?.aLMessageActivity?.toDomain() ?:
+                activity.onTextActivity?.aLTextActivity?.toDomain()
+            } ?: throw IllegalStateException("Error fetching activity with ID: $activityId")
+        }
+    }
+
+    override fun getActivityReplies(
+        activityId: Int,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<ActivityReply>> {
+        val activityRepliesQuery = ActivityRepliesQuery(
+            activityId = activityId,
+            page = page,
+            limit = limit
+        )
+
+        val response = apolloClient.query(activityRepliesQuery)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .toFlow()
+
+        return response.asPagedResult(page = { it.Page?.pageInfo?.commonPage } ) { data ->
+            data.Page?.activityReplies?.mapNotNull { reply ->
+                reply?.aLActivityReply?.toDomainReply()
+            } ?: emptyList()
+        }
+    }
+
     override suspend fun toggleLike(
         id: Int,
-        type: ActivityType
+        type: LikeableType
     ): DataResult<Like> {
         val likeMutation = ToggleLikeMutation(
             likeableId = id,
@@ -140,7 +186,7 @@ class AnilistUserDataSource @Inject constructor(
             .execute()
 
         return response.asDataResult { data ->
-            data.ToggleLikeV2?.toDomainLike()
+            data.ToggleLikeV2?.toDomainLike(type)
                 ?: throw NoSuchElementException("No Activity/Reply with ID: $id")
         }
     }

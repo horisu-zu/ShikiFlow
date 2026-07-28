@@ -14,6 +14,7 @@ import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.thread.Like
+import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
@@ -27,7 +28,7 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
-import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
 import com.example.shikiflow.domain.model.user.stats.StudioStat
@@ -75,9 +76,25 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getSingleActivity(activityId: Int): Flow<DataResult<UserActivity>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getSingleActivity(activityId)
+        }
+    }
+
+    override fun getActivityReplies(
+        activityId: Int,
+        page: Int,
+        limit: Int
+    ): Flow<PagedResult<ActivityReply>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getActivityReplies(activityId, page, limit)
+        }
+    }
+
     override suspend fun toggleLike(
         id: Int,
-        type: ActivityType
+        type: LikeableType
     ): DataResult<Like> {
         return withSourceSuspend(dataSource) { dataSource ->
             dataSource.toggleLike(id, type)

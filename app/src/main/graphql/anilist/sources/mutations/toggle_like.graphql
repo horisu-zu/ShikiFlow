@@ -26,5 +26,9 @@ mutation ToggleLike(
             likeCount
             isLiked
         }
+        ... on ActivityReply {
+            likeCount
+            isLiked
+        }
     }
 }

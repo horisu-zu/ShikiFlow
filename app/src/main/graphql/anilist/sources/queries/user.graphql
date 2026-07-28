@@ -39,6 +39,37 @@ query UserActivities(
     }
 }
 
+query SingleUserActivity(
+    $activityId: Int!
+) {
+    Activity(id: $activityId) {
+        ...on ListActivity {
+            ...ALListActivity
+        }
+        ...on TextActivity {
+            ...ALTextActivity
+        }
+        ...on MessageActivity {
+            ...ALMessageActivity
+        }
+    }
+}
+
+query ActivityReplies(
+    $activityId: Int!,
+    $page: Int!,
+    $limit: Int!
+) {
+    Page(page: $page, perPage: $limit) {
+        activityReplies(activityId: $activityId) {
+            ...ALActivityReply
+        }
+        pageInfo {
+            ...CommonPage
+        }
+    }
+}
+
 query UserStats(
     $userId: Int!
 ) {

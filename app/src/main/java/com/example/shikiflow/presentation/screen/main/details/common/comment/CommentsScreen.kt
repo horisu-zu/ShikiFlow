@@ -79,7 +79,7 @@ fun CommentsScreen(
                 start = 12.dp,
                 end = 12.dp,
                 top = paddingValues.calculateTopPadding(),
-                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 56.dp
+                bottom = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding() + 64.dp
             )
 
             when(screenMode) {
@@ -227,11 +227,12 @@ private fun TopicCommentsSection(
                     state = lazyListState,
                     modifier = Modifier.fillMaxWidth(),
                     contentPadding = contentPadding,
-                    userScrollEnabled = !(uiState.isLoading && uiState.comments.isEmpty())
+                    userScrollEnabled = !(uiState.isLoading && uiState.comments.isEmpty()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                 ) {
                     val showInitPlaceholders = when (uiState.authType) {
                         null -> true
-                        AuthType.ANILIST -> uiState.thread == null
+                        AuthType.ANILIST -> uiState.isLoadingThread
                         else -> uiState.comments.isEmpty()
                     }
 
@@ -244,7 +245,7 @@ private fun TopicCommentsSection(
                                 ErrorItem(
                                     message = stringResource(R.string.common_error),
                                     buttonLabel = stringResource(R.string.common_retry),
-                                    onButtonClick = { commentViewModel.onRefresh() }
+                                    onButtonClick = { commentViewModel.refresh() }
                                 )
                             }
                         }
@@ -257,8 +258,7 @@ private fun TopicCommentsSection(
                             CommentItemPlaceholder(
                                 backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
                                 itemIndex = index,
-                                maxValue = 4,
-                                modifier = Modifier.padding(top = 8.dp)
+                                maxValue = 4
                             )
                         }
                     } else {
@@ -292,9 +292,7 @@ private fun TopicCommentsSection(
                                 },
                                 onReplyClick = onReplyClick,
                                 onEditClick = onEditClick,
-                                modifier = Modifier
-                                    .padding(top = 8.dp)
-                                    .animateItem()
+                                modifier = Modifier.animateItem()
                             )
                         }
 
@@ -302,8 +300,7 @@ private fun TopicCommentsSection(
                             items(3) { index ->
                                 CommentItemPlaceholder(
                                     backgroundColor = MaterialTheme.colorScheme.surfaceContainer,
-                                    itemIndex = index,
-                                    modifier = Modifier.padding(top = 8.dp)
+                                    itemIndex = index
                                 )
                             }
                         } else if (uiState.errorMessage != null) {
@@ -317,7 +314,7 @@ private fun TopicCommentsSection(
                                     ErrorItem(
                                         message = stringResource(R.string.common_error),
                                         buttonLabel = stringResource(R.string.common_retry),
-                                        onButtonClick = { commentViewModel.onRetry() }
+                                        onButtonClick = { commentViewModel.retry() }
                                     )
                                 }
                             }
