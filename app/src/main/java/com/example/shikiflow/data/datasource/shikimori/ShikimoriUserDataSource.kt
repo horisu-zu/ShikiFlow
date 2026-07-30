@@ -109,6 +109,18 @@ class ShikimoriUserDataSource @Inject constructor(
         TODO("Can not be implemented")
     }
 
+    override suspend fun submitActivityReply(
+        id: Int?,
+        activityId: Int,
+        body: String
+    ): DataResult<ActivityReply> {
+        TODO("Can not be implemented")
+    }
+
+    override suspend fun deleteActivityReply(id: Int): DataResult<Boolean> {
+        TODO("Can not be implemented")
+    }
+
     override suspend fun toggleLike(id: Int, type: LikeableType): DataResult<Like> {
         TODO("Can not be implemented")
     }

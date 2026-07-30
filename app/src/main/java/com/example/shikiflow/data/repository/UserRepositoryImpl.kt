@@ -92,6 +92,22 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun submitActivityReply(
+        id: Int?,
+        activityId: Int,
+        body: String
+    ): DataResult<ActivityReply> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.submitActivityReply(id, activityId, body)
+        }
+    }
+
+    override suspend fun deleteActivityReply(id: Int): DataResult<Boolean> {
+        return withSourceSuspend(dataSource) { dataSource ->
+            dataSource.deleteActivityReply(id)
+        }
+    }
+
     override suspend fun toggleLike(
         id: Int,
         type: LikeableType

@@ -1,10 +1,12 @@
 package com.example.shikiflow.presentation.viewmodel.comment.section
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.comment.Comment
+import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.usecase.GetCommentsUseCase
 import com.example.shikiflow.presentation.UiStateViewModel
-import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
+import com.example.shikiflow.presentation.viewmodel.comment.editor.EditorEvent
 import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,11 +18,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CommentSectionViewModel @Inject constructor(
+    private val commentRepository: CommentRepository,
     private val getCommentsUseCase: GetCommentsUseCase,
     private val settingsRepository: SettingsRepository
 ): UiStateViewModel<CommentSectionUiState>() {
@@ -39,15 +43,55 @@ class CommentSectionViewModel @Inject constructor(
         }
     }
 
-    fun onCommentEvent(commentEvent: CommentEvent) {
+    fun submitComment(
+        commentId: Int?,
+        topicId: Int,
+        parentCommentId: Int?,
+        commentBody: String,
+        isOfftopic: Boolean = false
+    ) {
+        viewModelScope.launch {
+            commentRepository.publishComment(
+                id = commentId,
+                topicId = topicId,
+                parentCommentId = parentCommentId,
+                commentBody = commentBody,
+                isOfftopic = isOfftopic
+            ).let { result ->
+                if (result is DataResult.Success) {
+                    val comment = result.data
+                    val event = when (commentId) {
+                        null -> EditorEvent.Published(comment, parentCommentId)
+                        else -> EditorEvent.Updated(comment)
+                    }
+
+                    onCommentEvent(event)
+                }
+            }
+        }
+    }
+
+    fun deleteComment(commentId: Int) {
+        viewModelScope.launch {
+            commentRepository.deleteComment(commentId).let { result ->
+                if (result is DataResult.Success) {
+                    onCommentEvent(EditorEvent.Deleted(commentId))
+                }
+            }
+        }
+    }
+
+    private fun onCommentEvent(editorEvent: EditorEvent<Comment>) {
         mutableUiState.update { state ->
             state.copy(
-                comments = when (commentEvent) {
-                    is CommentEvent.Published -> state.comments + commentEvent.comment
-                    is CommentEvent.Updated -> state.comments.map { comment ->
-                        if (comment.id == commentEvent.comment.id) commentEvent.comment else comment
+                comments = when (editorEvent) {
+                    is EditorEvent.Published -> state.comments + editorEvent.entry
+                    is EditorEvent.Updated -> {
+                        state.comments.map { comment ->
+                            if (comment.id == editorEvent.entry.id) editorEvent.entry else comment
+                        }
                     }
-                    is CommentEvent.Deleted -> state.comments.filter { it.id != commentEvent.commentId }
+                    is EditorEvent.Deleted -> state.comments.filter { it.id != editorEvent.entryId }
                 }
             )
         }

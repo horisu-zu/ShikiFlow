@@ -64,6 +64,7 @@
     <string name="common_note">Заметка</string>
 
     <string name="common_default">По умолчанию</string>
+    <string name="common_confirm">Подтвердить</string>
     <string name="tracker_services_update_title">Обновлять отслеживаемое на всех подключённых сервисах</string>
     <string name="tracker_services_update_note">
         из-за особенностей синхронизации обновлений через MAL ID
@@ -939,11 +940,12 @@
     <string name="score_format_3_point_smiley">3-бальная</string>
     <string name="settings_score_format">Система оценивания</string>
 
+    <string name="comment_section_editor_button_label">Написать комментарий…</string>
     <string name="comment_editor_text_placeholder">Текст комментария…</string>
     <string name="comment_editor_publish">Опубликовать</string>
     <string name="comment_editor_update">Обновить</string>
     <string name="comment_editor_media_upload_label">Загрузка медиа…</string>
     <string name="comment_editor_delete_label">Это действие необратимо. Вы уверены, что хотите удалить комментарий?</string>
     <string name="comment_editor_edit_label">Редактор</string>
-    <string name="comment_editor_preview_label">Предпросмотр</string>
+    <string name="comment_editor_preview_label">Превью</string>
 </resources>

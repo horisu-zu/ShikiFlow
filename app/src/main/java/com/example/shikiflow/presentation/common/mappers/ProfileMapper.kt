@@ -35,8 +35,8 @@ object ProfileMapper {
         return when(this) {
             FavoriteCategory.ANIME -> IconResource.Drawable(R.drawable.ic_anime)
             FavoriteCategory.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
-            FavoriteCategory.CHARACTER -> IconResource.Drawable(R.drawable.ic_character)
-            FavoriteCategory.STAFF -> IconResource.Vector(Icons.Default.Person)
+            FavoriteCategory.CHARACTER -> IconResource.Vector(Icons.Default.Person)
+            FavoriteCategory.STAFF -> IconResource.Drawable(R.drawable.ic_group)
             FavoriteCategory.STUDIO -> IconResource.Drawable(R.drawable.ic_videocam)
             FavoriteCategory.SEYU -> IconResource.Drawable(R.drawable.ic_microphone)
             FavoriteCategory.MANGAKA -> IconResource.Drawable(R.drawable.ic_drawing)

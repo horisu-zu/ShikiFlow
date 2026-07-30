@@ -128,16 +128,16 @@ private fun TopicCommentsSection(
 
     val onReplyClick: (Int) -> Unit = { commentId ->
         editorSheetState.value = EditorSheetState(
-            threadId = topicId,
+            id = topicId,
             parentCommentId = commentId
         )
     }
 
     val onEditClick: (Int, String) -> Unit = { commentId, markdownBody ->
         editorSheetState.value = EditorSheetState(
-            threadId = topicId,
-            commentId = commentId,
-            commentBody = markdownBody
+            id = topicId,
+            entryId = commentId,
+            body = markdownBody
         )
     }
 
@@ -291,8 +291,7 @@ private fun TopicCommentsSection(
                                     commentViewModel.selectComment(commentId)
                                 },
                                 onReplyClick = onReplyClick,
-                                onEditClick = onEditClick,
-                                modifier = Modifier.animateItem()
+                                onEditClick = onEditClick
                             )
                         }
 
@@ -325,7 +324,7 @@ private fun TopicCommentsSection(
         }
 
         FloatingActionButton(
-            onClick = { editorSheetState.value = EditorSheetState(threadId = topicId) },
+            onClick = { editorSheetState.value = EditorSheetState(id = topicId) },
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             modifier = Modifier
@@ -341,14 +340,21 @@ private fun TopicCommentsSection(
 
     editorSheetState.value?.let { editorState ->
         CommentEditorSheet(
-            threadId = editorState.threadId,
-            commentId = editorState.commentId,
-            commentBody = editorState.commentBody,
+            commentId = editorState.entryId,
+            commentBody = editorState.body,
             parentCommentId = editorState.parentCommentId,
             onDismiss = { editorSheetState.value = null },
-            onEvent = { event ->
-                commentViewModel.onEvent(event)
-                editorSheetState.value = null
+            onSubmit = { commentBody, isOfftopic ->
+                commentViewModel.submitComment(
+                    commentId = editorState.entryId,
+                    topicId = editorState.id,
+                    parentCommentId = editorState.parentCommentId,
+                    commentBody = commentBody,
+                    isOfftopic = isOfftopic
+                )
+            },
+            onDelete = { commentId ->
+                commentViewModel.deleteComment(commentId)
             }
         )
     }

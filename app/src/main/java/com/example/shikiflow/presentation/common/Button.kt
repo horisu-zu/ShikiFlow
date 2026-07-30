@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.common
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.style.ExperimentalFoundationStyleApi
@@ -36,7 +37,8 @@ fun Button(
     ),
     onClick: () -> Unit,
     enabled: Boolean = true,
-    shape: Shape = RoundedCornerShape(8.dp)
+    shape: Shape = RoundedCornerShape(8.dp),
+    contentPadding: PaddingValues = ButtonDefaults.ContentPadding
 ) {
     val styleState = remember { MutableStyleState(null) }
 
@@ -52,7 +54,8 @@ fun Button(
         ),
         border = if (enabled) BorderStroke(0.dp, Color.Transparent) else
             BorderStroke(2.dp, MaterialTheme.colorScheme.onSurfaceVariant),
-        shape = shape
+        shape = shape,
+        contentPadding = contentPadding
     ) {
         icon?.let {
             icon.toIcon(

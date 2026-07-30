@@ -48,6 +48,16 @@ interface UserDataSource {
         limit: Int = 15
     ): Flow<PagedResult<ActivityReply>>
 
+    suspend fun submitActivityReply(
+        id: Int?,
+        activityId: Int,
+        body: String
+    ): DataResult<ActivityReply>
+
+    suspend fun deleteActivityReply(
+        id: Int
+    ): DataResult<Boolean>
+
     suspend fun toggleLike(
         id: Int,
         type: LikeableType

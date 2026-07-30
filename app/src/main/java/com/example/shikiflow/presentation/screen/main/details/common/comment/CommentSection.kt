@@ -134,15 +134,15 @@ fun CommentSection(
                     onCommentSelect = { /**/ },
                     onReplyClick = { commentId ->
                         editorSheetState.value = EditorSheetState(
-                            threadId = topicId,
+                            id = topicId,
                             parentCommentId = commentId
                         )
                     },
                     onEditClick = { commentId, markdownBody ->
                         editorSheetState.value = EditorSheetState(
-                            threadId = topicId,
-                            commentId = commentId,
-                            commentBody = markdownBody
+                            id = topicId,
+                            entryId = commentId,
+                            body = markdownBody
                         )
                     }
                 )
@@ -157,7 +157,7 @@ fun CommentSection(
                     .clip(RoundedCornerShape(12.dp))
                     .clickable {
                         editorSheetState.value = EditorSheetState(
-                            threadId = topicId
+                            id = topicId
                         )
                     }
                     .background(MaterialTheme.colorScheme.background)
@@ -165,7 +165,7 @@ fun CommentSection(
                 contentAlignment = Alignment.TopStart
             ) {
                 TextWithIcon(
-                    text = stringResource(R.string.comment_editor_text_placeholder),
+                    text = stringResource(R.string.comment_section_editor_button_label),
                     iconResources = listOf(IconResource.Vector(imageVector = Icons.Default.Edit)),
                     style = MaterialTheme.typography.bodyMedium
                 )
@@ -175,14 +175,21 @@ fun CommentSection(
 
     editorSheetState.value?.let { editorState ->
         CommentEditorSheet(
-            threadId = editorState.threadId,
-            commentId = editorState.commentId,
-            commentBody = editorState.commentBody,
+            commentId = editorState.entryId,
+            commentBody = editorState.body,
             parentCommentId = editorState.parentCommentId,
             onDismiss = { editorSheetState.value = null },
-            onEvent = { event ->
-                commentSectionViewModel.onCommentEvent(event)
-                editorSheetState.value = null
+            onSubmit = { commentBody, isOfftopic ->
+                commentSectionViewModel.submitComment(
+                    commentId = editorState.entryId,
+                    topicId = editorState.id,
+                    parentCommentId = editorState.parentCommentId,
+                    commentBody = commentBody,
+                    isOfftopic = isOfftopic
+                )
+            },
+            onDelete = { commentId ->
+                commentSectionViewModel.deleteComment(commentId)
             }
         )
     }

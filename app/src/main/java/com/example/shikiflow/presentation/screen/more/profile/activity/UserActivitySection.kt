@@ -111,6 +111,7 @@ fun UserActivitySection(
                         ActivityItem(
                             userActivity = activityItem,
                             titleType = preferredTitleType,
+                            isCurrentUser = userId == uiState.currentUserId,
                             onListActivityClick = { mediaType, id ->
                                 val detailsNavRoute = when(mediaType) {
                                     MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
@@ -127,6 +128,7 @@ fun UserActivitySection(
                             },
                             onRepliesClick = {
                                 navOptions.navigateToActivityReplies(
+                                    userId = userId,
                                     activityId = activityItem.id,
                                     activityType = activityItem.type
                                 )

@@ -10,6 +10,8 @@ import com.apollographql.cache.normalized.FetchPolicy
 import com.apollographql.cache.normalized.fetchPolicy
 import com.example.graphql.anilist.ActivityRepliesQuery
 import com.example.graphql.anilist.CurrentUserQuery
+import com.example.graphql.anilist.DeleteActivityReplyMutation
+import com.example.graphql.anilist.PublishActivityReplyMutation
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.SingleUserActivityQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
@@ -172,6 +174,41 @@ class AnilistUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun submitActivityReply(
+        id: Int?,
+        activityId: Int,
+        body: String
+    ): DataResult<ActivityReply> {
+        val activityReplyMutation = PublishActivityReplyMutation(
+            id = Optional.presentIfNotNull(id),
+            activityId = activityId,
+            text = body
+        )
+
+        val response = apolloClient.mutation(activityReplyMutation)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.asDataResult { data ->
+            data.SaveActivityReply?.aLActivityReply?.toDomainReply()
+                ?: throw IllegalStateException("Couldn't Submit Activity Reply")
+        }
+    }
+
+    override suspend fun deleteActivityReply(id: Int): DataResult<Boolean> {
+        val deleteReplyMutation = DeleteActivityReplyMutation(id = id)
+
+        val response = apolloClient.mutation(deleteReplyMutation)
+            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .execute()
+
+        return response.asDataResult { data ->
+            data.DeleteActivityReply?.deleted
+                ?: throw IllegalStateException("Couldn't Delete Activity Reply")
+        }
+    }
+
+
     override suspend fun toggleLike(
         id: Int,
         type: LikeableType
@@ -187,7 +224,7 @@ class AnilistUserDataSource @Inject constructor(
 
         return response.asDataResult { data ->
             data.ToggleLikeV2?.toDomainLike(type)
-                ?: throw NoSuchElementException("No Activity/Reply with ID: $id")
+                ?: throw IllegalStateException("No Activity/Reply with ID: $id")
         }
     }
 

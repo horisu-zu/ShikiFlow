@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.user.activity
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
 import com.example.shikiflow.utils.result.DataResult
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class UserActivityViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<UserActivityUiState>() {
 
     override val initialState: UserActivityUiState = UserActivityUiState()
@@ -64,6 +66,17 @@ class UserActivityViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach {
                 refresh()
+            }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .mapNotNull { user -> user?.id }
+            .distinctUntilChanged()
+            .onEach { userId ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        currentUserId = userId
+                    )
+                }
             }.launchIn(viewModelScope)
     }
 

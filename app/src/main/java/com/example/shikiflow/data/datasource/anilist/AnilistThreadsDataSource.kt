@@ -156,7 +156,7 @@ class AnilistThreadsDataSource @Inject constructor(
 
         return response.asDataResult { data ->
             data.SaveThreadComment?.aLThreadComment?.toDomain()
-                ?: throw NoSuchElementException("Couldn't Publish a Comment")
+                ?: throw IllegalStateException("Couldn't Publish a Comment")
         }
     }
 
@@ -171,7 +171,7 @@ class AnilistThreadsDataSource @Inject constructor(
 
         return response.asDataResult { data ->
             data.DeleteThreadComment?.deleted
-                ?: throw NoSuchElementException("Couldn't Publish a Comment")
+                ?: throw IllegalStateException("Couldn't Delete the Comment")
         }
     }
 }

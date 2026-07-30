@@ -64,6 +64,7 @@
     <string name="common_note">Нотатка</string>
 
     <string name="common_default">За замовчуванням</string>
+    <string name="common_confirm">Підтвердити</string>
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
         оскільки синхронізація оновлень відбувається за ідентифікатором MAL,
@@ -318,7 +319,7 @@
     <string name="details_comments_count">— %1s</string>
 
     <string name="thread_item_user_replied">" відповів(-ла) "</string>
-    <string name="comment_offtopic">Оффтоп</string>
+    <string name="comment_offtopic">Офтоп</string>
     <string name="comment_tree_show_more">Переглянути більше</string>
 
     <string name="media_user_status_all">Усі</string>
@@ -939,6 +940,7 @@
     <string name="score_format_3_point_smiley">3-бальна</string>
     <string name="settings_score_format">Система оцінювання</string>
 
+    <string name="comment_section_editor_button_label">Написати коментар…</string>
     <string name="comment_editor_text_placeholder">Текст коментаря…</string>
     <string name="comment_editor_publish">Опублікувати</string>
     <string name="comment_editor_update">Оновити</string>

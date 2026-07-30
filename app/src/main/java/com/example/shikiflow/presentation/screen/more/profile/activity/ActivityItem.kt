@@ -50,6 +50,7 @@ import com.example.shikiflow.utils.toIcon
 fun ActivityItem(
     userActivity: UserActivity,
     titleType: PreferredTitleType,
+    isCurrentUser: Boolean,
     onListActivityClick: (MediaType, Int) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
@@ -61,6 +62,7 @@ fun ActivityItem(
             ListActivityItem(
                 listActivity = userActivity,
                 titleType = titleType,
+                isCurrentUser = isCurrentUser,
                 onListActivityClick = onListActivityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
@@ -70,6 +72,7 @@ fun ActivityItem(
         is MessageActivity -> {
             MessageActivityItem(
                 messageActivity = userActivity,
+                isCurrentUser = isCurrentUser,
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
@@ -79,6 +82,7 @@ fun ActivityItem(
         is TextActivity -> {
             TextActivityItem(
                 textActivity = userActivity,
+                isCurrentUser = isCurrentUser,
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
@@ -92,6 +96,7 @@ fun ActivityItem(
 fun ListActivityItem(
     listActivity: ListActivity,
     titleType: PreferredTitleType,
+    isCurrentUser: Boolean,
     onListActivityClick: (MediaType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -154,14 +159,16 @@ fun ListActivityItem(
                 verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                 horizontalAlignment = Alignment.End
             ) {
-                LikeComponent(
-                    likesCount = listActivity.likeCount,
-                    isLiked = listActivity.isLiked,
-                    onLikeToggle = onLikeToggle,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(MaterialTheme.colorScheme.surfaceContainer)
-                )
+                if (!isCurrentUser) {
+                    LikeComponent(
+                        likesCount = listActivity.likeCount,
+                        isLiked = listActivity.isLiked,
+                        onLikeToggle = onLikeToggle,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                    )
+                }
 
                 onRepliesClick?.let {
                     CounterItem(
@@ -231,26 +238,20 @@ fun ListActivityItemPlaceholder(
             )
         }
 
-        Column(
-            modifier = Modifier.padding(all = 6.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
-            horizontalAlignment = Alignment.End
-        ) {
-            repeat(2) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(percent = 32))
-                        .background(MaterialTheme.colorScheme.onSurface)
-                )
-            }
-        }
+        Box(
+            modifier = Modifier
+                .padding(all = 6.dp)
+                .size(32.dp)
+                .clip(RoundedCornerShape(percent = 32))
+                .background(MaterialTheme.colorScheme.onSurface)
+        )
     }
 }
 
 @Composable
 fun TextActivityItem(
     textActivity: TextActivity,
+    isCurrentUser: Boolean,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -281,11 +282,13 @@ fun TextActivityItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    LikeComponent(
-                        likesCount = textActivity.likeCount,
-                        isLiked = textActivity.isLiked,
-                        onLikeToggle = onLikeToggle
-                    )
+                    if (!isCurrentUser) {
+                        LikeComponent(
+                            likesCount = textActivity.likeCount,
+                            isLiked = textActivity.isLiked,
+                            onLikeToggle = onLikeToggle
+                        )
+                    }
 
                     onRepliesClick?.let {
                         CounterItem(
@@ -309,6 +312,7 @@ fun TextActivityItem(
 @Composable
 fun MessageActivityItem(
     messageActivity: MessageActivity,
+    isCurrentUser: Boolean,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -343,11 +347,13 @@ fun MessageActivityItem(
                         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        LikeComponent(
-                            likesCount = messageActivity.likeCount,
-                            isLiked = messageActivity.isLiked,
-                            onLikeToggle = onLikeToggle
-                        )
+                        if (!isCurrentUser) {
+                            LikeComponent(
+                                likesCount = messageActivity.likeCount,
+                                isLiked = messageActivity.isLiked,
+                                onLikeToggle = onLikeToggle
+                            )
+                        }
 
                         onRepliesClick?.let {
                             CounterItem(

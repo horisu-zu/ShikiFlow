@@ -19,6 +19,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -77,19 +78,18 @@ import com.example.shikiflow.presentation.common.mappers.MarkdownFormatMapper
 import com.example.shikiflow.presentation.common.mappers.MarkdownFormatMapper.iconResource
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEditorUiState
 import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEditorViewModel
-import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
 import com.example.shikiflow.presentation.viewmodel.comment.editor.UploadMediaState
 import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CommentEditorSheet(
-    threadId: Int,
     commentId: Int?,
     commentBody: String?,
     parentCommentId: Int?,
     onDismiss: () -> Unit,
-    onEvent: (CommentEvent) -> Unit,
+    onSubmit: (String, Boolean) -> Unit,
+    onDelete: (Int) -> Unit,
     commentEditorViewModel: CommentEditorViewModel = hiltViewModel()
 ) {
     val uiState by commentEditorViewModel.uiState.collectAsStateWithLifecycle()
@@ -102,12 +102,6 @@ fun CommentEditorSheet(
     )
     val showDeleteDialog = remember { mutableStateOf(false) }
     val showPreview = remember { mutableStateOf(false) }
-
-    LaunchedEffect(Unit) {
-        commentEditorViewModel.commentEvent.collect { event ->
-            onEvent(event)
-        }
-    }
 
     LaunchedEffect(uiState.authType) {
         if (uiState.authType == AuthType.SHIKIMORI && parentCommentId != null) {
@@ -132,7 +126,7 @@ fun CommentEditorSheet(
             onDismissRequest = { showDeleteDialog.value = false },
             text = stringResource(R.string.comment_editor_delete_label),
             confirmButtonText = stringResource(R.string.common_confirm),
-            onConfirm = { commentEditorViewModel.deleteComment(commentId!!) }
+            onConfirm = { onDelete(commentId!!) }
         )
     }
 
@@ -144,11 +138,7 @@ fun CommentEditorSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(
-                    top = 12.dp,
-                    start = 12.dp,
-                    end = 12.dp
-                )
+                .padding(all = 12.dp)
                 .imePadding()
         ) {
             Row(
@@ -156,21 +146,7 @@ fun CommentEditorSheet(
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(
-                    enabled = textFieldState.text.isNotBlank(),
-                    shape = RoundedCornerShape(percent = 24),
-                    onClick = { showPreview.value = !showPreview.value }
-                ) {
-                    Text(
-                        text = when (showPreview.value) {
-                            true -> stringResource(R.string.comment_editor_edit_label)
-                            false -> stringResource(R.string.comment_editor_preview_label)
-                        },
-                        style = MaterialTheme.typography.bodySmall
-                    )
-                }
-
-                if (uiState.authType != null && textFieldState.text.isNotEmpty()) {
+                if (uiState.authType != null && textFieldState.text.isNotBlank()) {
                     Text(
                         text = buildString {
                             append(textFieldState.text.length)
@@ -182,7 +158,21 @@ fun CommentEditorSheet(
                                 }
                             )
                         },
-                        style = MaterialTheme.typography.bodySmall
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+
+                TextButton(
+                    enabled = textFieldState.text.isNotBlank(),
+                    shape = RoundedCornerShape(percent = 24),
+                    onClick = { showPreview.value = !showPreview.value }
+                ) {
+                    Text(
+                        text = when (showPreview.value) {
+                            true -> stringResource(R.string.comment_editor_edit_label)
+                            false -> stringResource(R.string.comment_editor_preview_label)
+                        },
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
 
@@ -198,22 +188,22 @@ fun CommentEditorSheet(
                             modifier = Modifier.size(24.dp)
                         )
                     }
-                }
-
-                AnimatedVisibility(
-                    visible = uiState.authType == AuthType.SHIKIMORI
-                ) {
-                    FilterChip(
-                        selected = uiState.isOfftopic,
-                        enabled = commentId == null,
-                        label = {
-                            Text(
-                                text = stringResource(R.string.comment_offtopic),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        },
-                        onClick = { commentEditorViewModel.toggleOfftopic() }
-                    )
+                } else {
+                    AnimatedVisibility(
+                        visible = uiState.authType == AuthType.SHIKIMORI
+                    ) {
+                        FilterChip(
+                            selected = uiState.isOfftopic,
+                            label = {
+                                Text(
+                                    text = stringResource(R.string.comment_offtopic),
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            },
+                            contentPadding = PaddingValues(horizontal = 4.dp),
+                            onClick = { commentEditorViewModel.toggleOfftopic() }
+                        )
+                    }
                 }
 
                 Button(
@@ -221,15 +211,12 @@ fun CommentEditorSheet(
                         null -> stringResource(R.string.comment_editor_publish)
                         else -> stringResource(R.string.comment_editor_update)
                     },
+                    style = MaterialTheme.typography.bodySmall,
+                    enabled = textFieldState.text.isNotBlank(),
                     shape = RoundedCornerShape(percent = 24),
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                     onClick = {
-                        commentEditorViewModel.publishComment(
-                            commentId = commentId,
-                            topicId = threadId,
-                            parentCommentId = parentCommentId,
-                            commentBody = textFieldState.text.toString(),
-                            isOfftopic = uiState.isOfftopic
-                        )
+                        onSubmit(textFieldState.text.toString(), uiState.isOfftopic)
                     }
                 )
             }

@@ -7,6 +7,8 @@ import com.example.shikiflow.presentation.PagedUiState
 
 data class UserActivityUiState(
     val userId: Int? = null,
+    val currentUserId: Int? = null,
+
     val items: SnapshotStateList<UserActivity> = mutableStateListOf(),
     override val page: Int = 1,
     override val hasNextPage: Boolean = true,

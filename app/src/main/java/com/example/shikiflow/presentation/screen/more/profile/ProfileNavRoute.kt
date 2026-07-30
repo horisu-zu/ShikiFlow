@@ -15,6 +15,7 @@ sealed interface ProfileNavRoute : NavKey {
 
     @Serializable
     data class ActivityReplies(
+        val userId: Int,
         val activityId: Int,
         val activityType: ActivityType
     ) : ProfileNavRoute

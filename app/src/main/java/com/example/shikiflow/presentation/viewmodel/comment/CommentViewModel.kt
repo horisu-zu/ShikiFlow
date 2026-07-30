@@ -6,13 +6,14 @@ import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.deleteComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.findComment
 import com.example.shikiflow.domain.model.comment.ALComment.Companion.updateComment
+import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
-import com.example.shikiflow.presentation.viewmodel.comment.editor.CommentEvent
+import com.example.shikiflow.presentation.viewmodel.comment.editor.EditorEvent
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +33,7 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CommentViewModel @Inject constructor(
-    private val commentsRepository: CommentRepository,
+    private val commentRepository: CommentRepository,
     private val userRepository: UserRepository,
     private val settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<CommentsUiState>() {
@@ -48,7 +49,7 @@ class CommentViewModel @Inject constructor(
                 old.page == new.page && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                commentsRepository.getThreadComments(state.topicId!!, state.page)
+                commentRepository.getThreadComments(state.topicId!!, state.page)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
@@ -74,7 +75,7 @@ class CommentViewModel @Inject constructor(
             }
             .distinctUntilChangedBy { state -> state.topicId }
             .flatMapLatest { state ->
-                commentsRepository.getThread(state.topicId!!)
+                commentRepository.getThread(state.topicId!!)
             }.onEach { result ->
                 mutableUiState
                     .update { state ->
@@ -194,28 +195,66 @@ class CommentViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: CommentEvent) {
+    fun submitComment(
+        commentId: Int?,
+        topicId: Int,
+        parentCommentId: Int?,
+        commentBody: String,
+        isOfftopic: Boolean = false
+    ) {
+        viewModelScope.launch {
+            commentRepository.publishComment(
+                id = commentId,
+                topicId = topicId,
+                parentCommentId = parentCommentId,
+                commentBody = commentBody,
+                isOfftopic = isOfftopic
+            ).let { result ->
+                if (result is DataResult.Success) {
+                    val comment = result.data
+                    val event = when (commentId) {
+                        null -> EditorEvent.Published(comment, parentCommentId)
+                        else -> EditorEvent.Updated(comment)
+                    }
+
+                    onEvent(event)
+                }
+            }
+        }
+    }
+
+    fun deleteComment(commentId: Int) {
+        viewModelScope.launch {
+            commentRepository.deleteComment(commentId).let { result ->
+                if (result is DataResult.Success) {
+                    onEvent(EditorEvent.Deleted(commentId))
+                }
+            }
+        }
+    }
+
+    private fun onEvent(event: EditorEvent<Comment>) {
         mutableUiState.update { state ->
             when (event) {
-                is CommentEvent.Published -> when (event.comment) {
-                    is ALComment -> if (event.parentCommentId != null) {
+                is EditorEvent.Published -> when (event.entry) {
+                    is ALComment -> if (event.parentEntryId != null) {
                         val index = state.comments.indexOfFirst { comment ->
-                            (comment as ALComment).findComment(event.parentCommentId) != null
+                            (comment as ALComment).findComment(event.parentEntryId) != null
                         }
 
                         if (index != -1) {
                             val root = state.comments[index] as ALComment
 
-                            state.comments[index] = root.updateComment(event.parentCommentId) { comment ->
-                                comment.copy(childComments = comment.childComments + event.comment)
+                            state.comments[index] = root.updateComment(event.parentEntryId) { comment ->
+                                comment.copy(childComments = comment.childComments + event.entry)
                             }
                         }
-                    } else state.comments.add(0, event.comment)
+                    } else state.comments.add(0, event.entry)
 
-                    is ShikiComment -> state.comments.add(0, event.comment)
+                    is ShikiComment -> state.comments.add(0, event.entry)
                 }
-                is CommentEvent.Updated -> {
-                    when (val updatedComment = event.comment) {
+                is EditorEvent.Updated -> {
+                    when (val updatedComment = event.entry) {
                         is ShikiComment -> {
                             val index = state.comments.indexOfFirst { it.id == updatedComment.id }
 
@@ -235,18 +274,18 @@ class CommentViewModel @Inject constructor(
                         }
                     }
                 }
-                is CommentEvent.Deleted -> {
+                is EditorEvent.Deleted -> {
                     val index = state.comments.indexOfFirst { comment ->
                         if (comment is ALComment) {
-                            comment.findComment(event.commentId) != null
-                        } else comment.id == event.commentId
+                            comment.findComment(event.entryId) != null
+                        } else comment.id == event.entryId
                     }
 
                     if (index != -1) {
                         val comment = state.comments[index]
 
-                        if (comment is ALComment && comment.id != event.commentId) {
-                            state.comments[index] = comment.deleteComment(event.commentId)
+                        if (comment is ALComment && comment.id != event.entryId) {
+                            state.comments[index] = comment.deleteComment(event.entryId)
                         } else {
                             state.comments.removeAt(index)
                         }

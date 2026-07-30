@@ -20,6 +20,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -33,7 +35,9 @@ import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentEditorSheet
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentItemPlaceholder
+import com.example.shikiflow.presentation.screen.main.details.common.comment.EditorSheetState
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.screen.more.profile.activity.ActivityItem
 import com.example.shikiflow.presentation.screen.more.profile.activity.ListActivityItemPlaceholder
@@ -41,6 +45,7 @@ import com.example.shikiflow.presentation.viewmodel.user.activity.reply.Activity
 
 @Composable
 fun ActivityRepliesScreen(
+    userId: Int,
     activityId: Int,
     activityType: ActivityType,
     navOptions: ProfileNavOptions,
@@ -48,6 +53,7 @@ fun ActivityRepliesScreen(
 ) {
     val preferredTitleType = LocalTitleTypeController.current
     val uiState by activityRepliesViewModel.uiState.collectAsStateWithLifecycle()
+    val editorSheetState = remember { mutableStateOf<EditorSheetState?>(null) }
 
     LaunchedEffect(activityId) {
         activityRepliesViewModel.setId(activityId)
@@ -56,7 +62,7 @@ fun ActivityRepliesScreen(
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*Editor Sheet State*/ },
+                onClick = { editorSheetState.value = EditorSheetState(id = activityId) },
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer
             ) {
@@ -119,6 +125,7 @@ fun ActivityRepliesScreen(
                         ActivityItem(
                             userActivity = userActivity,
                             titleType = preferredTitleType,
+                            isCurrentUser = userId == uiState.currentUserId,
                             onListActivityClick = { mediaType, id ->
                                 val detailsNavRoute = when(mediaType) {
                                     MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
@@ -157,7 +164,13 @@ fun ActivityRepliesScreen(
                                 type = LikeableType.ACTIVITY_REPLY
                             )
                         },
-                        onEditClick = { /*Editor Sheet*/ },
+                        onEditClick = {
+                            editorSheetState.value = EditorSheetState(
+                                id = activityId,
+                                entryId = activityReply.id,
+                                body = activityReply.markdownBody
+                            )
+                        },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -186,5 +199,24 @@ fun ActivityRepliesScreen(
                 }
             }
         }
+    }
+
+    editorSheetState.value?.let { editorState ->
+        CommentEditorSheet(
+            commentId = editorState.entryId,
+            commentBody = editorState.body,
+            parentCommentId = editorState.parentCommentId,
+            onDismiss = { editorSheetState.value = null },
+            onSubmit = { commentBody, _ ->
+                activityRepliesViewModel.submitReply(
+                    id = editorState.entryId,
+                    activityId = editorState.id,
+                    textBody = commentBody
+                )
+            },
+            onDelete = { replyId ->
+                activityRepliesViewModel.deleteReply(replyId)
+            }
+        )
     }
 }

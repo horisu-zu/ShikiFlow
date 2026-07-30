@@ -960,7 +960,8 @@ f
     <string name="score_format_5_point">5 Point</string>
     <string name="score_format_3_point_smiley">3 Point Smiley</string>
 
-    <string name="comment_editor_text_placeholder">Write comment…</string>
+    <string name="comment_section_editor_button_label">Write Comment…</string>
+    <string name="comment_editor_text_placeholder">Comment Text…</string>
     <string name="comment_editor_publish">Publish</string>
     <string name="comment_editor_update">Update</string>
     <string name="comment_editor_media_upload_label">Uploading Media…</string>

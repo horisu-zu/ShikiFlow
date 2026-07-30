@@ -2,10 +2,12 @@ package com.example.shikiflow.presentation.viewmodel.user.activity.reply
 
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.thread.LikeableType
+import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
+import com.example.shikiflow.presentation.viewmodel.comment.editor.EditorEvent
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -142,6 +144,66 @@ class ActivityRepliesViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun submitReply(
+        id: Int?,
+        activityId: Int,
+        textBody: String
+    ) {
+        viewModelScope.launch {
+            userRepository.submitActivityReply(
+                id = id,
+                activityId = activityId,
+                body = textBody
+            ).let { result ->
+                if (result is DataResult.Success) {
+                    val reply = result.data
+                    val editorEvent = when (id) {
+                        null -> EditorEvent.Published(entry = reply, parentEntryId = null)
+                        else -> EditorEvent.Updated(entry = reply)
+                    }
+
+                    onEvent(editorEvent)
+                }
+            }
+        }
+    }
+
+    fun deleteReply(id: Int) {
+        viewModelScope.launch {
+            userRepository.deleteActivityReply(id).let { result ->
+                if (result is DataResult.Success) {
+                    onEvent(EditorEvent.Deleted(id))
+                }
+            }
+        }
+    }
+
+    private fun onEvent(event: EditorEvent<ActivityReply>) {
+        mutableUiState.update { state ->
+            when (event) {
+                is EditorEvent.Published -> {
+                    state.replies.add(event.entry)
+                }
+                is EditorEvent.Updated -> {
+                    val index = state.replies.indexOfFirst { it.id == event.entry.id }
+
+                    if (index != -1) {
+                        state.replies[index] = event.entry
+                    }
+                }
+                is EditorEvent.Deleted -> {
+                    val index = state.replies.indexOfFirst { it.id == event.entryId }
+
+                    if (index != -1) {
+                        state.replies.removeAt(index)
+                    }
+                }
+            }
+
+            state
         }
     }
 
