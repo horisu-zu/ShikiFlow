@@ -281,9 +281,9 @@ private fun FavoriteItemPlaceholder(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(all = 4.dp)
                 .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                 .clip(RoundedCornerShape(percent = 32))
-                .padding(all = 4.dp)
                 .background(MaterialTheme.colorScheme.onSurface)
         )
     }

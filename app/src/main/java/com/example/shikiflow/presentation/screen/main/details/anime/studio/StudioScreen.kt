@@ -142,7 +142,9 @@ fun StudioScreen(
                                 ToggleFavoriteButton(
                                     favoritesCount = studio.favorites,
                                     isFavorite = studio.isFavorite,
-                                    onToggle = { studioViewModel.toggleFavorite(studio.id) }
+                                    onToggle = {
+                                        studioViewModel.toggleFavorite(studio.id, studio.isFavorite)
+                                    }
                                 )
                             }
                         }

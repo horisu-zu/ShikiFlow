@@ -19,4 +19,10 @@ data class StaffDetails(
     val staffAnimeRoles: PaginatedList<StaffMediaRole>,
     val staffMangaRoles: PaginatedList<StaffMediaRole>,
     val topicId: Int? = null
-)
+) {
+    companion object {
+        fun StaffDetails.replace(staff: StaffDetails): StaffDetails {
+            return staff.copy(isFavorite = isFavorite)
+        }
+    }
+}

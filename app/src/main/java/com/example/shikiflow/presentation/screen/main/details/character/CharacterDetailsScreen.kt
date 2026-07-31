@@ -102,11 +102,16 @@ fun CharacterDetailsScreen(
                     },
                     actions = {
                         uiState.details?.let { details ->
-                            if(details.favorites != null && details.isFavorite != null) {
+                            if(details.isFavorite != null) {
                                 ToggleFavoriteButton(
                                     favoritesCount = details.favorites,
                                     isFavorite = details.isFavorite,
-                                    onToggle = { characterDetailsViewModel.toggleFavorite(details.id) }
+                                    onToggle = {
+                                        characterDetailsViewModel.toggleFavorite(
+                                            id = details.id,
+                                            isFavorite = details.isFavorite
+                                        )
+                                    }
                                 )
                             }
                         }
@@ -148,7 +153,7 @@ fun CharacterDetailsScreen(
                     message = uiState.errorMessage
                         ?: stringResource(R.string.common_error),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { characterDetailsViewModel.onRefresh() }
+                    onButtonClick = { characterDetailsViewModel.refresh() }
                 )
             }
         } else {

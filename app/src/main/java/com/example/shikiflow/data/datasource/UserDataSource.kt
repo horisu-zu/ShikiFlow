@@ -82,6 +82,11 @@ interface UserDataSource {
 
     fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
 
+    fun getFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<DataResult<List<UserFavorite>>>
+
     fun getUserSocial(
         userId: Int,
         socialCategory: SocialCategory,
@@ -102,11 +107,12 @@ interface UserDataSource {
     ): DataResult<UserFollow>
 
     suspend fun toggleFavorite(
-        animeId: Int? = null,
-        mangaId: Int? = null,
-        characterId: Int? = null,
-        staffId: Int? = null,
-        studioId: Int? = null,
+        animeId: Int?,
+        mangaId: Int?,
+        characterId: Int?,
+        staffId: Int?,
+        studioId: Int?,
+        isFavorite: Boolean
     ): DataResult<Unit>
 
     suspend fun toggleFollow(

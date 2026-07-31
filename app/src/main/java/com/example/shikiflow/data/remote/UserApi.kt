@@ -80,6 +80,25 @@ interface UserApi {
         @Path("id") userId: Long
     ): ShikiUserFavoritesResponse
 
+    @POST("/api/favorites/{linkedType}/{id}")
+    suspend fun createFavorite(
+        @Path("linkedType") linkedType: String,
+        @Path("id") id: Int
+    )
+
+    @DELETE("/api/favorites/{linkedType}/{id}")
+    suspend fun deleteFavorite(
+        @Path("linkedType") linkedType: String,
+        @Path("id") id: Int
+    )
+
+    @POST("/api/favorites/{linkedType}/{id}/{kind}")
+    suspend fun createFavoriteStaff(
+        @Path("linkedType") linkedType: String,
+        @Path("id") id: Int,
+        @Path("kind") kind: String = "common"
+    )
+
     @GET("/api/users/{id}/friends")
     suspend fun getUserFriends(
         @Path("id") userId: Long,

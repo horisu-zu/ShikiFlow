@@ -10,4 +10,8 @@ enum class FavoriteCategory {
     MANGAKA,
     PRODUCER,
     OTHER_PERSON;
+
+    companion object {
+        val shikiStaffEntries = setOf(SEYU, MANGAKA, PRODUCER, OTHER_PERSON)
+    }
 }

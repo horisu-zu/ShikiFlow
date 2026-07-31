@@ -217,6 +217,26 @@ class ShikimoriUserDataSource @Inject constructor(
         }.flow
     }
 
+    override fun getFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<DataResult<List<UserFavorite>>> = flow {
+        try {
+            val favorites = getShikiFavorites(userId)
+                .filter { favorite ->
+                    if (favoriteCategory == FavoriteCategory.STAFF) {
+                        favorite.favoriteCategory in FavoriteCategory.shikiStaffEntries
+                    } else {
+                        favorite.favoriteCategory == favoriteCategory
+                    }
+                }
+
+            emit(DataResult.Success(favorites))
+        } catch (e: Exception) {
+            emit(DataResult.Error(e.message ?: "Unknown Error"))
+        }
+    }.onStart { emit(DataResult.Loading) }
+
     override fun getUserSocial(
         userId: Int,
         socialCategory: SocialCategory,
@@ -313,9 +333,35 @@ class ShikimoriUserDataSource @Inject constructor(
         mangaId: Int?,
         characterId: Int?,
         staffId: Int?,
-        studioId: Int?
+        studioId: Int?,
+        isFavorite: Boolean
     ): DataResult<Unit> {
-        TODO("Not available in the API")
+        return try {
+            val pair = when {
+                animeId != null -> "Anime" to animeId
+                mangaId != null -> "Manga" to mangaId
+                characterId != null -> "Character" to characterId
+                staffId != null -> "Person" to staffId
+                else -> "" to 0
+            }
+
+            val response = when(isFavorite) {
+                false -> {
+                    if (staffId != null) {
+                        userApi.createFavoriteStaff(linkedType = pair.first, id = pair.second)
+                    } else {
+                        userApi.createFavorite(linkedType = pair.first, id = pair.second)
+                    }
+                }
+                true -> {
+                    userApi.deleteFavorite(linkedType = pair.first, id = pair.second)
+                }
+            }
+
+            DataResult.Success(response)
+        } catch (e: Exception) {
+            DataResult.Error(e.message ?: "Unknown Error")
+        }
     }
 
     override suspend fun toggleFollow(

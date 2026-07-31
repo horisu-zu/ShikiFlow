@@ -58,7 +58,7 @@ fun AnimeDetailsScreen(
                 ErrorItem(
                     message = uiState.errorMessage ?: stringResource(id = R.string.details_error),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { animeDetailsViewModel.onRefresh() }
+                    onButtonClick = { animeDetailsViewModel.refresh() }
                 )
             }
         } else {
@@ -82,7 +82,7 @@ fun AnimeDetailsScreen(
 
                     PullToRefreshBox(
                         isRefreshing = uiState.isRefreshing,
-                        onRefresh = { animeDetailsViewModel.onRefresh() }
+                        onRefresh = { animeDetailsViewModel.refresh() }
                     ) {
                         uiState.authType?.let { authType ->
                             AnimeDetailsContent(
@@ -91,6 +91,7 @@ fun AnimeDetailsScreen(
                                 userRate = uiState.userRate,
                                 rateUpdateState = uiState.rateUpdateState,
                                 scoreFormat = uiState.scoreFormat,
+                                favoriteErrorMessage = uiState.favoriteErrorMessage,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 selectedScreenshotIndex = selectedScreenshotIndex,
                                 onScreenshotClick = { index ->
@@ -111,8 +112,12 @@ fun AnimeDetailsScreen(
                                     )
                                 },
                                 onToggleFavorite = {
-                                    animeDetailsViewModel.toggleFavorite(details.id)
+                                    animeDetailsViewModel.toggleFavorite(
+                                        id = details.id,
+                                        isFavorite = details.isFavorite ?: false
+                                    )
                                 },
+                                onRefreshFavorite = { animeDetailsViewModel.refreshFavorite() },
                                 mediaNavOptions = navOptions,
                                 modifier = Modifier.padding(
                                     end = paddingValues.calculateEndPadding(LayoutDirection.Ltr),

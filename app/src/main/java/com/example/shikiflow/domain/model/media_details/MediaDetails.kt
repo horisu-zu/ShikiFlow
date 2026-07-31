@@ -45,4 +45,10 @@ data class MediaDetails(
     val threadId: Int? = null,
     val isFavorite: Boolean? = null,
     val mediaFollowings: PaginatedList<MediaFollowing> = PaginatedList(false, emptyList())
-)
+) {
+    companion object {
+        fun MediaDetails.replace(mediaDetails: MediaDetails): MediaDetails {
+            return mediaDetails.copy(isFavorite = isFavorite)
+        }
+    }
+}

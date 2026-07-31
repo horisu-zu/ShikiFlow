@@ -11,6 +11,7 @@ data class MangaDetailsUiState(
     val mediaId: Int? = null,
     val userId: Int? = null,
     val authType: AuthType? = null,
+
     val details: MediaDetails? = null,
     val userRate: MediaUserTrack? = null,
     val mangaDexUiState: MangaDexUiState = MangaDexUiState(),
@@ -18,7 +19,9 @@ data class MangaDetailsUiState(
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
     override val isLoading: Boolean = true,
     override val errorMessage: String? = null,
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+    val isRefreshingFavorite: Boolean = false,
+    val favoriteErrorMessage: String? = null
 ): UiState() {
     override fun setError(value: String?) = copy(errorMessage = value)
     override fun setLoading(value: Boolean) = copy(isLoading = value)

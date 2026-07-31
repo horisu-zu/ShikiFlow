@@ -1,9 +1,6 @@
 package com.example.shikiflow.presentation.screen.main.details.manga
 
 import android.content.res.Configuration
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -17,14 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,6 +55,7 @@ import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.common.mappers.MediaFormatMapper.isManga
+import com.example.shikiflow.presentation.screen.main.details.anime.FavoriteButton
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
 
@@ -70,10 +66,12 @@ fun MangaDetailsHeader(
     mangaDexUiState: MangaDexUiState,
     titleType: PreferredTitleType,
     scoreFormat: ScoreFormat,
+    favoriteErrorMessage: String?,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onMangaDexIconClick: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val orientation = LocalConfiguration.current.orientation
@@ -190,10 +188,12 @@ fun MangaDetailsHeader(
                     scoreFormat = scoreFormat,
                     isManga = mangaDetails.format.isManga(),
                     isFavorite = mangaDetails.isFavorite,
+                    favoriteErrorMessage = favoriteErrorMessage,
                     mangaDexUiState = mangaDexUiState,
                     onStatusClick = { onStatusClick() },
                     onMangaDexIconClick = onMangaDexIconClick,
-                    onToggleFavorite = onToggleFavorite
+                    onToggleFavorite = onToggleFavorite,
+                    onRefreshFavorite = onRefreshFavorite
                 )
             }
         }
@@ -209,10 +209,12 @@ fun MangaUserRateItem(
     scoreFormat: ScoreFormat,
     isManga: Boolean,
     isFavorite: Boolean?,
+    favoriteErrorMessage: String?,
     mangaDexUiState: MangaDexUiState,
     onStatusClick: () -> Unit,
     onMangaDexIconClick: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val rateColor = (userRateStatus ?: UserRateStatus.UNKNOWN).color()
@@ -266,28 +268,14 @@ fun MangaUserRateItem(
                 )
             )
         }
-        if(isFavorite != null) {
-            val iconTint by animateColorAsState(
-                targetValue = when(isFavorite) {
-                    true -> MaterialTheme.colorScheme.error
-                    false -> MaterialTheme.colorScheme.onSecondaryContainer
-                },
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            )
 
-            HeaderButton(
-                onClick = onToggleFavorite
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    tint = iconTint,
-                    contentDescription = "Favorite Icon"
-                )
-            }
-        }
+        FavoriteButton(
+            isFavorite = isFavorite,
+            favoriteErrorMessage = favoriteErrorMessage,
+            onToggleFavorite = onToggleFavorite,
+            onRefreshFavorite = onRefreshFavorite
+        )
+
         if(isManga) {
             HeaderButton(
                 enabled = !mangaDexUiState.isLoading,

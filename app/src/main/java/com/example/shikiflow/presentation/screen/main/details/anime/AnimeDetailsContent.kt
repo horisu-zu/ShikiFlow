@@ -75,12 +75,14 @@ fun AnimeDetailsContent(
     userRate: MediaUserTrack?,
     rateUpdateState: RateUpdateState,
     scoreFormat: ScoreFormat,
+    favoriteErrorMessage: String?,
     sharedTransitionScope: SharedTransitionScope,
     selectedScreenshotIndex: Int?,
     onScreenshotClick: (Int) -> Unit,
     onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
     onDeleteUserRate: (Int) -> Unit,
     onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
     mediaNavOptions: MediaNavOptions,
     modifier: Modifier = Modifier
 ) {
@@ -106,12 +108,14 @@ fun AnimeDetailsContent(
                 authType = currentAuthType,
                 titleType = titleType,
                 scoreFormat = scoreFormat,
+                favoriteErrorMessage = favoriteErrorMessage,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onPlayClick = { title, id, completedEpisodes ->
                     mediaNavOptions.navigateToAnimeWatch(title, id, completedEpisodes)
                 },
-                onToggleFavorite = onToggleFavorite
+                onToggleFavorite = onToggleFavorite,
+                onRefreshFavorite = onRefreshFavorite
             )
         }
 

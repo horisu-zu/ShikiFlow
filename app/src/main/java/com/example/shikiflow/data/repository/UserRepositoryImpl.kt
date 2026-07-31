@@ -192,6 +192,15 @@ class UserRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<DataResult<List<UserFavorite>>> {
+        return withSource(dataSource) { dataSource ->
+            dataSource.getFavorites(userId, favoriteCategory)
+        }
+    }
+
     override suspend fun getMediaRates(
         userId: Int,
         mediaType: MediaType
@@ -226,9 +235,10 @@ class UserRepositoryImpl @Inject constructor(
         mangaId: Int?,
         characterId: Int?,
         staffId: Int?,
-        studioId: Int?
+        studioId: Int?,
+        isFavorite: Boolean
     ): DataResult<Unit> = withSourceSuspend(dataSource) { dataSource ->
-        dataSource.toggleFavorite(animeId, mangaId, characterId, staffId, studioId)
+        dataSource.toggleFavorite(animeId, mangaId, characterId, staffId, studioId, isFavorite)
     }
 
     override suspend fun getFollow(

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ToggleFavoriteButton(
-    favoritesCount: Int,
+    favoritesCount: Int?,
     isFavorite: Boolean,
     onToggle: () -> Unit,
     modifier: Modifier = Modifier
@@ -47,13 +47,15 @@ fun ToggleFavoriteButton(
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = favoritesCount.toString(),
-            style = MaterialTheme.typography.bodyMedium.copy(
-                fontWeight = FontWeight.SemiBold,
-                color = color
+        favoritesCount?.let { count ->
+            Text(
+                text = count.toString(),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = FontWeight.SemiBold,
+                    color = color
+                )
             )
-        )
+        }
 
         Icon(
             imageVector = Icons.Default.Favorite,

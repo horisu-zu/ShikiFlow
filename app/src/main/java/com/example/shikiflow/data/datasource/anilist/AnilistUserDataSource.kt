@@ -382,6 +382,13 @@ class AnilistUserDataSource @Inject constructor(
         ).flow
     }
 
+    override fun getFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<DataResult<List<UserFavorite>>> {
+        TODO("No need to implement")
+    }
+
     private suspend fun loadFavoriteAnime(
         userId: Int,
         page: Int,
@@ -675,7 +682,8 @@ class AnilistUserDataSource @Inject constructor(
         mangaId: Int?,
         characterId: Int?,
         staffId: Int?,
-        studioId: Int?
+        studioId: Int?,
+        isFavorite: Boolean
     ): DataResult<Unit> {
         val toggleFavoriteMutation = ToggleFavoriteMutation(
             animeId = Optional.presentIfNotNull(animeId),

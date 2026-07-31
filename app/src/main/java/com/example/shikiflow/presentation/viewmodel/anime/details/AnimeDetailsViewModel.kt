@@ -1,10 +1,13 @@
 package com.example.shikiflow.presentation.viewmodel.anime.details
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.media_details.MediaDetails.Companion.replace
 import com.example.shikiflow.domain.model.tracks.RateUpdateState
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.tracks.SaveUserRate
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -19,6 +22,7 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -41,7 +45,7 @@ class AnimeDetailsViewModel @Inject constructor(
         }
     }
 
-    fun onRefresh() {
+    fun refresh() {
         mutableUiState.update { state ->
             state.copy(
                 isRefreshing = true
@@ -49,9 +53,15 @@ class AnimeDetailsViewModel @Inject constructor(
         }
     }
 
-    fun toggleFavorite(id: Int) {
+    fun refreshFavorite() {
+        mutableUiState.update { state ->
+            state.copy(isRefreshingFavorite = true)
+        }
+    }
+
+    fun toggleFavorite(id: Int, isFavorite: Boolean) {
         viewModelScope.launch {
-            userRepository.toggleFavorite(animeId = id).let { result ->
+            userRepository.toggleFavorite(animeId = id, isFavorite = isFavorite).let { result ->
                 if(result is DataResult.Success) {
                     mutableUiState.update { state ->
                         state.copy(
@@ -88,7 +98,9 @@ class AnimeDetailsViewModel @Inject constructor(
                         }
                         is DataResult.Success -> {
                             state.copy(
-                                details = result.data,
+                                details = state.details?.replace(
+                                    mediaDetails = result.data
+                                ) ?: result.data,
                                 isLoading = false
                             )
                         }
@@ -118,12 +130,58 @@ class AnimeDetailsViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
+        mutableUiState
+            .filter { state ->
+                state.authType == AuthType.SHIKIMORI && state.userId != null && state.details != null
+            }
+            .distinctUntilChanged { old, new ->
+                old.mediaId == new.mediaId && !new.isRefreshingFavorite
+            }
+            .flatMapLatest { state ->
+                userRepository.getFavorites(state.userId!!, FavoriteCategory.ANIME)
+            }
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    when (result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isRefreshingFavorite = false,
+                                favoriteErrorMessage = null
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                details = state.details?.copy(
+                                    isFavorite = result.data
+                                        .map { favorite -> favorite.id }
+                                        .contains(state.mediaId)
+                                )
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                favoriteErrorMessage = result.message
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+
         settingsRepository.authTypeFlow
             .filterNotNull()
             .distinctUntilChanged()
             .onEach { authType ->
                 mutableUiState.update { state ->
                     state.copy(authType = authType)
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .mapNotNull { user -> user?.id }
+            .distinctUntilChanged()
+            .onEach { currentUserId ->
+                mutableUiState.update { state ->
+                    state.copy(userId = currentUserId)
                 }
             }.launchIn(viewModelScope)
 

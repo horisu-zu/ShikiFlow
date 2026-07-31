@@ -49,14 +49,14 @@ fun MangaDetailsScreen(
                 ErrorItem(
                     message = uiState.errorMessage ?: stringResource(id = R.string.details_error),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { mangaDetailsViewModel.onRefresh() }
+                    onButtonClick = { mangaDetailsViewModel.refresh() }
                 )
             }
         } else {
             uiState.details?.let { details ->
                 PullToRefreshBox(
                     isRefreshing = uiState.isRefreshing,
-                    onRefresh = { mangaDetailsViewModel.onRefresh() }
+                    onRefresh = { mangaDetailsViewModel.refresh() }
                 ) {
                     uiState.authType?.let { authType ->
                         MangaDetailsContent(
@@ -66,8 +66,9 @@ fun MangaDetailsScreen(
                             mangaDexUiState = uiState.mangaDexUiState,
                             rateUpdateState = uiState.rateUpdateState,
                             scoreFormat = uiState.scoreFormat,
+                            favoriteErrorMessage = uiState.favoriteErrorMessage,
                             mediaNavOptions = navOptions,
-                            onMangaDexRefreshClick = { mangaDetailsViewModel.onMangaDexRefresh() },
+                            onMangaDexRefreshClick = { mangaDetailsViewModel.mangaDexRefresh() },
                             onSaveUserRate = { save, shortData ->
                                 mangaDetailsViewModel.saveUserRate(
                                     saveUserRate = save,
@@ -83,8 +84,12 @@ fun MangaDetailsScreen(
                                 )
                             },
                             onToggleFavorite = {
-                                mangaDetailsViewModel.toggleFavorite(details.id)
+                                mangaDetailsViewModel.toggleFavorite(
+                                    id = details.id,
+                                    isFavorite = details.isFavorite ?: false
+                                )
                             },
+                            onRefreshFavorite = { mangaDetailsViewModel.refreshFavorite() },
                             modifier = Modifier.padding(
                                 end = paddingValues.calculateEndPadding(LayoutDirection.Ltr)
                             )

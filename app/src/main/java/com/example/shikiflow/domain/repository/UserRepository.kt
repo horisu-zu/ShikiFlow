@@ -88,7 +88,15 @@ interface UserRepository {
         limit: Int = 18
     ): Flow<PagedResult<UserSocial>>
 
-    fun getUserFavorites(userId: Int, favoriteCategory: FavoriteCategory): Flow<PagingData<UserFavorite>>
+    fun getUserFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<PagingData<UserFavorite>>
+
+    fun getFavorites(
+        userId: Int,
+        favoriteCategory: FavoriteCategory
+    ): Flow<DataResult<List<UserFavorite>>>
 
     suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>
 
@@ -102,6 +110,7 @@ interface UserRepository {
         characterId: Int? = null,
         staffId: Int? = null,
         studioId: Int? = null,
+        isFavorite: Boolean
     ): DataResult<Unit>
 
     suspend fun getFollow(userId: Int): DataResult<UserFollow>

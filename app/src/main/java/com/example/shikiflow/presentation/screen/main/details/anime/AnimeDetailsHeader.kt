@@ -19,7 +19,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -82,10 +84,12 @@ fun AnimeDetailsHeader(
     authType: AuthType,
     titleType: PreferredTitleType,
     scoreFormat: ScoreFormat,
+    favoriteErrorMessage: String?,
     horizontalPadding: Dp,
     onStatusClick: () -> Unit,
     onPlayClick: (String, Int, Int) -> Unit,
     onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
@@ -258,6 +262,7 @@ fun AnimeDetailsHeader(
                     watchedEpisodes = userRate?.progress,
                     score = userRate?.score?.toFloat(),
                     scoreFormat = scoreFormat,
+                    favoriteErrorMessage = favoriteErrorMessage,
                     isFavorite = animeDetails.isFavorite,
                     onStatusClick = onStatusClick,
                     onPlayClick = { onPlayClick(
@@ -265,7 +270,8 @@ fun AnimeDetailsHeader(
                         animeDetails.id,
                         userRate?.progress ?: 0
                     ) },
-                    onToggleFavorite = onToggleFavorite
+                    onToggleFavorite = onToggleFavorite,
+                    onRefreshFavorite = onRefreshFavorite
                 )
             }
         }
@@ -379,10 +385,12 @@ private fun UserStatusItem(
     watchedEpisodes: Int?,
     score: Float?,
     scoreFormat: ScoreFormat,
+    favoriteErrorMessage: String?,
     isFavorite: Boolean?,
     onStatusClick: () -> Unit,
     onPlayClick: () -> Unit,
     onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val style = MaterialTheme.typography.bodyMedium.copy(
@@ -434,6 +442,13 @@ private fun UserStatusItem(
             )
         }
 
+        FavoriteButton(
+            isFavorite = isFavorite,
+            favoriteErrorMessage = favoriteErrorMessage,
+            onToggleFavorite = onToggleFavorite,
+            onRefreshFavorite = onRefreshFavorite
+        )
+
         if(authType == AuthType.SHIKIMORI) {
             HeaderButton(
                 onClick = onPlayClick
@@ -443,27 +458,6 @@ private fun UserStatusItem(
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSecondaryContainer,
                     modifier = Modifier.size(24.dp)
-                )
-            }
-        } else if(isFavorite != null) {
-            val iconTint by animateColorAsState(
-                targetValue = when(isFavorite) {
-                    true -> MaterialTheme.colorScheme.error
-                    false -> MaterialTheme.colorScheme.onSecondaryContainer
-                },
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioNoBouncy,
-                    stiffness = Spring.StiffnessMediumLow
-                )
-            )
-
-            HeaderButton(
-                onClick = onToggleFavorite
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    tint = iconTint,
-                    contentDescription = "Favorite Icon"
                 )
             }
         }
@@ -489,6 +483,58 @@ fun HeaderButton(
         contentAlignment = Alignment.Center
     ) {
         content()
+    }
+}
+
+@Composable
+fun FavoriteButton(
+    isFavorite: Boolean?,
+    favoriteErrorMessage: String?,
+    onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val isLoadingFavorite = isFavorite == null && favoriteErrorMessage == null
+
+    HeaderButton(
+        enabled = !isLoadingFavorite,
+        onClick = {
+            when {
+                favoriteErrorMessage != null -> onRefreshFavorite()
+                else -> onToggleFavorite()
+            }
+        },
+        modifier = modifier
+    ) {
+        val iconTint by animateColorAsState(
+            targetValue = when(isFavorite) {
+                true -> MaterialTheme.colorScheme.error
+                else -> MaterialTheme.colorScheme.onSecondaryContainer
+            },
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioNoBouncy,
+                stiffness = Spring.StiffnessMediumLow
+            )
+        )
+
+        when {
+            isFavorite == null && favoriteErrorMessage == null -> {
+                CircularProgressIndicator(
+                    strokeWidth = 3.dp,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            else -> {
+                Icon(
+                    imageVector = when {
+                        favoriteErrorMessage != null -> Icons.Default.Refresh
+                        else -> Icons.Default.Favorite
+                    },
+                    tint = iconTint,
+                    contentDescription = "Favorite Icon"
+                )
+            }
+        }
     }
 }
 

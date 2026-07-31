@@ -156,11 +156,13 @@ fun StaffScreen(
                     },
                     actions = {
                         staffUiState.staffDetails?.let { details ->
-                            if(details.favorites != null && details.isFavorite != null) {
+                            if(details.isFavorite != null) {
                                 ToggleFavoriteButton(
                                     favoritesCount = details.favorites,
                                     isFavorite = details.isFavorite,
-                                    onToggle = { staffViewModel.toggleFavorite(details.id) }
+                                    onToggle = {
+                                        staffViewModel.toggleFavorite(details.id, details.isFavorite)
+                                    }
                                 )
                             }
                         }
@@ -170,6 +172,7 @@ fun StaffScreen(
                             else MaterialTheme.colorScheme.surfaceContainer
                     )
                 )
+
                 if(!isAtTop) { HorizontalDivider() }
             }
         }
@@ -199,7 +202,7 @@ fun StaffScreen(
                 ErrorItem(
                     message = staffUiState.errorMessage ?: stringResource(R.string.common_error),
                     buttonLabel = stringResource(R.string.common_retry),
-                    onButtonClick = { staffViewModel.onRefresh() }
+                    onButtonClick = { staffViewModel.refresh() }
                 )
             }
         } else {

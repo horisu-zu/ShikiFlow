@@ -78,11 +78,13 @@ fun MangaDetailsContent(
     mangaDexUiState: MangaDexUiState,
     rateUpdateState: RateUpdateState,
     scoreFormat: ScoreFormat,
+    favoriteErrorMessage: String?,
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
     onSaveUserRate: (SaveUserRate, MediaShortData) -> Unit,
     onDeleteUserRate: (Int) -> Unit,
     onToggleFavorite: () -> Unit,
+    onRefreshFavorite: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var rateBottomSheet by remember { mutableStateOf(false) }
@@ -107,6 +109,7 @@ fun MangaDetailsContent(
                 mangaDexUiState = mangaDexUiState,
                 titleType = titleType,
                 scoreFormat = scoreFormat,
+                favoriteErrorMessage = favoriteErrorMessage,
                 horizontalPadding = horizontalPadding,
                 onStatusClick = { rateBottomSheet = true },
                 onMangaDexIconClick = {
@@ -122,7 +125,8 @@ fun MangaDetailsContent(
                         onMangaDexRefreshClick()
                     }
                 },
-                onToggleFavorite = onToggleFavorite
+                onToggleFavorite = onToggleFavorite,
+                onRefreshFavorite = onRefreshFavorite
             )
         }
 

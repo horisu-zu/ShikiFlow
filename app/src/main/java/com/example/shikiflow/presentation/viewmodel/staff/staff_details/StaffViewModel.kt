@@ -1,6 +1,9 @@
 package com.example.shikiflow.presentation.viewmodel.staff.staff_details
 
 import androidx.lifecycle.viewModelScope
+import com.example.shikiflow.domain.model.auth.AuthType
+import com.example.shikiflow.domain.model.staff.StaffDetails.Companion.replace
+import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.UserRepository
@@ -13,10 +16,12 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.contains
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -44,7 +49,9 @@ class StaffViewModel @Inject constructor(
                     when (result) {
                         is DataResult.Success -> {
                             state.copy(
-                                staffDetails = result.data,
+                                staffDetails = state.staffDetails?.replace(
+                                    staff = result.data
+                                ) ?: result.data,
                                 isLoading = false,
                                 errorMessage = null
                             )
@@ -66,6 +73,43 @@ class StaffViewModel @Inject constructor(
                 }
             }.launchIn(viewModelScope)
 
+        mutableUiState
+            .filter { state ->
+                state.authType == AuthType.SHIKIMORI && state.userId != null && state.staffDetails != null
+            }
+            .distinctUntilChanged { old, new ->
+                old.staffId == new.staffId && !new.isRefreshingFavorite
+            }
+            .flatMapLatest { state ->
+                userRepository.getFavorites(state.userId!!, FavoriteCategory.STAFF)
+            }
+            .onEach { result ->
+                mutableUiState.update { state ->
+                    when (result) {
+                        is DataResult.Loading -> {
+                            state.copy(
+                                isRefreshingFavorite = false,
+                                favoriteErrorMessage = null
+                            )
+                        }
+                        is DataResult.Success -> {
+                            state.copy(
+                                staffDetails = state.staffDetails?.copy(
+                                    isFavorite = result.data
+                                        .map { favorite -> favorite.id }
+                                        .contains(state.staffId)
+                                )
+                            )
+                        }
+                        is DataResult.Error -> {
+                            state.copy(
+                                favoriteErrorMessage = result.message
+                            )
+                        }
+                    }
+                }
+            }.launchIn(viewModelScope)
+
         settingsRepository.authTypeFlow
             .filterNotNull()
             .distinctUntilChanged()
@@ -76,11 +120,23 @@ class StaffViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .mapNotNull { user -> user?.id }
+            .distinctUntilChanged()
+            .onEach { currentUserId ->
+                mutableUiState.update { state ->
+                    state.copy(userId = currentUserId)
+                }
+            }.launchIn(viewModelScope)
     }
 
-    fun toggleFavorite(id: Int) {
+    fun toggleFavorite(id: Int, isFavorite: Boolean) {
         viewModelScope.launch {
-            userRepository.toggleFavorite(staffId = id).let { result ->
+            userRepository.toggleFavorite(
+                staffId = id,
+                isFavorite = isFavorite
+            ).let { result ->
                 if(result is DataResult.Success) {
                     mutableUiState.update { state ->
                         state.copy(
@@ -106,9 +162,15 @@ class StaffViewModel @Inject constructor(
         }
     }
 
-    fun onRefresh() {
+    fun refresh() {
         mutableUiState.update { state ->
             state.copy(isRefreshing = true)
+        }
+    }
+
+    fun refreshFavorite() {
+        mutableUiState.update { state ->
+            state.copy(isRefreshingFavorite = true)
         }
     }
 }

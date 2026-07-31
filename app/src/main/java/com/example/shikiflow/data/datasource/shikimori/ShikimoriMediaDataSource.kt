@@ -75,7 +75,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                             ids = Optional.presentIfNotNull((id ?: idMal).toString())
                         )
                     )
-                    .fetchPolicy(FetchPolicy.CacheAndNetwork)
+                    .fetchPolicy(FetchPolicy.NetworkFirst)
                     .toFlow()
                     .asDataResult { data ->
                         data.animes.firstOrNull()?.toDomain()
@@ -89,7 +89,7 @@ class ShikimoriMediaDataSource @Inject constructor(
                             ids = Optional.presentIfNotNull((id ?: idMal).toString())
                         )
                     )
-                    .fetchPolicy(FetchPolicy.CacheAndNetwork)
+                    .fetchPolicy(FetchPolicy.NetworkFirst)
                     .toFlow()
                     .asDataResult { data ->
                         data.mangas.firstOrNull()?.toDomain()

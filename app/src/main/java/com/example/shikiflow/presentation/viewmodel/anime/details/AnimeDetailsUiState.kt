@@ -17,8 +17,10 @@ data class AnimeDetailsUiState(
     val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
     val isRefreshing: Boolean = false,
+    val isRefreshingFavorite: Boolean = false,
     override val isLoading: Boolean = true,
-    override val errorMessage: String? = null
+    override val errorMessage: String? = null,
+    val favoriteErrorMessage: String? = null
 ): UiState() {
     override fun setError(value: String?) = copy(errorMessage = value)
     override fun setLoading(value: Boolean) = copy(isLoading = value)

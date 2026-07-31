@@ -107,9 +107,9 @@ class StudioViewModel @Inject constructor(
             )
         }.cachedIn(viewModelScope)
 
-    fun toggleFavorite(id: Int) {
+    fun toggleFavorite(id: Int, isFavorite: Boolean) {
         viewModelScope.launch {
-            userRepository.toggleFavorite(studioId = id).let { result ->
+            userRepository.toggleFavorite(studioId = id, isFavorite = isFavorite).let { result ->
                 if(result is DataResult.Success) {
                     mutableUiState.update { state ->
                         state.copy(

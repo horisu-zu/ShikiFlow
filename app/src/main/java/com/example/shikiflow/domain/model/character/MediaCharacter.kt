@@ -19,4 +19,13 @@ data class MediaCharacter(
     val animeRoles: PaginatedList<CharacterMediaRole>,
     val mangaRoles: PaginatedList<CharacterMediaRole>,
     val topicId: Int? = null
-)
+) {
+    companion object {
+        fun MediaCharacter.replace(character: MediaCharacter): MediaCharacter {
+            return character.copy(
+                favorites = favorites,
+                isFavorite = isFavorite
+            )
+        }
+    }
+}

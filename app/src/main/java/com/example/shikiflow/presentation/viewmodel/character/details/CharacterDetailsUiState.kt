@@ -7,11 +7,14 @@ import com.example.shikiflow.presentation.UiState
 data class CharacterDetailsUiState(
     val characterId: Int? = null,
     val authType: AuthType? = null,
+    val userId: Int? = null,
     val details: MediaCharacter? = null,
 
     override val isLoading: Boolean = true,
     val isRefreshing: Boolean = false,
-    override val errorMessage: String? = null
+    val isRefreshingFavorite: Boolean = false,
+    override val errorMessage: String? = null,
+    val favoriteErrorMessage: String? = null
 ): UiState() {
     override fun setError(value: String?) = copy(errorMessage = value)
     override fun setLoading(value: Boolean) = copy(isLoading = value)
