@@ -19,6 +19,7 @@ import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toShikiKind
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.di.annotations.ShikimoriApollo
@@ -27,6 +28,7 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
@@ -333,6 +335,7 @@ class ShikimoriUserDataSource @Inject constructor(
         mangaId: Int?,
         characterId: Int?,
         staffId: Int?,
+        staffKind: StaffKind?,
         studioId: Int?,
         isFavorite: Boolean
     ): DataResult<Unit> {
@@ -341,14 +344,18 @@ class ShikimoriUserDataSource @Inject constructor(
                 animeId != null -> "Anime" to animeId
                 mangaId != null -> "Manga" to mangaId
                 characterId != null -> "Character" to characterId
-                staffId != null -> "Person" to staffId
+                staffId != null && staffKind != null -> "Person" to staffId
                 else -> "" to 0
             }
 
             val response = when(isFavorite) {
                 false -> {
-                    if (staffId != null) {
-                        userApi.createFavoriteStaff(linkedType = pair.first, id = pair.second)
+                    if (staffId != null && staffKind != null) {
+                        userApi.createFavoriteStaff(
+                            linkedType = pair.first,
+                            id = pair.second,
+                            kind = staffKind.toShikiKind()
+                        )
                     } else {
                         userApi.createFavorite(linkedType = pair.first, id = pair.second)
                     }

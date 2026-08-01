@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -109,6 +110,7 @@ interface UserRepository {
         mangaId: Int? = null,
         characterId: Int? = null,
         staffId: Int? = null,
+        staffKind: StaffKind? = null,
         studioId: Int? = null,
         isFavorite: Boolean
     ): DataResult<Unit>

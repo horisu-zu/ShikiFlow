@@ -161,7 +161,7 @@ fun StaffScreen(
                                     favoritesCount = details.favorites,
                                     isFavorite = details.isFavorite,
                                     onToggle = {
-                                        staffViewModel.toggleFavorite(details.id, details.isFavorite)
+                                        staffViewModel.toggleFavorite(details.id, details.staffKind, details.isFavorite)
                                     }
                                 )
                             }

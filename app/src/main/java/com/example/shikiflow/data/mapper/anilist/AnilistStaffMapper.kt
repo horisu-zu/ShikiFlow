@@ -112,6 +112,7 @@ object AnilistStaffMapper {
             description = description,
             attributes = attributes(),
             imageUrl = image?.large,
+            staffKind = null,
             isFavorite = isFavourite,
             favorites = favourites,
             birthDate = dateOfBirth?.date?.toLocalDate(),

@@ -16,13 +16,17 @@ data class ShikiPerson(
     val japanese: String?,
     val russian: String?,
     @SerialName("birth_on") val birthDate: ShikiDate? = null,
-    @SerialName("job_title")
-    val jobTitle: String?,
+    @SerialName("job_title") val jobTitle: String?,
     val name: String,
     val roles: List<Role>?,
+    @SerialName("person_favoured") val personFavored: Boolean?,
     val seyu: Boolean?,
-    @SerialName("topic_id")
-    val topicId: Int?,
+    @SerialName("seyu_favoured") val seyuFavored: Boolean?,
+    val mangaka: Boolean?,
+    @SerialName("mangaka_favoured") val mangakaFavored: Boolean?,
+    val producer: Boolean?,
+    @SerialName("producer_favoured") val producerFavored: Boolean?,
+    @SerialName("topic_id") val topicId: Int?,
     val works: List<Work>?
 )
 

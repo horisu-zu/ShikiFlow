@@ -1,6 +1,7 @@
 package com.example.shikiflow.presentation.screen.main.details.staff
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -63,6 +64,10 @@ fun MediaStaffScreen(
 
     LaunchedEffect(mediaId) {
         mediaStaffViewModel.setParams(mediaId, mediaType)
+    }
+
+    LaunchedEffect(mediaStaffItems.loadState) {
+        Log.d("Staff Roles", mediaStaffItems.itemSnapshotList.items.joinToString(", ") { it.roles.joinToString(", ") { it.russian.toString() } })
     }
 
     Scaffold(

@@ -12,7 +12,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -48,8 +47,8 @@ fun ToggleFavoriteButton(
         verticalAlignment = Alignment.CenterVertically
     ) {
         favoritesCount?.let { count ->
-            Text(
-                text = count.toString(),
+            DigitCounter(
+                count = count,
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.SemiBold,
                     color = color

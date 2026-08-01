@@ -16,18 +16,64 @@ import com.example.shikiflow.domain.model.common.StaffMediaRole
 import com.example.shikiflow.domain.model.common.VoiceActorMediaRole
 import com.example.shikiflow.domain.model.media_details.MediaPersonShort
 import com.example.shikiflow.domain.model.staff.StaffDetails
+import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.staff.StaffRole
 import com.example.shikiflow.domain.model.staff.StaffShort
 
 object ShikimoriStaffMapper {
     fun ShikiPerson.toStaffDetails(imageUrl: String?): StaffDetails {
+        val staffKind = when {
+            mangaka == true && seyu == true -> {
+                val seyuRoles = groupedRoles?.firstOrNull { it.role == "Сэйю"}?.count ?: 0
+                val mangakaRoles = groupedRoles?.filter { staff ->
+                    staff.role in staffMangakaRolesRu
+                }?.maxOf { it.count } ?: 0
+
+                if (seyuRoles > mangakaRoles) {
+                    StaffKind.SEYU
+                } else StaffKind.MANGAKA
+            }
+            producer == true && seyu == true -> {
+                val seyuRoles = groupedRoles?.firstOrNull { it.role == "Сэйю"}?.count ?: 0
+                val producerRoles = groupedRoles?.filter { role ->
+                    role.role in staffRoleRu
+                }?.maxOf { it.count } ?: 0
+
+                if (seyuRoles > producerRoles) {
+                    StaffKind.SEYU
+                } else StaffKind.PRODUCER
+            }
+            producer == true && mangaka == true -> {
+                val producerRoles = groupedRoles?.filter { role ->
+                    role.role in staffRoleRu
+                }?.maxOf { it.count } ?: 0
+                val mangakaRoles = groupedRoles?.filter { staff ->
+                    staff.role in staffMangakaRolesRu
+                }?.maxOf { it.count } ?: 0
+
+                if (mangakaRoles > producerRoles) {
+                    StaffKind.MANGAKA
+                } else StaffKind.PRODUCER
+            }
+            producer == true -> StaffKind.PRODUCER
+            mangaka == true -> StaffKind.MANGAKA
+            seyu == true -> StaffKind.SEYU
+            else -> StaffKind.OTHER
+        }
+
         return StaffDetails(
             id = id,
             fullName = name.toStaffName(russian, japanese),
             description = null,
             attributes = null,
             imageUrl = imageUrl ?: "${BuildConfig.SHIKI_BASE_URL}${image.original}",
-            isFavorite = null,
+            staffKind = staffKind,
+            isFavorite = when(staffKind) {
+                StaffKind.PRODUCER -> producerFavored
+                StaffKind.MANGAKA -> mangakaFavored
+                StaffKind.SEYU -> seyuFavored
+                else -> personFavored
+            },
             favorites = null,
             birthDate = birthDate?.toLocalDate(),
             shortRoles = groupedRoles?.associateBy { it.role }
@@ -110,6 +156,15 @@ object ShikimoriStaffMapper {
         )
     }
 
+    fun StaffKind.toShikiKind(): String {
+        return when (this) {
+            StaffKind.SEYU -> "seyu"
+            StaffKind.MANGAKA -> "mangaka"
+            StaffKind.PRODUCER -> "producer"
+            StaffKind.OTHER -> "person"
+        }
+    }
+
     fun List<StaffShort>.sortByRole(): List<StaffShort> {
         return sortedBy { staff ->
             staff.roles.rolePriority()
@@ -154,5 +209,44 @@ object ShikimoriStaffMapper {
         "Recording Assistant",
         "Sound Effects",
         "ADR Director"
+    )
+
+    private val staffMangakaRolesRu = listOf(
+        "Автор оригинала",
+        "Сюжет и иллюстрации",
+        "Рисовка"
+    )
+
+    private val staffRoleRu = listOf(
+        "Режиссёр",
+        "Главный продюсер",
+        "Исполнение гл. муз. темы",
+        "Аранжировка гл. муз. темы",
+        "Арт-директор",
+        "Ассистент продюсера",
+        "Компоновка серий",
+        "Главный аниматор",
+        "Дизайн персонажей",
+        "Дизайн цвета",
+        "Исполнительн. продюсер",
+        "Режиссёр эпизодов",
+        "Раскадровка",
+        "Музыка",
+        "Звукорежиссёр",
+        "Оператор-постановщик",
+        "Монтаж",
+        "Продюсер",
+        "Планирование",
+        "Помощник режиссёра",
+        "Композитор гл. муз. темы",
+        "Лирика гл. муз. темы",
+        "Сценарий",
+        "Режиссёр анимации",
+        "Помощник режиссёра анимации",
+        "Фоновая рисовка",
+        "Звукооператор",
+        "Помощник звукооператора",
+        "Звуковые эффекты",
+        "Режиссёр озвучки"
     )
 }

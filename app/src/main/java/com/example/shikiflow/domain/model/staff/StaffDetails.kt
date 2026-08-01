@@ -11,6 +11,7 @@ data class StaffDetails(
     val description: String?,
     val attributes: StaffAttributes?,
     val imageUrl: String?,
+    val staffKind: StaffKind?,
     val isFavorite: Boolean?,
     val favorites: Int?,
     val birthDate: LocalDate?,
