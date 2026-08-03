@@ -59,6 +59,12 @@ fun ActivityRepliesScreen(
         activityRepliesViewModel.setId(activityId)
     }
 
+    LaunchedEffect(Unit) {
+        activityRepliesViewModel.event.collect {
+            editorSheetState.value = null
+        }
+    }
+
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(

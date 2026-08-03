@@ -152,6 +152,12 @@ private fun TopicCommentsSection(
         commentViewModel.setTopicId(topicId)
     }
 
+    LaunchedEffect(Unit) {
+        commentViewModel.event.collect {
+            editorSheetState.value = null
+        }
+    }
+
     BackHandler(enabled = uiState.navState.isNotEmpty()) {
         commentViewModel.removeCommentFromStack()
     }

@@ -4,14 +4,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
+import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
 import com.example.shikiflow.presentation.viewmodel.comment.editor.EditorEvent
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
@@ -25,11 +27,14 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class ActivityRepliesViewModel @Inject constructor(
-    private val userRepository: UserRepository,
+    private val activityRepository: ActivityRepository,
     private val settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<ActivityRepliesUiState>() {
 
     override val initialState: ActivityRepliesUiState = ActivityRepliesUiState()
+
+    private val _event = MutableSharedFlow<EditorEvent<ActivityReply>>()
+    val event = _event.asSharedFlow()
 
     init {
         mutableUiState
@@ -40,7 +45,7 @@ class ActivityRepliesViewModel @Inject constructor(
                 old.page == new.page && !new.isRefreshing
             }
             .flatMapLatest { state ->
-                userRepository.getActivityReplies(state.activityId!!, state.page)
+                activityRepository.getActivityReplies(state.activityId!!, state.page)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
@@ -64,7 +69,7 @@ class ActivityRepliesViewModel @Inject constructor(
             .mapNotNull { state -> state.activityId }
             .distinctUntilChanged()
             .flatMapLatest { activityId ->
-                userRepository.getSingleActivity(activityId)
+                activityRepository.getSingleActivity(activityId)
             }
             .onEach { result ->
                 mutableUiState.update { state ->
@@ -113,7 +118,7 @@ class ActivityRepliesViewModel @Inject constructor(
 
     fun toggleLike(id: Int, type: LikeableType) {
         viewModelScope.launch {
-            userRepository.toggleLike(id, type).let { result ->
+            activityRepository.toggleLike(id, type).let { result ->
                 if (result is DataResult.Success) {
                     val data = result.data
 
@@ -153,7 +158,7 @@ class ActivityRepliesViewModel @Inject constructor(
         textBody: String
     ) {
         viewModelScope.launch {
-            userRepository.submitActivityReply(
+            activityRepository.submitActivityReply(
                 id = id,
                 activityId = activityId,
                 body = textBody
@@ -173,7 +178,7 @@ class ActivityRepliesViewModel @Inject constructor(
 
     fun deleteReply(id: Int) {
         viewModelScope.launch {
-            userRepository.deleteActivityReply(id).let { result ->
+            activityRepository.deleteActivityReply(id).let { result ->
                 if (result is DataResult.Success) {
                     onEvent(EditorEvent.Deleted(id))
                 }
@@ -182,28 +187,32 @@ class ActivityRepliesViewModel @Inject constructor(
     }
 
     private fun onEvent(event: EditorEvent<ActivityReply>) {
-        mutableUiState.update { state ->
-            when (event) {
-                is EditorEvent.Published -> {
-                    state.replies.add(event.entry)
-                }
-                is EditorEvent.Updated -> {
-                    val index = state.replies.indexOfFirst { it.id == event.entry.id }
+        viewModelScope.launch {
+            _event.emit(event)
 
-                    if (index != -1) {
-                        state.replies[index] = event.entry
+            mutableUiState.update { state ->
+                when (event) {
+                    is EditorEvent.Published -> {
+                        state.replies.add(event.entry)
+                    }
+                    is EditorEvent.Updated -> {
+                        val index = state.replies.indexOfFirst { it.id == event.entry.id }
+
+                        if (index != -1) {
+                            state.replies[index] = event.entry
+                        }
+                    }
+                    is EditorEvent.Deleted -> {
+                        val index = state.replies.indexOfFirst { it.id == event.entryId }
+
+                        if (index != -1) {
+                            state.replies.removeAt(index)
+                        }
                     }
                 }
-                is EditorEvent.Deleted -> {
-                    val index = state.replies.indexOfFirst { it.id == event.entryId }
 
-                    if (index != -1) {
-                        state.replies.removeAt(index)
-                    }
-                }
+                state
             }
-
-            state
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.shikiflow.di.module
 
+import com.example.shikiflow.data.repository.ActivityRepositoryImpl
 import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
@@ -13,6 +14,7 @@ import com.example.shikiflow.data.repository.ReviewRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
 import com.example.shikiflow.data.uploader.MediaUploader
+import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
@@ -70,6 +72,12 @@ interface RepositoryModule {
     fun bindUserRepository(
         impl: UserRepositoryImpl
     ): UserRepository
+
+    @Binds
+    @Singleton
+    fun bindActivityRepository(
+        impl: ActivityRepositoryImpl
+    ): ActivityRepository
 
     @Binds
     @Singleton

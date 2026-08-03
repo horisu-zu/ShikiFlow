@@ -1,5 +1,6 @@
 package com.example.shikiflow.di.module
 
+import com.example.shikiflow.data.datasource.ActivityDataSource
 import com.example.shikiflow.data.datasource.AuthDataSource
 import com.example.shikiflow.data.datasource.CharactersDataSource
 import com.example.shikiflow.data.datasource.CommentsDataSource
@@ -8,6 +9,7 @@ import com.example.shikiflow.data.datasource.MediaTracksDataSource
 import com.example.shikiflow.data.datasource.ReviewDataSource
 import com.example.shikiflow.data.datasource.StaffDataSource
 import com.example.shikiflow.data.datasource.UserDataSource
+import com.example.shikiflow.data.datasource.anilist.AnilistActivityDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistAuthDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistCharactersDataSource
 import com.example.shikiflow.data.datasource.anilist.AnilistMediaDataSource
@@ -77,6 +79,13 @@ interface DataSourceModule {
     fun bindAnilistUserDataSource(
         impl: AnilistUserDataSource
     ): UserDataSource
+
+    @AniList
+    @Binds
+    @Singleton
+    fun bindAnilistActivityDataSource(
+        impl: AnilistActivityDataSource
+    ): ActivityDataSource
 
     @Shikimori
     @Binds

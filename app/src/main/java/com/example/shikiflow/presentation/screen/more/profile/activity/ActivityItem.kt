@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,7 +57,8 @@ fun ActivityItem(
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    onRepliesClick: (() -> Unit)? = null
+    onRepliesClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)? = null
 ) {
     when(userActivity) {
         is ListActivity -> {
@@ -66,6 +69,7 @@ fun ActivityItem(
                 onListActivityClick = onListActivityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
+                onDeleteClick = onDeleteClick,
                 modifier = modifier
             )
         }
@@ -76,6 +80,7 @@ fun ActivityItem(
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
+                onDeleteClick = onDeleteClick,
                 modifier = modifier
             )
         }
@@ -86,6 +91,7 @@ fun ActivityItem(
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
+                onDeleteClick = onDeleteClick,
                 modifier = modifier
             )
         }
@@ -100,7 +106,8 @@ fun ListActivityItem(
     onListActivityClick: (MediaType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    onRepliesClick: (() -> Unit)? = null
+    onRepliesClick: (() -> Unit)?,
+    onDeleteClick: (() -> Unit)?
 ) {
     val imageType = ImageType.Poster()
 
@@ -175,6 +182,17 @@ fun ListActivityItem(
                         count = listActivity.replyCount,
                         iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
                         onClick = onRepliesClick,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                    )
+                }
+
+                if (isCurrentUser && onDeleteClick != null) {
+                    CounterItem(
+                        count = 0,
+                        iconResource = IconResource.Vector(Icons.Default.Delete),
+                        onClick = onDeleteClick,
                         modifier = Modifier
                             .clip(RoundedCornerShape(8.dp))
                             .background(MaterialTheme.colorScheme.surfaceContainer)
@@ -255,7 +273,8 @@ fun TextActivityItem(
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    onRepliesClick: (() -> Unit)? = null
+    onRepliesClick: (() -> Unit)?,
+    onDeleteClick: (() -> Unit)?
 ) {
     Column(
         modifier = modifier
@@ -297,6 +316,17 @@ fun TextActivityItem(
                             onClick = onRepliesClick
                         )
                     }
+
+                    if (isCurrentUser && onDeleteClick != null) {
+                        CounterItem(
+                            count = 0,
+                            iconResource = IconResource.Vector(Icons.Default.Delete),
+                            onClick = onDeleteClick,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceContainer)
+                        )
+                    }
                 }
             }
         }
@@ -316,7 +346,8 @@ fun MessageActivityItem(
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
-    onRepliesClick: (() -> Unit)? = null
+    onRepliesClick: (() -> Unit)? = null,
+    onDeleteClick: (() -> Unit)?
 ) {
     Column(
         modifier = modifier,
@@ -360,6 +391,17 @@ fun MessageActivityItem(
                                 count = messageActivity.replyCount,
                                 iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
                                 onClick = onRepliesClick
+                            )
+                        }
+
+                        if (isCurrentUser && onDeleteClick != null) {
+                            CounterItem(
+                                count = 0,
+                                iconResource = IconResource.Vector(Icons.Default.Delete),
+                                onClick = onDeleteClick,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(MaterialTheme.colorScheme.surfaceContainer)
                             )
                         }
                     }

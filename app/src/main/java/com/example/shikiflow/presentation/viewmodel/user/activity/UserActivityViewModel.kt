@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.viewmodel.user.activity
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
+import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
@@ -24,6 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 class UserActivityViewModel @Inject constructor(
     private val userRepository: UserRepository,
+    private val activityRepository: ActivityRepository,
     settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<UserActivityUiState>() {
 
@@ -90,7 +92,7 @@ class UserActivityViewModel @Inject constructor(
 
     fun toggleLike(activityId: Int) {
         viewModelScope.launch {
-            userRepository.toggleLike(activityId, LikeableType.ACTIVITY).let { result ->
+            activityRepository.toggleLike(activityId, LikeableType.ACTIVITY).let { result ->
                 if (result is DataResult.Success) {
                     mutableUiState.update { state ->
                         val like = result.data
@@ -101,6 +103,24 @@ class UserActivityViewModel @Inject constructor(
                                 likeCount = like.likeCount,
                                 isLiked = like.isLiked
                             )
+                        }
+
+                        state
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteActivity(id: Int) {
+        viewModelScope.launch {
+            activityRepository.deleteActivity(id).let { result ->
+                if (result is DataResult.Success) {
+                    mutableUiState.update { state ->
+                        val index = state.items.indexOfFirst { it.id == id }
+
+                        if (index != -1) {
+                            state.items.removeAt(index)
                         }
 
                         state

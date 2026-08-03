@@ -173,20 +173,28 @@ fun BrowseListItemPlaceholder(
                     .background(MaterialTheme.colorScheme.onSurface)
             )
 
+            Box(
+                modifier = Modifier
+                    .width(48.dp + indexValue * 12.dp)
+                    .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
+
             Row(
-                horizontalArrangement = Arrangement.spacedBy(6.dp, Alignment.Start),
+                horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                repeat(times = indexValue) { index ->
+                repeat(times = 3) { index ->
                     Box(
                         modifier = Modifier
-                            .width(64.dp)
+                            .width(36.dp)
                             .height(MaterialTheme.typography.labelSmall.lineHeight.value.dp)
                             .clip(RoundedCornerShape(percent = 32))
                             .background(MaterialTheme.colorScheme.onSurface)
                     )
 
-                    if(index != indexValue - 1) {
+                    if(index != 2) {
                         Text(
                             text = " • ",
                             style = MaterialTheme.typography.labelSmall.copy(
@@ -197,6 +205,14 @@ fun BrowseListItemPlaceholder(
                     }
                 }
             }
+
+            Box(
+                modifier = Modifier
+                    .width(120.dp)
+                    .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
+                    .clip(RoundedCornerShape(percent = 32))
+                    .background(MaterialTheme.colorScheme.onSurface)
+            )
 
             Row(
                 horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start)

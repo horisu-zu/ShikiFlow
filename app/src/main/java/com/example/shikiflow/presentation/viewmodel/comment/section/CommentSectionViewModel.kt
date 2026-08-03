@@ -10,6 +10,8 @@ import com.example.shikiflow.presentation.viewmodel.comment.editor.EditorEvent
 import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
@@ -30,6 +32,9 @@ class CommentSectionViewModel @Inject constructor(
 ): UiStateViewModel<CommentSectionUiState>() {
 
     override val initialState: CommentSectionUiState = CommentSectionUiState()
+
+    private val _event = MutableSharedFlow<EditorEvent<Comment>>()
+    val event = _event.asSharedFlow()
 
     fun setTopicId(topicId: Int) {
         mutableUiState.update { state ->
@@ -82,18 +87,22 @@ class CommentSectionViewModel @Inject constructor(
     }
 
     private fun onCommentEvent(editorEvent: EditorEvent<Comment>) {
-        mutableUiState.update { state ->
-            state.copy(
-                comments = when (editorEvent) {
-                    is EditorEvent.Published -> state.comments + editorEvent.entry
-                    is EditorEvent.Updated -> {
-                        state.comments.map { comment ->
-                            if (comment.id == editorEvent.entry.id) editorEvent.entry else comment
+        viewModelScope.launch {
+            _event.emit(editorEvent)
+
+            mutableUiState.update { state ->
+                state.copy(
+                    comments = when (editorEvent) {
+                        is EditorEvent.Published -> state.comments + editorEvent.entry
+                        is EditorEvent.Updated -> {
+                            state.comments.map { comment ->
+                                if (comment.id == editorEvent.entry.id) editorEvent.entry else comment
+                            }
                         }
+                        is EditorEvent.Deleted -> state.comments.filter { it.id != editorEvent.entryId }
                     }
-                    is EditorEvent.Deleted -> state.comments.filter { it.id != editorEvent.entryId }
-                }
-            )
+                )
+            }
         }
     }
 

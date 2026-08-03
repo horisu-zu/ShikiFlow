@@ -9,15 +9,17 @@ import com.example.shikiflow.domain.model.comment.ALComment.Companion.updateComm
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.LikeableType
+import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.CommentRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.PagedUiStateViewModel
 import com.example.shikiflow.presentation.viewmodel.comment.editor.EditorEvent
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
@@ -34,11 +36,14 @@ import javax.inject.Inject
 @HiltViewModel
 class CommentViewModel @Inject constructor(
     private val commentRepository: CommentRepository,
-    private val userRepository: UserRepository,
+    private val activityRepository: ActivityRepository,
     private val settingsRepository: SettingsRepository
 ): PagedUiStateViewModel<CommentsUiState>() {
 
     override val initialState = CommentsUiState()
+
+    private val _event = MutableSharedFlow<EditorEvent<Comment>>()
+    val event = _event.asSharedFlow()
 
     init {
         mutableUiState
@@ -149,7 +154,7 @@ class CommentViewModel @Inject constructor(
 
     fun toggleCommentLike(commentId: Int) {
         viewModelScope.launch {
-            userRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
+            activityRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
                 if (result is DataResult.Success) {
                     val response = result.data
 
@@ -178,7 +183,7 @@ class CommentViewModel @Inject constructor(
 
     fun toggleThreadLike(threadId: Int) {
         viewModelScope.launch {
-            userRepository.toggleLike(threadId, LikeableType.THREAD).let { result ->
+            activityRepository.toggleLike(threadId, LikeableType.THREAD).let { result ->
                 if (result is DataResult.Success) {
                     val response = result.data
 
@@ -234,66 +239,70 @@ class CommentViewModel @Inject constructor(
     }
 
     private fun onEvent(event: EditorEvent<Comment>) {
-        mutableUiState.update { state ->
-            when (event) {
-                is EditorEvent.Published -> when (event.entry) {
-                    is ALComment -> if (event.parentEntryId != null) {
-                        val index = state.comments.indexOfFirst { comment ->
-                            (comment as ALComment).findComment(event.parentEntryId) != null
-                        }
+        viewModelScope.launch {
+            mutableUiState.update { state ->
+                _event.emit(event)
 
-                        if (index != -1) {
-                            val root = state.comments[index] as ALComment
-
-                            state.comments[index] = root.updateComment(event.parentEntryId) { comment ->
-                                comment.copy(childComments = comment.childComments + event.entry)
-                            }
-                        }
-                    } else state.comments.add(0, event.entry)
-
-                    is ShikiComment -> state.comments.add(0, event.entry)
-                }
-                is EditorEvent.Updated -> {
-                    when (val updatedComment = event.entry) {
-                        is ShikiComment -> {
-                            val index = state.comments.indexOfFirst { it.id == updatedComment.id }
-
-                            if (index != -1) {
-                                state.comments[index] = updatedComment
-                            }
-                        }
-                        is ALComment -> {
+                when (event) {
+                    is EditorEvent.Published -> when (event.entry) {
+                        is ALComment -> if (event.parentEntryId != null) {
                             val index = state.comments.indexOfFirst { comment ->
-                                comment is ALComment && comment.findComment(updatedComment.id) != null
+                                (comment as ALComment).findComment(event.parentEntryId) != null
                             }
 
                             if (index != -1) {
                                 val root = state.comments[index] as ALComment
-                                state.comments[index] = root.updateComment(updatedComment.id) { updatedComment }
+
+                                state.comments[index] = root.updateComment(event.parentEntryId) { comment ->
+                                    comment.copy(childComments = comment.childComments + event.entry)
+                                }
+                            }
+                        } else state.comments.add(0, event.entry)
+
+                        is ShikiComment -> state.comments.add(0, event.entry)
+                    }
+                    is EditorEvent.Updated -> {
+                        when (val updatedComment = event.entry) {
+                            is ShikiComment -> {
+                                val index = state.comments.indexOfFirst { it.id == updatedComment.id }
+
+                                if (index != -1) {
+                                    state.comments[index] = updatedComment
+                                }
+                            }
+                            is ALComment -> {
+                                val index = state.comments.indexOfFirst { comment ->
+                                    comment is ALComment && comment.findComment(updatedComment.id) != null
+                                }
+
+                                if (index != -1) {
+                                    val root = state.comments[index] as ALComment
+                                    state.comments[index] = root.updateComment(updatedComment.id) { updatedComment }
+                                }
+                            }
+                        }
+                    }
+                    is EditorEvent.Deleted -> {
+                        val index = state.comments.indexOfFirst { comment ->
+                            if (comment is ALComment) {
+                                comment.findComment(event.entryId) != null
+                            } else comment.id == event.entryId
+                        }
+
+                        if (index != -1) {
+                            val comment = state.comments[index]
+
+                            if (comment is ALComment && comment.id != event.entryId) {
+                                state.comments[index] = comment.deleteComment(event.entryId)
+                            } else {
+                                state.comments.removeAt(index)
                             }
                         }
                     }
                 }
-                is EditorEvent.Deleted -> {
-                    val index = state.comments.indexOfFirst { comment ->
-                        if (comment is ALComment) {
-                            comment.findComment(event.entryId) != null
-                        } else comment.id == event.entryId
-                    }
 
-                    if (index != -1) {
-                        val comment = state.comments[index]
-
-                        if (comment is ALComment && comment.id != event.entryId) {
-                            state.comments[index] = comment.deleteComment(event.entryId)
-                        } else {
-                            state.comments.removeAt(index)
-                        }
-                    }
-                }
+                state
             }
-
-            state
         }
     }
 

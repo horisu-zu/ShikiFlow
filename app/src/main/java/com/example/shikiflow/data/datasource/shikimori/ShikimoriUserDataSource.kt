@@ -29,8 +29,6 @@ import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.staff.StaffKind
-import com.example.shikiflow.domain.model.thread.Like
-import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
@@ -39,7 +37,6 @@ import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.UserStatsCategories
-import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.social.Follower
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.UserSocial
@@ -98,34 +95,6 @@ class ShikimoriUserDataSource @Inject constructor(
             emit(PagedResult.Error(e.message ?: "Unknown Error"))
         }
     }.onStart { emit(PagedResult.Loading) }
-
-    override fun getSingleActivity(activityId: Int): Flow<DataResult<UserActivity>> {
-        TODO("No need to be implented")
-    }
-
-    override fun getActivityReplies(
-        activityId: Int,
-        page: Int,
-        limit: Int
-    ): Flow<PagedResult<ActivityReply>> {
-        TODO("Can not be implemented")
-    }
-
-    override suspend fun submitActivityReply(
-        id: Int?,
-        activityId: Int,
-        body: String
-    ): DataResult<ActivityReply> {
-        TODO("Can not be implemented")
-    }
-
-    override suspend fun deleteActivityReply(id: Int): DataResult<Boolean> {
-        TODO("Can not be implemented")
-    }
-
-    override suspend fun toggleLike(id: Int, type: LikeableType): DataResult<Like> {
-        TODO("Can not be implemented")
-    }
 
     override suspend fun getUserStatsCategories(
         userId: Int,

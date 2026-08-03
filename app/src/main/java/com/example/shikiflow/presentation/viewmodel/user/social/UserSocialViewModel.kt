@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.comment.ALComment
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.ThreadComment
+import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
@@ -25,7 +26,8 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class UserSocialViewModel @Inject constructor(
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val activityRepository: ActivityRepository
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(UserSocialUiState())
@@ -137,7 +139,7 @@ class UserSocialViewModel @Inject constructor(
 
     fun toggleCommentLike(commentId: Int) {
         viewModelScope.launch {
-            userRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
+            activityRepository.toggleLike(commentId, LikeableType.COMMENT).let { result ->
                 if (result is DataResult.Success) {
                     _uiState.update { state ->
                         val items = state.categories.getValue(SocialCategory.COMMENTS).items

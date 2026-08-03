@@ -15,6 +15,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -25,6 +27,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.activity.ListActivity
+import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
@@ -46,6 +49,7 @@ fun UserActivitySection(
     val preferredTitleType = LocalTitleTypeController.current
     val lazyListState = rememberLazyGridState()
     val uiState by userActivityViewModel.uiState.collectAsStateWithLifecycle()
+    val deleteActivityId = remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(userId) {
         userActivityViewModel.setId(userId)
@@ -55,6 +59,15 @@ fun UserActivitySection(
         lazyListState.onBottomReached(
             buffer = 5,
             onLoadMore = { userActivityViewModel.onLoadMore() }
+        )
+    }
+
+    if (deleteActivityId.value != null) {
+        CustomDialog(
+            onDismissRequest = { deleteActivityId.value = null },
+            text = stringResource(R.string.user_activity_delete_label),
+            confirmButtonText = stringResource(R.string.common_confirm),
+            onConfirm = { userActivityViewModel.deleteActivity(deleteActivityId.value!!) }
         )
     }
 
@@ -133,6 +146,7 @@ fun UserActivitySection(
                                     activityType = activityItem.type
                                 )
                             },
+                            onDeleteClick = { deleteActivityId.value = activityItem.id },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
