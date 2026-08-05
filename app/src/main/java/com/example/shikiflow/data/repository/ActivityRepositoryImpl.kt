@@ -5,6 +5,7 @@ import com.example.shikiflow.di.annotations.AniList
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
+import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.utils.result.DataResult
@@ -18,6 +19,11 @@ class ActivityRepositoryImpl @Inject constructor(
     override fun getSingleActivity(
         activityId: Int
     ): Flow<DataResult<UserActivity>> = anilistUserDataSource.getSingleActivity(activityId)
+
+    override suspend fun submitTextActivity(
+        id: Int?,
+        body: String
+    ): DataResult<TextActivity> = anilistUserDataSource.submitTextActivity(id, body)
 
     override suspend fun deleteActivity(
         id: Int

@@ -13,7 +13,6 @@ import com.example.shikiflow.data.repository.MediaUploaderRepositoryImpl
 import com.example.shikiflow.data.repository.ReviewRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
-import com.example.shikiflow.data.uploader.MediaUploader
 import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository

@@ -3,6 +3,7 @@ package com.example.shikiflow.domain.repository
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
+import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
@@ -12,6 +13,11 @@ interface ActivityRepository {
     fun getSingleActivity(
         activityId: Int
     ): Flow<DataResult<UserActivity>>
+
+    suspend fun submitTextActivity(
+        id: Int?,
+        body: String
+    ): DataResult<TextActivity>
 
     suspend fun deleteActivity(
         id: Int

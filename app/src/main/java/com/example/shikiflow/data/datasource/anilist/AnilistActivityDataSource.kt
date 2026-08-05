@@ -8,6 +8,7 @@ import com.example.graphql.anilist.ActivityRepliesQuery
 import com.example.graphql.anilist.DeleteActivityMutation
 import com.example.graphql.anilist.DeleteActivityReplyMutation
 import com.example.graphql.anilist.PublishActivityReplyMutation
+import com.example.graphql.anilist.PublishTextActivityMutation
 import com.example.graphql.anilist.SingleUserActivityQuery
 import com.example.graphql.anilist.ToggleLikeMutation
 import com.example.shikiflow.data.datasource.ActivityDataSource
@@ -19,6 +20,7 @@ import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
+import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.result.DataResult
@@ -46,6 +48,25 @@ class AnilistActivityDataSource @Inject constructor(
                 activity.onMessageActivity?.aLMessageActivity?.toDomain() ?:
                 activity.onTextActivity?.aLTextActivity?.toDomain()
             } ?: throw IllegalStateException("Error fetching activity with ID: $activityId")
+        }
+    }
+
+    override suspend fun submitTextActivity(
+        id: Int?,
+        body: String
+    ): DataResult<TextActivity> {
+        val textActivityMutation = PublishTextActivityMutation(
+            activityId = Optional.presentIfNotNull(id),
+            textBody = body
+        )
+
+        val response = apolloClient.mutation(textActivityMutation)
+            .fetchPolicy(FetchPolicy.NetworkOnly)
+            .execute()
+
+        return response.asDataResult { data ->
+            data.SaveTextActivity?.aLTextActivity?.toDomain()
+                ?: throw IllegalStateException("Couldn't Submit Text Activity")
         }
     }
 
@@ -96,7 +117,7 @@ class AnilistActivityDataSource @Inject constructor(
         )
 
         val response = apolloClient.mutation(activityReplyMutation)
-            .fetchPolicy(FetchPolicy.NetworkFirst)
+            .fetchPolicy(FetchPolicy.NetworkOnly)
             .execute()
 
         return response.asDataResult { data ->

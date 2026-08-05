@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,6 +59,7 @@ fun ActivityItem(
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
     onRepliesClick: (() -> Unit)? = null,
+    onEditClick: ((String) -> Unit)? = null,
     onDeleteClick: (() -> Unit)? = null
 ) {
     when(userActivity) {
@@ -91,6 +93,7 @@ fun ActivityItem(
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
+                onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier
             )
@@ -274,6 +277,7 @@ fun TextActivityItem(
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
     onRepliesClick: (() -> Unit)?,
+    onEditClick: ((String) -> Unit)?,
     onDeleteClick: (() -> Unit)?
 ) {
     Column(
@@ -314,6 +318,14 @@ fun TextActivityItem(
                             count = textActivity.replyCount,
                             iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
                             onClick = onRepliesClick
+                        )
+                    }
+
+                    if (isCurrentUser && onEditClick != null) {
+                        CounterItem(
+                            count = 0,
+                            iconResource = IconResource.Vector(Icons.Default.Edit),
+                            onClick = { onEditClick(textActivity.markdownText) }
                         )
                     }
 

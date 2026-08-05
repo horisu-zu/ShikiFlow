@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.viewmodel.user.activity
 
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.thread.LikeableType
+import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
 import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -11,8 +12,11 @@ import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapNotNull
@@ -30,6 +34,9 @@ class UserActivityViewModel @Inject constructor(
 ): PagedUiStateViewModel<UserActivityUiState>() {
 
     override val initialState: UserActivityUiState = UserActivityUiState()
+
+    private val _event = MutableSharedFlow<Boolean>()
+    val event = _event.asSharedFlow()
 
     init {
         mutableUiState
@@ -68,6 +75,17 @@ class UserActivityViewModel @Inject constructor(
             .distinctUntilChanged()
             .onEach {
                 refresh()
+            }.launchIn(viewModelScope)
+
+        settingsRepository.authTypeFlow
+            .filterNotNull()
+            .distinctUntilChanged()
+            .onEach { authType ->
+                mutableUiState.update { state ->
+                    state.copy(
+                        authType = authType
+                    )
+                }
             }.launchIn(viewModelScope)
 
         settingsRepository.userFlow
@@ -112,10 +130,42 @@ class UserActivityViewModel @Inject constructor(
         }
     }
 
+    fun submitTextActivity(id: Int?, body: String) {
+        viewModelScope.launch {
+            activityRepository.submitTextActivity(id, body).let { result ->
+                if (result is DataResult.Success) {
+                    _event.emit(true)
+
+                    mutableUiState.update { state ->
+                        when (id) {
+                            null -> {
+                                state.items.add(0, result.data)
+                            }
+                            else -> {
+                                val activity = result.data
+                                val index = state.items.indexOfFirst { item ->
+                                    item.id == activity.id && item is TextActivity
+                                }
+
+                                if (index != -1) {
+                                    state.items[index] = activity
+                                }
+                            }
+                        }
+
+                        state
+                    }
+                }
+            }
+        }
+    }
+
     fun deleteActivity(id: Int) {
         viewModelScope.launch {
             activityRepository.deleteActivity(id).let { result ->
                 if (result is DataResult.Success) {
+                    _event.emit(true)
+
                     mutableUiState.update { state ->
                         val index = state.items.indexOfFirst { it.id == id }
 

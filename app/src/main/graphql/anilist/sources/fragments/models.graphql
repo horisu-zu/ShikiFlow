@@ -239,6 +239,7 @@ fragment ALListActivity on ListActivity {
 fragment ALTextActivity on TextActivity {
     id
     text(asHtml: true)
+    markdownText: text
     user {
         ...ALUserShort
     }

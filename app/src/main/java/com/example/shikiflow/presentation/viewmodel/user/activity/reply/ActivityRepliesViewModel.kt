@@ -153,8 +153,8 @@ class ActivityRepliesViewModel @Inject constructor(
     }
 
     fun submitReply(
-        id: Int?,
         activityId: Int,
+        id: Int?,
         textBody: String
     ) {
         viewModelScope.launch {

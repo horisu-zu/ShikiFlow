@@ -127,6 +127,7 @@ object AnilistUserMapper {
         return TextActivity(
             id = id,
             text = text ?: "",
+            markdownText = markdownText ?: "",
             user = user?.aLUserShort?.toDomainUser() ?: User(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
             likeCount = likeCount,

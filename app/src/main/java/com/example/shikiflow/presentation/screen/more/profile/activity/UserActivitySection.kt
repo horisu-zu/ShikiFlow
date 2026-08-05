@@ -11,7 +11,13 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.activity.ListActivity
 import com.example.shikiflow.presentation.common.CustomDialog
@@ -32,6 +39,8 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentEditorSheet
+import com.example.shikiflow.presentation.screen.main.details.common.comment.EditorSheetState
 import com.example.shikiflow.presentation.screen.more.profile.ProfileNavOptions
 import com.example.shikiflow.presentation.viewmodel.user.activity.UserActivityViewModel
 import com.example.shikiflow.utils.LazyListUtils.onBottomReached
@@ -49,10 +58,17 @@ fun UserActivitySection(
     val preferredTitleType = LocalTitleTypeController.current
     val lazyListState = rememberLazyGridState()
     val uiState by userActivityViewModel.uiState.collectAsStateWithLifecycle()
+    val editorSheetState = remember { mutableStateOf<EditorSheetState?>(null) }
     val deleteActivityId = remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(userId) {
         userActivityViewModel.setId(userId)
+    }
+
+    LaunchedEffect(Unit) {
+        userActivityViewModel.event.collect {
+            editorSheetState.value = null
+        }
     }
 
     if (!uiState.isLoading) {
@@ -146,6 +162,13 @@ fun UserActivitySection(
                                     activityType = activityItem.type
                                 )
                             },
+                            onEditClick = { textBody ->
+                                editorSheetState.value = EditorSheetState(
+                                    id = activityItem.id,
+                                    entryId = activityItem.id,
+                                    body = textBody
+                                )
+                            },
                             onDeleteClick = { deleteActivityId.value = activityItem.id },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -178,6 +201,42 @@ fun UserActivitySection(
                     }
                 }
             }
+        }
+
+        FloatingActionButton(
+            onClick = { editorSheetState.value = EditorSheetState(id = 0) },
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            modifier = Modifier
+                .animateFloatingActionButton(
+                    visible = uiState.authType == AuthType.ANILIST,
+                    alignment = Alignment.BottomCenter
+                )
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Edit,
+                contentDescription = "Open the Editor"
+            )
+        }
+
+        editorSheetState.value?.let { editorState ->
+            CommentEditorSheet(
+                commentId = editorState.entryId,
+                commentBody = editorState.body,
+                parentCommentId = editorState.parentCommentId,
+                onDismiss = { editorSheetState.value = null },
+                onSubmit = { textBody, _ ->
+                    userActivityViewModel.submitTextActivity(
+                        id = editorState.entryId,
+                        body = textBody
+                    )
+                },
+                onDelete = { activityId ->
+                    userActivityViewModel.deleteActivity(activityId)
+                }
+            )
         }
     }
 }

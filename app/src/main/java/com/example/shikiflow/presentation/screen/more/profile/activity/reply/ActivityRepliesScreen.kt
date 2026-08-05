@@ -215,8 +215,8 @@ fun ActivityRepliesScreen(
             onDismiss = { editorSheetState.value = null },
             onSubmit = { commentBody, _ ->
                 activityRepliesViewModel.submitReply(
-                    id = editorState.entryId,
                     activityId = editorState.id,
+                    id = editorState.entryId,
                     textBody = commentBody
                 )
             },

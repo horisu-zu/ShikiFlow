@@ -36,6 +36,7 @@ data class TextActivity(
     override val id: Int,
     override val type: ActivityType = ActivityType.TEXT,
     val text: String,
+    val markdownText: String,
     val user: User,
     override val createdAt: Instant,
     override val likeCount: Int? = null,
