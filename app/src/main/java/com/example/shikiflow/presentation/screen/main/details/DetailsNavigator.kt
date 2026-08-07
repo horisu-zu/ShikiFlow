@@ -206,11 +206,9 @@ fun DetailsNavigator(
                     mediaId = route.id,
                     mediaType = route.mediaType,
                     onMediaNavigate = { id, mediaType ->
-                        navOptions.navigateBack().let {
-                            when (mediaType) {
-                                MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
-                                MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
-                            }
+                        when (mediaType) {
+                            MediaType.ANIME -> navOptions.navigateToAnimeDetails(id)
+                            MediaType.MANGA -> navOptions.navigateToMangaDetails(id)
                         }
                     }
                 )

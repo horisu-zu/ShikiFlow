@@ -34,6 +34,7 @@ fun <T> ConnectedButtonGroup(
     onItemSelection: (Int) -> Unit,
     modifier: Modifier = Modifier,
     showText: Boolean = false,
+    enabled: Boolean = true,
     textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
     iconSize: Dp = IconButtonDefaults.smallIconSize,
     contentPadding: PaddingValues = ButtonDefaults.ExtraSmallContentPadding
@@ -46,6 +47,7 @@ fun <T> ConnectedButtonGroup(
             ToggleButton(
                 checked = selectedIndex == index,
                 onCheckedChange = { onItemSelection(index) },
+                enabled = enabled,
                 shapes = when {
                     items.size == 1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
                     index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()

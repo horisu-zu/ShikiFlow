@@ -199,6 +199,13 @@ class UserRepositoryImpl @Inject constructor(
         dataSource.toggleFavorite(animeId, mangaId, characterId, staffId, staffKind, studioId, isFavorite)
     }
 
+    override suspend fun changeFavoritesOrder(
+        ids: List<Int>,
+        category: FavoriteCategory
+    ): DataResult<Unit> = withSourceSuspend(dataSource) { dataSource ->
+        dataSource.changeFavoritesOrder(ids, category)
+    }
+
     override suspend fun getFollow(
         userId: Int
     ): DataResult<UserFollow> = withSourceSuspend(dataSource) { dataSource ->

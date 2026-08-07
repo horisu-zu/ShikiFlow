@@ -12,6 +12,7 @@ import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
 import com.example.graphql.anilist.ToggleFollowMutation
+import com.example.graphql.anilist.UpdateFavoritesOrderMutation
 import com.example.graphql.anilist.UpdateUserMutation
 import com.example.graphql.anilist.UserActivitiesQuery
 import com.example.graphql.anilist.UserFavoriteAnimeQuery
@@ -589,6 +590,32 @@ class AnilistUserDataSource @Inject constructor(
         )
 
         val response = apolloClient.mutation(toggleFavoriteMutation)
+            .execute()
+            .asDataResult { Unit }
+
+        return response
+    }
+
+    override suspend fun changeFavoritesOrder(
+        ids: List<Int>,
+        category: FavoriteCategory
+    ): DataResult<Unit> {
+        val order = List(ids.size) { index -> index }
+
+        val updateOrderMutation = UpdateFavoritesOrderMutation(
+            animeIds = Optional.presentIfNotNull(if (category == FavoriteCategory.ANIME) ids else null),
+            mangaIds = Optional.presentIfNotNull(if (category == FavoriteCategory.MANGA) ids else null),
+            characterIds = Optional.presentIfNotNull(if (category == FavoriteCategory.CHARACTER) ids else null),
+            staffIds = Optional.presentIfNotNull(if (category == FavoriteCategory.STAFF) ids else null),
+            studioIds = Optional.presentIfNotNull(if (category == FavoriteCategory.STUDIO) ids else null),
+            animeOrder = Optional.presentIfNotNull(if (category == FavoriteCategory.ANIME) order else null),
+            mangaOrder = Optional.presentIfNotNull(if (category == FavoriteCategory.MANGA) order else null),
+            characterOrder = Optional.presentIfNotNull(if (category == FavoriteCategory.CHARACTER) order else null),
+            staffOrder = Optional.presentIfNotNull(if (category == FavoriteCategory.STAFF) order else null),
+            studioOrder = Optional.presentIfNotNull(if (category == FavoriteCategory.STUDIO) order else null)
+        )
+
+        val response = apolloClient.mutation(updateOrderMutation)
             .execute()
             .asDataResult { Unit }
 

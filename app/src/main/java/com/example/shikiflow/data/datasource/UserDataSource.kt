@@ -89,6 +89,11 @@ interface UserDataSource {
         isFavorite: Boolean
     ): DataResult<Unit>
 
+    suspend fun changeFavoritesOrder(
+        ids: List<Int>,
+        category: FavoriteCategory
+    ): DataResult<Unit>
+
     suspend fun toggleFollow(
         userId: Int,
         isFollowing: Boolean

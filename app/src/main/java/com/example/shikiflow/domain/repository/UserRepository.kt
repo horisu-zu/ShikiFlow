@@ -87,6 +87,11 @@ interface UserRepository {
         isFavorite: Boolean
     ): DataResult<Unit>
 
+    suspend fun changeFavoritesOrder(
+        ids: List<Int>,
+        category: FavoriteCategory
+    ): DataResult<Unit>
+
     suspend fun getFollow(userId: Int): DataResult<UserFollow>
 
     suspend fun toggleFollow(

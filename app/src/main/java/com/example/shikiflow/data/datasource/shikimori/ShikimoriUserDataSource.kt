@@ -340,6 +340,13 @@ class ShikimoriUserDataSource @Inject constructor(
         }
     }
 
+    override suspend fun changeFavoritesOrder(
+        ids: List<Int>,
+        category: FavoriteCategory
+    ): DataResult<Unit> {
+        TODO("Can not be implemented (even though there's an API method")
+    }
+
     override suspend fun toggleFollow(
         userId: Int,
         isFollowing: Boolean

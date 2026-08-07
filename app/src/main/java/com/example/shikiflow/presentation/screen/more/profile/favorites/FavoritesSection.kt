@@ -1,38 +1,55 @@
 package com.example.shikiflow.presentation.screen.more.profile.favorites
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -41,8 +58,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.user.FavoriteCategory
@@ -57,6 +76,8 @@ import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.viewmodel.user.favorites.FavoritesViewModel
 import kotlinx.coroutines.launch
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyGridState
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -82,6 +103,7 @@ fun FavoritesSection(
         pageCount = { favoriteCategories.size }
     )
     val scope = rememberCoroutineScope()
+    val isEditingOrder = remember { mutableStateOf(false) }
 
     LaunchedEffect(userId) {
         favoritesViewModel.setUserId(userId)
@@ -109,6 +131,7 @@ fun FavoritesSection(
                         )
                     }
                 },
+                enabled = !isEditingOrder.value,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
@@ -124,10 +147,20 @@ fun FavoritesSection(
         }
     ) { paddingValues ->
         HorizontalPager(
-            state = pagerState
+            state = pagerState,
+            userScrollEnabled = !isEditingOrder.value
         ) { page ->
+            val lazyGridState = rememberLazyGridState()
             val userFavoriteItems = favoritesViewModel.userFavorites[favoriteCategories[page]]
                 ?.collectAsLazyPagingItems() ?: return@HorizontalPager
+            val imageType = ImageType.Poster(width = Int.MAX_VALUE.dp)
+
+            LaunchedEffect(Unit) {
+                favoritesViewModel.orderEvent.collect {
+                    isEditingOrder.value = false
+                    userFavoriteItems.refresh()
+                }
+            }
 
             when (userFavoriteItems.loadState.refresh) {
                 is LoadState.Error -> {
@@ -143,84 +176,121 @@ fun FavoritesSection(
                     }
                 }
                 else -> {
-                    PullToRefreshCustomBox(
-                        isRefreshing = false,
-                        enabled = isRefreshEnabled,
-                        onRefresh = {
-                            onRefresh()
-                            userFavoriteItems.refresh()
-                        },
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(top = paddingValues.calculateTopPadding())
-                    ) {
-                        LazyVerticalGrid(
-                            columns = GridCells.Adaptive(108.dp),
-                            userScrollEnabled = userFavoriteItems.loadState.refresh !is LoadState.Loading,
-                            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
-                            horizontalArrangement = Arrangement.spacedBy(6.dp),
-                            contentPadding = PaddingValues(
-                                horizontal = horizontalPadding,
-                                vertical = 8.dp
-                            ),
-                            modifier = Modifier.fillMaxSize()
-                        ) {
-                            if (userFavoriteItems.loadState.refresh is LoadState.Loading) {
-                                items(24) { index ->
-                                    if (favoriteCategories[page] == FavoriteCategory.STUDIO) {
-                                        FavoriteStudioItemPlaceholder(
-                                            itemIndex = index,
-                                            modifier = Modifier.aspectRatio(1.5f)
-                                        )
-                                    } else {
-                                        FavoriteItemPlaceholder()
-                                    }
-                                }
-                            } else if (userFavoriteItems.loadState.refresh is LoadState.NotLoading) {
-                                items(
-                                    count = userFavoriteItems.itemCount,
-                                    key = { index -> userFavoriteItems[index]?.id ?: index }
-                                ) { index ->
-                                    userFavoriteItems[index]?.let { item ->
-                                        if(item.favoriteCategory == FavoriteCategory.STUDIO) {
-                                            FavoriteStudioItem(
-                                                id = item.id,
-                                                name = item.name.preferred(titleType),
-                                                onStudioClick = onStudioClick,
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .aspectRatio(1.5f)
-                                            )
-                                        } else {
-                                            FavoriteItem(
-                                                userFavorite = item,
-                                                titleType = titleType,
-                                                onItemClick = { id ->
-                                                    onFavoriteClick(favoriteCategories[page], id)
-                                                },
-                                                modifier = Modifier.fillMaxWidth()
-                                            )
+                    when (isEditingOrder.value) {
+                        true -> {
+                            OrderEditorComponent(
+                                lazyGridState = lazyGridState,
+                                userFavoriteItems = userFavoriteItems,
+                                titleType = titleType,
+                                imageType = imageType,
+                                horizontalPadding = horizontalPadding,
+                                onClearClick = { isEditingOrder.value = false },
+                                onSaveClick = { reorderedIds ->
+                                    favoritesViewModel.changeOrder(reorderedIds, favoriteCategories[page])
+                                },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = paddingValues.calculateTopPadding())
+                            )
+                        }
+                        false -> {
+                            PullToRefreshCustomBox(
+                                isRefreshing = false,
+                                enabled = isRefreshEnabled,
+                                onRefresh = {
+                                    onRefresh()
+                                    userFavoriteItems.refresh()
+                                },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = paddingValues.calculateTopPadding())
+                            ) {
+                                LazyVerticalGrid(
+                                    state = lazyGridState,
+                                    columns = GridCells.Adaptive(108.dp),
+                                    userScrollEnabled = userFavoriteItems.loadState.refresh !is LoadState.Loading,
+                                    verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+                                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                    contentPadding = PaddingValues(
+                                        horizontal = horizontalPadding,
+                                        vertical = 8.dp
+                                    ),
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    if (userFavoriteItems.loadState.refresh is LoadState.Loading) {
+                                        items(24) { index ->
+                                            if (favoriteCategories[page] == FavoriteCategory.STUDIO) {
+                                                FavoriteStudioItemPlaceholder(
+                                                    itemIndex = index,
+                                                    modifier = Modifier.aspectRatio(1.5f)
+                                                )
+                                            } else {
+                                                FavoriteItemPlaceholder(
+                                                    imageType = imageType
+                                                )
+                                            }
+                                        }
+                                    } else if (userFavoriteItems.loadState.refresh is LoadState.NotLoading) {
+                                        items(
+                                            count = userFavoriteItems.itemCount,
+                                            key = { index -> userFavoriteItems[index]?.id ?: index }
+                                        ) { index ->
+                                            userFavoriteItems[index]?.let { item ->
+                                                if(item.favoriteCategory == FavoriteCategory.STUDIO) {
+                                                    FavoriteStudioItem(
+                                                        name = item.name.preferred(titleType),
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .aspectRatio(1.5f)
+                                                            .clickable {
+                                                                onStudioClick(
+                                                                    item.id,
+                                                                    item.name.preferred(titleType)
+                                                                )
+                                                            }
+                                                    )
+                                                } else {
+                                                    FavoriteItem(
+                                                        userFavorite = item,
+                                                        titleType = titleType,
+                                                        imageType = imageType,
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .clip(imageType.shape)
+                                                            .combinedClickable(
+                                                                onClick = {
+                                                                    onFavoriteClick(favoriteCategories[page], item.id)
+                                                                },
+                                                                onLongClick = {
+                                                                    if (params.authType == AuthType.ANILIST) {
+                                                                        isEditingOrder.value = true
+                                                                    }
+                                                                }
+                                                            )
+                                                    )
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
 
-                            item(span = { GridItemSpan(maxLineSpan) }) {
-                                if (userFavoriteItems.loadState.append is LoadState.Loading) {
-                                    Box(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentAlignment = Alignment.Center
-                                    ) { CircularProgressIndicator() }
-                                } else if (userFavoriteItems.loadState.append is LoadState.Error) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        ErrorItem(
-                                            message = stringResource(R.string.common_error),
-                                            buttonLabel = stringResource(R.string.common_retry),
-                                            onButtonClick = { userFavoriteItems.retry() }
-                                        )
+                                    item(span = { GridItemSpan(maxLineSpan) }) {
+                                        if (userFavoriteItems.loadState.append is LoadState.Loading) {
+                                            Box(
+                                                modifier = Modifier.fillMaxWidth(),
+                                                contentAlignment = Alignment.Center
+                                            ) { CircularProgressIndicator() }
+                                        } else if (userFavoriteItems.loadState.append is LoadState.Error) {
+                                            Box(
+                                                modifier = Modifier.fillMaxSize(),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                ErrorItem(
+                                                    message = stringResource(R.string.common_error),
+                                                    buttonLabel = stringResource(R.string.common_retry),
+                                                    onButtonClick = { userFavoriteItems.retry() }
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -233,19 +303,138 @@ fun FavoritesSection(
 }
 
 @Composable
+private fun OrderEditorComponent(
+    lazyGridState: LazyGridState,
+    userFavoriteItems: LazyPagingItems<UserFavorite>,
+    titleType: PreferredTitleType,
+    imageType: ImageType,
+    horizontalPadding: Dp,
+    onClearClick: () -> Unit,
+    onSaveClick: (List<Int>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val hapticFeedback = LocalHapticFeedback.current
+    var reorderableList by remember(userFavoriteItems.itemSnapshotList.items) {
+        mutableStateOf(userFavoriteItems.itemSnapshotList.items)
+    }
+    val reorderableState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
+        reorderableList = reorderableList.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick)
+    }
+
+    Box {
+        LazyVerticalGrid(
+            state = lazyGridState,
+            columns = GridCells.Adaptive(108.dp),
+            userScrollEnabled = userFavoriteItems.loadState.refresh !is LoadState.Loading,
+            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            contentPadding = PaddingValues(
+                start = horizontalPadding,
+                end = horizontalPadding,
+                top = 8.dp,
+                bottom = 64.dp
+            ),
+            modifier = modifier
+        ) {
+            items(
+                items = reorderableList,
+                key = { item -> item.id }
+            ) { item ->
+                ReorderableItem(reorderableState, key = item.id) { isDragging ->
+                    val backgroundColor by animateColorAsState(
+                        targetValue = if (isDragging) MaterialTheme.colorScheme.surfaceContainerHigh
+                        else MaterialTheme.colorScheme.background,
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioNoBouncy,
+                            stiffness = Spring.StiffnessMediumLow
+                        )
+                    )
+                    val dragHandleModifier = Modifier
+                        .draggableHandle(
+                            onDragStarted = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+                            },
+                            onDragStopped = {
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureEnd)
+                            }
+                        )
+
+                    if (item.favoriteCategory == FavoriteCategory.STUDIO) {
+                        FavoriteStudioItem(
+                            name = item.name.preferred(titleType),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .aspectRatio(1.5f)
+                                .then(dragHandleModifier)
+                        )
+                    } else {
+                        FavoriteItem(
+                            userFavorite = item,
+                            titleType = titleType,
+                            imageType = imageType,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(imageType.shape)
+                                .background(backgroundColor)
+                                .then(dragHandleModifier)
+                        )
+                    }
+                }
+            }
+        }
+
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(all = 16.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(percent = 32)
+                )
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(
+                shape = RoundedCornerShape(percent = 24),
+                onClick = onClearClick,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Clear Order Changes",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+
+            IconButton(
+                enabled = reorderableList != userFavoriteItems.itemSnapshotList.items,
+                shape = RoundedCornerShape(percent = 24),
+                onClick = { onSaveClick(reorderableList.map { it.id }) } ,
+                modifier = Modifier.size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Save Order Changes",
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun FavoriteItem(
     userFavorite: UserFavorite,
     titleType: PreferredTitleType,
-    onItemClick: (Int) -> Unit,
+    imageType: ImageType,
     modifier: Modifier = Modifier
 ) {
-    val imageType = ImageType.Poster(width = Int.MAX_VALUE.dp)
-
-    Column(
-        modifier = modifier
-            .clip(imageType.shape)
-            .clickable { onItemClick(userFavorite.id) }
-    ) {
+    Column(modifier = modifier) {
         BaseImage(
             model = userFavorite.imageUrl,
             contentScale = ContentScale.Crop,
@@ -263,10 +452,9 @@ private fun FavoriteItem(
 
 @Composable
 private fun FavoriteItemPlaceholder(
+    imageType: ImageType,
     modifier: Modifier = Modifier
 ) {
-    val imageType = ImageType.Poster(width = Int.MAX_VALUE.dp)
-
     Column(
         modifier = modifier.shimmerEffect(overContent = true)
     ) {
@@ -291,16 +479,14 @@ private fun FavoriteItemPlaceholder(
 
 @Composable
 private fun FavoriteStudioItem(
-    id: Int,
     name: String,
-    onStudioClick: (Int, String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .clickable { onStudioClick(id, name) }
+            .then(modifier)
             .padding(horizontal = 12.dp, vertical = 18.dp),
         contentAlignment = Alignment.Center
     ) {

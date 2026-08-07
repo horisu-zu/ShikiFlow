@@ -597,7 +597,8 @@ fun LikeComponent(
     likesCount: Int,
     isLiked: Boolean,
     onLikeToggle: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     val likeTint by animateColorAsState(
         targetValue = if(isLiked) MaterialTheme.colorScheme.error
@@ -611,7 +612,10 @@ fun LikeComponent(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(percent = 32))
-            .clickable { onLikeToggle() }
+            .clickable(
+                enabled = enabled,
+                onClick = onLikeToggle
+            )
             .padding(horizontal = 8.dp, vertical = 6.dp)
             .animateContentSize(),
         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),

@@ -169,16 +169,15 @@ fun ListActivityItem(
                 verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
                 horizontalAlignment = Alignment.End
             ) {
-                if (!isCurrentUser) {
-                    LikeComponent(
-                        likesCount = listActivity.likeCount,
-                        isLiked = listActivity.isLiked,
-                        onLikeToggle = onLikeToggle,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainer)
-                    )
-                }
+                LikeComponent(
+                    likesCount = listActivity.likeCount,
+                    isLiked = listActivity.isLiked,
+                    onLikeToggle = onLikeToggle,
+                    enabled = !isCurrentUser,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainer)
+                )
 
                 onRepliesClick?.let {
                     CounterItem(
@@ -305,13 +304,12 @@ fun TextActivityItem(
                     horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (!isCurrentUser) {
-                        LikeComponent(
-                            likesCount = textActivity.likeCount,
-                            isLiked = textActivity.isLiked,
-                            onLikeToggle = onLikeToggle
-                        )
-                    }
+                    LikeComponent(
+                        likesCount = textActivity.likeCount,
+                        isLiked = textActivity.isLiked,
+                        onLikeToggle = onLikeToggle,
+                        enabled = !isCurrentUser
+                    )
 
                     onRepliesClick?.let {
                         CounterItem(
@@ -390,13 +388,12 @@ fun MessageActivityItem(
                         horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        if (!isCurrentUser) {
-                            LikeComponent(
-                                likesCount = messageActivity.likeCount,
-                                isLiked = messageActivity.isLiked,
-                                onLikeToggle = onLikeToggle
-                            )
-                        }
+                        LikeComponent(
+                            likesCount = messageActivity.likeCount,
+                            isLiked = messageActivity.isLiked,
+                            onLikeToggle = onLikeToggle,
+                            enabled = !isCurrentUser
+                        )
 
                         onRepliesClick?.let {
                             CounterItem(
