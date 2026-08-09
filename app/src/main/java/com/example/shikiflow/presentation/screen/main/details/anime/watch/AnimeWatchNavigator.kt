@@ -75,7 +75,7 @@ fun AnimeWatchNavigator(
         onBack = { watchBackstack.removeLastOrNull() },
         entryProvider = entryProvider {
             entry<AnimeWatchNavRoute.TranslationSelect> { route ->
-                AnimeTranslationSelectScreen(
+                AnimeTranslationsScreen(
                     title = title,
                     shikimoriId = route.shikimoriId,
                     navOptions = options,

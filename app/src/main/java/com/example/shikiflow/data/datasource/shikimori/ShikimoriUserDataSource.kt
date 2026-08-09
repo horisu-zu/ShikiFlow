@@ -144,23 +144,23 @@ class ShikimoriUserDataSource @Inject constructor(
     }
 
     override fun getUserGenres(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<Genre>>>>> {
-        return emptyFlow()
+        TODO("Not available in the API")
     }
 
     override fun getUserTags(userId: Int): Flow<DataResult<MediaTypeStats<List<TypeStat<MediaTagEnum>>>>> {
-        return emptyFlow()
+        TODO("Not available in the API")
     }
 
     override fun getUserStaff(userId: Int): Flow<DataResult<MediaTypeStats<List<StaffStat>>>> {
-        return emptyFlow()
+        TODO("Not available in the API")
     }
 
     override fun getUserVoiceActors(userId: Int): Flow<DataResult<List<StaffStat>>> {
-        return emptyFlow()
+        TODO("Not available in the API")
     }
 
     override fun getUserStudios(userId: Int): Flow<DataResult<List<StudioStat>>> {
-        return emptyFlow()
+        TODO("Not available in the API")
     }
 
     override fun getUserFavorites(
@@ -214,8 +214,6 @@ class ShikimoriUserDataSource @Inject constructor(
         page: Int,
         limit: Int
     ): Flow<PagedResult<UserSocial>> = flow {
-        emit(PagedResult.Loading)
-
         val result = getUserFriends(userId, page, limit)
 
         result.fold(
@@ -230,7 +228,7 @@ class ShikimoriUserDataSource @Inject constructor(
                 emit(PagedResult.Error(throwable.message ?: "Unknown Error"))
             }
         )
-    }
+    }.onStart { emit(PagedResult.Loading) }
 
     override suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate> {
         return when(mediaType) {

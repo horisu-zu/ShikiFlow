@@ -72,13 +72,12 @@ fun Player(
     var isFit by rememberSaveable { mutableStateOf(true) }
     var containerSize by remember { mutableStateOf(IntSize.Zero) }
     var showControls by remember { mutableStateOf(false) }
-    var isDropdownExpanded by remember { mutableStateOf(false) }
 
     val isLoading = player?.playbackState == Player.STATE_BUFFERING || episodeUiState.isLoading
 
-    LaunchedEffect(showControls, playerState.isPlaying, isDropdownExpanded) {
+    LaunchedEffect(showControls, playerState.isPlaying) {
         delay(3000.milliseconds)
-        if (playerState.isPlaying && !isDropdownExpanded) {
+        if (playerState.isPlaying) {
             showControls = false
         }
     }
@@ -174,9 +173,6 @@ fun Player(
                 },
                 onEpisodeChange = { episodeNum ->
                     onSeekToEpisode(episodeNum)
-                },
-                onExpand = { value ->
-                    isDropdownExpanded = value
                 }
             )
         }

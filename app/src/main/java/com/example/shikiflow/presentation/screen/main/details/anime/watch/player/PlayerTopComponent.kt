@@ -1,25 +1,27 @@
 package com.example.shikiflow.presentation.screen.main.details.anime.watch.player
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.DropdownMenu
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material3.DropdownMenuGroup
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DropdownMenuPopup
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -30,14 +32,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEachIndexed
 import com.example.shikiflow.R
+import com.example.shikiflow.presentation.common.ChipWithMenu
 
 @Composable
 fun PlayerTopComponent(
@@ -50,7 +55,6 @@ fun PlayerTopComponent(
     onNavigateBack: () -> Unit,
     onQualityChange: (String) -> Unit,
     onEpisodeChange: (Int) -> Unit,
-    onExpand: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -93,112 +97,107 @@ fun PlayerTopComponent(
 
         qualityData?.let {
             if(episodesList.size > 1) {
-                PlayerDropdown(
-                    label = stringResource(R.string.media_item_episode, episodeNum),
-                    values = episodesList.map { epNum ->
-                        stringResource(R.string.media_item_episode, epNum)
+                EpisodeDropdown(
+                    values = episodesList,
+                    selectedValue = episodeNum,
+                    onValueChange = { episodeNum ->
+                        onEpisodeChange(episodeNum)
                     },
-                    onValueChange = { index ->
-                        onEpisodeChange(index + 1)
-                    },
-                    onExpand = onExpand
+                    itemLabel = { episodeNum ->
+                        stringResource(R.string.media_item_episode, episodeNum)
+                    }
                 )
             }
 
-            PlayerDropdown(
-                label = "${currentQuality}P",
-                values = qualityData.map { "${it}P" },
-                onValueChange = { index ->
-                    onQualityChange(qualityData[index])
+            ChipWithMenu(
+                title = "${currentQuality}P",
+                values = qualityData,
+                selectedValue = currentQuality,
+                onValueSelected = { quality ->
+                    onQualityChange(quality)
                 },
-                onExpand = onExpand
+                itemLabel = { quality ->
+                    "${quality}P"
+                }
             )
         }
     }
 }
 
 @Composable
-private fun PlayerDropdown(
-    label: String,
-    values: List<String>,
+private fun EpisodeDropdown(
+    values: List<Int>,
+    selectedValue: Int,
     onValueChange: (Int) -> Unit,
-    onExpand: (Boolean) -> Unit,
+    itemLabel: @Composable (Int) -> String,
     modifier: Modifier = Modifier
 ) {
-    var dropdownExpanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
     var itemHeight by remember { mutableIntStateOf(0) }
+    val windowHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp()
+    }
     val scrollState = rememberScrollState()
 
-    LaunchedEffect(dropdownExpanded) {
-        if(dropdownExpanded) {
-            scrollState.scrollTo(value = itemHeight * values.indexOf(label))
+    LaunchedEffect(expanded, itemHeight) {
+        if (expanded && itemHeight != 0) {
+            scrollState.scrollTo(value = itemHeight * values.indexOf(selectedValue))
         }
     }
 
     Box(
-        modifier = modifier
+        modifier = modifier.wrapContentSize(Alignment.TopStart)
     ) {
-        Row(
-            modifier = Modifier
-                .clip(RoundedCornerShape(6.dp))
-                .clickable {
-                    dropdownExpanded = true
-                    onExpand(true)
-                }
-                .padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = Color.White
+        FilterChip(
+            selected = true,
+            onClick = { expanded = true },
+            label = {
+                Text(
+                    text = itemLabel(selectedValue)
                 )
-            )
-
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "Expand Dropdown",
-                tint = Color.White
-            )
-        }
-
-        DropdownMenu(
-            scrollState = scrollState,
-            expanded = dropdownExpanded,
-            onDismissRequest = {
-                dropdownExpanded = false
-                onExpand(false)
             },
-            modifier = Modifier.heightIn(max = 200.dp),
-            containerColor = Color.Black.copy(alpha = 0.75f),
+            modifier = Modifier.heightIn(max = 32.dp)
+        )
+
+        DropdownMenuPopup(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.requiredSizeIn(maxHeight = windowHeight / 2)
         ) {
-            values.forEachIndexed { index, value ->
-                DropdownMenuItem(
-                    text = {
-                        Text(
-                            text = value,
-                            style = MaterialTheme.typography.labelMedium.copy(
-                                color = Color.White
+            DropdownMenuGroup(
+                shapes = MenuDefaults.groupShapes(),
+                modifier = Modifier.verticalScroll(scrollState)
+            ) {
+                values.fastForEachIndexed { index, item ->
+                    DropdownMenuItem(
+                        checked = selectedValue == item,
+                        onCheckedChange = {
+                            onValueChange(item)
+                            expanded = false
+                        },
+                        text = {
+                            Text(
+                                text = itemLabel(item)
                             )
-                        )
-                    },
-                    modifier = Modifier
-                        .background(
-                            color = if(value != label) {
-                                Color.Transparent
-                            } else { Color.White.copy(alpha = 0.25f) }
-                        )
-                        .onSizeChanged { intSize ->
-                            itemHeight = intSize.height
+                        },
+                        shapes = MenuDefaults.itemShape(index, values.size),
+                        colors = MenuDefaults.selectableItemColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                            selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                            selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer
+                        ),
+                        checkedLeadingIcon = {
+                            Icon(
+                                imageVector = Icons.Default.Done,
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        modifier = Modifier.onSizeChanged { size ->
+                            if (itemHeight == 0) itemHeight = size.height
                         }
-                    ,
-                    onClick = {
-                        if(value != label) onValueChange(index)
-                        dropdownExpanded = false
-                        onExpand(false)
-                    }
-                )
+                    )
+                }
             }
         }
     }

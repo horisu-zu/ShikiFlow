@@ -243,6 +243,7 @@ fun BrowseSearchBar(
                             searchBarState.animateToCollapsed()
                         }
                     }
+
                     when(browseItem) {
                         is BrowseMedia -> {
                             val detailsNavRoute = when(browseItem.mediaType) {
@@ -428,9 +429,7 @@ private fun SearchBarContent(
                             BrowseGridItemPlaceholder()
                         }
                         SearchType.CHARACTER, SearchType.STAFF -> {
-                            MediaPersonItemPlaceholder(
-                                itemIndex = index
-                            )
+                            MediaPersonItemPlaceholder()
                         }
                         SearchType.USER -> {
                             UserSocialItemPlaceholder(
@@ -539,14 +538,11 @@ private fun MediaPersonItem(
 
 @Composable
 private fun MediaPersonItemPlaceholder(
-    itemIndex: Int,
     modifier: Modifier = Modifier,
     imageType: ImageType = ImageType.Poster(
         width = Int.MAX_VALUE.dp
     )
 ) {
-    val indexValue = itemIndex % 3 + 1
-
     Column(
         modifier = modifier.shimmerEffect(overContent = true),
         verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -561,10 +557,10 @@ private fun MediaPersonItemPlaceholder(
 
         Box(
             modifier = Modifier
-                .width(56.dp + indexValue * 8.dp)
+                .fillMaxWidth()
                 .height(MaterialTheme.typography.labelMedium.lineHeight.value.dp)
-                .clip(RoundedCornerShape(percent = 32))
                 .padding(horizontal = 4.dp)
+                .clip(RoundedCornerShape(percent = 32))
                 .background(MaterialTheme.colorScheme.onSurface)
         )
     }

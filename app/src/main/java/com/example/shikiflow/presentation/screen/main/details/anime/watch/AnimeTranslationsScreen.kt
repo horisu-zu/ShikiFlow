@@ -66,7 +66,7 @@ import com.example.shikiflow.utils.Converter.toAbbreviation
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
-fun AnimeTranslationSelectScreen(
+fun AnimeTranslationsScreen(
     title: String,
     shikimoriId: Int,
     navOptions: AnimeWatchNavOptions,
@@ -280,7 +280,7 @@ private fun AnimeTranslationItem(
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(52.dp)
                 .clip(RoundedCornerShape(percent = 32))
                 .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)),
             contentAlignment = Alignment.Center
@@ -337,7 +337,7 @@ private fun AnimeTranslationItemPlaceholder(
     ) {
         Box(
             modifier = Modifier
-                .size(48.dp)
+                .size(52.dp)
                 .clip(RoundedCornerShape(percent = 32))
                 .background(MaterialTheme.colorScheme.onSurface)
         )
