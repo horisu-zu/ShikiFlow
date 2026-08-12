@@ -96,11 +96,10 @@ fun ProfileNavigator(
         }
 
         override fun navigateToActivityReplies(
-            userId: Int,
             activityId: Int,
             activityType: ActivityType
         ) {
-            backstack.add(ProfileNavRoute.ActivityReplies(userId, activityId, activityType))
+            backstack.add(ProfileNavRoute.ActivityReplies(activityId, activityType))
         }
     }
 
@@ -128,7 +127,6 @@ fun ProfileNavigator(
             }
             entry<ProfileNavRoute.ActivityReplies> { route ->
                 ActivityRepliesScreen(
-                    userId = route.userId,
                     activityId = route.activityId,
                     activityType = route.activityType,
                     navOptions = profileNavOptions

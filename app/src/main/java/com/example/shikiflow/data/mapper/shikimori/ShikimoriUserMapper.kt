@@ -54,6 +54,7 @@ object ShikimoriUserMapper {
 
         return ListActivity(
             id = id.toInt(),
+            userId = 0,
             mediaId = target?.id?.toInt() ?: 0,
             mediaType = mediaType,
             title = (target?.name ?: "").toDomainTitle(null, target?.russian, null),

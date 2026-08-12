@@ -227,6 +227,7 @@ fragment ALListActivity on ListActivity {
             medium
         }
     }
+    userId
     type
     status
     progress
@@ -252,6 +253,7 @@ fragment ALTextActivity on TextActivity {
 fragment ALMessageActivity on MessageActivity {
     id
     message(asHtml: true)
+    markdownText: message
     messenger {
         ...ALUserShort
     }

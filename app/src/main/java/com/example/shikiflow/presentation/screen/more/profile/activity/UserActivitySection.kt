@@ -140,7 +140,7 @@ fun UserActivitySection(
                         ActivityItem(
                             userActivity = activityItem,
                             titleType = preferredTitleType,
-                            isCurrentUser = userId == uiState.currentUserId,
+                            currentUserId = uiState.currentUserId ?: 0,
                             onListActivityClick = { mediaType, id ->
                                 val detailsNavRoute = when(mediaType) {
                                     MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
@@ -228,8 +228,12 @@ fun UserActivitySection(
                 parentCommentId = editorState.parentCommentId,
                 onDismiss = { editorSheetState.value = null },
                 onSubmit = { textBody, _ ->
-                    userActivityViewModel.submitTextActivity(
+                    userActivityViewModel.submitActivity(
                         id = editorState.entryId,
+                        recipientId = when (userId == uiState.currentUserId) {
+                            true -> null
+                            false -> userId
+                        },
                         body = textBody
                     )
                 },

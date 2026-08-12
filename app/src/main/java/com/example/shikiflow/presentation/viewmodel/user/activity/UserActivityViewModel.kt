@@ -2,7 +2,7 @@ package com.example.shikiflow.presentation.viewmodel.user.activity
 
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.thread.LikeableType
-import com.example.shikiflow.domain.model.user.activity.TextActivity
+import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.domain.model.user.activity.UserActivityMapper.updateLike
 import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -130,9 +130,13 @@ class UserActivityViewModel @Inject constructor(
         }
     }
 
-    fun submitTextActivity(id: Int?, body: String) {
+    fun submitActivity(
+        id: Int?,
+        recipientId: Int?,
+        body: String
+    ) {
         viewModelScope.launch {
-            activityRepository.submitTextActivity(id, body).let { result ->
+            activityRepository.submitActivity(id, recipientId, body).let { result ->
                 if (result is DataResult.Success) {
                     _event.emit(true)
 
@@ -144,7 +148,7 @@ class UserActivityViewModel @Inject constructor(
                             else -> {
                                 val activity = result.data
                                 val index = state.items.indexOfFirst { item ->
-                                    item.id == activity.id && item is TextActivity
+                                    item.id == activity.id
                                 }
 
                                 if (index != -1) {

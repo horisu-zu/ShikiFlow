@@ -53,7 +53,7 @@ import com.example.shikiflow.utils.toIcon
 fun ActivityItem(
     userActivity: UserActivity,
     titleType: PreferredTitleType,
-    isCurrentUser: Boolean,
+    currentUserId: Int,
     onListActivityClick: (MediaType, Int) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
@@ -67,7 +67,7 @@ fun ActivityItem(
             ListActivityItem(
                 listActivity = userActivity,
                 titleType = titleType,
-                isCurrentUser = isCurrentUser,
+                currentUserId = currentUserId,
                 onListActivityClick = onListActivityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
@@ -78,10 +78,11 @@ fun ActivityItem(
         is MessageActivity -> {
             MessageActivityItem(
                 messageActivity = userActivity,
-                isCurrentUser = isCurrentUser,
+                currentUserId = currentUserId,
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
+                onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,
                 modifier = modifier
             )
@@ -89,7 +90,7 @@ fun ActivityItem(
         is TextActivity -> {
             TextActivityItem(
                 textActivity = userActivity,
-                isCurrentUser = isCurrentUser,
+                currentUserId = currentUserId,
                 onEntityClick = onEntityClick,
                 onLikeToggle = onLikeToggle,
                 onRepliesClick = onRepliesClick,
@@ -105,7 +106,7 @@ fun ActivityItem(
 fun ListActivityItem(
     listActivity: ListActivity,
     titleType: PreferredTitleType,
-    isCurrentUser: Boolean,
+    currentUserId: Int,
     onListActivityClick: (MediaType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -113,6 +114,7 @@ fun ListActivityItem(
     onDeleteClick: (() -> Unit)?
 ) {
     val imageType = ImageType.Poster()
+    val isCurrentUser = currentUserId == listActivity.userId
 
     Row(
         modifier = modifier
@@ -271,7 +273,7 @@ fun ListActivityItemPlaceholder(
 @Composable
 fun TextActivityItem(
     textActivity: TextActivity,
-    isCurrentUser: Boolean,
+    currentUserId: Int,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
@@ -279,6 +281,8 @@ fun TextActivityItem(
     onEditClick: ((String) -> Unit)?,
     onDeleteClick: (() -> Unit)?
 ) {
+    val isCurrentUser = currentUserId == textActivity.user.id
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -352,13 +356,16 @@ fun TextActivityItem(
 @Composable
 fun MessageActivityItem(
     messageActivity: MessageActivity,
-    isCurrentUser: Boolean,
+    currentUserId: Int,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: () -> Unit,
     modifier: Modifier = Modifier,
     onRepliesClick: (() -> Unit)? = null,
+    onEditClick: ((String) -> Unit)?,
     onDeleteClick: (() -> Unit)?
 ) {
+    val isCurrentUser = currentUserId == messageActivity.messenger.id || currentUserId == messageActivity.recipient.id
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
@@ -400,6 +407,14 @@ fun MessageActivityItem(
                                 count = messageActivity.replyCount,
                                 iconResource = IconResource.Drawable(R.drawable.ic_bubble_filled),
                                 onClick = onRepliesClick
+                            )
+                        }
+
+                        if (currentUserId == messageActivity.messenger.id && onEditClick != null) {
+                            CounterItem(
+                                count = 0,
+                                iconResource = IconResource.Vector(Icons.Default.Edit),
+                                onClick = { onEditClick(messageActivity.markdownText) }
                             )
                         }
 

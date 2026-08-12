@@ -8,6 +8,7 @@ import com.example.graphql.anilist.ActivityRepliesQuery
 import com.example.graphql.anilist.DeleteActivityMutation
 import com.example.graphql.anilist.DeleteActivityReplyMutation
 import com.example.graphql.anilist.PublishActivityReplyMutation
+import com.example.graphql.anilist.PublishMessageActivityMutation
 import com.example.graphql.anilist.PublishTextActivityMutation
 import com.example.graphql.anilist.SingleUserActivityQuery
 import com.example.graphql.anilist.ToggleLikeMutation
@@ -20,6 +21,7 @@ import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
+import com.example.shikiflow.domain.model.user.activity.MessageActivity
 import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
@@ -67,6 +69,27 @@ class AnilistActivityDataSource @Inject constructor(
         return response.asDataResult { data ->
             data.SaveTextActivity?.aLTextActivity?.toDomain()
                 ?: throw IllegalStateException("Couldn't Submit Text Activity")
+        }
+    }
+
+    override suspend fun submitMessageActivity(
+        id: Int?,
+        recipientId: Int,
+        body: String
+    ): DataResult<MessageActivity> {
+        val messageActivityMutation = PublishMessageActivityMutation(
+            activityId = Optional.presentIfNotNull(id),
+            recipientId = recipientId,
+            textBody = body
+        )
+
+        val response = apolloClient.mutation(messageActivityMutation)
+            .fetchPolicy(FetchPolicy.NetworkOnly)
+            .execute()
+
+        return response.asDataResult { data ->
+            data.SaveMessageActivity?.aLMessageActivity?.toDomain()
+                ?: throw IllegalStateException("Couldn't Submit Message Activity")
         }
     }
 

@@ -3,6 +3,7 @@ package com.example.shikiflow.data.datasource
 import com.example.shikiflow.domain.model.thread.Like
 import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
+import com.example.shikiflow.domain.model.user.activity.MessageActivity
 import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.utils.result.DataResult
@@ -18,6 +19,12 @@ interface ActivityDataSource {
         id: Int?,
         body: String
     ): DataResult<TextActivity>
+
+    suspend fun submitMessageActivity(
+        id: Int?,
+        recipientId: Int,
+        body: String
+    ): DataResult<MessageActivity>
 
     suspend fun deleteActivity(
         id: Int

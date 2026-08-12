@@ -14,9 +14,5 @@ interface ProfileNavOptions : MainNavOptions {
 
     fun navigateByEntity(entityType: EntityType, id: Int)
 
-    fun navigateToActivityReplies(
-        userId: Int,
-        activityId: Int,
-        activityType: ActivityType
-    )
+    fun navigateToActivityReplies(activityId: Int, activityType: ActivityType)
 }

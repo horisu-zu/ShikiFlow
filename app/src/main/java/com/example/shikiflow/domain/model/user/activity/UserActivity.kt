@@ -18,6 +18,7 @@ sealed interface UserActivity {
 data class ListActivity(
     override val id: Int,
     override val type: ActivityType = ActivityType.LIST,
+    val userId: Int,
     val mediaId: Int,
     val mediaType: MediaType?,
     val title: MediaTitle,
@@ -48,6 +49,7 @@ data class MessageActivity(
     override val id: Int,
     override val type: ActivityType = ActivityType.MESSAGE,
     val text: String,
+    val markdownText: String,
     val messenger: User,
     val recipient: User,
     override val createdAt: Instant,

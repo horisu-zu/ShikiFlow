@@ -45,7 +45,6 @@ import com.example.shikiflow.presentation.viewmodel.user.activity.reply.Activity
 
 @Composable
 fun ActivityRepliesScreen(
-    userId: Int,
     activityId: Int,
     activityType: ActivityType,
     navOptions: ProfileNavOptions,
@@ -131,7 +130,7 @@ fun ActivityRepliesScreen(
                         ActivityItem(
                             userActivity = userActivity,
                             titleType = preferredTitleType,
-                            isCurrentUser = userId == uiState.currentUserId,
+                            currentUserId = uiState.currentUserId ?: 0,
                             onListActivityClick = { mediaType, id ->
                                 val detailsNavRoute = when(mediaType) {
                                     MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)

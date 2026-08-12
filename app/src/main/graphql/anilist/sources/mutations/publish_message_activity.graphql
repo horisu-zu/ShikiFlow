@@ -1,0 +1,13 @@
+mutation PublishMessageActivity(
+    $activityId: Int,
+    $recipientId: Int!,
+    $textBody: String!
+) {
+    SaveMessageActivity(
+        id: $activityId,
+        recipientId: $recipientId
+        message: $textBody
+    ) {
+        ...ALMessageActivity
+    }
+}

@@ -91,6 +91,7 @@ object AnilistUserMapper {
     fun ALListActivity.toDomain(): ListActivity {
         return ListActivity(
             id = id,
+            userId = userId ?: 0,
             mediaId = media?.id ?: 0,
             mediaType = media?.type?.toDomain(),
             title = media?.title?.mediaTitle.toDomainTitle(),
@@ -140,6 +141,7 @@ object AnilistUserMapper {
         return MessageActivity(
             id = id,
             text = message ?: "",
+            markdownText = markdownText ?: "",
             messenger = messenger?.aLUserShort?.toDomainUser() ?: User(),
             recipient = recipient?.aLUserShort?.toDomainUser() ?: User(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
