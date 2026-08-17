@@ -57,6 +57,7 @@ object TracksMapper {
         updateDate = track.updatedAt,
         totalCount = if (shortData.status == MediaStatus.RELEASED) shortData.totalCount ?: 0
             else shortData.currentProgress ?: Int.MAX_VALUE,
-        volumesCount = shortData.volumes ?: 0
+        volumesCount = shortData.volumes ?: 0,
+        customLists = track.customLists
     )
 }

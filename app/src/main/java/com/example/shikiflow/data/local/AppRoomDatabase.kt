@@ -15,7 +15,7 @@ import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
 
 @Database(
-    version = 4,
+    version = 5,
     entities = [
         MediaTrackEntity::class,
         MediaShortEntity::class,
@@ -24,7 +24,8 @@ import com.example.shikiflow.data.local.entity.mediatrack.MediaTrackEntity
     autoMigrations = [
         AutoMigration(from = 1, to = 2),
         AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4)
+        AutoMigration(from = 3, to = 4),
+        AutoMigration(from = 4, to = 5)
     ],
     exportSchema = true
 )

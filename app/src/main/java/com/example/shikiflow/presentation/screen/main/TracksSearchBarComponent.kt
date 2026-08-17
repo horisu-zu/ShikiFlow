@@ -82,7 +82,7 @@ fun TracksSearchBarComponent(
     var showBottomSheet by remember { mutableStateOf(false) }
 
     val lazyGridState = rememberLazyGridState()
-    val trackItems = tracksViewModel.animeTracksItems.collectAsLazyPagingItems()
+    val trackItems = tracksViewModel.tracksItems.collectAsLazyPagingItems()
     val rateUpdateState by tracksViewModel.rateUpdateState.collectAsStateWithLifecycle()
     val tracksParams by tracksViewModel.params.collectAsStateWithLifecycle()
     val preferredTitleType = LocalTitleTypeController.current
@@ -268,6 +268,7 @@ fun TracksSearchBarComponent(
                         preferredTitleType = preferredTitleType,
                         rateUpdateState = rateUpdateState,
                         scoreFormat = tracksParams.scoreFormat,
+                        customLists = tracksParams.customLists[mediaType] ?: emptyList(),
                         onDismiss = {
                             if (rateUpdateState != RateUpdateState.LOADING) {
                                 selectedItem = null

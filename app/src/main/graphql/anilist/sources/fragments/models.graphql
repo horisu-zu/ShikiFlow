@@ -10,6 +10,7 @@ fragment MediaListShort on MediaList {
     media {
         ...MediaShort
     }
+    customLists
 }
 
 fragment MediaFollowingShort on MediaList {
@@ -165,6 +166,12 @@ fragment ALUser on User {
     isFollowing
     mediaListOptions {
         scoreFormat
+        animeList {
+            customLists
+        }
+        mangaList {
+            customLists
+        }
     }
 }
 
@@ -289,6 +296,7 @@ fragment ALRateEntry on MediaList {
     notes
     createdAt
     updatedAt
+    customLists
 }
 
 fragment ALUserListStats on UserStatistics {

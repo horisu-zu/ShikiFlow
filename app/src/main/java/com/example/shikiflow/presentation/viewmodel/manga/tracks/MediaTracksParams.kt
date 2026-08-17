@@ -6,5 +6,6 @@ import com.example.shikiflow.domain.model.tracks.RateUpdateState
 data class MediaTracksParams(
     val userId: Int? = null,
     val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
-    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10
+    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
+    val customLists: List<String> = emptyList()
 )

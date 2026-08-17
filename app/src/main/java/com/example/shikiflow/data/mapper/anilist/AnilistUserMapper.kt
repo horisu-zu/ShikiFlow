@@ -66,7 +66,15 @@ object AnilistUserMapper {
             nickname = name,
             avatarUrl = avatar?.large ?: "",
             profileBannerUrl = bannerImage,
-            scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
+            scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10,
+            customLists = buildMap {
+                mediaListOptions?.animeList?.customLists?.mapNotNull { it }?.let { animeLists ->
+                    put(MediaType.ANIME, animeLists)
+                }
+                mediaListOptions?.mangaList?.customLists?.mapNotNull { it }?.let { mangaLists ->
+                    put(MediaType.MANGA, mangaLists)
+                }
+            }
         )
     }
 

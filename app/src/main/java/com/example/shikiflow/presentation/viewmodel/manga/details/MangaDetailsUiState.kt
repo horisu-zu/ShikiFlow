@@ -17,6 +17,7 @@ data class MangaDetailsUiState(
     val mangaDexUiState: MangaDexUiState = MangaDexUiState(),
     val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
+    val customLists: List<String> = emptyList(),
     override val isLoading: Boolean = true,
     override val errorMessage: String? = null,
     val isRefreshing: Boolean = false,

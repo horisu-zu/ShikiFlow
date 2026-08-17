@@ -233,6 +233,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
         progressVolumes: Int?,
         repeat: Int?,
         score: Float?,
+        customLists: List<String>,
         mediaShortData: MediaShortData?
     ): Flow<DataResult<UserMediaRate>> = flow {
         emit(DataResult.Loading)
@@ -269,7 +270,8 @@ class MediaTracksRepositoryImpl @Inject constructor(
                             progress = progress,
                             progressVolumes = progressVolumes,
                             repeat = repeat,
-                            score = score
+                            score = score,
+                            customLists = customLists
                         )
                     }
             }

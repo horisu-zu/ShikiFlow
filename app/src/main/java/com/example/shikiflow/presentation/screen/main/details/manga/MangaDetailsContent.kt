@@ -78,6 +78,7 @@ fun MangaDetailsContent(
     mangaDexUiState: MangaDexUiState,
     rateUpdateState: RateUpdateState,
     scoreFormat: ScoreFormat,
+    customLists: List<String>,
     favoriteErrorMessage: String?,
     mediaNavOptions: MediaNavOptions,
     onMangaDexRefreshClick: () -> Unit,
@@ -396,6 +397,7 @@ fun MangaDetailsContent(
             preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
             scoreFormat = scoreFormat,
+            customLists = customLists,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
                 onSaveUserRate(save, mangaDetails.toShortData())

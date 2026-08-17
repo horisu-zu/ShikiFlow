@@ -14,6 +14,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
@@ -33,7 +34,7 @@ import androidx.compose.ui.util.fastForEachIndexed
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun <T> ChipWithMenu(
-    title: String,
+    title: @Composable () -> Unit,
     values: List<T>,
     selectedValue: T?,
     onValueSelected: (T) -> Unit,
@@ -55,15 +56,15 @@ fun <T> ChipWithMenu(
             selected = selectedValue != null,
             onClick = { expanded = true },
             label = {
-                Text(
-                    text = selectedValue?.let {
-                        itemLabel(it)
-                    } ?: title
-                )
+                selectedValue?.let {
+                    Text(
+                        text = itemLabel(it)
+                    )
+                } ?: title()
             },
             trailingIcon = trailingIcon,
             leadingIcon = leadingIcon,
-            modifier = Modifier.heightIn(max = 32.dp)
+            modifier = Modifier.heightIn(max = FilterChipDefaults.Height)
         )
 
         DropdownMenuPopup(

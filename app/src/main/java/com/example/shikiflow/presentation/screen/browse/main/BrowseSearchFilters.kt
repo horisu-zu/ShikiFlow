@@ -132,7 +132,11 @@ fun BrowseSearchFilters(
                 ) {
                     item {
                         ChipWithMenu(
-                            title = stringResource(R.string.common_default),
+                            title = {
+                                Text(
+                                    text = stringResource(R.string.common_default)
+                                )
+                            },
                             values = listOf(
                                 MediaSort.Common.entries,
                                 when (authType) {
@@ -174,7 +178,11 @@ fun BrowseSearchFilters(
                                 exit = fadeOut() + shrinkHorizontally()
                             ) {
                                 ChipWithMenu(
-                                    title = stringResource(R.string.browse_search_label_sort_by),
+                                    title = {
+                                        Text(
+                                            text = stringResource(R.string.browse_search_label_sort_by)
+                                        )
+                                    },
                                     values = SortDirection.entries,
                                     selectedValue = searchOptions.sort?.direction,
                                     onValueSelected = { direction ->
@@ -204,7 +212,11 @@ fun BrowseSearchFilters(
                 ) {
                     item {
                         ChipWithMenu(
-                            title = stringResource(R.string.browse_search_label_format),
+                            title = {
+                                Text(
+                                    text = stringResource(R.string.browse_search_label_format)
+                                )
+                            },
                             values = MediaFormat.entries.filter { formatEntry ->
                                 formatEntry.mediaType == searchOptions.mediaType
                             }.filter { formatEntry ->
@@ -224,7 +236,11 @@ fun BrowseSearchFilters(
                     }
                     item {
                         ChipWithMenu(
-                            title = stringResource(R.string.browse_search_label_status),
+                            title = {
+                                Text(
+                                    text = stringResource(R.string.browse_search_label_status)
+                                )
+                            },
                             values = MediaStatus.entries.filter { statusEntry ->
                                 authType to searchOptions.mediaType !in statusEntry.exclusions
                             }.filter { status ->
@@ -249,7 +265,11 @@ fun BrowseSearchFilters(
                             exit = fadeOut() + shrinkHorizontally()
                         ) {
                             ChipWithMenu(
-                                title = stringResource(R.string.browse_search_label_age_rating),
+                                title = {
+                                    Text(
+                                        text = stringResource(R.string.browse_search_label_age_rating)
+                                    )
+                                },
                                 values = AgeRating.entries,
                                 selectedValue = searchOptions.ageRating,
                                 onValueSelected = { ageRating ->
@@ -282,7 +302,11 @@ fun BrowseSearchFilters(
                             exit = fadeOut() + shrinkHorizontally()
                         ) {
                             ChipWithMenu(
-                                title = stringResource(R.string.browse_search_label_season),
+                                title = {
+                                    Text(
+                                        text = stringResource(R.string.browse_search_label_season)
+                                    )
+                                },
                                 values = MediaSeasonEnum.entries,
                                 selectedValue = searchOptions.season?.seasonEnum,
                                 onValueSelected = { season ->
@@ -316,7 +340,11 @@ fun BrowseSearchFilters(
                         }
 
                         ChipWithMenu(
-                            title = stringResource(R.string.browse_search_label_season_year),
+                            title = {
+                                Text(
+                                    text = stringResource(R.string.browse_search_label_season_year)
+                                )
+                            },
                             values = DateUtils.seasonYears(),
                             selectedValue = searchOptions.season?.year,
                             onValueSelected = { year ->

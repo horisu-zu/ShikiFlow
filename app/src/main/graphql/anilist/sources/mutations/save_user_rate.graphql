@@ -5,7 +5,8 @@ mutation SaveUserRate(
     $progress: Int,
     $progressVolumes: Int,
     $repeat: Int,
-    $score: Float
+    $score: Float,
+    $customLists: [String]
 ) {
     SaveMediaListEntry(
         id: $rateEntryId,
@@ -14,7 +15,8 @@ mutation SaveUserRate(
         progress: $progress,
         progressVolumes: $progressVolumes,
         repeat: $repeat,
-        score: $score
+        score: $score,
+        customLists: $customLists
     ) {
         ...ALRateEntry
     }

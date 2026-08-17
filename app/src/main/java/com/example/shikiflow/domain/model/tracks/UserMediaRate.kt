@@ -13,5 +13,6 @@ data class UserMediaRate(
     val textNotes: String?,
     val score: Int,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val customLists: List<String>
 )

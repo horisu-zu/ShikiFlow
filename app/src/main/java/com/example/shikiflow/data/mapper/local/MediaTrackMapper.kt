@@ -25,7 +25,8 @@ object MediaTrackMapper {
             score = score,
             text = text,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            customLists = customLists
         )
     }
 
@@ -40,7 +41,8 @@ object MediaTrackMapper {
             score = score,
             text = text,
             createdAt = createdAt,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            customLists = customLists
         )
     }
 
@@ -75,6 +77,8 @@ object MediaTrackMapper {
     }
 
     fun MediaListShort.toTrack(): MediaUserTrack {
+        val customListsMap = customLists as? Map<String, Boolean> ?: emptyMap()
+
         return MediaUserTrack(
             mediaId = media?.mediaShort?.id ?: 0,
             id = id,
@@ -85,7 +89,11 @@ object MediaTrackMapper {
             score = (score.score?.times(10))?.roundToInt() ?: 0,
             text = null,
             createdAt = Instant.fromEpochSeconds(createdAt?.toLong() ?: 0L),
-            updatedAt = Instant.fromEpochSeconds(updatedAt?.toLong() ?: 0L)
+            updatedAt = Instant.fromEpochSeconds(updatedAt?.toLong() ?: 0L),
+            customLists = customListsMap
+                .filterValues { it }
+                .keys
+                .toList()
         )
     }
 
@@ -100,7 +108,8 @@ object MediaTrackMapper {
             text = textNotes,
             createdAt = createdAt,
             updatedAt = updatedAt,
-            mediaId = mediaId
+            mediaId = mediaId,
+            customLists = customLists
         )
     }
 

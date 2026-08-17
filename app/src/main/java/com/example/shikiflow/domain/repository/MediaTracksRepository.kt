@@ -48,6 +48,7 @@ interface MediaTracksRepository {
         progressVolumes: Int? = null,
         repeat: Int? = null,
         score: Float? = null,
+        customLists: List<String> = emptyList(),
         mediaShortData: MediaShortData? = null
     ): Flow<DataResult<UserMediaRate>>
 

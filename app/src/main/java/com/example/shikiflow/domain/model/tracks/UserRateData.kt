@@ -28,7 +28,8 @@ data class UserRateData(
     val createDate: Instant,
     val updateDate: Instant,
     val totalCount: Int,
-    val volumesCount: Int
+    val volumesCount: Int,
+    val customLists: List<String>
 ) {
     companion object {
         fun MediaDetails.toUiModel(userRate: MediaUserTrack?): UserRateData {
@@ -48,7 +49,8 @@ data class UserRateData(
                     createDate = userRate.createdAt,
                     updateDate = userRate.updatedAt,
                     totalCount = (if(status == MediaStatus.RELEASED) totalCount else currentProgress) ?: Int.MAX_VALUE,
-                    volumesCount = if(status == MediaStatus.RELEASED) volumes ?: 0 else Int.MAX_VALUE
+                    volumesCount = if(status == MediaStatus.RELEASED) volumes ?: 0 else Int.MAX_VALUE,
+                    customLists = userRate.customLists
                 )
             } ?: createEmpty(
                 mediaId = id,
@@ -83,7 +85,8 @@ data class UserRateData(
             title = mediaTitle,
             posterUrl = mediaPosterUrl,
             createDate = Clock.System.now(),
-            updateDate = Clock.System.now()
+            updateDate = Clock.System.now(),
+            customLists = emptyList()
         )
     }
 }
@@ -96,5 +99,6 @@ data class SaveUserRate(
     val score: Float = 0f,
     val progress: Int = 0,
     val progressVolumes: Int? = null,
-    val repeat: Int = 0
+    val repeat: Int = 0,
+    val customLists: List<String> = emptyList()
 )

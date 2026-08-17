@@ -21,8 +21,7 @@ interface MediaTracksDataSource {
         mediaType: MediaType,
         userId: Int? = null,
         status: UserRateStatus? = null,
-        order: Sort<UserRateType>? = null,
-        idsList: List<Int>? = null
+        order: Sort<UserRateType>? = null
     ): Result<List<MediaTrack>>
 
     suspend fun browseMediaTracks(
@@ -35,15 +34,16 @@ interface MediaTracksDataSource {
     ): Result<List<MediaTrack>>
 
     suspend fun saveUserRate(
-        userId: Int? = null,
-        entryId: Int? = null,
+        userId: Int?,
+        entryId: Int?,
         mediaType: MediaType,
         mediaId: Int,
         status: UserRateStatus,
-        progress: Int? = null,
-        progressVolumes: Int? = null,
-        repeat: Int? = null,
-        score: Float? = null
+        progress: Int?,
+        progressVolumes: Int?,
+        repeat: Int?,
+        score: Float?,
+        customLists: List<String> = emptyList()
     ): UserMediaRate
 
     suspend fun saveServiceUserRate(

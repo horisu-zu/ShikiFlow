@@ -75,6 +75,7 @@ fun AnimeDetailsContent(
     userRate: MediaUserTrack?,
     rateUpdateState: RateUpdateState,
     scoreFormat: ScoreFormat,
+    customLists: List<String>,
     favoriteErrorMessage: String?,
     sharedTransitionScope: SharedTransitionScope,
     selectedScreenshotIndex: Int?,
@@ -405,6 +406,7 @@ fun AnimeDetailsContent(
             preferredTitleType = titleType,
             rateUpdateState = rateUpdateState,
             scoreFormat = scoreFormat,
+            customLists = customLists,
             onDismiss = { rateBottomSheet = false },
             onSave = { save ->
                 onSaveUserRate(save, animeDetails.toShortData())

@@ -157,7 +157,6 @@ fun UserActivitySection(
                             },
                             onRepliesClick = {
                                 navOptions.navigateToActivityReplies(
-                                    userId = userId,
                                     activityId = activityItem.id,
                                     activityType = activityItem.type
                                 )

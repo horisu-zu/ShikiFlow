@@ -100,8 +100,7 @@ class ShikimoriTracksDataSource @Inject constructor(
         mediaType: MediaType,
         userId: Int?,
         status: UserRateStatus?,
-        order: Sort<UserRateType>?,
-        idsList: List<Int>?
+        order: Sort<UserRateType>?
     ): Result<List<MediaTrack>> {
         when(mediaType) {
             MediaType.ANIME -> {
@@ -218,7 +217,8 @@ class ShikimoriTracksDataSource @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Float?
+        score: Float?,
+        customLists: List<String>
     ): UserMediaRate {
         return when(entryId) {
             null -> {

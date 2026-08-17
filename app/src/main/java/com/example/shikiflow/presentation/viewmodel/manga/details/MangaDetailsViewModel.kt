@@ -229,11 +229,14 @@ class MangaDetailsViewModel @Inject constructor(
 
         settingsRepository.userSettingsFlow
             .filterNotNull()
-            .distinctUntilChangedBy { settings -> settings.scoreFormat }
+            .distinctUntilChanged { old, new ->
+                old.scoreFormat == new.scoreFormat && old.customLists == new.customLists
+            }
             .onEach { settings ->
                 mutableUiState.update { state ->
                     state.copy(
-                        scoreFormat = settings.scoreFormat
+                        scoreFormat = settings.scoreFormat,
+                        customLists = settings.customLists[MediaType.MANGA] ?: emptyList()
                     )
                 }
             }.launchIn(viewModelScope)
@@ -272,6 +275,7 @@ class MangaDetailsViewModel @Inject constructor(
             repeat = saveUserRate.repeat,
             status = saveUserRate.userStatus,
             mediaType = MediaType.MANGA,
+            customLists = saveUserRate.customLists,
             mediaShortData = mediaShortData
         ).onEach { result ->
             when (result) {

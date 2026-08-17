@@ -40,7 +40,7 @@ fun MainScreen(
     var isAtTop by remember { mutableStateOf(true) }
     val isScrolling by remember {
         derivedStateOf {
-            !isAtTop || scrollBehavior.scrollOffset <= scrollBehavior.scrollOffsetLimit
+            !isAtTop || scrollBehavior.scrollState.scrollOffset <= scrollBehavior.scrollState.scrollOffsetLimit
         }
     }
 

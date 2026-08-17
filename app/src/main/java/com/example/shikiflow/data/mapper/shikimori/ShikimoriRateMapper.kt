@@ -44,7 +44,8 @@ object ShikimoriRateMapper {
             textNotes = text,
             score = score.times(10),
             createdAt = Instant.parse(createdAt),
-            updatedAt = Instant.parse(updatedAt)
+            updatedAt = Instant.parse(updatedAt),
+            customLists = emptyList()
         )
     }
 

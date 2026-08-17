@@ -110,7 +110,11 @@ fun PlayerTopComponent(
             }
 
             ChipWithMenu(
-                title = "${currentQuality}P",
+                title = {
+                    Text(
+                        text = "${currentQuality}P"
+                    )
+                },
                 values = qualityData,
                 selectedValue = currentQuality,
                 onValueSelected = { quality ->

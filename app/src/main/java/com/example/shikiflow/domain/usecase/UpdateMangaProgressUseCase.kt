@@ -31,7 +31,8 @@ class UpdateMangaProgressUseCase @Inject constructor(
                     malId = malId,
                     status = if(chapterNum == mediaTrack.shortData.totalCount) UserRateStatus.COMPLETED
                         else UserRateStatus.WATCHING,
-                    progress = chapterNum
+                    progress = chapterNum,
+                    customLists = mediaTrack.track.customLists
                 ).onEach { result ->
                     when(result) {
                         is DataResult.Loading -> {

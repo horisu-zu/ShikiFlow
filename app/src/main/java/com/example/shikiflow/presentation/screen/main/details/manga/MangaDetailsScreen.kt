@@ -66,6 +66,7 @@ fun MangaDetailsScreen(
                             mangaDexUiState = uiState.mangaDexUiState,
                             rateUpdateState = uiState.rateUpdateState,
                             scoreFormat = uiState.scoreFormat,
+                            customLists = uiState.customLists,
                             favoriteErrorMessage = uiState.favoriteErrorMessage,
                             mediaNavOptions = navOptions,
                             onMangaDexRefreshClick = { mangaDetailsViewModel.mangaDexRefresh() },

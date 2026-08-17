@@ -62,11 +62,14 @@ class AnimeTracksViewModel @Inject constructor(
 
         settingsRepository.userSettingsFlow
             .filterNotNull()
-            .distinctUntilChangedBy { settings -> settings.scoreFormat }
+            .distinctUntilChanged { old, new ->
+                old.scoreFormat == new.scoreFormat && old.customLists == new.customLists
+            }
             .onEach { settings ->
                 _params.update { params ->
                     params.copy(
-                        scoreFormat = settings.scoreFormat
+                        scoreFormat = settings.scoreFormat,
+                        customLists = settings.customLists[MediaType.ANIME] ?: emptyList()
                     )
                 }
             }.launchIn(viewModelScope)
@@ -94,7 +97,8 @@ class AnimeTracksViewModel @Inject constructor(
             status = saveUserRate.userStatus,
             score = saveUserRate.score,
             progress = saveUserRate.progress,
-            repeat = saveUserRate.repeat
+            repeat = saveUserRate.repeat,
+            customLists = saveUserRate.customLists
         ).onEach { result ->
             _params.update { params ->
                 when(result) {

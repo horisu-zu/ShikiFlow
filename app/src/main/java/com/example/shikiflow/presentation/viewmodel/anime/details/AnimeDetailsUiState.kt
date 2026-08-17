@@ -16,6 +16,7 @@ data class AnimeDetailsUiState(
     val userRate: MediaUserTrack? = null,
     val rateUpdateState: RateUpdateState = RateUpdateState.INITIAL,
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
+    val customLists: List<String> = emptyList(),
     val isRefreshing: Boolean = false,
     val isRefreshingFavorite: Boolean = false,
     override val isLoading: Boolean = true,

@@ -91,6 +91,7 @@ fun AnimeDetailsScreen(
                                 userRate = uiState.userRate,
                                 rateUpdateState = uiState.rateUpdateState,
                                 scoreFormat = uiState.scoreFormat,
+                                customLists = uiState.customLists,
                                 favoriteErrorMessage = uiState.favoriteErrorMessage,
                                 sharedTransitionScope = this@SharedTransitionLayout,
                                 selectedScreenshotIndex = selectedScreenshotIndex,

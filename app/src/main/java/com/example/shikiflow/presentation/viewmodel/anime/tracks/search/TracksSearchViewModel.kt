@@ -22,7 +22,6 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -56,17 +55,20 @@ class TracksSearchViewModel @Inject constructor(
 
         settingsRepository.userSettingsFlow
             .filterNotNull()
-            .distinctUntilChangedBy { settings -> settings.scoreFormat }
+            .distinctUntilChanged { old, new ->
+                old.scoreFormat == new.scoreFormat && old.customLists == new.customLists
+            }
             .onEach { settings ->
                 _params.update { params ->
                     params.copy(
-                        scoreFormat = settings.scoreFormat
+                        scoreFormat = settings.scoreFormat,
+                        customLists = settings.customLists
                     )
                 }
             }.launchIn(viewModelScope)
     }
 
-    val animeTracksItems = _params
+    val tracksItems = _params
         .map { it.filters }
         .filter { filters ->
             filters.mediaType != null
@@ -92,7 +94,8 @@ class TracksSearchViewModel @Inject constructor(
             score = saveUserRate.score,
             progress = saveUserRate.progress,
             progressVolumes = saveUserRate.progressVolumes,
-            repeat = saveUserRate.repeat
+            repeat = saveUserRate.repeat,
+            customLists = saveUserRate.customLists
         ).onEach { result ->
             _rateUpdateState.update {
                 when(result) {

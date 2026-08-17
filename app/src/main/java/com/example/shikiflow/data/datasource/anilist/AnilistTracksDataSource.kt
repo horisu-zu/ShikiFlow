@@ -62,8 +62,7 @@ class AnilistTracksDataSource @Inject constructor(
         mediaType: MediaType,
         userId: Int?,
         status: UserRateStatus?,
-        order: Sort<UserRateType>?,
-        idsList: List<Int>?
+        order: Sort<UserRateType>?
     ): Result<List<MediaTrack>> {
         val additionalSort = Sort(
             type = UserRateType.ID,
@@ -80,8 +79,7 @@ class AnilistTracksDataSource @Inject constructor(
                 order?.toAnilistOrder()?.let { order ->
                     listOf(order, additionalSort)
                 }
-            ),
-            idsIn = Optional.presentIfNotNull(idsList)
+            )
         )
 
         val response = apolloClient.query(query)
@@ -145,7 +143,8 @@ class AnilistTracksDataSource @Inject constructor(
         progress: Int?,
         progressVolumes: Int?,
         repeat: Int?,
-        score: Float?
+        score: Float?,
+        customLists: List<String>
     ): UserMediaRate {
         val userRateQuery = SaveUserRateMutation(
             rateEntryId = Optional.presentIfNotNull(entryId),
@@ -154,7 +153,8 @@ class AnilistTracksDataSource @Inject constructor(
             progress = Optional.presentIfNotNull(progress),
             progressVolumes = Optional.presentIfNotNull(progressVolumes),
             repeat = Optional.presentIfNotNull(repeat),
-            score = Optional.presentIfNotNull(score?.toDouble())
+            score = Optional.presentIfNotNull(score?.toDouble()),
+            customLists = Optional.present(customLists)
         )
 
         val response = apolloClient.mutation(userRateQuery).execute()
@@ -193,7 +193,8 @@ class AnilistTracksDataSource @Inject constructor(
             progress = progress,
             progressVolumes = progressVolumes,
             repeat = repeat,
-            score = formattedScore
+            score = formattedScore,
+            customLists = emptyList()
         )
     }
 

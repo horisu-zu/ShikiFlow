@@ -4,16 +4,14 @@ query MediaListTracksQuery(
     $type: MediaType,
     $userId: Int,
     $status: MediaListStatus,
-    $order: [MediaListSort],
-    $idsIn: [Int]
+    $order: [MediaListSort]
 ) {
     Page(page: $page, perPage: $limit) {
         mediaList(
             type: $type,
             userId: $userId,
             status: $status,
-            sort: $order,
-            mediaId_in: $idsIn
+            sort: $order
         ) {
             ...MediaListShort
         }

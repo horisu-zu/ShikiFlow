@@ -14,7 +14,8 @@ import com.example.shikiflow.presentation.screen.main.TracksFilterType
 data class TracksParams(
     val authType: AuthType? = null,
     val filters: TracksFilters = TracksFilters(),
-    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10
+    val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
+    val customLists: Map<MediaType, List<String>> = emptyMap()
 )
 
 data class TracksFilters(

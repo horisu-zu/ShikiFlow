@@ -7,6 +7,7 @@ import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.RateStatusMapper.toDomain
 import com.example.shikiflow.data.mapper.common.TagMapper
 import com.example.shikiflow.domain.model.track.UserRateStatus
+import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import kotlin.math.roundToInt
@@ -14,6 +15,8 @@ import kotlin.time.Instant
 
 object AnilistRateMapper {
     fun ALRateEntry.toDomain(): UserMediaRate {
+        val customListsMap = customLists as? Map<String, Boolean> ?: emptyMap()
+
         return UserMediaRate(
             rateId = id,
             mediaId = mediaId,
@@ -24,7 +27,11 @@ object AnilistRateMapper {
             textNotes = notes,
             score = (score.score?.times(10))?.roundToInt() ?: 0,
             createdAt = Instant.fromEpochSeconds(createdAt?.toLong() ?: 0L),
-            updatedAt = Instant.fromEpochSeconds(updatedAt?.toLong() ?: 0L)
+            updatedAt = Instant.fromEpochSeconds(updatedAt?.toLong() ?: 0L),
+            customLists = customListsMap
+                .filterValues { it }
+                .keys
+                .toList()
         )
     }
 

@@ -2,6 +2,11 @@ package com.example.shikiflow.presentation.common
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -39,9 +44,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -93,6 +97,7 @@ fun UserRateBottomSheet(
     rateUpdateState: RateUpdateState,
     preferredTitleType: PreferredTitleType,
     scoreFormat: ScoreFormat,
+    customLists: List<String>,
     onDismiss: () -> Unit,
     onSave: (SaveUserRate) -> Unit,
     onDelete: (Int) -> Unit,
@@ -105,19 +110,23 @@ fun UserRateBottomSheet(
     val scope = rememberCoroutineScope()
 
     val chips = UserRateStatus.entries.filter { it != UserRateStatus.UNKNOWN }.toList()
-    val initialStatusIndex = chips.indexOfFirst { chip ->
-        chip == userRate.status
-    }
-
     var showDeleteDialog by remember { mutableStateOf(false) }
 
-    var selectedStatus by remember { mutableIntStateOf(initialStatusIndex) }
-    var selectedScore by remember {
-        mutableFloatStateOf(scoreFormat.formatValue(userRate.score.toFloat()))
+    var rateEntry by remember {
+        mutableStateOf(
+            SaveUserRate(
+                rateId = userRate.id,
+                mediaId = userRate.mediaId,
+                malId = userRate.malId,
+                userStatus = userRate.status,
+                score = scoreFormat.formatValue(userRate.score.toFloat()),
+                progress = userRate.progress,
+                progressVolumes = userRate.progressVolumes,
+                repeat = userRate.rewatches,
+                customLists = userRate.customLists
+            )
+        )
     }
-    var progress by remember { mutableIntStateOf(userRate.progress) }
-    var progressVolumes by remember { mutableIntStateOf(userRate.progressVolumes) }
-    var rewatches by remember { mutableIntStateOf(userRate.rewatches) }
 
     LaunchedEffect(rateUpdateState) {
         if(sheetState.isVisible && rateUpdateState == RateUpdateState.FINISHED) {
@@ -163,53 +172,59 @@ fun UserRateBottomSheet(
             StatusChips(
                 chips = chips,
                 mediaType = userRate.mediaType,
-                selectedStatus = selectedStatus,
-                onStatusSelected = { selectedStatus = it },
+                selectedStatus = rateEntry.userStatus,
+                onStatusSelected = { rateEntry = rateEntry.copy(userStatus = it) },
                 horizontalPadding = horizontalPadding
             )
 
             AnimatedVisibility(
-                visible = selectedStatus != -1
+                visible = rateEntry.userStatus != UserRateStatus.UNKNOWN
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
                 ) {
                     ScoreSelector(
-                        score = selectedScore,
+                        score = rateEntry.score,
                         scoreFormat = scoreFormat,
-                        onScoreChange = { selectedScore = it },
+                        onScoreChange = { rateEntry = rateEntry.copy(score = it) },
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     ProgressColumn(
                         userRate = userRate.copy(
-                            progress = progress,
-                            progressVolumes = progressVolumes,
-                            rewatches = rewatches
+                            progress = rateEntry.progress,
+                            progressVolumes = rateEntry.progressVolumes ?: 0,
+                            rewatches = rateEntry.repeat
                         ),
-                        onProgressChange = { progress = it },
-                        onVolumesProgressChange = { progressVolumes = it },
-                        onRewatchesChange = { rewatches = it }
+                        onProgressChange = { rateEntry = rateEntry.copy(progress = it) },
+                        onVolumesProgressChange = { rateEntry = rateEntry.copy(progressVolumes = it) },
+                        onRewatchesChange = { rateEntry = rateEntry.copy(repeat = it) }
                     )
+
+                    if (customLists.isNotEmpty()) {
+                        CustomListsComponent(
+                            lists = rateEntry.customLists,
+                            initialList = userRate.customLists,
+                            userCustomLists = customLists,
+                            onListChange = { listName ->
+                                rateEntry = rateEntry.copy(
+                                    customLists = when (rateEntry.customLists.contains(listName)) {
+                                        true -> rateEntry.customLists - listName
+                                        false -> rateEntry.customLists + listName
+                                    }
+                                )
+                            },
+                            horizontalPadding = horizontalPadding,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
+
             if(userRate.id != null) {
                 ChangeRow(
-                    onSave = {
-                        onSave(
-                            SaveUserRate(
-                                rateId = userRate.id,
-                                mediaId = userRate.mediaId,
-                                malId = userRate.malId,
-                                userStatus = UserRateStatus.entries[selectedStatus],
-                                score = selectedScore,
-                                progress  = progress,
-                                progressVolumes = progressVolumes,
-                                repeat = rewatches
-                            )
-                        )
-                    },
+                    onSave = { onSave(rateEntry) },
                     onDelete = { showDeleteDialog = true },
                     createDate = userRate.createDate,
                     updateDate = userRate.updateDate,
@@ -222,20 +237,8 @@ fun UserRateBottomSheet(
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp)),
                     label = stringResource(R.string.user_rate_add_to_list),
-                    onClick = {
-                        onSave(
-                            SaveUserRate(
-                                mediaId = userRate.mediaId,
-                                malId = userRate.malId,
-                                userStatus = UserRateStatus.entries[selectedStatus],
-                                score = selectedScore,
-                                progress  = progress,
-                                progressVolumes = progressVolumes,
-                                repeat = rewatches
-                            )
-                        )
-                    },
-                    enabled = selectedStatus != -1
+                    onClick = { onSave(rateEntry) },
+                    enabled = rateEntry.userStatus != UserRateStatus.UNKNOWN
                 )
             }
         }
@@ -270,6 +273,7 @@ private fun SheetHeader(
                 text = stringResource(R.string.rate_progress),
                 style = MaterialTheme.typography.bodyLarge
             )
+
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelMedium.copy(
@@ -293,8 +297,8 @@ private fun SheetHeader(
 private fun StatusChips(
     chips: List<UserRateStatus>,
     mediaType: MediaType,
-    selectedStatus: Int,
-    onStatusSelected: (Int) -> Unit,
+    selectedStatus: UserRateStatus,
+    onStatusSelected: (UserRateStatus) -> Unit,
     horizontalPadding: Dp,
     modifier: Modifier = Modifier
 ) {
@@ -307,11 +311,8 @@ private fun StatusChips(
             val rateStatus = userRateStatus.mapStatus(mediaType)
 
             FilterChip(
-                selected = selectedStatus != -1 && chips.getOrNull(selectedStatus) == userRateStatus,
-                onClick = {
-                    val newIndex = chips.indexOf(userRateStatus)
-                    onStatusSelected(if (selectedStatus == newIndex) -1 else newIndex)
-                },
+                selected = userRateStatus == selectedStatus,
+                onClick = { onStatusSelected(userRateStatus) },
                 label = {
                     Text(
                         text = stringResource(rateStatus)
@@ -327,6 +328,127 @@ private fun StatusChips(
                     )
                 }
             )
+        }
+    }
+}
+
+@Composable
+private fun CustomListsComponent(
+    lists: List<String>,
+    initialList: List<String>,
+    userCustomLists: List<String>,
+    onListChange: (String) -> Unit,
+    horizontalPadding: Dp,
+    modifier: Modifier = Modifier
+) {
+    val fullLists = remember(lists) { (lists + initialList).distinct() }
+    val listsEmpty by remember {
+        derivedStateOf {
+            (lists + initialList).isEmpty()
+        }
+    }
+
+    Column(
+        modifier = modifier.animateContentSize(),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Box(
+                modifier = Modifier.height(FilterChipDefaults.Height),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                Text(
+                    text = "Custom Lists",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            AnimatedVisibility(
+                visible = listsEmpty,
+                enter = fadeIn() + slideInHorizontally(
+                    initialOffsetX = { it / 2 }
+                ),
+                exit = fadeOut() + slideOutHorizontally(
+                    targetOffsetX = { it / 2 }
+                )
+            ) {
+                ChipWithMenu(
+                    title = {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Open the Dropdown",
+                            modifier = Modifier.size(FilterChipDefaults.IconSize)
+                        )
+                    },
+                    values = userCustomLists,
+                    selectedValue = null,
+                    onValueSelected = { onListChange(it) },
+                    itemLabel = { listName -> listName }
+                )
+            }
+        }
+
+        SnapFlingLazyRow(
+            contentPadding = PaddingValues(horizontal = horizontalPadding),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .ignoreHorizontalParentPadding(horizontalPadding)
+                .fillMaxWidth()
+        ) {
+            items(
+                items = fullLists,
+                key = { it }
+            ) { listName ->
+                FilterChip(
+                    selected = lists.contains(listName),
+                    label = {
+                        Text(
+                            text = listName,
+                            style = MaterialTheme.typography.labelMedium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    leadingIcon = if (!lists.contains(listName)) {
+                        {
+                            Icon(
+                                imageVector = Icons.Default.Clear,
+                                tint = MaterialTheme.colorScheme.onSurface,
+                                contentDescription = null
+                            )
+                        }
+                    } else { null },
+                    onClick = { onListChange(listName) },
+                    modifier = Modifier
+                        .height(FilterChipDefaults.Height)
+                        .animateItem()
+                )
+            }
+
+            item {
+                AnimatedVisibility(
+                    visible = !listsEmpty
+                ) {
+                    ChipWithMenu(
+                        title = {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Open the Dropdown",
+                                modifier = Modifier.size(FilterChipDefaults.IconSize)
+                            )
+                        },
+                        values = userCustomLists,
+                        selectedValue = null,
+                        onValueSelected = { onListChange(it) },
+                        itemLabel = { listName -> listName }
+                    )
+                }
+            }
         }
     }
 }
@@ -599,7 +721,7 @@ private fun RoundBox(
             .clip(RoundedCornerShape(percent = 24))
             .background(
                 color = if (enabled) MaterialTheme.colorScheme.surface
-                    else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                else MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
             )
             .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center

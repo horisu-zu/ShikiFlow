@@ -119,6 +119,7 @@ fun AnimeTracksPage(
                         preferredTitleType = preferredTitleType,
                         scoreFormat = params.scoreFormat,
                         rateUpdateState = params.rateUpdateState,
+                        customLists = params.customLists,
                         onDismiss = {
                             if (params.rateUpdateState != RateUpdateState.LOADING) {
                                 selectedItem = null

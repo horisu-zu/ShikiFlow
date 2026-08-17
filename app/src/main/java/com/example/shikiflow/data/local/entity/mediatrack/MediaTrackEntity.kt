@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.local.entity.mediatrack
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.shikiflow.domain.model.track.UserRateStatus
@@ -16,5 +17,6 @@ data class MediaTrackEntity(
     val text: String?,
     val createdAt: Instant,
     val updatedAt: Instant,
+    @ColumnInfo (defaultValue = "[]") val customLists: List<String>,
     @PrimaryKey val mediaId: Int
 )

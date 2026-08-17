@@ -13,5 +13,6 @@ data class MediaUserTrack(
     val score: Int,
     val text: String?,
     val createdAt: Instant,
-    val updatedAt: Instant
+    val updatedAt: Instant,
+    val customLists: List<String> = emptyList()
 )

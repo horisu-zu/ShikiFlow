@@ -45,6 +45,8 @@ class SettingsRepositoryImpl @Inject constructor(
         private fun userNickname(authType: AuthType) = stringPreferencesKey("${authType}user_nickname")
         private fun userBanner(authType: AuthType) = stringPreferencesKey("${authType}user_banner")
         private fun userScoreFormat(authType: AuthType) = stringPreferencesKey("${authType}_score_format")
+        private fun userCustomAnimeLists(authType: AuthType) = stringSetPreferencesKey("${authType}_anime_lists")
+        private fun userCustomMangaLists(authType: AuthType) = stringSetPreferencesKey("${authType}_manga_lists")
 
         private val TRACKER_SERVICE_UPDATE = booleanPreferencesKey("tracker_update")
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
@@ -100,7 +102,15 @@ class SettingsRepositoryImpl @Inject constructor(
                 } ?: PreferredTitleType.ROMAJI,
                 scoreFormat = preferences[userScoreFormat(currentAuthType)]?.let { format ->
                     ScoreFormat.valueOf(format)
-                } ?: ScoreFormat.POINT_10
+                } ?: ScoreFormat.POINT_10,
+                customLists = buildMap {
+                    preferences[userCustomAnimeLists(currentAuthType)]?.let { animeLists ->
+                        put(MediaType.ANIME, animeLists.toList())
+                    }
+                    preferences[userCustomMangaLists(currentAuthType)]?.let { mangaLists ->
+                        put(MediaType.MANGA, mangaLists.toList())
+                    }
+                }
             )
         }
 
@@ -222,6 +232,12 @@ class SettingsRepositoryImpl @Inject constructor(
                 preferences[userBanner(authType)] = profileBannerUrl
             }
             preferences[userScoreFormat(authType)] = user.scoreFormat.name
+            user.customLists.forEach { (mediaType, lists) ->
+                when (mediaType) {
+                    MediaType.ANIME -> preferences[userCustomAnimeLists(authType)] = lists.toSet()
+                    MediaType.MANGA -> preferences[userCustomMangaLists(authType)] = lists.toSet()
+                }
+            }
         }
     }
 
@@ -356,6 +372,8 @@ class SettingsRepositoryImpl @Inject constructor(
                 preferences.remove(userNickname(authType))
                 preferences.remove(userAvatar(authType))
                 preferences.remove(userBanner(authType))
+                preferences.remove(userCustomAnimeLists(authType))
+                preferences.remove(userCustomMangaLists(authType))
             }
 
             preferences.remove(AUTH_TYPE)
