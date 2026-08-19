@@ -106,7 +106,10 @@ fun AnimeTranslationsScreen(
                         )
                     },
                     navigationIcon = {
-                        IconButton(onClick = onNavigateBack) {
+                        IconButton(
+                            shape = RoundedCornerShape(percent = 24),
+                            onClick = onNavigateBack
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back"

@@ -109,6 +109,7 @@ fun TracksSearchBar(
                         shape = RoundedCornerShape(clip),
                         leadingIcon = {
                             IconButton(
+                                shape = RoundedCornerShape(percent = 24),
                                 onClick = {
                                     scope.launch {
                                         searchBarState.animateToCollapsed()
@@ -124,6 +125,7 @@ fun TracksSearchBar(
                         trailingIcon = {
                             if(textFieldState.text.isNotBlank()) {
                                 IconButton(
+                                    shape = RoundedCornerShape(percent = 24),
                                     onClick = { textFieldState.clearText() }
                                 ) {
                                     Icon(
@@ -150,6 +152,7 @@ fun TracksSearchBar(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
+                            shape = RoundedCornerShape(percent = 24),
                             onClick = {
                                 scope.launch {
                                     searchBarState.animateToExpanded()

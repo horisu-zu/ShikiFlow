@@ -129,7 +129,10 @@ fun StudioScreen(
                     },
                     //expandedHeight = 48.dp, //IconButton Size
                     navigationIcon = {
-                        IconButton(onClick = onNavigateBack) {
+                        IconButton(
+                            shape = RoundedCornerShape(percent = 24),
+                            onClick = onNavigateBack
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back"
@@ -151,6 +154,7 @@ fun StudioScreen(
 
                         if(uiState.errorMessage != null) {
                             IconButton(
+                                shape = RoundedCornerShape(percent = 24),
                                 onClick = {
                                     studioViewModel.onRefresh()
 

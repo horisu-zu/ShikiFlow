@@ -304,14 +304,12 @@ private fun CommentInputComponent(
                 color = MaterialTheme.colorScheme.onSurface
             ),
             placeholder = {
-                if (textFieldState.text.isEmpty()) {
-                    Text(
-                        text = stringResource(R.string.comment_editor_text_placeholder),
-                        style = MaterialTheme.typography.bodyMedium.copy(
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                        )
+                Text(
+                    text = stringResource(R.string.comment_editor_text_placeholder),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                     )
-                }
+                )
             },
             lineLimits = TextFieldLineLimits.MultiLine(
                 minHeightInLines = 6,

@@ -185,7 +185,6 @@ fragment ALUserShort on User {
 }
 
 fragment ALUserSettings on User {
-    id
     options {
         displayAdultContent
         staffNameLanguage
@@ -194,16 +193,6 @@ fragment ALUserSettings on User {
     }
     mediaListOptions {
         scoreFormat
-        animeList {
-            advancedScoringEnabled
-            advancedScoring
-            customLists
-        }
-        mangaList {
-            advancedScoringEnabled
-            advancedScoring
-            customLists
-        }
     }
 }
 

@@ -12,6 +12,7 @@ import com.example.graphql.anilist.CurrentUserQuery
 import com.example.graphql.anilist.ShortUserRateQuery
 import com.example.graphql.anilist.ToggleFavoriteMutation
 import com.example.graphql.anilist.ToggleFollowMutation
+import com.example.graphql.anilist.UpdateCustomListsMutation
 import com.example.graphql.anilist.UpdateFavoritesOrderMutation
 import com.example.graphql.anilist.UpdateUserMutation
 import com.example.graphql.anilist.UserActivitiesQuery
@@ -651,6 +652,33 @@ class AnilistUserDataSource @Inject constructor(
             .asDataResult { data ->
                 data.UpdateUser?.aLUserSettings?.toUserSettings()
                     ?: error("Error updating User Settings")
+            }
+
+        return response
+    }
+
+    override suspend fun updateCustomLists(
+        customLists: Map<MediaType, List<String>>
+    ): DataResult<Map<MediaType, List<String>>> {
+        val customListsMutation = UpdateCustomListsMutation(
+            animeCustomLists = Optional.presentIfNotNull(customLists[MediaType.ANIME]),
+            mangaCustomLists = Optional.presentIfNotNull(customLists[MediaType.MANGA])
+        )
+
+        val response = apolloClient.mutation(customListsMutation)
+            .execute()
+            .asDataResult { data ->
+                val listOptions = data.UpdateUser?.mediaListOptions
+                    ?: error("Error updating Custom Lists")
+
+                buildMap {
+                    listOptions.animeList?.customLists?.mapNotNull { it }?.let { animeLists ->
+                        put(MediaType.ANIME, animeLists)
+                    }
+                    listOptions.mangaList?.customLists?.mapNotNull { it }?.let { mangaLists ->
+                        put(MediaType.MANGA, mangaLists)
+                    }
+                }
             }
 
         return response

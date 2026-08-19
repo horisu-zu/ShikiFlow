@@ -284,7 +284,10 @@ private fun SheetHeader(
             )
         }
 
-        IconButton(onClick = onDismiss) {
+        IconButton(
+            shape = RoundedCornerShape(percent = 24),
+            onClick = onDismiss
+        ) {
             Icon(
                 imageVector = Icons.Default.Clear,
                 contentDescription = null
@@ -342,7 +345,7 @@ private fun CustomListsComponent(
     modifier: Modifier = Modifier
 ) {
     val fullLists = remember(lists) { (lists + initialList).distinct() }
-    val listsEmpty by remember {
+    val listsEmpty by remember(lists) {
         derivedStateOf {
             (lists + initialList).isEmpty()
         }
@@ -769,7 +772,8 @@ private fun ChangeRow(
         }
 
         IconButton(
-            onClick = onDelete
+            onClick = onDelete,
+            shape = RoundedCornerShape(percent = 24),
         ) {
             Icon(
                 imageVector = Icons.Default.Delete,
@@ -793,7 +797,8 @@ private fun ChangeRow(
             } else {
                 IconButton(
                     onClick = onSave,
-                    enabled = enabled
+                    enabled = enabled,
+                    shape = RoundedCornerShape(percent = 24)
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.Done,

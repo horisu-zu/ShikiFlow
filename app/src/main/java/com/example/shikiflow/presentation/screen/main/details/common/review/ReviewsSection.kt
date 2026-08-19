@@ -76,8 +76,9 @@ fun ReviewsSection(
             )
             if(reviewsList.hasNextPage) {
                 IconButton(
+                    shape = RoundedCornerShape(percent = 24),
                     onClick = { onMoreClick() },
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(24.dp)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

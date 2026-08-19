@@ -84,6 +84,7 @@ fun ChapterNavigationComponent(
         modifier = modifier.heightIn(max = 56.dp)
     ) {
         IconButton(
+            shape = RoundedCornerShape(percent = 24),
             onClick = { onNavigateClick(currentPage - 1) },
             enabled = currentPage > 1
         ) {
@@ -142,6 +143,7 @@ fun ChapterNavigationComponent(
             modifier = Modifier.align(Alignment.CenterVertically)
         )
         IconButton(
+            shape = RoundedCornerShape(percent = 24),
             onClick = { onNavigateClick(currentPage + 1) },
             enabled = currentPage < pageCount
         ) {

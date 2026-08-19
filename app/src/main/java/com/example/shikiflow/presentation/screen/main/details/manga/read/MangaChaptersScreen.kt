@@ -130,6 +130,7 @@ fun MangaChaptersScreen(
                     },
                     navigationIcon = {
                         IconButton(
+                            shape = RoundedCornerShape(percent = 24),
                             onClick = { navOptions.navigateBack() }
                         ) {
                             Icon(
@@ -140,6 +141,7 @@ fun MangaChaptersScreen(
                     },
                     actions = {
                         IconButton(
+                            shape = RoundedCornerShape(percent = 24),
                             onClick = {
                                 mangaChaptersViewModel.changeDirection(
                                     sortDirection = chaptersUiState.sortDirection.changeDirection()

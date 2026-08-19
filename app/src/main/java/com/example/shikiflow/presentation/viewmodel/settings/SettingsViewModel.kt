@@ -149,11 +149,21 @@ class SettingsViewModel @Inject constructor(
     fun setScoreFormat(scoreFormat: ScoreFormat) {
         viewModelScope.launch {
             userRepository.setUserSettings(scoreFormat = scoreFormat)
-                .also { result ->
+                .let { result ->
                     if(result is DataResult.Success) {
                         settingsRepository.saveScoreFormat(result.data.scoreFormat)
                     }
                 }
+        }
+    }
+
+    fun updateCustomLists(lists: Map<MediaType, List<String>>) {
+        viewModelScope.launch {
+            userRepository.updateCustomLists(customLists = lists).let { result ->
+                if (result is DataResult.Success) {
+                    settingsRepository.saveCustomLists(result.data)
+                }
+            }
         }
     }
 

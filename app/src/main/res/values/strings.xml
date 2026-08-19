@@ -53,6 +53,8 @@
     <string name="media_type_anime">Anime</string>
     <string name="media_type_manga">Manga</string>
 
+    <string name="media_custom_lists">%1s Lists</string>
+
     <string name="details_error">Error Loading Media Details</string>
 
     <string name="error_image">Error Loading Image</string>
@@ -63,6 +65,7 @@
     <string name="common_ok" translatable="false">OK</string>
     <string name="common_default">Default</string>
     <string name="common_confirm">Confirm</string>
+    <string name="common_add">Add</string>
 
     <string name="tracker_services_update_title">Update Tracks on All Connected Services</string>
     <string name="tracker_services_update_note">
@@ -117,6 +120,7 @@
     <string name="settings_tracker_services_display">Connect your existing account to update tracks on all services at once</string>
     <string name="settings_switch_account">Switch Account</string>
     <string name="settings_log_out">Log Out</string>
+    <string name="settings_custom_lists_label">Custom Lists</string>
 
     <string name="color_picker_bottom_sheet_system_label">Use System Wallpaper Color</string>
     <string name="color_picker_bottom_sheet_save">Apply</string>

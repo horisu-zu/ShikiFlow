@@ -197,7 +197,9 @@ private fun BrowseSection(
                     text = stringResource(browseType.displayValue()),
                     style = MaterialTheme.typography.titleMedium
                 )
+
                 IconButton(
+                    shape = RoundedCornerShape(percent = 24),
                     onClick = { onSectionClick() }
                 ) {
                     Icon(

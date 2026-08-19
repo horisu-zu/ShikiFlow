@@ -122,6 +122,7 @@ fun PlayerBottomComponent(
             }
             if(opTimeCode == null) {
                 IconButton(
+                    shape = RoundedCornerShape(percent = 24),
                     onClick = {
                         playerEvent.onSeek(87500L)
                     }
@@ -134,7 +135,11 @@ fun PlayerBottomComponent(
                     )
                 }
             }
-            IconButton(onClick = onResize) {
+
+            IconButton(
+                shape = RoundedCornerShape(percent = 24),
+                onClick = onResize
+            ) {
                 Icon(
                     painter = painterResource(
                         id = if(isFit) R.drawable.ic_exit_full_screen else R.drawable.ic_open_full_screen

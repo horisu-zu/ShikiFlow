@@ -99,7 +99,10 @@ fun MediaCharactersScreen(
                         }
                     },
                     navigationIcon = {
-                        IconButton(onClick = { navOptions.navigateBack() }) {
+                        IconButton(
+                            shape = RoundedCornerShape(percent = 24),
+                            onClick = { navOptions.navigateBack() }
+                        ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                                 contentDescription = "Back"

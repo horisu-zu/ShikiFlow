@@ -262,6 +262,7 @@ fun ChapterScreen(
                             },
                             navigationIcon = {
                                 IconButton(
+                                    shape = RoundedCornerShape(percent = 24),
                                     onClick = { navOptions.navigateBack() }
                                 ) {
                                     Icon(
@@ -272,6 +273,7 @@ fun ChapterScreen(
                             },
                             actions = {
                                 IconButton(
+                                    shape = RoundedCornerShape(percent = 24),
                                     onClick = { showBottomSheet.value = true }
                                 ) {
                                     Icon(

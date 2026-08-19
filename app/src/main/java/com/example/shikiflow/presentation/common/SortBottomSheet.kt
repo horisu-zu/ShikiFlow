@@ -109,7 +109,7 @@ fun TracksSortBottomSheet(
             modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 12.dp)
                 .animateContentSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top),
+            verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
             ConnectedButtonGroup(
                 items = TracksFilterType.entries.map { filterType ->
@@ -226,17 +226,15 @@ fun GenresFilterComponent(
             CustomTextField(
                 textFieldState = textFieldState,
                 placeholder = {
-                    if(textFieldState.text.isEmpty()) {
-                        TextWithIcon(
-                            text = stringResource(R.string.browse_search_tag_search_label),
-                            iconResources = listOf(
-                                IconResource.Vector(imageVector = Icons.Default.Search)
-                            ),
-                            placeIconAtTheBeginning = true,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    TextWithIcon(
+                        text = stringResource(R.string.browse_search_tag_search_label),
+                        iconResources = listOf(
+                            IconResource.Vector(imageVector = Icons.Default.Search)
+                        ),
+                        placeIconAtTheBeginning = true,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -285,17 +283,15 @@ fun TagsFilterComponent(
             CustomTextField(
                 textFieldState = textFieldState,
                 placeholder = {
-                    if(textFieldState.text.isEmpty()) {
-                        TextWithIcon(
-                            text = stringResource(R.string.browse_search_tag_search_label),
-                            iconResources = listOf(
-                                IconResource.Vector(imageVector = Icons.Default.Search)
-                            ),
-                            placeIconAtTheBeginning = true,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    TextWithIcon(
+                        text = stringResource(R.string.browse_search_tag_search_label),
+                        iconResources = listOf(
+                            IconResource.Vector(imageVector = Icons.Default.Search)
+                        ),
+                        placeIconAtTheBeginning = true,
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()

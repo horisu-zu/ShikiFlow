@@ -117,6 +117,7 @@ fun OngoingSideScreen(
                 },
                 navigationIcon = {
                     IconButton(
+                        shape = RoundedCornerShape(percent = 24),
                         onClick = { onBackNavigate() }
                     ) {
                         Icon(

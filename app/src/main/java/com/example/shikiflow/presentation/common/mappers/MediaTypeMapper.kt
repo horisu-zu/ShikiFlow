@@ -2,6 +2,7 @@ package com.example.shikiflow.presentation.common.mappers
 
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.common.TabRowItem
 import com.example.shikiflow.utils.IconResource
 
 object MediaTypeMapper {
@@ -17,5 +18,13 @@ object MediaTypeMapper {
             MediaType.ANIME -> IconResource.Drawable(R.drawable.ic_anime)
             MediaType.MANGA -> IconResource.Drawable(R.drawable.ic_manga)
         }
+    }
+
+    fun MediaType.toTabRowItem(): TabRowItem<MediaType> {
+        return TabRowItem(
+            value = this,
+            iconResource = iconResource(),
+            titleRes = displayValue()
+        )
     }
 }

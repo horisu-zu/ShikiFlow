@@ -225,4 +225,10 @@ class UserRepositoryImpl @Inject constructor(
     ): DataResult<UserSettings> = withSourceSuspend(dataSource) { dataSource ->
         dataSource.setUserSettings(preferredTitleType, scoreFormat)
     }
+
+    override suspend fun updateCustomLists(
+        customLists: Map<MediaType, List<String>>
+    ): DataResult<Map<MediaType, List<String>>> = withSourceSuspend(dataSource) { dataSource ->
+        dataSource.updateCustomLists(customLists)
+    }
 }

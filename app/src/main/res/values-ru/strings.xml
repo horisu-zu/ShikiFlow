@@ -55,6 +55,7 @@
     <string name="media_type_anime">Аниме</string>
     <string name="media_type_manga">Манга</string>
 
+    <string name="media_custom_lists">%1s-списки</string>
     <string name="details_error">Ошибка загрузки данных</string>
 
     <string name="error_image">Ошибка загрузки изображения</string>
@@ -65,6 +66,7 @@
 
     <string name="common_default">По умолчанию</string>
     <string name="common_confirm">Подтвердить</string>
+    <string name="common_add">Добавить</string>
     <string name="tracker_services_update_title">Обновлять отслеживаемое на всех подключённых сервисах</string>
     <string name="tracker_services_update_note">
         из-за особенностей синхронизации обновлений через MAL ID
@@ -115,6 +117,8 @@
     </string>
 
     <string name="settings_log_out">Выйти из аккаунта</string>
+    <string name="settings_custom_lists_label">Кастомные списки</string>
+
     <string name="color_picker_bottom_sheet_system_label">Использовать цвет заставки системы</string>
     <string name="color_picker_bottom_sheet_save">Применить</string>
     <string name="next_episode">"Следующий эпизод в "</string>

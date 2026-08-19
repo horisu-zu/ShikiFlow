@@ -29,7 +29,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -347,7 +347,7 @@ private fun OrderEditorComponent(
                 ReorderableItem(reorderableState, key = item.id) { isDragging ->
                     val backgroundColor by animateColorAsState(
                         targetValue = if (isDragging) MaterialTheme.colorScheme.surfaceContainerHigh
-                        else MaterialTheme.colorScheme.background,
+                            else MaterialTheme.colorScheme.background,
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioNoBouncy,
                             stiffness = Spring.StiffnessMediumLow
@@ -405,7 +405,7 @@ private fun OrderEditorComponent(
                 modifier = Modifier.size(32.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Delete,
+                    imageVector = Icons.Default.Clear,
                     contentDescription = "Clear Order Changes",
                     modifier = Modifier.size(24.dp)
                 )

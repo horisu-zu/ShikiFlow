@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,6 +62,7 @@ fun SettingsScreen(
     val openCacheDialog = remember { mutableStateOf(false) }
     var showColorPickerBottomSheet by remember { mutableStateOf(false) }
     var showLanguagesBottomSheet by remember { mutableStateOf(false) }
+    var showCustomListsBottomSheet by remember { mutableStateOf(false) }
 
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
@@ -132,6 +134,7 @@ fun SettingsScreen(
                         )
                     )
                 )
+
                 SettingsSection(
                     title = stringResource(R.string.settings_theme_section_title),
                     items = listOf(
@@ -203,6 +206,7 @@ fun SettingsScreen(
                         )
                     )
                 )
+
                 SettingsSection(
                     title = stringResource(R.string.seetings_interface_section_title),
                     items = listOf(
@@ -254,27 +258,6 @@ fun SettingsScreen(
                             }
                         ),
                         SectionItem.Default(
-                            title = stringResource(R.string.settings_score_format),
-                            displayValue = stringResource(settingsState.userSettings.scoreFormat.displayValue()),
-                            isVisible = settingsState.authType == AuthType.ANILIST,
-                            onClick = {
-                                bottomSheetConfig.value = BottomSheetConfig(
-                                    title = resources.getString(R.string.settings_score_format_desc),
-                                    options = ScoreFormat.entries.map { format ->
-                                        resources.getString(format.displayValue())
-                                    },
-                                    currentValue = resources.getString(settingsState.userSettings.scoreFormat.displayValue()),
-                                    onOptionClick = { selectedIndex ->
-                                        settingsViewModel.setScoreFormat(ScoreFormat.entries[selectedIndex])
-
-                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                            bottomSheetConfig.value = null
-                                        }
-                                    }
-                                )
-                            }
-                        ),
-                        SectionItem.Default(
                             title = stringResource(R.string.settings_track_mode),
                             displayValue = stringResource(settingsState.settings.trackMode.displayValue()),
                             onClick = {
@@ -310,6 +293,54 @@ fun SettingsScreen(
                         )
                     )
                 )
+
+                AnimatedVisibility(
+                    visible = settingsState.authType == AuthType.ANILIST
+                ) {
+                    SettingsSection(
+                        title = "Lists",
+                        items = listOf(
+                            SectionItem.Default(
+                                title = stringResource(R.string.settings_score_format),
+                                displayValue = stringResource(settingsState.userSettings.scoreFormat.displayValue()),
+                                onClick = {
+                                    bottomSheetConfig.value = BottomSheetConfig(
+                                        title = resources.getString(R.string.settings_score_format_desc),
+                                        options = ScoreFormat.entries.map { format ->
+                                            resources.getString(format.displayValue())
+                                        },
+                                        currentValue = resources.getString(settingsState.userSettings.scoreFormat.displayValue()),
+                                        onOptionClick = { selectedIndex ->
+                                            settingsViewModel.setScoreFormat(ScoreFormat.entries[selectedIndex])
+
+                                            scope.launch { sheetState.hide() }.invokeOnCompletion {
+                                                bottomSheetConfig.value = null
+                                            }
+                                        }
+                                    )
+                                }
+                            ),
+                            SectionItem.Default(
+                                title = stringResource(R.string.settings_custom_lists_label),
+                                displayValue = buildString {
+                                    append(stringResource(
+                                        R.string.media_custom_lists,
+                                        stringResource(MediaType.ANIME.displayValue())
+                                    ))
+                                    append(": ${settingsState.userSettings.customLists[MediaType.ANIME]?.size ?: 0}")
+                                    append(", ")
+                                    append(stringResource(
+                                        R.string.media_custom_lists,
+                                        stringResource(MediaType.ANIME.displayValue())
+                                    ))
+                                    append(": ${settingsState.userSettings.customLists[MediaType.MANGA]?.size ?: 0}")
+                                },
+                                onClick = { showCustomListsBottomSheet = true }
+                            )
+                        )
+                    )
+                }
+
                 SettingsSection(
                     title = stringResource(R.string.settings_data_section_title),
                     items = listOf(
@@ -336,6 +367,7 @@ fun SettingsScreen(
                         )
                     )
                 )
+
                 SettingsSection(
                     title = stringResource(R.string.media_type_manga),
                     items = listOf(
@@ -385,7 +417,7 @@ fun SettingsScreen(
             )
         }
 
-        if(showColorPickerBottomSheet) {
+        if (showColorPickerBottomSheet) {
             settingsState.themeSettings?.let { themeSettings ->
                 ColorPickerBottomSheet(
                     currentColor = themeSettings.primaryColor,
@@ -398,13 +430,29 @@ fun SettingsScreen(
             }
         }
 
-        if(showLanguagesBottomSheet) {
+        if (showLanguagesBottomSheet) {
             LanguagesBottomSheet(
                 initialLanguages = settingsState.chapterLanguages,
                 onSave = { languagesSet ->
                     settingsViewModel.setChapterLanguages(languagesSet)
                 },
                 onDismiss = { showLanguagesBottomSheet = false }
+            )
+        }
+
+        if (showCustomListsBottomSheet) {
+            val customMediaLists = remember(settingsState.userSettings.customLists) {
+                settingsState.userSettings.customLists.mapValues { (_, value) ->
+                    value.map { CustomList(listName = it) }
+                }
+            }
+
+            CustomListsBottomSheet(
+                customMediaLists = customMediaLists,
+                onSave = { lists ->
+                    settingsViewModel.updateCustomLists(lists)
+                },
+                onDismiss = { showCustomListsBottomSheet = false }
             )
         }
 

@@ -210,12 +210,4 @@ class TracksSearchViewModel @Inject constructor(
             )
         }
     }
-
-    fun clearFilters() {
-        _params.update { params ->
-            params.copy(
-                filters = TracksFilters()
-            )
-        }
-    }
 }

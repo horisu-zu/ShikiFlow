@@ -77,6 +77,7 @@ fun MediaFollowingsSection(
                 IconButton(
                     onClick = onMoreClick,
                     modifier = Modifier.size(24.dp),
+                    shape = RoundedCornerShape(percent = 24)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,

@@ -130,22 +130,20 @@ fun GenreBottomSheet(
                 CustomTextField(
                     textFieldState = textFieldState,
                     placeholder = {
-                        if(textFieldState.text.isEmpty()) {
-                            TextWithIcon(
-                                text = stringResource(
-                                    id = when(genreType) {
-                                        GenreType.GENRE -> R.string.browse_search_genre_search_label
-                                        GenreType.TAG -> R.string.browse_search_tag_search_label
-                                    }
-                                ),
-                                iconResources = listOf(
-                                    IconResource.Vector(imageVector = Icons.Default.Search)
-                                ),
-                                placeIconAtTheBeginning = true,
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        TextWithIcon(
+                            text = stringResource(
+                                id = when(genreType) {
+                                    GenreType.GENRE -> R.string.browse_search_genre_search_label
+                                    GenreType.TAG -> R.string.browse_search_tag_search_label
+                                }
+                            ),
+                            iconResources = listOf(
+                                IconResource.Vector(imageVector = Icons.Default.Search)
+                            ),
+                            placeIconAtTheBeginning = true,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     },
                     modifier = Modifier
                         .fillMaxWidth()

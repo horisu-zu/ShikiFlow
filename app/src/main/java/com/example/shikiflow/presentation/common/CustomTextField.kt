@@ -35,7 +35,9 @@ fun CustomTextField(
         inputTransformation = inputTransformation,
         decorator = { innerTextField ->
             Box {
-                placeholder()
+                if (textFieldState.text.isEmpty()) {
+                    placeholder()
+                }
 
                 innerTextField()
             }

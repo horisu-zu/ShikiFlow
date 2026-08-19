@@ -152,6 +152,7 @@ fun BrowseSearchBar(
                     },
                     leadingIcon = {
                         IconButton(
+                            shape = RoundedCornerShape(percent = 24),
                             onClick = {
                                 scope.launch {
                                     searchBarState.animateToCollapsed()

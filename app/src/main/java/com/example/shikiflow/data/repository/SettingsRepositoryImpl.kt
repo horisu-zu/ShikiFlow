@@ -32,6 +32,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.collections.component1
+import kotlin.collections.component2
 
 class SettingsRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
@@ -362,6 +364,21 @@ class SettingsRepositoryImpl @Inject constructor(
             } ?: AuthType.ANILIST
 
             preferences[userScoreFormat(currentAuthType)] = scoreFormat.name
+        }
+    }
+
+    override suspend fun saveCustomLists(lists: Map<MediaType, List<String>>) {
+        dataStore.edit { preferences ->
+            lists.forEach { (mediaType, lists) ->
+                val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                    AuthType.valueOf(authType)
+                } ?: AuthType.ANILIST
+
+                when (mediaType) {
+                    MediaType.ANIME -> preferences[userCustomAnimeLists(currentAuthType)] = lists.toSet()
+                    MediaType.MANGA -> preferences[userCustomMangaLists(currentAuthType)] = lists.toSet()
+                }
+            }
         }
     }
 

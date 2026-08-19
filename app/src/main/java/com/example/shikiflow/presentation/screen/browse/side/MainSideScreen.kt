@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
@@ -71,6 +72,7 @@ fun MainSideScreen(
                     },
                     navigationIcon = {
                         IconButton(
+                            shape = RoundedCornerShape(percent = 24),
                             onClick = { onBackNavigate() }
                         ) {
                             Icon(

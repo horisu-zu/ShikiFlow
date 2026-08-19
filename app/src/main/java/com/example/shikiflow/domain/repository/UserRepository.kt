@@ -103,4 +103,8 @@ interface UserRepository {
         preferredTitleType: PreferredTitleType? = null,
         scoreFormat: ScoreFormat? = null
     ): DataResult<UserSettings>
+
+    suspend fun updateCustomLists(
+        customLists: Map<MediaType, List<String>>
+    ): DataResult<Map<MediaType, List<String>>>
 }

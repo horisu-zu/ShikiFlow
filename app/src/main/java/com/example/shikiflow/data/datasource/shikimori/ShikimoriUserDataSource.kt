@@ -372,4 +372,8 @@ class ShikimoriUserDataSource @Inject constructor(
     ): DataResult<UserSettings> {
         TODO("AniList API only")
     }
+
+    override suspend fun updateCustomLists(customLists: Map<MediaType, List<String>>): DataResult<Map<MediaType, List<String>>> {
+        TODO("AniList API only")
+    }
 }

@@ -200,17 +200,15 @@ private fun TitleSearchComponent(
     CustomTextField(
         textFieldState = textFieldState,
         placeholder = {
-            if(textFieldState.text.isEmpty()) {
-                TextWithIcon(
-                    text = stringResource(R.string.compare_title_search_label),
-                    iconResources = listOf(
-                        IconResource.Vector(imageVector = Icons.Default.Search)
-                    ),
-                    placeIconAtTheBeginning = true,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
+            TextWithIcon(
+                text = stringResource(R.string.compare_title_search_label),
+                iconResources = listOf(
+                    IconResource.Vector(imageVector = Icons.Default.Search)
+                ),
+                placeIconAtTheBeginning = true,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         },
         modifier = modifier
             .clip(RoundedCornerShape(percent = 16))

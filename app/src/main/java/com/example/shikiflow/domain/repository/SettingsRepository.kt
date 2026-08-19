@@ -53,6 +53,7 @@ interface SettingsRepository {
     suspend fun saveChapterLanguages(chapterLanguages: Set<String>)
     suspend fun savePreferredTitleType(preferredType: PreferredTitleType)
     suspend fun saveScoreFormat(scoreFormat: ScoreFormat)
+    suspend fun saveCustomLists(lists: Map<MediaType, List<String>>)
 
     suspend fun clearUserData()
     suspend fun clearUserData(authType: AuthType)

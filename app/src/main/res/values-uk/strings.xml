@@ -55,6 +55,7 @@
     <string name="media_type_anime">Аніме</string>
     <string name="media_type_manga">Манґа</string>
 
+    <string name="media_custom_lists">%1s-списки</string>
     <string name="details_error">Помилка завантаження медіа-деталей</string>
 
     <string name="error_image">Помилка завантаження зображення</string>
@@ -65,6 +66,7 @@
 
     <string name="common_default">За замовчуванням</string>
     <string name="common_confirm">Підтвердити</string>
+    <string name="common_add">Додати</string>
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
         оскільки синхронізація оновлень відбувається за ідентифікатором MAL,
@@ -115,6 +117,8 @@
     </string>
 
     <string name="settings_log_out">Вийти з аккаунту</string>
+    <string name="settings_custom_lists_label">Кастомні списки</string>
+
     <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>
     <string name="color_picker_bottom_sheet_save">Застосувати</string>
     <string name="next_episode">"Наступний епізод в "</string>

@@ -26,8 +26,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 
@@ -45,9 +45,7 @@ fun <T> ChipWithMenu(
     trailingIcon: @Composable (() -> Unit)? = null
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val windowHeight = with(LocalDensity.current) {
-        LocalWindowInfo.current.containerSize.height.toDp()
-    }
+    val windowSize = LocalWindowInfo.current.containerDpSize
 
     Box(
         modifier = modifier.wrapContentSize(Alignment.TopStart)
@@ -70,7 +68,10 @@ fun <T> ChipWithMenu(
         DropdownMenuPopup(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.requiredSizeIn(maxHeight = windowHeight / 2)
+            modifier = Modifier.requiredSizeIn(
+                maxHeight = windowSize.height / 2,
+                maxWidth = windowSize.width / 2
+            )
         ) {
             DropdownMenuGroup(
                 shapes = MenuDefaults.groupShapes(),
@@ -85,7 +86,9 @@ fun <T> ChipWithMenu(
                         },
                         text = {
                             Text(
-                                text = itemLabel(item)
+                                text = itemLabel(item),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         },
                         shapes = MenuDefaults.itemShape(index, values.size),
