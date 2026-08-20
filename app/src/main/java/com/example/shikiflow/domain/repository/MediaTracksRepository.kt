@@ -31,7 +31,8 @@ interface MediaTracksRepository {
         userRateStatus: UserRateStatus?,
         sort: Sort<UserRateType>,
         genres: List<Genre> = emptyList(),
-        tags: List<MediaTagEnum> = emptyList()
+        tags: List<MediaTagEnum> = emptyList(),
+        customLists: List<String> = emptyList()
     ): Flow<PagingData<MediaTrack>>
 
     suspend fun getShortUserMediaRates(

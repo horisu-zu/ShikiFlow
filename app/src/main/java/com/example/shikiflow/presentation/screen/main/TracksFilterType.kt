@@ -7,7 +7,8 @@ import com.example.shikiflow.utils.IconResource
 enum class TracksFilterType {
     SORT,
     GENRES,
-    TAGS;
+    TAGS,
+    CUSTOM_LISTS;
 
     companion object {
         fun TracksFilterType.displayValue(): Int {
@@ -15,6 +16,7 @@ enum class TracksFilterType {
                 SORT -> R.string.browse_search_label_sort_by
                 GENRES -> R.string.browse_search_label_genre
                 TAGS -> R.string.browse_search_label_tag
+                CUSTOM_LISTS -> R.string.settings_custom_lists_label
             }
         }
 
@@ -23,6 +25,7 @@ enum class TracksFilterType {
                 SORT -> IconResource.Drawable(resId = R.drawable.ic_sort_vertical)
                 GENRES -> IconResource.Drawable(resId = R.drawable.ic_masks)
                 TAGS -> IconResource.Drawable(resId = R.drawable.ic_hashtag)
+                CUSTOM_LISTS -> IconResource.Drawable(resId = R.drawable.ic_format_list)
             }
         }
 

@@ -29,4 +29,16 @@ data class TracksFilters(
     val currentFilterType: TracksFilterType = TracksFilterType.SORT,
     val genres: List<Genre> = emptyList(),
     val tags: List<MediaTagEnum> = emptyList(),
-)
+    val customLists: Map<MediaType, List<String>> = emptyMap()
+) {
+    companion object {
+        fun TracksFilters.isDefaultValue(): Boolean {
+            val filters = TracksFilters()
+
+            return query == filters.query &&
+                    genres == filters.genres &&
+                    tags == filters.tags &&
+                    customLists == filters.customLists
+        }
+    }
+}

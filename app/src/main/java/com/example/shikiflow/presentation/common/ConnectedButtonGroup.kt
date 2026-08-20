@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ButtonGroupDefaults
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -24,6 +25,7 @@ import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.example.shikiflow.utils.toIcon
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -64,6 +66,62 @@ fun <T> ConnectedButtonGroup(
                 modifier = Modifier
                     .weight(1f)
                     .semantics { role = Role.RadioButton }
+            ) {
+                item.iconResource?.toIcon(
+                    modifier = Modifier.size(iconSize)
+                )
+
+                if(showText && item.titleRes != null) {
+                    Spacer(Modifier.size(ToggleButtonDefaults.IconSpacing))
+
+                    Text(
+                        text = stringResource(id = item.titleRes),
+                        style = textStyle,
+                        maxLines = 1
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun <T> ScrollableConnectedButtonGroup(
+    items: List<TabRowItem<T>>,
+    selectedIndex: Int,
+    onItemSelection: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    paddingValues: PaddingValues = PaddingValues(0.dp),
+    showText: Boolean = false,
+    enabled: Boolean = true,
+    textStyle: TextStyle = MaterialTheme.typography.bodyMedium,
+    iconSize: Dp = IconButtonDefaults.smallIconSize,
+    contentPadding: PaddingValues = ButtonDefaults.ExtraSmallContentPadding
+) {
+    SnapFlingLazyRow(
+        modifier = modifier,
+        contentPadding = paddingValues,
+        horizontalArrangement = Arrangement.spacedBy(ButtonGroupDefaults.ConnectedSpaceBetween)
+    ) {
+        itemsIndexed(items) { index, item ->
+            ToggleButton(
+                checked = selectedIndex == index,
+                onCheckedChange = { onItemSelection(index) },
+                enabled = enabled,
+                shapes = when {
+                    items.size == 1 -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                    index == 0 -> ButtonGroupDefaults.connectedLeadingButtonShapes()
+                    index == items.size - 1 -> ButtonGroupDefaults.connectedTrailingButtonShapes()
+                    else -> ButtonGroupDefaults.connectedMiddleButtonShapes()
+                },
+                contentPadding = contentPadding,
+                colors = ToggleButtonDefaults.toggleButtonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    checkedContainerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                    checkedContentColor = MaterialTheme.colorScheme.onPrimary
+                ),
+                modifier = Modifier.semantics { role = Role.RadioButton }
             ) {
                 item.iconResource?.toIcon(
                     modifier = Modifier.size(iconSize)

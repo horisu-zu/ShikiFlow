@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.main
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,12 +20,15 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -61,6 +65,7 @@ import com.example.shikiflow.presentation.common.SortConfig
 import com.example.shikiflow.presentation.common.TracksSortBottomSheet
 import com.example.shikiflow.presentation.common.UserRateBottomSheet
 import com.example.shikiflow.presentation.common.mappers.UserRateStatusMapper.mapStatus
+import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksFilters.Companion.isDefaultValue
 import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksSearchViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
@@ -72,6 +77,7 @@ fun TracksSearchBarComponent(
     text: String,
     mediaType: MediaType,
     onMediaClick: (MediaType, Int) -> Unit,
+    onClear: () -> Unit,
     modifier: Modifier = Modifier,
     tracksViewModel: TracksSearchViewModel = hiltViewModel()
 ) {
@@ -115,15 +121,41 @@ fun TracksSearchBarComponent(
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showBottomSheet = true },
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_sort),
-                    contentDescription = "Show Sort Bottom Sheet"
-                )
+                AnimatedVisibility(
+                    visible = !tracksParams.filters.isDefaultValue()
+                ) {
+                    IconButton(
+                        shape = RoundedCornerShape(percent = 24),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        onClick = {
+                            onClear()
+                            tracksViewModel.clearFilters()
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear Filters"
+                        )
+                    }
+                }
+
+                FloatingActionButton(
+                    onClick = { showBottomSheet = true },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_sort),
+                        contentDescription = "Show Sort Bottom Sheet"
+                    )
+                }
             }
         },
         modifier = modifier
@@ -173,6 +205,7 @@ fun TracksSearchBarComponent(
                     )
                 }
             }
+
             if(trackItems.loadState.refresh is LoadState.Error) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -291,7 +324,8 @@ fun TracksSearchBarComponent(
                 if(showBottomSheet && tracksParams.authType != null) {
                     TracksSortBottomSheet(
                         authType = tracksParams.authType!!,
-                        filterType = tracksParams.filters.currentFilterType,
+                        tracksFilters = tracksParams.filters,
+                        customLists = tracksParams.customLists[mediaType] ?: emptyList(),
                         config = SortConfig(
                             options = UserRateType.entries,
                             selected = tracksParams.filters.sort,
@@ -299,8 +333,6 @@ fun TracksSearchBarComponent(
                                 tracksViewModel.setSort(userRateSort)
                             }
                         ),
-                        selectedGenres = tracksParams.filters.genres,
-                        selectedTags = tracksParams.filters.tags,
                         onDismiss = { showBottomSheet = false },
                         onFilterTypeChange = { filterType ->
                             tracksViewModel.setFilterType(filterType)
@@ -310,6 +342,9 @@ fun TracksSearchBarComponent(
                         },
                         onTagChange = { tag ->
                             tracksViewModel.setTag(tag)
+                        },
+                        onCustomListChange = { list ->
+                            tracksViewModel.setCustomList(list)
                         }
                     )
                 }

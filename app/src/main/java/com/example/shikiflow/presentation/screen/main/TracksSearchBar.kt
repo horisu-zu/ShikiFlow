@@ -224,7 +224,8 @@ fun TracksSearchBar(
                 }
 
                 mainNavOptions.navigateToDetails(detailsNavRoute)
-            }
+            },
+            onClear = { textFieldState.clearText() }
         )
     }
 }

@@ -133,9 +133,12 @@ class MediaTracksRepositoryImpl @Inject constructor(
         userRateStatus: UserRateStatus?,
         sort: Sort<UserRateType>,
         genres: List<Genre>,
-        tags: List<MediaTagEnum>
+        tags: List<MediaTagEnum>,
+        customLists: List<String>
     ): Flow<PagingData<MediaTrack>> {
         val mediaShortPrefix = "media_short"
+        val mediaTrackPrefix = "media_track"
+
         val column = when (sort.type) {
             UserRateType.ID -> "$mediaShortPrefix.id"
             UserRateType.ADDED_AT -> "createdAt"
@@ -149,7 +152,7 @@ class MediaTracksRepositoryImpl @Inject constructor(
         }
         val sortOption = "$column $direction"
 
-        val whereStatus = if (userRateStatus != null) "AND media_track.status = ?" else ""
+        val whereStatus = if (userRateStatus != null) "AND $mediaTrackPrefix.status = ?" else ""
         val whereTitle  = if (title.isNotBlank()) "AND (name LIKE ? OR synonyms LIKE ?)" else ""
         val whereGenres = if (genres.isNotEmpty()) {
             "AND (" + genres.joinToString(" OR ") {
@@ -161,16 +164,22 @@ class MediaTracksRepositoryImpl @Inject constructor(
                 "$mediaShortPrefix.tags LIKE ?"
             } + ")"
         } else ""
+        val whereLists = if (customLists.isNotEmpty()) {
+            "AND (" + customLists.joinToString(" OR ") {
+                "$mediaTrackPrefix.customLists LIKE ?"
+            }  + ")"
+        } else ""
 
         val query = RoomRawQuery(
             sql = """
-                SELECT * FROM media_track
-                INNER JOIN $mediaShortPrefix ON media_track.mediaId = $mediaShortPrefix.id
+                SELECT * FROM $mediaTrackPrefix
+                INNER JOIN $mediaShortPrefix ON $mediaTrackPrefix.mediaId = $mediaShortPrefix.id
                 WHERE $mediaShortPrefix.mediaType = ?
                 $whereStatus
                 $whereTitle
                 $whereGenres
                 $whereTags
+                $whereLists
                 ORDER BY $sortOption
             """.trimIndent(),
             onBindStatement = { stmt ->
@@ -179,9 +188,9 @@ class MediaTracksRepositoryImpl @Inject constructor(
                 stmt.bindText(++index, mediaType.name)
                 if (userRateStatus != null) stmt.bindText(++index, userRateStatus.name)
                 if (title.isNotBlank()) {
-                    val like = "%$title%"
-                    stmt.bindText(++index, like)
-                    stmt.bindText(++index, like)
+                    repeat(2) {
+                        stmt.bindText(++index, "%$title%")
+                    }
                 }
                 if (genres.isNotEmpty()) {
                     genres.forEach { genre ->
@@ -191,6 +200,11 @@ class MediaTracksRepositoryImpl @Inject constructor(
                 if (tags.isNotEmpty()) {
                     tags.forEach { tag ->
                         stmt.bindText(++index, "%${tag.name}%")
+                    }
+                }
+                if (customLists.isNotEmpty()) {
+                    customLists.forEach { list ->
+                        stmt.bindText(++index, "%$list%")
                     }
                 }
             }

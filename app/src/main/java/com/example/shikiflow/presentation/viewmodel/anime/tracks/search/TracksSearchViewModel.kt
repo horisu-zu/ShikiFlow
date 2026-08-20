@@ -80,7 +80,8 @@ class TracksSearchViewModel @Inject constructor(
                 userRateStatus = filters.userRateStatus,
                 sort = filters.sort,
                 genres = filters.genres,
-                tags = filters.tags
+                tags = filters.tags,
+                customLists = filters.customLists[filters.mediaType] ?: emptyList()
             )
         }.cachedIn(viewModelScope)
 
@@ -191,6 +192,21 @@ class TracksSearchViewModel @Inject constructor(
         }
     }
 
+    fun setCustomList(list: String) {
+        _params.update { params ->
+            val mediaType = params.filters.mediaType ?: return@update params
+
+            val currentLists = params.filters.customLists[mediaType].orEmpty()
+            val updatedLists = if (list in currentLists) currentLists - list else currentLists + list
+
+            params.copy(
+                filters = params.filters.copy(
+                    customLists = params.filters.customLists + (mediaType to updatedLists)
+                )
+            )
+        }
+    }
+
     fun setFilterType(filterType: TracksFilterType) {
         _params.update { params ->
             params.copy(
@@ -206,6 +222,17 @@ class TracksSearchViewModel @Inject constructor(
             params.copy(
                 filters = params.filters.copy(
                     query = newQuery
+                )
+            )
+        }
+    }
+
+    fun clearFilters() {
+        _params.update { params ->
+            params.copy(
+                filters = TracksFilters(
+                    mediaType = params.filters.mediaType,
+                    currentFilterType = params.filters.currentFilterType
                 )
             )
         }

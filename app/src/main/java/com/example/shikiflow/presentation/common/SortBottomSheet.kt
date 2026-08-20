@@ -10,12 +10,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.material.icons.Icons
@@ -51,6 +54,7 @@ import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.TracksFilterType
 import com.example.shikiflow.presentation.screen.main.TracksFilterType.Companion.tabRowItem
+import com.example.shikiflow.presentation.viewmodel.anime.tracks.search.TracksFilters
 import com.example.shikiflow.utils.IconResource
 
 data class SortConfig<T : SortType>(
@@ -86,15 +90,16 @@ fun <T : SortType> SortBottomSheet(
 @Composable
 fun TracksSortBottomSheet(
     authType: AuthType,
-    filterType: TracksFilterType,
+    tracksFilters: TracksFilters,
+    customLists: List<String>,
     config: SortConfig<UserRateType>,
-    selectedGenres: List<Genre>,
-    selectedTags: List<MediaTagEnum>,
     onFilterTypeChange: (TracksFilterType) -> Unit,
     onGenreChange: (Genre) -> Unit,
     onTagChange: (MediaTagEnum) -> Unit,
+    onCustomListChange: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
+    val horizontalPadding = 16.dp
     val sheetState = rememberBottomSheetState(
         initialValue = SheetValue.Hidden,
         enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
@@ -106,27 +111,34 @@ fun TracksSortBottomSheet(
         onDismissRequest = { onDismiss() }
     ) {
         Column(
-            modifier = Modifier
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .animateContentSize(),
+            modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
-            ConnectedButtonGroup(
-                items = TracksFilterType.entries.map { filterType ->
+            ScrollableConnectedButtonGroup(
+                items = TracksFilterType.entries.filter { type ->
+                    if (authType == AuthType.SHIKIMORI) {
+                        type != TracksFilterType.CUSTOM_LISTS
+                    } else true
+                }. map { filterType ->
                     filterType.tabRowItem()
                 },
-                selectedIndex = filterType.ordinal,
+                selectedIndex = tracksFilters.currentFilterType.ordinal,
                 onItemSelection = { index ->
                     onFilterTypeChange(TracksFilterType.entries[index])
                 },
                 showText = true,
                 textStyle = MaterialTheme.typography.bodySmall,
-                iconSize = IconButtonDefaults.extraSmallIconSize
+                iconSize = IconButtonDefaults.extraSmallIconSize,
+                paddingValues = PaddingValues(horizontal = horizontalPadding),
+                modifier = Modifier
+                    .ignoreHorizontalParentPadding(horizontalPadding)
+                    .fillMaxWidth()
             )
 
             AnimatedContent(
-                targetState = filterType,
-                transitionSpec = { fadeIn() togetherWith fadeOut() }
+                targetState = tracksFilters.currentFilterType,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                modifier = Modifier.animateContentSize()
             ) { filterType ->
                 when(filterType) {
                     TracksFilterType.SORT -> {
@@ -135,15 +147,23 @@ fun TracksSortBottomSheet(
                     TracksFilterType.GENRES -> {
                         GenresFilterComponent(
                             authType = authType,
-                            selectedGenres = selectedGenres,
+                            selectedGenres = tracksFilters.genres,
                             onGenreClick = onGenreChange
                         )
                     }
                     TracksFilterType.TAGS -> {
                         TagsFilterComponent(
                             authType = authType,
-                            selectedTags = selectedTags,
+                            selectedTags = tracksFilters.tags,
                             onTagClick = onTagChange
+                        )
+                    }
+                    TracksFilterType.CUSTOM_LISTS -> {
+                        CustomListBottomSheet(
+                            customLists = customLists,
+                            selectedLists = tracksFilters.customLists[tracksFilters.mediaType] ?: emptyList(),
+                            onListClick = onCustomListChange,
+                            modifier = Modifier.fillMaxWidth()
                         )
                     }
                 }
@@ -306,6 +326,28 @@ fun TagsFilterComponent(
                 label = stringResource(tag.displayValue()),
                 isSelected = selectedTags.contains(tag),
                 onToggle = { onTagClick(tag) },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+}
+
+@Composable
+private fun CustomListBottomSheet(
+    customLists: List<String>,
+    selectedLists: List<String>,
+    onListClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
+    ) {
+        items(customLists) { list ->
+            CheckboxItem(
+                label = list,
+                isSelected = selectedLists.contains(list),
+                onToggle = { onListClick(list) },
                 modifier = Modifier.fillMaxWidth()
             )
         }
