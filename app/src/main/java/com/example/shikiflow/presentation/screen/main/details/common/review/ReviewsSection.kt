@@ -74,6 +74,7 @@ fun ReviewsSection(
             TextWithDivider(
                 text = stringResource(R.string.details_reviews_section_label)
             )
+
             if(reviewsList.hasNextPage) {
                 IconButton(
                     shape = RoundedCornerShape(percent = 24),
@@ -142,6 +143,7 @@ fun ReviewShortItem(
                         width = 24.dp
                     )
                 )
+
                 Text(
                     text = review.author.nickname,
                     style = MaterialTheme.typography.labelMedium.copy(
@@ -152,6 +154,7 @@ fun ReviewShortItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
+
             ReviewStatsItem(
                 score = review.score,
                 likesCount = review.likesCount,

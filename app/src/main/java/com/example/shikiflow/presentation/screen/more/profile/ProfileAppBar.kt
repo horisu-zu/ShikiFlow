@@ -121,6 +121,7 @@ fun ProfileAppBar(
                             .weight(1f, fill = false)
                             .align(Alignment.Bottom)
                     )
+
                     if(isCurrentUser) {
                         Row(
                             modifier = Modifier.align(Alignment.Top),
@@ -138,7 +139,9 @@ fun ProfileAppBar(
                                     contentDescription = "Settings"
                                 )
                             }
+
                             IconButton(
+                                shape = RoundedCornerShape(percent = 24),
                                 onClick = { navOptions.navigateToAbout() },
                                 colors = IconButtonDefaults.iconButtonColors(
                                     containerColor = backgroundColor.copy(alpha = 0.35f)

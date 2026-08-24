@@ -30,8 +30,11 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfoV2
 import androidx.compose.material3.rememberBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +52,7 @@ import com.example.shikiflow.domain.model.sort.Sort
 import com.example.shikiflow.domain.model.sort.SortDirection
 import com.example.shikiflow.domain.model.sort.SortType
 import com.example.shikiflow.domain.model.sort.UserRateType
+import com.example.shikiflow.presentation.WindowSize
 import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SortMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.TagMapper.displayValue
@@ -100,10 +104,17 @@ fun TracksSortBottomSheet(
     onDismiss: () -> Unit
 ) {
     val horizontalPadding = 16.dp
+    val windowSizeClass = currentWindowAdaptiveInfoV2().windowSizeClass
+
     val sheetState = rememberBottomSheetState(
         initialValue = SheetValue.Hidden,
         enabledValues = setOf(SheetValue.Hidden, SheetValue.Expanded)
     )
+    val windowSize by remember(windowSizeClass) {
+        derivedStateOf {
+            WindowSize.from(windowSizeClass)
+        }
+    }
 
     ModalBottomSheet(
         sheetState = sheetState,
@@ -114,26 +125,44 @@ fun TracksSortBottomSheet(
             modifier = Modifier.padding(horizontal = horizontalPadding, vertical = 12.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.Top)
         ) {
-            ScrollableConnectedButtonGroup(
-                items = TracksFilterType.entries.filter { type ->
-                    if (authType == AuthType.SHIKIMORI) {
-                        type != TracksFilterType.CUSTOM_LISTS
-                    } else true
-                }. map { filterType ->
-                    filterType.tabRowItem()
-                },
-                selectedIndex = tracksFilters.currentFilterType.ordinal,
-                onItemSelection = { index ->
-                    onFilterTypeChange(TracksFilterType.entries[index])
-                },
-                showText = true,
-                textStyle = MaterialTheme.typography.bodySmall,
-                iconSize = IconButtonDefaults.extraSmallIconSize,
-                paddingValues = PaddingValues(horizontal = horizontalPadding),
-                modifier = Modifier
-                    .ignoreHorizontalParentPadding(horizontalPadding)
-                    .fillMaxWidth()
-            )
+            when (windowSize != WindowSize.COMPACT || authType == AuthType.SHIKIMORI) {
+                true -> {
+                    ConnectedButtonGroup(
+                        items = TracksFilterType.entries.filter { type ->
+                            if (authType == AuthType.SHIKIMORI) {
+                                type != TracksFilterType.CUSTOM_LISTS
+                            } else true
+                        }.map { filterType ->
+                            filterType.tabRowItem()
+                        },
+                        selectedIndex = tracksFilters.currentFilterType.ordinal,
+                        onItemSelection = { index ->
+                            onFilterTypeChange(TracksFilterType.entries[index])
+                        },
+                        showText = true,
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        iconSize = IconButtonDefaults.extraSmallIconSize,
+                    )
+                }
+                false -> {
+                    ScrollableConnectedButtonGroup(
+                        items = TracksFilterType.entries.map { filterType ->
+                            filterType.tabRowItem()
+                        },
+                        selectedIndex = tracksFilters.currentFilterType.ordinal,
+                        onItemSelection = { index ->
+                            onFilterTypeChange(TracksFilterType.entries[index])
+                        },
+                        showText = true,
+                        textStyle = MaterialTheme.typography.bodySmall,
+                        iconSize = IconButtonDefaults.extraSmallIconSize,
+                        paddingValues = PaddingValues(horizontal = horizontalPadding),
+                        modifier = Modifier
+                            .ignoreHorizontalParentPadding(horizontalPadding)
+                            .fillMaxWidth()
+                    )
+                }
+            }
 
             AnimatedContent(
                 targetState = tracksFilters.currentFilterType,

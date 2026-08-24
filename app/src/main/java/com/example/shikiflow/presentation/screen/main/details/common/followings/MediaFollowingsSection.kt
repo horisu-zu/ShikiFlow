@@ -114,7 +114,7 @@ fun MediaFollowingItem(
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(percent = 16))
-            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
         verticalAlignment = Alignment.CenterVertically
@@ -144,13 +144,7 @@ fun MediaFollowingItem(
             if(score != 0.0f) {
                 TextWithIcon(
                     text = buildString {
-                        append(
-                            when(mediaFollowing.scoreFormat) {
-                                ScoreFormat.POINT_10_DECIMAL -> score
-                                ScoreFormat.POINT_3 -> mediaFollowing.scoreFormat.displayValue(score)
-                                else -> score.toInt()
-                            }
-                        )
+                        append(mediaFollowing.scoreFormat.displayValue(score))
                         if(mediaFollowing.scoreFormat != ScoreFormat.POINT_3) {
                             append(" / ")
                             append(mediaFollowing.scoreFormat.maxValue())
@@ -178,7 +172,7 @@ private fun FollowingUserItem(
         Row(
             modifier = Modifier
                 .offset((-6).dp)
-                .clip(RoundedCornerShape(percent = 32))
+                .clip(RoundedCornerShape(percent = 24))
                 .clickable { onUserClick() }
                 .padding(horizontal = 6.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
