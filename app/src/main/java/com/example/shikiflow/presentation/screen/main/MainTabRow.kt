@@ -52,7 +52,8 @@ fun MainTabRow(
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
                     )
-                }, modifier = Modifier.clip(RoundedCornerShape(8.dp))
+                },
+                modifier = Modifier.clip(RoundedCornerShape(8.dp))
             )
         }
     }

@@ -46,6 +46,7 @@ fun MainPage(
             },
             isAtTop = isScrolling
         )
+
         HorizontalPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),

@@ -120,6 +120,7 @@
     <string name="settings_tracker_services_display">Connect your existing account to update tracks on all services at once</string>
     <string name="settings_switch_account">Switch Account</string>
     <string name="settings_log_out">Log Out</string>
+    <string name="settings_lists_label">Lists</string>
     <string name="settings_custom_lists_label">Custom Lists</string>
 
     <string name="color_picker_bottom_sheet_system_label">Use System Wallpaper Color</string>

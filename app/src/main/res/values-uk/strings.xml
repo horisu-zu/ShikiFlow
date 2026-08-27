@@ -117,6 +117,7 @@
     </string>
 
     <string name="settings_log_out">Вийти з аккаунту</string>
+    <string name="settings_lists_label">Списки</string>
     <string name="settings_custom_lists_label">Кастомні списки</string>
 
     <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>

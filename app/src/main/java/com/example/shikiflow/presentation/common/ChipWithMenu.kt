@@ -10,7 +10,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
@@ -18,6 +17,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -78,9 +78,9 @@ fun <T> ChipWithMenu(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 values.fastForEachIndexed { index, item ->
-                    DropdownMenuItem(
-                        checked = selectedValue == item,
-                        onCheckedChange = {
+                    SelectableDropdownMenuItem(
+                        selected = selectedValue == item,
+                        onClick = {
                             onValueSelected(item)
                             expanded = false
                         },
@@ -97,7 +97,7 @@ fun <T> ChipWithMenu(
                             selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
-                        checkedLeadingIcon = {
+                        selectedLeadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = null,

@@ -47,7 +47,6 @@ import com.example.shikiflow.utils.LocaleUtils.getAvailableLocales
 import com.example.shikiflow.utils.ThemeMode
 import com.example.shikiflow.utils.ThemeMode.Companion.isDarkTheme
 import com.example.shikiflow.utils.WebIntent.openActionView
-import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,6 +62,7 @@ fun SettingsScreen(
     var showColorPickerBottomSheet by remember { mutableStateOf(false) }
     var showLanguagesBottomSheet by remember { mutableStateOf(false) }
     var showCustomListsBottomSheet by remember { mutableStateOf(false) }
+    var showPaletteStyleBottomSheet by remember { mutableStateOf(false) }
 
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
@@ -165,19 +165,7 @@ fun SettingsScreen(
                             title = stringResource(R.string.settings_palette_style_label),
                             displayValue = themeSettings.paletteStyle.name,
                             isVisible = themeSettings.isDynamicThemeEnabled,
-                            onClick = {
-                                bottomSheetConfig.value = BottomSheetConfig(
-                                    title = resources.getString(R.string.settings_palette_style_bottom_title),
-                                    options = PaletteStyle.entries.map { it.name },
-                                    currentValue = themeSettings.paletteStyle.name,
-                                    onOptionClick = { selectedIndex ->
-                                        settingsViewModel.setPaletteStyle(PaletteStyle.entries[selectedIndex])
-                                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                                            bottomSheetConfig.value = null
-                                        }
-                                    }
-                                )
-                            }
+                            onClick = { showPaletteStyleBottomSheet = true }
                         ),
                         SectionItem.Mode(
                             title = stringResource(R.string.settings_app_theme_label),
@@ -298,7 +286,7 @@ fun SettingsScreen(
                     visible = settingsState.authType == AuthType.ANILIST
                 ) {
                     SettingsSection(
-                        title = "Lists",
+                        title = stringResource(R.string.settings_lists_label),
                         items = listOf(
                             SectionItem.Default(
                                 title = stringResource(R.string.settings_score_format),
@@ -454,6 +442,18 @@ fun SettingsScreen(
                 },
                 onDismiss = { showCustomListsBottomSheet = false }
             )
+        }
+
+        if (showPaletteStyleBottomSheet) {
+            settingsState.themeSettings?.let { themeSettings ->
+                PaletteStyleBottomSheet(
+                    themeSettings = themeSettings,
+                    onStyleChange = { paletteStyle ->
+                        settingsViewModel.setPaletteStyle(paletteStyle)
+                    },
+                    onDismiss = { showPaletteStyleBottomSheet = false }
+                )
+            }
         }
 
         selectedTracker?.let { authType ->

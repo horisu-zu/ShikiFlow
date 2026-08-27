@@ -89,6 +89,7 @@ fun SettingsBottomSheet(
                 text = title,
                 style = MaterialTheme.typography.titleMedium
             )
+
             options.forEachIndexed { index, value ->
                 Row(
                     modifier = Modifier
@@ -104,6 +105,7 @@ fun SettingsBottomSheet(
                         selected = (value == currentValue),
                         onClick = { onOptionClick(index) }
                     )
+
                     Text(
                         text = value,
                         style = MaterialTheme.typography.bodyMedium

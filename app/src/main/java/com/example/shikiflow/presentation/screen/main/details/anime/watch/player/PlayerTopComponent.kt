@@ -16,13 +16,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.DropdownMenuGroup
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.DropdownMenuPopup
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.SelectableDropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -177,9 +177,9 @@ private fun EpisodeDropdown(
                 modifier = Modifier.verticalScroll(scrollState)
             ) {
                 values.fastForEachIndexed { index, item ->
-                    DropdownMenuItem(
-                        checked = selectedValue == item,
-                        onCheckedChange = {
+                    SelectableDropdownMenuItem(
+                        selected = selectedValue == item,
+                        onClick = {
                             onValueChange(item)
                             expanded = false
                         },
@@ -194,7 +194,7 @@ private fun EpisodeDropdown(
                             selectedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
                             selectedLeadingIconColor = MaterialTheme.colorScheme.onSecondaryContainer
                         ),
-                        checkedLeadingIcon = {
+                        selectedLeadingIcon = {
                             Icon(
                                 imageVector = Icons.Default.Done,
                                 contentDescription = null,

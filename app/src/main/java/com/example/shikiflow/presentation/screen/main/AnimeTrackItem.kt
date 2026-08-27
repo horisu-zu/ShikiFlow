@@ -65,8 +65,7 @@ fun AnimeTrackItem(
     ) {
         BaseImage(
             model = userRate.shortData.poster?.originalUrl,
-            contentDescription = "Poster",
-            modifier = Modifier.width(96.dp)
+            contentDescription = "Poster"
         )
 
         Column(
