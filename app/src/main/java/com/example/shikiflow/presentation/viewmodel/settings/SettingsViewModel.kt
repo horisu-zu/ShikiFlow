@@ -86,6 +86,10 @@ class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
+    fun syncTracks(userId: Int) {
+        mediaTracksScheduler.scheduleOneTimeSync(userId, applyDelay = false)
+    }
+
     fun getAuthorizationUrl(authType: AuthType): String {
         return authRepository.getAuthorizationUrl(authType)
     }

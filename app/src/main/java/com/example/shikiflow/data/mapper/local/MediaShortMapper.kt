@@ -171,7 +171,7 @@ object MediaShortMapper {
         totalCount = episodes ?: chapters ?: 0,
         currentProgress = nextAiringEpisode?.episode?.minus(1),
         volumes = volumes,
-        nextEpisodeAt =  nextAiringEpisode?.let { Instant.fromEpochMilliseconds(it.airingAt.toLong()) },
+        nextEpisodeAt = nextAiringEpisode?.let { Instant.fromEpochSeconds(it.airingAt.toLong()) },
         duration = duration,
         airedOn = startDate?.date?.toDomain(),
         releasedOn = endDate?.date?.toDomain(),

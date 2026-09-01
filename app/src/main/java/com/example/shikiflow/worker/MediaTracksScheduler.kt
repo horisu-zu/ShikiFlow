@@ -24,12 +24,15 @@ class MediaTracksScheduler @Inject constructor(
     companion object {
         private const val ONE_TIME_WORK_NAME = "MediaTracksLibraryOneTime"
         private const val PERIODIC_WORK_NAME = "MediaTracksLibrary"
-        private const val ONE_TIME_BACKOFF_DELAY = 15 * 1000L //15 seconds
+        private const val ONE_TIME_BACKOFF_DELAY = 15 * 1000L
     }
 
     private val workManager by lazy { WorkManager.getInstance(context) }
 
-    fun scheduleOneTimeSync(userId: Int) {
+    fun scheduleOneTimeSync(
+        userId: Int,
+        applyDelay: Boolean = true
+    ) {
         val networkConstraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -41,7 +44,13 @@ class MediaTracksScheduler @Inject constructor(
                 )
             )
             .setConstraints(networkConstraints)
-            .setInitialDelay(5000L, TimeUnit.MILLISECONDS)
+            .setInitialDelay(
+                duration = when (applyDelay) {
+                    true -> 3000L
+                    false -> 0L
+                },
+                timeUnit = TimeUnit.MILLISECONDS
+            )
             .setBackoffCriteria(BackoffPolicy.LINEAR, ONE_TIME_BACKOFF_DELAY, TimeUnit.MILLISECONDS)
             .build()
 

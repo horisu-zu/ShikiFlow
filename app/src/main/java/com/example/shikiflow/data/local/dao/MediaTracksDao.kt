@@ -28,7 +28,7 @@ interface MediaTracksDao {
     suspend fun insertTrack(track: MediaTrackEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertShortEntity(anime: MediaShortEntity)
+    suspend fun insertShortEntity(media: MediaShortEntity)
 
     @Query("""
         DELETE FROM media_track

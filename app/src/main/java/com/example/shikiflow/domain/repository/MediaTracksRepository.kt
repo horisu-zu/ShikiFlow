@@ -9,7 +9,6 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.track.media.MediaShortData
 import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.UserMediaRate
 import com.example.shikiflow.utils.result.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -35,9 +34,7 @@ interface MediaTracksRepository {
         customLists: List<String> = emptyList()
     ): Flow<PagingData<MediaTrack>>
 
-    suspend fun getShortUserMediaRates(
-        mediaType: MediaType
-    ): List<ShortUserMediaRate>
+    suspend fun getLocalMediaTracks(mediaType: MediaType): List<MediaTrack>
 
     fun saveUserRate(
         entryId: Int? = null,

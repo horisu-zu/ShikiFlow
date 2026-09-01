@@ -131,6 +131,16 @@ fun SettingsScreen(
                             onServiceUpdateToggle = {
                                 settingsViewModel.setTrackerServiceUpdate(!settingsState.settings.serviceUpdateState)
                             }
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_resync_tracks_label),
+                            displayValue = stringResource(R.string.settings_resync_tracks_value),
+                            trailingIcon = IconResource.Drawable(R.drawable.ic_sync),
+                            onClick = {
+                                settingsState.user?.let { currentUser ->
+                                    settingsViewModel.syncTracks(currentUser.id)
+                                }
+                            }
                         )
                     )
                 )
@@ -319,7 +329,7 @@ fun SettingsScreen(
                                     append(", ")
                                     append(stringResource(
                                         R.string.media_custom_lists,
-                                        stringResource(MediaType.ANIME.displayValue())
+                                        stringResource(MediaType.MANGA.displayValue())
                                     ))
                                     append(": ${settingsState.userSettings.customLists[MediaType.MANGA]?.size ?: 0}")
                                 },

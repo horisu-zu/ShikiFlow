@@ -11,6 +11,7 @@ sealed interface SectionItem {
     data class Default(
         override val title: String,
         override val displayValue: String,
+        val trailingIcon: IconResource? = null,
         val onClick: () -> Unit,
         val isVisible: Boolean = true
     ): SectionItem

@@ -1,6 +1,7 @@
 package com.example.shikiflow.domain.usecase
 
 import android.util.Log
+import com.example.shikiflow.domain.model.track.media.MediaTrack.Companion.toShortUserMediaRate
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.domain.model.user.MediaComparison
@@ -28,7 +29,9 @@ class GroupUserRatesUseCase @Inject constructor(
 
             val (currentUserRates, targetUserRates) = coroutineScope {
                 val currentUser = async {
-                    mediaTracksRepository.getShortUserMediaRates(mediaType)
+                    mediaTracksRepository.getLocalMediaTracks(mediaType).map { mediaTrack ->
+                        mediaTrack.toShortUserMediaRate()
+                    }
                 }
 
                 val targetUser = async {

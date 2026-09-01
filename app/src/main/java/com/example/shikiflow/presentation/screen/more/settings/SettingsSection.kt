@@ -94,6 +94,7 @@ fun SettingsSection(
                         TextItem(
                             title = item.title,
                             subtitle = item.displayValue,
+                            trailingIcon = item.trailingIcon,
                             modifier = Modifier
                                 .clickable { item.onClick() }
                                 .then(itemModifier)
@@ -164,23 +165,38 @@ fun SettingsSection(
 private fun TextItem(
     title: String,
     subtitle: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    trailingIcon: IconResource? = null
 ) {
-    Column(modifier = modifier) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyMedium,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = subtitle,
-            modifier = Modifier,
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-            ),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Text(
+                text = subtitle,
+                modifier = Modifier,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        trailingIcon?.toIcon(
+            modifier = Modifier.size(24.dp)
         )
     }
 }
@@ -214,6 +230,7 @@ private fun UserItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
+
             Text(
                 text = displayValue,
                 style = MaterialTheme.typography.labelSmall.copy(
@@ -252,12 +269,17 @@ private fun SwitchItem(
         horizontalArrangement = Arrangement.spacedBy(4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column(modifier = Modifier.weight(1f)) {
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
+        ) {
             Text(
                 text = title,
+                style = MaterialTheme.typography.bodyMedium,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis
             )
+
             Text(
                 text = displayValue,
                 style = MaterialTheme.typography.labelSmall.copy(

@@ -55,7 +55,8 @@ fun PaletteStyleBottomSheet(
 ) {
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        dragHandle = null
+        dragHandle = null,
+        sheetGesturesEnabled = false //Temporary fix found on issue tracker
     ) {
         val horizontalPadding = 16.dp
         val isDarkTheme = themeSettings.themeMode.isDarkTheme(isSystemInDarkTheme())
