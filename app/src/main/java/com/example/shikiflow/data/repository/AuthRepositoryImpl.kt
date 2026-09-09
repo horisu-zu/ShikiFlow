@@ -10,7 +10,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.TokenRepository
-import com.example.shikiflow.worker.MediaTracksScheduler
+import com.example.shikiflow.worker.track.MediaTracksScheduler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

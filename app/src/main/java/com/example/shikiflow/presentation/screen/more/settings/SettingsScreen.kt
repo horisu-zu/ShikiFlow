@@ -1,5 +1,10 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -25,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ActivityCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
@@ -71,6 +77,12 @@ fun SettingsScreen(
 
     val availableLocales = remember { context.getAvailableLocales() }
     var currentLocale by remember { mutableStateOf(LocaleUtils.getDefaultLocale()) }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        settingsViewModel.setShowNotifications(granted)
+    }
 
     if(openCacheDialog.value) {
         CustomDialog(
@@ -338,6 +350,30 @@ fun SettingsScreen(
                         )
                     )
                 }
+
+                SettingsSection(
+                    title = stringResource(R.string.settings_notifications_section_title),
+                    items = listOf(
+                        SectionItem.Switch(
+                            title = stringResource(R.string.settings_show_notifications_label),
+                            displayValue = stringResource(R.string.settings_show_notifications_description),
+                            onClick = {
+                                if (!settingsState.settings.showNotifications &&
+                                    ActivityCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.POST_NOTIFICATIONS
+                                    ) != PackageManager.PERMISSION_GRANTED &&
+                                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                                ) {
+                                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                                } else {
+                                    settingsViewModel.setShowNotifications(!settingsState.settings.showNotifications)
+                                }
+                            },
+                            isChecked = settingsState.settings.showNotifications
+                        )
+                    )
+                )
 
                 SettingsSection(
                     title = stringResource(R.string.settings_data_section_title),

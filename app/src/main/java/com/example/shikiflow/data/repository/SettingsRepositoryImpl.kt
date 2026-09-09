@@ -66,6 +66,7 @@ class SettingsRepositoryImpl @Inject constructor(
 
         private val LOCALE_KEY = stringPreferencesKey("locale")
         private val TRACK_MODE = stringPreferencesKey("track_theme")
+        private val SHOW_NOTIFICATIONS = booleanPreferencesKey("show_notifications")
 
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
@@ -153,7 +154,8 @@ class SettingsRepositoryImpl @Inject constructor(
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
                 browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
                 trackMode = preferences[TRACK_MODE]?.let { MediaType.valueOf(it) }
-                    ?: MediaType.ANIME
+                    ?: MediaType.ANIME,
+                showNotifications = preferences[SHOW_NOTIFICATIONS] ?: false
             )
     }
 
@@ -379,6 +381,12 @@ class SettingsRepositoryImpl @Inject constructor(
                     MediaType.MANGA -> preferences[userCustomMangaLists(currentAuthType)] = lists.toSet()
                 }
             }
+        }
+    }
+
+    override suspend fun saveShowNotifications(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SHOW_NOTIFICATIONS] = value
         }
     }
 

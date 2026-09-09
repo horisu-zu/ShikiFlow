@@ -70,7 +70,7 @@
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
         оскільки синхронізація оновлень відбувається за ідентифікатором MAL,
-        деякі запити можуть не виконатися чи викликати невідповідність
+        деякі запити можуть не виконатися чи викликати невідповідності
     </string>
 
     <string name="settings_language_label">Мова</string>
@@ -119,6 +119,13 @@
     <string name="settings_log_out">Вийти з аккаунту</string>
     <string name="settings_lists_label">Списки</string>
     <string name="settings_custom_lists_label">Кастомні списки</string>
+
+    <string name="settings_resync_tracks_label">Синхронізувати медіа</string>
+    <string name="settings_resync_tracks_value">Натисніть, щоб здійснити синхронізацію відтсежуваного медіа</string>
+
+    <string name="settings_show_notifications_description">Дозволити відображати нотифікації</string>
+    <string name="settings_notifications_section_title">Нотифікації</string>
+    <string name="settings_show_notifications_label">Відображати нотифікації</string>
 
     <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>
     <string name="color_picker_bottom_sheet_save">Застосувати</string>
@@ -954,4 +961,13 @@
     <string name="comment_editor_edit_label">Редактор</string>
     <string name="comment_editor_preview_label">Прев\'ю</string>
     <string name="user_activity_delete_label">Хочете видалити цю активність?</string>
+
+    <string name="airing_summary_notification_label">Відстежувані тайтли, що зараз транслюються:</string>
+    <string name="airing_episode_notification_label">Епізод %d вже транслюється</string>
+    <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких скоро здійснеться</string>
+    <string name="airing_premiere_notification_label">Перший епізод незабаром вийде</string>
+
+    <string name="anime_streaming_notifications_group_system_label">Трансляція аніме</string>
+    <string name="airing_notifications_system_label">Нотифікації трансляції</string>
+    <string name="airing_premiere_notifications_system_label">Нотифікації прем\'єри</string>
 </resources>

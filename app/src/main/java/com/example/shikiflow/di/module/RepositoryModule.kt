@@ -4,6 +4,7 @@ import com.example.shikiflow.data.repository.ActivityRepositoryImpl
 import com.example.shikiflow.data.repository.AuthRepositoryImpl
 import com.example.shikiflow.data.repository.CharacterRepositoryImpl
 import com.example.shikiflow.data.repository.CommentRepositoryImpl
+import com.example.shikiflow.data.repository.EpisodeNotificationRepositoryImpl
 import com.example.shikiflow.data.repository.ReleaseRepositoryImpl
 import com.example.shikiflow.data.repository.KodikRepositoryImpl
 import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
@@ -17,6 +18,7 @@ import com.example.shikiflow.domain.repository.ActivityRepository
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CharacterRepository
 import com.example.shikiflow.domain.repository.CommentRepository
+import com.example.shikiflow.domain.repository.EpisodeNotificationRepository
 import com.example.shikiflow.domain.repository.ReleaseRepository
 import com.example.shikiflow.domain.repository.KodikRepository
 import com.example.shikiflow.domain.repository.MangaDexRepository
@@ -113,4 +115,10 @@ interface RepositoryModule {
     fun bindMediaUploader(
         impl: MediaUploaderRepositoryImpl
     ): MediaUploaderRepository
+
+    @Binds
+    @Singleton
+    fun bindNotificationRepository(
+        impl: EpisodeNotificationRepositoryImpl
+    ): EpisodeNotificationRepository
 }

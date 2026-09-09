@@ -3,10 +3,10 @@ package com.example.shikiflow.data.mapper.local
 import com.example.graphql.anilist.fragment.MediaShort
 import com.example.graphql.shikimori.fragment.AnimeShort
 import com.example.graphql.shikimori.fragment.MangaShort
-import com.example.shikiflow.data.local.entity.PosterEntity.Companion.toDomain
-import com.example.shikiflow.data.local.entity.PosterEntity.Companion.toDto
-import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toDomain
-import com.example.shikiflow.data.local.entity.ReleaseDateEntity.Companion.toDto
+import com.example.shikiflow.data.local.entity.mediatrack.PosterEntity.Companion.toDomain
+import com.example.shikiflow.data.local.entity.mediatrack.PosterEntity.Companion.toDto
+import com.example.shikiflow.data.local.entity.mediatrack.ReleaseDateEntity.Companion.toDomain
+import com.example.shikiflow.data.local.entity.mediatrack.ReleaseDateEntity.Companion.toDto
 import com.example.shikiflow.data.local.entity.mediatrack.MediaShortEntity
 import com.example.shikiflow.data.mapper.common.DateMapper.toDomain
 import com.example.shikiflow.data.mapper.common.GenreMapper

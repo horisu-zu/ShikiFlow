@@ -10,7 +10,7 @@ import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.result.DataResult
-import com.example.shikiflow.worker.MediaTracksScheduler
+import com.example.shikiflow.worker.track.MediaTracksScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted

@@ -6,6 +6,7 @@ import androidx.work.Configuration
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
+import com.example.shikiflow.utils.notifications.NotificationChannels
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
@@ -24,4 +25,10 @@ class ShikiFlowApp: Application(), Configuration.Provider, SingletonImageLoader.
             .build()
 
     override fun newImageLoader(context: PlatformContext): ImageLoader = imageLoader
+
+    override fun onCreate() {
+        super.onCreate()
+
+        NotificationChannels.createChannels(this@ShikiFlowApp)
+    }
 }

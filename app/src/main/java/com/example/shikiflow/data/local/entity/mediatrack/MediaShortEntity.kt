@@ -4,8 +4,6 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.shikiflow.data.local.entity.PosterEntity
-import com.example.shikiflow.data.local.entity.ReleaseDateEntity
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum

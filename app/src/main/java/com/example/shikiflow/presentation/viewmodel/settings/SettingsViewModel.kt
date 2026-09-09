@@ -20,7 +20,8 @@ import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.ThemeMode
-import com.example.shikiflow.worker.MediaTracksScheduler
+import com.example.shikiflow.worker.notification.NotificationScheduler
+import com.example.shikiflow.worker.track.MediaTracksScheduler
 import com.materialkolor.PaletteStyle
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +41,8 @@ class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val authRepository: AuthRepository,
     private val cacheRepository: CacheRepository,
-    private val mediaTracksScheduler: MediaTracksScheduler
+    private val mediaTracksScheduler: MediaTracksScheduler,
+    private val notificationScheduler: NotificationScheduler
 ): ViewModel() {
 
     private val _settingsState = MutableStateFlow(SettingsUiState())
@@ -198,6 +200,17 @@ class SettingsViewModel @Inject constructor(
     fun setPrimaryColorPreferences(color: Color, useSystemWallpaperColor: Boolean) {
         viewModelScope.launch {
             settingsRepository.savePrimaryColorPreferences(color, useSystemWallpaperColor)
+        }
+    }
+
+    fun setShowNotifications(value: Boolean) {
+        viewModelScope.launch {
+            settingsRepository.saveShowNotifications(value)
+
+            when (value) {
+                true -> notificationScheduler.schedulePeriodicWork()
+                false -> notificationScheduler.cancel()
+            }
         }
     }
 
