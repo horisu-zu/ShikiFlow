@@ -7,6 +7,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -23,6 +24,7 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
+import com.example.shikiflow.domain.model.settings.NotificationSettings
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.utils.ThemeMode
@@ -66,7 +68,11 @@ class SettingsRepositoryImpl @Inject constructor(
 
         private val LOCALE_KEY = stringPreferencesKey("locale")
         private val TRACK_MODE = stringPreferencesKey("track_theme")
+
         private val SHOW_NOTIFICATIONS = booleanPreferencesKey("show_notifications")
+        private val SHOW_AIRING_NOTIFICATIONS = booleanPreferencesKey("airing_notifications")
+        private val SHOW_UPCOMING_NOTIFICATIONS = booleanPreferencesKey("upcoming_notifications")
+        private val AIRING_NOTIFICATIONS_DELAY = floatPreferencesKey("airing_notifications_delay")
 
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
@@ -154,8 +160,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 appUiMode = AppUiMode.fromString(preferences[APP_UI_MODE]),
                 browseUiMode = BrowseUiMode.fromString(preferences[BROWSE_UI_MODE]),
                 trackMode = preferences[TRACK_MODE]?.let { MediaType.valueOf(it) }
-                    ?: MediaType.ANIME,
-                showNotifications = preferences[SHOW_NOTIFICATIONS] ?: false
+                    ?: MediaType.ANIME
             )
     }
 
@@ -170,6 +175,15 @@ class SettingsRepositoryImpl @Inject constructor(
                     Color.fromColorLong(colorKey)
                 } ?: Color(0xFF526CFD),
                 useSystemWallpaperColor = preferences[SYSTEM_WALLPAPER_COLOR] ?: true
+            )
+        }
+    override val notificationSettingsFlow: Flow<NotificationSettings> = dataStore.data
+        .map { preferences ->
+            NotificationSettings(
+                showNotifications = preferences[SHOW_NOTIFICATIONS] ?: false,
+                showAiringNotifications = preferences[SHOW_AIRING_NOTIFICATIONS] ?: true,
+                showUpcomingNotifications = preferences[SHOW_UPCOMING_NOTIFICATIONS] ?: true,
+                airingDelay = preferences[AIRING_NOTIFICATIONS_DELAY] ?: 0f
             )
         }
 
@@ -387,6 +401,24 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun saveShowNotifications(value: Boolean) {
         dataStore.edit { preferences ->
             preferences[SHOW_NOTIFICATIONS] = value
+        }
+    }
+
+    override suspend fun saveAiringNotifications(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SHOW_AIRING_NOTIFICATIONS] = value
+        }
+    }
+
+    override suspend fun saveUpcomingNotifications(value: Boolean) {
+        dataStore.edit { preferences ->
+            preferences[SHOW_UPCOMING_NOTIFICATIONS] = value
+        }
+    }
+
+    override suspend fun saveAiringDelay(delay: Float) {
+        dataStore.edit { preferences ->
+            preferences[AIRING_NOTIFICATIONS_DELAY] = delay
         }
     }
 

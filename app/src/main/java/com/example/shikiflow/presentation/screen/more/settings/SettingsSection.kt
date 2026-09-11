@@ -19,13 +19,19 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,6 +40,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
@@ -50,6 +57,7 @@ import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.utils.toIcon
 import com.materialkolor.ktx.harmonize
+import kotlin.math.roundToInt
 
 @Composable
 fun SettingsSection(
@@ -125,6 +133,18 @@ fun SettingsSection(
                         )
                     }
                 }
+                is SectionItem.Slider -> {
+                    AnimatedVisibility(item.isVisible) {
+                        SliderItem(
+                            title = item.title,
+                            displayValue = item.displayValue,
+                            value = item.value,
+                            trackRange = item.trackRange,
+                            onChange = item.onChange,
+                            modifier = itemModifier
+                        )
+                    }
+                }
                 is SectionItem.Mode -> {
                     AnimatedVisibility(item.isVisible) {
                         ModeItem(
@@ -186,7 +206,6 @@ private fun TextItem(
 
             Text(
                 text = subtitle,
-                modifier = Modifier,
                 style = MaterialTheme.typography.labelSmall.copy(
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
                 ),
@@ -259,7 +278,7 @@ private fun UserItem(
 @Composable
 private fun SwitchItem(
     title: String,
-    displayValue: String,
+    displayValue: String?,
     isChecked: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -280,18 +299,99 @@ private fun SwitchItem(
                 overflow = TextOverflow.Ellipsis
             )
 
-            Text(
-                text = displayValue,
-                style = MaterialTheme.typography.labelSmall.copy(
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
-                ),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
+            displayValue?.let {
+                Text(
+                    text = displayValue,
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                    ),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
         }
         Switch(
             checked = isChecked,
             onCheckedChange = { onClick() }
+        )
+    }
+}
+
+@Composable
+private fun SliderItem(
+    title: String,
+    displayValue: String,
+    value: Float,
+    trackRange: ClosedFloatingPointRange<Float>,
+    onChange: (Float) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val sliderState = rememberSliderState(
+        value = value,
+        trackRange = trackRange
+    )
+
+    LaunchedEffect(sliderState.value) {
+        onChange(sliderState.value)
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+
+            Text(
+                text = value.roundToInt().toString(),
+                style = MaterialTheme.typography.labelMedium.copy(
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                ),
+                modifier = Modifier
+                    .width(40.dp)
+                    .background(
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = RoundedCornerShape(percent = 32)
+                    )
+                    .padding(horizontal = 8.dp, vertical = 6.dp)
+            )
+        }
+
+        Text(
+            text = displayValue,
+            style = MaterialTheme.typography.labelSmall.copy(
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+            ),
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
+
+        Slider(
+            state = sliderState,
+            onValueChange = { newValue ->
+                sliderState.value = newValue
+            },
+            track = { state ->
+                SliderDefaults.Track(
+                    sliderState = state,
+                    thumbTrackGapSize = 4.dp,
+                    modifier = Modifier.height(12.dp)
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(24.dp)
         )
     }
 }
@@ -316,6 +416,7 @@ private fun <T> ModeItem(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp),

@@ -38,7 +38,7 @@ class UpcomingNotificationHandler @Inject constructor(
         val airingSoonMedia =  mediaTracksRepository.getLocalMediaTracks(MediaType.ANIME)
             .map { mediaTrack -> mediaTrack.shortData }
             .filter { mediaTrack ->
-                mediaTrack.currentProgress ==0 && mediaTrack.nextEpisodeAt != null &&
+                mediaTrack.currentProgress == 0 && mediaTrack.nextEpisodeAt != null &&
                 mediaTrack.nextEpisodeAt.timeDifference() in 0.seconds..1.days
             }
             .filter { mediaTrack ->
@@ -54,7 +54,7 @@ class UpcomingNotificationHandler @Inject constructor(
                 notificationId = 0,
                 channelId = UPCOMING_CHANNEL_ID,
                 group = AIRING_GROUP_ID,
-                title = resources.getString(R.string.airing_summary_notification_label),
+                title = resources.getString(R.string.airing_premiere_summary_notification_label),
                 text = airingSoonMedia.joinToString(", ") { media ->
                     media.title.preferred(titleType)
                 },

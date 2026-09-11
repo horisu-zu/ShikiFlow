@@ -13,6 +13,7 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
+import com.example.shikiflow.domain.model.settings.NotificationSettings
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.utils.ThemeMode
@@ -26,6 +27,7 @@ interface SettingsRepository {
     val connectedServicesFlow: Flow<Map<AuthType, User>>
     val settingsFlow: Flow<Settings>
     val themeSettingsFlow: Flow<ThemeSettings>
+    val notificationSettingsFlow: Flow<NotificationSettings>
     val browseUiSettingsFlow: Flow<BrowseUiSettings>
     val mangaSettingsFlow: Flow<MangaChapterSettings>
     val localeFlow: Flow<String>
@@ -54,7 +56,11 @@ interface SettingsRepository {
     suspend fun savePreferredTitleType(preferredType: PreferredTitleType)
     suspend fun saveScoreFormat(scoreFormat: ScoreFormat)
     suspend fun saveCustomLists(lists: Map<MediaType, List<String>>)
+
     suspend fun saveShowNotifications(value: Boolean)
+    suspend fun saveAiringNotifications(value: Boolean)
+    suspend fun saveUpcomingNotifications(value: Boolean)
+    suspend fun saveAiringDelay(delay: Float)
 
     suspend fun clearUserData()
     suspend fun clearUserData(authType: AuthType)

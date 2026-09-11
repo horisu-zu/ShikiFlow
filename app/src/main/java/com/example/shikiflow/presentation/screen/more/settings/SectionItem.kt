@@ -18,9 +18,18 @@ sealed interface SectionItem {
 
     data class Switch(
         override val title: String,
-        override val displayValue: String,
+        override val displayValue: String? = null,
         val onClick: () -> Unit,
         val isChecked: Boolean,
+        val isVisible: Boolean = true
+    ): SectionItem
+
+    data class Slider(
+        override val title: String,
+        override val displayValue: String,
+        val value: Float,
+        val trackRange: ClosedFloatingPointRange<Float>,
+        val onChange: (Float) -> Unit,
         val isVisible: Boolean = true
     ): SectionItem
 
@@ -41,15 +50,6 @@ sealed interface SectionItem {
         val onServiceClick: (AuthType, Boolean) -> Unit,
         val onServiceUpdateToggle: () -> Unit
     ): SectionItem
-
-    /*data class Theme(
-        override val title: String,
-        val onClick: (ThemeMode) -> Unit,
-        val themeMode: ThemeMode
-    ): SectionItem {
-        override val displayValue: String
-            get() = themeMode.name.lowercase().replaceFirstChar { it.uppercase() }
-    }*/
 
     data class Mode(
         override val title: String,

@@ -42,6 +42,7 @@ import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -498,21 +499,25 @@ private fun ScoreSlider(
     onScoreChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val sliderState = rememberSliderState(
+        value = score,
+        steps = scoreFormat.valueRange().steps(),
+        trackRange = scoreFormat.valueRange().floatingPointRange()
+    )
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Slider(
-            value = score,
+            state = sliderState,
             onValueChange = { value ->
                 val step = scoreFormat.valueRange().step
                 val rounded = (value / step).roundToInt() * step
 
                 onScoreChange(rounded)
             },
-            steps = scoreFormat.valueRange().steps(),
-            valueRange = scoreFormat.valueRange().floatingPointRange(),
             modifier = Modifier
                 .height(24.dp)
                 .weight(1f)

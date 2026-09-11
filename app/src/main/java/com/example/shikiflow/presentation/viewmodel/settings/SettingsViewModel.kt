@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.ScoreFormat
+import com.example.shikiflow.domain.model.episode_notification.EpisodeNotificationType
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
@@ -12,6 +13,7 @@ import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
+import com.example.shikiflow.domain.model.settings.NotificationSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -55,7 +57,8 @@ class SettingsViewModel @Inject constructor(
             settingsRepository.mangaSettingsFlow.distinctUntilChanged(),
             settingsRepository.userSettingsFlow.distinctUntilChanged(),
             settingsRepository.connectedServicesFlow.distinctUntilChanged(),
-            settingsRepository.chapterLanguagesFlow.distinctUntilChanged()
+            settingsRepository.chapterLanguagesFlow.distinctUntilChanged(),
+            settingsRepository.notificationSettingsFlow.distinctUntilChanged()
         ) { values ->
             _settingsState.update { state ->
                 state.copy(
@@ -64,7 +67,8 @@ class SettingsViewModel @Inject constructor(
                     mangaSettings = values[2] as MangaChapterSettings,
                     userSettings = values[3] as UserSettings,
                     connectedServices = values[4] as Map<AuthType, User>,
-                    chapterLanguages = values[5] as Set<String>
+                    chapterLanguages = values[5] as Set<String>,
+                    notificationSettings = values[6] as NotificationSettings
                 )
             }
         }.launchIn(viewModelScope)
@@ -203,7 +207,7 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun setShowNotifications(value: Boolean) {
+    fun setNotifications(value: Boolean) {
         viewModelScope.launch {
             settingsRepository.saveShowNotifications(value)
 
@@ -211,6 +215,23 @@ class SettingsViewModel @Inject constructor(
                 true -> notificationScheduler.schedulePeriodicWork()
                 false -> notificationScheduler.cancel()
             }
+        }
+    }
+
+    fun setEpisodeNotifications(value: Boolean, type: EpisodeNotificationType) {
+        viewModelScope.launch {
+            when(type) {
+                EpisodeNotificationType.UPCOMING -> settingsRepository.saveUpcomingNotifications(value)
+                EpisodeNotificationType.AIRING -> settingsRepository.saveAiringNotifications(value)
+            }
+        }
+
+        notificationScheduler.schedulePeriodicWork()
+    }
+
+    fun setAiringDelay(newValue: Float) {
+        viewModelScope.launch {
+            settingsRepository.saveAiringDelay(newValue)
         }
     }
 

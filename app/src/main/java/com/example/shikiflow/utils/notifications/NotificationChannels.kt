@@ -11,15 +11,15 @@ object NotificationChannels {
     private val airingChannels = listOf(
         NotificationChannelData(
             id = AIRING_CHANNEL_ID,
-            nameRes = R.string.airing_notifications_system_label,
-            descriptionRes = R.string.airing_episode_notification_system_description,
+            nameRes = R.string.airing_notifications_settings_label,
+            descriptionRes = R.string.airing_episode_notification_settings_description,
             groupId = AIRING_GROUP_ID,
             groupNameRes = R.string.anime_streaming_notifications_group_system_label
         ),
         NotificationChannelData(
             id = UPCOMING_CHANNEL_ID,
-            nameRes = R.string.airing_premiere_notifications_system_label,
-            descriptionRes = R.string.airing_premiere_notification_system_description,
+            nameRes = R.string.airing_premiere_notifications_settings_label,
+            descriptionRes = R.string.airing_premiere_notification_settings_description,
             groupId = AIRING_GROUP_ID,
             groupNameRes = R.string.anime_streaming_notifications_group_system_label
         )

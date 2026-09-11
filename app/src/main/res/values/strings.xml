@@ -129,6 +129,12 @@
     <string name="settings_notifications_section_title">Notifications</string>
     <string name="settings_show_notifications_label">Show Notifications</string>
     <string name="settings_show_notifications_description">Allow to display notifications</string>
+    <string name="airing_notifications_settings_label">Airing Notifications</string>
+    <string name="airing_premiere_notifications_settings_label">Airing Premiere Notifications</string>
+    <string name="airing_premiere_notification_settings_description">Notifications one day before title\'s premiere</string>
+    <string name="airing_episode_notification_settings_description">Notifications of new episodes of tracked titles</string>
+    <string name="airing_notifications_settings_delay_label">Airing Notifications Delay</string>
+    <string name="airing_notifications_settings_delay_description">Applies delay to the airing notifications (in minutes)</string>
 
     <string name="color_picker_bottom_sheet_system_label">Use System Wallpaper Color</string>
     <string name="color_picker_bottom_sheet_save">Apply</string>
@@ -986,12 +992,8 @@ f
     <string name="airing_summary_notification_label">Airing tracked titles:</string>
     <string name="airing_episode_notification_label">Episode %d is airing</string>
 
-    <string name="airing_premiere_summary_notification_label">Tracked titles premiering soon:</string>
-    <string name="airing_premiere_notification_label">First episode is airing soon</string>
+    <string name="airing_premiere_summary_notification_label">Tracked titles premiering tomorrow:</string>
+    <string name="airing_premiere_notification_label">First episode is airing tomorrow</string>
 
     <string name="anime_streaming_notifications_group_system_label">Anime Streaming</string>
-    <string name="airing_notifications_system_label">Airing Notifications</string>
-    <string name="airing_episode_notification_system_description" translatable="false">Airing Anime Episode Notification</string>
-    <string name="airing_premiere_notifications_system_label">Airing Premiere Notifications</string>
-    <string name="airing_premiere_notification_system_description" translatable="false">Premiering Anime Episode Notification</string>
 </resources>

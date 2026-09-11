@@ -5,30 +5,32 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.shikiflow.R
-import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
-import com.example.shikiflow.domain.model.media_details.PreferredTitleType
-import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.repository.MediaTracksRepository
+import com.apollographql.apollo.api.not
 import com.example.shikiflow.domain.repository.SettingsRepository
-import com.example.shikiflow.utils.DateUtils.timeDifference
-import com.example.shikiflow.utils.notifications.NotificationUtils.showNotification
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.flow.firstOrNull
-import kotlin.time.Duration.Companion.hours
-import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.flow.first
 
 @HiltWorker
 class NotificationWorker @AssistedInject constructor(
     @Assisted val appContext: Context,
     @Assisted val workerParams: WorkerParameters,
-    private val handlers: Set<@JvmSuppressWildcards NotificationHandler>
+    private val handlers: Set<@JvmSuppressWildcards NotificationHandler>,
+    private val settingsRepository: SettingsRepository
 ) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
         return try {
+            val notificationSettings = settingsRepository.notificationSettingsFlow.first()
+
             handlers.forEach { handler ->
-                handler.checkAndNotify()
+                when (handler) {
+                    is AiringNotificationHandler -> if (notificationSettings.showAiringNotifications) {
+                        handler.checkAndNotify()
+                    }
+                    is UpcomingNotificationHandler -> if (notificationSettings.showUpcomingNotifications) {
+                        handler.checkAndNotify()
+                    }
+                }
             }
 
             Result.success()

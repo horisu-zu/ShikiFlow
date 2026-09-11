@@ -33,6 +33,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -210,11 +211,21 @@ private fun ColorPickerBottomSheetContent(
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Slider(
+            val sliderState = rememberSliderState(
                 value = hue,
-                onValueChange = { hue = it },
+                trackRange = 0f..360f
+            )
+
+            LaunchedEffect(sliderState.value) {
+                hue = sliderState.value
+            }
+
+            Slider(
+                state = sliderState,
+                onValueChange = { newValue ->
+                    sliderState.value = newValue
+                },
                 enabled = !useSystemColor,
-                valueRange = 0f..360f,
                 colors = SliderDefaults.colors(
                     thumbColor = MaterialTheme.colorScheme.onSurface,
                     activeTrackColor = Color.Transparent,

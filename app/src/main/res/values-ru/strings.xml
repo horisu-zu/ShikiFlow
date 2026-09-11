@@ -126,6 +126,12 @@
     <string name="settings_show_notifications_description">Разрешить показ уведомлений</string>
     <string name="settings_notifications_section_title">Уведомления</string>
     <string name="settings_show_notifications_label">Показывать уведомления</string>
+    <string name="airing_notifications_settings_label">Уведомления трансляции</string>
+    <string name="airing_premiere_notifications_settings_label">Уведомления премьеры</string>
+    <string name="airing_premiere_notification_settings_description">Уведомления за день до премьеры тайтла</string>
+    <string name="airing_episode_notification_settings_description">Уведомления о новых эпизодах отслеживаемых тайтлов</string>
+    <string name="airing_notifications_settings_delay_label">Задержка уведомлений трансляции</string>
+    <string name="airing_notifications_settings_delay_description">Применяет задержку уведомлений трансляции (в минутах)</string>
 
     <string name="color_picker_bottom_sheet_system_label">Использовать цвет заставки системы</string>
     <string name="color_picker_bottom_sheet_save">Применить</string>
@@ -964,10 +970,8 @@
 
     <string name="airing_summary_notification_label">Транслирующиеся отслеживаемые тайтлы:</string>
     <string name="airing_episode_notification_label">Эпизод %d уже транслируется</string>
-    <string name="airing_premiere_summary_notification_label">Отслеживаемые тайтлы, премьера которых состоится скоро:</string>
-    <string name="airing_premiere_notification_label">Первый эпизод скоро выйдет</string>
+    <string name="airing_premiere_summary_notification_label">Отслеживаемые тайтлы, премьера которых состоится завтра:</string>
+    <string name="airing_premiere_notification_label">Первый эпизод выйдет завтра</string>
 
     <string name="anime_streaming_notifications_group_system_label">Трансляция аниме</string>
-    <string name="airing_notifications_system_label">Уведомления трансляции</string>
-    <string name="airing_premiere_notifications_system_label">Уведомления премьеры</string>
 </resources>

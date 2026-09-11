@@ -24,11 +24,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,7 +67,7 @@ fun PlayerBottomComponent(
     }
 
     Column(
-        modifier = modifier.padding(start = 48.dp, bottom = 16.dp)
+        modifier = modifier.padding(start = 48.dp, end = 16.dp, bottom = 16.dp)
     ) {
         AnimatedVisibility(
             visible = shouldShowSkipOp,
@@ -108,7 +108,8 @@ fun PlayerBottomComponent(
                     onSeek = { positionMs ->
                         playerEvent.onSeekTo(positionMs)
                     },
-                    thumbSize = thumbSize
+                    thumbSize = thumbSize,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Row(
@@ -120,6 +121,7 @@ fun PlayerBottomComponent(
                     DurationBox(duration)
                 }
             }
+
             if(opTimeCode == null) {
                 IconButton(
                     shape = RoundedCornerShape(percent = 24),
@@ -183,23 +185,23 @@ fun PlayerSlider(
     thumbSize: Dp,
     modifier: Modifier = Modifier
 ) {
-    var sliderPosition by remember { mutableFloatStateOf(0f) }
     var isSeeking by remember { mutableStateOf(false) }
+    val sliderState = rememberSliderState()
 
     LaunchedEffect(currentProgress, duration) {
         if (!isSeeking && duration > 0) {
-            sliderPosition = currentProgress / duration.toFloat()
+            sliderState.value = currentProgress / duration.toFloat()
         }
     }
 
     Slider(
-        value = sliderPosition,
+        state = sliderState,
         onValueChange = { newValue ->
             isSeeking = true
-            sliderPosition = newValue
+            sliderState.value = newValue
         },
         onValueChangeFinished = {
-            val newPosition = (duration * sliderPosition).toLong()
+            val newPosition = (duration * sliderState.value).toLong()
             onSeek(newPosition)
             isSeeking = false
         },
@@ -225,7 +227,6 @@ fun PlayerSlider(
                 modifier = Modifier.height(6.dp)
             )
         },
-        valueRange = 0f..1f,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
     )
 }

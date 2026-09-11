@@ -37,6 +37,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.FileSize
 import com.example.shikiflow.domain.model.common.ScoreFormat
+import com.example.shikiflow.domain.model.episode_notification.EpisodeNotificationType
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.presentation.common.CustomDialog
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
@@ -81,7 +82,7 @@ fun SettingsScreen(
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
-        settingsViewModel.setShowNotifications(granted)
+        settingsViewModel.setNotifications(granted)
     }
 
     if(openCacheDialog.value) {
@@ -358,7 +359,7 @@ fun SettingsScreen(
                             title = stringResource(R.string.settings_show_notifications_label),
                             displayValue = stringResource(R.string.settings_show_notifications_description),
                             onClick = {
-                                if (!settingsState.settings.showNotifications &&
+                                if (!settingsState.notificationSettings.showNotifications &&
                                     ActivityCompat.checkSelfPermission(
                                         context,
                                         Manifest.permission.POST_NOTIFICATIONS
@@ -367,10 +368,45 @@ fun SettingsScreen(
                                 ) {
                                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                                 } else {
-                                    settingsViewModel.setShowNotifications(!settingsState.settings.showNotifications)
+                                    settingsViewModel.setNotifications(!settingsState.notificationSettings.showNotifications)
                                 }
                             },
-                            isChecked = settingsState.settings.showNotifications
+                            isChecked = settingsState.notificationSettings.showNotifications
+                        ),
+                        SectionItem.Switch(
+                            title = stringResource(R.string.airing_premiere_notifications_settings_label),
+                            displayValue = stringResource(R.string.airing_premiere_notification_settings_description),
+                            onClick = {
+                                settingsViewModel.setEpisodeNotifications(
+                                    value = !settingsState.notificationSettings.showUpcomingNotifications,
+                                    type = EpisodeNotificationType.UPCOMING
+                                )
+                            },
+                            isChecked = settingsState.notificationSettings.showUpcomingNotifications,
+                            isVisible = settingsState.notificationSettings.showNotifications
+                        ),
+                        SectionItem.Switch(
+                            title = stringResource(R.string.airing_notifications_settings_label),
+                            displayValue = stringResource(R.string.airing_episode_notification_settings_description),
+                            onClick = {
+                                settingsViewModel.setEpisodeNotifications(
+                                    value = !settingsState.notificationSettings.showAiringNotifications,
+                                    type = EpisodeNotificationType.AIRING
+                                )
+                            },
+                            isChecked = settingsState.notificationSettings.showAiringNotifications,
+                            isVisible = settingsState.notificationSettings.showNotifications
+                        ),
+                        SectionItem.Slider(
+                            title = stringResource(R.string.airing_notifications_settings_delay_label),
+                            displayValue = stringResource(R.string.airing_notifications_settings_delay_description),
+                            value = settingsState.notificationSettings.airingDelay,
+                            trackRange = 0f..120f,
+                            onChange = { newValue ->
+                                settingsViewModel.setAiringDelay(newValue)
+                            },
+                            isVisible = settingsState.notificationSettings.showNotifications &&
+                                settingsState.notificationSettings.showAiringNotifications
                         )
                     )
                 )

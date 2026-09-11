@@ -274,7 +274,8 @@ private fun PlayerBottomComponent(
             onSeek = { positionMs ->
                 onSeek(positionMs)
             },
-            thumbSize = thumbSize
+            thumbSize = thumbSize,
+            modifier = Modifier.fillMaxWidth()
         )
 
         Row(

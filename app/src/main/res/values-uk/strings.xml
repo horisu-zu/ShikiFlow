@@ -126,6 +126,12 @@
     <string name="settings_show_notifications_description">Дозволити відображати нотифікації</string>
     <string name="settings_notifications_section_title">Нотифікації</string>
     <string name="settings_show_notifications_label">Відображати нотифікації</string>
+    <string name="airing_notifications_settings_label">Нотифікації трансляції</string>
+    <string name="airing_premiere_notifications_settings_label">Нотифікації прем\'єри</string>
+    <string name="airing_premiere_notification_settings_description">Нотифікації за день до прем\'єри тайтлу</string>
+    <string name="airing_episode_notification_settings_description">Нотифікації нових епізодів відстежуваних тайтлів</string>
+    <string name="airing_notifications_settings_delay_label">Затримка нотифікацій трансляції</string>
+    <string name="airing_notifications_settings_delay_description">Застосовує затримку до нотифікацій трансляції (в хвилинах)</string>
 
     <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>
     <string name="color_picker_bottom_sheet_save">Застосувати</string>
@@ -964,10 +970,7 @@
 
     <string name="airing_summary_notification_label">Відстежувані тайтли, що зараз транслюються:</string>
     <string name="airing_episode_notification_label">Епізод %d вже транслюється</string>
-    <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких скоро здійснеться</string>
-    <string name="airing_premiere_notification_label">Перший епізод незабаром вийде</string>
-
+    <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких відбудеться завтра</string>
+    <string name="airing_premiere_notification_label">Перший епізод вийде завтра</string>
     <string name="anime_streaming_notifications_group_system_label">Трансляція аніме</string>
-    <string name="airing_notifications_system_label">Нотифікації трансляції</string>
-    <string name="airing_premiere_notifications_system_label">Нотифікації прем\'єри</string>
 </resources>

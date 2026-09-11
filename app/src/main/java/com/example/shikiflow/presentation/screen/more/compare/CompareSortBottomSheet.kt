@@ -25,6 +25,7 @@ import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberBottomSheetState
+import androidx.compose.material3.rememberRangeSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -225,6 +226,13 @@ private fun ScoreRangeSliderComponent(
     onRangeChange: (ClosedFloatingPointRange<Float>) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val sliderState = rememberRangeSliderState(
+        startValue = scoreRange.start,
+        endValue = scoreRange.endInclusive,
+        steps = scoreFormat.valueRange().steps(),
+        trackRange = scoreFormat.valueRange().floatingPointRange(),
+    )
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
@@ -277,9 +285,7 @@ private fun ScoreRangeSliderComponent(
         }
 
         RangeSlider(
-            value = scoreRange,
-            steps = scoreFormat.valueRange().steps(),
-            valueRange = scoreFormat.valueRange().floatingPointRange(),
+            state = sliderState,
             onValueChange = { newRange ->
                 onRangeChange(newRange)
             },
