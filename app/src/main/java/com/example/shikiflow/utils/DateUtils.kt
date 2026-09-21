@@ -67,7 +67,7 @@ object DateUtils {
         if (nowLocal >= target) {
             target = LocalDateTime(
                 date = nowLocal.date.plus(1, DateTimeUnit.DAY),
-                time = LocalTime(hour, minute, 0)
+                time = LocalTime(hour, minute)
             )
         }
 

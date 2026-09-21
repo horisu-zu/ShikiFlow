@@ -81,13 +81,13 @@ class MediaTracksScheduler @Inject constructor(
 
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = PERIODIC_WORK_NAME,
-            existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.KEEP,
+            existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.REPLACE,
             request = mediaTracksRequest
         )
     }
 
-    fun scheduleSyncs(userId: Int) {
-        scheduleOneTimeSync(userId)
+    fun scheduleSyncs(userId: Int, applyDelay: Boolean = true) {
+        scheduleOneTimeSync(userId, applyDelay)
         schedulePeriodicSync(userId)
     }
 

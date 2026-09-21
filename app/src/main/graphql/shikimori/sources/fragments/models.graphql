@@ -127,7 +127,17 @@ fragment MangaUserRateWithModel on UserRate {
 }
 
 fragment PosterShort on Poster {
-    originalUrl mainUrl previewUrl
+    originalUrl
+    mainUrl
+    previewUrl
+}
+
+fragment VideoShort on Video {
+    id
+    name
+    kind
+    url
+    imageUrl
 }
 
 fragment DateShort on IncompleteDate {

@@ -128,7 +128,7 @@ fun ProfileAppBar(
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
                         ) {
                             IconButton(
-                                shape = RoundedCornerShape(percent = 24),
+                                shape = RoundedCornerShape(percent = 32),
                                 onClick = { navOptions.navigateToSettings() },
                                 colors = IconButtonDefaults.iconButtonColors(
                                     containerColor = backgroundColor.copy(alpha = 0.35f)
@@ -141,7 +141,7 @@ fun ProfileAppBar(
                             }
 
                             IconButton(
-                                shape = RoundedCornerShape(percent = 24),
+                                shape = RoundedCornerShape(percent = 32),
                                 onClick = { navOptions.navigateToAbout() },
                                 colors = IconButtonDefaults.iconButtonColors(
                                     containerColor = backgroundColor.copy(alpha = 0.35f)

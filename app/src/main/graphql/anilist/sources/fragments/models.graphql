@@ -155,6 +155,12 @@ fragment Score on MediaList {
     score(format: POINT_10_DECIMAL)
 }
 
+fragment ALVideoShort on MediaTrailer {
+    id
+    site
+    thumbnail
+}
+
 fragment ALUser on User {
     id
     name

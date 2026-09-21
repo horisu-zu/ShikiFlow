@@ -59,7 +59,6 @@ class AiringNotificationHandler @Inject constructor(
 
         Log.d("AiringNotificationHandler", "Airing Media: $airingMedia")
 
-        val now = Clock.System.now()
         val airingDelayMs = settingsRepository.notificationSettingsFlow
             .map { notificationSettings -> notificationSettings.airingDelay }
             .first()
@@ -67,7 +66,7 @@ class AiringNotificationHandler @Inject constructor(
 
         airingMedia.forEach { media ->
             val episode = media.currentProgress?.plus(1) ?: 1
-            val delayMs = media.nextEpisodeAt!!.minus(now)
+            val delayMs = media.nextEpisodeAt!!.minus(Clock.System.now())
                 .inWholeMilliseconds
                 .coerceAtLeast(0L) + airingDelayMs
 

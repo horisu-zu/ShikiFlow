@@ -30,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
@@ -66,7 +67,9 @@ import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.GenreMapper.displayValue
 import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.presentation.screen.main.details.anime.video.VideoSection
 import com.example.shikiflow.presentation.screen.main.details.common.MediaTagItem
+import com.example.shikiflow.utils.WebIntent
 
 @Composable
 fun AnimeDetailsContent(
@@ -92,6 +95,7 @@ fun AnimeDetailsContent(
 
     val horizontalPadding = 12.dp
     val titleType = LocalTitleTypeController.current
+    val context = LocalContext.current
 
     LazyColumn(
         modifier = modifier,
@@ -187,6 +191,7 @@ fun AnimeDetailsContent(
                 }
             }
         }
+
         if(animeDetails.characters.entries.isNotEmpty()) {
             item {
                 val clipPercent = 16
@@ -290,6 +295,19 @@ fun AnimeDetailsContent(
                     selectedIndex = selectedScreenshotIndex,
                     onScreenshotClick = onScreenshotClick,
                     sharedTransitionScope = sharedTransitionScope,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        if (animeDetails.videos.isNotEmpty()) {
+            item {
+                VideoSection(
+                    videos = animeDetails.videos,
+                    onVideoClick = { url ->
+                        WebIntent.openUrlCustomTab(context, url)
+                    },
+                    horizontalPadding = horizontalPadding,
                     modifier = Modifier.fillMaxWidth()
                 )
             }

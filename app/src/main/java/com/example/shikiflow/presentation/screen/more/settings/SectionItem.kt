@@ -30,6 +30,7 @@ sealed interface SectionItem {
         val value: Float,
         val trackRange: ClosedFloatingPointRange<Float>,
         val onChange: (Float) -> Unit,
+        val onChangeFinished: (() -> Unit)? = null,
         val isVisible: Boolean = true
     ): SectionItem
 

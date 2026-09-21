@@ -7,6 +7,7 @@ import com.example.graphql.shikimori.MangaDetailsQuery
 import com.example.graphql.shikimori.type.AnimeKindEnum
 import com.example.graphql.shikimori.type.GenreKindEnum
 import com.example.graphql.shikimori.type.MangaKindEnum
+import com.example.graphql.shikimori.type.VideoKindEnum
 import com.example.shikiflow.BuildConfig
 import com.example.shikiflow.data.datasource.dto.ShikiAnime
 import com.example.shikiflow.data.datasource.dto.ShikiManga
@@ -21,6 +22,7 @@ import com.example.shikiflow.data.mapper.common.RatingMapper.toDomain
 import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.data.mapper.common.TagMapper
+import com.example.shikiflow.data.mapper.common.VideoMapper.toDomainVideo
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriCharacterMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.sortByRole
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toDomain
@@ -83,6 +85,13 @@ object ShikimoriMediaMapper {
             nextEpisodeAt = nextEpisodeAt?.let { Instant.parse(it.toString()) },
             origin = origin?.toDomain() ?: MediaOrigin.UNKNOWN,
             screenshots = screenshots.map { it.originalUrl },
+            videos = videos
+                .map { it.videoShort }
+                .filter { it.kind != VideoKindEnum.episode_preview }
+                .sortedBy { it.id }
+                .map { videoShort ->
+                    videoShort.toDomainVideo()
+                },
             studios = studios.map { it.toStudioShort() },
             staffList = personRoles?.map { it.personRoleShort.toDomain() }
                 ?.sortByRole() ?: emptyList(),

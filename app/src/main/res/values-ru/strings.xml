@@ -282,6 +282,7 @@
     <string name="details_short_info_episodes">Эпизоды</string>
     <string name="details_short_info_age_rating">Рейтинг</string>
     <string name="anime_details_screenshots">Скриншоты</string>
+    <string name="anime_details_video">Видео</string>
     <string name="details_short_info_manga_type">Тип</string>
     <string name="details_short_info_manga_published">Опубликовано</string>
     <string name="details_short_info_manga_volumes">Тома</string>

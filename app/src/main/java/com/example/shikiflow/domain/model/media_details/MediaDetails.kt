@@ -35,6 +35,7 @@ data class MediaDetails(
     val nextEpisodeAt: Instant? = null,
     val origin: MediaOrigin? = null,
     val screenshots: List<String> = emptyList(),
+    val videos: List<VideoShort> = emptyList(),
     val studios: List<StudioShort>? = null,
     val staffList: List<StaffShort> = emptyList(),
     val durationMins: Int? = null,

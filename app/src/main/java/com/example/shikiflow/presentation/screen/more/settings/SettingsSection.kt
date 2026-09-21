@@ -141,6 +141,7 @@ fun SettingsSection(
                             value = item.value,
                             trackRange = item.trackRange,
                             onChange = item.onChange,
+                            onChangeFinished = item.onChangeFinished,
                             modifier = itemModifier
                         )
                     }
@@ -324,6 +325,7 @@ private fun SliderItem(
     value: Float,
     trackRange: ClosedFloatingPointRange<Float>,
     onChange: (Float) -> Unit,
+    onChangeFinished: (() -> Unit)?,
     modifier: Modifier = Modifier
 ) {
     val sliderState = rememberSliderState(
@@ -382,6 +384,7 @@ private fun SliderItem(
             onValueChange = { newValue ->
                 sliderState.value = newValue
             },
+            onValueChangeFinished = onChangeFinished,
             track = { state ->
                 SliderDefaults.Track(
                     sliderState = state,

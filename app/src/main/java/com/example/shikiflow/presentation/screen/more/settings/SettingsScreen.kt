@@ -405,6 +405,7 @@ fun SettingsScreen(
                             onChange = { newValue ->
                                 settingsViewModel.setAiringDelay(newValue)
                             },
+                            onChangeFinished = { settingsViewModel.rescheduleNotificationWork() },
                             isVisible = settingsState.notificationSettings.showNotifications &&
                                 settingsState.notificationSettings.showAiringNotifications
                         )

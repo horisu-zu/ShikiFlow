@@ -41,6 +41,10 @@ query AnimeDetails(
 
         screenshots { originalUrl }
 
+        videos {
+            ...VideoShort
+        }
+
         scoresStats { score count }
         statusesStats { status count }
 

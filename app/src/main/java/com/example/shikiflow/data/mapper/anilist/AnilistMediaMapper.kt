@@ -21,6 +21,7 @@ import com.example.shikiflow.data.mapper.common.RelatedMediaMapper.toDomain
 import com.example.shikiflow.data.mapper.common.ScoreFormatMapper.toDomainFormat
 import com.example.shikiflow.data.mapper.common.StudioMapper.toStudioShort
 import com.example.shikiflow.data.mapper.common.TagMapper
+import com.example.shikiflow.data.mapper.common.VideoMapper.toDomainVideo
 import com.example.shikiflow.domain.model.anime.AiringAnime
 import com.example.shikiflow.domain.model.anime.AiringAnimeDataShort
 import com.example.shikiflow.domain.model.browse.BrowseMedia
@@ -83,6 +84,7 @@ object AnilistMediaMapper {
                 Instant.fromEpochSeconds(it.aLAiringEpisodeShort.airingAt.toLong())
             },
             origin = source?.toDomain() ?: MediaOrigin.UNKNOWN,
+            videos = listOfNotNull(trailer?.aLVideoShort?.toDomainVideo()),
             studios = studios?.nodes?.mapNotNull { it?.aLStudioShort?.toStudioShort() } ?: emptyList(),
             staffList = staff?.edges?.mapNotNull { staffEdge ->
                 staffEdge?.aLStaffEdgeShort?.toDomain()

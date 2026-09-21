@@ -69,7 +69,7 @@
 
     <string name="tracker_services_update_title">Update Tracks on All Connected Services</string>
     <string name="tracker_services_update_note">
-        due to the nature of syncing tracks updates via the MAL ID,
+        because tracks are synced via MAL ID,
         some requests might not be completed or could cause a mismatch
     </string>
 
@@ -287,6 +287,7 @@
     <string name="details_short_info_episodes">Episodes</string>
     <string name="details_short_info_age_rating">Age Rating</string>
     <string name="anime_details_screenshots">Screenshots</string>
+    <string name="anime_details_video">Video</string>
     <string name="details_short_info_manga_type">Type</string>
     <string name="details_short_info_manga_published">Published</string>
     <string name="details_short_info_manga_volumes">Volumes</string>

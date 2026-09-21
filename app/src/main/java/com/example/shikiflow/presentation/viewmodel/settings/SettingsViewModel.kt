@@ -93,7 +93,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun syncTracks(userId: Int) {
-        mediaTracksScheduler.scheduleOneTimeSync(userId, applyDelay = false)
+        mediaTracksScheduler.scheduleSyncs(userId, applyDelay = false)
     }
 
     fun getAuthorizationUrl(authType: AuthType): String {
@@ -233,6 +233,10 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             settingsRepository.saveAiringDelay(newValue)
         }
+    }
+
+    fun rescheduleNotificationWork() {
+        notificationScheduler.schedulePeriodicWork()
     }
 
     fun setDataSaver(isEnabled: Boolean) {
