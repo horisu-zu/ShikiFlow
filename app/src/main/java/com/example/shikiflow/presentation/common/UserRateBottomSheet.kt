@@ -505,6 +505,10 @@ private fun ScoreSlider(
         trackRange = scoreFormat.valueRange().floatingPointRange()
     )
 
+    LaunchedEffect(sliderState.value) {
+        onScoreChange(sliderState.value)
+    }
+
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -516,7 +520,7 @@ private fun ScoreSlider(
                 val step = scoreFormat.valueRange().step
                 val rounded = (value / step).roundToInt() * step
 
-                onScoreChange(rounded)
+                sliderState.value = rounded
             },
             modifier = Modifier
                 .height(24.dp)

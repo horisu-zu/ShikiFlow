@@ -233,6 +233,10 @@ private fun ScoreRangeSliderComponent(
         trackRange = scoreFormat.valueRange().floatingPointRange(),
     )
 
+    LaunchedEffect(sliderState.startValue, sliderState.endValue) {
+        onRangeChange(sliderState.startValue..sliderState.endValue)
+    }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top)
@@ -287,7 +291,8 @@ private fun ScoreRangeSliderComponent(
         RangeSlider(
             state = sliderState,
             onValueChange = { newRange ->
-                onRangeChange(newRange)
+                sliderState.startValue = newRange.start
+                sliderState.endValue = newRange.endInclusive
             },
             modifier = Modifier.height(24.dp)
         )

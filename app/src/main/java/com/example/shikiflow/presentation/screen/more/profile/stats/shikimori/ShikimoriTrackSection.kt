@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -133,7 +132,7 @@ private fun ShikimoriTrackSectionContent(
             if(!isCurrentUser) {
                 Row(
                     modifier = Modifier
-                        .clip(CircleShape)
+                        .clip(RoundedCornerShape(percent = 32))
                         .clickable { onCompareClick() }
                         .padding(start = 8.dp, top = 4.dp, bottom = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.Start),
@@ -143,6 +142,7 @@ private fun ShikimoriTrackSectionContent(
                         text = stringResource(R.string.more_profile_compare),
                         style = MaterialTheme.typography.bodyMedium
                     )
+
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                         contentDescription = null,
