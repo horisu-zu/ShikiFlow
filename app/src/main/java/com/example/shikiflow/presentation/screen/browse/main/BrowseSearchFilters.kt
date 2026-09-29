@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
@@ -438,6 +439,7 @@ fun BrowseSearchFilters(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             TextButton(
+                shape = RoundedCornerShape(percent = 32),
                 onClick = { event.changeFiltersVisibility() }
             ) {
                 Text(
@@ -455,6 +457,7 @@ fun BrowseSearchFilters(
                 exit = fadeOut() + shrinkHorizontally()
             ) {
                 TextButton(
+                    shape = RoundedCornerShape(percent = 32),
                     onClick = { event.clearFilters() }
                 ) {
                     Text(

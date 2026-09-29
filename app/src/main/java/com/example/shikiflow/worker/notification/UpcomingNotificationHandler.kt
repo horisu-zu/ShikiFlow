@@ -63,22 +63,22 @@ class UpcomingNotificationHandler @Inject constructor(
         }
 
         airingSoonMedia.forEach { media ->
-            runCatching {
-                context.showNotification(
-                    notificationId = media.id,
-                    channelId = UPCOMING_CHANNEL_ID,
-                    group = AIRING_GROUP_ID,
-                    title = media.title.preferred(titleType),
-                    text = resources.getString(R.string.airing_premiere_notification_label)
-                )
-            }.onSuccess {
-                episodeNotificationRepository.saveEntry(
-                    EpisodeNotification(
-                        mediaId = media.id,
-                        episode = media.currentProgress?.plus(1) ?: 1,
-                        type = EpisodeNotificationType.UPCOMING
+            context.showNotification(
+                notificationId = media.id,
+                channelId = UPCOMING_CHANNEL_ID,
+                group = AIRING_GROUP_ID,
+                title = media.title.preferred(titleType),
+                text = resources.getString(R.string.airing_premiere_notification_label)
+            ).also { notified ->
+                if (notified) {
+                    episodeNotificationRepository.saveEntry(
+                        EpisodeNotification(
+                            mediaId = media.id,
+                            episode = media.currentProgress?.plus(1) ?: 1,
+                            type = EpisodeNotificationType.UPCOMING
+                        )
                     )
-                )
+                }
             }
         }
     }

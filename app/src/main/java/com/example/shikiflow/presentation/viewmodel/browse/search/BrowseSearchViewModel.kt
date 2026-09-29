@@ -93,7 +93,8 @@ class BrowseSearchViewModel @Inject constructor(
         _params.update { params ->
             params.copy(
                 mediaBrowseOptions = MediaBrowseOptions(
-                    mediaType = params.mediaBrowseOptions.mediaType
+                    mediaType = params.mediaBrowseOptions.mediaType,
+                    name = params.mediaBrowseOptions.name
                 )
             )
         }

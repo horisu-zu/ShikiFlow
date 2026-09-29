@@ -57,25 +57,25 @@ fun BrowseScreenNavigator(
                         slideInHorizontally(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessLow
+                                stiffness = Spring.StiffnessMediumLow
                             ),
                             initialOffsetX = { it / 2 }
                         ) togetherWith fadeOut(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessLow
+                                stiffness = Spring.StiffnessMediumLow
                             )
                         )
                     } + NavDisplay.popTransitionSpec {
                         slideInHorizontally(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessLow
+                                stiffness = Spring.StiffnessMediumLow
                             )
                         ) togetherWith fadeOut(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioNoBouncy,
-                                stiffness = Spring.StiffnessLow
+                                stiffness = Spring.StiffnessMediumLow
                             )
                         )
                     }

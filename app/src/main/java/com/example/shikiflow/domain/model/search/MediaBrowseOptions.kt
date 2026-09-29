@@ -26,8 +26,7 @@ data class MediaBrowseOptions(
 ) {
     companion object {
         fun MediaBrowseOptions.isEmpty(): Boolean {
-            return name == null &&
-                status == null &&
+            return status == null &&
                 sort == null &&
                 format == null &&
                 season == null &&
