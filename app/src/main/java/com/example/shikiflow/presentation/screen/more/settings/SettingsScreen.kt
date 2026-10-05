@@ -30,6 +30,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastRoundToInt
 import androidx.core.app.ActivityCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,6 +49,7 @@ import com.example.shikiflow.presentation.common.mappers.MediaTypeMapper.display
 import com.example.shikiflow.presentation.common.mappers.ScoreFormatMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.displayValue
 import com.example.shikiflow.presentation.common.mappers.SettingsMapper.iconResource
+import com.example.shikiflow.utils.Converter
 import com.example.shikiflow.utils.IconResource
 import com.example.shikiflow.utils.LocaleUtils
 import com.example.shikiflow.utils.LocaleUtils.getAvailableLocales
@@ -372,6 +374,21 @@ fun SettingsScreen(
                                 }
                             },
                             isChecked = settingsState.notificationSettings.showNotifications
+                        ),
+                        SectionItem.RangeSlider(
+                            title = "Delivery Window",
+                            displayValue = "Receive notifications between displayed times",
+                            values = settingsState.notificationSettings.timeRange,
+                            rangeDisplayValue = { value ->
+                                Converter.formatToDisplayTime(value.fastRoundToInt())
+                            },
+                            range = 0f..1440f,
+                            steps = 287,
+                            onChange = { newValue ->
+                                settingsViewModel.setNotificationsTimeRange(newValue)
+                            },
+                            onChangeFinished = { settingsViewModel.rescheduleNotificationWork() },
+                            isVisible = settingsState.notificationSettings.showNotifications
                         ),
                         SectionItem.Switch(
                             title = stringResource(R.string.airing_premiere_notifications_settings_label),

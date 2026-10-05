@@ -14,16 +14,17 @@ import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.EpisodeNotificationRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.utils.DateUtils
 import com.example.shikiflow.utils.DateUtils.timeDifference
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.map
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -59,18 +60,18 @@ class AiringNotificationHandler @Inject constructor(
 
         Log.d("AiringNotificationHandler", "Airing Media: $airingMedia")
 
-        val airingDelayMs = settingsRepository.notificationSettingsFlow
-            .map { notificationSettings -> notificationSettings.airingDelay }
+        val notificationSettings = settingsRepository.notificationSettingsFlow
             .first()
-            .roundToInt() * 60L * 1000L
+
+        val airingDelayMs = notificationSettings.airingDelay.roundToInt() * 60L * 1000L
+        val deliveryWindow = notificationSettings.timeRange
 
         airingMedia.forEach { media ->
             val episode = media.currentProgress?.plus(1) ?: 1
-            val delayMs = media.nextEpisodeAt!!.minus(Clock.System.now())
-                .inWholeMilliseconds
-                .coerceAtLeast(0L) + airingDelayMs
+            val instant = media.nextEpisodeAt!! + airingDelayMs.milliseconds
+            val delayMs = DateUtils.calculateDelayUntilWindow(instant, deliveryWindow)
 
-            Log.d("AiringNotificationHandler", "Showing notification in ${delayMs / 1000L / 60L} mins")
+            Log.d("AiringNotificationHandler", "Showing notification in ${delayMs.inWholeMinutes} mins")
 
             val inputData = workDataOf(
                 AiringNotificationWorker.KEY_MEDIA_ID to media.id,
@@ -79,7 +80,7 @@ class AiringNotificationHandler @Inject constructor(
             )
 
             val request = OneTimeWorkRequestBuilder<AiringNotificationWorker>()
-                .setInitialDelay(delayMs, timeUnit = TimeUnit.MILLISECONDS)
+                .setInitialDelay(delayMs.inWholeMilliseconds, timeUnit = TimeUnit.MILLISECONDS)
                 .setInputData(inputData)
                 .setBackoffCriteria(BackoffPolicy.LINEAR, 15 * 1000L, TimeUnit.MILLISECONDS)
                 .build()

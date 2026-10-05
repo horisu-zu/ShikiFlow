@@ -10,6 +10,7 @@ import kotlinx.datetime.minus
 import kotlinx.datetime.plus
 import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
+import kotlin.math.roundToInt
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Instant
@@ -74,6 +75,47 @@ object DateUtils {
         val targetInstant = target.toInstant(timeZone)
 
         return (targetInstant - now).inWholeMilliseconds
+    }
+
+    fun calculateDelayUntilWindow(
+        instant: Instant,
+        window: Pair<Float, Float>
+    ): Duration {
+        val timeZone = TimeZone.currentSystemDefault()
+        val now = Clock.System.now()
+
+        val start = window.first.roundToInt()
+        val end = window.second.roundToInt()
+
+        val local = instant.toLocalDateTime(timeZone)
+        val current = local.hour * 60 + local.minute
+
+        val isWithin = current in start..end
+
+        val target = if (!isWithin) {
+            val date = if (current < start) local.date
+                else local.date.plus(1, DateTimeUnit.DAY)
+
+            LocalDateTime(
+                date = date,
+                time = LocalTime(start / 60 % 24, start % 60),
+            ).toInstant(timeZone)
+        } else instant
+
+        return target - now
+    }
+
+    fun isWithinWindow(window: Pair<Float, Float>): Boolean {
+        val time = Clock.System.now()
+            .toLocalDateTime(TimeZone.currentSystemDefault())
+            .time
+
+        val start = window.first.roundToInt()
+        val end = window.second.roundToInt()
+
+        val current = time.hour * 60 + time.minute
+
+        return current in start..end
     }
 
     fun Int.calculateDuration(): Pair<Int, Int> {

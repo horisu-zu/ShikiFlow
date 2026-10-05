@@ -113,6 +113,10 @@ object Converter {
         }
     }
 
+    fun formatToDisplayTime(minutes: Int): String {
+        return "%d:%02d".format(minutes / 60, minutes % 60)
+    }
+
     fun String.toAbbreviation(maxLetters: Int = 2): String {
         val words = this.split(Regex("\\s+")).filter { it.isNotBlank() }
 

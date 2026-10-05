@@ -235,6 +235,12 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun setNotificationsTimeRange(range: Pair<Float, Float>) {
+        viewModelScope.launch {
+            settingsRepository.saveTimeRange(range)
+        }
+    }
+
     fun rescheduleNotificationWork() {
         notificationScheduler.schedulePeriodicWork()
     }

@@ -25,10 +25,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RangeSlider
 import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
+import androidx.compose.material3.SliderDefaults.Track as SliderTrack
+import androidx.compose.material3.SliderDefaults.Track as RangeSliderTrack
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberRangeSliderState
 import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -140,6 +143,21 @@ fun SettingsSection(
                             displayValue = item.displayValue,
                             value = item.value,
                             trackRange = item.trackRange,
+                            onChange = item.onChange,
+                            onChangeFinished = item.onChangeFinished,
+                            modifier = itemModifier
+                        )
+                    }
+                }
+                is SectionItem.RangeSlider -> {
+                    AnimatedVisibility(item.isVisible) {
+                        RangeSliderItem(
+                            title = item.title,
+                            displayValue = item.displayValue,
+                            values = item.values,
+                            range = item.range,
+                            steps = item.steps,
+                            rangeDisplayValue = item.rangeDisplayValue,
                             onChange = item.onChange,
                             onChangeFinished = item.onChangeFinished,
                             modifier = itemModifier
@@ -386,7 +404,7 @@ private fun SliderItem(
             },
             onValueChangeFinished = onChangeFinished,
             track = { state ->
-                SliderDefaults.Track(
+                SliderTrack(
                     sliderState = state,
                     thumbTrackGapSize = 4.dp,
                     modifier = Modifier.height(12.dp)
@@ -395,6 +413,117 @@ private fun SliderItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(24.dp)
+        )
+    }
+}
+
+@Composable
+private fun RangeSliderItem(
+    title: String,
+    displayValue: String?,
+    values: Pair<Float, Float>,
+    range: ClosedFloatingPointRange<Float>,
+    steps: Int,
+    rangeDisplayValue: (Float) -> String,
+    onChange: (Pair<Float, Float>) -> Unit,
+    onChangeFinished: (() -> Unit)?,
+    modifier: Modifier = Modifier
+) {
+    val sliderState = rememberRangeSliderState(
+        startValue = values.first,
+        endValue = values.second,
+        trackRange = range,
+        steps = steps
+    )
+
+    LaunchedEffect(sliderState.startValue, sliderState.endValue) {
+        onChange(sliderState.startValue to sliderState.endValue)
+    }
+
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(2.dp, Alignment.End),
+                verticalAlignment = Alignment.Bottom
+            ) {
+                Text(
+                    text = rangeDisplayValue(sliderState.startValue),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier
+                        .width(56.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(percent = 32)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                )
+
+                Text(
+                    text = "..",
+                    style = MaterialTheme.typography.labelMedium
+                )
+
+                Text(
+                    text = rangeDisplayValue(sliderState.endValue),
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    ),
+                    modifier = Modifier
+                        .width(56.dp)
+                        .background(
+                            color = MaterialTheme.colorScheme.secondaryContainer,
+                            shape = RoundedCornerShape(percent = 32)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 6.dp)
+                )
+            }
+        }
+
+        displayValue?.let {
+            Text(
+                text = displayValue,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
+                ),
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+
+        RangeSlider(
+            state = sliderState,
+            onValueChange = { newRange ->
+                sliderState.startValue = newRange.start
+                sliderState.endValue = newRange.endInclusive
+            },
+            track = { state ->
+                RangeSliderTrack(
+                    rangeSliderState = state,
+                    thumbTrackGapSize = 6.dp,
+                    drawTick = { _, _ -> /*removed steps indicator*/ },
+                    modifier = Modifier.height(12.dp)
+                )
+            },
+            onValueChangeFinished = onChangeFinished,
+            modifier = Modifier.height(24.dp)
         )
     }
 }

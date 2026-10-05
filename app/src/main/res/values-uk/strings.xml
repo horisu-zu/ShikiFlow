@@ -971,7 +971,7 @@
 
     <string name="airing_summary_notification_label">Відстежувані тайтли, що зараз транслюються:</string>
     <string name="airing_episode_notification_label">Епізод %d вже транслюється</string>
-    <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких відбудеться завтра</string>
-    <string name="airing_premiere_notification_label">Перший епізод вийде завтра</string>
+    <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких незабаром відбудеться</string>
+    <string name="airing_premiere_notification_label">Перший епізод незабаром вийде</string>
     <string name="anime_streaming_notifications_group_system_label">Трансляція аніме</string>
 </resources>

@@ -34,6 +34,18 @@ sealed interface SectionItem {
         val isVisible: Boolean = true
     ): SectionItem
 
+    data class RangeSlider(
+        override val title: String,
+        override val displayValue: String?,
+        val values: Pair<Float, Float>,
+        val rangeDisplayValue: (Float) -> String,
+        val range: ClosedFloatingPointRange<Float>,
+        val steps: Int = 0,
+        val onChange: (Pair<Float, Float>) -> Unit,
+        val onChangeFinished: (() -> Unit)? = null,
+        val isVisible: Boolean = true
+    ): SectionItem
+
     data class User(
         override val title: String,
         override val displayValue: String,

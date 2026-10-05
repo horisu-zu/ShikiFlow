@@ -61,6 +61,7 @@ interface SettingsRepository {
     suspend fun saveAiringNotifications(value: Boolean)
     suspend fun saveUpcomingNotifications(value: Boolean)
     suspend fun saveAiringDelay(delay: Float)
+    suspend fun saveTimeRange(range: Pair<Float, Float>)
 
     suspend fun clearUserData()
     suspend fun clearUserData(authType: AuthType)

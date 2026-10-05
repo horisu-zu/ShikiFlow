@@ -36,6 +36,7 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.to
 
 class SettingsRepositoryImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>
@@ -73,6 +74,8 @@ class SettingsRepositoryImpl @Inject constructor(
         private val SHOW_AIRING_NOTIFICATIONS = booleanPreferencesKey("airing_notifications")
         private val SHOW_UPCOMING_NOTIFICATIONS = booleanPreferencesKey("upcoming_notifications")
         private val AIRING_NOTIFICATIONS_DELAY = floatPreferencesKey("airing_notifications_delay")
+        private val NOTIFICATIONS_TIME_RANGE_START = floatPreferencesKey("notifications_time_range_start")
+        private val NOTIFICATIONS_TIME_RANGE_END = floatPreferencesKey("notifications_time_range_end")
 
         private val DATA_SAVER_MODE = booleanPreferencesKey("data_saver")
         private val CHAPTER_UI_MODE = stringPreferencesKey("chapter_ui_mode")
@@ -183,7 +186,9 @@ class SettingsRepositoryImpl @Inject constructor(
                 showNotifications = preferences[SHOW_NOTIFICATIONS] ?: false,
                 showAiringNotifications = preferences[SHOW_AIRING_NOTIFICATIONS] ?: true,
                 showUpcomingNotifications = preferences[SHOW_UPCOMING_NOTIFICATIONS] ?: true,
-                airingDelay = preferences[AIRING_NOTIFICATIONS_DELAY] ?: 0f
+                airingDelay = preferences[AIRING_NOTIFICATIONS_DELAY] ?: 0f,
+                timeRange = (preferences[NOTIFICATIONS_TIME_RANGE_START] ?: 0f) to
+                    (preferences[NOTIFICATIONS_TIME_RANGE_END] ?: 1440f)
             )
         }
 
@@ -419,6 +424,13 @@ class SettingsRepositoryImpl @Inject constructor(
     override suspend fun saveAiringDelay(delay: Float) {
         dataStore.edit { preferences ->
             preferences[AIRING_NOTIFICATIONS_DELAY] = delay
+        }
+    }
+
+    override suspend fun saveTimeRange(range: Pair<Float, Float>) {
+        dataStore.edit { preferences ->
+            preferences[NOTIFICATIONS_TIME_RANGE_START] = range.first
+            preferences[NOTIFICATIONS_TIME_RANGE_END] = range.second
         }
     }
 
