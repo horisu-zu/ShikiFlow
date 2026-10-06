@@ -126,6 +126,8 @@
     <string name="settings_show_notifications_description">Дозволити відображати нотифікації</string>
     <string name="settings_notifications_section_title">Нотифікації</string>
     <string name="settings_show_notifications_label">Відображати нотифікації</string>
+    <string name="settings_notifications_delivery_window_label">Години сповіщень</string>
+    <string name="settings_notifications_delivery_window_description">Отримувати сповіщення лише у вказаний проміжок часу</string>
     <string name="airing_notifications_settings_label">Нотифікації трансляції</string>
     <string name="airing_premiere_notifications_settings_label">Нотифікації прем\'єри</string>
     <string name="airing_premiere_notification_settings_description">Нотифікації за день до прем\'єри тайтлу</string>
@@ -972,6 +974,6 @@
     <string name="airing_summary_notification_label">Відстежувані тайтли, що зараз транслюються:</string>
     <string name="airing_episode_notification_label">Епізод %d вже транслюється</string>
     <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких незабаром відбудеться</string>
-    <string name="airing_premiere_notification_label">Перший епізод незабаром вийде</string>
+    <string name="airing_premiere_notification_label">Перший епізод вийде через</string>
     <string name="anime_streaming_notifications_group_system_label">Трансляція аніме</string>
 </resources>

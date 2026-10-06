@@ -80,7 +80,11 @@ class UpcomingNotificationHandler @Inject constructor(
                 channelId = UPCOMING_CHANNEL_ID,
                 group = AIRING_GROUP_ID,
                 title = media.title.preferred(titleType),
-                text = media.nextEpisodeAt!!.untilPremiere(context)
+                text = buildString {
+                    append(resources.getString(R.string.airing_premiere_notification_label))
+                    append(" ")
+                    append(media.nextEpisodeAt!!.untilPremiere(resources))
+                }
             ).also { notified ->
                 if (notified) {
                     episodeNotificationRepository.saveEntry(

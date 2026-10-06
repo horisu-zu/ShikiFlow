@@ -376,8 +376,8 @@ fun SettingsScreen(
                             isChecked = settingsState.notificationSettings.showNotifications
                         ),
                         SectionItem.RangeSlider(
-                            title = "Delivery Window",
-                            displayValue = "Receive notifications between displayed times",
+                            title = stringResource(R.string.settings_notifications_delivery_window_label),
+                            displayValue = stringResource(R.string.settings_notifications_delivery_window_description),
                             values = settingsState.notificationSettings.timeRange,
                             rangeDisplayValue = { value ->
                                 Converter.formatToDisplayTime(value.fastRoundToInt())

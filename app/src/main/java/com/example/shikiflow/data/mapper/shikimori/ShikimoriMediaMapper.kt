@@ -259,25 +259,10 @@ object ShikimoriMediaMapper {
                 totalEpisodes = if(episodes != 0) episodes else null,
                 duration = duration?.minutes
             ),
-            episode = if(airedThisWeek) episodesAired else episodesAired + 1,
+            episode = episodesAired + 1,
             timeUntilAiring = episodeInstant?.timeDifference(),
             airingAt = episodeInstant,
             releasedOn = releasedOn?.dateShort?.toDomain()?.date
         )
     }
-
-    /*fun CalendarAnime.toAiringAnime(): AiringAnime {
-        return AiringAnime(
-            data = ShortMedia(
-                id = shikiAnime.id ?: 0,
-                title = shikiAnime.name ?: "",
-                mediaType = MediaType.ANIME,
-                coverImageUrl = BuildConfig.SHIKI_BASE_URL + shikiAnime.image?.original,
-                userRateStatus = null
-            ),
-            episode = nextEpisode,
-            airingAt = Instant.parse(nextEpisodeAt),
-            timeUntilAiring = Instant.parse(nextEpisodeAt).timeDifference()
-        )
-    }*/
 }

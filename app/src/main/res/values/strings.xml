@@ -129,6 +129,8 @@
     <string name="settings_notifications_section_title">Notifications</string>
     <string name="settings_show_notifications_label">Show Notifications</string>
     <string name="settings_show_notifications_description">Allow to display notifications</string>
+    <string name="settings_notifications_delivery_window_label">Delivery Window</string>
+    <string name="settings_notifications_delivery_window_description">Receive notifications between displayed times</string>
     <string name="airing_notifications_settings_label">Airing Notifications</string>
     <string name="airing_premiere_notifications_settings_label">Airing Premiere Notifications</string>
     <string name="airing_premiere_notification_settings_description">Notifications one day before title\'s premiere</string>
@@ -994,7 +996,7 @@ f
     <string name="airing_episode_notification_label">Episode %d is airing</string>
 
     <string name="airing_premiere_summary_notification_label">Tracked titles premiering soon:</string>
-    <string name="airing_premiere_notification_label">First episode is airing in </string>
+    <string name="airing_premiere_notification_label">First episode is airing in</string>
 
     <string name="anime_streaming_notifications_group_system_label">Anime Streaming</string>
 </resources>

@@ -1,6 +1,6 @@
 package com.example.shikiflow.presentation.common.mappers
 
-import android.content.Context
+import android.content.res.Resources
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -94,8 +94,7 @@ object DateMapper {
         return timer
     }
 
-    fun Instant.untilPremiere(context: Context): String {
-        val resources = context.resources
+    fun Instant.untilPremiere(resources: Resources): String {
         val premiereAiring = this.timeDifference()
 
         val hours = premiereAiring.inWholeHours % 24
@@ -112,7 +111,7 @@ object DateMapper {
             else -> resources.getQuantityString(R.plurals.minutes, minutes.toInt(), minutes)
         }
 
-        return resources.getString(R.string.airing_premiere_notification_label) + timer
+        return timer
     }
 
     @Composable
