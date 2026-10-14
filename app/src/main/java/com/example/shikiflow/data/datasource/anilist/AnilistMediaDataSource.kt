@@ -48,6 +48,7 @@ import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -113,6 +114,15 @@ class AnilistMediaDataSource @Inject constructor(
         }
     }
 
+    override fun pagedBrowseMedia(
+        page: Int,
+        limit: Int,
+        browseOptions: MediaBrowseOptions,
+        isRefresh: Boolean
+    ): Flow<PagedResult<BrowseMedia>> {
+        TODO("Not needed")
+    }
+
     override suspend fun browseMedia(
         page: Int,
         limit: Int,
@@ -139,14 +149,14 @@ class AnilistMediaDataSource @Inject constructor(
             format = Optional.presentIfNotNull(browseOptions.format?.toAnilistFormat()),
             score = Optional.presentIfNotNull(browseOptions.score),
             genreIn = if(browseOptions.genres.isNotEmpty()) {
-                Optional.presentIfNotNull(
+                Optional.present(
                     value = browseOptions.genres.map { genre ->
                         genre.toAnilistGenre().orEmpty()
                     }
                 )
             } else Optional.absent(),
             tagIn = if(browseOptions.tags.isNotEmpty()) {
-                Optional.presentIfNotNull(
+                Optional.present(
                     value = browseOptions.tags.map { tag ->
                         tag.toAnilistTag().orEmpty()
                     }

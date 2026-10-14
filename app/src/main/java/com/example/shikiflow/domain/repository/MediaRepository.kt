@@ -13,6 +13,7 @@ import com.example.shikiflow.domain.model.sort.UserRateType
 import com.example.shikiflow.domain.model.studio.Studio
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
@@ -31,6 +32,13 @@ interface MediaRepository {
         browseOptions: MediaBrowseOptions,
         isRefreshing: Boolean = false
     ): Flow<PagingData<BrowseMedia>>
+
+    fun pagedBrowseMedia(
+        page: Int,
+        limit: Int = 24,
+        browseOptions: MediaBrowseOptions,
+        isRefreshing: Boolean = false
+    ): Flow<PagedResult<BrowseMedia>>
 
     suspend fun browseMedia(
         page: Int = 1,

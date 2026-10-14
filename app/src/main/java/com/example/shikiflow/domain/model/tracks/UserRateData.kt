@@ -94,6 +94,7 @@ data class UserRateData(
 data class SaveUserRate(
     val rateId: Int? = null,
     val mediaId: Int,
+    val mediaType: MediaType,
     val malId: Int?,
     val userStatus: UserRateStatus,
     val score: Float = 0f,

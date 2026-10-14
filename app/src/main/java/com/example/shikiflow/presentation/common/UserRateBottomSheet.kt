@@ -118,6 +118,7 @@ fun UserRateBottomSheet(
             SaveUserRate(
                 rateId = userRate.id,
                 mediaId = userRate.mediaId,
+                mediaType = userRate.mediaType,
                 malId = userRate.malId,
                 userStatus = userRate.status,
                 score = scoreFormat.formatValue(userRate.score.toFloat()),

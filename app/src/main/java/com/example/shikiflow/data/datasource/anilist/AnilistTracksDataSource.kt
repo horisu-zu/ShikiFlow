@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.datasource.anilist
 
-import androidx.paging.ExperimentalPagingApi
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
@@ -33,7 +32,6 @@ import javax.inject.Inject
 import kotlin.Result
 import kotlin.collections.flatMap
 
-@OptIn(ExperimentalPagingApi::class)
 class AnilistTracksDataSource @Inject constructor(
     @param:AnilistApollo private val apolloClient: ApolloClient
 ): MediaTracksDataSource, BaseNetworkRepository() {

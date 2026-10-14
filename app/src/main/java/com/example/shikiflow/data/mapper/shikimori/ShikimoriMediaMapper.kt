@@ -259,7 +259,8 @@ object ShikimoriMediaMapper {
                 totalEpisodes = if(episodes != 0) episodes else null,
                 duration = duration?.minutes
             ),
-            episode = episodesAired + 1,
+            episode = if (nextEpInstant?.isInCurrentWeek() == true) episodesAired + 1
+                else episodesAired.coerceAtLeast(1),
             timeUntilAiring = episodeInstant?.timeDifference(),
             airingAt = episodeInstant,
             releasedOn = releasedOn?.dateShort?.toDomain()?.date

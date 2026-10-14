@@ -37,7 +37,7 @@ object LazyListUtils {
     @Composable
     fun LazyGridState.onBottomReached(
         buffer: Int,
-        onLoadMore: suspend () -> Unit
+        onLoadMore: () -> Unit
     ) {
         require(buffer >= 0) { "buffer cannot be negative, but was $buffer" }
 

@@ -90,7 +90,7 @@ class TracksSearchViewModel @Inject constructor(
             entryId = saveUserRate.rateId,
             mediaId = saveUserRate.mediaId,
             malId = saveUserRate.malId,
-            mediaType = MediaType.MANGA,
+            mediaType = saveUserRate.mediaType,
             status = saveUserRate.userStatus,
             score = saveUserRate.score,
             progress = saveUserRate.progress,

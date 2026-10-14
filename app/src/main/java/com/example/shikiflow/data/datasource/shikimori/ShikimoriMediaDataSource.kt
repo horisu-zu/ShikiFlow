@@ -47,11 +47,13 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.result.DataResult
+import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
@@ -108,6 +110,112 @@ class ShikimoriMediaDataSource @Inject constructor(
         TODO("Not available in the API")
     }
 
+    override fun pagedBrowseMedia(
+        page: Int,
+        limit: Int,
+        browseOptions: MediaBrowseOptions,
+        isRefresh: Boolean
+    ): Flow<PagedResult<BrowseMedia>> = flow {
+        val result = when(browseOptions.mediaType) {
+            MediaType.ANIME -> {
+                val query = AnimeBrowseQuery(
+                    page = Optional.presentIfNotNull(page),
+                    limit = Optional.presentIfNotNull(limit),
+                    search = Optional.presentIfNotNull(browseOptions.name),
+                    order = Optional.presentIfNotNull(browseOptions.sort?.type?.toShikimoriBrowseOrder()),
+                    kind = Optional.presentIfNotNull(browseOptions.format?.toShikiAnimeKind()?.name),
+                    status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriAnimeStatus()?.name),
+                    season = Optional.presentIfNotNull(browseOptions.season?.toShikiSeason()),
+                    score = Optional.presentIfNotNull(browseOptions.score),
+                    genre = if (browseOptions.genres.isNotEmpty() || browseOptions.tags.isNotEmpty()) {
+                        val genres = browseOptions.genres.mapNotNull { genre ->
+                            genre.toShikimoriGenre()
+                        }
+                        val tags = browseOptions.tags.mapNotNull { tag ->
+                            tag.toShikimoriTag()
+                        }
+
+                        Optional.presentIfNotNull(
+                            value = (genres + tags).joinToString(",").ifEmpty { null }
+                        )
+                    } else Optional.absent(),
+                    rating = Optional.presentIfNotNull(browseOptions.ageRating?.toShikiRating()?.name),
+                    censored = Optional.present(true)
+                )
+
+                val response = apolloClient.query(query)
+                    .fetchPolicy(
+                        fetchPolicy = when (isRefresh) {
+                            true -> FetchPolicy.NetworkFirst
+                            false -> FetchPolicy.CacheFirst
+                        }
+                    )
+                    .execute()
+
+                response.toResult().map { data ->
+                    data.animes.map { anime ->
+                        anime.toBrowseAnime()
+                    }
+                }
+            }
+
+            MediaType.MANGA -> {
+                val query = MangaBrowseQuery(
+                    page = Optional.presentIfNotNull(page),
+                    limit = Optional.presentIfNotNull(limit),
+                    search = Optional.presentIfNotNull(browseOptions.name),
+                    order = Optional.presentIfNotNull(browseOptions.sort?.type?.toShikimoriBrowseOrder()),
+                    kind = Optional.presentIfNotNull(browseOptions.format?.toShikiMangaKind()?.name),
+                    status = Optional.presentIfNotNull(browseOptions.status?.toShikimoriMangaStatus()?.name),
+                    genre = if (browseOptions.genres.isNotEmpty() || browseOptions.tags.isNotEmpty()) {
+                        val genres = browseOptions.genres.mapNotNull { genre ->
+                            genre.toShikimoriGenre()
+                        }
+                        val tags = browseOptions.tags.mapNotNull { tag ->
+                            tag.toShikimoriTag()
+                        }
+
+                        Optional.presentIfNotNull(
+                            value = (genres + tags).joinToString(",").ifEmpty { null }
+                        )
+                    } else Optional.absent(),
+                    score = Optional.presentIfNotNull(browseOptions.score),
+                    censored = Optional.present(true)
+                )
+
+                val response = apolloClient.query(query)
+                    .fetchPolicy(
+                        fetchPolicy = when (isRefresh) {
+                            true -> FetchPolicy.NetworkFirst
+                            false -> FetchPolicy.CacheFirst
+                        }
+                    )
+                    .execute()
+
+                response.toResult().map { data ->
+                    data.mangas.map { manga ->
+                        manga.toBrowseManga()
+                    }
+                }
+            }
+        }
+
+        result.fold(
+            onSuccess = { list ->
+                emit(
+                    PagedResult.Success(
+                        list = list,
+                        currentPage = page,
+                        hasNextPage = list.size == limit
+                    )
+                )
+            },
+            onFailure = { throwable ->
+                emit(PagedResult.Error(throwable.message ?: "Unknown Error"))
+            }
+        )
+    }.onStart { emit(PagedResult.Loading) }
+
     override suspend fun browseMedia(
         page: Int,
         limit: Int,
@@ -124,7 +232,7 @@ class ShikimoriMediaDataSource @Inject constructor(
             browseOptions.tags.isEmpty()
         ) return Result.success(emptyList())
 
-        return  when(browseOptions.mediaType) {
+        return when(browseOptions.mediaType) {
             MediaType.ANIME -> {
                 val query = AnimeBrowseQuery(
                     page = Optional.presentIfNotNull(page),

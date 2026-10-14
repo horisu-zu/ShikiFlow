@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.datasource.anilist
 
-import androidx.paging.ExperimentalPagingApi
 import com.apollographql.apollo.ApolloClient
 import com.apollographql.apollo.api.Optional
 import com.apollographql.cache.normalized.FetchPolicy
@@ -28,7 +27,6 @@ import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-@OptIn(ExperimentalPagingApi::class)
 class AnilistThreadsDataSource @Inject constructor(
     @param:AnilistApollo private val apolloClient: ApolloClient
 ): CommentsDataSource, BaseNetworkRepository() {
