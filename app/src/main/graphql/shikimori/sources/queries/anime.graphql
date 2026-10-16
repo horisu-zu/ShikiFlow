@@ -94,7 +94,6 @@ query AnimeBrowse(
         duration
         airedOn { ...DateShort }
         releasedOn { ...DateShort }
-        url
         season
 
         poster { ...PosterShort }

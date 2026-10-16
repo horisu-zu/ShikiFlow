@@ -210,7 +210,12 @@ object ShikimoriMediaMapper {
             score = score?.toFloat(),
             mediaType = MediaType.MANGA,
             mediaFormat = kind?.toDomain() ?: MediaFormat.UNKNOWN,
-            userRateStatus = userRate?.mangaUserRate?.status?.toDomain()
+            userRateStatus = userRate?.mangaUserRate?.status?.toDomain(),
+            genres = genres?.mapNotNull { genre ->
+                GenreMapper.fromString(genre.name)
+            } ?: emptyList(),
+            staff = personRoles?.map { it.person.name } ?: emptyList(),
+            publishers = publishers.map { it.name }
         )
     }
 

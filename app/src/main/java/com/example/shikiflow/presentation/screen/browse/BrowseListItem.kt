@@ -38,7 +38,7 @@ import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.utils.Converter
 
 @Composable
-fun BrowseListItem(
+fun BrowseAnimeListItem(
     browseItem: BrowseMedia.Anime,
     titleType: PreferredTitleType,
     onItemClick: (Int, MediaType) -> Unit,
@@ -107,6 +107,7 @@ fun BrowseListItem(
                         text = stringResource(R.string.next_episode),
                         style = MaterialTheme.typography.labelMedium
                     )
+
                     Text(
                         text = Converter.formatInstant(nextEpisodeInstant, includeDayOfWeek = true),
                         style = MaterialTheme.typography.labelMedium.copy(
@@ -139,7 +140,7 @@ fun BrowseListItem(
 }
 
 @Composable
-fun BrowseListItemPlaceholder(
+fun BrowseAnimeListItemPlaceholder(
     itemIndex: Int,
     modifier: Modifier = Modifier,
     maxValue: Int = 3
@@ -221,6 +222,92 @@ fun BrowseListItemPlaceholder(
                     CardItemPlaceholder(
                         modifier = Modifier.width(24.dp + 12.dp * (maxValue - index))
                     )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun BrowseMangaListItem(
+    browseItem: BrowseMedia.Manga,
+    titleType: PreferredTitleType,
+    onItemClick: (Int, MediaType) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val roundedCornerShape = 12.dp
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(roundedCornerShape))
+            .clickable { onItemClick(browseItem.id, browseItem.mediaType) },
+        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+        verticalAlignment = Alignment.Top
+    ) {
+        BrowseCoverItem(
+            posterUrl = browseItem.posterUrl,
+            mediaType = browseItem.mediaType,
+            userRateStatus = browseItem.userRateStatus,
+            coverWidth = 96.dp,
+            cornerShape = roundedCornerShape
+        )
+
+        Column(
+            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
+            horizontalAlignment = Alignment.Start
+        ) {
+            Text(
+                text = browseItem.title.preferred(titleType),
+                style = MaterialTheme.typography.labelLarge.copy(
+                    fontWeight = FontWeight.Medium
+                ),
+                maxLines = 2,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            if (browseItem.staff.isNotEmpty()) {
+                Text(
+                    text = browseItem.staff.joinToString(separator = " • "),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+            }
+
+            Text(
+                text = listOfNotNull(
+                    stringResource(id = browseItem.mediaFormat.displayValue()),
+                    browseItem.score?.let { score ->
+                        stringResource(id = R.string.media_score, score)
+                    }
+                ).joinToString(" • "),
+                style = MaterialTheme.typography.labelSmall
+            )
+
+            if (browseItem.publishers.isNotEmpty()) {
+                Text(
+                    text = browseItem.publishers.joinToString(separator = " • "),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                )
+            }
+
+            if(browseItem.genres.isNotEmpty()) {
+                FlowRow(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.Start),
+                    verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
+                ) {
+                    browseItem.genres.forEach { genre ->
+                        CardItem(
+                            item = stringResource(genre.displayValue()),
+                            style = MaterialTheme.typography.labelSmall,
+                            modifier = Modifier.clip(RoundedCornerShape(percent = 40))
+                        )
+                    }
                 }
             }
         }

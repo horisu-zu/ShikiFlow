@@ -66,10 +66,8 @@ query MangaBrowse(
         genre: $genre, publisher: $publisher, franchise: $franchise,censored: $censored, mylist: $mylist, ids: $ids
     ) {
         id
-        malId
         name
         russian
-        licenseNameRu
         english
         japanese
         synonyms
@@ -78,18 +76,16 @@ query MangaBrowse(
         status
         volumes
         chapters
-        airedOn { year month day date }
-        releasedOn { year month day date }
-        url
 
         poster { ...PosterShort }
 
-        createdAt,
-        updatedAt,
-        isCensored
-
-        genres { id name russian kind }
-        publishers { id name }
+        genres { name }
+        publishers { name }
+        personRoles {
+            person {
+                name
+            }
+        }
 
         userRate {
             ...MangaUserRate

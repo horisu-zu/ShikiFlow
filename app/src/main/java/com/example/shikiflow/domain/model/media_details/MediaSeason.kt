@@ -37,7 +37,7 @@ data class MediaSeason(
             val next = when(date.month.ordinal + 1) {
                 in 1..3 -> SPRING
                 in 4..6 -> SUMMER
-                in 7..10 -> FALL
+                in 7..9 -> FALL
                 else -> WINTER
             }
 

@@ -49,8 +49,9 @@ import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
-import com.example.shikiflow.presentation.screen.browse.BrowseListItem
-import com.example.shikiflow.presentation.screen.browse.BrowseListItemPlaceholder
+import com.example.shikiflow.presentation.screen.browse.BrowseAnimeListItem
+import com.example.shikiflow.presentation.screen.browse.BrowseAnimeListItemPlaceholder
+import com.example.shikiflow.presentation.screen.browse.BrowseMangaListItem
 import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
 import com.example.shikiflow.presentation.screen.browse.main.BrowseMainBottomSheet
 import com.example.shikiflow.presentation.screen.browse.main.NavigationSection
@@ -218,14 +219,14 @@ fun BrowseListComponent(
             items(count = sectionState.entries.size) { index ->
                 when (val browseItem = sectionState.entries[index]) {
                     is BrowseMedia.Anime -> {
-                        BrowseListItem(
+                        BrowseAnimeListItem(
                             browseItem = browseItem,
                             titleType = preferredTitleType,
                             onItemClick = onNavigate
                         )
                     }
                     is BrowseMedia.Manga -> {
-                        BrowseGridItem(
+                        BrowseMangaListItem(
                             browseItem = browseItem,
                             titleType = preferredTitleType,
                             onItemClick = onNavigate
@@ -236,7 +237,7 @@ fun BrowseListComponent(
 
             if (sectionState.isLoading) {
                 items(count = 9) { index ->
-                    BrowseListItemPlaceholder(itemIndex = index % 3 + 1)
+                    BrowseAnimeListItemPlaceholder(itemIndex = index % 3 + 1)
                 }
             } else if (sectionState.errorMessage != null) {
                 item {
