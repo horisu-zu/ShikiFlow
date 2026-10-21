@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.viewmodel.browse.main.shikimori
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.media_details.MediaStatus
@@ -139,11 +140,25 @@ class ShikiBrowseViewModel @Inject constructor(
     }
 
     override fun refresh() {
+        updateSection { sectionState ->
+            sectionState.entries.clear()
 
+            sectionState.copy(
+                page = 1,
+                isRefreshing = true,
+                hasNextPage = true
+            )
+        }
     }
 
     override fun retry() {
-
+        updateSection { sectionState ->
+            sectionState.copy(
+                page = sectionState.page,
+                isRefreshing = true,
+                hasNextPage = true
+            )
+        }
     }
 
     private fun updateSection(

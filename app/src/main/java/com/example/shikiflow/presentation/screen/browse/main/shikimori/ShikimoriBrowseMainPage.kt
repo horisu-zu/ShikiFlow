@@ -46,6 +46,7 @@ import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.sort.MediaSort
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.presentation.common.ErrorItem
+import com.example.shikiflow.presentation.common.PullToRefreshCustomBox
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItem
 import com.example.shikiflow.presentation.screen.browse.BrowseGridItemPlaceholder
@@ -67,6 +68,7 @@ import com.example.shikiflow.utils.LazyListUtils.onBottomReached
 fun ShikimoriBrowseMainPage(
     paddingValues: PaddingValues,
     horizontalPadding: Dp,
+    isAtTop: Boolean,
     browseNavOptions: BrowseNavOptions,
     onIsAtTopChange: (Boolean) -> Unit,
     browseViewModel: ShikiBrowseViewModel = hiltViewModel()
@@ -84,68 +86,74 @@ fun ShikimoriBrowseMainPage(
         }
     }
 
-    uiMode?.let {
-        when (uiMode) {
-            AppUiMode.LIST -> {
-                BrowseListComponent(
-                    uiState = uiState,
-                    browseEvent = browseViewModel,
-                    preferredTitleType = preferredTitleType,
-                    horizontalPadding = horizontalPadding,
-                    onSideScreenNavigate = { browseType ->
-                        browseNavOptions.navigateToSideScreen(browseType)
-                    },
-                    onNavigate = { id, mediaType ->
-                        val detailsNavRoute = when(mediaType) {
-                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                        }
+    PullToRefreshCustomBox(
+        isRefreshing = uiState.mainSections[uiState.mediaType]?.isRefreshing == true,
+        onRefresh = { browseViewModel.refresh() },
+        enabled = isAtTop
+    ) {
+        uiMode?.let {
+            when (uiMode) {
+                AppUiMode.LIST -> {
+                    BrowseListComponent(
+                        uiState = uiState,
+                        browseEvent = browseViewModel,
+                        preferredTitleType = preferredTitleType,
+                        horizontalPadding = horizontalPadding,
+                        onSideScreenNavigate = { browseType ->
+                            browseNavOptions.navigateToSideScreen(browseType)
+                        },
+                        onNavigate = { id, mediaType ->
+                            val detailsNavRoute = when(mediaType) {
+                                MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                                MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                            }
 
-                        browseNavOptions.navigateToDetails(detailsNavRoute)
-                    },
-                    onSettingClick = { showBottomSheet.value = true },
-                    onIsAtTopChange = onIsAtTopChange,
-                    modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
-                )
-            }
-            AppUiMode.GRID -> {
-                BrowseGridComponent(
-                    uiState = uiState,
-                    browseEvent = browseViewModel,
-                    preferredTitleType = preferredTitleType,
-                    horizontalPadding = horizontalPadding,
-                    onSideScreenNavigate = { browseType ->
-                        browseNavOptions.navigateToSideScreen(browseType)
-                    },
-                    onNavigate = { id, mediaType ->
-                        val detailsNavRoute = when(mediaType) {
-                            MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
-                            MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
-                        }
-
-                        browseNavOptions.navigateToDetails(detailsNavRoute)
-                    },
-                    onSettingClick = { showBottomSheet.value = true },
-                    onIsAtTopChange = onIsAtTopChange,
-                    modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
-                )
-            }
-        }
-
-        if(showBottomSheet.value) {
-            BrowseMainBottomSheet(
-                currentBrowseMode = browseUiSettings.browseUiMode ?: BrowseUiMode.AUTO,
-                ongoingOrder = MediaSort.Shikimori.ongoingOptions,
-                currentOngoingMode = browseUiSettings.browseOngoingOrder ?: MediaSort.Common.POPULARITY,
-                onDismiss = { showBottomSheet.value = false },
-                onModeSelect = { newMode ->
-                    browseViewModel.setBrowseUiMode(newMode)
-                },
-                onSortSelect = { newOrder ->
-                    browseViewModel.setBrowseOngoingOrder(newOrder)
+                            browseNavOptions.navigateToDetails(detailsNavRoute)
+                        },
+                        onSettingClick = { showBottomSheet.value = true },
+                        onIsAtTopChange = onIsAtTopChange,
+                        modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+                    )
                 }
-            )
+                AppUiMode.GRID -> {
+                    BrowseGridComponent(
+                        uiState = uiState,
+                        browseEvent = browseViewModel,
+                        preferredTitleType = preferredTitleType,
+                        horizontalPadding = horizontalPadding,
+                        onSideScreenNavigate = { browseType ->
+                            browseNavOptions.navigateToSideScreen(browseType)
+                        },
+                        onNavigate = { id, mediaType ->
+                            val detailsNavRoute = when(mediaType) {
+                                MediaType.ANIME -> DetailsNavRoute.AnimeDetails(id)
+                                MediaType.MANGA -> DetailsNavRoute.MangaDetails(id)
+                            }
+
+                            browseNavOptions.navigateToDetails(detailsNavRoute)
+                        },
+                        onSettingClick = { showBottomSheet.value = true },
+                        onIsAtTopChange = onIsAtTopChange,
+                        modifier = Modifier.padding(top = paddingValues.calculateTopPadding())
+                    )
+                }
+            }
         }
+    }
+
+    if(showBottomSheet.value) {
+        BrowseMainBottomSheet(
+            currentBrowseMode = browseUiSettings.browseUiMode ?: BrowseUiMode.AUTO,
+            ongoingOrder = MediaSort.Shikimori.ongoingOptions,
+            currentOngoingMode = browseUiSettings.browseOngoingOrder ?: MediaSort.Common.POPULARITY,
+            onDismiss = { showBottomSheet.value = false },
+            onModeSelect = { newMode ->
+                browseViewModel.setBrowseUiMode(newMode)
+            },
+            onSortSelect = { newOrder ->
+                browseViewModel.setBrowseOngoingOrder(newOrder)
+            }
+        )
     }
 }
 
@@ -174,7 +182,7 @@ fun BrowseListComponent(
         onIsAtTopChange(isAtTop)
     }
 
-    if (!sectionState.isLoading) {
+    if (!sectionState.isLoading && sectionState.hasNextPage) {
         lazyListState.onBottomReached(
             buffer = 6,
             onLoadMore = { browseEvent.loadMore() }
@@ -284,7 +292,7 @@ fun BrowseGridComponent(
         onIsAtTopChange(isAtTop)
     }
 
-    if (!sectionState.isLoading) {
+    if (!sectionState.isLoading && sectionState.hasNextPage) {
         lazyGridState.onBottomReached(
             buffer = 6,
             onLoadMore = { browseEvent.loadMore() }

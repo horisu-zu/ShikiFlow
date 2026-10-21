@@ -8,7 +8,7 @@ import kotlin.time.Instant
 
 @Entity(
     tableName = "episode_notifications",
-    primaryKeys = ["mediaId", "episode"]
+    primaryKeys = ["mediaId", "episode", "type"]
 )
 data class EpisodeNotificationEntity(
     val mediaId: Int,

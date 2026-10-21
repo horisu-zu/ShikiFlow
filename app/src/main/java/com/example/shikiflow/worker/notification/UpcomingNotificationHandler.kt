@@ -56,7 +56,7 @@ class UpcomingNotificationHandler @Inject constructor(
             .filter { mediaTrack ->
                 !episodeNotificationRepository.checkNotified(
                     mediaId = mediaTrack.id,
-                    episode = mediaTrack.currentProgress?.plus(1) ?: 1,
+                    episode = 1,
                     type = EpisodeNotificationType.UPCOMING
                 )
             }
@@ -90,7 +90,7 @@ class UpcomingNotificationHandler @Inject constructor(
                     episodeNotificationRepository.saveEntry(
                         EpisodeNotification(
                             mediaId = media.id,
-                            episode = media.currentProgress?.plus(1) ?: 1,
+                            episode = 1,
                             type = EpisodeNotificationType.UPCOMING
                         )
                     )

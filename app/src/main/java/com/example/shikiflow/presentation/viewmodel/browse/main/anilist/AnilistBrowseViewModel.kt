@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.browse.main.anilist
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.browse.BrowseType
@@ -80,7 +79,6 @@ class AnilistBrowseViewModel @Inject constructor(
                             }
                         }
                         is DataResult.Error -> {
-                            Log.d("BrowseViewModel", "Error: ${result.message}")
                             state.updateSection(browseType) { section ->
                                 section.copy(
                                     errorMessage = result.message,

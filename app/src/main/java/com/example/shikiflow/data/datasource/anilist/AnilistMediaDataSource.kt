@@ -50,6 +50,7 @@ import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -119,9 +120,7 @@ class AnilistMediaDataSource @Inject constructor(
         limit: Int,
         browseOptions: MediaBrowseOptions,
         isRefresh: Boolean
-    ): Flow<PagedResult<BrowseMedia>> {
-        TODO("Not needed")
-    }
+    ): Flow<PagedResult<BrowseMedia>> = emptyFlow()
 
     override suspend fun browseMedia(
         page: Int,

@@ -42,6 +42,7 @@ fun BrowseScreen(
                     ShikimoriBrowseMainPage(
                         paddingValues = paddingValues,
                         horizontalPadding = horizontalPadding,
+                        isAtTop = isAtTop,
                         browseNavOptions = browseNavOptions,
                         onIsAtTopChange = { isAtTop = it }
                     )
