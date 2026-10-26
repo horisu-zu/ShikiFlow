@@ -1,6 +1,5 @@
 package com.example.shikiflow.presentation.viewmodel.browse.main.shikimori
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.shikiflow.domain.model.media_details.MediaStatus

@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -52,6 +53,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private fun userScoreFormat(authType: AuthType) = stringPreferencesKey("${authType}_score_format")
         private fun userCustomAnimeLists(authType: AuthType) = stringSetPreferencesKey("${authType}_anime_lists")
         private fun userCustomMangaLists(authType: AuthType) = stringSetPreferencesKey("${authType}_manga_lists")
+        private fun userUnreadNotificationsCount(authType: AuthType) = intPreferencesKey("${authType}_unread_notifications_count")
 
         private val TRACKER_SERVICE_UPDATE = booleanPreferencesKey("tracker_update")
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
@@ -95,7 +97,8 @@ class SettingsRepositoryImpl @Inject constructor(
                         id = userId.toInt(),
                         nickname = preferences[userNickname(authType)] ?: "",
                         avatarUrl = preferences[userAvatar(authType)] ?: "",
-                        profileBannerUrl = preferences[userBanner(authType)]
+                        profileBannerUrl = preferences[userBanner(authType)],
+                        unreadNotificationsCount = preferences[userUnreadNotificationsCount(authType)]
                     )
                 }
             }
@@ -261,6 +264,19 @@ class SettingsRepositoryImpl @Inject constructor(
                     MediaType.MANGA -> preferences[userCustomMangaLists(authType)] = lists.toSet()
                 }
             }
+            user.unreadNotificationsCount?.let { unreadNotificationsCount ->
+                preferences[userUnreadNotificationsCount(authType)] = unreadNotificationsCount
+            }
+        }
+    }
+
+    override suspend fun saveUnreadCount(unreadNotificationsCount: Int) {
+        dataStore.edit { preferences ->
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            } ?: AuthType.ANILIST
+
+            preferences[userUnreadNotificationsCount(currentAuthType)] = unreadNotificationsCount
         }
     }
 

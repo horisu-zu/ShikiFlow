@@ -2,6 +2,7 @@ package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.fragment.ALActivityReply
+import com.example.graphql.anilist.fragment.ALCurrentUser
 import com.example.graphql.anilist.fragment.ALFavoriteCharacterShort
 import com.example.graphql.anilist.fragment.ALFavoriteMediaShort
 import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
@@ -10,7 +11,6 @@ import com.example.graphql.anilist.fragment.ALMediaFollowingUser
 import com.example.graphql.anilist.fragment.ALMessageActivity
 import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
-import com.example.graphql.anilist.fragment.ALUser
 import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.graphql.anilist.fragment.ALUserSettings
@@ -60,7 +60,7 @@ import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
 
 object AnilistUserMapper {
-    fun ALUser.toDomainUser(): User {
+    fun ALCurrentUser.toDomainUser(): User {
         return User(
             id = id,
             nickname = name,
@@ -74,7 +74,8 @@ object AnilistUserMapper {
                 mediaListOptions?.mangaList?.customLists?.mapNotNull { it }?.let { mangaLists ->
                     put(MediaType.MANGA, mangaLists)
                 }
-            }
+            },
+            unreadNotificationsCount = unreadNotificationCount
         )
     }
 

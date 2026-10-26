@@ -161,12 +161,11 @@ fragment ALVideoShort on MediaTrailer {
     thumbnail
 }
 
-fragment ALUser on User {
+fragment ALCurrentUser on User {
     id
     name
     avatar {
         large
-        medium
     }
     bannerImage
     isFollowing
@@ -179,6 +178,7 @@ fragment ALUser on User {
             customLists
         }
     }
+    unreadNotificationCount
 }
 
 fragment ALUserShort on User {

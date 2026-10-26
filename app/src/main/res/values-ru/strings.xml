@@ -63,10 +63,11 @@
     <string name="common_retry">Повторить</string>
     <string name="common_unknown">Неизвестно</string>
     <string name="common_note">Заметка</string>
-
     <string name="common_default">По умолчанию</string>
     <string name="common_confirm">Подтвердить</string>
     <string name="common_add">Добавить</string>
+    <string name="common_all">Все</string>
+
     <string name="tracker_services_update_title">Обновлять отслеживаемое на всех подключённых сервисах</string>
     <string name="tracker_services_update_note">
         из-за особенностей синхронизации обновлений через MAL ID
@@ -253,7 +254,6 @@
     <string name="episodes_watched">Эпизоды: %1s</string>
     <string name="ongoing_episodes">%1$s из %2$s эп.</string>
     <string name="airing_episodes">Эпизод %1$s из %2$s</string>
-    <string name="translation_filter_all">Все</string>
     <string name="translation_filter_voice">Дубляж</string>
     <string name="translation_filter_subtitles">Субтитры</string>
     <string name="translation_empty_response">Переводы пока недоступны</string>
@@ -342,7 +342,6 @@
     <string name="comment_offtopic">Оффтоп</string>
     <string name="comment_tree_show_more">Показать больше</string>
 
-    <string name="media_user_status_all">Все</string>
     <string name="media_user_status_anime_watching">Смотрю</string>
     <string name="media_user_status_manga_reading">Читаю</string>
     <string name="media_user_status_anime_rewatching">Пересматриваю</string>
@@ -975,6 +974,12 @@
     <string name="airing_episode_notification_label">Эпизод %d уже транслируется</string>
     <string name="airing_premiere_summary_notification_label">Отслеживаемые тайтлы, премьера которых состоится скоро:</string>
     <string name="airing_premiere_notification_label">Первый эпизод выйдет через</string>
-
     <string name="anime_streaming_notifications_group_system_label">Трансляция аниме</string>
+
+    <string name="notification_type_group_airing">Трансляция</string>
+    <string name="notification_type_group_activity">Активность</string>
+    <string name="notification_type_group_forum">Форум</string>
+    <string name="notification_type_group_follows">Подписки</string>
+    <string name="notification_type_group_media">Медиа</string>
+    <string name="notification_type_group_submission">Заявки</string>
 </resources>

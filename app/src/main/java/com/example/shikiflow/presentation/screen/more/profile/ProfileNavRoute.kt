@@ -20,6 +20,9 @@ sealed interface ProfileNavRoute : NavKey {
     ) : ProfileNavRoute
 
     @Serializable
+    data object Notifications : ProfileNavRoute
+
+    @Serializable
     data class Details(val detailsNavRoute: DetailsNavRoute) : ProfileNavRoute
 
     @Serializable

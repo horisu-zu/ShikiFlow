@@ -66,6 +66,7 @@
     <string name="common_default">Default</string>
     <string name="common_confirm">Confirm</string>
     <string name="common_add">Add</string>
+    <string name="common_all">All</string>
 
     <string name="tracker_services_update_title">Update Tracks on All Connected Services</string>
     <string name="tracker_services_update_note">
@@ -258,7 +259,6 @@
     <string name="ongoing_episodes">%1$s of %2$s ep.</string>
     <string name="airing_episode">Episode %1$s</string>
     <string name="airing_episodes">Episode %1$s of %2$s</string>
-    <string name="translation_filter_all">All</string>
     <string name="translation_filter_voice">Voice</string>
     <string name="translation_filter_subtitles">Subtitles</string>
     <string name="translation_empty_response">Translations aren\'t available yet</string>
@@ -357,7 +357,6 @@
     <string name="comment_offtopic">Off Topic</string>
     <string name="comment_tree_show_more">View more</string>
 
-    <string name="media_user_status_all">All</string>
     <string name="media_user_status_anime_watching">Watching</string>
     <string name="media_user_status_manga_reading">Reading</string>
     <string name="media_user_status_anime_rewatching">Rewatching</string>
@@ -994,9 +993,14 @@ f
 
     <string name="airing_summary_notification_label">Airing tracked titles:</string>
     <string name="airing_episode_notification_label">Episode %d is airing</string>
-
     <string name="airing_premiere_summary_notification_label">Tracked titles premiering soon:</string>
     <string name="airing_premiere_notification_label">First episode is airing in</string>
-
     <string name="anime_streaming_notifications_group_system_label">Anime Streaming</string>
+    
+    <string name="notification_type_group_airing">Airing</string>
+    <string name="notification_type_group_activity">Activity</string>
+    <string name="notification_type_group_forum">Forum</string>
+    <string name="notification_type_group_follows">Follows</string>
+    <string name="notification_type_group_media">Media</string>
+    <string name="notification_type_group_submission">Submission</string>
 </resources>

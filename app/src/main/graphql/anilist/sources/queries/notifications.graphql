@@ -1,0 +1,80 @@
+query Notifications(
+    $page: Int!,
+    $perPage: Int!,
+    $typeIn: [NotificationType],
+    $resetCount: Boolean!
+) {
+    Page(page: $page, perPage: $perPage) {
+        pageInfo {
+            ...CommonPage
+        }
+        notifications(resetNotificationCount: $resetCount, type_in: $typeIn) {
+            ... on AiringNotification {
+                ...ALAiringNotification
+            }
+            ... on FollowingNotification {
+                ...ALFollowingNotification
+            }
+            ... on ActivityMessageNotification {
+                ...ALActivityMessageNotification
+            }
+            ... on ActivityMentionNotification {
+                ...ALActivityMentionNotification
+            }
+            ... on ActivityReplyNotification {
+                ...ALActivityReplyNotification
+            }
+            ... on ActivityReplySubscribedNotification {
+                ...ALActivityReplySubscribedNotification
+            }
+            ... on ActivityLikeNotification {
+                ...ALActivityLikeNotification
+            }
+            ... on ActivityReplyLikeNotification {
+                ...ALActivityReplyLikeNotification
+            }
+            ... on ThreadCommentMentionNotification {
+                ...ALThreadCommentMentionNotification
+            }
+            ... on ThreadCommentReplyNotification {
+                ...ALThreadCommentReplyNotification
+            }
+            ... on ThreadCommentSubscribedNotification {
+                ...ALThreadCommentSubscribedNotification
+            }
+            ... on ThreadCommentLikeNotification {
+                ...ALThreadCommentLikeNotification
+            }
+            ... on ThreadLikeNotification {
+                ...ALThreadLikeNotification
+            }
+            ... on RelatedMediaAdditionNotification {
+                ...ALRelatedMediaAdditionNotification
+            }
+            ... on MediaDataChangeNotification {
+                ...ALMediaDataChangeNotification
+            }
+            ... on MediaMergeNotification {
+                ...ALMediaMergeNotification
+            }
+            ... on MediaDeletionNotification {
+                ...ALMediaDeletionNotification
+            }
+            ... on MediaSubmissionUpdateNotification {
+                ...ALMediaSubmissionUpdateNotification
+            }
+            ... on StaffSubmissionUpdateNotification {
+                ...ALStaffSubmissionUpdateNotification
+            }
+            ... on CharacterSubmissionUpdateNotification {
+                ...ALCharacterSubmissionUpdateNotification
+            }
+        }
+    }
+}
+
+query UnreadNotificationsCount {
+    Viewer {
+        unreadNotificationCount
+    }
+}

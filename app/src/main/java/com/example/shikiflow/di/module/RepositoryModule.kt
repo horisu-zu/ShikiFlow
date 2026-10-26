@@ -11,6 +11,7 @@ import com.example.shikiflow.data.repository.MangaDexRepositoryImpl
 import com.example.shikiflow.data.repository.MediaRepositoryImpl
 import com.example.shikiflow.data.repository.MediaTracksRepositoryImpl
 import com.example.shikiflow.data.repository.MediaUploaderRepositoryImpl
+import com.example.shikiflow.data.repository.NotificationRepositoryImpl
 import com.example.shikiflow.data.repository.ReviewRepositoryImpl
 import com.example.shikiflow.data.repository.StaffRepositoryImpl
 import com.example.shikiflow.data.repository.UserRepositoryImpl
@@ -25,6 +26,7 @@ import com.example.shikiflow.domain.repository.MangaDexRepository
 import com.example.shikiflow.domain.repository.MediaRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
 import com.example.shikiflow.domain.repository.MediaUploaderRepository
+import com.example.shikiflow.domain.repository.NotificationRepository
 import com.example.shikiflow.domain.repository.ReviewRepository
 import com.example.shikiflow.domain.repository.StaffRepository
 import com.example.shikiflow.domain.repository.UserRepository
@@ -118,7 +120,13 @@ interface RepositoryModule {
 
     @Binds
     @Singleton
-    fun bindNotificationRepository(
+    fun bindEpisodeNotificationRepository(
         impl: EpisodeNotificationRepositoryImpl
     ): EpisodeNotificationRepository
+
+    @Binds
+    @Singleton
+    fun bindNotificationRepository(
+        impl: NotificationRepositoryImpl
+    ): NotificationRepository
 }

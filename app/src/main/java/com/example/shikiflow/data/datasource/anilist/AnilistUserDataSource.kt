@@ -93,7 +93,7 @@ class AnilistUserDataSource @Inject constructor(
             .fetchPolicy(FetchPolicy.NetworkFirst)
             .toFlow()
             .asDataResult { data ->
-                data.Viewer?.aLUser?.toDomainUser()
+                data.Viewer?.aLCurrentUser?.toDomainUser()
                     ?: throw IllegalStateException("No user data returned")
             }
     }

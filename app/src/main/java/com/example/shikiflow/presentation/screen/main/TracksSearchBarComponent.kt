@@ -180,7 +180,7 @@ fun TracksSearchBarComponent(
                 items(chips) { rateStatus ->
                     val userRateStatus = rateStatus?.let {
                         rateStatus.mapStatus(mediaType)
-                    } ?: R.string.media_user_status_all
+                    } ?: R.string.common_all
 
                     FilterChip(
                         selected = chips[selectedTabSearch] == rateStatus,

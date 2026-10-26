@@ -71,7 +71,10 @@ interface UserRepository {
         favoriteCategory: FavoriteCategory
     ): Flow<DataResult<List<UserFavorite>>>
 
-    suspend fun getMediaRates(userId: Int, mediaType: MediaType): List<ShortUserMediaRate>
+    suspend fun getMediaRates(
+        userId: Int,
+        mediaType: MediaType
+    ): List<ShortUserMediaRate>
 
     fun getUsers(
         nickname: String

@@ -9,7 +9,7 @@ enum class TranslationFilter {
 
     val displayValue: Int
         get() = when(this) {
-            ALL -> R.string.translation_filter_all
+            ALL -> R.string.common_all
             VOICE -> R.string.translation_filter_voice
             SUBTITLE -> R.string.translation_filter_subtitles
         }

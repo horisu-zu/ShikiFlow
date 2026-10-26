@@ -63,10 +63,11 @@
     <string name="common_retry">Повторити</string>
     <string name="common_unknown">Невідомо</string>
     <string name="common_note">Нотатка</string>
-
     <string name="common_default">За замовчуванням</string>
     <string name="common_confirm">Підтвердити</string>
     <string name="common_add">Додати</string>
+    <string name="common_all">Усі</string>
+
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
         оскільки синхронізація оновлень відбувається за ідентифікатором MAL,
@@ -253,7 +254,6 @@
     <string name="episodes_watched">Епізоди: %1s</string>
     <string name="ongoing_episodes">%1$s з %2$s еп.</string>
     <string name="airing_episodes">Епізод %1$s з %2$s</string>
-    <string name="translation_filter_all">Усі</string>
     <string name="translation_filter_voice">Дубляж</string>
     <string name="translation_filter_subtitles">Субтитри</string>
     <string name="translation_empty_response">Наразі трансляції недоступні</string>
@@ -343,7 +343,6 @@
     <string name="comment_offtopic">Офтоп</string>
     <string name="comment_tree_show_more">Переглянути більше</string>
 
-    <string name="media_user_status_all">Усі</string>
     <string name="media_user_status_anime_watching">Дивлюся</string>
     <string name="media_user_status_manga_reading">Читаю</string>
     <string name="media_user_status_anime_rewatching">Переглядаю</string>
@@ -976,4 +975,11 @@
     <string name="airing_premiere_summary_notification_label">Відстежувані тайтли, прем\'єра яких незабаром відбудеться</string>
     <string name="airing_premiere_notification_label">Перший епізод вийде через</string>
     <string name="anime_streaming_notifications_group_system_label">Трансляція аніме</string>
+
+    <string name="notification_type_group_airing">Трансляція</string>
+    <string name="notification_type_group_activity">Активність</string>
+    <string name="notification_type_group_forum">Форум</string>
+    <string name="notification_type_group_follows">Підписки</string>
+    <string name="notification_type_group_media">Медіа</string>
+    <string name="notification_type_group_submission">Заявки</string>
 </resources>

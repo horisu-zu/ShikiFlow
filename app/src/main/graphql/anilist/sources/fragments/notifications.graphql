@@ -1,0 +1,314 @@
+fragment ALAiringNotification on AiringNotification {
+    id
+    contexts
+    animeId
+    episode
+
+    media {
+        title {
+            userPreferred
+        }
+        coverImage {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALFollowingNotification on FollowingNotification {
+    id
+    context
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALActivityMessageNotification on ActivityMessageNotification {
+    id
+    context
+    activityId
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALActivityMentionNotification on ActivityMentionNotification {
+    id
+    context
+    activityId
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALActivityReplyNotification on ActivityReplyNotification {
+    id
+    context
+    activityId
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALActivityReplySubscribedNotification on ActivityReplySubscribedNotification {
+    id
+    context
+    activityId
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALActivityLikeNotification on ActivityLikeNotification {
+    id
+    context
+    activityId
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALActivityReplyLikeNotification on ActivityReplyLikeNotification {
+    id
+    context
+    activityId
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALThreadCommentMentionNotification on ThreadCommentMentionNotification {
+    id
+    context
+    commentId
+    thread {
+        id
+        title
+    }
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALThreadCommentReplyNotification on ThreadCommentReplyNotification {
+    id
+    context
+    commentId
+    thread {
+        id
+        title
+    }
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALThreadCommentSubscribedNotification on ThreadCommentSubscribedNotification {
+    id
+    context
+    commentId
+    thread {
+        id
+        title
+    }
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALThreadCommentLikeNotification on ThreadCommentLikeNotification {
+    id
+    context
+    commentId
+    thread {
+        id
+        title
+    }
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALThreadLikeNotification on ThreadLikeNotification {
+    id
+    context
+    threadId
+    thread {
+        id
+        title
+    }
+    userId
+    user {
+        name
+        avatar {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALRelatedMediaAdditionNotification on RelatedMediaAdditionNotification {
+    id
+    context
+    mediaId
+    media {
+        title {
+            userPreferred
+        }
+        coverImage {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALMediaDataChangeNotification on MediaDataChangeNotification {
+    id
+    context
+    mediaId
+    reason
+    media {
+        title {
+            userPreferred
+        }
+        coverImage {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALMediaMergeNotification on MediaMergeNotification {
+    id
+    context
+    mediaId
+    reason
+    media {
+        title {
+            userPreferred
+        }
+        coverImage {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALMediaDeletionNotification on MediaDeletionNotification {
+    id
+    context
+    reason
+    deletedMediaTitle
+    type
+    createdAt
+}
+
+fragment ALMediaSubmissionUpdateNotification on MediaSubmissionUpdateNotification {
+    id
+    contexts
+    media {
+        id
+        coverImage {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALStaffSubmissionUpdateNotification on StaffSubmissionUpdateNotification {
+    id
+    contexts
+    staff {
+        id
+        image {
+            large
+        }
+    }
+    type
+    createdAt
+}
+
+fragment ALCharacterSubmissionUpdateNotification on CharacterSubmissionUpdateNotification {
+    id
+    contexts
+    character {
+        id
+        image {
+            large
+        }
+    }
+    type
+    createdAt
+}

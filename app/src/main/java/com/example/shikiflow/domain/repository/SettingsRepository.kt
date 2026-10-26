@@ -37,6 +37,7 @@ interface SettingsRepository {
 
     suspend fun saveAuthType(authType: AuthType)
     suspend fun saveUserData(user: User, authType: AuthType)
+    suspend fun saveUnreadCount(unreadNotificationsCount: Int)
     suspend fun saveServiceUpdatePreference(shouldUpdate: Boolean)
     suspend fun saveAppUiMode(appUiMode: AppUiMode)
     suspend fun saveBrowseUiMode(browseUiMode: BrowseUiMode)

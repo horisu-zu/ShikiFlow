@@ -11,7 +11,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -43,7 +42,6 @@ import com.example.shikiflow.domain.model.track.media.MediaTrack
 import com.example.shikiflow.utils.PagingUtils.fetched
 import com.example.shikiflow.utils.PagingUtils.isLoading
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AnimeTracksPage(
     userStatus: UserRateStatus,

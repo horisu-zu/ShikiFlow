@@ -13,7 +13,8 @@ data class User(
     val lastOnlineAt: Instant? = null,
     val profileBannerUrl: String? = null,
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
-    val customLists: Map<MediaType, List<String>> = emptyMap()
+    val customLists: Map<MediaType, List<String>> = emptyMap(),
+    val unreadNotificationsCount: Int? = null
 )
 
 data class UserFollow(

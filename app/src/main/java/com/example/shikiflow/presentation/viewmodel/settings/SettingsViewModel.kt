@@ -31,7 +31,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -152,7 +155,23 @@ class SettingsViewModel @Inject constructor(
 
     fun setTitleType(preferredType: PreferredTitleType) {
         viewModelScope.launch {
-            settingsRepository.savePreferredTitleType(preferredType)
+            val authType = _settingsState.firstOrNull()?.authType
+
+            authType?.let {
+                when (authType) {
+                    AuthType.SHIKIMORI -> {
+                        settingsRepository.savePreferredTitleType(preferredType)
+                    }
+                    AuthType.ANILIST -> {
+                        userRepository.setUserSettings(preferredTitleType = preferredType)
+                            .let { result ->
+                                if (result is DataResult.Success) {
+                                    settingsRepository.savePreferredTitleType(preferredType)
+                                }
+                            }
+                    }
+                }
+            }
         }
     }
 
@@ -160,7 +179,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.setUserSettings(scoreFormat = scoreFormat)
                 .let { result ->
-                    if(result is DataResult.Success) {
+                    if (result is DataResult.Success) {
                         settingsRepository.saveScoreFormat(result.data.scoreFormat)
                     }
                 }

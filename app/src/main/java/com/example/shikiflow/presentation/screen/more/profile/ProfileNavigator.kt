@@ -26,6 +26,7 @@ import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
+import com.example.shikiflow.presentation.screen.more.notifications.NotificationsScreen
 import com.example.shikiflow.presentation.screen.more.profile.activity.reply.ActivityRepliesScreen
 import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
@@ -101,6 +102,10 @@ fun ProfileNavigator(
         ) {
             backstack.add(ProfileNavRoute.ActivityReplies(activityId, activityType))
         }
+
+        override fun navigateToNotifications() {
+            backstack.add(ProfileNavRoute.Notifications)
+        }
     }
 
     NavDisplay(
@@ -129,6 +134,11 @@ fun ProfileNavigator(
                 ActivityRepliesScreen(
                     activityId = route.activityId,
                     activityType = route.activityType,
+                    navOptions = profileNavOptions
+                )
+            }
+            entry<ProfileNavRoute.Notifications> {
+                NotificationsScreen(
                     navOptions = profileNavOptions
                 )
             }

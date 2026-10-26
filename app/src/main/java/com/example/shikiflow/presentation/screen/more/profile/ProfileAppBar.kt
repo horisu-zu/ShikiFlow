@@ -19,8 +19,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
@@ -52,7 +54,6 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.foregroundGradient
 import com.example.shikiflow.presentation.common.shimmerEffect
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileAppBar(
     userData: User?,
@@ -127,6 +128,39 @@ fun ProfileAppBar(
                             modifier = Modifier.align(Alignment.Top),
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
                         ) {
+                            if (authType == AuthType.ANILIST) {
+                                IconButton(
+                                    shape = RoundedCornerShape(percent = 32),
+                                    onClick = { navOptions.navigateToNotifications() },
+                                    colors = IconButtonDefaults.iconButtonColors(
+                                        containerColor = backgroundColor.copy(alpha = 0.35f)
+                                    )
+                                ) {
+                                    BadgedBox(
+                                        badge = {
+                                            userData.unreadNotificationsCount?.let { unreadCount ->
+                                                if (unreadCount > 0) {
+                                                    Badge(
+                                                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                                                        contentColor = MaterialTheme.colorScheme.onErrorContainer
+                                                    ) {
+                                                        Text(
+                                                            text = unreadCount.toString(),
+                                                            style = MaterialTheme.typography.labelSmall
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Notifications,
+                                            contentDescription = "Notifications"
+                                        )
+                                    }
+                                }
+                            }
+
                             IconButton(
                                 shape = RoundedCornerShape(percent = 32),
                                 onClick = { navOptions.navigateToSettings() },
