@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
@@ -57,6 +58,7 @@ interface SettingsRepository {
     suspend fun savePreferredTitleType(preferredType: PreferredTitleType)
     suspend fun saveScoreFormat(scoreFormat: ScoreFormat)
     suspend fun saveCustomLists(lists: Map<MediaType, List<String>>)
+    suspend fun saveNotificationPreferences(preferences: Map<NotificationType, Boolean>)
 
     suspend fun saveShowNotifications(value: Boolean)
     suspend fun saveAiringNotifications(value: Boolean)

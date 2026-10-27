@@ -3,14 +3,16 @@ mutation UpdateUser(
     $titleLanguage: UserTitleLanguage,
     $staffNameLanguage: UserStaffNameLanguage,
     $scoreFormat: ScoreFormat,
-    $airingNotifications: Boolean
+    $airingNotifications: Boolean,
+    $notificationPreferences: [NotificationOptionInput]
 ) {
     UpdateUser(
         displayAdultContent: $displayAdultContent,
         titleLanguage: $titleLanguage,
         staffNameLanguage: $staffNameLanguage,
         scoreFormat: $scoreFormat,
-        airingNotifications: $airingNotifications
+        airingNotifications: $airingNotifications,
+        notificationOptions: $notificationPreferences
     ) {
         ...ALUserSettings
     }

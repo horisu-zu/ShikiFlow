@@ -13,6 +13,7 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -221,9 +222,10 @@ class UserRepositoryImpl @Inject constructor(
 
     override suspend fun setUserSettings(
         preferredTitleType: PreferredTitleType?,
-        scoreFormat: ScoreFormat?
+        scoreFormat: ScoreFormat?,
+        notificationPreferences: Map<NotificationType, Boolean>?
     ): DataResult<UserSettings> = withSourceSuspend(dataSource) { dataSource ->
-        dataSource.setUserSettings(preferredTitleType, scoreFormat)
+        dataSource.setUserSettings(preferredTitleType, scoreFormat, notificationPreferences)
     }
 
     override suspend fun updateCustomLists(

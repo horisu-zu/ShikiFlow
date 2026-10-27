@@ -67,6 +67,8 @@
     <string name="common_confirm">Подтвердить</string>
     <string name="common_add">Добавить</string>
     <string name="common_all">Все</string>
+    <string name="common_update">Обновить</string>
+    <string name="common_clear_changes">Отменить изменения</string>
 
     <string name="tracker_services_update_title">Обновлять отслеживаемое на всех подключённых сервисах</string>
     <string name="tracker_services_update_note">
@@ -135,6 +137,9 @@
     <string name="airing_episode_notification_settings_description">Уведомления о новых эпизодах отслеживаемых тайтлов</string>
     <string name="airing_notifications_settings_delay_label">Задержка уведомлений трансляции</string>
     <string name="airing_notifications_settings_delay_description">Применяет задержку уведомлений трансляции (в минутах)</string>
+
+    <string name="settings_notifications_preferences_label">Настройки уведомлений</string>
+    <string name="settings_notifications_preferences_description">Выберите, какие уведомления с сайта вы получаете</string>
 
     <string name="color_picker_bottom_sheet_system_label">Использовать цвет заставки системы</string>
     <string name="color_picker_bottom_sheet_save">Применить</string>
@@ -976,10 +981,51 @@
     <string name="airing_premiere_notification_label">Первый эпизод выйдет через</string>
     <string name="anime_streaming_notifications_group_system_label">Трансляция аниме</string>
 
-    <string name="notification_type_group_airing">Трансляция</string>
+    <string name="notification_type_group_airing">Выход серий</string>
     <string name="notification_type_group_activity">Активность</string>
     <string name="notification_type_group_forum">Форум</string>
     <string name="notification_type_group_follows">Подписки</string>
     <string name="notification_type_group_media">Медиа</string>
     <string name="notification_type_group_submission">Заявки</string>
+
+    <string name="notification_type_airing_label">Выход серий</string>
+    <string name="notification_type_following_label">Новый подписчик</string>
+    <string name="notification_type_activity_message_label">Сообщение</string>
+    <string name="notification_type_activity_mention_label">Упоминание в активности</string>
+    <string name="notification_type_activity_reply_label">Ответ в активности</string>
+    <string name="notification_type_activity_reply_subscribed_label">Ответ в отслеживаемой активности</string>
+    <string name="notification_type_activity_like_label">Лайк активности</string>
+    <string name="notification_type_activity_reply_like_label">Лайк ответа в активности</string>
+    <string name="notification_type_thread_comment_mention_label">Упоминание в комментарии</string>
+    <string name="notification_type_thread_comment_reply_label">Ответ на комментарий</string>
+    <string name="notification_type_thread_subscribed_label">Ответ в отслеживаемой теме</string>
+    <string name="notification_type_thread_comment_like_label">Лайк комментария</string>
+    <string name="notification_type_thread_like_label">Лайк темы</string>
+    <string name="notification_type_related_media_addition_label">Новая связанная запись</string>
+    <string name="notification_type_media_data_change_label">Изменение данных тайтла</string>
+    <string name="notification_type_media_merge_label">Слияние тайтлов</string>
+    <string name="notification_type_media_deletion_label">Удаление тайтла</string>
+    <string name="notification_type_media_submission_update_label">Статус заявки (тайтл)</string>
+    <string name="notification_type_staff_submission_update_label">Статус заявки (персонал)</string>
+    <string name="notification_type_character_submission_update_label">Статус заявки (персонаж)</string>
+    <string name="notification_type_airing_description">Уведомлять о выходе новой серии аниме из вашего списка</string>
+    <string name="notification_type_following_description">Уведомлять, когда на вас подписываются</string>
+    <string name="notification_type_activity_message_description">Уведомлять о новых сообщениях</string>
+    <string name="notification_type_activity_mention_description">Уведомлять об упоминаниях в активности или ответе</string>
+    <string name="notification_type_activity_reply_description">Уведомлять об ответах на вашу активность</string>
+    <string name="notification_type_activity_reply_subscribed_description">Уведомлять об ответах в активности, на которую вы подписаны</string>
+    <string name="notification_type_activity_like_description">Уведомлять о лайках вашей активности</string>
+    <string name="notification_type_activity_reply_like_description">Уведомлять о лайках вашего ответа в активности</string>
+    <string name="notification_type_thread_comment_mention_description">Уведомлять об упоминаниях в комментариях на форуме</string>
+    <string name="notification_type_thread_comment_reply_description">Уведомлять об ответах на ваш комментарий на форуме</string>
+    <string name="notification_type_thread_subscribed_description">Уведомлять об ответах в теме, на которую вы подписаны</string>
+    <string name="notification_type_thread_comment_like_description">Уведомлять о лайках вашего комментария на форуме</string>
+    <string name="notification_type_thread_like_description">Уведомлять о лайках вашей темы на форуме</string>
+    <string name="notification_type_related_media_addition_description">Уведомлять о новой связанной записи у тайтла из вашего списка</string>
+    <string name="notification_type_media_data_change_description">Уведомлять об изменении данных тайтла из вашего списка</string>
+    <string name="notification_type_media_merge_description">Уведомлять о слиянии тайтлов из вашего списка</string>
+    <string name="notification_type_media_deletion_description">Уведомлять об удалении тайтла из вашего списка с сайта</string>
+    <string name="notification_type_media_submission_update_description">Уведомлять об изменении статуса вашей заявки на тайтл</string>
+    <string name="notification_type_staff_submission_update_description">Уведомлять об изменении статуса вашей заявки на персонал</string>
+    <string name="notification_type_character_submission_update_description">Уведомлять об изменении статуса вашей заявки на персонажа</string>
 </resources>

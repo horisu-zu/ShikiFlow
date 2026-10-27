@@ -196,6 +196,7 @@ fragment ALUserSettings on User {
         staffNameLanguage
         titleLanguage
         airingNotifications
+        notificationOptions { ...ALNotificationOption }
     }
     mediaListOptions {
         scoreFormat

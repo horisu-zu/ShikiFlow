@@ -15,6 +15,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.settings.BrowseUiSettings
 import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
@@ -54,6 +55,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private fun userCustomAnimeLists(authType: AuthType) = stringSetPreferencesKey("${authType}_anime_lists")
         private fun userCustomMangaLists(authType: AuthType) = stringSetPreferencesKey("${authType}_manga_lists")
         private fun userUnreadNotificationsCount(authType: AuthType) = intPreferencesKey("${authType}_unread_notifications_count")
+        private fun userDisabledNotificationTypes(authType: AuthType) = stringSetPreferencesKey("${authType}_disabled_notification_types")
 
         private val TRACKER_SERVICE_UPDATE = booleanPreferencesKey("tracker_update")
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
@@ -125,11 +127,13 @@ class SettingsRepositoryImpl @Inject constructor(
                     preferences[userCustomMangaLists(currentAuthType)]?.let { mangaLists ->
                         put(MediaType.MANGA, mangaLists.toList())
                     }
+                },
+                notificationPreferences = NotificationType.entries.associateWith { type ->
+                    preferences[userDisabledNotificationTypes(currentAuthType)]
+                        ?.contains(type.name) == false
                 }
             )
         }
-
-
 
     override val authTypeFlow = dataStore.data
         .map { preferences ->
@@ -416,6 +420,20 @@ class SettingsRepositoryImpl @Inject constructor(
                     MediaType.MANGA -> preferences[userCustomMangaLists(currentAuthType)] = lists.toSet()
                 }
             }
+        }
+    }
+
+    override suspend fun saveNotificationPreferences(preferences: Map<NotificationType, Boolean>) {
+        dataStore.edit { prefs ->
+            val currentAuthType = prefs[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            } ?: AuthType.ANILIST
+
+            prefs[userDisabledNotificationTypes(currentAuthType)] = preferences
+                .filter { !it.value }
+                .keys
+                .map { it.name }
+                .toSet()
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.shikiflow.data.mapper.anilist
 
+import com.apollographql.apollo.api.Optional
 import com.example.graphql.anilist.UserStatsCategoriesQuery
 import com.example.graphql.anilist.fragment.ALActivityReply
 import com.example.graphql.anilist.fragment.ALCurrentUser
@@ -9,6 +10,7 @@ import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
 import com.example.graphql.anilist.fragment.ALListActivity
 import com.example.graphql.anilist.fragment.ALMediaFollowingUser
 import com.example.graphql.anilist.fragment.ALMessageActivity
+import com.example.graphql.anilist.fragment.ALNotificationOption
 import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
 import com.example.graphql.anilist.fragment.ALUserGenres
@@ -20,6 +22,9 @@ import com.example.graphql.anilist.fragment.ALUserStudios
 import com.example.graphql.anilist.fragment.ALUserTags
 import com.example.graphql.anilist.fragment.ALUserVoiceActors
 import com.example.graphql.anilist.type.MediaListStatus
+import com.example.graphql.anilist.type.NotificationOptionInput
+import com.example.shikiflow.data.mapper.anilist.AnilistNotificationsMapper.toAnilistType
+import com.example.shikiflow.data.mapper.anilist.AnilistNotificationsMapper.toDomainType
 import com.example.shikiflow.data.mapper.anilist.AnilistStaffMapper.toDomain
 import com.example.shikiflow.data.mapper.common.CountryOfOriginMapper.toCountryOfOrigin
 import com.example.shikiflow.data.mapper.common.DateMapper.minutesToDays
@@ -37,6 +42,7 @@ import com.example.shikiflow.domain.model.media_details.CountryOfOrigin
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -543,7 +549,26 @@ object AnilistUserMapper {
         return UserSettings(
             showAdultContent = false,
             preferredTitleType = options?.titleLanguage?.toDomainType() ?: PreferredTitleType.ROMAJI,
-            scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10
+            scoreFormat = mediaListOptions?.scoreFormat?.toDomainFormat() ?: ScoreFormat.POINT_10,
+            notificationPreferences = options?.notificationOptions
+                ?.mapNotNull { it?.aLNotificationOption }
+                ?.toDomainOptions() ?: emptyMap()
         )
     }
+
+    fun Map<NotificationType, Boolean>.toAnilistPreferences(): List<NotificationOptionInput> =
+        map { (type, enabled) ->
+            NotificationOptionInput(
+                type = Optional.present(type.toAnilistType()),
+                enabled = Optional.present(enabled)
+            )
+        }
+
+    private fun List<ALNotificationOption>.toDomainOptions(): Map<NotificationType, Boolean> =
+        mapNotNull { option ->
+            val type = option.type ?: return@mapNotNull null
+            val enabled = option.enabled ?: return@mapNotNull null
+
+            type.toDomainType() to enabled
+        }.toMap()
 }

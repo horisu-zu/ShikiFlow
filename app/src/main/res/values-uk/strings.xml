@@ -67,6 +67,8 @@
     <string name="common_confirm">Підтвердити</string>
     <string name="common_add">Додати</string>
     <string name="common_all">Усі</string>
+    <string name="common_update">Оновити</string>
+    <string name="common_clear_changes">Відмінити зміни</string>
 
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
@@ -135,6 +137,9 @@
     <string name="airing_episode_notification_settings_description">Нотифікації нових епізодів відстежуваних тайтлів</string>
     <string name="airing_notifications_settings_delay_label">Затримка нотифікацій трансляції</string>
     <string name="airing_notifications_settings_delay_description">Застосовує затримку до нотифікацій трансляції (в хвилинах)</string>
+
+    <string name="settings_notifications_preferences_label">Настройки уведомлений</string>
+    <string name="settings_notifications_preferences_description">Выберите, какие уведомления с сайта вы получаете</string>
 
     <string name="color_picker_bottom_sheet_system_label">Використовувати колір заставки системи</string>
     <string name="color_picker_bottom_sheet_save">Застосувати</string>
@@ -982,4 +987,45 @@
     <string name="notification_type_group_follows">Підписки</string>
     <string name="notification_type_group_media">Медіа</string>
     <string name="notification_type_group_submission">Заявки</string>
+
+    <string name="notification_type_airing_label">Вихід серій</string>
+    <string name="notification_type_following_label">Новий підписник</string>
+    <string name="notification_type_activity_message_label">Повідомлення</string>
+    <string name="notification_type_activity_mention_label">Згадка в активності</string>
+    <string name="notification_type_activity_reply_label">Відповідь в активності</string>
+    <string name="notification_type_activity_reply_subscribed_label">Відповідь у відстежуваній активності</string>
+    <string name="notification_type_activity_like_label">Вподобання активності</string>
+    <string name="notification_type_activity_reply_like_label">Вподобання відповіді в активності</string>
+    <string name="notification_type_thread_comment_mention_label">Згадка в коментарі</string>
+    <string name="notification_type_thread_comment_reply_label">Відповідь на коментар</string>
+    <string name="notification_type_thread_subscribed_label">Відповідь у відстежуваній темі</string>
+    <string name="notification_type_thread_comment_like_label">Вподобання коментаря</string>
+    <string name="notification_type_thread_like_label">Вподобання теми</string>
+    <string name="notification_type_related_media_addition_label">Новий пов\'язаний запис</string>
+    <string name="notification_type_media_data_change_label">Зміна даних тайтла</string>
+    <string name="notification_type_media_merge_label">Злиття тайтлів</string>
+    <string name="notification_type_media_deletion_label">Видалення тайтла</string>
+    <string name="notification_type_media_submission_update_label">Статус заявки (тайтл)</string>
+    <string name="notification_type_staff_submission_update_label">Статус заявки (персонал)</string>
+    <string name="notification_type_character_submission_update_label">Статус заявки (персонаж)</string>
+    <string name="notification_type_airing_description">Сповіщати про вихід нової серії аніме з вашого списку</string>
+    <string name="notification_type_following_description">Сповіщати, коли на вас підписуються</string>
+    <string name="notification_type_activity_message_description">Сповіщати про нові повідомлення</string>
+    <string name="notification_type_activity_mention_description">Сповіщати про згадки в активності або відповіді</string>
+    <string name="notification_type_activity_reply_description">Сповіщати про відповіді на вашу активність</string>
+    <string name="notification_type_activity_reply_subscribed_description">Сповіщати про відповіді в активності, на яку ви підписані</string>
+    <string name="notification_type_activity_like_description">Сповіщати про вподобання вашої активності</string>
+    <string name="notification_type_activity_reply_like_description">Сповіщати про вподобання вашої відповіді в активності</string>
+    <string name="notification_type_thread_comment_mention_description">Сповіщати про згадки в коментарях на форумі</string>
+    <string name="notification_type_thread_comment_reply_description">Сповіщати про відповіді на ваш коментар на форумі</string>
+    <string name="notification_type_thread_subscribed_description">Сповіщати про відповіді в темі, на яку ви підписані</string>
+    <string name="notification_type_thread_comment_like_description">Сповіщати про вподобання вашого коментаря на форумі</string>
+    <string name="notification_type_thread_like_description">Сповіщати про вподобання вашої теми на форумі</string>
+    <string name="notification_type_related_media_addition_description">Сповіщати про новий пов\'язаний запис у тайтла з вашого списку</string>
+    <string name="notification_type_media_data_change_description">Сповіщати про зміну даних тайтла з вашого списку</string>
+    <string name="notification_type_media_merge_description">Сповіщати про злиття тайтлів з вашого списку</string>
+    <string name="notification_type_media_deletion_description">Сповіщати про видалення тайтла з вашого списку з сайту</string>
+    <string name="notification_type_media_submission_update_description">Сповіщати про зміну статусу вашої заявки на тайтл</string>
+    <string name="notification_type_staff_submission_update_description">Сповіщати про зміну статусу вашої заявки на персонал</string>
+    <string name="notification_type_character_submission_update_description">Сповіщати про зміну статусу вашої заявки на персонажа</string>
 </resources>

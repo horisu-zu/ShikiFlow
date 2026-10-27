@@ -67,6 +67,8 @@
     <string name="common_confirm">Confirm</string>
     <string name="common_add">Add</string>
     <string name="common_all">All</string>
+    <string name="common_update">Update</string>
+    <string name="common_clear_changes">Clear Changes</string>
 
     <string name="tracker_services_update_title">Update Tracks on All Connected Services</string>
     <string name="tracker_services_update_note">
@@ -138,6 +140,9 @@
     <string name="airing_episode_notification_settings_description">Notifications of new episodes of tracked titles</string>
     <string name="airing_notifications_settings_delay_label">Airing Notifications Delay</string>
     <string name="airing_notifications_settings_delay_description">Applies delay to the airing notifications (in minutes)</string>
+
+    <string name="settings_notifications_preferences_label">Notification Preferences</string>
+    <string name="settings_notifications_preferences_description">Configure which site notifications you receive</string>
 
     <string name="color_picker_bottom_sheet_system_label">Use System Wallpaper Color</string>
     <string name="color_picker_bottom_sheet_save">Apply</string>
@@ -1003,4 +1008,45 @@ f
     <string name="notification_type_group_follows">Follows</string>
     <string name="notification_type_group_media">Media</string>
     <string name="notification_type_group_submission">Submission</string>
+
+    <string name="notification_type_airing_label">Airing</string>
+    <string name="notification_type_following_label">Following</string>
+    <string name="notification_type_activity_message_label">Activity Message</string>
+    <string name="notification_type_activity_mention_label">Activity Mention</string>
+    <string name="notification_type_activity_reply_label">Activity Reply</string>
+    <string name="notification_type_activity_reply_subscribed_label">Activity Reply Subscribed</string>
+    <string name="notification_type_activity_like_label">Activity Like</string>
+    <string name="notification_type_activity_reply_like_label">Activity Reply Like</string>
+    <string name="notification_type_thread_comment_mention_label">Thread Comment Mention</string>
+    <string name="notification_type_thread_comment_reply_label">Thread Comment Reply</string>
+    <string name="notification_type_thread_subscribed_label">Thread Subscribed</string>
+    <string name="notification_type_thread_comment_like_label">Thread Comment Like</string>
+    <string name="notification_type_thread_like_label">Thread Like</string>
+    <string name="notification_type_related_media_addition_label">Related Media Addition</string>
+    <string name="notification_type_media_data_change_label">Media Data Change</string>
+    <string name="notification_type_media_merge_label">Media Merge</string>
+    <string name="notification_type_media_deletion_label">Media Deletion</string>
+    <string name="notification_type_media_submission_update_label">Media Submission Update</string>
+    <string name="notification_type_staff_submission_update_label">Staff Submission Update</string>
+    <string name="notification_type_character_submission_update_label">Character Submission Update</string>
+    <string name="notification_type_airing_description">Get notified when a new episode of an anime on your list airs</string>
+    <string name="notification_type_following_description">Get notified when someone follows you</string>
+    <string name="notification_type_activity_message_description">Get notified when you receive a message</string>
+    <string name="notification_type_activity_mention_description">Get notified when you\'re mentioned in an activity or reply</string>
+    <string name="notification_type_activity_reply_description">Get notified when someone replies to your activity</string>
+    <string name="notification_type_activity_reply_subscribed_description">Get notified when someone replies to an activity you\'re subscribed to</string>
+    <string name="notification_type_activity_like_description">Get notified when someone likes your activity</string>
+    <string name="notification_type_activity_reply_like_description">Get notified when someone likes your activity reply</string>
+    <string name="notification_type_thread_comment_mention_description">Get notified when you\'re mentioned in a forum comment</string>
+    <string name="notification_type_thread_comment_reply_description">Get notified when someone replies to your forum comment</string>
+    <string name="notification_type_thread_subscribed_description">Get notified when someone replies to a thread you\'re subscribed to</string>
+    <string name="notification_type_thread_comment_like_description">Get notified when someone likes your forum comment</string>
+    <string name="notification_type_thread_like_description">Get notified when someone likes your forum thread</string>
+    <string name="notification_type_related_media_addition_description">Get notified when a title on your list gets a new related entry</string>
+    <string name="notification_type_media_data_change_description">Get notified when data changes for a title on your list</string>
+    <string name="notification_type_media_merge_description">Get notified when titles on your list are merged into another</string>
+    <string name="notification_type_media_deletion_description">Get notified when a title on your list is deleted from the site</string>
+    <string name="notification_type_media_submission_update_description">Get notified when your media submission status changes</string>
+    <string name="notification_type_staff_submission_update_description">Get notified when your staff submission status changes</string>
+    <string name="notification_type_character_submission_update_description">Get notified when your character submission status changes</string>
 </resources>

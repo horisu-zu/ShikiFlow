@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.episode_notification.EpisodeNotificationType
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.repository.AuthRepository
 import com.example.shikiflow.domain.repository.CacheRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
@@ -31,10 +32,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -193,6 +192,17 @@ class SettingsViewModel @Inject constructor(
                     settingsRepository.saveCustomLists(result.data)
                 }
             }
+        }
+    }
+
+    fun updateNotificationPreferences(preferences: Map<NotificationType, Boolean>) {
+        viewModelScope.launch {
+            userRepository.setUserSettings(notificationPreferences = preferences)
+                .let { result ->
+                    if (result is DataResult.Success) {
+                        settingsRepository.saveNotificationPreferences(preferences)
+                    }
+                }
         }
     }
 

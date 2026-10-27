@@ -72,6 +72,7 @@ fun SettingsScreen(
     var showLanguagesBottomSheet by remember { mutableStateOf(false) }
     var showCustomListsBottomSheet by remember { mutableStateOf(false) }
     var showPaletteStyleBottomSheet by remember { mutableStateOf(false) }
+    val showNotificationsBottomSheet = remember { mutableStateOf(false) }
 
     val sheetState = rememberBottomSheetState(initialValue = SheetValue.Hidden)
     val scope = rememberCoroutineScope()
@@ -425,6 +426,12 @@ fun SettingsScreen(
                             onChangeFinished = { settingsViewModel.rescheduleNotificationWork() },
                             isVisible = settingsState.notificationSettings.showNotifications &&
                                 settingsState.notificationSettings.showAiringNotifications
+                        ),
+                        SectionItem.Default(
+                            title = stringResource(R.string.settings_notifications_preferences_label),
+                            displayValue = stringResource(R.string.settings_notifications_preferences_description),
+                            onClick = { showNotificationsBottomSheet.value = true },
+                            isVisible = settingsState.notificationSettings.showNotifications
                         )
                     )
                 )
@@ -554,6 +561,16 @@ fun SettingsScreen(
                     onDismiss = { showPaletteStyleBottomSheet = false }
                 )
             }
+        }
+
+        if (showNotificationsBottomSheet.value) {
+            NotificationPreferencesBottomSheet(
+                preferences = settingsState.userSettings.notificationPreferences,
+                onSave = { preferences ->
+                    settingsViewModel.updateNotificationPreferences(preferences)
+                },
+                onDismiss = { showNotificationsBottomSheet.value = false }
+            )
         }
 
         selectedTracker?.let { authType ->

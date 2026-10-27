@@ -39,6 +39,7 @@ import com.example.shikiflow.data.local.source.GenericPagingSource
 import com.example.shikiflow.data.mapper.anilist.AnilistRateMapper.toShortUserMediaRate
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toAnilistPreferences
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
@@ -57,6 +58,7 @@ import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -640,11 +642,15 @@ class AnilistUserDataSource @Inject constructor(
 
     override suspend fun setUserSettings(
         preferredTitleType: PreferredTitleType?,
-        scoreFormat: ScoreFormat?
+        scoreFormat: ScoreFormat?,
+        notificationPreferences: Map<NotificationType, Boolean>?
     ): DataResult<UserSettings> {
         val userSettingsMutation = UpdateUserMutation(
             titleLanguage = Optional.presentIfNotNull(preferredTitleType?.toAnilistType()),
-            scoreFormat = Optional.presentIfNotNull(scoreFormat?.toAnilistFormat())
+            scoreFormat = Optional.presentIfNotNull(scoreFormat?.toAnilistFormat()),
+            notificationPreferences = Optional.presentIfNotNull(
+                value = notificationPreferences?.toAnilistPreferences()
+            )
         )
 
         val response = apolloClient.mutation(userSettingsMutation)

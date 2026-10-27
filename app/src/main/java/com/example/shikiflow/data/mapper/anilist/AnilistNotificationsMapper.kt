@@ -44,6 +44,56 @@ object AnilistNotificationsMapper {
         }
     }
 
+    fun ALNotificationType.toDomainType(): NotificationType {
+        return when (this) {
+            ALNotificationType.ACTIVITY_MESSAGE -> NotificationType.ACTIVITY_MESSAGE
+            ALNotificationType.ACTIVITY_REPLY -> NotificationType.ACTIVITY_REPLY
+            ALNotificationType.FOLLOWING -> NotificationType.FOLLOWING
+            ALNotificationType.ACTIVITY_MENTION -> NotificationType.ACTIVITY_MENTION
+            ALNotificationType.THREAD_COMMENT_MENTION -> NotificationType.THREAD_COMMENT_MENTION
+            ALNotificationType.THREAD_SUBSCRIBED -> NotificationType.THREAD_SUBSCRIBED
+            ALNotificationType.THREAD_COMMENT_REPLY -> NotificationType.THREAD_COMMENT_REPLY
+            ALNotificationType.ACTIVITY_LIKE -> NotificationType.ACTIVITY_LIKE
+            ALNotificationType.ACTIVITY_REPLY_LIKE -> NotificationType.ACTIVITY_REPLY_LIKE
+            ALNotificationType.THREAD_LIKE -> NotificationType.THREAD_LIKE
+            ALNotificationType.THREAD_COMMENT_LIKE -> NotificationType.THREAD_COMMENT_LIKE
+            ALNotificationType.ACTIVITY_REPLY_SUBSCRIBED -> NotificationType.ACTIVITY_REPLY_SUBSCRIBED
+            ALNotificationType.RELATED_MEDIA_ADDITION -> NotificationType.RELATED_MEDIA_ADDITION
+            ALNotificationType.MEDIA_DATA_CHANGE -> NotificationType.MEDIA_DATA_CHANGE
+            ALNotificationType.MEDIA_MERGE -> NotificationType.MEDIA_MERGE
+            ALNotificationType.MEDIA_DELETION -> NotificationType.MEDIA_DELETION
+            ALNotificationType.MEDIA_SUBMISSION_UPDATE -> NotificationType.MEDIA_SUBMISSION_UPDATE
+            ALNotificationType.STAFF_SUBMISSION_UPDATE -> NotificationType.STAFF_SUBMISSION_UPDATE
+            ALNotificationType.CHARACTER_SUBMISSION_UPDATE -> NotificationType.CHARACTER_SUBMISSION_UPDATE
+            else -> NotificationType.AIRING
+        }
+    }
+
+    fun NotificationType.toAnilistType(): ALNotificationType {
+        return when (this) {
+            NotificationType.ACTIVITY_MESSAGE -> ALNotificationType.ACTIVITY_MESSAGE
+            NotificationType.ACTIVITY_REPLY -> ALNotificationType.ACTIVITY_REPLY
+            NotificationType.FOLLOWING -> ALNotificationType.FOLLOWING
+            NotificationType.ACTIVITY_MENTION -> ALNotificationType.ACTIVITY_MENTION
+            NotificationType.THREAD_COMMENT_MENTION -> ALNotificationType.THREAD_COMMENT_MENTION
+            NotificationType.THREAD_SUBSCRIBED -> ALNotificationType.THREAD_SUBSCRIBED
+            NotificationType.THREAD_COMMENT_REPLY -> ALNotificationType.THREAD_COMMENT_REPLY
+            NotificationType.ACTIVITY_LIKE -> ALNotificationType.ACTIVITY_LIKE
+            NotificationType.ACTIVITY_REPLY_LIKE -> ALNotificationType.ACTIVITY_REPLY_LIKE
+            NotificationType.THREAD_LIKE -> ALNotificationType.THREAD_LIKE
+            NotificationType.THREAD_COMMENT_LIKE -> ALNotificationType.THREAD_COMMENT_LIKE
+            NotificationType.ACTIVITY_REPLY_SUBSCRIBED -> ALNotificationType.ACTIVITY_REPLY_SUBSCRIBED
+            NotificationType.RELATED_MEDIA_ADDITION -> ALNotificationType.RELATED_MEDIA_ADDITION
+            NotificationType.MEDIA_DATA_CHANGE -> ALNotificationType.MEDIA_DATA_CHANGE
+            NotificationType.MEDIA_MERGE -> ALNotificationType.MEDIA_MERGE
+            NotificationType.MEDIA_DELETION -> ALNotificationType.MEDIA_DELETION
+            NotificationType.MEDIA_SUBMISSION_UPDATE -> ALNotificationType.MEDIA_SUBMISSION_UPDATE
+            NotificationType.STAFF_SUBMISSION_UPDATE -> ALNotificationType.STAFF_SUBMISSION_UPDATE
+            NotificationType.CHARACTER_SUBMISSION_UPDATE -> ALNotificationType.CHARACTER_SUBMISSION_UPDATE
+            else -> ALNotificationType.AIRING
+        }
+    }
+
     //WIP, there's a lot to change
     fun NotificationsQuery.Notification.toDomainNotification(): Notification? {
         onAiringNotification?.aLAiringNotification?.let { notification ->
