@@ -38,6 +38,7 @@ import java.util.Locale
 import javax.inject.Inject
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.time.Instant
 import kotlin.to
 
 class SettingsRepositoryImpl @Inject constructor(
@@ -56,6 +57,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private fun userCustomMangaLists(authType: AuthType) = stringSetPreferencesKey("${authType}_manga_lists")
         private fun userUnreadNotificationsCount(authType: AuthType) = intPreferencesKey("${authType}_unread_notifications_count")
         private fun userDisabledNotificationTypes(authType: AuthType) = stringSetPreferencesKey("${authType}_disabled_notification_types")
+        private fun userLastNotificationTimestamp(authType: AuthType) = longPreferencesKey("${authType}_last_notification_timestamp")
 
         private val TRACKER_SERVICE_UPDATE = booleanPreferencesKey("tracker_update")
         private val APP_UI_MODE = stringPreferencesKey("app_ui_mode")
@@ -189,13 +191,20 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     override val notificationSettingsFlow: Flow<NotificationSettings> = dataStore.data
         .map { preferences ->
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            } ?: AuthType.ANILIST
+
             NotificationSettings(
                 showNotifications = preferences[SHOW_NOTIFICATIONS] ?: false,
                 showAiringNotifications = preferences[SHOW_AIRING_NOTIFICATIONS] ?: true,
                 showUpcomingNotifications = preferences[SHOW_UPCOMING_NOTIFICATIONS] ?: true,
                 airingDelay = preferences[AIRING_NOTIFICATIONS_DELAY] ?: 0f,
                 timeRange = (preferences[NOTIFICATIONS_TIME_RANGE_START] ?: 0f) to
-                    (preferences[NOTIFICATIONS_TIME_RANGE_END] ?: 1440f)
+                    (preferences[NOTIFICATIONS_TIME_RANGE_END] ?: 1440f),
+                lastNotificationTimestamp = Instant.fromEpochMilliseconds(
+                    preferences[userLastNotificationTimestamp(currentAuthType)] ?: 0L
+                )
             )
         }
 
@@ -434,6 +443,16 @@ class SettingsRepositoryImpl @Inject constructor(
                 .keys
                 .map { it.name }
                 .toSet()
+        }
+    }
+
+    override suspend fun saveNotificationTimestamp(instant: Instant) {
+        dataStore.edit { preferences ->
+            val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
+                AuthType.valueOf(authType)
+            } ?: AuthType.ANILIST
+
+            preferences[userLastNotificationTimestamp(currentAuthType)] = instant.toEpochMilliseconds()
         }
     }
 

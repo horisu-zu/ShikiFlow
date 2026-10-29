@@ -20,6 +20,7 @@ import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
+import kotlin.time.Instant
 
 interface SettingsRepository {
     val userFlow: Flow<User?>
@@ -59,6 +60,7 @@ interface SettingsRepository {
     suspend fun saveScoreFormat(scoreFormat: ScoreFormat)
     suspend fun saveCustomLists(lists: Map<MediaType, List<String>>)
     suspend fun saveNotificationPreferences(preferences: Map<NotificationType, Boolean>)
+    suspend fun saveNotificationTimestamp(instant: Instant)
 
     suspend fun saveShowNotifications(value: Boolean)
     suspend fun saveAiringNotifications(value: Boolean)

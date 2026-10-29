@@ -6,6 +6,7 @@ import com.example.shikiflow.domain.model.episode_notification.EpisodeNotificati
 import com.example.shikiflow.domain.model.episode_notification.EpisodeNotificationType
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.media_details.PreferredTitleType
+import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.repository.EpisodeNotificationRepository
 import com.example.shikiflow.domain.repository.MediaTracksRepository
@@ -14,7 +15,6 @@ import com.example.shikiflow.presentation.common.mappers.DateMapper.untilPremier
 import com.example.shikiflow.utils.DateUtils
 import com.example.shikiflow.utils.DateUtils.timeDifference
 import com.example.shikiflow.utils.notifications.NotificationUtils.showNotification
-import com.example.shikiflow.worker.notification.AiringNotificationHandler.Companion.AIRING_GROUP_ID
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -32,6 +32,7 @@ class UpcomingNotificationHandler @Inject constructor(
 
     companion object {
         const val UPCOMING_CHANNEL_ID = "upcoming_channel"
+        const val UPCOMING_GROUP_ID = "upcoming_group"
     }
 
     override suspend fun checkAndNotify() {
@@ -61,11 +62,11 @@ class UpcomingNotificationHandler @Inject constructor(
                 )
             }
 
-        if (airingSoonMedia.size > 3) {
+        if (airingSoonMedia.size > 1) {
             context.showNotification(
                 notificationId = 0,
                 channelId = UPCOMING_CHANNEL_ID,
-                group = AIRING_GROUP_ID,
+                group = UPCOMING_GROUP_ID,
                 title = resources.getString(R.string.airing_premiere_summary_notification_label),
                 text = airingSoonMedia.joinToString(", ") { media ->
                     media.title.preferred(titleType)
@@ -78,10 +79,13 @@ class UpcomingNotificationHandler @Inject constructor(
             context.showNotification(
                 notificationId = media.id,
                 channelId = UPCOMING_CHANNEL_ID,
-                group = AIRING_GROUP_ID,
+                group = UPCOMING_GROUP_ID,
                 title = media.title.preferred(titleType),
                 text = buildString {
-                    append(resources.getString(R.string.airing_premiere_notification_label))
+                    when (media.kind) {
+                        MediaFormat.TV -> append(resources.getString(R.string.airing_premiere_tv_notification_label))
+                        else -> append(resources.getString(R.string.airing_premiere_notification_label))
+                    }
                     append(" ")
                     append(media.nextEpisodeAt!!.untilPremiere(resources))
                 }

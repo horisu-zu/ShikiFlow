@@ -2,9 +2,9 @@ package com.example.shikiflow.presentation.screen.more.settings
 
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,22 +19,24 @@ import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.mutableStateSetOf
@@ -43,8 +45,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -193,102 +195,94 @@ fun NotificationPreferencesBottomSheet(
     onSave: (Map<NotificationType, Boolean>) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val lazyListState = rememberLazyListState()
     var currentPreferences by remember { mutableStateOf(preferences) }
     val onToggle: (NotificationType) -> Unit = { type ->
         currentPreferences = currentPreferences + (type to !currentPreferences.getValue(type))
     }
 
-    val isAtTop by remember {
-        derivedStateOf {
-            lazyListState.firstVisibleItemIndex == 0 &&
-            lazyListState.firstVisibleItemScrollOffset == 0
-        }
-    }
-
     ModalBottomSheet(
         onDismissRequest = onDismiss
     ) {
-        LazyColumn(
-            state = lazyListState,
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
-            horizontalAlignment = Alignment.End
-        ) {
-            stickyHeader {
-                Row(
-                    modifier = Modifier
-                        .clip(
-                            shape = RoundedCornerShape(
-                                topStart = 4.dp, topEnd = 4.dp,
-                                bottomStart = 12.dp, bottomEnd = 12.dp
-                            )
-                        )
-                        .background(
-                            color = if (!isAtTop) MaterialTheme.colorScheme.surfaceContainerHigh
-                                else Color.Transparent
-                        )
-                        .padding(horizontal = 6.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.End),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AnimatedVisibility(
-                        visible = preferences != currentPreferences
+        Box {
+            LazyColumn(
+                contentPadding = PaddingValues(
+                    start = 16.dp, end = 16.dp,
+                    top = 12.dp, bottom = 72.dp
+                ),
+                verticalArrangement = Arrangement.spacedBy(6.dp, Alignment.Top),
+                horizontalAlignment = Alignment.End
+            ) {
+                items(
+                    items = currentPreferences.entries.filter { it.key != NotificationType.AIRING },
+                    key = { it.key }
+                ) { (type, enabled) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { onToggle(type) },
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(
-                            onClick = { currentPreferences = preferences },
-                            colors = ButtonDefaults.textButtonColors(
-                                contentColor = MaterialTheme.colorScheme.errorContainer
-                            )
+                        Column(
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = "Clear Changes",
-                                style = MaterialTheme.typography.labelMedium
+                                text = stringResource(type.displayValue()),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Medium
+                                )
+                            )
+
+                            Text(
+                                text = stringResource(type.description()),
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                )
                             )
                         }
-                    }
 
-                    Button(
-                        label = stringResource(R.string.color_picker_bottom_sheet_save),
-                        enabled = preferences != currentPreferences,
-                        onClick = { onSave(currentPreferences) }
-                    )
+                        Switch(
+                            checked = enabled,
+                            onCheckedChange = { onToggle(type) }
+                        )
+                    }
                 }
             }
 
-            items(
-                items = currentPreferences.entries.filter { it.key != NotificationType.AIRING },
-                key = { it.key }
-            ) { (type, enabled) ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { onToggle(type) },
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
+            Column(
+                verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Bottom),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(all = 12.dp)
+            ) {
+                AnimatedVisibility(
+                    visible = preferences != currentPreferences
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
+                    IconButton(
+                        shape = RoundedCornerShape(percent = 24),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        onClick = { currentPreferences = preferences }
                     ) {
-                        Text(
-                            text = stringResource(type.displayValue()),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Medium
-                            )
-                        )
-
-                        Text(
-                            text = stringResource(type.description()),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-                            )
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = "Clear Changes"
                         )
                     }
+                }
 
-                    Switch(
-                        checked = enabled,
-                        onCheckedChange = { onToggle(type) }
+                FloatingActionButton(
+                    onClick = { onSave(currentPreferences) },
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_save),
+                        contentDescription = "Save Updated Preferences"
                     )
                 }
             }

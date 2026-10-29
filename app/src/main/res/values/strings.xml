@@ -309,8 +309,8 @@
 
     <string name="airing_soon">Airing Soon</string>
 
-    <string name="rate_decrement">-</string>
-    <string name="rate_increment">+</string>
+    <string name="rate_decrement" translatable="false">-</string>
+    <string name="rate_increment" translatable="false">+</string>
     <string name="rewatches">Rewatches</string>
     <string name="rereads">Rereads</string>
     <string name="user_rate_add_to_list">Add to List</string>
@@ -999,8 +999,17 @@ f
     <string name="airing_summary_notification_label">Airing tracked titles:</string>
     <string name="airing_episode_notification_label">Episode %d is airing</string>
     <string name="airing_premiere_summary_notification_label">Tracked titles premiering soon:</string>
-    <string name="airing_premiere_notification_label">First episode is airing in</string>
+    <string name="airing_premiere_tv_notification_label">First episode is airing in</string>
+    <string name="airing_premiere_notification_label">Premiering in</string>
     <string name="anime_streaming_notifications_group_system_label">Anime Streaming</string>
+    <string name="anime_premiere_notifications_group_system_label">Anime Premiering</string>
+    <string name="service_notifications_channel_label">Service Notifications</string>
+    <string name="service_notifications_channel_description">Notifications provided by the tracker service</string>
+    <string name="service_notifications_group_system_label">Tracker Service Notifications</string>
+    <plurals name="service_notifications_group_label">
+        <item quantity="one">%1$d unread notification</item>
+        <item quantity="other">%1$d unread notifications</item>
+    </plurals>
     
     <string name="notification_type_group_airing">Airing</string>
     <string name="notification_type_group_activity">Activity</string>

@@ -29,6 +29,7 @@ class NotificationWorker @AssistedInject constructor(
                     is UpcomingNotificationHandler -> if (notificationSettings.showUpcomingNotifications) {
                         handler.checkAndNotify()
                     }
+                    is ServiceNotificationHandler -> handler.checkAndNotify()
                 }
             }
 

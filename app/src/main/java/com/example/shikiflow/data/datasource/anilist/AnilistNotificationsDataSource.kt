@@ -18,7 +18,6 @@ import com.example.shikiflow.domain.model.notification.Notification
 import com.example.shikiflow.domain.repository.BaseNetworkRepository
 import com.example.shikiflow.presentation.screen.more.notifications.NotificationTypeGroup
 import com.example.shikiflow.utils.result.DataResult
-import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -44,7 +43,7 @@ class AnilistNotificationsDataSource @Inject constructor(
         perPage: Int,
         typeGroup: NotificationTypeGroup,
         resetCount: Boolean
-    ): Flow<PagedResult<Notification>> {
+    ): Result<List<Notification>> {
         val notificationsQuery = NotificationsQuery(
             page = page,
             perPage = perPage,
@@ -57,8 +56,9 @@ class AnilistNotificationsDataSource @Inject constructor(
 
         val result = apolloClient.query(notificationsQuery)
             .fetchPolicy(FetchPolicy.NetworkFirst)
-            .toFlow()
-            .asPagedResult(page = { it.Page?.pageInfo?.commonPage }) { data ->
+            .execute()
+            .toResult()
+            .map { data ->
                 data.Page?.notifications?.mapNotNull { notification ->
                     notification?.toDomainNotification()
                 } ?: emptyList()

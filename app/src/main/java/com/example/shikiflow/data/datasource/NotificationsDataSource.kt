@@ -4,7 +4,6 @@ import androidx.paging.PagingData
 import com.example.shikiflow.domain.model.notification.Notification
 import com.example.shikiflow.presentation.screen.more.notifications.NotificationTypeGroup
 import com.example.shikiflow.utils.result.DataResult
-import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 
 interface NotificationsDataSource {
@@ -15,7 +14,7 @@ interface NotificationsDataSource {
         perPage: Int,
         typeGroup: NotificationTypeGroup,
         resetCount: Boolean
-    ): Flow<PagedResult<Notification>>
+    ): Result<List<Notification>>
 
     fun getNotifications(
         typeGroup: NotificationTypeGroup,

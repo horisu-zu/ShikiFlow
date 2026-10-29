@@ -1,7 +1,5 @@
 package com.example.shikiflow.presentation.screen.browse.side
 
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import com.example.shikiflow.domain.model.browse.BrowseType
 import com.example.shikiflow.domain.model.tracks.MediaType
@@ -9,7 +7,6 @@ import com.example.shikiflow.presentation.screen.browse.BrowseNavOptions
 import com.example.shikiflow.presentation.screen.browse.ongoings.OngoingSideScreen
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun BrowseSideScreen(
     browseType: BrowseType,

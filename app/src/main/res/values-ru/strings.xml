@@ -302,8 +302,6 @@
 
     <string name="media_details_following">Отслеживают</string>
     <string name="airing_soon">Скоро в эфире</string>
-    <string name="rate_decrement">-</string>
-    <string name="rate_increment">+</string>
     <string name="rewatches">Повторные просмотры</string>
     <string name="rereads">Повторные прочтения</string>
     <string name="user_rate_add_to_list">Добавить в список</string>
@@ -978,8 +976,18 @@
     <string name="airing_summary_notification_label">Транслирующиеся отслеживаемые тайтлы:</string>
     <string name="airing_episode_notification_label">Эпизод %d уже транслируется</string>
     <string name="airing_premiere_summary_notification_label">Отслеживаемые тайтлы, премьера которых состоится скоро:</string>
-    <string name="airing_premiere_notification_label">Первый эпизод выйдет через</string>
+    <string name="airing_premiere_tv_notification_label">Первый эпизод выйдет через</string>
+    <string name="airing_premiere_notification_label">Премьера состоится через</string>
     <string name="anime_streaming_notifications_group_system_label">Трансляция аниме</string>
+    <string name="anime_premiere_notifications_group_system_label">Премьера аниме</string>
+    <string name="service_notifications_channel_label">Уведомления сервиса</string>
+    <string name="service_notifications_channel_description">Уведомления отправляемые сервисом трекинга</string>
+    <string name="service_notifications_group_system_label">Уведомления сервиса трекинга</string>
+    <plurals name="service_notifications_group_label">
+        <item quantity="one">%1$d новых уведомлений</item>
+        <item quantity="few">%1$d новых уведомления</item>
+        <item quantity="many">%1$d новых уведомлений</item>
+    </plurals>
 
     <string name="notification_type_group_airing">Выход серий</string>
     <string name="notification_type_group_activity">Активность</string>

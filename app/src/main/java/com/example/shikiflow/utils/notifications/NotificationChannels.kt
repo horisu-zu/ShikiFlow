@@ -5,7 +5,10 @@ import com.example.shikiflow.R
 import com.example.shikiflow.utils.notifications.NotificationUtils.createNotificationChannel
 import com.example.shikiflow.worker.notification.AiringNotificationHandler.Companion.AIRING_CHANNEL_ID
 import com.example.shikiflow.worker.notification.AiringNotificationHandler.Companion.AIRING_GROUP_ID
+import com.example.shikiflow.worker.notification.ServiceNotificationHandler.Companion.SERVICE_NOTIFICATION_CHANNEL_ID
+import com.example.shikiflow.worker.notification.ServiceNotificationHandler.Companion.SERVICE_NOTIFICATION_GROUP_ID
 import com.example.shikiflow.worker.notification.UpcomingNotificationHandler.Companion.UPCOMING_CHANNEL_ID
+import com.example.shikiflow.worker.notification.UpcomingNotificationHandler.Companion.UPCOMING_GROUP_ID
 
 object NotificationChannels {
     private val airingChannels = listOf(
@@ -20,8 +23,15 @@ object NotificationChannels {
             id = UPCOMING_CHANNEL_ID,
             nameRes = R.string.airing_premiere_notifications_settings_label,
             descriptionRes = R.string.airing_premiere_notification_settings_description,
-            groupId = AIRING_GROUP_ID,
+            groupId = UPCOMING_GROUP_ID,
             groupNameRes = R.string.anime_streaming_notifications_group_system_label
+        ),
+        NotificationChannelData(
+            id = SERVICE_NOTIFICATION_CHANNEL_ID,
+            nameRes = R.string.service_notifications_channel_label,
+            descriptionRes = R.string.service_notifications_channel_description,
+            groupId = SERVICE_NOTIFICATION_GROUP_ID,
+            groupNameRes = R.string.service_notifications_group_system_label
         )
     )
 

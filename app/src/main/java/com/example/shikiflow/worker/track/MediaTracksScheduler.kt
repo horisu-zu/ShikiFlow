@@ -10,7 +10,6 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import androidx.work.workDataOf
 import com.example.shikiflow.utils.DateUtils.calculateDelayUntil
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.util.concurrent.TimeUnit
@@ -29,20 +28,12 @@ class MediaTracksScheduler @Inject constructor(
 
     private val workManager by lazy { WorkManager.getInstance(context) }
 
-    fun scheduleOneTimeSync(
-        userId: Int,
-        applyDelay: Boolean = true
-    ) {
+    fun scheduleOneTimeSync(applyDelay: Boolean = true) {
         val networkConstraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
 
         val mediaTracksRequest = OneTimeWorkRequestBuilder<MediaTracksWorker>()
-            .setInputData(
-                workDataOf(
-                    "userId" to userId
-                )
-            )
             .setConstraints(networkConstraints)
             .setInitialDelay(
                 duration = when (applyDelay) {
@@ -61,7 +52,7 @@ class MediaTracksScheduler @Inject constructor(
         )
     }
 
-    fun schedulePeriodicSync(userId: Int) {
+    fun schedulePeriodicSync() {
         val networkConstraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
@@ -69,11 +60,6 @@ class MediaTracksScheduler @Inject constructor(
         val mediaTracksRequest = PeriodicWorkRequestBuilder<MediaTracksWorker>(
             repeatInterval = 1, repeatIntervalTimeUnit = TimeUnit.DAYS
         )
-            .setInputData(
-                workDataOf(
-                    "userId" to userId
-                )
-            )
             .setConstraints(networkConstraints)
             .setInitialDelay(calculateDelayUntil(hour = 5, minute = 0), TimeUnit.MILLISECONDS)
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, WorkRequest.MIN_BACKOFF_MILLIS, TimeUnit.MILLISECONDS)
@@ -86,9 +72,9 @@ class MediaTracksScheduler @Inject constructor(
         )
     }
 
-    fun scheduleSyncs(userId: Int, applyDelay: Boolean = true) {
-        scheduleOneTimeSync(userId, applyDelay)
-        schedulePeriodicSync(userId)
+    fun scheduleSyncs(applyDelay: Boolean = true) {
+        scheduleOneTimeSync(applyDelay)
+        schedulePeriodicSync()
     }
 
     fun cancelAll() {

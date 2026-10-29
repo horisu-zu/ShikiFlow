@@ -12,7 +12,6 @@ import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.worker.track.MediaTracksScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@OptIn(FlowPreview::class)
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
@@ -76,7 +74,7 @@ class MainViewModel @Inject constructor(
                                 settingsRepository.saveUserData(result.data, type)
 
                                 if(currentAuthType == null) {
-                                    mediaTracksScheduler.scheduleSyncs(result.data.id)
+                                    mediaTracksScheduler.scheduleSyncs()
                                 }
                             }
                         }

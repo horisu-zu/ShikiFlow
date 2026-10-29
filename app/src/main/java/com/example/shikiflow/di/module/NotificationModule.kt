@@ -2,6 +2,7 @@ package com.example.shikiflow.di.module
 
 import com.example.shikiflow.worker.notification.AiringNotificationHandler
 import com.example.shikiflow.worker.notification.NotificationHandler
+import com.example.shikiflow.worker.notification.ServiceNotificationHandler
 import com.example.shikiflow.worker.notification.UpcomingNotificationHandler
 import dagger.Binds
 import dagger.Module
@@ -20,4 +21,8 @@ interface NotificationModule {
     @Binds
     @IntoSet
     fun bindUpcomingHandler(upcomingHandler: UpcomingNotificationHandler): NotificationHandler
+
+    @Binds
+    @IntoSet
+    fun bindServiceHandler(serviceHandler: ServiceNotificationHandler): NotificationHandler
 }

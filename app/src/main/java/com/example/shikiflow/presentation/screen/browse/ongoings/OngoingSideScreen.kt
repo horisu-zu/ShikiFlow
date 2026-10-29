@@ -18,8 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -67,7 +65,6 @@ import kotlinx.datetime.toLocalDateTime
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun OngoingSideScreen(
     browseType: BrowseType,
@@ -92,7 +89,8 @@ fun OngoingSideScreen(
                     Text(
                         text = stringResource(id = browseType.displayValue()),
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        style = MaterialTheme.typography.titleMedium
                     )
                 },
                 actions = {
@@ -100,7 +98,8 @@ fun OngoingSideScreen(
                         selected = params.onList,
                         label = {
                             Text(
-                                text = stringResource(R.string.browse_on_my_list)
+                                text = stringResource(R.string.browse_on_my_list),
+                                style = MaterialTheme.typography.titleSmall
                             )
                         },
                         onClick = { ongoingsCalendarViewModel.setOnList(!params.onList) },

@@ -152,11 +152,7 @@ fun SettingsScreen(
                             title = stringResource(R.string.settings_resync_tracks_label),
                             displayValue = stringResource(R.string.settings_resync_tracks_value),
                             trailingIcon = IconResource.Drawable(R.drawable.ic_sync),
-                            onClick = {
-                                settingsState.user?.let { currentUser ->
-                                    settingsViewModel.syncTracks(currentUser.id)
-                                }
-                            }
+                            onClick = { settingsViewModel.syncTracks() }
                         )
                     )
                 )
@@ -578,7 +574,7 @@ fun SettingsScreen(
                 TrackerUserBottomSheet(
                     authType = authType,
                     user = serviceUser,
-                    onSwitch = { settingsViewModel.setAuthType(authType, serviceUser.id) },
+                    onSwitch = { settingsViewModel.setAuthType(authType) },
                     onLogout = { settingsViewModel.clearUserData(authType) },
                     onDismiss = { selectedTracker = null }
                 )

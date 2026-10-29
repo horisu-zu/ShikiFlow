@@ -22,7 +22,7 @@ class NotificationScheduler @Inject constructor(
     private val workManager by lazy { WorkManager.getInstance(context) }
 
     fun schedulePeriodicWork() {
-        val airingMediaRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<NotificationWorker>(
             repeatInterval = 15, repeatIntervalTimeUnit = TimeUnit.MINUTES
         )
             .setBackoffCriteria(BackoffPolicy.LINEAR, BACKOFF_DELAY_MS, TimeUnit.MILLISECONDS)
@@ -31,7 +31,7 @@ class NotificationScheduler @Inject constructor(
         workManager.enqueueUniquePeriodicWork(
             uniqueWorkName = NOTIFICATION_WORK_NAME,
             existingPeriodicWorkPolicy = ExistingPeriodicWorkPolicy.REPLACE,
-            request = airingMediaRequest
+            request = periodicWorkRequest
         )
     }
 
