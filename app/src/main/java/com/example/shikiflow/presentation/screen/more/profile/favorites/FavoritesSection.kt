@@ -1,5 +1,6 @@
 package com.example.shikiflow.presentation.screen.more.profile.favorites
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -113,6 +114,10 @@ fun FavoritesSection(
         favoritesViewModel.setCategory(
             favoriteCategory = favoriteCategories[pagerState.currentPage]
         )
+    }
+
+    BackHandler(enabled = isEditingOrder.value) {
+        isEditingOrder.value = false
     }
 
     Scaffold(

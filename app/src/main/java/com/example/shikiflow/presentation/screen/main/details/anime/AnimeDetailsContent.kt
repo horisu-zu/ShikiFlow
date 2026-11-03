@@ -244,7 +244,7 @@ fun AnimeDetailsContent(
                             CharacterCard(
                                 characterPoster = characterItem.imageUrl,
                                 characterName = characterItem.fullName.preferred(titleType),
-                                onClick = { mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id) },
+                                onClick = { mediaNavOptions.navigateByEntity(EntityType.Character, characterItem.id) },
                                 clipPercent = clipPercent,
                                 imageType = imageType
                             )

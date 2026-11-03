@@ -15,10 +15,10 @@ object LinkRouter {
         val anilistMatch = anilistLinkRegex.matchEntire(url)
         if (anilistMatch != null) {
             val type = when (anilistMatch.groupValues[1]) {
-                "anime" -> EntityType.ANIME
-                "manga" -> EntityType.MANGA
-                "character" -> EntityType.CHARACTER
-                "staff" -> EntityType.PERSON
+                "anime" -> EntityType.Anime
+                "manga" -> EntityType.Manga
+                "character" -> EntityType.Character
+                "staff" -> EntityType.Staff
                 else -> return null
             }
             return EntityData(id = anilistMatch.groupValues[2], type = type)
@@ -27,12 +27,12 @@ object LinkRouter {
         val shikimoriMatch = shikimoriLinkRegex.matchEntire(url)
         if (shikimoriMatch != null) {
             val type = when (shikimoriMatch.groupValues[1]) {
-                "animes" -> EntityType.ANIME
-                "mangas" -> EntityType.MANGA
-                "ranobe" -> EntityType.RANOBE
-                "characters" -> EntityType.CHARACTER
-                "people" -> EntityType.PERSON
-                "comments" -> EntityType.COMMENT_REPLY
+                "animes" -> EntityType.Anime
+                "mangas" -> EntityType.Manga
+                "ranobe" -> EntityType.Ranobe
+                "characters" -> EntityType.Character
+                "people" -> EntityType.Staff
+                "comments" -> EntityType.CommentReply
                 else -> return null
             }
             return EntityData(id = shikimoriMatch.groupValues[2], type = type)

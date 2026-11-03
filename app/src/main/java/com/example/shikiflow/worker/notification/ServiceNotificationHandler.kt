@@ -48,7 +48,7 @@ class ServiceNotificationHandler @Inject constructor(
                     onSuccess = { data ->
                         val filteredData = data.filter { notification ->
                             notification.type in notificationPreferences.filter { it.value } &&
-                            notification.timestamp > lastCreatedAt
+                            notification.createdAt > lastCreatedAt
                         }
 
                         if (filteredData.size > 1) {
@@ -76,7 +76,7 @@ class ServiceNotificationHandler @Inject constructor(
                         }
 
                         settingsRepository.saveNotificationTimestamp(
-                            instant = data.first().timestamp
+                            instant = data.first().createdAt
                         )
                     },
                     onFailure = { throwable -> throw IllegalStateException(throwable) }

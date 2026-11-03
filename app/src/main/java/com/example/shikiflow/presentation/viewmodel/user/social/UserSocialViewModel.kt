@@ -7,6 +7,7 @@ import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.social.ThreadComment
 import com.example.shikiflow.domain.repository.ActivityRepository
+import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.utils.result.DataResult
 import com.example.shikiflow.utils.result.PagedResult
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class UserSocialViewModel @Inject constructor(
     private val userRepository: UserRepository,
-    private val activityRepository: ActivityRepository
+    private val activityRepository: ActivityRepository,
+    private val settingsRepository: SettingsRepository
 ): ViewModel() {
 
     private val _uiState = MutableStateFlow(UserSocialUiState())
@@ -86,6 +89,17 @@ class UserSocialViewModel @Inject constructor(
                             }
                         }
                     }
+                }
+            }.launchIn(viewModelScope)
+
+        settingsRepository.userFlow
+            .mapNotNull { user -> user?.id }
+            .distinctUntilChanged()
+            .onEach { userId ->
+                _uiState.update { state ->
+                    state.copy(
+                        currentUserId = userId
+                    )
                 }
             }.launchIn(viewModelScope)
     }

@@ -203,12 +203,12 @@ fun SocialSection(
                                             threadData = item.data,
                                             resources = resources,
                                             onThreadClick = { id ->
-                                                val navRoute = DetailsNavRoute.Comments(
-                                                    screenMode = CommentsScreenMode.TOPIC,
-                                                    id = id
+                                                navOptions.navigateToDetails(
+                                                    detailsNavRoute = DetailsNavRoute.Comments(
+                                                        screenMode = CommentsScreenMode.TOPIC,
+                                                        id = id
+                                                    )
                                                 )
-
-                                                navOptions.navigateToDetails(navRoute)
                                             },
                                             modifier = Modifier.fillMaxWidth()
                                         )
@@ -217,15 +217,17 @@ fun SocialSection(
                                         ThreadCommentItem(
                                             threadComment = item,
                                             onThreadClick = {
-                                                val navRoute = DetailsNavRoute.Comments(
-                                                    screenMode = CommentsScreenMode.TOPIC,
-                                                    id = item.thread.id
+                                                navOptions.navigateToDetails(
+                                                    detailsNavRoute = DetailsNavRoute.Comments(
+                                                        screenMode = CommentsScreenMode.TOPIC,
+                                                        id = item.thread.id
+                                                    )
                                                 )
-
-                                                navOptions.navigateToDetails(navRoute)
                                             },
                                             onLikeToggle = { commentId ->
-                                                userSocialViewModel.toggleCommentLike(commentId)
+                                                if (userId != uiState.currentUserId) {
+                                                    userSocialViewModel.toggleCommentLike(commentId)
+                                                }
                                             },
                                             onEntityClick = { entityType, id ->
                                                 navOptions.navigateByEntity(entityType, id)

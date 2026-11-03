@@ -23,6 +23,7 @@ import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
+import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute.*
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavigator
 import com.example.shikiflow.presentation.screen.more.about.AboutAppScreen
 import com.example.shikiflow.presentation.screen.more.compare.CompareScreen
@@ -69,31 +70,39 @@ fun ProfileNavigator(
             entityType: EntityType,
             id: Int
         ) {
-            val detailsNavRoute = when (entityType) {
-                EntityType.CHARACTER -> {
-                    DetailsNavRoute.CharacterDetails(id)
+            when (entityType) {
+                EntityType.Character -> {
+                    navigateToDetails(CharacterDetails(id))
                 }
-                EntityType.PERSON -> {
-                    DetailsNavRoute.Staff(id)
+                EntityType.Staff -> {
+                    navigateToDetails(Staff(id))
                 }
-                EntityType.ANIME -> {
-                    DetailsNavRoute.AnimeDetails(id)
+                EntityType.Anime -> {
+                    navigateToDetails(AnimeDetails(id))
                 }
-                EntityType.MANGA, EntityType.RANOBE -> {
-                    DetailsNavRoute.MangaDetails(id)
+                EntityType.Manga, EntityType.Ranobe -> {
+                    navigateToDetails(MangaDetails(id))
                 }
-                EntityType.COMMENT_REPLY -> {
-                    DetailsNavRoute.Comments(
-                        screenMode = CommentsScreenMode.REPLY,
-                        id = id
-                    )
+                EntityType.Thread, EntityType.CommentReply -> {
+                    navigateToDetails(
+                        Comments(
+                            screenMode = when (entityType) {
+                                EntityType.CommentReply -> CommentsScreenMode.REPLY
+                                EntityType.Thread -> CommentsScreenMode.TOPIC
+                            },
+                            id = id
+                        ))
                 }
-                EntityType.REVIEW -> {
-                    DetailsNavRoute.Review(id)
+                EntityType.Review -> {
+                    navigateToDetails(Review(id))
+                }
+                is EntityType.Activity -> {
+                    navigateToActivityReplies(id, entityType.type)
+                }
+                is EntityType.User -> {
+                    navigateToProfile(user = entityType.user)
                 }
             }
-
-            navigateToDetails(detailsNavRoute)
         }
 
         override fun navigateToActivityReplies(

@@ -8,7 +8,6 @@ fragment ALAiringNotification on AiringNotification {
     contexts
     animeId
     episode
-
     media {
         title {
             userPreferred
@@ -17,212 +16,143 @@ fragment ALAiringNotification on AiringNotification {
             large
         }
     }
-    type
     createdAt
 }
 
 fragment ALFollowingNotification on FollowingNotification {
     id
-    context
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
     createdAt
 }
 
 fragment ALActivityMessageNotification on ActivityMessageNotification {
     id
-    context
-    activityId
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
+    message {
+        id
+        message(asHtml: true)
+    }
     createdAt
 }
 
 fragment ALActivityMentionNotification on ActivityMentionNotification {
     id
-    context
-    activityId
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
+    activity { ...ALNotificationActivity }
     createdAt
 }
 
 fragment ALActivityReplyNotification on ActivityReplyNotification {
     id
-    context
-    activityId
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
+    activity { ...ALNotificationActivity }
     createdAt
 }
 
 fragment ALActivityReplySubscribedNotification on ActivityReplySubscribedNotification {
     id
-    context
-    activityId
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
+    activity { ...ALNotificationActivity }
     createdAt
 }
 
 fragment ALActivityLikeNotification on ActivityLikeNotification {
     id
-    context
-    activityId
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
+    activity { ...ALNotificationActivity }
     createdAt
 }
 
 fragment ALActivityReplyLikeNotification on ActivityReplyLikeNotification {
     id
-    context
     activityId
     userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
+    activity { ...ALNotificationActivity }
     createdAt
 }
 
 fragment ALThreadCommentMentionNotification on ThreadCommentMentionNotification {
     id
-    context
     commentId
     thread {
         id
         title
     }
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
     createdAt
 }
 
 fragment ALThreadCommentReplyNotification on ThreadCommentReplyNotification {
     id
-    context
     commentId
     thread {
         id
         title
     }
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
     createdAt
 }
 
 fragment ALThreadCommentSubscribedNotification on ThreadCommentSubscribedNotification {
     id
-    context
     commentId
     thread {
         id
         title
     }
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
     createdAt
 }
 
 fragment ALThreadCommentLikeNotification on ThreadCommentLikeNotification {
     id
-    context
     commentId
     thread {
         id
         title
     }
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
     createdAt
 }
 
 fragment ALThreadLikeNotification on ThreadLikeNotification {
     id
-    context
     threadId
     thread {
         id
         title
     }
-    userId
     user {
-        name
-        avatar {
-            large
-        }
+        ...ALUserShort
     }
-    type
     createdAt
 }
 
 fragment ALRelatedMediaAdditionNotification on RelatedMediaAdditionNotification {
     id
-    context
     mediaId
     media {
         title {
@@ -231,14 +161,13 @@ fragment ALRelatedMediaAdditionNotification on RelatedMediaAdditionNotification 
         coverImage {
             large
         }
+        type
     }
-    type
     createdAt
 }
 
 fragment ALMediaDataChangeNotification on MediaDataChangeNotification {
     id
-    context
     mediaId
     reason
     media {
@@ -248,14 +177,13 @@ fragment ALMediaDataChangeNotification on MediaDataChangeNotification {
         coverImage {
             large
         }
+        type
     }
-    type
     createdAt
 }
 
 fragment ALMediaMergeNotification on MediaMergeNotification {
     id
-    context
     mediaId
     reason
     media {
@@ -265,55 +193,64 @@ fragment ALMediaMergeNotification on MediaMergeNotification {
         coverImage {
             large
         }
+        type
     }
-    type
+    deletedMediaTitles
     createdAt
 }
 
 fragment ALMediaDeletionNotification on MediaDeletionNotification {
     id
-    context
     reason
     deletedMediaTitle
-    type
     createdAt
 }
 
 fragment ALMediaSubmissionUpdateNotification on MediaSubmissionUpdateNotification {
     id
-    contexts
+    status
+    notes
     media {
         id
+        title {
+            userPreferred
+        }
         coverImage {
             large
         }
+        type
     }
-    type
     createdAt
 }
 
 fragment ALStaffSubmissionUpdateNotification on StaffSubmissionUpdateNotification {
     id
-    contexts
+    status
+    notes
     staff {
         id
+        name {
+            userPreferred
+        }
         image {
             large
         }
     }
-    type
     createdAt
 }
 
 fragment ALCharacterSubmissionUpdateNotification on CharacterSubmissionUpdateNotification {
     id
-    contexts
+    status
+    notes
     character {
         id
+        name {
+            userPreferred
+        }
         image {
             large
         }
     }
-    type
     createdAt
 }

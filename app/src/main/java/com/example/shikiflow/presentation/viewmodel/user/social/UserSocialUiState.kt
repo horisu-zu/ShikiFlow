@@ -8,6 +8,7 @@ import com.example.shikiflow.presentation.PagedUiState
 
 data class UserSocialUiState(
     val userId: Int? = null,
+    val currentUserId: Int? = null,
     val currentCategory: SocialCategory? = null,
     val categories: Map<SocialCategory, SocialCategoryUiState> = SocialCategory.entries
         .associateWith { SocialCategoryUiState() }

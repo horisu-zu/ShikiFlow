@@ -38,9 +38,7 @@ class NotificationsViewModel @Inject constructor(
                     typeGroup = typeGroup,
                     resetCount = typeGroup == NotificationTypeGroup.ALL
                 )
-            }
-
-            .cachedIn(viewModelScope)
+            }.cachedIn(viewModelScope)
     }
 
     fun setNotificationTypeGroup(typeGroup: NotificationTypeGroup) {

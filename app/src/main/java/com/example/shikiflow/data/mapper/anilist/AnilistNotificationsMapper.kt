@@ -1,10 +1,24 @@
 package com.example.shikiflow.data.mapper.anilist
 
 import com.example.graphql.anilist.NotificationsQuery
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toNotificationActivity
+import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
+import com.example.shikiflow.domain.model.notification.ActivityNotification
 import com.example.shikiflow.domain.model.notification.AiringNotification
-import com.example.shikiflow.domain.model.notification.BaseNotification
+import com.example.shikiflow.domain.model.notification.FollowingNotification
+import com.example.shikiflow.domain.model.notification.MediaDeletionNotification
+import com.example.shikiflow.domain.model.notification.MediaMergeNotification
+import com.example.shikiflow.domain.model.notification.MediaNotification
 import com.example.shikiflow.domain.model.notification.Notification
 import com.example.shikiflow.domain.model.notification.NotificationType
+import com.example.shikiflow.domain.model.notification.SubmissionNotification
+import com.example.shikiflow.domain.model.notification.SubmissionStatus
+import com.example.shikiflow.domain.model.notification.ThreadCommentNotification
+import com.example.shikiflow.domain.model.notification.ThreadNotification
+import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.activity.TextNotificationActivity
 import com.example.graphql.anilist.type.NotificationType as ALNotificationType
 import com.example.shikiflow.presentation.screen.more.notifications.NotificationTypeGroup
 import kotlin.time.Instant
@@ -99,257 +113,233 @@ object AnilistNotificationsMapper {
         onAiringNotification?.aLAiringNotification?.let { notification ->
             return AiringNotification(
                 id = notification.id,
-                text = notification.media?.title?.userPreferred.orEmpty(),
-                contentId = notification.animeId,
-                imageUrl = notification.media?.coverImage?.large.orEmpty(),
-                timestamp = notification.createdAt.toInstant(),
-                episodeNumber = notification.episode,
+                mediaTitle = notification.media?.title?.userPreferred.orEmpty(),
+                mediaId = notification.animeId,
+                coverImageUrl = notification.media?.coverImage?.large.orEmpty(),
+                createdAt = notification.createdAt.toInstant(),
+                episodeNumber = notification.episode
             )
         }
 
         onFollowingNotification?.aLFollowingNotification?.let { notification ->
-            return userNotification(
-                id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
-                type = NotificationType.FOLLOWING,
-                contentId = notification.userId,
-            )
+            notification.user?.aLUserShort?.let {
+                return FollowingNotification(
+                    id = notification.id,
+                    createdAt = notification.createdAt.toInstant(),
+                    type = NotificationType.FOLLOWING,
+                    user = notification.user.aLUserShort.toDomainUser()
+                )
+            }
         }
 
         onActivityMessageNotification?.aLActivityMessageNotification?.let { notification ->
-            return userNotification(
-                id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
-                type = NotificationType.ACTIVITY_MESSAGE,
-                contentId = notification.activityId,
-                secondaryContentId = notification.userId,
-            )
+            notification.message?.let { messageActivity ->
+                return ActivityNotification(
+                    id = notification.id,
+                    createdAt = notification.createdAt.toInstant(),
+                    type = NotificationType.ACTIVITY_MESSAGE,
+                    user = notification.user?.aLUserShort?.toDomainUser(),
+                    activity = TextNotificationActivity(
+                        id = messageActivity.id,
+                        type = ActivityType.MESSAGE,
+                        text = messageActivity.message ?: ""
+                    )
+                )
+            }
         }
         onActivityMentionNotification?.aLActivityMentionNotification?.let { notification ->
-            return userNotification(
+            return ActivityNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.ACTIVITY_MENTION,
-                contentId = notification.activityId,
-                secondaryContentId = notification.userId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                activity = notification.activity?.aLNotificationActivity?.toNotificationActivity()
             )
         }
         onActivityReplyNotification?.aLActivityReplyNotification?.let { notification ->
-            return userNotification(
+            return ActivityNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.ACTIVITY_REPLY,
-                contentId = notification.activityId,
-                secondaryContentId = notification.userId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                activity = notification.activity?.aLNotificationActivity?.toNotificationActivity()
             )
         }
         onActivityReplySubscribedNotification?.aLActivityReplySubscribedNotification?.let { notification ->
-            return userNotification(
+            return ActivityNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.ACTIVITY_REPLY_SUBSCRIBED,
-                contentId = notification.activityId,
-                secondaryContentId = notification.userId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                activity = notification.activity?.aLNotificationActivity?.toNotificationActivity()
             )
         }
         onActivityLikeNotification?.aLActivityLikeNotification?.let { notification ->
-            return userNotification(
+            return ActivityNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.ACTIVITY_LIKE,
-                contentId = notification.activityId,
-                secondaryContentId = notification.userId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                activity = notification.activity?.aLNotificationActivity?.toNotificationActivity()
             )
         }
         onActivityReplyLikeNotification?.aLActivityReplyLikeNotification?.let { notification ->
-            return userNotification(
+            return ActivityNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.ACTIVITY_REPLY_LIKE,
-                contentId = notification.activityId,
-                secondaryContentId = notification.userId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                activity = notification.activity?.aLNotificationActivity?.toNotificationActivity()
             )
         }
 
         onThreadCommentMentionNotification?.aLThreadCommentMentionNotification?.let { notification ->
-            return userNotification(
+            return ThreadCommentNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.THREAD_COMMENT_MENTION,
-                contentId = notification.thread?.id,
-                secondaryContentId = notification.commentId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                threadId = notification.thread?.id ?: 0,
+                threadTitle = notification.thread?.title,
+                commentId = notification.commentId
             )
         }
         onThreadCommentReplyNotification?.aLThreadCommentReplyNotification?.let { notification ->
-            return userNotification(
+            return ThreadCommentNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.THREAD_COMMENT_REPLY,
-                contentId = notification.thread?.id,
-                secondaryContentId = notification.commentId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                threadId = notification.thread?.id ?: 0,
+                threadTitle = notification.thread?.title,
+                commentId = notification.commentId
             )
         }
         onThreadCommentSubscribedNotification?.aLThreadCommentSubscribedNotification?.let { notification ->
-            return userNotification(
+            return ThreadCommentNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.THREAD_SUBSCRIBED,
-                contentId = notification.thread?.id,
-                secondaryContentId = notification.commentId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                threadId = notification.thread?.id ?: 0,
+                threadTitle = notification.thread?.title,
+                commentId = notification.commentId
             )
         }
         onThreadCommentLikeNotification?.aLThreadCommentLikeNotification?.let { notification ->
-            return userNotification(
+            return ThreadCommentNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.THREAD_COMMENT_LIKE,
-                contentId = notification.thread?.id,
-                secondaryContentId = notification.commentId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                threadId = notification.thread?.id ?: 0,
+                threadTitle = notification.thread?.title,
+                commentId = notification.commentId
             )
         }
         onThreadLikeNotification?.aLThreadLikeNotification?.let { notification ->
-            return userNotification(
+            return ThreadNotification(
                 id = notification.id,
-                user = notification.user?.name,
-                avatar = notification.user?.avatar?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.THREAD_LIKE,
-                contentId = notification.threadId,
-                secondaryContentId = notification.userId,
+                user = notification.user?.aLUserShort?.toDomainUser(),
+                threadId = notification.thread?.id ?: 0,
+                threadTitle = notification.thread?.title
             )
         }
 
         onRelatedMediaAdditionNotification?.aLRelatedMediaAdditionNotification?.let { notification ->
-            return mediaNotification(
+            return MediaNotification(
                 id = notification.id,
-                text = notification.media?.title?.userPreferred,
-                imageUrl = notification.media?.coverImage?.large,
-                createdAt = notification.createdAt,
+                mediaTitle = notification.media?.title?.userPreferred ?: "",
+                mediaId = notification.mediaId,
+                coverImageUrl = notification.media?.coverImage?.large,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.RELATED_MEDIA_ADDITION,
-                contentId = notification.mediaId,
+                mediaType = notification.media?.type?.toDomain() ?: MediaType.ANIME,
+                reason = null
             )
         }
         onMediaDataChangeNotification?.aLMediaDataChangeNotification?.let { notification ->
-            return mediaNotification(
+            return MediaNotification(
                 id = notification.id,
-                text = notification.media?.title?.userPreferred,
-                imageUrl = notification.media?.coverImage?.large,
-                createdAt = notification.createdAt,
+                mediaTitle = notification.media?.title?.userPreferred ?: "",
+                mediaId = notification.mediaId,
+                coverImageUrl = notification.media?.coverImage?.large,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.MEDIA_DATA_CHANGE,
-                contentId = notification.mediaId,
+                mediaType = notification.media?.type?.toDomain() ?: MediaType.ANIME,
+                reason = notification.reason
             )
         }
         onMediaMergeNotification?.aLMediaMergeNotification?.let { notification ->
-            return mediaNotification(
+            return MediaMergeNotification(
                 id = notification.id,
-                text = notification.media?.title?.userPreferred,
-                imageUrl = notification.media?.coverImage?.large,
-                createdAt = notification.createdAt,
-                type = NotificationType.MEDIA_MERGE,
-                contentId = notification.mediaId,
+                mediaTitle = notification.media?.title?.userPreferred ?: "",
+                mediaId = notification.mediaId,
+                coverImageUrl = notification.media?.coverImage?.large,
+                createdAt = notification.createdAt.toInstant(),
+                mediaType = notification.media?.type?.toDomain() ?: MediaType.ANIME,
+                mergedMediaTitles = notification.deletedMediaTitles?.filterNotNull() ?: emptyList(),
+                reason = notification.reason
             )
         }
         onMediaDeletionNotification?.aLMediaDeletionNotification?.let { notification ->
-            return mediaNotification(
+            return MediaDeletionNotification(
                 id = notification.id,
-                text = notification.deletedMediaTitle,
-                imageUrl = null,
-                createdAt = notification.createdAt,
-                type = NotificationType.MEDIA_DELETION,
-                contentId = null,
+                deletedMediaTitle = notification.deletedMediaTitle.orEmpty(),
+                createdAt = notification.createdAt.toInstant()
             )
         }
 
         onMediaSubmissionUpdateNotification?.aLMediaSubmissionUpdateNotification?.let { notification ->
-            return mediaNotification(
+            return SubmissionNotification(
                 id = notification.id,
-                text = notification.contexts?.filterNotNull()?.joinToString("\n").orEmpty(),
-                imageUrl = notification.media?.coverImage?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.MEDIA_SUBMISSION_UPDATE,
-                contentId = notification.media?.id,
+                text = notification.media?.title?.userPreferred.orEmpty(),
+                imageUrl = notification.media?.coverImage?.large,
+                submissionStatus = notification.status.toDomainStatus(),
+                notes = notification.notes.orEmpty(),
+                contentId = notification.media?.id ?: 0,
+                mediaType = notification.media?.type?.toDomain()
             )
         }
         onStaffSubmissionUpdateNotification?.aLStaffSubmissionUpdateNotification?.let { notification ->
-            return mediaNotification(
+            return SubmissionNotification(
                 id = notification.id,
-                text = notification.contexts?.filterNotNull()?.joinToString("\n").orEmpty(),
-                imageUrl = notification.staff?.image?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.STAFF_SUBMISSION_UPDATE,
-                contentId = notification.staff?.id,
+                text = notification.staff?.name?.userPreferred.orEmpty(),
+                imageUrl = notification.staff?.image?.large,
+                submissionStatus = notification.status.toDomainStatus(),
+                notes = notification.notes.orEmpty(),
+                contentId = notification.staff?.id ?: 0
             )
         }
         onCharacterSubmissionUpdateNotification?.aLCharacterSubmissionUpdateNotification?.let { notification ->
-            return mediaNotification(
+            return SubmissionNotification(
                 id = notification.id,
-                text = notification.contexts?.filterNotNull()?.joinToString("\n").orEmpty(),
-                imageUrl = notification.character?.image?.large,
-                createdAt = notification.createdAt,
+                createdAt = notification.createdAt.toInstant(),
                 type = NotificationType.CHARACTER_SUBMISSION_UPDATE,
-                contentId = notification.character?.id,
+                text = notification.character?.name?.userPreferred.orEmpty(),
+                imageUrl = notification.character?.image?.large,
+                submissionStatus = notification.status.toDomainStatus(),
+                notes = notification.notes.orEmpty(),
+                contentId = notification.character?.id ?: 0
             )
         }
 
         return null
     }
 
-    private fun userNotification(
-        id: Int,
-        user: String?,
-        avatar: String?,
-        createdAt: Int?,
-        type: NotificationType,
-        contentId: Int?,
-        secondaryContentId: Int? = null,
-    ) = BaseNotification(
-        id = id,
-        text = user.orEmpty(),
-        contentId = contentId ?: 0,
-        imageUrl = avatar.orEmpty(),
-        timestamp = createdAt.toInstant(),
-        type = type,
-        secondaryContentId = secondaryContentId,
-    )
-
-    private fun mediaNotification(
-        id: Int,
-        text: String?,
-        imageUrl: String?,
-        createdAt: Int?,
-        type: NotificationType,
-        contentId: Int?,
-    ) = BaseNotification(
-        id = id,
-        text = text.orEmpty(),
-        contentId = contentId ?: 0,
-        imageUrl = imageUrl.orEmpty(),
-        timestamp = createdAt.toInstant(),
-        type = type,
-        secondaryContentId = null,
-    )
+    private fun String?.toDomainStatus(): SubmissionStatus {
+        return when (this?.lowercase()) {
+            "accepted" -> SubmissionStatus.ACCEPTED
+            "rejected" -> SubmissionStatus.REJECTED
+            else -> SubmissionStatus.PARTIALLY_ACCEPTED
+        }
+    }
 
     private fun Int?.toInstant() = Instant.fromEpochSeconds(this?.toLong() ?: 0L)
 }

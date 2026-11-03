@@ -40,7 +40,7 @@ import com.example.shikiflow.presentation.common.DigitCounter
 import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
-import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.description
+import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.listActivityDescription
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import com.example.shikiflow.presentation.common.shimmerEffect
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserItem
@@ -115,17 +115,12 @@ fun ListActivityItem(
 ) {
     val imageType = ImageType.Poster()
     val isCurrentUser = currentUserId == listActivity.userId
+    val resources = LocalResources.current
 
     Row(
         modifier = modifier
             .clip(imageType.shape)
-            .then(
-                if(listActivity.mediaType != null) {
-                    Modifier.clickable {
-                        onListActivityClick(listActivity.mediaType, listActivity.mediaId)
-                    }
-                } else Modifier
-            ),
+            .clickable { onListActivityClick(listActivity.mediaType, listActivity.mediaId) },
         horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
     ) {
         BaseImage(
@@ -140,7 +135,7 @@ fun ListActivityItem(
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
-                text = convertInstantToString(LocalResources.current, listActivity.createdAt),
+                text = convertInstantToString(resources, listActivity.createdAt),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f)
             )
@@ -152,13 +147,19 @@ fun ListActivityItem(
             )
 
             Text(
-                text = listActivity.description()
-                    .withStyledDigits(
-                        style = SpanStyle(
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    ),
+                text = listActivityDescription(
+                    resources = resources,
+                    mediaType = listActivity.mediaType,
+                    status = listActivity.status,
+                    progress = listActivity.progress,
+                    progressVolumes = listActivity.progressVolumes,
+                    scoreChange = listActivity.scoreChange
+                ).withStyledDigits(
+                    style = SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)

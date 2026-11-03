@@ -1,29 +1,22 @@
 package com.example.shikiflow.domain.model.comment
 
+import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.User as DomainUser
+
 data class EntityData(
     val id: String,
     val type: EntityType
 )
 
-enum class EntityType {
-    CHARACTER,
-    PERSON,
-    ANIME,
-    MANGA,
-    RANOBE,
-    COMMENT_REPLY,
-    REVIEW;
-
-    companion object {
-        fun String.getAnilistEntityType(): EntityType? {
-            return when(this) {
-                "anime" -> ANIME
-                "manga" -> MANGA
-                "character" -> CHARACTER
-                "staff" -> PERSON
-                "review" -> REVIEW
-                else -> null
-            }
-        }
-    }
+sealed interface EntityType {
+    data object Character : EntityType
+    data object Staff : EntityType
+    data object Anime : EntityType
+    data object Manga : EntityType
+    data object Ranobe : EntityType
+    data object Thread : EntityType
+    data object CommentReply : EntityType
+    data object Review : EntityType
+    data class User(val user: DomainUser) : EntityType
+    data class Activity(val type: ActivityType) : EntityType
 }

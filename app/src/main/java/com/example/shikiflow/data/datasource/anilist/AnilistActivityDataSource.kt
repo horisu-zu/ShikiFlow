@@ -16,6 +16,7 @@ import com.example.shikiflow.data.datasource.ActivityDataSource
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toALType
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainLike
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainActivity
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainReply
 import com.example.shikiflow.di.annotations.AnilistApollo
 import com.example.shikiflow.domain.model.thread.Like
@@ -45,11 +46,8 @@ class AnilistActivityDataSource @Inject constructor(
             .toFlow()
 
         return response.asDataResult { data ->
-            data.Activity?.let { activity ->
-                activity.onListActivity?.aLListActivity?.toDomain() ?:
-                activity.onMessageActivity?.aLMessageActivity?.toDomain() ?:
-                activity.onTextActivity?.aLTextActivity?.toDomain()
-            } ?: throw IllegalStateException("Error fetching activity with ID: $activityId")
+            data.Activity?.aLUserActivity?.toDomainActivity()
+                ?: throw IllegalStateException("Error fetching activity with ID: $activityId")
         }
     }
 

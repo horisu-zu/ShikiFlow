@@ -144,27 +144,34 @@ fun DetailsNavigator(
 
         override fun navigateByEntity(entityType: EntityType, id: Int) {
             when (entityType) {
-                EntityType.CHARACTER -> {
+                is EntityType.Character -> {
                     navigateToCharacterDetails(id)
                 }
-                EntityType.PERSON -> {
+                is EntityType.Staff -> {
                     navigateToStaff(id)
                 }
-                EntityType.ANIME -> {
+                is EntityType.Anime -> {
                     navigateToAnimeDetails(id)
                 }
-                EntityType.MANGA, EntityType.RANOBE -> {
+                is EntityType.Manga, is EntityType.Ranobe -> {
                     navigateToMangaDetails(id)
                 }
-                EntityType.COMMENT_REPLY -> {
+                is EntityType.CommentReply, is EntityType.Thread -> {
                     navigateToComments(
-                        screenMode = CommentsScreenMode.REPLY,
+                        screenMode = when (entityType) {
+                            EntityType.CommentReply -> CommentsScreenMode.REPLY
+                            EntityType.Thread -> CommentsScreenMode.TOPIC
+                        },
                         id = id
                     )
                 }
-                EntityType.REVIEW -> {
+                is EntityType.Review -> {
                     navigateToReview(id)
                 }
+                is EntityType.User -> {
+                    navigateToUserProfile(entityType.user)
+                }
+                is EntityType.Activity -> { /**/ }
             }
         }
 

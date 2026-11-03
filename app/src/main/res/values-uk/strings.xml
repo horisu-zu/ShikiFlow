@@ -70,6 +70,7 @@
     <string name="common_update">Оновити</string>
     <string name="common_clear_changes">Відмінити зміни</string>
 
+    <string name="common_and_separator">та</string>
     <string name="tracker_services_update_title">Оновлювати відстежуване на всіх під\'єднаних сервісах</string>
     <string name="tracker_services_update_note">
         оскільки синхронізація оновлень відбувається за ідентифікатором MAL,

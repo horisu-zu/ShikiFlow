@@ -10,9 +10,11 @@ import com.example.graphql.anilist.fragment.ALFavoriteStaffShort
 import com.example.graphql.anilist.fragment.ALListActivity
 import com.example.graphql.anilist.fragment.ALMediaFollowingUser
 import com.example.graphql.anilist.fragment.ALMessageActivity
+import com.example.graphql.anilist.fragment.ALNotificationActivity
 import com.example.graphql.anilist.fragment.ALNotificationOption
 import com.example.graphql.anilist.fragment.ALStudioShort
 import com.example.graphql.anilist.fragment.ALTextActivity
+import com.example.graphql.anilist.fragment.ALUserActivity
 import com.example.graphql.anilist.fragment.ALUserGenres
 import com.example.graphql.anilist.fragment.ALUserListStats
 import com.example.graphql.anilist.fragment.ALUserSettings
@@ -61,6 +63,11 @@ import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserSettings
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
+import com.example.shikiflow.domain.model.user.activity.ActivityType
+import com.example.shikiflow.domain.model.user.activity.ListNotificationActivity
+import com.example.shikiflow.domain.model.user.activity.NotificationActivity
+import com.example.shikiflow.domain.model.user.activity.TextNotificationActivity
+import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
@@ -103,12 +110,43 @@ object AnilistUserMapper {
         )
     }
 
+    fun ALUserActivity.toDomainActivity(): UserActivity? {
+        return onListActivity?.aLListActivity?.toDomain()
+            ?: onTextActivity?.aLTextActivity?.toDomain()
+            ?: onMessageActivity?.aLMessageActivity?.toDomain()
+    }
+
+    fun ALNotificationActivity.toNotificationActivity(): NotificationActivity? {
+        return onListActivity?.let { listActivity ->
+            ListNotificationActivity(
+                id = listActivity.id,
+                mediaType = listActivity.media?.type?.toDomain() ?: MediaType.ANIME,
+                title = listActivity.media?.title?.mediaTitle.toDomainTitle(),
+                coverImage = listActivity.media?.coverImage?.large ?: "",
+                status = listActivity.status.toUserRateStatus(),
+                progress = listActivity.progress?.toProgress() ?: emptyList()
+            )
+        } ?: onTextActivity?.let { textActivity ->
+            TextNotificationActivity(
+                id = textActivity.id,
+                type = ActivityType.TEXT,
+                text = textActivity.text ?: ""
+            )
+        } ?: onMessageActivity?.let { messageActivity ->
+            TextNotificationActivity(
+                id = messageActivity.id,
+                type = ActivityType.MESSAGE,
+                text = messageActivity.message ?: ""
+            )
+        }
+    }
+
     fun ALListActivity.toDomain(): ListActivity {
         return ListActivity(
             id = id,
             userId = userId ?: 0,
             mediaId = media?.id ?: 0,
-            mediaType = media?.type?.toDomain(),
+            mediaType = media?.type?.toDomain() ?: MediaType.ANIME,
             title = media?.title?.mediaTitle.toDomainTitle(),
             coverImage = media?.coverImage?.extraLarge ?: "",
             status = status.toUserRateStatus(),

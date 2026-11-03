@@ -253,7 +253,7 @@ fun MangaDetailsContent(
                                 characterPoster = characterItem.imageUrl,
                                 characterName = characterItem.fullName.preferred(titleType),
                                 onClick = {
-                                    mediaNavOptions.navigateByEntity(EntityType.CHARACTER, characterItem.id)
+                                    mediaNavOptions.navigateByEntity(EntityType.Character, characterItem.id)
                                 },
                                 clipPercent = clipPercent,
                                 imageType = imageType

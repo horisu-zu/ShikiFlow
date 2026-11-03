@@ -20,7 +20,7 @@ data class ListActivity(
     override val type: ActivityType = ActivityType.LIST,
     val userId: Int,
     val mediaId: Int,
-    val mediaType: MediaType?,
+    val mediaType: MediaType,
     val title: MediaTitle,
     val coverImage: String,
     val status: UserRateStatus,

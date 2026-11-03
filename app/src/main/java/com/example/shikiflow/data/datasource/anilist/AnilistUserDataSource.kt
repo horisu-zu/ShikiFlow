@@ -1,6 +1,5 @@
 package com.example.shikiflow.data.datasource.anilist
 
-import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -41,6 +40,7 @@ import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomain
 import com.example.shikiflow.data.mapper.anilist.AnilistThreadsMapper.toDomainThread
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toAnilistPreferences
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomain
+import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainActivity
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toGenreStats
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toOverviewStats
@@ -118,9 +118,7 @@ class AnilistUserDataSource @Inject constructor(
         return response.asPagedResult( page = {it.Page?.pageInfo?.commonPage} ) { data ->
             data.Page?.activities?.let { activities ->
                 activities.mapNotNull { activity ->
-                    activity?.onListActivity?.aLListActivity?.toDomain() ?:
-                    activity?.onMessageActivity?.aLMessageActivity?.toDomain() ?:
-                    activity?.onTextActivity?.aLTextActivity?.toDomain()
+                    activity?.aLUserActivity?.toDomainActivity()
                 }
             } ?: emptyList()
         }
@@ -387,7 +385,6 @@ class AnilistUserDataSource @Inject constructor(
         }
     }
 
-    @OptIn(ExperimentalPagingApi::class)
     override fun getUserSocial(
         userId: Int,
         socialCategory: SocialCategory,

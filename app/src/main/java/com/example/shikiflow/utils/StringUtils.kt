@@ -38,4 +38,13 @@ object StringUtils {
 
         return sb.toString()
     }
+
+    fun List<String>.joinWithLast(
+        separator: String,
+        lastSeparator: String
+    ): String = when (size) {
+        0 -> ""
+        1 -> first()
+        else -> dropLast(1).joinToString(separator) + lastSeparator + last()
+    }
 }

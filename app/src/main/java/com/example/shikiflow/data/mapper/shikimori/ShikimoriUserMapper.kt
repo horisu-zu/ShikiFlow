@@ -56,7 +56,7 @@ object ShikimoriUserMapper {
             id = id.toInt(),
             userId = 0,
             mediaId = target?.id?.toInt() ?: 0,
-            mediaType = mediaType,
+            mediaType = mediaType ?: MediaType.ANIME,
             title = (target?.name ?: "").toDomainTitle(null, target?.russian, null),
             coverImage = "${BuildConfig.SHIKI_BASE_URL}${target?.image?.original}",
             status = descriptionText.toUserRateStatus(),

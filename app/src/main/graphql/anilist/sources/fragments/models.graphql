@@ -216,6 +216,44 @@ fragment ALMediaFollowingUser on User {
     }
 }
 
+fragment ALUserActivity on ActivityUnion {
+    ...on ListActivity {
+        ...ALListActivity
+    }
+    ...on TextActivity {
+        ...ALTextActivity
+    }
+    ...on MessageActivity {
+        ...ALMessageActivity
+    }
+}
+
+fragment ALNotificationActivity on ActivityUnion {
+    ...on ListActivity {
+        id
+        status
+        progress
+        media {
+            id
+            type
+            title {
+                ...MediaTitle
+            }
+            coverImage {
+                large
+            }
+        }
+    }
+    ...on TextActivity {
+        id
+        text(asHtml: true)
+    }
+    ...on MessageActivity {
+        id
+        message(asHtml: true)
+    }
+}
+
 fragment ALListActivity on ListActivity {
     id
     media {
@@ -226,8 +264,6 @@ fragment ALListActivity on ListActivity {
         }
         coverImage {
             extraLarge
-            large
-            medium
         }
     }
     userId

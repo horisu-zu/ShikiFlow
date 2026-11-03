@@ -236,7 +236,12 @@ fun NotificationsScreen(
                             ) { index ->
                                 val notificationItem = notificationItems[index] ?: return@items
 
-                                NotificationItem(notification = notificationItem)
+                                NotificationItem(
+                                    notification = notificationItem,
+                                    onEntityClick = { entityType, id ->
+                                        navOptions.navigateByEntity(entityType, id)
+                                    }
+                                )
                             }
 
                             if (notificationItems.loadState.append is LoadState.Loading) {
