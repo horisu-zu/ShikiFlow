@@ -1,5 +1,6 @@
 package com.example.shikiflow.domain.model.notification
 
+import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.activity.NotificationActivity
@@ -15,7 +16,7 @@ data class AiringNotification(
     override val id: Int,
     override val type: NotificationType = NotificationType.AIRING,
     override val createdAt: Instant,
-    val mediaTitle: String,
+    val mediaTitle: MediaTitle,
     val mediaId: Int,
     val coverImageUrl: String?,
     val episodeNumber: Int
@@ -32,7 +33,7 @@ data class MediaNotification(
     override val id: Int,
     override val createdAt: Instant,
     override val type: NotificationType,
-    val mediaTitle: String,
+    val mediaTitle: MediaTitle,
     val mediaId: Int,
     val coverImageUrl: String?,
     val mediaType: MediaType,
@@ -43,7 +44,7 @@ data class MediaMergeNotification(
     override val id: Int,
     override val createdAt: Instant,
     override val type: NotificationType = NotificationType.MEDIA_MERGE,
-    val mediaTitle: String,
+    val mediaTitle: MediaTitle,
     val mediaId: Int,
     val coverImageUrl: String?,
     val mediaType: MediaType,
@@ -82,7 +83,8 @@ data class ThreadCommentNotification(
     val user: User?,
     val threadId: Int,
     val threadTitle: String?,
-    val commentId: Int
+    val commentId: Int,
+    val commentText: String
 ): Notification
 
 data class SubmissionNotification(
@@ -92,7 +94,7 @@ data class SubmissionNotification(
     val imageUrl: String?,
     val text: String,
     val submissionStatus: SubmissionStatus,
-    val notes: String,
+    val notes: String?,
     val contentId: Int,
     val mediaType: MediaType? = null
 ): Notification

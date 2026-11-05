@@ -5,9 +5,6 @@ query Notifications(
     $resetCount: Boolean!
 ) {
     Page(page: $page, perPage: $perPage) {
-        pageInfo {
-            ...CommonPage
-        }
         notifications(resetNotificationCount: $resetCount, type_in: $typeIn) {
             ... on AiringNotification {
                 ...ALAiringNotification

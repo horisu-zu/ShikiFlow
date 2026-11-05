@@ -125,7 +125,7 @@ private fun ShikimoriCommentItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             commentData.sender?.let { sender ->
-                CommentUserItem(
+                CommentUserComponent(
                     userData = sender,
                     commentInstant = commentData.dateTime,
                     onUserClick = onUserClick,
@@ -285,7 +285,7 @@ private fun AnilistCommentItem(
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
             commentData.sender?.let { sender ->
-                CommentUserItem(
+                CommentUserComponent(
                     userData = sender,
                     commentInstant = commentData.dateTime,
                     onUserClick = onUserClick,
@@ -386,7 +386,7 @@ fun ThreadHeaderItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             threadHeader.createdBy?.let { threadAuthor ->
-                CommentUserItem(
+                CommentUserComponent(
                     userData = threadAuthor,
                     commentInstant = threadHeader.createdAt,
                     onUserClick = onUserClick,
@@ -492,7 +492,7 @@ fun ThreadHeaderItemPlaceholder(
 }
 
 @Composable
-fun CommentUserItem(
+fun CommentUserComponent(
     userData: User,
     commentInstant: Instant,
     modifier: Modifier = Modifier,
@@ -502,39 +502,13 @@ fun CommentUserItem(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row(
+        CompactUserItem(
+            userData = userData,
+            onUserClick = onUserClick,
             modifier = Modifier
                 .weight(1f, fill = false)
                 .offset(x = (-4).dp)
-                .clip(RoundedCornerShape(percent = 32))
-                .then(
-                    if (onUserClick != null) {
-                        Modifier.clickable { onUserClick(userData) }
-                    } else Modifier
-                )
-                .padding(horizontal = 4.dp, vertical = 2.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            BaseImage(
-                model = userData.avatarUrl,
-                imageType = ImageType.Square(
-                    shape = RoundedCornerShape(percent = 16),
-                    width = 24.dp
-                )
-            )
-
-            Text(
-                text = userData.nickname,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                ),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, fill = false)
-            )
-        }
+        )
 
         Text(
             text = "· ${formatInstant(commentInstant, includeTime = true)}",
@@ -542,6 +516,45 @@ fun CommentUserItem(
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
             ),
             maxLines = 1
+        )
+    }
+}
+
+@Composable
+fun CompactUserItem(
+    userData: User,
+    modifier: Modifier = Modifier,
+    onUserClick: ((User) -> Unit)? = null
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(percent = 32))
+            .then(
+                if (onUserClick != null) {
+                    Modifier.clickable { onUserClick(userData) }
+                } else Modifier
+            )
+            .padding(horizontal = 4.dp, vertical = 2.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        BaseImage(
+            model = userData.avatarUrl,
+            imageType = ImageType.Square(
+                shape = RoundedCornerShape(percent = 16),
+                width = 24.dp
+            )
+        )
+
+        Text(
+            text = userData.nickname,
+            style = MaterialTheme.typography.labelMedium.copy(
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            ),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.weight(1f, fill = false)
         )
     }
 }

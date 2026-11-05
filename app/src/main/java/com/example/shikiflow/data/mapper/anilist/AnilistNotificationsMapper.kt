@@ -3,6 +3,7 @@ package com.example.shikiflow.data.mapper.anilist
 import com.example.graphql.anilist.NotificationsQuery
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toDomainUser
 import com.example.shikiflow.data.mapper.anilist.AnilistUserMapper.toNotificationActivity
+import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.data.mapper.common.MediaTypeMapper.toDomain
 import com.example.shikiflow.domain.model.notification.ActivityNotification
 import com.example.shikiflow.domain.model.notification.AiringNotification
@@ -113,7 +114,7 @@ object AnilistNotificationsMapper {
         onAiringNotification?.aLAiringNotification?.let { notification ->
             return AiringNotification(
                 id = notification.id,
-                mediaTitle = notification.media?.title?.userPreferred.orEmpty(),
+                mediaTitle = notification.media?.title?.mediaTitle.toDomainTitle(),
                 mediaId = notification.animeId,
                 coverImageUrl = notification.media?.coverImage?.large.orEmpty(),
                 createdAt = notification.createdAt.toInstant(),
@@ -142,7 +143,8 @@ object AnilistNotificationsMapper {
                     activity = TextNotificationActivity(
                         id = messageActivity.id,
                         type = ActivityType.MESSAGE,
-                        text = messageActivity.message ?: ""
+                        text = messageActivity.message.orEmpty(),
+                        recipient = messageActivity.recipient?.aLUserShort?.toDomainUser()
                     )
                 )
             }
@@ -201,7 +203,8 @@ object AnilistNotificationsMapper {
                 user = notification.user?.aLUserShort?.toDomainUser(),
                 threadId = notification.thread?.id ?: 0,
                 threadTitle = notification.thread?.title,
-                commentId = notification.commentId
+                commentId = notification.commentId,
+                commentText = notification.comment?.comment.orEmpty()
             )
         }
         onThreadCommentReplyNotification?.aLThreadCommentReplyNotification?.let { notification ->
@@ -212,7 +215,8 @@ object AnilistNotificationsMapper {
                 user = notification.user?.aLUserShort?.toDomainUser(),
                 threadId = notification.thread?.id ?: 0,
                 threadTitle = notification.thread?.title,
-                commentId = notification.commentId
+                commentId = notification.commentId,
+                commentText = notification.comment?.comment.orEmpty()
             )
         }
         onThreadCommentSubscribedNotification?.aLThreadCommentSubscribedNotification?.let { notification ->
@@ -223,7 +227,8 @@ object AnilistNotificationsMapper {
                 user = notification.user?.aLUserShort?.toDomainUser(),
                 threadId = notification.thread?.id ?: 0,
                 threadTitle = notification.thread?.title,
-                commentId = notification.commentId
+                commentId = notification.commentId,
+                commentText = notification.comment?.comment.orEmpty()
             )
         }
         onThreadCommentLikeNotification?.aLThreadCommentLikeNotification?.let { notification ->
@@ -234,7 +239,8 @@ object AnilistNotificationsMapper {
                 user = notification.user?.aLUserShort?.toDomainUser(),
                 threadId = notification.thread?.id ?: 0,
                 threadTitle = notification.thread?.title,
-                commentId = notification.commentId
+                commentId = notification.commentId,
+                commentText = notification.comment?.comment.orEmpty()
             )
         }
         onThreadLikeNotification?.aLThreadLikeNotification?.let { notification ->
@@ -251,7 +257,7 @@ object AnilistNotificationsMapper {
         onRelatedMediaAdditionNotification?.aLRelatedMediaAdditionNotification?.let { notification ->
             return MediaNotification(
                 id = notification.id,
-                mediaTitle = notification.media?.title?.userPreferred ?: "",
+                mediaTitle = notification.media?.title?.mediaTitle.toDomainTitle(),
                 mediaId = notification.mediaId,
                 coverImageUrl = notification.media?.coverImage?.large,
                 createdAt = notification.createdAt.toInstant(),
@@ -263,7 +269,7 @@ object AnilistNotificationsMapper {
         onMediaDataChangeNotification?.aLMediaDataChangeNotification?.let { notification ->
             return MediaNotification(
                 id = notification.id,
-                mediaTitle = notification.media?.title?.userPreferred ?: "",
+                mediaTitle = notification.media?.title?.mediaTitle.toDomainTitle(),
                 mediaId = notification.mediaId,
                 coverImageUrl = notification.media?.coverImage?.large,
                 createdAt = notification.createdAt.toInstant(),
@@ -275,7 +281,7 @@ object AnilistNotificationsMapper {
         onMediaMergeNotification?.aLMediaMergeNotification?.let { notification ->
             return MediaMergeNotification(
                 id = notification.id,
-                mediaTitle = notification.media?.title?.userPreferred ?: "",
+                mediaTitle = notification.media?.title?.mediaTitle.toDomainTitle(),
                 mediaId = notification.mediaId,
                 coverImageUrl = notification.media?.coverImage?.large,
                 createdAt = notification.createdAt.toInstant(),
@@ -300,7 +306,7 @@ object AnilistNotificationsMapper {
                 text = notification.media?.title?.userPreferred.orEmpty(),
                 imageUrl = notification.media?.coverImage?.large,
                 submissionStatus = notification.status.toDomainStatus(),
-                notes = notification.notes.orEmpty(),
+                notes = notification.notes,
                 contentId = notification.media?.id ?: 0,
                 mediaType = notification.media?.type?.toDomain()
             )
@@ -313,7 +319,7 @@ object AnilistNotificationsMapper {
                 text = notification.staff?.name?.userPreferred.orEmpty(),
                 imageUrl = notification.staff?.image?.large,
                 submissionStatus = notification.status.toDomainStatus(),
-                notes = notification.notes.orEmpty(),
+                notes = notification.notes,
                 contentId = notification.staff?.id ?: 0
             )
         }
@@ -325,7 +331,7 @@ object AnilistNotificationsMapper {
                 text = notification.character?.name?.userPreferred.orEmpty(),
                 imageUrl = notification.character?.image?.large,
                 submissionStatus = notification.status.toDomainStatus(),
-                notes = notification.notes.orEmpty(),
+                notes = notification.notes,
                 contentId = notification.character?.id ?: 0
             )
         }

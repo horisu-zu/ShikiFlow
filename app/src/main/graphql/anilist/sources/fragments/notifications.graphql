@@ -5,12 +5,11 @@ fragment ALNotificationOption on NotificationOption {
 
 fragment ALAiringNotification on AiringNotification {
     id
-    contexts
     animeId
     episode
     media {
         title {
-            userPreferred
+                ...MediaTitle
         }
         coverImage {
             large
@@ -35,6 +34,9 @@ fragment ALActivityMessageNotification on ActivityMessageNotification {
     message {
         id
         message(asHtml: true)
+        recipient {
+            ...ALUserShort
+        }
     }
     createdAt
 }
@@ -89,6 +91,9 @@ fragment ALActivityReplyLikeNotification on ActivityReplyLikeNotification {
 fragment ALThreadCommentMentionNotification on ThreadCommentMentionNotification {
     id
     commentId
+    comment {
+        comment(asHtml: true)
+    }
     thread {
         id
         title
@@ -102,6 +107,9 @@ fragment ALThreadCommentMentionNotification on ThreadCommentMentionNotification 
 fragment ALThreadCommentReplyNotification on ThreadCommentReplyNotification {
     id
     commentId
+    comment {
+        comment(asHtml: true)
+    }
     thread {
         id
         title
@@ -115,6 +123,9 @@ fragment ALThreadCommentReplyNotification on ThreadCommentReplyNotification {
 fragment ALThreadCommentSubscribedNotification on ThreadCommentSubscribedNotification {
     id
     commentId
+    comment {
+        comment(asHtml: true)
+    }
     thread {
         id
         title
@@ -128,6 +139,9 @@ fragment ALThreadCommentSubscribedNotification on ThreadCommentSubscribedNotific
 fragment ALThreadCommentLikeNotification on ThreadCommentLikeNotification {
     id
     commentId
+    comment {
+        comment(asHtml: true)
+    }
     thread {
         id
         title
@@ -156,7 +170,7 @@ fragment ALRelatedMediaAdditionNotification on RelatedMediaAdditionNotification 
     mediaId
     media {
         title {
-            userPreferred
+            ...MediaTitle
         }
         coverImage {
             large
@@ -172,7 +186,7 @@ fragment ALMediaDataChangeNotification on MediaDataChangeNotification {
     reason
     media {
         title {
-            userPreferred
+            ...MediaTitle
         }
         coverImage {
             large
@@ -188,7 +202,7 @@ fragment ALMediaMergeNotification on MediaMergeNotification {
     reason
     media {
         title {
-            userPreferred
+            ...MediaTitle
         }
         coverImage {
             large

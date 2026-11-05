@@ -25,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
@@ -43,7 +42,7 @@ import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.listActivityDescription
 import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import com.example.shikiflow.presentation.common.shimmerEffect
-import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserItem
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserComponent
 import com.example.shikiflow.presentation.screen.main.details.common.comment.LikeComponent
 import com.example.shikiflow.utils.Converter.convertInstantToString
 import com.example.shikiflow.utils.IconResource
@@ -161,7 +160,6 @@ fun ListActivityItem(
                     )
                 ),
                 style = MaterialTheme.typography.bodyMedium,
-                overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.padding(top = 2.dp)
             )
         }
@@ -296,7 +294,7 @@ fun TextActivityItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CommentUserItem(
+            CommentUserComponent(
                 userData = textActivity.user,
                 commentInstant = textActivity.createdAt,
                 modifier = Modifier.weight(1f)
@@ -383,7 +381,7 @@ fun MessageActivityItem(
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                CommentUserItem(
+                CommentUserComponent(
                     userData = messageActivity.messenger,
                     commentInstant = messageActivity.createdAt,
                     modifier = Modifier.weight(1f)

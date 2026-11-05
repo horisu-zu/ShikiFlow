@@ -2,6 +2,7 @@ package com.example.shikiflow.data.mapper.anilist
 
 import com.apollographql.apollo.api.Optional
 import com.example.graphql.anilist.UserStatsCategoriesQuery
+import com.example.graphql.anilist.type.ActivityType as ALActivityType
 import com.example.graphql.anilist.fragment.ALActivityReply
 import com.example.graphql.anilist.fragment.ALCurrentUser
 import com.example.graphql.anilist.fragment.ALFavoriteCharacterShort
@@ -120,9 +121,13 @@ object AnilistUserMapper {
         return onListActivity?.let { listActivity ->
             ListNotificationActivity(
                 id = listActivity.id,
-                mediaType = listActivity.media?.type?.toDomain() ?: MediaType.ANIME,
-                title = listActivity.media?.title?.mediaTitle.toDomainTitle(),
-                coverImage = listActivity.media?.coverImage?.large ?: "",
+                mediaType = listActivity.media?.type?.toDomain() ?: when (listActivity.type) {
+                    ALActivityType.ANIME_LIST -> MediaType.ANIME
+                    ALActivityType.MANGA_LIST -> MediaType.MANGA
+                    else -> null
+                } ?: MediaType.ANIME,
+                title = listActivity.media?.title?.mediaTitle?.toDomainTitle(),
+                coverImageUrl = listActivity.media?.coverImage?.large,
                 status = listActivity.status.toUserRateStatus(),
                 progress = listActivity.progress?.toProgress() ?: emptyList()
             )
@@ -130,13 +135,14 @@ object AnilistUserMapper {
             TextNotificationActivity(
                 id = textActivity.id,
                 type = ActivityType.TEXT,
-                text = textActivity.text ?: ""
+                text = textActivity.text.orEmpty()
             )
         } ?: onMessageActivity?.let { messageActivity ->
             TextNotificationActivity(
                 id = messageActivity.id,
                 type = ActivityType.MESSAGE,
-                text = messageActivity.message ?: ""
+                text = messageActivity.message.orEmpty(),
+                recipient = messageActivity.recipient?.aLUserShort?.toDomainUser()
             )
         }
     }
@@ -148,7 +154,7 @@ object AnilistUserMapper {
             mediaId = media?.id ?: 0,
             mediaType = media?.type?.toDomain() ?: MediaType.ANIME,
             title = media?.title?.mediaTitle.toDomainTitle(),
-            coverImage = media?.coverImage?.extraLarge ?: "",
+            coverImage = media?.coverImage?.extraLarge.orEmpty(),
             status = status.toUserRateStatus(),
             progress = progress?.toProgress() ?: emptyList(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong()),

@@ -12,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.notification.ActivityNotification
 import com.example.shikiflow.domain.model.notification.AiringNotification
 import com.example.shikiflow.domain.model.notification.FollowingNotification
@@ -25,6 +26,7 @@ import com.example.shikiflow.domain.model.notification.SubmissionStatus
 import com.example.shikiflow.domain.model.notification.ThreadCommentNotification
 import com.example.shikiflow.domain.model.notification.ThreadNotification
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.utils.StringUtils.joinWithLast
 
 object NotificationMapper {
@@ -91,6 +93,7 @@ object NotificationMapper {
         onEntityClick: (EntityType, Int) -> Unit
     ): AnnotatedString {
         val notification = this
+        val titleType = LocalTitleTypeController.current
         val linkStyle = SpanStyle(
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -102,7 +105,7 @@ object NotificationMapper {
                     appendTemplate(
                         template = stringResource(R.string.notification_type_airing_text),
                         { append(notification.episodeNumber.toString()) },
-                        { link(notification.mediaTitle, linkStyle) { onEntityClick(EntityType.Anime, notification.mediaId) } }
+                        { link(notification.mediaTitle.preferred(titleType), linkStyle) { onEntityClick(EntityType.Anime, notification.mediaId) } }
                     )
                 }
                 is FollowingNotification -> {
@@ -255,7 +258,7 @@ object NotificationMapper {
                         NotificationType.RELATED_MEDIA_ADDITION -> {
                             appendTemplate(
                                 template = stringResource(R.string.notification_type_related_media_addition_text),
-                                { link(notification.mediaTitle, linkStyle) {
+                                { link(notification.mediaTitle.preferred(titleType), linkStyle) {
                                     onEntityClick(
                                         when (notification.mediaType) {
                                             MediaType.ANIME -> EntityType.Anime
@@ -269,7 +272,7 @@ object NotificationMapper {
                         NotificationType.MEDIA_DATA_CHANGE -> {
                             appendTemplate(
                                 template = stringResource(R.string.notification_type_media_data_change_text),
-                                { link(notification.mediaTitle, linkStyle) {
+                                { link(notification.mediaTitle.preferred(titleType), linkStyle) {
                                     onEntityClick(
                                         when (notification.mediaType) {
                                             MediaType.ANIME -> EntityType.Anime
@@ -296,7 +299,7 @@ object NotificationMapper {
                                 )
                             )
                         },
-                        { link(notification.mediaTitle, linkStyle) {
+                        { link(notification.mediaTitle.preferred(titleType), linkStyle) {
                             onEntityClick(
                                 when (notification.mediaType) {
                                     MediaType.ANIME -> EntityType.Anime

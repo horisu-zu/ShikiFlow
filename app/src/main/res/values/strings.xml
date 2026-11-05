@@ -1077,9 +1077,6 @@ f
     <string name="notification_type_media_data_change_text">%1$s received site data changes</string>
     <string name="notification_type_media_merge_text">%1$s were merged into %2$s</string>
     <string name="notification_type_media_deletion_text">%1$s was deleted from the site</string>
-    <string name="notification_type_media_submission_update_text"></string>
-    <string name="notification_type_staff_submission_update_text"></string>
-    <string name="notification_type_character_submission_update_text"></string>
     <string name="notification_type_submission_text">Your submission was %1$s</string>
 
     <string name="submission_status_accepted">Accepted</string>

@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,9 +20,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.example.shikiflow.domain.model.comment.EntityType
+import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
 import com.example.shikiflow.domain.model.notification.ActivityNotification
 import com.example.shikiflow.domain.model.notification.AiringNotification
 import com.example.shikiflow.domain.model.notification.FollowingNotification
@@ -35,15 +40,23 @@ import com.example.shikiflow.domain.model.notification.SubmissionNotification
 import com.example.shikiflow.domain.model.notification.ThreadCommentNotification
 import com.example.shikiflow.domain.model.notification.ThreadNotification
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.activity.ListNotificationActivity
+import com.example.shikiflow.domain.model.user.activity.TextNotificationActivity
+import com.example.shikiflow.presentation.common.ExpandableText
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
+import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.listActivityDescription
+import com.example.shikiflow.presentation.common.mappers.ListActivityMapper.withStyledDigits
 import com.example.shikiflow.presentation.common.mappers.NotificationMapper.annotatedText
 import com.example.shikiflow.presentation.common.shimmerEffect
+import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CompactUserItem
 import com.example.shikiflow.utils.Converter
 
 @Composable
 fun NotificationItem(
     notification: Notification,
+    currentUserId: Int?,
     onEntityClick: (EntityType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -65,6 +78,7 @@ fun NotificationItem(
         is ActivityNotification -> {
             ActivityNotificationItem(
                 activityNotification = notification,
+                currentUserId = currentUserId,
                 onEntityClick = onEntityClick,
                 modifier = modifier
             )
@@ -93,7 +107,7 @@ fun NotificationItem(
         else -> {
             Row(
                 modifier = modifier
-                    .clip(RoundedCornerShape(16.dp))
+                    .clip(RoundedCornerShape(12.dp))
                     .background(MaterialTheme.colorScheme.surfaceContainerLow),
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
             ) {
@@ -108,9 +122,8 @@ fun NotificationItem(
                         model = imageUrl,
                         imageType = ImageType.Poster(
                             width = 48.dp,
-                            shape = RoundedCornerShape(12.dp)
-                        ),
-                        modifier = Modifier.fillMaxHeight()
+                            shape = RoundedCornerShape(percent = 16)
+                        )
                     )
                 }
 
@@ -149,7 +162,7 @@ fun NotificationItemPlaceholder(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .shimmerEffect(overContent = true),
         horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
@@ -160,7 +173,7 @@ fun NotificationItemPlaceholder(
                 .aspectRatio(2f / 2.85f)
                 .background(
                     color = MaterialTheme.colorScheme.onSurface,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(percent = 16)
                 )
         )
 
@@ -267,7 +280,7 @@ private fun FollowingNotificationItem(
             imageType = ImageType.Poster(
                 width = 36.dp,
                 aspectRatio = 1f,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(percent = 16)
             )
         )
 
@@ -289,9 +302,13 @@ private fun FollowingNotificationItem(
 @Composable
 private fun ActivityNotificationItem(
     activityNotification: ActivityNotification,
+    currentUserId: Int?,
     onEntityClick: (EntityType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val resources = LocalResources.current
+    val preferredTitleType = LocalTitleTypeController.current
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
@@ -300,7 +317,9 @@ private fun ActivityNotificationItem(
                 activityNotification.activity?.let {
                     onEntityClick(EntityType.Activity(activityNotification.activity.type), activityNotification.activity.id)
                 }
-            }.padding(all = 8.dp)
+            }
+            .padding(all = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
@@ -315,7 +334,7 @@ private fun ActivityNotificationItem(
                 imageType = ImageType.Poster(
                     width = 36.dp,
                     aspectRatio = 1f,
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(percent = 16)
                 )
             )
 
@@ -334,7 +353,119 @@ private fun ActivityNotificationItem(
         }
 
         activityNotification.activity?.let { notificationActivity ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .clickable {
+                        onEntityClick(EntityType.Activity(notificationActivity.type), notificationActivity.id)
+                    }
+                    .padding(all = 6.dp)
+            ) {
+                when (notificationActivity) {
+                    is ListNotificationActivity -> {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            notificationActivity.coverImageUrl?.let { coverImageUrl ->
+                                BaseImage(
+                                    model = coverImageUrl,
+                                    imageType = ImageType.Poster(
+                                        width = 36.dp,
+                                        shape = RoundedCornerShape(percent = 16)
+                                    )
+                                )
+                            }
 
+                            Column(
+                                verticalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                notificationActivity.title?.let { mediaTitle ->
+                                    Text(
+                                        text = mediaTitle.preferred(preferredTitleType),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                }
+
+                                Text(
+                                    text = listActivityDescription(
+                                        resources = resources,
+                                        mediaType = notificationActivity.mediaType,
+                                        status = notificationActivity.status,
+                                        progress = notificationActivity.progress,
+                                        progressVolumes = notificationActivity.progressVolumes,
+                                        scoreChange = notificationActivity.scoreChange
+                                    ).withStyledDigits(
+                                        style = SpanStyle(
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.primary
+                                        )
+                                    ),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                    is TextNotificationActivity -> {
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            activityNotification.user?.let { sender ->
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(
+                                        modifier = Modifier.weight(1f),
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        CompactUserItem(
+                                            userData = sender,
+                                            modifier = Modifier.offset((-4).dp),
+                                            onUserClick = {
+                                                if (sender.id != currentUserId) {
+                                                    onEntityClick(EntityType.User(sender), sender.id)
+                                                }
+                                            }
+                                        )
+
+                                        notificationActivity.recipient?.let { recipient ->
+                                            Text(
+                                                text = "→",
+                                                style = MaterialTheme.typography.bodySmall.copy(
+                                                    fontWeight = FontWeight.SemiBold
+                                                )
+                                            )
+
+                                            CompactUserItem(
+                                                userData = recipient,
+                                                modifier = Modifier.offset((-4).dp),
+                                                onUserClick = {
+                                                    if (recipient.id != currentUserId) {
+                                                        onEntityClick(EntityType.User(recipient), sender.id)
+                                                    }
+                                                }
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
+                            ExpandableText(
+                                htmlText = notificationActivity.text,
+                                style = MaterialTheme.typography.labelMedium,
+                                collapsedMaxLines = 2,
+                                onEntityClick = onEntityClick
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -362,7 +493,7 @@ private fun ThreadNotificationItem(
             imageType = ImageType.Poster(
                 width = 36.dp,
                 aspectRatio = 1f,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(percent = 16)
             )
         )
 
@@ -387,39 +518,57 @@ private fun ThreadCommentNotificationItem(
     onEntityClick: (EntityType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .clickable { onEntityClick(EntityType.CommentReply, threadCommentNotification.commentId) }
             .padding(all = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
-        BaseImage(
-            model = threadCommentNotification.user?.avatarUrl,
-            onClick = {
-                threadCommentNotification.user?.let { user ->
-                    onEntityClick(EntityType.User(user), user.id)
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+        ) {
+            BaseImage(
+                model = threadCommentNotification.user?.avatarUrl,
+                onClick = {
+                    threadCommentNotification.user?.let { user ->
+                        onEntityClick(EntityType.User(user), user.id)
+                    }
+                },
+                imageType = ImageType.Poster(
+                    width = 36.dp,
+                    aspectRatio = 1f,
+                    shape = RoundedCornerShape(percent = 16)
+                )
+            )
+
+            Text(
+                text = threadCommentNotification.annotatedText(onEntityClick = onEntityClick),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
+            )
+
+            Text(
+                text = Converter.formatInstant(instant = threadCommentNotification.createdAt),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+            )
+        }
+
+        ExpandableText(
+            htmlText = threadCommentNotification.commentText,
+            style = MaterialTheme.typography.bodySmall,
+            collapsedMaxLines = 2,
+            onEntityClick = onEntityClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colorScheme.background)
+                .clickable {
+                    onEntityClick(EntityType.CommentReply, threadCommentNotification.commentId)
                 }
-            },
-            imageType = ImageType.Poster(
-                width = 36.dp,
-                aspectRatio = 1f,
-                shape = RoundedCornerShape(12.dp)
-            )
-        )
-
-        Text(
-            text = threadCommentNotification.annotatedText(onEntityClick = onEntityClick),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
-        )
-
-        Text(
-            text = Converter.formatInstant(instant = threadCommentNotification.createdAt),
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
-            )
+                .padding(all = 6.dp)
         )
     }
 }
@@ -430,51 +579,67 @@ private fun SubmissionNotificationItem(
     onEntityClick: (EntityType, Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Row(
+    Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
             .padding(all = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+        verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {
-        BaseImage(
-            model = submissionNotification.imageUrl,
-            onClick = {
-                val type = when (submissionNotification.type) {
-                    NotificationType.MEDIA_SUBMISSION_UPDATE -> {
-                        when (submissionNotification.mediaType) {
-                            MediaType.ANIME -> EntityType.Anime
-                            MediaType.MANGA -> EntityType.Manga
-                            null -> null
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start)
+        ) {
+            BaseImage(
+                model = submissionNotification.imageUrl,
+                onClick = {
+                    val type = when (submissionNotification.type) {
+                        NotificationType.MEDIA_SUBMISSION_UPDATE -> {
+                            when (submissionNotification.mediaType) {
+                                MediaType.ANIME -> EntityType.Anime
+                                MediaType.MANGA -> EntityType.Manga
+                                null -> null
+                            }
                         }
+                        NotificationType.STAFF_SUBMISSION_UPDATE -> EntityType.Staff
+                        NotificationType.CHARACTER_SUBMISSION_UPDATE -> EntityType.Character
+                        else -> null
                     }
-                    NotificationType.STAFF_SUBMISSION_UPDATE -> EntityType.Staff
-                    NotificationType.CHARACTER_SUBMISSION_UPDATE -> EntityType.Character
-                    else -> null
-                }
 
-                type?.let {
-                    onEntityClick(type, submissionNotification.contentId)
-                }
-            },
-            imageType = ImageType.Poster(
-                width = 36.dp,
-                aspectRatio = 1f,
-                shape = RoundedCornerShape(12.dp)
+                    type?.let {
+                        onEntityClick(type, submissionNotification.contentId)
+                    }
+                },
+                imageType = ImageType.Poster(
+                    width = 36.dp,
+                    aspectRatio = 1f,
+                    shape = RoundedCornerShape(percent = 16)
+                )
             )
-        )
 
-        Text(
-            text = submissionNotification.annotatedText(onEntityClick = onEntityClick),
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.weight(1f)
-        )
-
-        Text(
-            text = Converter.formatInstant(instant = submissionNotification.createdAt),
-            style = MaterialTheme.typography.labelSmall.copy(
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+            Text(
+                text = submissionNotification.annotatedText(onEntityClick = onEntityClick),
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.weight(1f)
             )
-        )
+
+            Text(
+                text = Converter.formatInstant(instant = submissionNotification.createdAt),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                )
+            )
+        }
+
+        submissionNotification.notes?.let { submissionNotes ->
+            Text(
+                text = submissionNotes,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(all = 6.dp)
+            )
+        }
     }
 }

@@ -21,7 +21,7 @@ import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.presentation.common.RichTextRenderer
-import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserItem
+import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserComponent
 import com.example.shikiflow.presentation.screen.main.details.common.comment.LikeComponent
 
 @Composable
@@ -46,7 +46,7 @@ fun ActivityReplyItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start)
         ) {
-            CommentUserItem(
+            CommentUserComponent(
                 userData = activityReply.sender,
                 commentInstant = activityReply.createdAt,
                 onUserClick = if (activityReply.sender.id != currentUserId) {

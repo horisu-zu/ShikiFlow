@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -57,7 +56,6 @@ import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.presentation.screen.main.details.staff.StaffAttributes
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CharacterDetailsScreen(
     characterId: Int,
@@ -198,7 +196,7 @@ fun CharacterDetailsScreen(
                         }
                     }
 
-                    if(!characterDetails.voiceActors.isEmpty()) {
+                    if(characterDetails.voiceActors.isNotEmpty()) {
                         item(span = { GridItemSpan(maxLineSpan) }) {
                             Column(
                                 modifier = Modifier.padding(top = 4.dp),

@@ -1038,4 +1038,27 @@
     <string name="notification_type_media_submission_update_description">Уведомлять об изменении статуса вашей заявки на тайтл</string>
     <string name="notification_type_staff_submission_update_description">Уведомлять об изменении статуса вашей заявки на персонал</string>
     <string name="notification_type_character_submission_update_description">Уведомлять об изменении статуса вашей заявки на персонажа</string>
+
+    <string name="notification_type_airing_text">Вышел эпизод %1$d — %2$s</string>
+    <string name="notification_type_following_text">Пользователь %1$s подписался на вас</string>
+    <string name="notification_type_activity_message_text">Пользователь %1$s отправил вам сообщение</string>
+    <string name="notification_type_activity_mention_text">Пользователь %1$s упомянул вас в своей активности</string>
+    <string name="notification_type_activity_reply_text">Пользователь %1$s ответил на вашу активность</string>
+    <string name="notification_type_activity_reply_subscribed_text">Пользователь %1$s ответил на активность, на которую вы подписаны</string>
+    <string name="notification_type_activity_like_text">Пользователю %1$s понравилась ваша активность</string>
+    <string name="notification_type_activity_reply_like_text">Пользователю %1$s понравился ваш ответ в активности</string>
+    <string name="notification_type_thread_comment_mention_text">Пользователь %1$s упомянул вас в своём комментарии</string>
+    <string name="notification_type_thread_comment_reply_text">Пользователь %1$s ответил на ваш комментарий в теме форума %2$s</string>
+    <string name="notification_type_thread_subscribed_text">Пользователь %1$s прокомментировал тему, на которую вы подписаны: %2$s</string>
+    <string name="notification_type_thread_comment_like_text">Пользователю %1$s понравился ваш комментарий в теме форума %2$s</string>
+    <string name="notification_type_thread_like_text">Пользователю %1$s понравилась ваша тема %2$s</string>
+    <string name="notification_type_related_media_addition_text">На сайт добавлено: %1$s</string>
+    <string name="notification_type_media_data_change_text">Данные изменены: %1$s</string>
+    <string name="notification_type_media_merge_text">%1$s объединено в %2$s</string>
+    <string name="notification_type_media_deletion_text">%1$s удалено с сайта</string>
+    <string name="notification_type_submission_text">Статус вашей заявки: %1$s</string>
+
+    <string name="submission_status_accepted">Принято</string>
+    <string name="submission_status_partially_accepted">Частично принято</string>
+    <string name="submission_status_rejected">Отклонено</string>
 </resources>

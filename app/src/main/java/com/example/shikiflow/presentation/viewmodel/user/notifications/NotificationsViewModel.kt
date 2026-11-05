@@ -10,9 +10,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,6 +30,19 @@ class NotificationsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(NotificationsUiState())
     val uiState = _uiState.asStateFlow()
+
+    init {
+        settingsRepository.userFlow
+            .mapNotNull { it?.id }
+            .distinctUntilChanged()
+            .onEach { userid ->
+                _uiState.update { state ->
+                    state.copy(
+                        currentUserId = userid
+                    )
+                }
+            }.launchIn(viewModelScope)
+    }
 
     val notificationItems = NotificationTypeGroup.entries.associateWith { typeGroup ->
         _uiState

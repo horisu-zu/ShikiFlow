@@ -1037,4 +1037,27 @@
     <string name="notification_type_media_submission_update_description">Сповіщати про зміну статусу вашої заявки на тайтл</string>
     <string name="notification_type_staff_submission_update_description">Сповіщати про зміну статусу вашої заявки на персонал</string>
     <string name="notification_type_character_submission_update_description">Сповіщати про зміну статусу вашої заявки на персонажа</string>
+
+    <string name="notification_type_airing_text">Вийшов епізод %1$d — %2$s</string>
+    <string name="notification_type_following_text">Користувач %1$s підписався на вас</string>
+    <string name="notification_type_activity_message_text">Користувач %1$s надіслав вам повідомлення</string>
+    <string name="notification_type_activity_mention_text">Користувач %1$s згадав вас у своїй активності</string>
+    <string name="notification_type_activity_reply_text">Користувач %1$s відповів на вашу активність</string>
+    <string name="notification_type_activity_reply_subscribed_text">Користувач %1$s відповів на активність, на яку ви підписані</string>
+    <string name="notification_type_activity_like_text">Користувач %1$s вподобав вашу активність</string>
+    <string name="notification_type_activity_reply_like_text">Користувач %1$s вподобав вашу відповідь в активності</string>
+    <string name="notification_type_thread_comment_mention_text">Користувач %1$s згадав вас у своєму коментарі</string>
+    <string name="notification_type_thread_comment_reply_text">Користувач %1$s відповів на ваш коментар у темі форуму %2$s</string>
+    <string name="notification_type_thread_subscribed_text">Користувач %1$s прокоментував тему, на яку ви підписані: %2$s</string>
+    <string name="notification_type_thread_comment_like_text">Користувач %1$s вподобав ваш коментар у темі форуму %2$s</string>
+    <string name="notification_type_thread_like_text">Користувач %1$s вподобав вашу тему %2$s</string>
+    <string name="notification_type_related_media_addition_text">На сайт додано: %1$s</string>
+    <string name="notification_type_media_data_change_text">Дані змінено: %1$s</string>
+    <string name="notification_type_media_merge_text">%1$s об’єднано з %2$s</string>
+    <string name="notification_type_media_deletion_text">%1$s видалено із сайту</string>
+    <string name="notification_type_submission_text">Статус вашої заявки: %1$s</string>
+
+    <string name="submission_status_accepted">Прийнято</string>
+    <string name="submission_status_partially_accepted">Частково прийнято</string>
+    <string name="submission_status_rejected">Відхилено</string>
 </resources>

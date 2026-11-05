@@ -103,7 +103,7 @@ fun NotificationsScreen(
                 },
                 title = {
                     Text(
-                        text = "Notifications",
+                        text = stringResource(R.string.settings_notifications_section_title),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -238,6 +238,7 @@ fun NotificationsScreen(
 
                                 NotificationItem(
                                     notification = notificationItem,
+                                    currentUserId = uiState.currentUserId,
                                     onEntityClick = { entityType, id ->
                                         navOptions.navigateByEntity(entityType, id)
                                     }
