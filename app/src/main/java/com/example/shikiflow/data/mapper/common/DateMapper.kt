@@ -27,15 +27,17 @@ object DateMapper {
         } else null
     }
 
-    fun ALDate.toDomain(): Date {
-        return Date(
-            year = year,
-            month = month,
-            day = day,
-            date = if(year != null && month != null && day != null) {
-                LocalDate(year, month, day).atStartOfDayIn(TimeZone.currentSystemDefault())
-            } else null
-        )
+    fun ALDate.toDomain(): Date? {
+        return if(year != null || month != null || day != null) {
+            Date(
+                year = year,
+                month = month,
+                day = day,
+                date = if(year != null && month != null && day != null) {
+                    LocalDate(year, month, day).atStartOfDayIn(TimeZone.currentSystemDefault())
+                } else null
+            )
+        } else null
     }
 
     fun ALDate.toLocalDate(): LocalDate? {

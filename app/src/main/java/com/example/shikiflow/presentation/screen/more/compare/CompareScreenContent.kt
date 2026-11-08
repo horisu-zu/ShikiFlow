@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.ComparisonType
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.mappers.MediaComparisonMapper.filterEntries
@@ -29,7 +29,7 @@ import com.example.shikiflow.presentation.viewmodel.user.compare.CompareScreenUi
 @Composable
 fun CompareScreenContent(
     mediaType: MediaType,
-    targetUser: User,
+    targetUser: UserShort,
     uiState: CompareScreenUiState,
     onMediaItemClick: (Int, MediaType) -> Unit,
     onRefresh: () -> Unit

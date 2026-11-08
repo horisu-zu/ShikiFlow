@@ -10,23 +10,24 @@ import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.model.sort.MediaSort
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.settings.NotificationSettings
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.UserSettings
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
 import kotlin.time.Instant
 
 interface SettingsRepository {
-    val userFlow: Flow<User?>
+    val userFlow: Flow<CurrentUser?>
     val userSettingsFlow: Flow<UserSettings?>
     val authTypeFlow: Flow<AuthType?>
-    val connectedServicesFlow: Flow<Map<AuthType, User>>
+    val connectedServicesFlow: Flow<Map<AuthType, UserShort>>
     val settingsFlow: Flow<Settings>
     val themeSettingsFlow: Flow<ThemeSettings>
     val notificationSettingsFlow: Flow<NotificationSettings>
@@ -38,7 +39,7 @@ interface SettingsRepository {
     fun scoreFormat(authType: AuthType): Flow<ScoreFormat>
 
     suspend fun saveAuthType(authType: AuthType)
-    suspend fun saveUserData(user: User, authType: AuthType)
+    suspend fun saveUserData(user: CurrentUser, authType: AuthType)
     suspend fun saveUnreadCount(unreadNotificationsCount: Int)
     suspend fun saveServiceUpdatePreference(shouldUpdate: Boolean)
     suspend fun saveAppUiMode(appUiMode: AppUiMode)

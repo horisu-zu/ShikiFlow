@@ -2,12 +2,12 @@ package com.example.shikiflow.domain.model.user.social
 
 import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.thread.ThreadShort
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 
 sealed interface UserSocial
 
 data class Follower(
-    val data: User
+    val data: UserShort
 ): UserSocial
 
 data class Thread(

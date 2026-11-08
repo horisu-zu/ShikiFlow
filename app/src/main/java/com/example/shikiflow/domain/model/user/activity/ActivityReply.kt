@@ -1,6 +1,6 @@
 package com.example.shikiflow.domain.model.user.activity
 
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import kotlin.time.Instant
 
 data class ActivityReply(
@@ -8,7 +8,7 @@ data class ActivityReply(
     val body: String,
     val markdownBody: String,
     val createdAt: Instant,
-    val sender: User,
+    val sender: UserShort,
     val likeCount: Int,
     val isLiked: Boolean
 )

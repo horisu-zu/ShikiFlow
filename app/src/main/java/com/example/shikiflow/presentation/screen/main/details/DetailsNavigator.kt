@@ -20,7 +20,7 @@ import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.scene.BottomSheetSceneStrategy
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.common.SimilarMediaScreen
@@ -138,7 +138,7 @@ fun DetailsNavigator(
             detailsBackstack.add(DetailsNavRoute.MediaFollowings(mediaId, totalCount))
         }
 
-        override fun navigateToUserProfile(user: User) {
+        override fun navigateToUserProfile(user: UserShort) {
             mainNavOptions.navigateToProfile(user)
         }
 

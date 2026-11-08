@@ -14,13 +14,13 @@ import com.example.graphql.shikimori.UsersQuery
 import com.example.shikiflow.data.datasource.UserDataSource
 import com.example.shikiflow.data.remote.UserApi
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriRateMapper.toDomain
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriStaffMapper.toShikiKind
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.mapUserStats
+import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toCurrentUser
 import com.example.shikiflow.data.mapper.shikimori.ShikimoriUserMapper.toDomain
 import com.example.shikiflow.di.annotations.ShikimoriApollo
 import com.example.shikiflow.domain.model.browse.Browse
@@ -31,6 +31,7 @@ import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserSettings
@@ -58,12 +59,12 @@ class ShikimoriUserDataSource @Inject constructor(
     @param:ShikimoriApollo private val apolloClient: ApolloClient,
     private val userApi: UserApi
 ): UserDataSource, BaseNetworkRepository() {
-    override fun fetchCurrentUser(): Flow<DataResult<User>> {
+    override fun fetchCurrentUser(): Flow<DataResult<CurrentUser>> {
         return apolloClient.query(CurrentUserQuery())
             .fetchPolicy(FetchPolicy.NetworkFirst)
             .toFlow()
             .asDataResult { data ->
-                data.currentUser?.userShort?.toDomain()
+                data.currentUser?.userShort?.toCurrentUser()
                     ?: throw IllegalStateException("No user data returned")
             }
     }

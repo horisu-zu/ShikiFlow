@@ -19,7 +19,7 @@ import com.example.shikiflow.domain.model.thread.LikeableType
 import com.example.shikiflow.domain.model.thread.Thread
 import com.example.shikiflow.domain.model.thread.ThreadShort
 import com.example.graphql.anilist.type.ThreadSort as ALThreadSort
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.social.ThreadComment
 import kotlin.time.Instant
 
@@ -104,7 +104,7 @@ object AnilistThreadsMapper {
             commentBody = comment ?: "",
             markdownBody = markdownBody ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
-            sender = User(
+            sender = UserShort(
                 id = user?.id ?: 0,
                 nickname = user?.name ?: "",
                 avatarUrl = user?.avatar?.large ?: "",
@@ -122,7 +122,7 @@ object AnilistThreadsMapper {
             commentBody = comment ?: "",
             markdownBody = markdownBody ?: "",
             dateTime = Instant.fromEpochSeconds(epochSeconds = createdAt.toLong()),
-            sender = User(
+            sender = UserShort(
                 id = user?.id ?: 0,
                 nickname = user?.name ?: "",
                 avatarUrl = user?.avatar?.large ?: "",

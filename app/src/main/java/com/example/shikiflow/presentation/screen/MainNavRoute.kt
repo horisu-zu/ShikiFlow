@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.screen
 
 import androidx.navigation3.runtime.NavKey
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import kotlinx.serialization.Serializable
 
@@ -24,5 +24,5 @@ sealed interface MainScreenNavRoute : NavKey {
     data class Details(val detailsNavRoute: DetailsNavRoute) : MainScreenNavRoute
 
     @Serializable
-    data class Profile(val user: User?) : MainScreenNavRoute
+    data class Profile(val user: UserShort?) : MainScreenNavRoute
 }

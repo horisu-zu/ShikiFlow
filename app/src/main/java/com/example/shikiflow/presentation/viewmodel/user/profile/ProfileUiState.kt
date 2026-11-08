@@ -1,15 +1,16 @@
 package com.example.shikiflow.presentation.viewmodel.user.profile
 
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.CurrentUser
+import com.example.shikiflow.domain.model.user.BaseUser
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.presentation.UiState
 
 data class ProfileUiState(
-    val user: User? = null,
+    val user: BaseUser? = null,
     val userFollow: UserFollow? = null,
-    val currentUser: User? = null,
+    val currentUser: CurrentUser? = null,
     val userStatsCategories: UserStatsCategories = UserStatsCategories(),
     val authType: AuthType? = null,
     val selectedTabIndex: Int = 0,

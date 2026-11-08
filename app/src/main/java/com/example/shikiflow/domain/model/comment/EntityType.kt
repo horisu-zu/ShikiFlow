@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.model.comment
 
 import com.example.shikiflow.domain.model.user.activity.ActivityType
-import com.example.shikiflow.domain.model.user.User as DomainUser
+import com.example.shikiflow.domain.model.user.UserShort as DomainUser
 
 data class EntityData(
     val id: String,

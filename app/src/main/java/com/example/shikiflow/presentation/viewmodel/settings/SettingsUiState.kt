@@ -6,14 +6,15 @@ import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.NotificationSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.UserSettings
+import com.example.shikiflow.domain.model.user.UserShort
 
 data class SettingsUiState(
-    val user: User? = null,
+    val user: CurrentUser? = null,
     val authType: AuthType? = null,
     val userSettings: UserSettings = UserSettings(),
-    val connectedServices: Map<AuthType, User> = emptyMap(),
+    val connectedServices: Map<AuthType, UserShort> = emptyMap(),
     val settings: Settings = Settings(),
     val notificationSettings: NotificationSettings = NotificationSettings(),
     val themeSettings: ThemeSettings? = null,

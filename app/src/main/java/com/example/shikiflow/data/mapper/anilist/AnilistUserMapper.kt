@@ -49,6 +49,7 @@ import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.user.stats.TypeStat
 import com.example.shikiflow.domain.model.user.stats.OverviewStatType
@@ -56,12 +57,12 @@ import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.user.stats.ShortOverviewStat
 import com.example.shikiflow.domain.model.user.stats.StaffStat
 import com.example.shikiflow.domain.model.user.stats.Stat
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.activity.ListActivity
 import com.example.shikiflow.domain.model.user.activity.MessageActivity
 import com.example.shikiflow.domain.model.user.activity.TextActivity
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.UserSettings
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.UserStatsCategories
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.domain.model.user.activity.ActivityType
@@ -74,8 +75,8 @@ import com.example.shikiflow.domain.model.user.stats.StudioStat
 import kotlin.time.Instant
 
 object AnilistUserMapper {
-    fun ALCurrentUser.toDomainUser(): User {
-        return User(
+    fun ALCurrentUser.toDomainUser(): CurrentUser {
+        return CurrentUser(
             id = id,
             nickname = name,
             avatarUrl = avatar?.large ?: "",
@@ -89,12 +90,15 @@ object AnilistUserMapper {
                     put(MediaType.MANGA, mangaLists)
                 }
             },
+            notificationPreferences = options?.notificationOptions
+                ?.mapNotNull { it?.aLNotificationOption }
+                ?.toDomainOptions() ?: emptyMap(),
             unreadNotificationsCount = unreadNotificationCount
         )
     }
 
-    fun ALUserShort.toDomainUser(): User {
-        return User(
+    fun ALUserShort.toDomainUser(): UserShort {
+        return UserShort(
             id = id,
             nickname = name,
             avatarUrl = avatar?.large ?: "",
@@ -102,8 +106,8 @@ object AnilistUserMapper {
         )
     }
 
-    fun ALMediaFollowingUser.toDomain(): User {
-        return User(
+    fun ALMediaFollowingUser.toDomain(): UserShort {
+        return UserShort(
             id = id,
             nickname = name,
             avatarUrl = avatar?.large ?: "",
@@ -188,7 +192,7 @@ object AnilistUserMapper {
             id = id,
             text = text ?: "",
             markdownText = markdownText ?: "",
-            user = user?.aLUserShort?.toDomainUser() ?: User(),
+            user = user?.aLUserShort?.toDomainUser(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
             likeCount = likeCount,
             replyCount = replyCount,
@@ -201,8 +205,8 @@ object AnilistUserMapper {
             id = id,
             text = message ?: "",
             markdownText = markdownText ?: "",
-            messenger = messenger?.aLUserShort?.toDomainUser() ?: User(),
-            recipient = recipient?.aLUserShort?.toDomainUser() ?: User(),
+            messenger = messenger?.aLUserShort?.toDomainUser(),
+            recipient = recipient?.aLUserShort?.toDomainUser(),
             createdAt = Instant.fromEpochSeconds(createdAt.toLong()),
             likeCount = likeCount,
             replyCount = replyCount,

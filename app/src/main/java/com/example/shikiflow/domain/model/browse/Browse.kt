@@ -14,7 +14,7 @@ import com.example.shikiflow.domain.model.track.MediaFormat
 import com.example.shikiflow.domain.model.tracks.MediaType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import com.example.shikiflow.domain.model.user.User as DomainUser
+import com.example.shikiflow.domain.model.user.UserShort as DomainUser
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 

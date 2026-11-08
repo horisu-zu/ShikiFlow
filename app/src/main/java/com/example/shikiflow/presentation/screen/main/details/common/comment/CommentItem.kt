@@ -45,7 +45,7 @@ import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.comment.ShikiComment
 import com.example.shikiflow.domain.model.thread.Thread
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.DigitCounter
 import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.common.TextWithIcon
@@ -61,7 +61,7 @@ fun CommentItem(
     comment: Comment,
     currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     onLikeToggle: (Int) -> Unit,
     onCommentSelect: (Int) -> Unit,
     modifier: Modifier = Modifier,
@@ -106,7 +106,7 @@ private fun ShikimoriCommentItem(
     commentData: ShikiComment,
     currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     backgroundColor: Color,
     modifier: Modifier = Modifier,
     onReplyClick: ((Int) -> Unit)?,
@@ -190,7 +190,7 @@ private fun AnilistCommentTree(
     commentData: ALComment,
     currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     onLikeToggle: (Int) -> Unit,
     onCommentSelect: (Int) -> Unit,
     firstBackgroundColor: Color,
@@ -269,7 +269,7 @@ private fun AnilistCommentItem(
     commentData: ALComment,
     currentUserId: Int,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onReplyClick: ((Int) -> Unit)?,
@@ -340,7 +340,7 @@ private fun AnilistCommentItem(
 fun ThreadHeaderItem(
     threadHeader: Thread,
     onEntityClick: (type: EntityType, id: Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     onLikeToggle: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -493,10 +493,10 @@ fun ThreadHeaderItemPlaceholder(
 
 @Composable
 fun CommentUserComponent(
-    userData: User,
+    userData: UserShort,
     commentInstant: Instant,
     modifier: Modifier = Modifier,
-    onUserClick: ((User) -> Unit)? = null
+    onUserClick: ((UserShort) -> Unit)? = null
 ) {
     Row(
         modifier = modifier,
@@ -522,9 +522,9 @@ fun CommentUserComponent(
 
 @Composable
 fun CompactUserItem(
-    userData: User,
+    userData: UserShort,
     modifier: Modifier = Modifier,
-    onUserClick: ((User) -> Unit)? = null
+    onUserClick: ((UserShort) -> Unit)? = null
 ) {
     Row(
         modifier = modifier

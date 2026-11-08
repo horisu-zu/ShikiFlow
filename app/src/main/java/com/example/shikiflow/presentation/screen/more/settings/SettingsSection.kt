@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.image.BaseImage
 import com.example.shikiflow.presentation.common.image.ImageType
 import com.example.shikiflow.presentation.common.mappers.AuthTypeMapper.colors
@@ -622,7 +622,7 @@ private fun ServicesItem(
     title: String,
     currentAuthType: AuthType?,
     serviceUpdateState: Boolean,
-    connectedServicesMap: Map<AuthType, User>,
+    connectedServicesMap: Map<AuthType, UserShort>,
     onServiceClick: (AuthType, Boolean) -> Unit,
     onServiceUpdateToggle: () -> Unit,
     horizontalPadding: Dp,
@@ -731,7 +731,7 @@ private fun TrackerSwitch(
 @Composable
 private fun TrackerServiceItem(
     authType: AuthType,
-    user: User?,
+    user: UserShort?,
     onServiceClick: (AuthType, Boolean) -> Unit,
     horizontalPadding: Dp,
     modifier: Modifier = Modifier
@@ -793,7 +793,7 @@ private fun TrackerServiceItem(
 
 @Composable
 private fun TrackerUserItem(
-    user: User,
+    user: UserShort,
     modifier: Modifier = Modifier
 ) {
     Row(

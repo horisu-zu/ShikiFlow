@@ -11,10 +11,10 @@ import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
@@ -30,7 +30,7 @@ import com.example.shikiflow.utils.result.PagedResult
 import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
-    fun fetchCurrentUser(authType: AuthType): Flow<DataResult<User>>
+    fun fetchCurrentUser(authType: AuthType): Flow<DataResult<CurrentUser>>
 
     fun getUserActivity(
         userId: Int,

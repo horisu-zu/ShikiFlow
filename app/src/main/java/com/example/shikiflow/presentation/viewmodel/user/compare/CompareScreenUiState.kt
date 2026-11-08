@@ -5,11 +5,11 @@ import com.example.shikiflow.domain.model.media_details.Genre
 import com.example.shikiflow.domain.model.media_details.MediaTagEnum
 import com.example.shikiflow.domain.model.tracks.MediaType
 import com.example.shikiflow.domain.model.user.ComparisonType
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.MediaComparison
-import com.example.shikiflow.domain.model.user.User
 
 data class CompareScreenUiState(
-    val currentUser: User? = null,
+    val currentUser: CurrentUser? = null,
     val targetUserId: Int? = null,
     val mediaType: MediaType? = null,
     val mediaUiState: Map<MediaType, CompareMediaUiState> =

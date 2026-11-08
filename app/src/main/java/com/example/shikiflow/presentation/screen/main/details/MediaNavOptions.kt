@@ -3,7 +3,7 @@ package com.example.shikiflow.presentation.screen.main.details
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.screen.NavOptions
 
 interface MediaNavOptions: NavOptions {
@@ -49,5 +49,5 @@ interface MediaNavOptions: NavOptions {
 
     fun navigateToMediaFollowings(mediaId: Int, totalCount: Int?)
 
-    fun navigateToUserProfile(user: User)
+    fun navigateToUserProfile(user: UserShort)
 }

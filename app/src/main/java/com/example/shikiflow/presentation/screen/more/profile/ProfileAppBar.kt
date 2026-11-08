@@ -46,7 +46,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.CurrentUser
+import com.example.shikiflow.domain.model.user.BaseUser
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.presentation.common.DynamicTopAppBar
 import com.example.shikiflow.presentation.common.image.BaseImage
@@ -56,10 +57,9 @@ import com.example.shikiflow.presentation.common.shimmerEffect
 
 @Composable
 fun ProfileAppBar(
-    userData: User?,
+    userData: BaseUser?,
     userFollow: UserFollow?,
     authType: AuthType?,
-    isCurrentUser: Boolean,
     scrollBehavior: TopAppBarScrollBehavior,
     statusBarsPadding: PaddingValues,
     navOptions: ProfileNavOptions,
@@ -123,7 +123,7 @@ fun ProfileAppBar(
                             .align(Alignment.Bottom)
                     )
 
-                    if(isCurrentUser) {
+                    if(userData is CurrentUser) {
                         Row(
                             modifier = Modifier.align(Alignment.Top),
                             horizontalArrangement = Arrangement.spacedBy(4.dp, Alignment.End)
@@ -210,7 +210,7 @@ fun ProfileAppBar(
 
 @Composable
 private fun UserComponent(
-    userData: User,
+    userData: BaseUser,
     userFollow: UserFollow?,
     imageType: ImageType,
     backgroundColor: Color,

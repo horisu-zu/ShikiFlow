@@ -1,6 +1,6 @@
 package com.example.shikiflow.data.mapper.shikimori
 
-import com.example.graphql.shikimori.fragment.UserShort
+import com.example.graphql.shikimori.fragment.UserShort as ShikiUserShort
 import com.example.graphql.shikimori.type.AnimeKindEnum
 import com.example.graphql.shikimori.type.MangaKindEnum
 import com.example.shikiflow.BuildConfig
@@ -15,10 +15,11 @@ import com.example.shikiflow.data.datasource.dto.person.ShikiPerson
 import com.example.shikiflow.data.mapper.common.MediaTitleMapper.toDomainTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.stats.MediaTypeStats
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.activity.ListActivity
 import com.example.shikiflow.domain.model.user.social.SocialCategory
 import com.example.shikiflow.domain.model.user.UserStatsCategories
@@ -26,21 +27,27 @@ import com.fleeksoft.ksoup.Ksoup
 import kotlin.time.Instant
 
 object ShikimoriUserMapper {
-    fun UserShort.toDomain(): User {
-        return User(
+    fun ShikiUserShort.toDomain(): UserShort {
+        return UserShort(
             id = id.toInt(),
             nickname = nickname,
-            avatarUrl = avatarUrl,
-            lastOnlineAt = Instant.parse(lastOnlineAt.toString())
+            avatarUrl = avatarUrl
         )
     }
 
-    fun ShikiUser.toDomain(): User {
-        return User(
+    fun ShikiUserShort.toCurrentUser(): CurrentUser {
+        return CurrentUser(
+            id = id.toInt(),
+            nickname = nickname,
+            avatarUrl = avatarUrl
+        )
+    }
+
+    fun ShikiUser.toDomain(): UserShort {
+        return UserShort(
             id = id,
             nickname = nickname,
-            avatarUrl = shikiCommentImage.x160,
-            lastOnlineAt = Instant.parse(lastOnlineAt.toString())
+            avatarUrl = shikiCommentImage.x160
         )
     }
 
@@ -155,7 +162,7 @@ object ShikimoriUserMapper {
     fun mapUserStats(
         mediaTypeStats: MediaTypeStats<OverviewStats>,
         userFavorites: List<UserFavorite>,
-        friends: List<User>
+        friends: List<UserShort>
     ): UserStatsCategories {
         val mediaTypes = buildList {
             mediaTypeStats.animeStats?.scoreStatsTitles?.let { animeScores ->

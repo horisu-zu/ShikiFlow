@@ -280,7 +280,7 @@ fun TextActivityItem(
     onEditClick: ((String) -> Unit)?,
     onDeleteClick: (() -> Unit)?
 ) {
-    val isCurrentUser = currentUserId == textActivity.user.id
+    val isCurrentUser = currentUserId == textActivity.user?.id
 
     Column(
         modifier = modifier
@@ -294,11 +294,13 @@ fun TextActivityItem(
             horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            CommentUserComponent(
-                userData = textActivity.user,
-                commentInstant = textActivity.createdAt,
-                modifier = Modifier.weight(1f)
-            )
+            textActivity.user?.let { activityUser ->
+                CommentUserComponent(
+                    userData = activityUser,
+                    commentInstant = textActivity.createdAt,
+                    modifier = Modifier.weight(1f)
+                )
+            }
 
             if (textActivity.likeCount != null && textActivity.isLiked != null
                 && textActivity.replyCount != null
@@ -363,7 +365,7 @@ fun MessageActivityItem(
     onEditClick: ((String) -> Unit)?,
     onDeleteClick: (() -> Unit)?
 ) {
-    val isCurrentUser = currentUserId == messageActivity.messenger.id || currentUserId == messageActivity.recipient.id
+    val isCurrentUser = currentUserId == messageActivity.messenger?.id
 
     Column(
         modifier = modifier,
@@ -381,11 +383,13 @@ fun MessageActivityItem(
                 horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.Start),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                CommentUserComponent(
-                    userData = messageActivity.messenger,
-                    commentInstant = messageActivity.createdAt,
-                    modifier = Modifier.weight(1f)
-                )
+                messageActivity.messenger?.let { activityUser ->
+                    CommentUserComponent(
+                        userData = activityUser,
+                        commentInstant = messageActivity.createdAt,
+                        modifier = Modifier.weight(1f)
+                    )
+                }
 
                 if (messageActivity.likeCount != null && messageActivity.isLiked != null
                     && messageActivity.replyCount != null
@@ -409,7 +413,7 @@ fun MessageActivityItem(
                             )
                         }
 
-                        if (currentUserId == messageActivity.messenger.id && onEditClick != null) {
+                        if (currentUserId == messageActivity.messenger?.id && onEditClick != null) {
                             CounterItem(
                                 count = 0,
                                 iconResource = IconResource.Vector(Icons.Default.Edit),

@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.viewmodel.user.profile
 
 import androidx.lifecycle.viewModelScope
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.BaseUser
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.repository.UserRepository
 import com.example.shikiflow.presentation.UiStateViewModel
@@ -138,7 +138,7 @@ class ProfileViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    fun setUser(user: User) {
+    fun setUser(user: BaseUser) {
         mutableUiState.update { state ->
             state.copy(user = user)
         }

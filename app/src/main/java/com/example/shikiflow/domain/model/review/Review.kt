@@ -1,6 +1,6 @@
 package com.example.shikiflow.domain.model.review
 
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import kotlin.time.Instant
 
 data class Review(
@@ -9,7 +9,7 @@ data class Review(
     val body: String,
     val score: Int,
     val userRating: ReviewRating,
-    val author: User,
+    val author: UserShort,
     val media: ReviewMedia?,
     val likesCount: Int,
     val ratingAmount: Int,

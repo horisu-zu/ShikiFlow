@@ -21,14 +21,15 @@ import com.example.shikiflow.domain.model.settings.MangaChapterSettings
 import com.example.shikiflow.domain.model.settings.Settings
 import com.example.shikiflow.domain.model.settings.ThemeSettings
 import com.example.shikiflow.domain.model.sort.MediaSort
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.repository.SettingsRepository
 import com.example.shikiflow.domain.model.settings.ChapterUIMode
 import com.example.shikiflow.domain.model.settings.AppUiMode
 import com.example.shikiflow.domain.model.settings.BrowseUiMode
 import com.example.shikiflow.domain.model.settings.NotificationSettings
 import com.example.shikiflow.domain.model.tracks.MediaType
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.UserSettings
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.utils.ThemeMode
 import com.materialkolor.PaletteStyle
 import kotlinx.coroutines.flow.Flow
@@ -89,7 +90,7 @@ class SettingsRepositoryImpl @Inject constructor(
         private val TRANSLATED_LANGUAGES = stringSetPreferencesKey("translated_languages")
     }
 
-    override val userFlow: Flow<User?> = dataStore.data
+    override val userFlow: Flow<CurrentUser?> = dataStore.data
         .map { preferences ->
             val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
                 AuthType.valueOf(authType)
@@ -97,7 +98,7 @@ class SettingsRepositoryImpl @Inject constructor(
 
             currentAuthType?.let { authType ->
                 preferences[userId(authType)]?.let { userId ->
-                    User(
+                    CurrentUser(
                         id = userId.toInt(),
                         nickname = preferences[userNickname(authType)] ?: "",
                         avatarUrl = preferences[userAvatar(authType)] ?: "",
@@ -144,7 +145,7 @@ class SettingsRepositoryImpl @Inject constructor(
             }
         }
 
-    override val connectedServicesFlow: Flow<Map<AuthType, User>> = dataStore.data
+    override val connectedServicesFlow: Flow<Map<AuthType, UserShort>> = dataStore.data
         .map { preferences ->
             val currentAuthType = preferences[AUTH_TYPE]?.let { authType ->
                 AuthType.valueOf(authType)
@@ -154,7 +155,7 @@ class SettingsRepositoryImpl @Inject constructor(
                 .filter { it != currentAuthType }
                 .mapNotNull { authType ->
                     preferences[userId(authType)]?.let { userId ->
-                        authType to User(
+                        authType to UserShort(
                             id = userId.toInt(),
                             nickname = preferences[userNickname(authType)] ?: "",
                             avatarUrl = preferences[userAvatar(authType)] ?: "",
@@ -262,7 +263,7 @@ class SettingsRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveUserData(user: User, authType: AuthType) {
+    override suspend fun saveUserData(user: CurrentUser, authType: AuthType) {
         dataStore.edit { preferences ->
             preferences[userId(authType)] = user.id.toString()
             preferences[userNickname(authType)] = user.nickname
@@ -276,6 +277,13 @@ class SettingsRepositoryImpl @Inject constructor(
                     MediaType.ANIME -> preferences[userCustomAnimeLists(authType)] = lists.toSet()
                     MediaType.MANGA -> preferences[userCustomMangaLists(authType)] = lists.toSet()
                 }
+            }
+            if (user.notificationPreferences.isNotEmpty()) {
+                preferences[userDisabledNotificationTypes(authType)] = user.notificationPreferences
+                    .filter { !it.value }
+                    .keys
+                    .map { it.name }
+                    .toSet()
             }
             user.unreadNotificationsCount?.let { unreadNotificationsCount ->
                 preferences[userUnreadNotificationsCount(authType)] = unreadNotificationsCount

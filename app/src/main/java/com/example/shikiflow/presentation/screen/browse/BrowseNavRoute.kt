@@ -2,7 +2,7 @@ package com.example.shikiflow.presentation.screen.browse
 
 import androidx.navigation3.runtime.NavKey
 import com.example.shikiflow.domain.model.browse.BrowseType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import kotlinx.serialization.Serializable
 
@@ -17,5 +17,5 @@ sealed interface BrowseNavRoute: NavKey {
     data class Details(val detailsNavRoute: DetailsNavRoute) : BrowseNavRoute
 
     @Serializable
-    data class Profile(val user: User?) : BrowseNavRoute
+    data class Profile(val user: UserShort?) : BrowseNavRoute
 }

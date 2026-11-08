@@ -51,7 +51,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.sort.ThreadType
 import com.example.shikiflow.domain.model.thread.ThreadShort
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.SortBottomSheet
 import com.example.shikiflow.presentation.common.SortConfig
@@ -339,7 +339,7 @@ fun ThreadItemPlaceholder(
 
 @Composable
 private fun ShortUserItem(
-    userData: User,
+    userData: UserShort,
     replyInstant: Instant,
     resources: Resources,
     modifier: Modifier = Modifier

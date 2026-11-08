@@ -53,7 +53,7 @@ import com.example.shikiflow.domain.model.comment.Comment
 import com.example.shikiflow.domain.model.comment.CommentType
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.ErrorItem
 import com.example.shikiflow.presentation.common.player.LocalExoPlayerCache
 import com.example.shikiflow.presentation.common.player.rememberExoPlayerCache
@@ -61,7 +61,6 @@ import com.example.shikiflow.presentation.screen.main.details.MediaNavOptions
 import com.example.shikiflow.presentation.viewmodel.comment.CommentViewModel
 import com.example.shikiflow.presentation.viewmodel.comment.reply.CommentRepliesViewModel
 import com.example.shikiflow.utils.LazyListUtils.onBottomReached
-import kotlinx.coroutines.FlowPreview
 
 @Composable
 fun CommentsScreen(
@@ -112,13 +111,12 @@ fun CommentsScreen(
     }
 }
 
-@OptIn(FlowPreview::class)
 @Composable
 private fun TopicCommentsSection(
     topicId: Int,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     modifier: Modifier = Modifier,
     commentViewModel: CommentViewModel = hiltViewModel()
 ) {
@@ -372,7 +370,7 @@ private fun CommentWithRepliesSection(
     commentId: Int,
     contentPadding: PaddingValues,
     onEntityClick: (EntityType, Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     modifier: Modifier = Modifier,
     commentRepliesViewModel: CommentRepliesViewModel = hiltViewModel()
 ) {
@@ -428,7 +426,7 @@ private fun CommentsMapSection(
     title: CommentType,
     comments: List<Comment>,
     onEntityClick: (EntityType, Int) -> Unit,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(

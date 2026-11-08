@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.activity.ActivityReply
 import com.example.shikiflow.presentation.common.RichTextRenderer
 import com.example.shikiflow.presentation.screen.main.details.common.comment.CommentUserComponent
@@ -28,7 +28,7 @@ import com.example.shikiflow.presentation.screen.main.details.common.comment.Lik
 fun ActivityReplyItem(
     activityReply: ActivityReply,
     currentUserId: Int?,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     onEntityClick: (EntityType, Int) -> Unit,
     onLikeToggle: (Int) -> Unit,
     onEditClick: () -> Unit,

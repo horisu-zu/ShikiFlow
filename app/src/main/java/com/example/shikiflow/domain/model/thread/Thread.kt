@@ -1,6 +1,6 @@
 package com.example.shikiflow.domain.model.thread
 
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import kotlin.time.Instant
 
 data class Thread(
@@ -12,6 +12,6 @@ data class Thread(
     val likeCount: Int,
     val replyCount: Int,
     val isLiked: Boolean,
-    val createdBy: User?,
+    val createdBy: UserShort?,
     val createdAt: Instant
 )

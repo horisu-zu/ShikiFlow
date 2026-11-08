@@ -1,17 +1,17 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
 import androidx.navigation3.runtime.NavKey
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
 import kotlinx.serialization.Serializable
 
 sealed interface ProfileNavRoute : NavKey {
     @Serializable
-    data class Profile(val user: User?) : ProfileNavRoute
+    data class Profile(val user: UserShort?) : ProfileNavRoute
 
     @Serializable
-    data class MediaComparison(val targetUser: User) : ProfileNavRoute
+    data class MediaComparison(val targetUser: UserShort) : ProfileNavRoute
 
     @Serializable
     data class ActivityReplies(

@@ -55,7 +55,7 @@ import androidx.compose.ui.window.DialogWindowProvider
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.notification.NotificationType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.Button
 import com.example.shikiflow.presentation.common.CheckboxItem
 import com.example.shikiflow.presentation.common.TextWithIcon
@@ -294,7 +294,7 @@ fun NotificationPreferencesBottomSheet(
 @Composable
 fun TrackerUserBottomSheet(
     authType: AuthType,
-    user: User,
+    user: UserShort,
     onSwitch: () -> Unit,
     onLogout: () -> Unit,
     onDismiss: () -> Unit

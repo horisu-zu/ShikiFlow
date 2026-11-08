@@ -14,7 +14,7 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.MainScreenNavRoute
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
@@ -30,7 +30,7 @@ fun MainScreenNavigator(
             mainScreenBackStack.add(MainScreenNavRoute.Details(detailsNavRoute))
         }
 
-        override fun navigateToProfile(user: User?) {
+        override fun navigateToProfile(user: UserShort?) {
             mainScreenBackStack.add(MainScreenNavRoute.Profile(user))
         }
 

@@ -1,12 +1,12 @@
 package com.example.shikiflow.presentation.screen.more.profile
 
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.presentation.screen.MainNavOptions
 
 interface ProfileNavOptions : MainNavOptions {
-    fun navigateToCompare(targetUser: User)
+    fun navigateToCompare(targetUser: UserShort)
 
     fun navigateToSettings()
 

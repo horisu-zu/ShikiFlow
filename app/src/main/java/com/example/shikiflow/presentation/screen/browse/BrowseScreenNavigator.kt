@@ -15,7 +15,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.browse.BrowseType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.screen.browse.main.BrowseScreen
 import com.example.shikiflow.presentation.screen.browse.side.BrowseSideScreen
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
@@ -35,7 +35,7 @@ fun BrowseScreenNavigator(
             browseBackStack.add(BrowseNavRoute.Details(detailsNavRoute))
         }
 
-        override fun navigateToProfile(user: User?) {
+        override fun navigateToProfile(user: UserShort?) {
             browseBackStack.add(BrowseNavRoute.Profile(user))
         }
 

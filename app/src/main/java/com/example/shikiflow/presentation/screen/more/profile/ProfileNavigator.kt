@@ -19,7 +19,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.example.shikiflow.domain.model.comment.CommentsScreenMode
 import com.example.shikiflow.domain.model.comment.EntityType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.activity.ActivityType
 import com.example.shikiflow.presentation.screen.MainNavOptions
 import com.example.shikiflow.presentation.screen.main.details.DetailsNavRoute
@@ -33,18 +33,18 @@ import com.example.shikiflow.presentation.screen.more.settings.SettingsScreen
 
 @Composable
 fun ProfileNavigator(
-    user: User? = null,
+    user: UserShort? = null,
     profileBackstack: NavBackStack<NavKey>? = null,
     mainNavOptions: MainNavOptions? = null
 ) {
     val backstack = profileBackstack ?: rememberNavBackStack(ProfileNavRoute.Profile(user))
 
     val profileNavOptions = object : ProfileNavOptions {
-        override fun navigateToProfile(user: User?) {
+        override fun navigateToProfile(user: UserShort?) {
             backstack.add(ProfileNavRoute.Profile(user))
         }
 
-        override fun navigateToCompare(targetUser: User) {
+        override fun navigateToCompare(targetUser: UserShort) {
             backstack.add(ProfileNavRoute.MediaComparison(targetUser))
         }
 

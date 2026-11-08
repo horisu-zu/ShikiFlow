@@ -1,7 +1,7 @@
 package com.example.shikiflow.domain.model.comment
 
 import androidx.compose.ui.util.fastForEach
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import kotlin.time.Instant
 
 sealed interface Comment {
@@ -9,7 +9,7 @@ sealed interface Comment {
     val commentBody: String
     val markdownBody: String
     val dateTime: Instant
-    val sender: User?
+    val sender: UserShort?
 }
 
 data class ShikiComment(
@@ -17,7 +17,7 @@ data class ShikiComment(
     override val commentBody: String,
     override val markdownBody: String,
     override val dateTime: Instant,
-    override val sender: User?,
+    override val sender: UserShort?,
     val isOfftopic: Boolean
 ): Comment
 
@@ -26,7 +26,7 @@ data class ALComment(
     override val commentBody: String,
     override val markdownBody: String,
     override val dateTime: Instant,
-    override val sender: User?,
+    override val sender: UserShort?,
     val childComments: List<ALComment>,
     val likesCount: Int,
     val isLiked: Boolean

@@ -13,14 +13,15 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.BaseUser
+import com.example.shikiflow.presentation.common.mappers.UserMapper.toUserShort
 import com.example.shikiflow.presentation.screen.more.profile.stats.anilist.AnilistUserStatsSection
 import com.example.shikiflow.presentation.screen.more.profile.stats.shikimori.ShikimoriTrackSection
 import com.example.shikiflow.presentation.viewmodel.user.statistics.UserStatsViewModel
 
 @Composable
 fun UserStatsSection(
-    userData: User,
+    userData: BaseUser,
     typesList: List<MediaType>,
     isCurrentUser: Boolean,
     horizontalPadding: Dp,
@@ -48,7 +49,7 @@ fun UserStatsSection(
                     },
                     onRetryClick = { userStatsViewModel.onRefresh(uiState.statsSectionType) },
                     onCompareClick = {
-                        navOptions.navigateToCompare(userData)
+                        navOptions.navigateToCompare(userData.toUserShort())
                     },
                     modifier = Modifier
                         .fillMaxSize()
@@ -61,7 +62,7 @@ fun UserStatsSection(
                     uiState = uiState,
                     isCurrentUser = isCurrentUser,
                     onCompareClick = {
-                        navOptions.navigateToCompare(userData)
+                        navOptions.navigateToCompare(userData.toUserShort())
                     },
                     horizontalPadding = horizontalPadding,
                     event = userStatsViewModel,

@@ -7,14 +7,13 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.retain.retain
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,8 +23,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.shikiflow.R
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.FavoriteCategory
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.UserStatsCategories.Companion.isEmpty
 import com.example.shikiflow.presentation.common.ConnectedButtonGroup
 import com.example.shikiflow.presentation.common.ConnectedButtonGroupPlaceholder
@@ -39,12 +39,14 @@ import com.example.shikiflow.presentation.viewmodel.user.profile.ProfileUiState
 
 @Composable
 fun ProfileScreen(
-    userData: User?,
+    userData: UserShort?,
     navOptions: ProfileNavOptions,
     profileViewModel: ProfileViewModel = hiltViewModel()
 ) {
     val uiState by profileViewModel.uiState.collectAsStateWithLifecycle()
-    val user = userData ?: uiState.currentUser
+    val user = remember(userData, uiState.currentUser) {
+        userData ?: uiState.currentUser
+    }
 
     LaunchedEffect(user) {
         user?.let {
@@ -55,7 +57,6 @@ fun ProfileScreen(
     user?.let {
         ProfileScreenContent(
             uiState = uiState,
-            isCurrentUser = uiState.currentUser?.id == user.id,
             navOptions = navOptions,
             onPageChange = { index -> profileViewModel.setTab(index) },
             onProfileRefresh = { profileViewModel.onRefresh() },
@@ -66,11 +67,9 @@ fun ProfileScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ProfileScreenContent(
     uiState: ProfileUiState,
-    isCurrentUser: Boolean,
     navOptions: ProfileNavOptions,
     onPageChange: (Int) -> Unit,
     onProfileRefresh: () -> Unit,
@@ -89,7 +88,6 @@ fun ProfileScreenContent(
                 userData = uiState.user,
                 userFollow = uiState.userFollow,
                 authType = uiState.authType,
-                isCurrentUser = isCurrentUser,
                 scrollBehavior = scrollBehavior,
                 statusBarsPadding = WindowInsets.statusBars.asPaddingValues(),
                 backgroundColor = backgroundColor,
@@ -141,7 +139,7 @@ fun ProfileScreenContent(
                                 UserStatsSection(
                                     userData = userData,
                                     typesList = uiState.userStatsCategories.scoreMediaTypes,
-                                    isCurrentUser = isCurrentUser,
+                                    isCurrentUser = userData is CurrentUser,
                                     horizontalPadding = horizontalPadding,
                                     navOptions = navOptions
                                 )

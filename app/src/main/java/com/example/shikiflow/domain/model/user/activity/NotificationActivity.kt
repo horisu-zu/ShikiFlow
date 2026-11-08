@@ -3,7 +3,7 @@ package com.example.shikiflow.domain.model.user.activity
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 
 sealed interface NotificationActivity {
     val id: Int
@@ -26,5 +26,5 @@ data class TextNotificationActivity(
     override val id: Int,
     override val type: ActivityType,
     val text: String,
-    val recipient: User? = null
+    val recipient: UserShort? = null
 ): NotificationActivity

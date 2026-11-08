@@ -2,7 +2,7 @@ package com.example.shikiflow.domain.model.notification
 
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.domain.model.user.activity.NotificationActivity
 import kotlin.time.Instant
 
@@ -26,7 +26,7 @@ data class FollowingNotification(
     override val id: Int,
     override val createdAt: Instant,
     override val type: NotificationType,
-    val user: User
+    val user: UserShort
 ): Notification
 
 data class MediaNotification(
@@ -63,7 +63,7 @@ data class ActivityNotification(
     override val id: Int,
     override val createdAt: Instant,
     override val type: NotificationType,
-    val user: User?,
+    val user: UserShort?,
     val activity: NotificationActivity?
 ): Notification
 
@@ -71,7 +71,7 @@ data class ThreadNotification(
     override val id: Int,
     override val createdAt: Instant,
     override val type: NotificationType,
-    val user: User?,
+    val user: UserShort?,
     val threadId: Int,
     val threadTitle: String?
 ): Notification
@@ -80,7 +80,7 @@ data class ThreadCommentNotification(
     override val id: Int,
     override val createdAt: Instant,
     override val type: NotificationType,
-    val user: User?,
+    val user: UserShort?,
     val threadId: Int,
     val threadTitle: String?,
     val commentId: Int,

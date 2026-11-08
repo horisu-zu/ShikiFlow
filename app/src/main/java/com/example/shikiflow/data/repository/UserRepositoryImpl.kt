@@ -17,10 +17,10 @@ import com.example.shikiflow.domain.model.notification.NotificationType
 import com.example.shikiflow.domain.model.staff.StaffKind
 import com.example.shikiflow.domain.model.user.FavoriteCategory
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
 import com.example.shikiflow.domain.model.user.UserFavorite
 import com.example.shikiflow.domain.model.user.stats.OverviewStats
 import com.example.shikiflow.domain.model.tracks.ShortUserMediaRate
+import com.example.shikiflow.domain.model.user.CurrentUser
 import com.example.shikiflow.domain.model.user.activity.UserActivity
 import com.example.shikiflow.domain.model.user.UserFollow
 import com.example.shikiflow.domain.model.user.UserSettings
@@ -58,7 +58,7 @@ class UserRepositoryImpl @Inject constructor(
         }
         .distinctUntilChanged()
 
-    override fun fetchCurrentUser(authType: AuthType): Flow<DataResult<User>> {
+    override fun fetchCurrentUser(authType: AuthType): Flow<DataResult<CurrentUser>> {
         return when(authType) {
             AuthType.SHIKIMORI -> shikimoriUserDataSource
             AuthType.ANILIST -> anilistUserDataSource

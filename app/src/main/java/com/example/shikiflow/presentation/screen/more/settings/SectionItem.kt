@@ -1,7 +1,7 @@
 package com.example.shikiflow.presentation.screen.more.settings
 
 import com.example.shikiflow.domain.model.auth.AuthType
-import com.example.shikiflow.domain.model.user.User as DomainUser
+import com.example.shikiflow.domain.model.user.UserShort as DomainUser
 import com.example.shikiflow.utils.IconResource
 
 sealed interface SectionItem {

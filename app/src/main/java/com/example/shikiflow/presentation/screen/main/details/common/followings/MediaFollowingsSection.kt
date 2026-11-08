@@ -36,7 +36,7 @@ import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.common.PaginatedList
 import com.example.shikiflow.domain.model.common.ScoreFormat
 import com.example.shikiflow.domain.model.media_details.MediaFollowing
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import com.example.shikiflow.presentation.common.SnapFlingHorizontalGrid
 import com.example.shikiflow.presentation.common.TextWithDivider
 import com.example.shikiflow.presentation.common.TextWithIcon
@@ -53,7 +53,7 @@ import com.example.shikiflow.utils.toIcon
 fun MediaFollowingsSection(
     mediaFollowings: PaginatedList<MediaFollowing>,
     episodesCount: Int?,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     onMoreClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -108,7 +108,7 @@ fun MediaFollowingsSection(
 fun MediaFollowingItem(
     mediaFollowing: MediaFollowing,
     totalCount: Int?,
-    onUserClick: (User) -> Unit,
+    onUserClick: (UserShort) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -162,7 +162,7 @@ fun MediaFollowingItem(
 
 @Composable
 private fun FollowingUserItem(
-    userData: User,
+    userData: UserShort,
     onUserClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {

@@ -3,7 +3,7 @@ package com.example.shikiflow.domain.model.user.activity
 import com.example.shikiflow.domain.model.media_details.MediaTitle
 import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.domain.model.tracks.MediaType
-import com.example.shikiflow.domain.model.user.User
+import com.example.shikiflow.domain.model.user.UserShort
 import kotlin.time.Instant
 
 sealed interface UserActivity {
@@ -38,7 +38,7 @@ data class TextActivity(
     override val type: ActivityType = ActivityType.TEXT,
     val text: String,
     val markdownText: String,
-    val user: User,
+    val user: UserShort?,
     override val createdAt: Instant,
     override val likeCount: Int? = null,
     override val replyCount: Int? = null,
@@ -50,8 +50,8 @@ data class MessageActivity(
     override val type: ActivityType = ActivityType.MESSAGE,
     val text: String,
     val markdownText: String,
-    val messenger: User,
-    val recipient: User,
+    val messenger: UserShort?,
+    val recipient: UserShort?,
     override val createdAt: Instant,
     override val likeCount: Int? = null,
     override val replyCount: Int? = null,
