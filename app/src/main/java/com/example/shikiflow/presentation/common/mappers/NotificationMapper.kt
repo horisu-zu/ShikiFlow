@@ -1,8 +1,10 @@
 package com.example.shikiflow.presentation.common.mappers
 
+import android.content.res.Resources
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -13,6 +15,7 @@ import androidx.compose.ui.text.withLink
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.comment.EntityType
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
+import com.example.shikiflow.domain.model.media_details.PreferredTitleType
 import com.example.shikiflow.domain.model.notification.ActivityNotification
 import com.example.shikiflow.domain.model.notification.AiringNotification
 import com.example.shikiflow.domain.model.notification.FollowingNotification
@@ -88,29 +91,26 @@ object NotificationMapper {
         }
     }
 
-    @Composable
     fun Notification.annotatedText(
-        onEntityClick: (EntityType, Int) -> Unit
+        resources: Resources,
+        titleType: PreferredTitleType,
+        linkStyle: SpanStyle = SpanStyle(),
+        onEntityClick: (EntityType, Int) -> Unit = { _, _ -> }
     ): AnnotatedString {
         val notification = this
-        val titleType = LocalTitleTypeController.current
-        val linkStyle = SpanStyle(
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
 
         return buildAnnotatedString {
             when (notification) {
                 is AiringNotification -> {
                     appendTemplate(
-                        template = stringResource(R.string.notification_type_airing_text),
+                        template = resources.getString((R.string.notification_type_airing_text)),
                         { append(notification.episodeNumber.toString()) },
                         { link(notification.mediaTitle.preferred(titleType), linkStyle) { onEntityClick(EntityType.Anime, notification.mediaId) } }
                     )
                 }
                 is FollowingNotification -> {
                     appendTemplate(
-                        template = stringResource(R.string.notification_type_following_text),
+                        template = resources.getString((R.string.notification_type_following_text)),
                         { link(notification.user.nickname, linkStyle) {
                             onEntityClick(EntityType.User(notification.user), notification.user.id)
                         } }
@@ -120,7 +120,7 @@ object NotificationMapper {
                     when (type) {
                         NotificationType.ACTIVITY_MESSAGE -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_activity_message_text),
+                                template = resources.getString((R.string.notification_type_activity_message_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -130,7 +130,7 @@ object NotificationMapper {
                         }
                         NotificationType.ACTIVITY_MENTION -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_activity_mention_text),
+                                template = resources.getString((R.string.notification_type_activity_mention_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -140,7 +140,7 @@ object NotificationMapper {
                         }
                         NotificationType.ACTIVITY_REPLY -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_activity_reply_text),
+                                template = resources.getString((R.string.notification_type_activity_reply_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -150,7 +150,7 @@ object NotificationMapper {
                         }
                         NotificationType.ACTIVITY_REPLY_SUBSCRIBED -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_activity_reply_subscribed_text),
+                                template = resources.getString((R.string.notification_type_activity_reply_subscribed_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -160,7 +160,7 @@ object NotificationMapper {
                         }
                         NotificationType.ACTIVITY_LIKE -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_activity_like_text),
+                                template = resources.getString((R.string.notification_type_activity_like_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -170,7 +170,7 @@ object NotificationMapper {
                         }
                         NotificationType.ACTIVITY_REPLY_LIKE -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_activity_reply_like_text),
+                                template = resources.getString((R.string.notification_type_activity_reply_like_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -178,14 +178,14 @@ object NotificationMapper {
                                 } }
                             )
                         }
-                        else -> append(stringResource(R.string.common_ok))
+                        else -> append(resources.getString((R.string.common_ok)))
                     }
                 }
                 is ThreadNotification -> {
                     when (type) {
                         NotificationType.THREAD_LIKE -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_thread_like_text),
+                                template = resources.getString((R.string.notification_type_thread_like_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -196,14 +196,14 @@ object NotificationMapper {
                                 } }
                             )
                         }
-                        else -> append(stringResource(R.string.common_ok))
+                        else -> append(resources.getString((R.string.common_ok)))
                     }
                 }
                 is ThreadCommentNotification -> {
                     when (type) {
                         NotificationType.THREAD_COMMENT_MENTION -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_thread_comment_mention_text),
+                                template = resources.getString((R.string.notification_type_thread_comment_mention_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -213,7 +213,7 @@ object NotificationMapper {
                         }
                         NotificationType.THREAD_COMMENT_REPLY -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_thread_comment_reply_text),
+                                template = resources.getString((R.string.notification_type_thread_comment_reply_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -226,7 +226,7 @@ object NotificationMapper {
                         }
                         NotificationType.THREAD_SUBSCRIBED -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_thread_subscribed_text),
+                                template = resources.getString((R.string.notification_type_thread_subscribed_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -239,7 +239,7 @@ object NotificationMapper {
                         }
                         NotificationType.THREAD_COMMENT_LIKE -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_thread_comment_like_text),
+                                template = resources.getString((R.string.notification_type_thread_comment_like_text)),
                                 { link(notification.user?.nickname ?: "", linkStyle) {
                                     user?.let {
                                         onEntityClick(EntityType.User(user = user), user.id)
@@ -250,14 +250,14 @@ object NotificationMapper {
                                 } }
                             )
                         }
-                        else -> append(stringResource(R.string.common_ok))
+                        else -> append(resources.getString((R.string.common_ok)))
                     }
                 }
                 is MediaNotification -> {
                     when (type) {
                         NotificationType.RELATED_MEDIA_ADDITION -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_related_media_addition_text),
+                                template = resources.getString((R.string.notification_type_related_media_addition_text)),
                                 { link(notification.mediaTitle.preferred(titleType), linkStyle) {
                                     onEntityClick(
                                         when (notification.mediaType) {
@@ -271,7 +271,7 @@ object NotificationMapper {
                         }
                         NotificationType.MEDIA_DATA_CHANGE -> {
                             appendTemplate(
-                                template = stringResource(R.string.notification_type_media_data_change_text),
+                                template = resources.getString((R.string.notification_type_media_data_change_text)),
                                 { link(notification.mediaTitle.preferred(titleType), linkStyle) {
                                     onEntityClick(
                                         when (notification.mediaType) {
@@ -283,14 +283,14 @@ object NotificationMapper {
                                 }
                             )
                         }
-                        else -> append(stringResource(R.string.common_ok))
+                        else -> append(resources.getString((R.string.common_ok)))
                     }
                 }
                 is MediaMergeNotification -> {
-                    val lastSeparator = " ${stringResource(R.string.common_and_separator)} "
+                    val lastSeparator = " ${resources.getString((R.string.common_and_separator))} "
 
                     appendTemplate(
-                        template = stringResource(R.string.notification_type_media_merge_text),
+                        template = resources.getString((R.string.notification_type_media_merge_text)),
                         {
                             append(notification.mergedMediaTitles
                                 .joinWithLast(
@@ -311,7 +311,7 @@ object NotificationMapper {
                     )
                 }
                 is MediaDeletionNotification -> {
-                    append(stringResource(R.string.notification_type_media_deletion_text, notification.deletedMediaTitle))
+                    append(resources.getString(R.string.notification_type_media_deletion_text, notification.deletedMediaTitle))
                 }
                 is SubmissionNotification -> {
                     when (type) {
@@ -319,16 +319,32 @@ object NotificationMapper {
                         NotificationType.STAFF_SUBMISSION_UPDATE,
                         NotificationType.CHARACTER_SUBMISSION_UPDATE -> {
                             append(
-                                stringResource(
-                                    id = R.string.notification_type_submission_text,
-                                    stringResource(submissionStatus.displayValue()).lowercase()
+                                resources.getString(
+                                    R.string.notification_type_submission_text,
+                                    resources.getString((submissionStatus.displayValue())).lowercase()
                                 )
                             )
                         }
-                        else -> { append(stringResource(R.string.common_ok)) }
+                        else -> { append(resources.getString((R.string.common_ok))) }
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    fun Notification.annotatedText(
+        onEntityClick: (EntityType, Int) -> Unit
+    ): AnnotatedString {
+        val resources = LocalResources.current
+        val titleType = LocalTitleTypeController.current
+        val linkStyle = SpanStyle(
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        return remember(this, resources, titleType, linkStyle) {
+            annotatedText(resources, titleType, linkStyle, onEntityClick)
         }
     }
 

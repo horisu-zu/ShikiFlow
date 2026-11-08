@@ -313,11 +313,6 @@ private fun ActivityNotificationItem(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .clickable {
-                activityNotification.activity?.let {
-                    onEntityClick(EntityType.Activity(activityNotification.activity.type), activityNotification.activity.id)
-                }
-            }
             .padding(all = 8.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top)
     ) {

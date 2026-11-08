@@ -18,7 +18,6 @@ import com.example.shikiflow.presentation.screen.main.TracksFilterType
 import com.example.shikiflow.utils.result.DataResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -31,7 +30,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-@OptIn(FlowPreview::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class TracksSearchViewModel @Inject constructor(
     private val mediaTracksRepository: MediaTracksRepository,
@@ -210,9 +209,7 @@ class TracksSearchViewModel @Inject constructor(
     fun setFilterType(filterType: TracksFilterType) {
         _params.update { params ->
             params.copy(
-                filters = params.filters.copy(
-                    currentFilterType = filterType
-                )
+                currentFilterType = filterType
             )
         }
     }
@@ -231,8 +228,7 @@ class TracksSearchViewModel @Inject constructor(
         _params.update { params ->
             params.copy(
                 filters = TracksFilters(
-                    mediaType = params.filters.mediaType,
-                    currentFilterType = params.filters.currentFilterType
+                    mediaType = params.filters.mediaType
                 )
             )
         }

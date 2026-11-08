@@ -47,6 +47,7 @@ import com.example.shikiflow.domain.model.track.UserRateStatus
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.model.auth.AuthType
 import com.example.shikiflow.domain.model.common.ScoreFormat
+import com.example.shikiflow.domain.model.media_details.AgeRating
 import com.example.shikiflow.domain.model.media_details.MediaDetails
 import com.example.shikiflow.domain.model.media_details.MediaStatus
 import com.example.shikiflow.domain.model.media_details.MediaTitle.Companion.preferred
@@ -68,6 +69,7 @@ import com.example.shikiflow.presentation.common.ignoreHorizontalParentPadding
 import com.example.shikiflow.presentation.common.mappers.DateMapper.isAiring
 import com.example.shikiflow.presentation.common.mappers.DateMapper.toCountdownString
 import com.example.shikiflow.presentation.common.mappers.DateMapper.untilNextEpisode
+import com.example.shikiflow.presentation.common.mappers.SeasonMapper.determineSeason
 import com.example.shikiflow.utils.Converter.formatInstant
 import com.example.shikiflow.utils.DateUtils.calculateDuration
 import com.example.shikiflow.utils.toIcon
@@ -210,28 +212,30 @@ fun AnimeDetailsHeader(
                         }
                     }
 
-                    animeDetails.ageRating?.let { ageRating ->
+                    if (animeDetails.ageRating != null && animeDetails.ageRating != AgeRating.NONE) {
                         item {
                             ShortInfoItem(
                                 infoType = stringResource(id = R.string.details_short_info_age_rating),
-                                infoItem = stringResource(ageRating.displayValue())
+                                infoItem = stringResource(animeDetails.ageRating.displayValue())
                             )
                         }
                     }
 
                     if(animeDetails.status == MediaStatus.ONGOING) {
-                        item {
-                            val isAiring = animeDetails.nextEpisodeAt?.isAiring(
-                                startDate = animeDetails.airedOn?.date ?: Clock.System.now(),
-                                episodeDuration = animeDetails.durationMins?.minutes ?: 0.minutes
-                            ) == true
+                        val isAiring = animeDetails.nextEpisodeAt?.isAiring(
+                            startDate = animeDetails.airedOn?.date ?: Clock.System.now(),
+                            episodeDuration = animeDetails.durationMins?.minutes ?: 0.minutes
+                        ) == true
 
-                            if (isAiring) {
-                                animeDetails.durationMins?.let { durationMins ->
+                        if (isAiring) {
+                            animeDetails.durationMins?.let { durationMins ->
+                                item {
                                     AiringCountdown(durationMins, animeDetails.nextEpisodeAt)
                                 }
-                            } else {
-                                animeDetails.nextEpisodeAt?.let { nextEpisodeAt ->
+                            }
+                        } else {
+                            animeDetails.nextEpisodeAt?.let { nextEpisodeAt ->
+                                item {
                                     ShortInfoItem(
                                         infoType = stringResource(R.string.details_short_info_airing_in),
                                         infoItem = nextEpisodeAt.untilNextEpisode()
@@ -239,15 +243,29 @@ fun AnimeDetailsHeader(
                                 }
                             }
                         }
-                    } else if(animeDetails.status == MediaStatus.ANNOUNCED && animeDetails.nextEpisodeAt != null) {
-                        item {
-                            ShortInfoItem(
-                                infoType = stringResource(R.string.details_short_info_airing_on),
-                                infoItem = formatInstant(
-                                    instant = animeDetails.nextEpisodeAt,
-                                    includeDayOfWeek = true
+                    } else if(animeDetails.status == MediaStatus.ANNOUNCED) {
+                        animeDetails.nextEpisodeAt?.let { nextEpisodeAt ->
+                            item {
+                                ShortInfoItem(
+                                    infoType = stringResource(R.string.details_short_info_premiere),
+                                    infoItem = formatInstant(
+                                        instant = nextEpisodeAt,
+                                        includeDayOfWeek = true
+                                    )
                                 )
-                            )
+                            }
+                        } ?: animeDetails.airedOn?.let { airingDate ->
+                            item {
+                                ShortInfoItem(
+                                    infoType = stringResource(R.string.details_short_info_premiere),
+                                    infoItem = determineSeason(airingDate.month)?.let { seasonRes ->
+                                        buildString {
+                                            append(stringResource(id = seasonRes))
+                                            append(" ${airingDate.year}")
+                                        }
+                                    } ?: airingDate.year.toString()
+                                )
+                            }
                         }
                     }
                 }

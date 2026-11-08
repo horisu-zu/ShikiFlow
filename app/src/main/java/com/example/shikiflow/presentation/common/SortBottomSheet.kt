@@ -94,6 +94,7 @@ fun <T : SortType> SortBottomSheet(
 @Composable
 fun TracksSortBottomSheet(
     authType: AuthType,
+    currentFilterType: TracksFilterType,
     tracksFilters: TracksFilters,
     customLists: List<String>,
     config: SortConfig<UserRateType>,
@@ -135,7 +136,7 @@ fun TracksSortBottomSheet(
                         }.map { filterType ->
                             filterType.tabRowItem()
                         },
-                        selectedIndex = tracksFilters.currentFilterType.ordinal,
+                        selectedIndex = currentFilterType.ordinal,
                         onItemSelection = { index ->
                             onFilterTypeChange(TracksFilterType.entries[index])
                         },
@@ -149,7 +150,7 @@ fun TracksSortBottomSheet(
                         items = TracksFilterType.entries.map { filterType ->
                             filterType.tabRowItem()
                         },
-                        selectedIndex = tracksFilters.currentFilterType.ordinal,
+                        selectedIndex = currentFilterType.ordinal,
                         onItemSelection = { index ->
                             onFilterTypeChange(TracksFilterType.entries[index])
                         },
@@ -165,7 +166,7 @@ fun TracksSortBottomSheet(
             }
 
             AnimatedContent(
-                targetState = tracksFilters.currentFilterType,
+                targetState = currentFilterType,
                 transitionSpec = { fadeIn() togetherWith fadeOut() },
                 modifier = Modifier.animateContentSize()
             ) { filterType ->

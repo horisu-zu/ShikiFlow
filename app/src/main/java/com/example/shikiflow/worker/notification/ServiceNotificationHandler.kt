@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.shikiflow.R
 import com.example.shikiflow.domain.repository.NotificationRepository
 import com.example.shikiflow.domain.repository.SettingsRepository
+import com.example.shikiflow.presentation.common.mappers.NotificationMapper.annotatedText
 import com.example.shikiflow.presentation.common.mappers.NotificationMapper.displayValue
 import com.example.shikiflow.presentation.screen.more.notifications.NotificationTypeGroup
 import com.example.shikiflow.utils.notifications.NotificationUtils.showNotification
@@ -33,6 +34,9 @@ class ServiceNotificationHandler @Inject constructor(
         if (notificationPreferences.values.none { it }) return
 
         val resources = context.resources
+        val preferredTitleType = settingsRepository.userSettingsFlow
+            .mapNotNull { it?.preferredTitleType }
+            .first()
         val lastCreatedAt = settingsRepository.notificationSettingsFlow
             .map { it.lastNotificationTimestamp }
             .first()
@@ -55,11 +59,11 @@ class ServiceNotificationHandler @Inject constructor(
                             context.showNotification(
                                 notificationId = 0,
                                 channelId = SERVICE_NOTIFICATION_CHANNEL_ID,
-                                title = resources.getQuantityString(
+                                title = resources.getString(R.string.app_name),
+                                text = resources.getQuantityString(
                                     R.plurals.service_notifications_group_label,
                                     filteredData.size
                                 ),
-                                text = "",
                                 group = SERVICE_NOTIFICATION_GROUP_ID,
                                 isGroupSummary = true
                             )
@@ -71,7 +75,10 @@ class ServiceNotificationHandler @Inject constructor(
                                 channelId = SERVICE_NOTIFICATION_CHANNEL_ID,
                                 group = SERVICE_NOTIFICATION_GROUP_ID,
                                 title = resources.getString(notification.type.displayValue()),
-                                text = ""
+                                text = notification.annotatedText(
+                                    resources = resources,
+                                    titleType = preferredTitleType
+                                ).toString()
                             )
                         }
 

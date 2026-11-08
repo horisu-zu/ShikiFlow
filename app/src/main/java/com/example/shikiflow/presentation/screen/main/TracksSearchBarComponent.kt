@@ -112,10 +112,8 @@ fun TracksSearchBarComponent(
         )
     }
 
-    LaunchedEffect(trackItems.loadState) {
-        if(trackItems.loadState.refresh is LoadState.NotLoading) {
-            lazyGridState.animateScrollToItem(0)
-        }
+    LaunchedEffect(tracksParams.filters) {
+        lazyGridState.animateScrollToItem(0)
     }
 
     Scaffold(
@@ -325,6 +323,7 @@ fun TracksSearchBarComponent(
                     TracksSortBottomSheet(
                         authType = tracksParams.authType!!,
                         tracksFilters = tracksParams.filters,
+                        currentFilterType = tracksParams.currentFilterType,
                         customLists = tracksParams.customLists[mediaType] ?: emptyList(),
                         config = SortConfig(
                             options = UserRateType.entries,

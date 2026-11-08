@@ -178,6 +178,9 @@ fragment ALCurrentUser on User {
             customLists
         }
     }
+    options {
+        notificationOptions { ...ALNotificationOption }
+    }
     unreadNotificationCount
 }
 

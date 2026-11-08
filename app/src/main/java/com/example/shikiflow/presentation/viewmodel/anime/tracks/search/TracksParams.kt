@@ -15,6 +15,7 @@ data class TracksParams(
     val authType: AuthType? = null,
     val filters: TracksFilters = TracksFilters(),
     val scoreFormat: ScoreFormat = ScoreFormat.POINT_10,
+    val currentFilterType: TracksFilterType = TracksFilterType.SORT,
     val customLists: Map<MediaType, List<String>> = emptyMap()
 )
 
@@ -26,7 +27,6 @@ data class TracksFilters(
         type = UserRateType.UPDATED_AT,
         direction = SortDirection.DESCENDING
     ),
-    val currentFilterType: TracksFilterType = TracksFilterType.SORT,
     val genres: List<Genre> = emptyList(),
     val tags: List<MediaTagEnum> = emptyList(),
     val customLists: Map<MediaType, List<String>> = emptyMap()
@@ -36,9 +36,9 @@ data class TracksFilters(
             val filters = TracksFilters()
 
             return query == filters.query &&
-                    genres == filters.genres &&
-                    tags == filters.tags &&
-                    customLists == filters.customLists
+                genres == filters.genres &&
+                tags == filters.tags &&
+                customLists == filters.customLists
         }
     }
 }
