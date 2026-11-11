@@ -87,7 +87,7 @@ class AiringNotificationHandler @Inject constructor(
 
             WorkManager.getInstance(context).enqueueUniqueWork(
                 uniqueWorkName = "airing_episode_notification_${media.id}_$episode",
-                existingWorkPolicy = ExistingWorkPolicy.KEEP,
+                existingWorkPolicy = ExistingWorkPolicy.REPLACE,
                 request = request
             )
         }

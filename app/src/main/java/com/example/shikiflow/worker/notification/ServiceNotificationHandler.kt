@@ -43,51 +43,53 @@ class ServiceNotificationHandler @Inject constructor(
 
         when (val result = notificationRepository.getUnreadNotificationsCount()) {
             is DataResult.Success -> {
-                notificationRepository.getNotifications(
-                    page = 1,
-                    perPage = result.data,
-                    typeGroup = NotificationTypeGroup.ALL,
-                    resetCount = false
-                ).fold(
-                    onSuccess = { data ->
-                        val filteredData = data.filter { notification ->
-                            notification.type in notificationPreferences.filter { it.value } &&
-                            notification.createdAt > lastCreatedAt
-                        }
+                if (result.data > 0) {
+                    notificationRepository.getNotifications(
+                        page = 1,
+                        perPage = result.data,
+                        typeGroup = NotificationTypeGroup.ALL,
+                        resetCount = false
+                    ).fold(
+                        onSuccess = { data ->
+                            val filteredData = data.filter { notification ->
+                                notification.type in notificationPreferences.filter { it.value } &&
+                                notification.createdAt > lastCreatedAt
+                            }
 
-                        if (filteredData.size > 1) {
-                            context.showNotification(
-                                notificationId = 0,
-                                channelId = SERVICE_NOTIFICATION_CHANNEL_ID,
-                                title = resources.getString(R.string.app_name),
-                                text = resources.getQuantityString(
-                                    R.plurals.service_notifications_group_label,
-                                    filteredData.size
-                                ),
-                                group = SERVICE_NOTIFICATION_GROUP_ID,
-                                isGroupSummary = true
+                            if (filteredData.size > 1) {
+                                context.showNotification(
+                                    notificationId = 0,
+                                    channelId = SERVICE_NOTIFICATION_CHANNEL_ID,
+                                    title = resources.getString(R.string.app_name),
+                                    text = resources.getQuantityString(
+                                        R.plurals.service_notifications_group_label,
+                                        filteredData.size
+                                    ),
+                                    group = SERVICE_NOTIFICATION_GROUP_ID,
+                                    isGroupSummary = true
+                                )
+                            }
+
+                            filteredData.forEach { notification ->
+                                context.showNotification(
+                                    notificationId = notification.id,
+                                    channelId = SERVICE_NOTIFICATION_CHANNEL_ID,
+                                    group = SERVICE_NOTIFICATION_GROUP_ID,
+                                    title = resources.getString(notification.type.displayValue()),
+                                    text = notification.annotatedText(
+                                        resources = resources,
+                                        titleType = preferredTitleType
+                                    ).toString()
+                                )
+                            }
+
+                            settingsRepository.saveNotificationTimestamp(
+                                instant = data.first().createdAt
                             )
-                        }
-
-                        filteredData.forEach { notification ->
-                            context.showNotification(
-                                notificationId = notification.id,
-                                channelId = SERVICE_NOTIFICATION_CHANNEL_ID,
-                                group = SERVICE_NOTIFICATION_GROUP_ID,
-                                title = resources.getString(notification.type.displayValue()),
-                                text = notification.annotatedText(
-                                    resources = resources,
-                                    titleType = preferredTitleType
-                                ).toString()
-                            )
-                        }
-
-                        settingsRepository.saveNotificationTimestamp(
-                            instant = data.first().createdAt
-                        )
-                    },
-                    onFailure = { throwable -> throw IllegalStateException(throwable) }
-                )
+                        },
+                        onFailure = { throwable -> throw IllegalStateException(throwable) }
+                    )
+                }
             }
             is DataResult.Error -> { throw IllegalStateException(result.message) }
             else -> { /**/ }
