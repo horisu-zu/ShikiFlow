@@ -208,7 +208,9 @@
     <string name="release_notes_install_update">Установить обновление</string>
     <string name="profile_screen_empty">Профиль %1$s пуст</string>
     <string name="more_profile_compare">Сравнить</string>
-    <string name="activity_planned">Запланировано</string>
+
+    <string name="activity_planned_watch">Планирует посмотреть</string>
+    <string name="activity_planned_read">Планирует прочитать</string>
     <string name="activity_watching">Смотрю</string>
     <plurals name="activity_watching_with_progress">
         <item quantity="one">Просмотрен эпизод %1$s</item>

@@ -207,7 +207,9 @@
     <string name="release_notes_install_update">Встановити оновлення</string>
     <string name="profile_screen_empty">Профіль %1$s пустий</string>
     <string name="more_profile_compare">Порівняти</string>
-    <string name="activity_planned">Заплановано</string>
+
+    <string name="activity_planned_watch">Планує переглянути</string>
+    <string name="activity_planned_read">Планує прочитати</string>
     <string name="activity_watching">Переглядаю</string>
     <plurals name="activity_watching_with_progress">
         <item quantity="one">Переглянуто епізод %1$s</item>
@@ -229,13 +231,13 @@
     <string name="activity_rated">Оцінено на %1$d</string>
     <string name="activity_completed_with_score">Завершено та оцінено на %1$d</string>
     <string name="activity_changed_score">Змінено оцінку з %1$d на %2$d</string>
-    <string name="activity_rewatching">Переглядаю</string>
+    <string name="activity_rewatching">Повторно переглядаю</string>
     <string name="activity_rereading">Перечитую</string>
     <string name="activity_paused_watching">Відкладено перегляд</string>
     <plurals name="activity_paused_watching_with_progress">
         <item quantity="one">Відкладено після епізоду %1$s</item>
-        <item quantity="few">Кинуто після перегляду епізодів %1$s</item>
-        <item quantity="many">Кинуто після перегляду епізодів %1$s</item>
+        <item quantity="few">Відкладено після перегляду епізодів %1$s</item>
+        <item quantity="many">Відкладено після перегляду епізодів %1$s</item>
     </plurals>
     <string name="activity_paused_reading">Відкладено</string>
     <plurals name="activity_paused_reading_with_progress">

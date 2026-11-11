@@ -218,7 +218,9 @@
 
     <string name="profile_screen_empty">%1$s\'s Profile is empty</string>
     <string name="more_profile_compare">Compare</string>
-    <string name="activity_planned">Plans to watch</string>
+
+    <string name="activity_planned_watch">Plans to watch</string>
+    <string name="activity_planned_read">Plans to read</string>
     <string name="activity_watching">Watching</string>
     <plurals name="activity_watching_with_progress">
         <item quantity="one">Watched episode %1$s</item>
@@ -236,7 +238,7 @@
     <string name="activity_completed">Completed</string>
     <string name="activity_rated">Rated %1$d</string>
     <string name="activity_completed_with_score">Completed and rated %1$d</string>
-    <string name="activity_changed_score">Changed Score from %1$d to %2$d</string>
+    <string name="activity_changed_score">Changed score from %1$d to %2$d</string>
     <string name="activity_rewatching">Rewatching</string>
     <string name="activity_rereading">Rereading</string>
     <string name="activity_paused_watching">Paused watching</string>

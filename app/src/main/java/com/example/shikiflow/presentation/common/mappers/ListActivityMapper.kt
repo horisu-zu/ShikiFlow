@@ -54,7 +54,12 @@ object ListActivityMapper {
                             MediaType.MANGA -> resources.getString(R.string.activity_reading)
                         }
                     }
-                    UserRateStatus.PLANNED -> resources.getString(R.string.activity_planned)
+                    UserRateStatus.PLANNED -> {
+                        when(mediaType) {
+                            MediaType.ANIME -> resources.getString(R.string.activity_planned_watch)
+                            MediaType.MANGA -> resources.getString(R.string.activity_planned_read)
+                        }
+                    }
                     UserRateStatus.COMPLETED -> resources.getString(R.string.activity_completed)
                     UserRateStatus.REWATCHING -> {
                         when(mediaType) {
@@ -80,7 +85,6 @@ object ListActivityMapper {
                             MediaType.MANGA -> resources.getQuantityString(R.plurals.activity_reading_with_progress, count, progressText)
                         }
                     }
-                    UserRateStatus.PLANNED -> resources.getString(R.string.activity_planned)
                     UserRateStatus.PAUSED -> {
                         when(mediaType) {
                             MediaType.ANIME -> resources.getQuantityString(R.plurals.activity_paused_watching_with_progress, count, progressText)
