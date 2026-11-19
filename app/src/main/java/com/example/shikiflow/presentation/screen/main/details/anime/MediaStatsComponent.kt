@@ -108,6 +108,7 @@ private fun ColumnMediaStats(
                 modifier = Modifier
             )
         }
+
         if(statusesStats.isNotEmpty()) {
             StatusesStatsComponent(
                 mediaType = mediaType,
@@ -184,9 +185,10 @@ private fun ScoreStatsComponent(
                 append("★")
             }
         )
+
         VerticalBarsChart(
             barData = scoreStats.map {
-                Stat<String>(
+                Stat(
                     type = it.type.toString(),
                     value = it.value
                 )
@@ -218,6 +220,7 @@ private fun StatusesStatsComponent(
         TextWithDivider(
             text = stringResource(R.string.details_info_statuses_stats)
         )
+
         Box(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))

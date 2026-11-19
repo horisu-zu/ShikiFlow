@@ -35,7 +35,6 @@ fun Section(
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp))
             .background(backgroundColor)
     ) {
@@ -49,19 +48,22 @@ fun Section(
                 overflow = TextOverflow.Ellipsis
             )
         }
+
         items.forEachIndexed { _, item ->
             when (item) {
                 is SectionItem.Expanded -> ExpandedItem(
                     avatar = item.avatar,
                     title = item.title,
                     subtitle = item.subtitle,
-                    onClick = item.onClick
+                    onClick = item.onClick,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 is SectionItem.General -> GeneralItem(
                     icon = item.icon,
                     title = item.title,
                     subtitle = item.subtitle,
-                    onClick = item.onClick
+                    onClick = item.onClick,
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }
@@ -73,11 +75,11 @@ fun ExpandedItem(
     avatar: String,
     title: String,
     subtitle: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
@@ -89,6 +91,7 @@ fun ExpandedItem(
             imageType = ImageType.Square(),
             modifier = Modifier.size(56.dp)
         )
+
         Column {
             Text(
                 text = title,
@@ -112,12 +115,12 @@ fun ExpandedItem(
 fun GeneralItem(
     icon: IconResource,
     title: String,
-    subtitle: String? = null,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
+        modifier = modifier
             .clickable(onClick = onClick)
             .padding(horizontal = 16.dp, vertical = 12.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.Start),
@@ -127,6 +130,7 @@ fun GeneralItem(
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.onSurface
         )
+
         Column(
             verticalArrangement = Arrangement.spacedBy(2.dp, Alignment.Top)
         ) {

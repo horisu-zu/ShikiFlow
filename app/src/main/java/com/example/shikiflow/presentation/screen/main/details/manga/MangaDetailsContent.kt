@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -314,10 +313,6 @@ fun MangaDetailsContent(
         }
 
         item {
-            HorizontalDivider()
-        }
-
-        item {
             MediaDetailsNavComponent(
                 authType = authType,
                 onThreadsClick = {
@@ -334,10 +329,6 @@ fun MangaDetailsContent(
                     mediaNavOptions.navigateToLinksPage(mangaDetails.id, mangaDetails.mediaType)
                 }
             )
-        }
-
-        item {
-            HorizontalDivider()
         }
 
         if(mangaDetails.reviews.entries.isNotEmpty()) {

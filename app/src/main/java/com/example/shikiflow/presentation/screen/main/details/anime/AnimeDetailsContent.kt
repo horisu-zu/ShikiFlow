@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -341,10 +340,6 @@ fun AnimeDetailsContent(
         }
 
         item {
-            HorizontalDivider()
-        }
-
-        item {
             MediaDetailsNavComponent(
                 authType = currentAuthType,
                 onThreadsClick = {
@@ -363,11 +358,7 @@ fun AnimeDetailsContent(
             )
         }
 
-        item {
-            HorizontalDivider()
-        }
-
-        if(animeDetails.reviews.entries.isNotEmpty()) {
+        if (animeDetails.reviews.entries.isNotEmpty()) {
             item {
                 ReviewsSection(
                     reviewsList = animeDetails.reviews,
@@ -382,7 +373,7 @@ fun AnimeDetailsContent(
             }
         }
 
-        if(animeDetails.mediaFollowings.entries.isNotEmpty()) {
+        if (animeDetails.mediaFollowings.entries.isNotEmpty()) {
             item {
                 MediaFollowingsSection(
                     mediaFollowings = animeDetails.mediaFollowings,
@@ -397,14 +388,16 @@ fun AnimeDetailsContent(
             }
         }
 
-        item {
-            MediaStatsComponent(
-                mediaType = animeDetails.mediaType,
-                isAnnounced = animeDetails.status == MediaStatus.ANNOUNCED,
-                titleScore = animeDetails.score,
-                scoreStats = animeDetails.scoreStats,
-                statusesStats = animeDetails.statusesStats
-            )
+        if (animeDetails.scoreStats.isNotEmpty() && animeDetails.statusesStats.isNotEmpty()) {
+            item {
+                MediaStatsComponent(
+                    mediaType = animeDetails.mediaType,
+                    isAnnounced = animeDetails.status == MediaStatus.ANNOUNCED,
+                    titleScore = animeDetails.score,
+                    scoreStats = animeDetails.scoreStats,
+                    statusesStats = animeDetails.statusesStats
+                )
+            }
         }
 
         animeDetails.threadId?.let { threadId ->

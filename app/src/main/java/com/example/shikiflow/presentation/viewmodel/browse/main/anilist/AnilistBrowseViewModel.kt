@@ -52,7 +52,7 @@ class AnilistBrowseViewModel @Inject constructor(
                 (section?.browseMedia.isNullOrEmpty() && section?.errorMessage == null) ||
                 section.isRefreshing
             }
-            .distinctUntilChanged { old, new ->
+            .distinctUntilChanged { _, new ->
                 new.sections[browseType]?.isRefreshing == false
             }
             .flatMapLatest { state ->

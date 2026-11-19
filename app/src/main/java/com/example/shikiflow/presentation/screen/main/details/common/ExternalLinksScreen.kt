@@ -128,6 +128,7 @@ private fun LinkItem(
             link.icon?.let { siteIcon ->
                 BaseImage(
                     model = siteIcon,
+                    tint = MaterialTheme.colorScheme.onSurface,
                     imageType = ImageType.Custom(
                         aspectRatio = 1f,
                         width = 24.dp,

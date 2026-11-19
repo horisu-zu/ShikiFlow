@@ -38,7 +38,7 @@ Kotlin - Jetpack Compose - MVVM - Hilt - Room - GraphQL (Apollo) - Coil - ExoPla
   </tr>
   <tr>
     <th>Shikimori Browse Main</th>
-    <th>Compare User Rate</th>
+    <th>Track Comparison</th>
     <th>Shikimori Profile</th>
   </tr>
 </table>

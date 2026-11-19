@@ -98,7 +98,7 @@ class CompareScreenViewModel @Inject constructor(
                 }
                 .distinctUntilChanged { old, new ->
                     old.targetUserId == new.targetUserId &&
-                        new.mediaUiState[new.mediaType!!]?.isRefreshing == false
+                    new.mediaUiState[new.mediaType!!]?.isRefreshing == false
                 }
                 .flatMapLatest { state ->
                     groupUserRatesUseCase(

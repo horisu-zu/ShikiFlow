@@ -29,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -52,6 +54,7 @@ fun BaseImage(
     contentDescription: String? = null,
     imageType: ImageType = ImageType.Poster(),
     onClick: (() -> Unit)? = null,
+    tint: Color? = null,
     error: @Composable () -> Unit = {
         BaseImage(
             model = BuildConfig.SHIKI_MISSING_IMAGE_URL,
@@ -73,6 +76,7 @@ fun BaseImage(
             .build(),
         contentDescription = contentDescription,
         contentScale = contentScale,
+        colorFilter = tint?.let { ColorFilter.tint(color = tint) },
         modifier = modifier
             .then(
                 if(imageType.width == Dp.Unspecified) Modifier.fillMaxWidth()

@@ -1,9 +1,11 @@
 package com.example.shikiflow.presentation.screen.main.details.anime
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,18 +35,29 @@ fun MediaDetailsNavComponent(
             GeneralItem(
                 icon = IconResource.Drawable(resId = R.drawable.ic_thread),
                 title = stringResource(R.string.details_info_threads),
-                onClick = { onThreadsClick() }
+                onClick = { onThreadsClick() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.surfaceContainerHigh)
             )
         }
+
         GeneralItem(
             icon = IconResource.Drawable(resId = R.drawable.ic_intersection),
             title = stringResource(R.string.details_info_recommendations),
-            onClick = { onSimilarClick() }
+            onClick = { onSimilarClick() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
         )
+
         GeneralItem(
             icon = IconResource.Drawable(resId = R.drawable.ic_link),
             title = stringResource(R.string.details_info_links),
-            onClick = { onExternalLinksClick() }
+            onClick = { onExternalLinksClick() },
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
         )
     }
 }
