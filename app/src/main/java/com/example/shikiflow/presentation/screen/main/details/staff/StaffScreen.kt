@@ -43,8 +43,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -101,7 +99,6 @@ import com.example.shikiflow.presentation.screen.main.LocalTitleTypeController
 import com.example.shikiflow.utils.Converter.format
 import com.example.shikiflow.utils.Converter.isHTMLStringBlank
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaffScreen(
     staffId: Int,
@@ -340,7 +337,6 @@ fun StaffScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun StaffTitleSection(
     avatarUrl: String?,

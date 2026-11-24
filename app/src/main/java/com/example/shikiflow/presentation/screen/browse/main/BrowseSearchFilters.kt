@@ -235,6 +235,7 @@ fun BrowseSearchFilters(
                             itemLabel = { stringResource(it.displayValue()) }
                         )
                     }
+
                     item {
                         ChipWithMenu(
                             title = {
@@ -293,7 +294,6 @@ fun BrowseSearchFilters(
                     exit = fadeOut() + shrinkVertically()
                 ) {
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(bottom = 12.dp)
                     ) {
@@ -315,7 +315,7 @@ fun BrowseSearchFilters(
                                         searchOptions.copy(
                                             season = MediaSeason(
                                                 seasonEnum = if (searchOptions.season?.seasonEnum == season) null
-                                                else season,
+                                                    else season,
                                                 year = searchOptions.season?.year
                                             )
                                         )
@@ -336,7 +336,8 @@ fun BrowseSearchFilters(
                                                 modifier = Modifier.size(20.dp)
                                             )
                                     }
-                                } else { null }
+                                } else { null },
+                                modifier = Modifier.padding(end = 8.dp)
                             )
                         }
 
@@ -349,11 +350,14 @@ fun BrowseSearchFilters(
                             values = DateUtils.seasonYears(),
                             selectedValue = searchOptions.season?.year,
                             onValueSelected = { year ->
+                                val selectedYear = searchOptions.season?.year == year
+
                                 event.updateSearchOptions(
                                     searchOptions.copy(
                                         season = MediaSeason(
-                                            seasonEnum = searchOptions.season?.seasonEnum,
-                                            year = if (searchOptions.season?.year == year) null
+                                            seasonEnum = if (selectedYear && authType == AuthType.SHIKIMORI) null
+                                                else searchOptions.season?.seasonEnum,
+                                            year = if (selectedYear) null
                                                 else year
                                         )
                                     )
@@ -394,6 +398,7 @@ fun BrowseSearchFilters(
                             )
                         }
                     }
+
                     if (searchOptions.tags.isNotEmpty()) {
                         items(searchOptions.tags.size) { index ->
                             val selectedTag = searchOptions.tags[index]
@@ -416,6 +421,7 @@ fun BrowseSearchFilters(
                             )
                         }
                     }
+
                     item {
                         FilterChip(
                             selected = false,

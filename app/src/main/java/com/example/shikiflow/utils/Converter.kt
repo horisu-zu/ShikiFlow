@@ -12,6 +12,10 @@ import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import kotlin.time.Clock
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Instant
 
 object Converter {
@@ -63,29 +67,27 @@ object Converter {
         return DateTimeFormatter.ofPattern(pattern, Locale.getDefault()).format(safeDate)
     }
 
-    fun convertInstantToString(resources: Resources, instant: Instant): String {
-        val currentTimeInstant = Clock.System.now()
-        val duration = currentTimeInstant - instant
-        val diffMillis = duration.inWholeMilliseconds
+    fun convertInstantToString(
+        resources: Resources,
+        instant: Instant,
+        now: Instant = Clock.System.now(),
+    ): String {
+        val duration = (now - instant).coerceAtLeast(Duration.ZERO)
 
         return when {
-            diffMillis < 60000 -> {
-                val seconds = duration.inWholeSeconds
-                resources.getQuantityString(R.plurals.seconds_ago, seconds.toInt(), seconds)
+            duration < 1.minutes -> {
+                val seconds = duration.inWholeSeconds.toInt()
+                resources.getQuantityString(R.plurals.seconds_ago, seconds, seconds)
             }
-            diffMillis < 3600000 -> {
-                val minutes = duration.inWholeMinutes
-                resources.getQuantityString(R.plurals.minutes_ago, minutes.toInt(), minutes)
+            duration < 1.hours -> {
+                val minutes = duration.inWholeMinutes.toInt()
+                resources.getQuantityString(R.plurals.minutes_ago, minutes, minutes)
             }
-            diffMillis < 86400000 -> {
-                val hours = duration.inWholeHours
-                resources.getQuantityString(R.plurals.hours_ago, hours.toInt(), hours)
+            duration < 1.days -> {
+                val hours = duration.inWholeHours.toInt()
+                resources.getQuantityString(R.plurals.hours_ago, hours, hours)
             }
-            else -> {
-                val date = Date(instant.toEpochMilliseconds())
-                val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
-                formatter.format(date)
-            }
+            else -> formatInstant(instant, includeTime = true)
         }
     }
 

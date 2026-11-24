@@ -402,6 +402,7 @@ private fun SortItem(
             selected = isSelected,
             onClick = { onSortClick() }
         )
+
         Text(
             text = stringResource(id = sortType.displayValue()),
             style = MaterialTheme.typography.bodyMedium

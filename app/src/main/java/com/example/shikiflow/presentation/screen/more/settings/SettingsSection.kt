@@ -168,10 +168,10 @@ fun SettingsSection(
                     AnimatedVisibility(item.isVisible) {
                         ModeItem(
                             title = item.title,
+                            displayValue = item.displayValue,
                             entries = item.entries,
                             iconResources = item.iconResources,
                             weights = item.weights,
-                            mode = item.mode,
                             onClick = item.onClick,
                             modifier = itemModifier
                         )
@@ -531,8 +531,8 @@ private fun RangeSliderItem(
 @Composable
 private fun <T> ModeItem(
     title: String,
+    displayValue: T,
     entries: List<T>,
-    mode: T,
     onClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     iconResources: List<IconResource> = emptyList(),
@@ -559,7 +559,7 @@ private fun <T> ModeItem(
 
                 ModeRowItem(
                     entry = entry.toString(),
-                    isCurrentMode = mode == entry,
+                    isCurrentMode = displayValue == entry,
                     onClick = { onClick(index) },
                     modifier = Modifier.weight(entryWeight),
                     iconResource = iconResources.getOrNull(entries.indexOf(entry))

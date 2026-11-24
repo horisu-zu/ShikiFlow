@@ -162,7 +162,7 @@ fun SettingsScreen(
                     items = listOf(
                         SectionItem.Mode(
                             title = stringResource(R.string.settings_dynamic_theme_label),
-                            mode = when (themeSettings.isDynamicThemeEnabled) {
+                            displayValue = when (themeSettings.isDynamicThemeEnabled) {
                                 true -> stringResource(R.string.settings_enabled)
                                 false -> stringResource(R.string.settings_disabled)
                             },
@@ -191,7 +191,7 @@ fun SettingsScreen(
                         ),
                         SectionItem.Mode(
                             title = stringResource(R.string.settings_app_theme_label),
-                            mode = stringResource(themeSettings.themeMode.displayValue()),
+                            displayValue = stringResource(themeSettings.themeMode.displayValue()),
                             entries = ThemeMode.entries.map { stringResource(it.displayValue()) },
                             iconResources = ThemeMode.entries.map { it.iconResource() },
                             weights = listOf(3f, 2f, 2f),
@@ -464,7 +464,7 @@ fun SettingsScreen(
                     items = listOf(
                         SectionItem.Mode(
                             title = stringResource(R.string.settings_chapter_ui_mode),
-                            mode = stringResource(settingsState.mangaSettings.chapterUIMode.displayValue()),
+                            displayValue = stringResource(settingsState.mangaSettings.chapterUIMode.displayValue()),
                             entries = ChapterUIMode.entries.map { stringResource(it.displayValue()) },
                             iconResources = ChapterUIMode.entries.map { it.iconResource() },
                             onClick = { index ->
