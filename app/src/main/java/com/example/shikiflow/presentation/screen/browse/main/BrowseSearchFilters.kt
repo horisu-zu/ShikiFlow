@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -373,56 +374,58 @@ fun BrowseSearchFilters(
                         .ignoreHorizontalParentPadding(horizontalPadding)
                         .fillMaxWidth(),
                     contentPadding = PaddingValues(horizontal = horizontalPadding),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (searchOptions.genres.isNotEmpty()) {
-                        items(searchOptions.genres.size) { index ->
-                            val selectedGenre = searchOptions.genres[index]
-
-                            FilterChip(
-                                selected = true,
-                                onClick = {
-                                    event.updateSearchOptions(
-                                        searchOptions.copy(
-                                            genres = searchOptions.genres - selectedGenre
-                                        )
+                    items(
+                        items = searchOptions.genres,
+                        key = { genre -> "genre_${genre.name}" }
+                    ) { selectedGenre ->
+                        FilterChip(
+                            selected = true,
+                            onClick = {
+                                event.updateSearchOptions(
+                                    searchOptions.copy(
+                                        genres = searchOptions.genres - selectedGenre
                                     )
-                                },
-                                label = {
-                                    Text(
-                                        stringResource(selectedGenre.displayValue())
-                                    )
-                                },
-                                modifier = Modifier.height(32.dp)
-                            )
-                        }
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(selectedGenre.displayValue())
+                                )
+                            },
+                            modifier = Modifier
+                                .height(32.dp)
+                                .animateItem()
+                        )
                     }
 
-                    if (searchOptions.tags.isNotEmpty()) {
-                        items(searchOptions.tags.size) { index ->
-                            val selectedTag = searchOptions.tags[index]
-
-                            FilterChip(
-                                selected = true,
-                                onClick = {
-                                    event.updateSearchOptions(
-                                        browseOptions = searchOptions.copy(
-                                            tags = searchOptions.tags - selectedTag
-                                        )
+                    items(
+                        items = searchOptions.tags,
+                        key = { tag -> "tag_${tag.name}" }
+                    ) { selectedTag ->
+                        FilterChip(
+                            selected = true,
+                            onClick = {
+                                event.updateSearchOptions(
+                                    browseOptions = searchOptions.copy(
+                                        tags = searchOptions.tags - selectedTag
                                     )
-                                },
-                                label = {
-                                    Text(
-                                        stringResource(selectedTag.displayValue())
-                                    )
-                                },
-                                modifier = Modifier.height(32.dp)
-                            )
-                        }
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(selectedTag.displayValue())
+                                )
+                            },
+                            modifier = Modifier
+                                .height(32.dp)
+                                .animateItem()
+                        )
                     }
 
-                    item {
+                    item(key = "add_genre") {
                         FilterChip(
                             selected = false,
                             onClick = { showGenreBottomSheet.value = true },
@@ -434,7 +437,9 @@ fun BrowseSearchFilters(
                                     contentDescription = null
                                 )
                             },
-                            modifier = Modifier.height(32.dp)
+                            modifier = Modifier
+                                .height(32.dp)
+                                .animateItem()
                         )
                     }
                 }
