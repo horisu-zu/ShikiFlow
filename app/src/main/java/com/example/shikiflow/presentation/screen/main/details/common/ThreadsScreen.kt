@@ -356,6 +356,7 @@ private fun ShortUserItem(
                 shape = RoundedCornerShape(4.dp)
             )
         )
+
         Text(
             text = buildString {
                 append(userData.nickname)
@@ -389,6 +390,7 @@ fun ThreadStatsItem(
             iconResources = listOf(IconResource.Drawable(resId = R.drawable.ic_eye_filled)),
             style = textStyle
         )
+
         TextWithIcon(
             text = replyCount.toString(),
             iconResources = listOf(IconResource.Drawable(resId = R.drawable.ic_bubble_filled)),

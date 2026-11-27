@@ -3,6 +3,7 @@ package com.example.shikiflow.presentation.screen.more.settings
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.spring
@@ -35,6 +36,7 @@ import androidx.compose.material3.rememberRangeSliderState
 import androidx.compose.material3.rememberSliderState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -577,14 +579,22 @@ private fun ModeRowItem(
     modifier: Modifier = Modifier,
     iconResource: IconResource? = null,
 ) {
+    val color by animateColorAsState(
+        targetValue = when(isCurrentMode) {
+            true -> MaterialTheme.colorScheme.primary
+            false -> MaterialTheme.colorScheme.background
+        },
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioNoBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        )
+    )
+
     Column(
         modifier = modifier
             .clip(RoundedCornerShape(12.dp))
             .clickable { onClick(entry) }
-            .background(
-                color = if (isCurrentMode) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.background
-            )
+            .background(color = color)
             .then(
                 other = if (!isCurrentMode) {
                     Modifier.border(

@@ -427,7 +427,8 @@ fun SettingsScreen(
                             title = stringResource(R.string.settings_notifications_preferences_label),
                             displayValue = stringResource(R.string.settings_notifications_preferences_description),
                             onClick = { showNotificationsBottomSheet.value = true },
-                            isVisible = settingsState.notificationSettings.showNotifications
+                            isVisible = settingsState.notificationSettings.showNotifications &&
+                                settingsState.authType == AuthType.ANILIST
                         )
                     )
                 )
